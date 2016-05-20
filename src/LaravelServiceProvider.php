@@ -14,6 +14,7 @@ class LaravelServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([__DIR__ . '/../config/config.php' => config_path('relay.php')]);
+        $this->registerNodes();
         $this->registerSchema();
     }
 
@@ -27,6 +28,17 @@ class LaravelServiceProvider extends ServiceProvider
         $this->app->singleton('graphql', function ($app) {
             return new GraphQL($app);
         });
+    }
+
+    /**
+     * Register node type and query.
+     *
+     * @return void
+     */
+    protected function registerNodes()
+    {
+        $graphql = app('graphql');
+        $graphql->type('node', \Nuwave\Relay\Support\Node\NodeType::class);
     }
 
     /**

@@ -16,15 +16,18 @@ class GraphQLConfigTest extends TestCase
     {
         $app['config']->set('relay.schema.register', function () {
             $graphql = app('graphql');
-            $graphql->type('foo', 'bar');
+            $graphql->addType('foo', 'bar');
+            $graphql->addQuery('bar', 'baz');
         });
     }
 
     /**
      * @test
      */
-    public function itCanRegisterTypesWithConfig()
+    public function itCanRegisterWithConfig()
     {
-        $this->assertEquals(app('graphql')->getType('bar'), 'foo');
+        $graphql = app('graphql');
+        $this->assertEquals('foo', $graphql->getType('bar'));
+        $this->assertEquals('bar', $graphql->getQuery('baz'));
     }
 }

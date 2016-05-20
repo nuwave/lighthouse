@@ -1,3 +1,4 @@
 <?php
 
-GraphQL::type('bar', 'foo');
+GraphQL::addType('bar', 'foo');
+GraphQL::addQuery('baz', 'bar');

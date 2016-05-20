@@ -23,5 +23,6 @@ class GraphQLFileConfigTest extends TestCase
     public function itCanRegisterTypesWithSchemaFile()
     {
         $this->assertEquals(app('graphql')->getType('foo'), 'bar');
+        $this->assertEquals(app('graphql')->getQuery('bar'), 'baz');
     }
 }
