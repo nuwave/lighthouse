@@ -24,5 +24,6 @@ class GraphQLFileConfigTest extends TestCase
     {
         $this->assertEquals(app('graphql')->getType('foo'), 'bar');
         $this->assertEquals(app('graphql')->getQuery('bar'), 'baz');
+        $this->assertEquals(app('graphql')->getMutation('baz'), 'foo');
     }
 }

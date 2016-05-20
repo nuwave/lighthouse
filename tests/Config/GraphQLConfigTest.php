@@ -18,6 +18,7 @@ class GraphQLConfigTest extends TestCase
             $graphql = app('graphql');
             $graphql->addType('foo', 'bar');
             $graphql->addQuery('bar', 'baz');
+            $graphql->addMutation('bar', 'foo');
         });
     }
 
@@ -29,5 +30,6 @@ class GraphQLConfigTest extends TestCase
         $graphql = app('graphql');
         $this->assertEquals('foo', $graphql->getType('bar'));
         $this->assertEquals('bar', $graphql->getQuery('baz'));
+        $this->assertEquals('bar', $graphql->getMutation('foo'));
     }
 }

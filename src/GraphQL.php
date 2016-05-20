@@ -4,10 +4,13 @@ namespace Nuwave\Relay;
 
 use Nuwave\Relay\Support\Traits\Container\TypeRegistrar;
 use Nuwave\Relay\Support\Traits\Container\QueryRegistrar;
+use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
 
 class GraphQL
 {
-    use TypeRegistrar, QueryRegistrar;
+    use TypeRegistrar,
+        QueryRegistrar,
+         MutationRegistrar;
 
     /**
      * Instance of application.
