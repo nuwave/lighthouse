@@ -6,11 +6,16 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "4.*"
+        "phpunit/phpunit": "4.*",
+        "orchestra/testbench": "^3.2"
     },
     "autoload-dev": {
         "psr-4": {
             "Nuwave\\Relay\\Tests\\": "tests/"
         }
+    },
+    "require": {
+        "webonyx/graphql-php": "^0.6.2",
+        "illuminate/support": "^5.2"
     }
 }
