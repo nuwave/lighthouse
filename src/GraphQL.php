@@ -52,6 +52,18 @@ class GraphQL
     }
 
     /**
+     * Add new type to collection.
+     *
+     * @param mixed $class
+     * @param string|null $name
+     * @return void
+     */
+    public function type($class, $name = null)
+    {
+        return $this->addType($class, $name);
+    }
+
+    /**
      * Get collection of registered types.
      *
      * @return \Illuminate\Support\Collection

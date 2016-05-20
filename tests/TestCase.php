@@ -30,7 +30,7 @@ class TestCase extends BaseTestCase
     protected function getPackageAliases($app)
     {
         return [
-            'GraphQL' => \Nuwave\Support\Facades\GraphQLFacade::class,
+            'GraphQL' => \Nuwave\Relay\Support\Facades\GraphQLFacade::class,
         ];
     }
 }

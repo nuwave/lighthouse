@@ -13,7 +13,8 @@ class LaravelServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->publishes([__DIR__ . '/../config/config.php' => config_path('relay.php')]);
+        $this->registerSchema();
     }
 
     /**
@@ -26,5 +27,21 @@ class LaravelServiceProvider extends ServiceProvider
         $this->app->singleton('graphql', function ($app) {
             return new GraphQL($app);
         });
+    }
+
+    /**
+     * Register schema w/ container.
+     *
+     * @return void
+     */
+    protected function registerSchema()
+    {
+        $schema = $this->app['config']->get('relay.schema.register');
+
+        if (is_callable($schema)) {
+            $schema();
+        } elseif (is_string($schema)) {
+            require_once $schema;
+        }
     }
 }

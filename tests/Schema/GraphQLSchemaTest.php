@@ -1,9 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Tests;
+namespace Nuwave\Relay\Tests\Schema;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Relay\Tests\TestCase;
 
 class GraphQLSchemaTest extends TestCase
 {
