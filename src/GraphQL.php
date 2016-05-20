@@ -2,6 +2,8 @@
 
 namespace Nuwave\Relay;
 
+use Illuminate\Support\Arr;
+
 class GraphQL
 {
     /**
@@ -33,9 +35,39 @@ class GraphQL
      *
      * @param mixed $class
      * @param string|null $name
+     * @return void
      */
     public function addType($class, $name = null)
     {
-        return 'foo';
+        if (!$name) {
+            $type = is_object($class) ? $class : app($class);
+            $name = $type->name;
+        }
+
+        $this->types = array_merge($this->types, [
+            $name => $class
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Get collection of registered types.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function types()
+    {
+        return $this->getTypes();
+    }
+
+    /**
+     * Get collection of types.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getTypes()
+    {
+        return collect($this->types);
     }
 }
