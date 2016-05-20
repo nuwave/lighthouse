@@ -6,7 +6,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Relay\Tests\TestCase;
 
-class GraphQLSchemaTest extends TestCase
+class TypeTest extends TestCase
 {
     /**
      * @test
@@ -17,8 +17,7 @@ class GraphQLSchemaTest extends TestCase
 
         $graphql->addType('foo', 'bar');
 
-        $this->assertCount(1, $graphql->types());
-        $this->assertEquals($graphql->types()->get('bar'), 'foo');
+        $this->assertEquals($graphql->getType('bar'), 'foo');
     }
 
     /**
@@ -45,7 +44,6 @@ class GraphQLSchemaTest extends TestCase
 
         $graphql->addType($type);
 
-        $this->assertCount(1, $graphql->types());
-        $this->assertEquals($graphql->types()->get('Human'), $type);
+        $this->assertEquals($graphql->getType('Human'), $type);
     }
 }

@@ -25,6 +25,6 @@ class GraphQLConfigTest extends TestCase
      */
     public function itCanRegisterTypesWithConfig()
     {
-        $this->assertEquals(app('graphql')->types()->get('bar'), 'foo');
+        $this->assertEquals(app('graphql')->getType('bar'), 'foo');
     }
 }

@@ -64,13 +64,13 @@ class GraphQL
     }
 
     /**
-     * Get collection of registered types.
+     * Get registered type.
      *
-     * @return \Illuminate\Support\Collection
+     * @return mixed
      */
-    public function types()
+    public function getType($type)
     {
-        return $this->getTypes();
+        return $this->getTypes()->get($type);
     }
 
     /**
