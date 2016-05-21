@@ -16,4 +16,8 @@
             <directory suffix=".php">./tests/</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <!-- Strong Password Generator (https://strongpasswordgenerator.com/) -->
+        <env name="APP_KEY" value="O4JYm19Y7qXbllmw5zng88a4MlUmW0uq" />
+    </php>
 </phpunit>

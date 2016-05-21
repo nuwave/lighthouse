@@ -23,6 +23,12 @@ return [
     // 'model_path' => 'App\\Models',
     // 'camel_case' => false,
 
+    'globalId' => [
+        'encode' => null,
+        'decodeId' => null,
+        'decodeType' => null,
+    ]
+
     /*
     |--------------------------------------------------------------------------
     | Schema declaration

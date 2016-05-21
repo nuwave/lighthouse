@@ -3,7 +3,6 @@
 namespace Nuwave\Relay\Support\Definition;
 
 use GraphQL\Type\Definition\ObjectType;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 
 class GraphQLType extends Fluent
