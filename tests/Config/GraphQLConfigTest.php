@@ -3,6 +3,7 @@
 namespace Nuwave\Relay\Tests\Config;
 
 use Nuwave\Relay\Tests\TestCase;
+use GraphQL\Type\Definition\ObjectType;
 
 class GraphQLConfigTest extends TestCase
 {
