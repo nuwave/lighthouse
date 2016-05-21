@@ -17,14 +17,18 @@ class GraphQLTest extends TestCase
     {
         $type = $this->getObjectType();
         $queryType = $this->getQueryType($type);
+        $mutationType = $this->getMutationType($type);
         $graphql = app('graphql');
 
         $graphql->addQuery($queryType, 'humanQuery');
+        $graphql->addMutation($mutationType, 'fooMutation');
 
         $schema = app('graphql')->schema();
-        $schemaQuery = $schema->getQueryType();
+        $schemaQueries = $schema->getQueryType();
+        $mutationQueries = $schema->getMutationType();
 
-        $this->assertTrue($this->hasType($schemaQuery, 'HumanQuery'));
+        $this->assertTrue($this->hasType($schemaQueries, 'HumanQuery'));
+        $this->assertTrue($this->hasType($mutationQueries, 'FooMutation'));
     }
 
     /**
@@ -67,7 +71,7 @@ class GraphQLTest extends TestCase
     /**
      * Generate query type.
      *
-     * @param  mixed $type
+     * @param  ObjectType $type
      * @return ObjectType
      */
     protected function getQueryType($type)
@@ -78,6 +82,26 @@ class GraphQLTest extends TestCase
                 'human' => [
                     'type' => $type,
                     'args' => []
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Generate mutation type.
+     *
+     * @param  ObjectType $type
+     * @return ObjectType
+     */
+    protected function getMutationType($type)
+    {
+        return new ObjectType([
+            'name' => 'FooMutation',
+            'type' => $type,
+            'args' => [
+                'foo' => [
+                    'name' => 'foo',
+                    'type' => Type::string(),
                 ]
             ]
         ]);
