@@ -7,6 +7,18 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 class TestCase extends BaseTestCase
 {
     /**
+     * Set up test environment.
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->withFactories(__DIR__.'/Support/Database/Factories');
+    }
+
+    /**
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app

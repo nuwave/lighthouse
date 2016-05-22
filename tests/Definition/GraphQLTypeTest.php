@@ -4,7 +4,8 @@ namespace Nuwave\Relay\Tests\Definition;
 
 use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Relay\Tests\TestCase;
-use Nuwave\Relay\Tests\Support\Types\UserType;
+use Nuwave\Relay\Tests\Support\Models\User;
+use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
 
 class GraphQLTypeTest extends TestCase
 {

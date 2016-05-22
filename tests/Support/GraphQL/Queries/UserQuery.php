@@ -2,6 +2,9 @@
 
 namespace Nuwave\Relay\Tests\Support\GraphQL\Queries;
 
+use GraphQL;
+use GraphQL\Type\Definition\Type;
+use Nuwave\Relay\Tests\Support\Models\User;
 use Nuwave\Relay\Support\Definition\GraphQLQuery;
 
 class UserQuery extends GraphQLQuery
@@ -25,8 +28,9 @@ class UserQuery extends GraphQLQuery
     {
         return [
             'id' => [
-                'type' => Type::nonNull(Type::string()),
-            ]
+                'type' => Type::string(),
+                'description' => 'ID of the user.',
+            ],
         ];
     }
 
@@ -39,6 +43,12 @@ class UserQuery extends GraphQLQuery
      */
     public function resolve($root, array $args)
     {
-        return User::find($args['id']);
+        $user = factory(User::class)->make([
+            'name' => 'foo'
+        ]);
+
+        $user->id = 1;
+
+        return $user;
     }
 }

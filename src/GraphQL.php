@@ -5,15 +5,18 @@ namespace Nuwave\Relay;
 use GraphQL\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
+use Nuwave\Relay\Support\Definition\GraphQLQuery;
 use Nuwave\Relay\Support\Traits\Container\TypeRegistrar;
+use Nuwave\Relay\Support\Traits\Container\QueryExecutor;
 use Nuwave\Relay\Support\Traits\Container\QueryRegistrar;
 use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
 
 class GraphQL
 {
-    use TypeRegistrar,
+    use MutationRegistrar,
+        QueryExecutor,
         QueryRegistrar,
-        MutationRegistrar;
+        TypeRegistrar;
 
     /**
      * Instance of application.
@@ -54,17 +57,21 @@ class GraphQL
      */
     protected function generateSchemaType(Collection $fields, $name)
     {
-        $config = [
+        $typeFields = $fields->map(function ($field, $key) {
+            if (is_string($field)) {
+                return array_merge(['name' => $key], app($field)->toArray());
+            } elseif ($field instanceof GraphQLQuery) {
+                return array_merge(['name' => $key], $field->toArray());
+            } elseif ($field instanceof ObjectType) {
+                return $field->config;
+            }
+
+            return $field;
+        });
+
+        return new ObjectType([
             'name' => $name,
-            'fields' => []
-        ];
-
-        return $fields->transform(function ($field) {
-            return is_string($field) ? app($field)->toArray() : $field;
-        })->reduce(function ($objectType, $field) {
-            $objectType->config['fields'] = array_merge($objectType->getFields(), [$field]);
-
-            return $objectType;
-        }, new ObjectType($config));
+            'fields' => $typeFields->toArray(),
+        ]);
     }
 }

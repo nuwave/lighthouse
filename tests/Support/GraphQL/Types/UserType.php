@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Support\Types;
+namespace Nuwave\Relay\Tests\Support\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
 use Nuwave\Relay\Support\Definition\GraphQLType;

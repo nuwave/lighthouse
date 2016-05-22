@@ -5,6 +5,7 @@ namespace Nuwave\Relay\Tests\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Relay\Tests\TestCase;
+use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
 
 class TypeTest extends TestCase
 {
@@ -45,5 +46,32 @@ class TypeTest extends TestCase
         $graphql->addType($type);
 
         $this->assertEquals($graphql->getType('Human'), $type);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveTypeInstance()
+    {
+        $graphql = app('graphql');
+
+        $type = new UserType;
+        $graphql->addType($type);
+        $resolvedType = $graphql->type('User');
+
+        $this->assertInstanceOf(ObjectType::class, $resolvedType);
+        $this->assertSame($resolvedType, $graphql->type('User'));
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsExceptionIfTypeIsNotFound()
+    {
+        $graphql = app('graphql');
+
+        $this->setExpectedException(\Exception::class);
+
+        $graphql->type('User');
     }
 }

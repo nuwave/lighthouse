@@ -16,6 +16,7 @@
     },
     "require": {
         "webonyx/graphql-php": "^0.6.2",
-        "illuminate/support": "^5.2"
+        "illuminate/support": "^5.2",
+        "illuminate/database": "^5.2"
     }
 }
