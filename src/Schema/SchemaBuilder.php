@@ -2,8 +2,9 @@
 
 namespace Nuwave\Relay\Schema;
 
-use Nuwave\Relay\Support\Traits\Container\CentralRegistrar;
+use Closure;
 use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Relay\Support\Traits\Container\CentralRegistrar;
 
 class SchemaBuilder
 {
@@ -15,6 +16,13 @@ class SchemaBuilder
      * @var array
      */
     protected $namespace = '';
+
+    /**
+     * Schema middleware stack.
+     *
+     * @var array
+     */
+    protected $middlewareStack = [];
 
     /**
      * Get current namespace.
@@ -34,6 +42,36 @@ class SchemaBuilder
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
+    }
+
+    /**
+     * Group child elements.
+     *
+     * @param  array   $attributes
+     * @param  Closure $callback
+     * @return void
+     */
+    public function group(array $attributes, Closure $callback)
+    {
+        $oldNamespace = $this->getNamespace();
+
+        if (isset($attributes['middleware'])) {
+            $this->middlewareStack[] = $attributes['middleware'];
+        }
+
+        if (isset($attributes['namespace'])) {
+            $this->namespace  .= '\\' . trim($attributes['namespace'], '\\');
+        }
+
+        $callback();
+
+        if (isset($attributes['middleware'])) {
+            array_pop($this->middlewareStack);
+        }
+
+        if (isset($attributes['namespace'])) {
+            $this->namespace = $oldNamespace;
+        }
     }
 
     /**

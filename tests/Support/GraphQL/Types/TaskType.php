@@ -2,6 +2,7 @@
 
 namespace Nuwave\Relay\Tests\Support\GraphQL\Types;
 
+use GraphQL;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Relay\Support\Definition\GraphQLType;
 
@@ -36,6 +37,10 @@ class TaskType extends GraphQLType
             'completed' => [
                 'type' => Type::boolean(),
                 'description' => 'Completed status.'
+            ],
+            'user' => [
+                'type' => GraphQL::type('user'),
+                'description' => 'User who owns task.',
             ]
         ];
     }
