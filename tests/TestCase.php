@@ -45,4 +45,15 @@ class TestCase extends BaseTestCase
             'GraphQL' => \Nuwave\Relay\Support\Facades\GraphQLFacade::class,
         ];
     }
+
+    /**
+     * Execute query.
+     *
+     * @param  string $query
+     * @return array
+     */
+    protected function executeQuery($query)
+    {
+        return app('graphql')->execute($query);
+    }
 }

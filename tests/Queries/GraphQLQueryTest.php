@@ -32,6 +32,6 @@ class GraphQLQueryTest extends TestCase
         $graphql->addType(new UserType, 'user');
         $graphql->addQuery(new UserQuery, 'userQuery');
 
-        $this->assertEquals(['data' => $expected], app('graphql')->execute($query));
+        $this->assertEquals(['data' => $expected], $this->executeQuery($query));
     }
 }
