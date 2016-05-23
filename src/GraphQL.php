@@ -5,18 +5,14 @@ namespace Nuwave\Relay;
 use GraphQL\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
-use Nuwave\Relay\Support\Definition\GraphQLQuery;
-use Nuwave\Relay\Support\Traits\Container\TypeRegistrar;
 use Nuwave\Relay\Support\Traits\Container\QueryExecutor;
-use Nuwave\Relay\Support\Traits\Container\QueryRegistrar;
 use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
 use Nuwave\Relay\Schema\Field;
 use Nuwave\Relay\Schema\SchemaBuilder;
 
 class GraphQL
 {
-    use MutationRegistrar,
-        QueryExecutor;
+    use QueryExecutor;
 
     /**
      * Instance of application.
@@ -50,7 +46,7 @@ class GraphQL
     public function buildSchema()
     {
         $queryType = $this->generateSchemaType($this->queries(), 'Query');
-        $mutationType = $this->generateSchemaType($this->getMutations(), 'Mutation');
+        $mutationType = $this->generateSchemaType($this->mutations(), 'Mutation');
 
         return new Schema($queryType, $mutationType);
     }
@@ -60,7 +56,7 @@ class GraphQL
      *
      * @param  Collection $fields
      * @param  array     $options
-     * @return \GraphQL\Type\Definition\ObjectType
+     * @return \GraphQL\Type\Definition\ObjectType|null
      */
     protected function generateSchemaType(Collection $fields, $name)
     {
@@ -71,6 +67,10 @@ class GraphQL
 
             return $field;
         });
+
+        if (! $typeFields->count()) {
+            return null;
+        }
 
         return new ObjectType([
             'name' => $name,
@@ -111,6 +111,16 @@ class GraphQL
     public function queries()
     {
         return collect($this->schema()->getQueryRegistrar()->all());
+    }
+
+    /**
+     * Get collection of registered mutations.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function mutations()
+    {
+        return collect($this->schema()->getMutationRegistrar()->all());
     }
 
     /**

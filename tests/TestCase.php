@@ -50,10 +50,11 @@ class TestCase extends BaseTestCase
      * Execute query.
      *
      * @param  string $query
+     * @param  array|null $variables
      * @return array
      */
-    protected function executeQuery($query)
+    protected function executeQuery($query, array $variables = null)
     {
-        return app('graphql')->execute($query);
+        return app('graphql')->execute($query, $variables);
     }
 }

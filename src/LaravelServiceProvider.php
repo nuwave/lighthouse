@@ -39,6 +39,7 @@ class LaravelServiceProvider extends ServiceProvider
     {
         $graphql = app('graphql');
         $graphql->schema()->type('node', \Nuwave\Relay\Support\Definition\NodeType::class);
+        $graphql->schema()->type('pageInfo', \Nuwave\Relay\Support\Definition\PageInfoType::class);
         $graphql->schema()->query('node', \Nuwave\Relay\Support\Definition\NodeQuery::class);
     }
 

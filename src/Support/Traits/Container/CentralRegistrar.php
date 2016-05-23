@@ -5,6 +5,7 @@ namespace Nuwave\Relay\Support\Traits\Container;
 use Nuwave\Relay\Schema\Registrars\TypeRegistrar;
 use Nuwave\Relay\Schema\Registrars\EdgeRegistrar;
 use Nuwave\Relay\Schema\Registrars\QueryRegistrar;
+use Nuwave\Relay\Schema\Registrars\MutationRegistrar;
 use Nuwave\Relay\Schema\Registrars\ConnectionRegistrar;
 
 trait CentralRegistrar
@@ -36,6 +37,13 @@ trait CentralRegistrar
      * @var QueryRegistrar
      */
     protected $queryRegistrar;
+
+    /**
+     * Mutation registrar.
+     *
+     * @var MutationRegistrar
+     */
+    protected $mutationRegistrar;
 
     /**
      * Set local instance of type registrar.
@@ -131,5 +139,29 @@ trait CentralRegistrar
         }
 
         return $this->queryRegistrar;
+    }
+
+    /**
+     * Set local instance of mutation registrar.
+     *
+     * @param MutationRegistrar $registrar
+     */
+    public function setMutationRegistrar(MutationRegistrar $registrar)
+    {
+        $this->mutationRegistrar = $registrar->setSchema($this);
+    }
+
+    /**
+     * Get instance of mutation registrar.
+     *
+     * @return MutationRegistrar
+     */
+    public function getMutationRegistrar()
+    {
+        if (! $this->mutationRegistrar) {
+            $this->mutationRegistrar = app(MutationRegistrar::class)->setSchema($this);
+        }
+
+        return $this->mutationRegistrar;
     }
 }

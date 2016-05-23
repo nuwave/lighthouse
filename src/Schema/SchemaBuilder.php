@@ -49,6 +49,18 @@ class SchemaBuilder
     }
 
     /**
+     * Add mutation to registrar.
+     *
+     * @param  string $name
+     * @param  string $namespace
+     * @return \Nuwave\Relay\Schema\Field
+     */
+    public function mutation($name, $namespace)
+    {
+        return $this->getMutationRegistrar()->register($name, $namespace);
+    }
+
+    /**
      * Add type to registrar.
      *
      * @param  string $name
