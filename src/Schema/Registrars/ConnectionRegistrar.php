@@ -2,6 +2,7 @@
 
 namespace Nuwave\Relay\Schema\Registrars;
 
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Relay\Support\Definition\RelayConnectionType;
 
@@ -34,7 +35,6 @@ class ConnectionRegistrar extends BaseRegistrar
      */
     public function instance($name, $resolve = null, $fresh = false)
     {
-        // TODO: Ensure type ($name) exists in TypeRegistrar.
         // TODO: Create resolve function for connection if is_callable($resolve)
 
         if (! $fresh && $this->instances->has($name)) {
@@ -44,7 +44,8 @@ class ConnectionRegistrar extends BaseRegistrar
             return $field;
         }
 
-        $instance = $this->getInstance($name, $resolve);
+        $nodeType = $this->getSchema()->typeInstance($name);
+        $instance = $this->getInstance($name, $nodeType, $resolve);
 
         $this->instances->put($name, $instance);
 
@@ -55,17 +56,17 @@ class ConnectionRegistrar extends BaseRegistrar
      * Generate connection field.
      *
      * @param  string $name
+     * @param  ObjectType $nodeType
      * @param  Closure|null $resolve
      * @return array
      */
-    public function getInstance($name, $resolve = null)
+    public function getInstance($name, ObjectType $nodeType, $resolve = null)
     {
         $connection = new RelayConnectionType();
 
         $connectionName = (!preg_match('/Connection$/', $name)) ? $name.'Connection' : $name;
         $connection->setName(studly_case($connectionName));
 
-        $nodeType = $this->getSchema()->typeInstance($name);
         $pageInfoType = $this->getSchema()->typeInstance('pageInfo');
         $edgeType = $this->getSchema()->edgeInstance($name, $nodeType);
 
