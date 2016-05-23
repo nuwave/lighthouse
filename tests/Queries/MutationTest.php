@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Schema;
+namespace Nuwave\Relay\Tests\Queries;
 
 use Nuwave\Relay\Tests\TestCase;
 

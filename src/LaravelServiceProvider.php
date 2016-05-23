@@ -38,7 +38,8 @@ class LaravelServiceProvider extends ServiceProvider
     protected function registerNodes()
     {
         $graphql = app('graphql');
-        $graphql->addType('Node', \Nuwave\Relay\Support\Definition\NodeType::class);
+        $graphql->schema()->type('node', \Nuwave\Relay\Support\Definition\NodeType::class);
+        $graphql->schema()->query('node', \Nuwave\Relay\Support\Definition\NodeQuery::class);
     }
 
     /**

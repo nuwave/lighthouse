@@ -2,6 +2,8 @@
 
 namespace Nuwave\Relay\Support\Definition;
 
+use GraphQL\Type\Definition\Type;
+
 class NodeType extends GraphQLInterface
 {
     /**
@@ -37,7 +39,7 @@ class NodeType extends GraphQLInterface
      */
     public function resolveType($obj)
     {
-        return GraphQL::type($this->extractType($obj));
+        return app('graphql')->type($this->extractType($obj));
     }
 
     /**

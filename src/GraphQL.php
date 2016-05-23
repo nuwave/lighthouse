@@ -10,14 +10,13 @@ use Nuwave\Relay\Support\Traits\Container\TypeRegistrar;
 use Nuwave\Relay\Support\Traits\Container\QueryExecutor;
 use Nuwave\Relay\Support\Traits\Container\QueryRegistrar;
 use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
+use Nuwave\Relay\Schema\Field;
 use Nuwave\Relay\Schema\SchemaBuilder;
 
 class GraphQL
 {
     use MutationRegistrar,
-        QueryExecutor,
-        QueryRegistrar,
-        TypeRegistrar;
+        QueryExecutor;
 
     /**
      * Instance of application.
@@ -50,7 +49,7 @@ class GraphQL
      */
     public function buildSchema()
     {
-        $queryType = $this->generateSchemaType($this->getQueries(), 'Query');
+        $queryType = $this->generateSchemaType($this->queries(), 'Query');
         $mutationType = $this->generateSchemaType($this->getMutations(), 'Mutation');
 
         return new Schema($queryType, $mutationType);
@@ -66,12 +65,8 @@ class GraphQL
     protected function generateSchemaType(Collection $fields, $name)
     {
         $typeFields = $fields->map(function ($field, $key) {
-            if (is_string($field)) {
-                return array_merge(['name' => $key], app($field)->toArray());
-            } elseif ($field instanceof GraphQLQuery) {
-                return array_merge(['name' => $key], $field->toArray());
-            } elseif ($field instanceof ObjectType) {
-                return $field->config;
+            if ($field instanceof Field) {
+                return app($field->namespace)->toArray();
             }
 
             return $field;
@@ -106,6 +101,16 @@ class GraphQL
     public function edge($name, ObjectType $type = null, $fresh = false)
     {
         return $this->schema()->edgeInstance($name, $type, $fresh);
+    }
+
+    /**
+     * Get collection of registered queries.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function queries()
+    {
+        return collect($this->schema()->getQueryRegistrar()->all());
     }
 
     /**

@@ -40,7 +40,7 @@ trait QueryExecutor
      */
     public function queryAndReturnResult($query, $variables = [], $rootValue = null)
     {
-        return GraphQL::executeAndReturnResult($this->schema(), $query, $rootValue, $variables);
+        return GraphQL::executeAndReturnResult($this->buildSchema(), $query, $rootValue, $variables);
     }
 
     /**
