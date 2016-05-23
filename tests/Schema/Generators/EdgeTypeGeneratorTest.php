@@ -14,7 +14,8 @@ class EdgeTypeGeneratorTest extends TestCase
     {
         app('graphql')->schema()->type('user', UserType::class);
 
-        $edge = app('graphql')->schema()->edgeInstance('user', UserType::class);
+        $type = app('graphql')->type('user');
+        $edge = app('graphql')->schema()->edgeInstance('user', $type);
         $this->assertEquals('UserEdge', $edge->name);
         $this->assertContains('node', array_keys($edge->config['fields']));
         $this->assertContains('cursor', array_keys($edge->config['fields']));

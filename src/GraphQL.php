@@ -99,12 +99,13 @@ class GraphQL
      * Extract instance from edge registrar.
      *
      * @param  string $name
+     * @param  ObjectType $type
      * @param  boolean $fresh
      * @return ObjectType
      */
-    public function edge($name, $fresh = false)
+    public function edge($name, ObjectType $type = null, $fresh = false)
     {
-        return $this->schema()->edgeInstance($name, $fresh);
+        return $this->schema()->edgeInstance($name, $type, $fresh);
     }
 
     /**
