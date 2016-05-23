@@ -10,6 +10,7 @@ use Nuwave\Relay\Support\Traits\Container\TypeRegistrar;
 use Nuwave\Relay\Support\Traits\Container\QueryExecutor;
 use Nuwave\Relay\Support\Traits\Container\QueryRegistrar;
 use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
+use Nuwave\Relay\Schema\SchemaBuilder;
 
 class GraphQL
 {
@@ -26,6 +27,13 @@ class GraphQL
     protected $app;
 
     /**
+     * Instance of schema builder.
+     *
+     * @var SchemaBuilder
+     */
+    protected $schema;
+
+    /**
      * Create new instance of graphql container.
      *
      * @param \Illuminate\Contracts\Foundation\Application $app
@@ -40,7 +48,7 @@ class GraphQL
      *
      * @return \GraphQL\Schema
      */
-    public function schema()
+    public function buildSchema()
     {
         $queryType = $this->generateSchemaType($this->getQueries(), 'Query');
         $mutationType = $this->generateSchemaType($this->getMutations(), 'Mutation');
@@ -73,5 +81,41 @@ class GraphQL
             'name' => $name,
             'fields' => $typeFields->toArray(),
         ]);
+    }
+
+    /**
+     * Extract instance from type registrar.
+     *
+     * @param  string $name
+     * @param  boolean $fresh
+     * @return ObjectType
+     */
+    public function type($name, $fresh = false)
+    {
+        return $this->schema()->typeInstance($name, $fresh);
+    }
+
+    /**
+     * Set local instance of schema.
+     *
+     * @param SchemaBuilder $schema
+     */
+    public function setSchema(SchemaBuilder $schema)
+    {
+        $this->schema = $schema;
+    }
+
+    /**
+     * Get instance of schema builder.
+     *
+     * @return SchemaBuilder
+     */
+    public function schema()
+    {
+        if (!$this->schema) {
+            $this->schema = app(SchemaBuilder::class);
+        }
+
+        return $this->schema;
     }
 }

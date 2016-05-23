@@ -23,7 +23,7 @@ class GraphQLTest extends TestCase
         $graphql->addQuery($queryType, 'humanQuery');
         $graphql->addMutation($mutationType, 'fooMutation');
 
-        $schema = app('graphql')->schema();
+        $schema = app('graphql')->buildSchema();
         $schemaQueries = $schema->getQueryType();
         $mutationQueries = $schema->getMutationType();
 

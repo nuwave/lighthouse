@@ -3,7 +3,10 @@
     "autoload": {
         "psr-4": {
             "Nuwave\\Relay\\": "src/"
-        }
+        },
+        "files": [
+            "src/Support/helpers.php"
+        ]
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",

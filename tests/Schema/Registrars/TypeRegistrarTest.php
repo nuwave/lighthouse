@@ -2,6 +2,7 @@
 
 namespace Nuwave\Relay\Tests\Schema\Registrars;
 
+use GraphQL;
 use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Relay\Tests\TestCase;
 use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
@@ -50,8 +51,32 @@ class TypeRegistrarTest extends TestCase
     public function itCanRetrieveTypeInstanceFromRegistrar()
     {
         $this->registrar->register('user', UserType::class);
-
         $instance = $this->registrar->instance('user');
+        
+        $this->assertInstanceOf(ObjectType::class, $instance);
+        $this->assertEquals('User', $instance->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUseFacadeToStoreType()
+    {
+        $field = GraphQL::schema()->type('user', UserType::class);
+        $instance = GraphQL::type('user');
+
+        $this->assertInstanceOf(ObjectType::class, $instance);
+        $this->assertEquals('User', $instance->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUseHelperToStoreTypeAndResolve()
+    {
+        $field = schema()->type('user', UserType::class);
+        $instance = graphql()->type('user');
+
         $this->assertInstanceOf(ObjectType::class, $instance);
         $this->assertEquals('User', $instance->name);
     }

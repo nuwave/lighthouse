@@ -3,6 +3,7 @@
 namespace Nuwave\Relay\Schema;
 
 use Nuwave\Relay\Schema\Registrars\TypeRegistrar;
+use GraphQL\Type\Definition\ObjectType;
 
 class SchemaBuilder
 {
@@ -41,6 +42,30 @@ class SchemaBuilder
     }
 
     /**
+     * Add type to registrar.
+     *
+     * @param  string $name
+     * @param  string $namespace
+     * @return \Nuwave\Relay\Schema\Field
+     */
+    public function type($name, $namespace)
+    {
+        return $this->getTypeRegistrar()->register($name, $namespace);
+    }
+
+    /**
+     * Extract type instance from registrar.
+     *
+     * @param  string $name
+     * @param  boolean $fresh
+     * @return ObjectType
+     */
+    public function typeInstance($name, $fresh = false)
+    {
+        return $this->getTypeRegistrar()->instance($name, $fresh);
+    }
+
+    /**
      * Set local instance of type registrar.
      *
      * @param TypeRegistrar $registrar
@@ -57,6 +82,10 @@ class SchemaBuilder
      */
     public function getTypeRegistrar()
     {
-        return $this->typeRegistrar ?: app(TypeRegistrar::class)->setSchema($this);
+        if (!$this->typeRegistrar) {
+            $this->typeRegistrar = app(TypeRegistrar::class)->setSchema($this);
+        }
+
+        return $this->typeRegistrar;
     }
 }
