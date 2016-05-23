@@ -4,9 +4,12 @@ namespace Nuwave\Relay\Support\Definition;
 
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Fluent;
+use Nuwave\Relay\Support\Traits\GlobalIdTrait;
 
 class GraphQLType extends Fluent
 {
+    use GlobalIdTrait;
+    
     /**
      * Type fields.
      *

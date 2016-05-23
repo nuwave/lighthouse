@@ -3,6 +3,8 @@
 namespace Nuwave\Relay\Schema;
 
 use Nuwave\Relay\Schema\Registrars\TypeRegistrar;
+use Nuwave\Relay\Schema\Registrars\EdgeRegistrar;
+use Nuwave\Relay\Schema\Registrars\ConnectionRegistrar;
 use GraphQL\Type\Definition\ObjectType;
 
 class SchemaBuilder
@@ -20,6 +22,20 @@ class SchemaBuilder
      * @var TypeRegistrar
      */
     protected $typeRegistrar;
+
+    /**
+     * Edge type registrar.
+     *
+     * @var EdgeRegistrar
+     */
+    protected $edgeRegistrar;
+
+    /**
+     * Connection type registrar.
+     *
+     * @var ConnectionRegistrar
+     */
+    protected $connectionRegistrar;
 
     /**
      * Get current namespace.
@@ -54,6 +70,17 @@ class SchemaBuilder
     }
 
     /**
+     * Get type field from registrar.
+     *
+     * @param  string $name
+     * @return \Nuwave\Relay\Schema\Field
+     */
+    public function getTypeField($name)
+    {
+        return $this->getTypeRegistrar()->get($name);
+    }
+
+    /**
      * Extract type instance from registrar.
      *
      * @param  string $name
@@ -63,6 +90,32 @@ class SchemaBuilder
     public function typeInstance($name, $fresh = false)
     {
         return $this->getTypeRegistrar()->instance($name, $fresh);
+    }
+
+    /**
+     * Extract connection instance from registrar.
+     *
+     * @param  string $name
+     * @param  Closure|null $resolve
+     * @param  boolean $fresh
+     * @return ObjectType
+     */
+    public function connectionInstance($name, Closure $resolve = null, $fresh = false)
+    {
+        return $this->getConnectionRegistrar()->instance($name, $resolve, $fresh);
+    }
+
+    /**
+     * Extract edge instance from registrar.
+     *
+     * @param  string $name
+     * @param  ObjectType|null $type
+     * @param  boolean $fresh
+     * @return ObjectType
+     */
+    public function edgeInstance($name, $type = null, $fresh = false)
+    {
+        return $this->getEdgeRegistrar()->instance($name, $fresh, $type);
     }
 
     /**
@@ -76,16 +129,64 @@ class SchemaBuilder
     }
 
     /**
-     * Get instance of type registrar.
+     * Get instance of edge registrar.
      *
      * @return TypeRegistrar
      */
     public function getTypeRegistrar()
     {
-        if (!$this->typeRegistrar) {
+        if (! $this->typeRegistrar) {
             $this->typeRegistrar = app(TypeRegistrar::class)->setSchema($this);
         }
 
         return $this->typeRegistrar;
+    }
+
+    /**
+     * Set local instance of edge registrar.
+     *
+     * @param EdgeRegistrar $registrar
+     */
+    public function setEdgeRegistrar(EdgeRegistrar $registrar)
+    {
+        $this->edgeRegistrar = $registrar->setSchema($this);
+    }
+
+    /**
+     * Get instance of edge registrar.
+     *
+     * @return Nuwave\Relay\Schema\Registrars\EdgeRegistrar
+     */
+    public function getEdgeRegistrar()
+    {
+        if (! $this->edgeRegistrar) {
+            $this->edgeRegistrar = app(EdgeRegistrar::class)->setSchema($this);
+        }
+
+        return $this->edgeRegistrar;
+    }
+
+    /**
+     * Set local instance of edge registrar.
+     *
+     * @param ConnectionRegistrar $registrar
+     */
+    public function setConnectionRegistrar(ConnectionRegistrar $registrar)
+    {
+        $this->connectionRegistrar = $registrar->setSchema($this);
+    }
+
+    /**
+     * Get instance of edge registrar.
+     *
+     * @return Nuwave\Relay\Schema\Registrars\ConnectionRegistrar
+     */
+    public function getConnectionRegistrar()
+    {
+        if (! $this->connectionRegistrar) {
+            $this->connectionRegistrar = app(ConnectionRegistrar::class)->setSchema($this);
+        }
+
+        return $this->connectionRegistrar;
     }
 }

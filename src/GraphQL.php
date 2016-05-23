@@ -96,6 +96,18 @@ class GraphQL
     }
 
     /**
+     * Extract instance from edge registrar.
+     *
+     * @param  string $name
+     * @param  boolean $fresh
+     * @return ObjectType
+     */
+    public function edge($name, $fresh = false)
+    {
+        return $this->schema()->edgeInstance($name, $fresh);
+    }
+
+    /**
      * Set local instance of schema.
      *
      * @param SchemaBuilder $schema
