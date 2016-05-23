@@ -3,6 +3,9 @@
 namespace Nuwave\Relay\Tests\Config;
 
 use Nuwave\Relay\Tests\TestCase;
+use Nuwave\Relay\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
+use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Relay\Tests\Support\GraphQL\Queries\UserQuery;
 use GraphQL\Type\Definition\ObjectType;
 
 class GraphQLConfigTest extends TestCase
@@ -17,9 +20,9 @@ class GraphQLConfigTest extends TestCase
     {
         $app['config']->set('relay.schema.register', function () {
             $graphql = app('graphql');
-            $graphql->addType('foo', 'bar');
-            $graphql->addQuery('bar', 'baz');
-            $graphql->addMutation('bar', 'foo');
+            $graphql->schema()->type('user', UserType::class);
+            $graphql->schema()->query('userQuery', UserQuery::class);
+            $graphql->schema()->mutation('updateEmail', UpdateEmailMutation::class);
         });
     }
 
@@ -29,8 +32,8 @@ class GraphQLConfigTest extends TestCase
     public function itCanRegisterWithConfig()
     {
         $graphql = app('graphql');
-        $this->assertEquals('foo', $graphql->getType('bar'));
-        $this->assertEquals('bar', $graphql->getQuery('baz'));
-        $this->assertEquals('bar', $graphql->getMutation('foo'));
+        $this->assertInstanceOf(ObjectType::class, $graphql->type('user'));
+        $this->assertContains('userQuery', $graphql->queries()->keys());
+        $this->assertContains('updateEmail', $graphql->mutations()->keys());
     }
 }

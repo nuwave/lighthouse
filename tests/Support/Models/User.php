@@ -14,4 +14,14 @@ class User extends Model
     protected $fillable = [
         'company_id', 'name', 'email',
     ];
+
+    /**
+     * User's assigned tasks.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 }

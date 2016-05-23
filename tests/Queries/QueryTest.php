@@ -6,10 +6,11 @@ use GraphQL;
 use Nuwave\Relay\Support\Definition\GraphQLQuery;
 use Nuwave\Relay\Tests\Support\Models\User;
 use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Relay\Tests\Support\GraphQL\Types\TaskType;
 use Nuwave\Relay\Tests\Support\GraphQL\Queries\UserQuery;
 use Nuwave\Relay\Tests\TestCase;
 
-class GraphQLQueryTest extends TestCase
+class QueryTest extends TestCase
 {
     /**
      * @test
@@ -30,6 +31,7 @@ class GraphQLQueryTest extends TestCase
 
         $graphql = app('graphql');
         $graphql->schema()->type('user', UserType::class);
+        $graphql->schema()->type('task', TaskType::class);
         $graphql->schema()->query('userQuery', UserQuery::class);
 
         $this->assertEquals(['data' => $expected], $this->executeQuery($query));

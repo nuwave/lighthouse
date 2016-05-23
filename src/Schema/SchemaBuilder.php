@@ -73,6 +73,18 @@ class SchemaBuilder
     }
 
     /**
+     * Add connection to registrar.
+     *
+     * @param  string $name
+     * @param  array $field
+     * @return array
+     */
+    public function connection($name, $field)
+    {
+        return $this->getConnectionRegistrar()->register($name, $field);
+    }
+
+    /**
      * Get type field from registrar.
      *
      * @param  string $name

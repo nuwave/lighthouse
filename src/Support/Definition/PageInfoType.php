@@ -15,7 +15,7 @@ class PageInfoType extends GraphQLType
      * @var array
      */
     protected $attributes = [
-        'name' => 'pageInfo',
+        'name' => 'PageInfo',
         'description' => 'Information to aid in pagination.'
     ];
 

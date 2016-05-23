@@ -3,6 +3,7 @@
 namespace Nuwave\Relay\Tests\Config;
 
 use Nuwave\Relay\Tests\TestCase;
+use GraphQL\Type\Definition\ObjectType;
 
 class GraphQLFileConfigTest extends TestCase
 {
@@ -22,8 +23,9 @@ class GraphQLFileConfigTest extends TestCase
      */
     public function itCanRegisterTypesWithSchemaFile()
     {
-        $this->assertEquals(app('graphql')->getType('foo'), 'bar');
-        $this->assertEquals(app('graphql')->getQuery('bar'), 'baz');
-        $this->assertEquals(app('graphql')->getMutation('baz'), 'foo');
+        $graphql = app('graphql');
+        $this->assertInstanceOf(ObjectType::class, $graphql->type('userConfig'));
+        $this->assertContains('userQueryConfig', $graphql->queries()->keys());
+        $this->assertContains('updateEmailConfig', $graphql->mutations()->keys());
     }
 }

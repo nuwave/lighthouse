@@ -66,11 +66,7 @@ class EdgeRegistrar extends BaseRegistrar
      */
     public function createInstance($name, $type)
     {
-        $instance = $this->getGenerator()->build($name, $type);
-
-        $this->instances->put($name, $instance);
-
-        return $instance;
+        return $this->getGenerator()->build($name, $type);
     }
 
     /**

@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Relay\Tests\TestCase;
 use Nuwave\Relay\Tests\Support\Models\User;
 use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Relay\Tests\Support\GraphQL\Types\TaskType;
 
 class GraphQLTypeTest extends TestCase
 {
@@ -14,11 +15,12 @@ class GraphQLTypeTest extends TestCase
      */
     public function itCanTransformToType()
     {
+        app('graphql')->schema()->type('task', TaskType::class);
+        
         $userType = new UserType;
         $type = $userType->toType();
 
         $this->assertEquals('User', $type->name);
         $this->assertInstanceOf(ObjectType::class, $type);
-        $this->assertCount(3, $type->getFields());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Relay;
 
+use Closure;
 use GraphQL\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
@@ -45,8 +46,11 @@ class GraphQL
      */
     public function buildSchema()
     {
-        $queryType = $this->generateSchemaType($this->queries(), 'Query');
-        $mutationType = $this->generateSchemaType($this->mutations(), 'Mutation');
+        $queryFields = $this->queries()->merge($this->connections()->toArray());
+        $mutationFields = $this->mutations();
+
+        $queryType = $this->generateSchemaType($queryFields, 'Query');
+        $mutationType = $this->generateSchemaType($mutationFields, 'Mutation');
 
         return new Schema($queryType, $mutationType);
     }
@@ -91,6 +95,25 @@ class GraphQL
     }
 
     /**
+     * Extract instance from connection registrar.
+     *
+     * @param  string $name
+     * @param  Closure|null $resolve
+     * @param  boolean $fresh
+     * @return ObjectType
+     */
+    public function connection($name, Closure $resolve = null, $fresh = false)
+    {
+        $connection = $this->schema()->connectionInstance($name, $resolve, $fresh);
+
+        if (! $this->connections()->has($name)) {
+            $this->schema()->connection($name, $connection);
+        }
+
+        return $connection;
+    }
+
+    /**
      * Extract instance from edge registrar.
      *
      * @param  string $name
@@ -101,6 +124,16 @@ class GraphQL
     public function edge($name, ObjectType $type = null, $fresh = false)
     {
         return $this->schema()->edgeInstance($name, $type, $fresh);
+    }
+
+    /**
+     * Get collection of registered types.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function types()
+    {
+        return collect($this->schema()->getTypeRegistrar()->all());
     }
 
     /**
@@ -121,6 +154,16 @@ class GraphQL
     public function mutations()
     {
         return collect($this->schema()->getMutationRegistrar()->all());
+    }
+
+    /**
+     * Get collection of registered connections.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function connections()
+    {
+        return collect($this->schema()->getConnectionRegistrar()->all());
     }
 
     /**

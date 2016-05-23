@@ -26,6 +26,20 @@ class ConnectionRegistrar extends BaseRegistrar
     }
 
     /**
+     * Add type to registrar.
+     *
+     * @param  string $name
+     * @param  array  $field
+     * @return array
+     */
+    public function register($name, $field)
+    {
+        $this->collection->put($name, $field);
+
+        return $field;
+    }
+
+    /**
      * Get instance of connection type.
      *
      * @param  string $name

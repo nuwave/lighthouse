@@ -2,6 +2,7 @@
 
 namespace Nuwave\Relay\Tests\Support\GraphQL\Types;
 
+use GraphQL;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Relay\Support\Definition\GraphQLType;
 
@@ -36,7 +37,8 @@ class UserType extends GraphQLType
             'email' => [
                 'type' => Type::string(),
                 'description' => 'Email of the user.'
-            ]
+            ],
+            'tasks' => GraphQL::connection('task')
         ];
     }
 

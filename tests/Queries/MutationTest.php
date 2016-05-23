@@ -4,6 +4,7 @@ namespace Nuwave\Relay\Tests\Queries;
 
 use Nuwave\Relay\Tests\TestCase;
 use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Relay\Tests\Support\GraphQL\Types\TaskType;
 use Nuwave\Relay\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
 
 class MutationTest extends TestCase
@@ -27,6 +28,7 @@ class MutationTest extends TestCase
 
         $graphql = app('graphql');
         $graphql->schema()->type('user', UserType::class);
+        $graphql->schema()->type('task', TaskType::class);
         $graphql->schema()->mutation('updateEmail', UpdateEmailMutation::class);
 
         $this->assertEquals(['data' => $expected], $this->executeQuery($query));
