@@ -9,6 +9,13 @@ use Nuwave\Relay\Support\Exceptions\ValidationError;
 trait QueryExecutor
 {
     /**
+     * Graphql requested query.
+     *
+     * @var string
+     */
+    protected $query;
+
+    /**
      * Execute GraphQL query.
      *
      * @param  string $query
@@ -67,5 +74,25 @@ trait QueryExecutor
         }
 
         return $error;
+    }
+
+    /**
+     * Get current graphql query.
+     *
+     * @return string
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+    /**
+     * Set current graphql query.
+     *
+     * @param string $query
+     */
+    public function setQuery($query)
+    {
+        $this->query = $query;
     }
 }

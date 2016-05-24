@@ -6,6 +6,7 @@ use GraphQL\Language\Parser;
 use GraphQL\Language\Source;
 use GraphQL\Language\AST\Field as QueryField;
 use Nuwave\Relay\Schema\SchemaBuilder;
+use Nuwave\Relay\Schema\Generators\ConnectionGenerator;
 
 class QueryParser
 {
@@ -43,37 +44,78 @@ class QueryParser
      */
     public function middleware()
     {
-        $ast = Parser::parse(new Source($this->query));
+        $selectionSet = $this->getSelectionSet();
+        $operation = $this->getOperation();
 
-        if (! isset($ast->definitions[0])) {
-            return null;
-        }
-
-        $d = $ast->definitions[0];
-        $operation = $d->operation ?: 'query';
-        $selectionSet = $d->selectionSet->selections;
-
-        return $this->extractMiddleware($selectionSet, $operation);
-    }
-
-    /**
-     * Extract middleware from query.
-     *
-     * @param  array $selectionSet
-     * @param  string $operation
-     * @return \Illuminate\Support\Collection
-     */
-    protected function extractMiddleware(array $selectionSet = [], $operation = '')
-    {
         return collect($selectionSet)->flatMap(function ($selection) use ($operation) {
-            if ($this->isField($selection)) {
-                if ($field = $this->getField($selection->name->value, $operation)) {
-                    return $field->middleware;
-                }
+            if ($field = $this->getField($selection, $operation)) {
+                return $field->middleware;
             }
 
             return [];
         });
+    }
+
+    /**
+     * Get connections requested in query.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function connections()
+    {
+        $selectionSet = $this->getSelectionSet();
+        $operation = $this->getOperation();
+
+        return collect($selectionSet)->flatMap(function ($selection) use ($operation) {
+            if ($field = $this->getField($selection, $operation)) {
+                if (isset($selection->selectionSet) && !empty($selection->selectionSet->selections)) {
+                    return (new ConnectionGenerator)->build(
+                        $selection->selectionSet->selections,
+                        $selection->name->value
+                    );
+                }
+            }
+
+            return [];
+        })->reject(function ($item) {
+            return empty($item);
+        });
+    }
+
+    /**
+     * Get selection set from query.
+     *
+     * @return array
+     */
+    protected function getSelectionSet()
+    {
+        $ast = Parser::parse(new Source($this->query));
+
+        if (! isset($ast->definitions[0])) {
+            return [];
+        }
+
+        $d = $ast->definitions[0];
+
+        return $d->selectionSet->selections;
+    }
+
+    /**
+     * Get operation from query.
+     *
+     * @return string
+     */
+    protected function getOperation()
+    {
+        $ast = Parser::parse(new Source($this->query));
+
+        if (! isset($ast->definitions[0])) {
+            return 'query';
+        }
+
+        $d = $ast->definitions[0];
+
+        return $d->operation ?: 'query';
     }
 
     /**
@@ -94,8 +136,14 @@ class QueryParser
      * @param  string $operation
      * @return array
      */
-    public function getField($name, $operation = 'query')
+    public function getField($selection, $operation = 'query')
     {
+        if (! $this->isField($selection)) {
+            return null;
+        }
+
+        $name = $selection->name->value;
+
         if ($operation == 'mutation') {
             return $this->schema->getMutationRegistrar()->get($name);
         } elseif ($operation == 'type') {

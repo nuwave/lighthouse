@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Nuwave\Relay\Support\Traits\Container\QueryExecutor;
 use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
 use Nuwave\Relay\Schema\Field;
+use Nuwave\Relay\Schema\QueryParser;
 use Nuwave\Relay\Schema\SchemaBuilder;
 
 class GraphQL
@@ -167,6 +168,18 @@ class GraphQL
     }
 
     /**
+     * Get list of available connections to eager load.
+     *
+     * @return array
+     */
+    public function eagerLoad()
+    {
+        return $this->parser()->connections()
+            ->pluck('path')
+            ->toArray();
+    }
+
+    /**
      * Set local instance of schema.
      *
      * @param SchemaBuilder $schema
@@ -188,5 +201,15 @@ class GraphQL
         }
 
         return $this->schema;
+    }
+
+    /**
+     * Get instance of query parser.
+     *
+     * @return QueryParser
+     */
+    public function parser()
+    {
+        return new QueryParser($this->schema(), $this->query);
     }
 }
