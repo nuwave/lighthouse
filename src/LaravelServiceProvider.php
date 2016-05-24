@@ -14,6 +14,12 @@ class LaravelServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([__DIR__ . '/../config/config.php' => config_path('relay.php')]);
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'relay');
+
+        if (config('relay.controller')) {
+            require_once __DIR__.'/Support/Http/routes.php';
+        }
+
         $this->registerNodes();
         $this->registerSchema();
     }

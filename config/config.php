@@ -19,7 +19,7 @@ return [
     //     'fields'    => 'App\\GraphQL\\Http\\Fields',
     // ],
 
-    // 'controller' => 'Nuwave\Relay\Http\Controllers\LaravelController@query',
+    'controller' => 'Nuwave\Relay\Support\Http\Controllers\LaravelController@query',
     // 'model_path' => 'App\\Models',
     // 'camel_case' => false,
 
@@ -27,7 +27,7 @@ return [
         'encode' => null,
         'decodeId' => null,
         'decodeType' => null,
-    ]
+    ],
 
     /*
     |--------------------------------------------------------------------------

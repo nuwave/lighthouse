@@ -75,6 +75,27 @@ class SchemaBuilder
     }
 
     /**
+     * Get instance of query parser.
+     *
+     * @param  string $query
+     * @return self
+     */
+    public function parse($query = '')
+    {
+        return new QueryParser($this, $query);
+    }
+
+    /**
+     * Get current middleware stack.
+     *
+     * @return array
+     */
+    public function getMiddlewareStack()
+    {
+        return $this->middlewareStack;
+    }
+
+    /**
      * Add query to registrar.
      *
      * @param  string $name

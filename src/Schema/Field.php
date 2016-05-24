@@ -55,9 +55,9 @@ class Field
      *
      * @param array $attributes
      */
-    public function addMiddleware(array $attributes)
+    public function addMiddleware(array $middleware)
     {
-        $this->middleware = array_unique(array_merge($this->middleware, array_flatten($attributes)));
+        $this->middleware = array_unique(array_merge($this->middleware, array_flatten($middleware)));
     }
 
     /**

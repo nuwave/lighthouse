@@ -78,21 +78,9 @@ abstract class BaseRegistrar
     {
         $field = new Field($name, $this->getClassName($namespace));
 
-        if ($this->hasMiddlewareStack()) {
-            $field->addMiddleware($this->middlewareStack);
-        }
+        $field->addMiddleware($this->schema->getMiddlewareStack());
 
         return $field;
-    }
-
-    /**
-     * Check if middleware stack is empty.
-     *
-     * @return boolean
-     */
-    protected function hasMiddlewareStack()
-    {
-        return !empty($this->middlewareStack);
     }
 
     /**
