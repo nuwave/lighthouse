@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
 use Nuwave\Relay\Support\Traits\Container\QueryExecutor;
 use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
+use Nuwave\Relay\Support\Cache\FileStore;
 use Nuwave\Relay\Schema\Field;
 use Nuwave\Relay\Schema\QueryParser;
 use Nuwave\Relay\Schema\SchemaBuilder;
@@ -29,6 +30,13 @@ class GraphQL
      * @var SchemaBuilder
      */
     protected $schema;
+
+    /**
+     * Instance of cache.
+     *
+     * @var FileStore
+     */
+    protected $cache;
 
     /**
      * Create new instance of graphql container.
@@ -201,6 +209,26 @@ class GraphQL
         }
 
         return $this->schema;
+    }
+
+    /**
+     * Set local instance of cache.
+     *
+     * @param FileStore $cache [description]
+     */
+    public function setCache(FileStore $cache)
+    {
+        $this->cache = $cache;
+    }
+
+    /**
+     * Get instance of cache.
+     *
+     * @return FileStore
+     */
+    public function cache()
+    {
+        return $this->cache ?: app(FileStore::class);
     }
 
     /**
