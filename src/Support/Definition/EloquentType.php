@@ -29,7 +29,7 @@ class EloquentType
     /**
      * Available fields.
      *
-     * @var \Illuminate\Support\DefinitionsCollection
+     * @var \Illuminate\Support\Collection
      */
     protected $fields;
 
@@ -149,7 +149,7 @@ class EloquentType
      *
      * @return void
      */
-    protected function schemaFields()
+    public function schemaFields()
     {
         $table = $this->model->getTable();
         $schema = $this->model->getConnection()->getSchemaBuilder();
@@ -201,20 +201,20 @@ class EloquentType
     protected function resolveTypeByColumn($name, $colType)
     {
         $type = Type::string();
-        $type->name = $this->getName().'_String';
+        $type->name = 'String';
 
         if ($name === $this->model->getKeyName()) {
             $type = Type::id();
-            $type->name = $this->getName().'_ID';
+            $type->name = 'ID';
         } elseif ($colType === 'integer') {
             $type = Type::int();
-            $type->name = $this->getName().'_Int';
+            $type->name = 'Int';
         } elseif ($colType === 'float' || $colType === 'decimal') {
             $type = Type::float();
-            $type->name = $this->getName().'_Float';
+            $type->name = 'Float';
         } elseif ($colType === 'boolean') {
             $type = Type::boolean();
-            $type->name = $this->getName().'_Boolean';
+            $type->name = 'Boolean';
         }
 
         return $type;
@@ -323,5 +323,15 @@ class EloquentType
     protected function getTypeMethod()
     {
         return 'graphql'.$this->getName().'Fields';
+    }
+
+    /**
+     * Get field collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }

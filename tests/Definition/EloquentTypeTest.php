@@ -54,6 +54,27 @@ class EloquentTypeTest extends DBTestCase
     }
 
     /**
+     * @test
+     */
+    public function itShouldUseCacheToPopulateFields()
+    {
+        $initCache = new FileStore;
+        $user = new User;
+
+        $initType = new EloquentType($user, 'user');
+        $initType->schemaFields();
+        $initCache->store('user', $initType->getFields());
+
+        $cache = $this->prophesize(FileStore::class);
+        $this->app->instance(FileStore::class, $cache->reveal());
+        $cache->get('User')->willReturn(collect(['foo' => 'bar']));
+        $cache->store()->shouldNotBeCalled();
+
+        $eloquentType = new EloquentType($user, 'user');
+        $eloquentType->toType();
+    }
+
+    /**
      * Extract type from field.
      *
      * @param  string $key

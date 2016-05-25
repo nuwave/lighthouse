@@ -45,7 +45,7 @@ class FileStore
         $path = $this->getPath('');
 
         if (file_exists($path)) {
-            collect(array_diff(scandir($path), ['..', '.']))->each(function ($file) {
+            collect(array_diff(scandir($path), ['..', '.', '.gitignore']))->each(function ($file) {
                 unlink($this->getPath($file));
             });
         }
