@@ -3,6 +3,7 @@
 namespace Nuwave\Relay\Support\Definition;
 
 use ReflectionClass;
+use Nuwave\Relay\Schema\Generators\TypeGenerator;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\Type;
@@ -41,6 +42,13 @@ class EloquentType
     protected $hiddenFields;
 
     /**
+     * Type generator.
+     *
+     * @var TypeGenerator
+     */
+    protected $typeGenerator;
+
+    /**
      * If fields should be camel cased.
      *
      * @var boolean
@@ -72,7 +80,7 @@ class EloquentType
         $name = $this->getName();
 
         if ($fields = $graphql->cache()->get($name)) {
-            $this->fields = $fields;
+            $this->fields = $this->cachedFields($fields);
         } else {
             $this->schemaFields();
             $graphql->cache()->store($name, $this->fields);
@@ -90,7 +98,9 @@ class EloquentType
         return new ObjectType([
             'name'        => $name,
             'description' => $this->getDescription(),
-            'fields'      => $this->fields->toArray()
+            'fields'      => function () {
+                return $this->fields->toArray();
+            }
         ]);
     }
 
@@ -162,6 +172,32 @@ class EloquentType
                     $schema->getColumnType($table, $column)
                 );
             }
+        });
+    }
+
+    /**
+     * Create fields from cache.
+     *
+     * Why do we need this: (https://github.com/webonyx/graphql-php/issues/31)
+     *
+     * @param  Collection $fields
+     * @return \Illuminate\Support\Collection
+     */
+    protected function cachedFields(Collection $fields)
+    {
+        $namespace = 'GraphQL\\Type\\Definition\\';
+        $generator = $this->typeGenerator();
+
+        return $fields->filter(function ($field) {
+            return isset($field['type']);
+        })
+        ->map(function ($field) use ($namespace, $generator) {
+            $type = $generator->fromType($field['type']);
+
+            return [
+                'type' => $type,
+                'description' => $field['description']
+            ];
         });
     }
 
@@ -333,5 +369,25 @@ class EloquentType
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * Set local instance of type generator.
+     *
+     * @param TypeGenerator $generator
+     */
+    public function setTypeGenerator(TypeGenerator $generator)
+    {
+        $this->typeGenerator = $generator;
+    }
+
+    /**
+     * Get instance of type genreator.
+     *
+     * @return TypeGenerator
+     */
+    public function typeGenerator()
+    {
+        return $this->typeGenerator ?: app(TypeGenerator::class);
     }
 }

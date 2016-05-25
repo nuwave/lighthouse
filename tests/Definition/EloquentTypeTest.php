@@ -2,6 +2,7 @@
 
 namespace Nuwave\Relay\Tests\Definition;
 
+use Nuwave\Relay\Tests\Support\GraphQL\Queries\UserQuery;
 use Nuwave\Relay\Tests\Support\Models\User;
 use Nuwave\Relay\Tests\DBTestCase;
 use Nuwave\Relay\Support\Definition\EloquentType;
@@ -39,7 +40,7 @@ class EloquentTypeTest extends DBTestCase
         $type = $eloquentType->toType();
         $this->assertInstanceOf(ObjectType::class, $type);
 
-        $fields = $type->config['fields'];
+        $fields = is_callable($type->config['fields']) ? $type->config['fields']() : $type->config['fields'];
         $fieldKeys = array_keys($fields);
 
         $this->assertEquals('User', $type->name);
@@ -72,6 +73,31 @@ class EloquentTypeTest extends DBTestCase
 
         $eloquentType = new EloquentType($user, 'user');
         $eloquentType->toType();
+    }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itCanQueryEloquentType()
+    {
+        $query = '{
+            userQuery {
+                name
+            }
+        }';
+
+        $expected = [
+            'userQuery' => [
+                'name' => 'foo',
+            ]
+        ];
+
+        $graphql = app('graphql');
+        $graphql->schema()->type('user', User::class);
+        $graphql->schema()->query('userQuery', UserQuery::class);
+
+        $this->assertEquals(['data' => $expected], $this->executeQuery($query));
     }
 
     /**

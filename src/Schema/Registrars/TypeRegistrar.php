@@ -2,6 +2,8 @@
 
 namespace Nuwave\Relay\Schema\Registrars;
 
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Relay\Support\Definition\EloquentType;
 use Nuwave\Relay\Support\Exceptions\GraphQLTypeInstanceNotFound;
 
 class TypeRegistrar extends BaseRegistrar
