@@ -10,7 +10,7 @@ class SchemaGenerator
      * @param  string $version
      * @return boolean
      */
-    public function build($version = '4.12')
+    public function build($version = '0.6.0')
     {
         $query = file_get_contents(__DIR__.'/../../../assets/introspection-'. $version .'.txt');
         $data = app('graphql')->execute($query);
