@@ -190,12 +190,9 @@ class EloquentType
 
         return $fields->filter(function ($field) {
             return isset($field['type']);
-        })
-        ->map(function ($field) use ($namespace, $generator) {
-            $type = $generator->fromType($field['type']);
-
+        })->map(function ($field) use ($namespace, $generator) {
             return [
-                'type' => $type,
+                'type' => $generator->fromType($field['type']),
                 'description' => $field['description']
             ];
         });

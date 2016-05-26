@@ -24,6 +24,7 @@
         "illuminate/database": "^5.2",
         "illuminate/contracts": "^5.2",
         "illuminate/routing": "^5.2",
-        "illuminate/http": "^5.2"
+        "illuminate/http": "^5.2",
+        "illuminate/console": "^5.2"
     }
 }

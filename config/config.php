@@ -43,7 +43,7 @@ return [
     */
 
     'schema' => [
-        // 'output' => null,
+        'output' => storage_path('relay/schema.json'),
         'register' => function () {
             //
         }
