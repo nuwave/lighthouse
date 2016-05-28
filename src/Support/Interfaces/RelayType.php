@@ -5,13 +5,13 @@ namespace Nuwave\Lighthouse\Support\Interfaces;
 interface RelayType
 {
     /**
-     * Get customer by id.
+     * Get model by id.
      *
-     * When the root 'node' query is called, it will use this method
-     * to resolve the type by providing the id.
+     * Note: When the root 'node' query is called, this method
+     * will be used to resolve the type by providing the id.
      *
-     * @param    string $id
-     * @return  User
+     * @param  mixed $id
+     * @return mixed
      */
     public function resolveById($id);
 }
