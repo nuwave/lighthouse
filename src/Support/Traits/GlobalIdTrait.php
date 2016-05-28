@@ -69,4 +69,38 @@ trait GlobalIdTrait
 
         return $type;
     }
+
+    /**
+     * Decode cursor from query arguments.
+     *
+     * @param  array  $args
+     * @return integer
+     */
+    protected function decodeCursor(array $args)
+    {
+        $resolver = config('lighthouse.globalId.decodeCursor');
+
+        if (is_callable($resolver)) {
+            return $resolver($args);
+        }
+
+        return isset($args['after']) ? $this->getCursorId($args['after']) : 0;
+    }
+
+    /**
+     * Get id from encoded cursor.
+     *
+     * @param  string $cursor
+     * @return integer
+     */
+    protected function getCursorId($cursor)
+    {
+        $resolver = config('lighthouse.globalId.getCursorId');
+
+        if (is_callable($resolver)) {
+            return $resolver($cursor);
+        }
+
+        return (int)$this->decodeRelayId($cursor);
+    }
 }
