@@ -18,7 +18,7 @@ return [
         'fields'    => 'App\\Http\\GraphQL\\Fields',
     ],
 
-    'cache' => storage_path('graphql/cache'),
+    'cache' => storage_path('lighthouse/cache'),
     'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
     // 'model_path' => 'App\\Models',
     // 'camel_case' => false,
