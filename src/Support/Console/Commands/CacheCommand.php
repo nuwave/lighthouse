@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Support\Console\Commands;
+namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\Command;
-use Nuwave\Relay\Support\SchemaGenerator;
-use Nuwave\Relay\Support\Cache\FileStore;
+use Nuwave\Lighthouse\Support\SchemaGenerator;
+use Nuwave\Lighthouse\Support\Cache\FileStore;
 
 class CacheCommand extends Command
 {
@@ -25,7 +25,7 @@ class CacheCommand extends Command
     /**
      * Cache manager.
      *
-     * @var \Nuwave\Relay\Support\Cache\FileStore
+     * @var \Nuwave\Lighthouse\Support\Cache\FileStore
      */
     protected $cache;
 

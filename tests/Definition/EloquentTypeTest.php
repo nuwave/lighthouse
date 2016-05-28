@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Definition;
+namespace Nuwave\Lighthouse\Tests\Definition;
 
-use Nuwave\Relay\Tests\Support\GraphQL\Queries\UserQuery;
-use Nuwave\Relay\Tests\Support\Models\User;
-use Nuwave\Relay\Tests\DBTestCase;
-use Nuwave\Relay\Support\Definition\EloquentType;
-use Nuwave\Relay\Support\Cache\FileStore;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Tests\DBTestCase;
+use Nuwave\Lighthouse\Support\Definition\EloquentType;
+use Nuwave\Lighthouse\Support\Cache\FileStore;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ObjectType;

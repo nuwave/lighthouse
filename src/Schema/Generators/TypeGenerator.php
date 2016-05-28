@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Generators;
+namespace Nuwave\Lighthouse\Schema\Generators;
 
 use GraphQL\Type\Definition\Type;
 

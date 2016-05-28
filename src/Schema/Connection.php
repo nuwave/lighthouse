@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Schema;
+namespace Nuwave\Lighthouse\Schema;
 
 use Illuminate\Support\Fluent;
 

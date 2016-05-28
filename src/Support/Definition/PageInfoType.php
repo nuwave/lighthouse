@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Relay\Support\Definition;
+namespace Nuwave\Lighthouse\Support\Definition;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Relay\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Traits\GlobalIdTrait;
 
 class PageInfoType extends GraphQLType
 {

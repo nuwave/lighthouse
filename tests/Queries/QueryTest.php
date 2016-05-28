@@ -1,14 +1,14 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Queries;
+namespace Nuwave\Lighthouse\Tests\Queries;
 
 use GraphQL;
-use Nuwave\Relay\Support\Definition\GraphQLQuery;
-use Nuwave\Relay\Tests\Support\Models\User;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\TaskType;
-use Nuwave\Relay\Tests\Support\GraphQL\Queries\UserQuery;
-use Nuwave\Relay\Tests\TestCase;
+use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
+use Nuwave\Lighthouse\Tests\TestCase;
 
 class QueryTest extends TestCase
 {

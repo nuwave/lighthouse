@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Support\Models;
+namespace Nuwave\Lighthouse\Tests\Support\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

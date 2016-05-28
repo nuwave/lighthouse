@@ -1,8 +1,8 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Config;
+namespace Nuwave\Lighthouse\Tests\Config;
 
-use Nuwave\Relay\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\TestCase;
 use GraphQL\Type\Definition\ObjectType;
 
 class GraphQLFileConfigTest extends TestCase

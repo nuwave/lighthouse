@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Config;
+namespace Nuwave\Lighthouse\Tests\Config;
 
-use Nuwave\Relay\Tests\TestCase;
-use Nuwave\Relay\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Relay\Tests\Support\GraphQL\Queries\UserQuery;
+use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 use GraphQL\Type\Definition\ObjectType;
 
 class GraphQLConfigTest extends TestCase

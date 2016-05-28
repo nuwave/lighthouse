@@ -1,8 +1,8 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Generators;
+namespace Nuwave\Lighthouse\Schema\Generators;
 
-use Nuwave\Relay\Support\Definition\EdgeType;
+use Nuwave\Lighthouse\Support\Definition\EdgeType;
 use GraphQL\Type\Definition\ObjectType;
 
 class EdgeTypeGenerator

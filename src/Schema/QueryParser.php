@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Relay\Schema;
+namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\Parser;
 use GraphQL\Language\Source;
 use GraphQL\Language\AST\Field as QueryField;
-use Nuwave\Relay\Schema\SchemaBuilder;
-use Nuwave\Relay\Schema\Generators\ConnectionGenerator;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Generators\ConnectionGenerator;
 
 class QueryParser
 {

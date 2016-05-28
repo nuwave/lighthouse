@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Registrars;
+namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Relay\Support\Definition\RelayConnectionType;
-use Nuwave\Relay\Support\Definition\Fields\ConnectionField;
+use Nuwave\Lighthouse\Support\Definition\RelayConnectionType;
+use Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField;
 
 class ConnectionRegistrar extends BaseRegistrar
 {
@@ -46,7 +46,7 @@ class ConnectionRegistrar extends BaseRegistrar
      * @param  string $name
      * @param  string|null $parent
      * @param  boolean $fresh
-     * @return \Nuwave\Relay\Support\Definition\Fields\ConnectionField
+     * @return \Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField
      */
     public function instance($name, $parent = null, $fresh = false)
     {

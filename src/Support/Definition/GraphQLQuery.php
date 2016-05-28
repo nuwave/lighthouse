@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Support\Definition;
+namespace Nuwave\Lighthouse\Support\Definition;
 
 class GraphQLQuery extends GraphQLField
 {

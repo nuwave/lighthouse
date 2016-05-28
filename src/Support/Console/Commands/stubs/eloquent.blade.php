@@ -2,7 +2,7 @@ namespace DummyNamespace;
 
 use GraphQL;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Relay\Support\Definition\RelayType;
+use Nuwave\Lighthouse\Support\Definition\RelayType;
 use GraphQL\Type\Definition\ResolveInfo;
 use {{ $model }};
 

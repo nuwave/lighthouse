@@ -6,7 +6,7 @@ use GraphQL;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\InputObjectType;
-use Nuwave\Relay\Support\Definition\RelayMutation;
+use Nuwave\Lighthouse\Support\Definition\RelayMutation;
 
 class DummyClass extends RelayMutation
 {

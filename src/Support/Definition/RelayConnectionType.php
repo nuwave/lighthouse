@@ -1,13 +1,13 @@
 <?php
 
-namespace Nuwave\Relay\Support\Definition;
+namespace Nuwave\Lighthouse\Support\Definition;
 
 use Closure;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Relay\Support\Definition\GraphQLType;
+use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 
 class RelayConnectionType extends GraphQLType
 {

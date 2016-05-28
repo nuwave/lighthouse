@@ -1,14 +1,14 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Schema\Registrars;
+namespace Nuwave\Lighthouse\Tests\Schema\Registrars;
 
 use GraphQL;
 use GraphQL\Type\Definition\ObjectType;
-use Nuwave\Relay\Tests\TestCase;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Relay\Schema\Registrars\TypeRegistrar;
-use Nuwave\Relay\Schema\SchemaBuilder;
-use Nuwave\Relay\Support\Exceptions\GraphQLTypeInstanceNotFound;
+use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound;
 
 class TypeRegistrarTest extends TestCase
 {

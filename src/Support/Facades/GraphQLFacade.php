@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Support\Facades;
+namespace Nuwave\Lighthouse\Support\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Definition;
+namespace Nuwave\Lighthouse\Tests\Definition;
 
 use Crypt;
 use Illuminate\Encryption\Encrypter;
-use Nuwave\Relay\Tests\TestCase;
-use Nuwave\Relay\Support\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class GlobalIdTest extends TestCase
 {

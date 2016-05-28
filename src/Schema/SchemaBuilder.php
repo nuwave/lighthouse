@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Schema;
+namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use GraphQL\Type\Definition\ObjectType;
-use Nuwave\Relay\Support\Traits\Container\CentralRegistrar;
+use Nuwave\Lighthouse\Support\Traits\Container\CentralRegistrar;
 
 class SchemaBuilder
 {
@@ -100,7 +100,7 @@ class SchemaBuilder
      *
      * @param  string $name
      * @param  string $namespace
-     * @return \Nuwave\Relay\Schema\Field
+     * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function query($name, $namespace)
     {
@@ -112,7 +112,7 @@ class SchemaBuilder
      *
      * @param  string $name
      * @param  string $namespace
-     * @return \Nuwave\Relay\Schema\Field
+     * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function mutation($name, $namespace)
     {
@@ -124,7 +124,7 @@ class SchemaBuilder
      *
      * @param  string $name
      * @param  string $namespace
-     * @return \Nuwave\Relay\Schema\Field
+     * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function type($name, $namespace)
     {
@@ -147,7 +147,7 @@ class SchemaBuilder
      * Get type field from registrar.
      *
      * @param  string $name
-     * @return \Nuwave\Relay\Schema\Field
+     * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function getTypeField($name)
     {

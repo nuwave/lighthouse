@@ -1,6 +1,6 @@
 <?php
 
-$namespace = "Nuwave\\Relay\\Tests\\Support\\Models\\";
+$namespace = "Nuwave\\Lighthouse\\Tests\\Support\\Models\\";
 
 $factory->define($namespace.'User', function (Faker\Generator $faker) {
     return [

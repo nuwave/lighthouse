@@ -1,17 +1,17 @@
 <?php
 
-namespace Nuwave\Relay;
+namespace Nuwave\Lighthouse;
 
 use Closure;
 use GraphQL\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
-use Nuwave\Relay\Support\Traits\Container\QueryExecutor;
-use Nuwave\Relay\Support\Traits\Container\MutationRegistrar;
-use Nuwave\Relay\Support\Cache\FileStore;
-use Nuwave\Relay\Schema\Field;
-use Nuwave\Relay\Schema\QueryParser;
-use Nuwave\Relay\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
+use Nuwave\Lighthouse\Support\Traits\Container\MutationRegistrar;
+use Nuwave\Lighthouse\Support\Cache\FileStore;
+use Nuwave\Lighthouse\Schema\Field;
+use Nuwave\Lighthouse\Schema\QueryParser;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 class GraphQL
 {

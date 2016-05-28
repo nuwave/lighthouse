@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Support\GraphQL\Types;
+namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Types;
 
 use GraphQL;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Relay\Support\Definition\GraphQLType;
+use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 
 class TaskType extends GraphQLType
 {

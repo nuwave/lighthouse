@@ -4,7 +4,7 @@ namespace DummyNamespace;
 
 use GraphQL;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Relay\Support\Definition\GraphQLQuery;
+use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 
 class DummyClass extends GraphQLQuery
 {

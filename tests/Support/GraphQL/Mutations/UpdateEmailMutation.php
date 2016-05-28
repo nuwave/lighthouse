@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Support\GraphQL\Mutations;
+namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations;
 
-use Nuwave\Relay\Support\Definition\GraphQLMutation;
-use Nuwave\Relay\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 

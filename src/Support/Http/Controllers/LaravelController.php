@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Support\Http\Controllers;
+namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;

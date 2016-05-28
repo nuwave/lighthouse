@@ -1,8 +1,8 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Support\GraphQL\Queries;
+namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Queries;
 
-use Nuwave\Relay\Support\Definition\GraphQLQuery;
+use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 
 class UserQuery extends GraphQLQuery
 {

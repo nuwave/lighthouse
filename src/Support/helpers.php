@@ -4,7 +4,7 @@ if (! function_exists('graphql')) {
     /**
      * Get instance of graphql container.
      *
-     * @return \Nuwave\Relay\GraphQL
+     * @return \Nuwave\Lighthouse\GraphQL
      */
     function graphql()
     {
@@ -16,7 +16,7 @@ if (! function_exists('schema')) {
     /**
      * Get instance of schema builder.
      *
-     * @return \Nuwave\Relay\Schema\SchemaBuilder
+     * @return \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     function schema()
     {

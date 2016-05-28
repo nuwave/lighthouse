@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Queries;
+namespace Nuwave\Lighthouse\Tests\Queries;
 
-use Nuwave\Relay\Tests\TestCase;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 
 class IntrospectionTest extends TestCase
 {

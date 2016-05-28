@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Schema;
+namespace Nuwave\Lighthouse\Tests\Schema;
 
-use Nuwave\Relay\Tests\TestCase;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\TaskType;
-use Nuwave\Relay\Tests\Support\GraphQL\Queries\UserQuery;
+use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 use GraphQL\Type\Definition\ObjectType;
 
 class SchemaBuilderTest extends TestCase
@@ -16,7 +16,7 @@ class SchemaBuilderTest extends TestCase
     public function itCanGroupElementsByNamespace()
     {
         $graphql = app('graphql');
-        $namespace = 'Nuwave\\Relay\\Tests\\Support\\GraphQL\\Types';
+        $namespace = 'Nuwave\\Lighthouse\\Tests\\Support\\GraphQL\\Types';
 
         $graphql->schema()->group(['namespace' => $namespace], function () use ($graphql) {
             $graphql->schema()->type('userGrouped', 'UserType');

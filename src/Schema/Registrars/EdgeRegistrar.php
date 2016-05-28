@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Registrars;
+namespace Nuwave\Lighthouse\Schema\Registrars;
 
-use Nuwave\Relay\Schema\Registrars\BaseRegistrar;
-use Nuwave\Relay\Schema\Generators\EdgeTypeGenerator;
+use Nuwave\Lighthouse\Schema\Registrars\BaseRegistrar;
+use Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator;
 use GraphQL\Type\Definition\ObjectType;
 
 class EdgeRegistrar extends BaseRegistrar

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Tests;
+namespace Nuwave\Lighthouse\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -28,7 +28,7 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            \Nuwave\Relay\LaravelServiceProvider::class,
+            \Nuwave\Lighthouse\LaravelServiceProvider::class,
         ];
     }
 
@@ -42,7 +42,7 @@ class TestCase extends BaseTestCase
     protected function getPackageAliases($app)
     {
         return [
-            'GraphQL' => \Nuwave\Relay\Support\Facades\GraphQLFacade::class,
+            'GraphQL' => \Nuwave\Lighthouse\Support\Facades\GraphQLFacade::class,
         ];
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Support\Cache;
+namespace Nuwave\Lighthouse\Support\Cache;
 
 class FileStore
 {

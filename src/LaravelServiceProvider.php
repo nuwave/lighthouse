@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay;
+namespace Nuwave\Lighthouse;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -44,9 +44,9 @@ class LaravelServiceProvider extends ServiceProvider
     protected function registerNodes()
     {
         $graphql = app('graphql');
-        $graphql->schema()->type('node', \Nuwave\Relay\Support\Definition\NodeType::class);
-        $graphql->schema()->type('pageInfo', \Nuwave\Relay\Support\Definition\PageInfoType::class);
-        $graphql->schema()->query('node', \Nuwave\Relay\Support\Definition\NodeQuery::class);
+        $graphql->schema()->type('node', \Nuwave\Lighthouse\Support\Definition\NodeType::class);
+        $graphql->schema()->type('pageInfo', \Nuwave\Lighthouse\Support\Definition\PageInfoType::class);
+        $graphql->schema()->query('node', \Nuwave\Lighthouse\Support\Definition\NodeQuery::class);
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Registrars;
+namespace Nuwave\Lighthouse\Schema\Registrars;
 
-use Nuwave\Relay\Schema\Field;
-use Nuwave\Relay\Schema\SchemaBuilder as Schema;
+use Nuwave\Lighthouse\Schema\Field;
+use Nuwave\Lighthouse\Schema\SchemaBuilder as Schema;
 
 abstract class BaseRegistrar
 {
@@ -34,7 +34,7 @@ abstract class BaseRegistrar
      *
      * @param  string $name
      * @param  string $namespace
-     * @return \Nuwave\Relay\Schema\Field
+     * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function register($name, $namespace)
     {
@@ -50,7 +50,7 @@ abstract class BaseRegistrar
      *
      * @param  string $name
      * @param  string $namespace
-     * @return \Nuwave\Relay\Schema\Field|null
+     * @return \Nuwave\Lighthouse\Schema\Field|null
      */
     public function get($name)
     {
@@ -72,7 +72,7 @@ abstract class BaseRegistrar
      *
      * @param  string $name
      * @param  string $namespace
-     * @return \Nuwave\Relay\Schema\Field
+     * @return \Nuwave\Lighthouse\Schema\Field
      */
     protected function createField($name, $namespace)
     {

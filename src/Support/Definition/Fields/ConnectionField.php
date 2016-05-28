@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Support\Definition\Fields;
+namespace Nuwave\Lighthouse\Support\Definition\Fields;
 
 use Closure;
 use Illuminate\Support\Fluent;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Schema;
+namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use Illuminate\Support\Collection;

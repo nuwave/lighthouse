@@ -2,7 +2,7 @@
     "name": "nuwave/laravel-relay",
     "autoload": {
         "psr-4": {
-            "Nuwave\\Relay\\": "src/"
+            "Nuwave\\Lighthouse\\": "src/"
         },
         "files": [
             "src/Support/helpers.php"
@@ -15,7 +15,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Nuwave\\Relay\\Tests\\": "tests/"
+            "Nuwave\\Lighthouse\\Tests\\": "tests/"
         }
     },
     "require": {

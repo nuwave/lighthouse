@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Support\Definition;
+namespace Nuwave\Lighthouse\Support\Definition;
 
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Fluent;
-use Nuwave\Relay\Support\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class GraphQLType extends Fluent
 {

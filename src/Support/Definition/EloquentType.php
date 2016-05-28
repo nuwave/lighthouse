@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Relay\Support\Definition;
+namespace Nuwave\Lighthouse\Support\Definition;
 
 use ReflectionClass;
-use Nuwave\Relay\Schema\Generators\TypeGenerator;
+use Nuwave\Lighthouse\Schema\Generators\TypeGenerator;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\Type;

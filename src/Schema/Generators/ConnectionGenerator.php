@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Generators;
+namespace Nuwave\Lighthouse\Schema\Generators;
 
 use GraphQL\Language\AST\Field;
-use Nuwave\Relay\Schema\Connection;
+use Nuwave\Lighthouse\Schema\Connection;
 
 class ConnectionGenerator
 {

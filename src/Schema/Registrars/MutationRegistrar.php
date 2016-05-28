@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Registrars;
+namespace Nuwave\Lighthouse\Schema\Registrars;
 
 class MutationRegistrar extends BaseRegistrar
 {

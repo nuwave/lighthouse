@@ -1,9 +1,9 @@
 <?php
-namespace Nuwave\Relay\Support\Definition;
+namespace Nuwave\Lighthouse\Support\Definition;
 
 use Illuminate\Support\Fluent;
-use Nuwave\Relay\Support\Traits\GlobalIdTrait;
-use Nuwave\Relay\Support\Exceptions\ValidationError;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 class GraphQLField extends Fluent
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Support\Traits\Container;
+namespace Nuwave\Lighthouse\Support\Traits\Container;
 
 use GraphQL\Error;
 use GraphQL\GraphQL;
-use Nuwave\Relay\Support\Exceptions\ValidationError;
+use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 trait QueryExecutor
 {

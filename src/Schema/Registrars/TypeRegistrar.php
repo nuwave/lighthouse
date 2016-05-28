@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Relay\Schema\Registrars;
+namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Relay\Support\Definition\EloquentType;
-use Nuwave\Relay\Support\Exceptions\GraphQLTypeInstanceNotFound;
+use Nuwave\Lighthouse\Support\Definition\EloquentType;
+use Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound;
 
 class TypeRegistrar extends BaseRegistrar
 {
@@ -54,7 +54,7 @@ class TypeRegistrar extends BaseRegistrar
      * Check if type is registered.
      *
      * @param  string $name
-     * @return \Nuwave\Relay\Schema\Field
+     * @return \Nuwave\Lighthouse\Schema\Field
      */
     protected function getType($name)
     {

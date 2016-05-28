@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Relay\Support\Traits\Container;
+namespace Nuwave\Lighthouse\Support\Traits\Container;
 
-use Nuwave\Relay\Schema\Registrars\TypeRegistrar;
-use Nuwave\Relay\Schema\Registrars\EdgeRegistrar;
-use Nuwave\Relay\Schema\Registrars\QueryRegistrar;
-use Nuwave\Relay\Schema\Registrars\MutationRegistrar;
-use Nuwave\Relay\Schema\Registrars\ConnectionRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\EdgeRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\QueryRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\MutationRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar;
 
 trait CentralRegistrar
 {
@@ -82,7 +82,7 @@ trait CentralRegistrar
     /**
      * Get instance of edge registrar.
      *
-     * @return Nuwave\Relay\Schema\Registrars\EdgeRegistrar
+     * @return Nuwave\Lighthouse\Schema\Registrars\EdgeRegistrar
      */
     public function getEdgeRegistrar()
     {
@@ -106,7 +106,7 @@ trait CentralRegistrar
     /**
      * Get instance of connection registrar.
      *
-     * @return Nuwave\Relay\Schema\Registrars\ConnectionRegistrar
+     * @return Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar
      */
     public function getConnectionRegistrar()
     {

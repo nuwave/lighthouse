@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Relay\Support\Console\Commands;
+namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use ReflectionClass;
-use Nuwave\Relay\Support\Definition\EloquentType;
+use Nuwave\Lighthouse\Support\Definition\EloquentType;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 

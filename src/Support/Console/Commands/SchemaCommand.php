@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Relay\Support\Console\Commands;
+namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\Command;
-use Nuwave\Relay\Schema\Generators\SchemaGenerator;
+use Nuwave\Lighthouse\Schema\Generators\SchemaGenerator;
 
 class SchemaCommand extends Command
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Console;
+namespace Nuwave\Lighthouse\Tests\Console;
 
-use Nuwave\Relay\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\TestCase;
 
 class SchemaGeneratorTest extends TestCase
 {
@@ -25,7 +25,7 @@ class SchemaGeneratorTest extends TestCase
      */
     protected function resolveApplicationConsoleKernel($app)
     {
-        $app->singleton('Illuminate\Contracts\Console\Kernel', 'Nuwave\Relay\Tests\Support\Console\Kernel');
+        $app->singleton('Illuminate\Contracts\Console\Kernel', 'Nuwave\Lighthouse\Tests\Support\Console\Kernel');
     }
 
     /**

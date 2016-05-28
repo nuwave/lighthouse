@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Relay\Tests\Definition;
+namespace Nuwave\Lighthouse\Tests\Definition;
 
 use GraphQL\Type\Definition\ObjectType;
-use Nuwave\Relay\Tests\TestCase;
-use Nuwave\Relay\Tests\Support\Models\User;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Relay\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 
 class GraphQLTypeTest extends TestCase
 {

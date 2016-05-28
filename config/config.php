@@ -11,16 +11,15 @@ return [
     | match the namespaces you'd like each piece to be created in.
     |
     */
-
-    // 'namespaces' => [
-    //     'mutations' => 'App\\GraphQL\\Http\\Mutations',
-    //     'queries'   => 'App\\GraphQL\\Http\\Queries',
-    //     'types'     => 'App\\GraphQL\\Http\\Types',
-    //     'fields'    => 'App\\GraphQL\\Http\\Fields',
-    // ],
+    'namespaces' => [
+        'mutations' => 'App\\GraphQL\\Http\\Mutations',
+        'queries'   => 'App\\GraphQL\\Http\\Queries',
+        'types'     => 'App\\GraphQL\\Http\\Types',
+        'fields'    => 'App\\GraphQL\\Http\\Fields',
+    ],
 
     'cache' => storage_path('graphql/cache'),
-    'controller' => 'Nuwave\Relay\Support\Http\Controllers\LaravelController@query',
+    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
     // 'model_path' => 'App\\Models',
     // 'camel_case' => false,
 

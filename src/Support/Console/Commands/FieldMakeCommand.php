@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Relay\Support\Console\Commands;
+namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 
