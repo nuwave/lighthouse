@@ -49,7 +49,7 @@ class GlobalIdTest extends TestCase
         $this->app->instance('encrypter', $encrypter->reveal());
         $encrypter->encrypt($type.':'.$id)->willReturn('foo');
 
-        $this->app['config']->set('relay.globalId.encode', function ($type, $id) {
+        $this->app['config']->set('lighthouse.globalId.encode', function ($type, $id) {
             return app('encrypter')->encrypt($type.':'.$id);
         });
 
@@ -67,7 +67,7 @@ class GlobalIdTest extends TestCase
         $this->app->instance('encrypter', $encrypter->reveal());
         $encrypter->decrypt($globalId)->willReturn('bar');
 
-        $this->app['config']->set('relay.globalId.decodeId', function ($globalId) {
+        $this->app['config']->set('lighthouse.globalId.decodeId', function ($globalId) {
             return app('encrypter')->decrypt($globalId);
         });
 
@@ -85,7 +85,7 @@ class GlobalIdTest extends TestCase
         $this->app->instance('encrypter', $encrypter->reveal());
         $encrypter->decrypt($globalId)->willReturn('baz');
 
-        $this->app['config']->set('relay.globalId.decodeType', function ($globalId) {
+        $this->app['config']->set('lighthouse.globalId.decodeType', function ($globalId) {
             return app('encrypter')->decrypt($globalId);
         });
 

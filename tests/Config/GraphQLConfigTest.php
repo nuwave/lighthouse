@@ -18,7 +18,7 @@ class GraphQLConfigTest extends TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('relay.schema.register', function () {
+        $app['config']->set('lighthouse.schema.register', function () {
             $graphql = app('graphql');
             $graphql->schema()->type('user', UserType::class);
             $graphql->schema()->query('userQuery', UserQuery::class);

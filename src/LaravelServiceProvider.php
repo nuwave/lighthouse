@@ -13,10 +13,10 @@ class LaravelServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([__DIR__ . '/../config/config.php' => config_path('relay.php')]);
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'relay');
+        $this->publishes([__DIR__ . '/../config/config.php' => config_path('lighthouse.php')]);
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'lighthouse');
 
-        if (config('relay.controller')) {
+        if (config('lighthouse.controller')) {
             require_once __DIR__.'/Support/Http/routes.php';
         }
 
@@ -56,7 +56,7 @@ class LaravelServiceProvider extends ServiceProvider
      */
     protected function registerSchema()
     {
-        $schema = $this->app['config']->get('relay.schema.register');
+        $schema = $this->app['config']->get('lighthouse.schema.register');
 
         if (is_callable($schema)) {
             $schema();

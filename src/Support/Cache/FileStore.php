@@ -59,7 +59,7 @@ class FileStore
      */
     protected function getPath($name)
     {
-        return config('relay.cache').'/'.strtolower($name);
+        return config('lighthouse.cache').'/'.strtolower($name);
     }
 
     /**

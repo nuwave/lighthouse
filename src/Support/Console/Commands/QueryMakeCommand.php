@@ -11,7 +11,7 @@ class QueryMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:relay:query';
+    protected $name = 'make:lighthouse:query';
 
     /**
      * The console command description.
@@ -45,6 +45,6 @@ class QueryMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return config('relay.namespaces.queries');
+        return config('lighthouse.namespaces.queries');
     }
 }

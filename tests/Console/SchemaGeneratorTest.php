@@ -14,7 +14,7 @@ class SchemaGeneratorTest extends TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('relay.schema.output', __DIR__.'/../Support/storage/schema/schema.json');
+        $app['config']->set('lighthouse.schema.output', __DIR__.'/../Support/storage/schema/schema.json');
     }
 
     /**
@@ -33,6 +33,6 @@ class SchemaGeneratorTest extends TestCase
      */
     public function itGeneratesSchemaFile()
     {
-        $this->artisan('relay:schema');
+        $this->artisan('lighthouse:schema');
     }
 }

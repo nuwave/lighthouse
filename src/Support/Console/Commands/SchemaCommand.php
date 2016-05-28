@@ -12,7 +12,7 @@ class SchemaCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'relay:schema';
+    protected $signature = 'lighthouse:schema';
 
     /**
      * The console command description.

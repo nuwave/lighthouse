@@ -24,7 +24,7 @@ class EloquentTypeTest extends DBTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('relay.cache', __DIR__.'/../Support/storage/cache');
+        $app['config']->set('lighthouse.cache', __DIR__.'/../Support/storage/cache');
     }
 
     /**

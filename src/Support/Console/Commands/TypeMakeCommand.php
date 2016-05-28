@@ -14,7 +14,7 @@ class TypeMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:relay:type';
+    protected $name = 'make:lighthouse:type';
 
     /**
      * The console command description.
@@ -48,7 +48,7 @@ class TypeMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return config('relay.namespaces.types');
+        return config('lighthouse.namespaces.types');
     }
 
     /**
@@ -108,7 +108,7 @@ class TypeMakeCommand extends GeneratorCommand
         if (starts_with($model, $rootNamespace)) {
             $shortName = (new ReflectionClass($model))->getShortName();
         } else {
-            $model = config('relay.model_path') . "\\" . $model;
+            $model = config('lighthouse.model_path') . "\\" . $model;
         }
 
         $fields = $this->getTypeFields($model);

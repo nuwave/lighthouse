@@ -13,7 +13,7 @@ trait GlobalIdTrait
      */
     public function encodeGlobalId($type, $id)
     {
-        $resolver = config('relay.globalId.encode');
+        $resolver = config('lighthouse.globalId.encode');
 
         if (is_callable($resolver)) {
             return $resolver($type, $id);
@@ -41,7 +41,7 @@ trait GlobalIdTrait
      */
     public function decodeRelayId($id)
     {
-        $resolver = config('relay.globalId.decodeId');
+        $resolver = config('lighthouse.globalId.decodeId');
 
         if (is_callable($resolver)) {
             return $resolver($id);
@@ -59,7 +59,7 @@ trait GlobalIdTrait
      */
     public function decodeRelayType($id)
     {
-        $resolver = config('relay.globalId.decodeType');
+        $resolver = config('lighthouse.globalId.decodeType');
 
         if (is_callable($resolver)) {
             return $resolver($id);

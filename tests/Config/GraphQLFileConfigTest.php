@@ -15,7 +15,7 @@ class GraphQLFileConfigTest extends TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('relay.schema.register', __DIR__ . '/../Support/schema.php');
+        $app['config']->set('lighthouse.schema.register', __DIR__ . '/../Support/schema.php');
     }
 
     /**

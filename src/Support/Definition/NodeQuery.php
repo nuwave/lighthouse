@@ -43,7 +43,7 @@ class NodeQuery extends GraphQLQuery
     {
         list($typeClass, $id) = $this->decodeGlobalId($args['id']);
 
-        foreach (config('relay.schema.types') as $type => $class) {
+        foreach (config('lighthouse.schema.types') as $type => $class) {
             if ($typeClass == $class) {
                 $objectType = app($typeClass);
 

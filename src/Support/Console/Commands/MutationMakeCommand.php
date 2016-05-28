@@ -11,7 +11,7 @@ class MutationMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:relay:mutation';
+    protected $name = 'make:lighthouse:mutation';
 
     /**
      * The console command description.
@@ -45,6 +45,6 @@ class MutationMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return config('relay.namespaces.mutations');
+        return config('lighthouse.namespaces.mutations');
     }
 }

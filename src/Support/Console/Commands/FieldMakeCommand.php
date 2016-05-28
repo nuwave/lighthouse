@@ -11,7 +11,7 @@ class FieldMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:relay:field';
+    protected $name = 'make:lighthouse:field';
 
     /**
      * The console command description.
@@ -45,6 +45,6 @@ class FieldMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return config('relay.namespaces.fields');
+        return config('lighthouse.namespaces.fields');
     }
 }

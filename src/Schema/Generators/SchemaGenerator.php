@@ -17,7 +17,7 @@ class SchemaGenerator
 
         if (isset($data['data']['__schema'])) {
             $schema = json_encode($data);
-            $path = config('relay.schema.output') ?: storage_path('relay/schema.json');
+            $path = config('lighthouse.schema.output') ?: storage_path('relay/schema.json');
 
             $this->put($path, $schema);
         }

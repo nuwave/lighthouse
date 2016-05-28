@@ -13,7 +13,7 @@ class CacheCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'relay:cache';
+    protected $signature = 'lighthouse:cache';
 
     /**
      * The console command description.
