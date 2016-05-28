@@ -12,10 +12,10 @@ return [
     |
     */
     'namespaces' => [
-        'mutations' => 'App\\GraphQL\\Http\\Mutations',
-        'queries'   => 'App\\GraphQL\\Http\\Queries',
-        'types'     => 'App\\GraphQL\\Http\\Types',
-        'fields'    => 'App\\GraphQL\\Http\\Fields',
+        'mutations' => 'App\\Http\\GraphQL\\Mutations',
+        'queries'   => 'App\\Http\\GraphQL\\Queries',
+        'types'     => 'App\\Http\\GraphQL\\Types',
+        'fields'    => 'App\\Http\\GraphQL\\Fields',
     ],
 
     'cache' => storage_path('graphql/cache'),
@@ -42,7 +42,7 @@ return [
     */
 
     'schema' => [
-        'output' => storage_path('relay/schema.json'),
+        'output' => storage_path('lighthouse/schema.json'),
         'register' => function () {
             //
         }
