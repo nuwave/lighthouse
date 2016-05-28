@@ -107,13 +107,13 @@ class GraphQL
      * Extract instance from connection registrar.
      *
      * @param  string $name
-     * @param  Closure|null $resolve
+     * @param  string|null $parent
      * @param  boolean $fresh
      * @return ObjectType
      */
-    public function connection($name, Closure $resolve = null, $fresh = false)
+    public function connection($name, $parent = null, $fresh = false)
     {
-        $connection = $this->schema()->connectionInstance($name, $resolve, $fresh);
+        $connection = $this->schema()->connectionInstance($name, $parent, $fresh);
 
         if (! $this->connections()->has($name)) {
             $this->schema()->connection($name, $connection);

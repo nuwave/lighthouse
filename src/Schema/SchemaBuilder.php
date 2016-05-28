@@ -170,13 +170,13 @@ class SchemaBuilder
      * Extract connection instance from registrar.
      *
      * @param  string $name
-     * @param  Closure|null $resolve
+     * @param  string|null $parent
      * @param  boolean $fresh
      * @return ObjectType
      */
-    public function connectionInstance($name, Closure $resolve = null, $fresh = false)
+    public function connectionInstance($name, $parent = null, $fresh = false)
     {
-        return $this->getConnectionRegistrar()->instance($name, $resolve, $fresh);
+        return $this->getConnectionRegistrar()->instance($name, $parent, $fresh);
     }
 
     /**

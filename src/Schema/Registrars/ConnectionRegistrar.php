@@ -44,25 +44,21 @@ class ConnectionRegistrar extends BaseRegistrar
      * Get instance of connection type.
      *
      * @param  string $name
-     * @param  Closure|null $resolve
+     * @param  string|null $parent
      * @param  boolean $fresh
      * @return \Nuwave\Relay\Support\Definition\Fields\ConnectionField
      */
-    public function instance($name, $resolve = null, $fresh = false)
+    public function instance($name, $parent = null, $fresh = false)
     {
-        // TODO: Create resolve function for connection if is_callable($resolve)
-
         if (! $fresh && $this->instances->has($name)) {
-            $field = $this->instances->get($name);
-            $field['resolve'] = $resolve;
-
-            return $field;
+            return $this->instances->get($name);
         }
 
+        $key = $parent ? $parent.'.'.$anme : $name;
         $nodeType = $this->getSchema()->typeInstance($name);
-        $instance = $this->getInstance($name, $nodeType, $resolve);
+        $instance = $this->getInstance($name, $nodeType);
 
-        $this->instances->put($name, $instance);
+        $this->instances->put($key, $instance);
 
         return $instance;
     }
@@ -72,10 +68,9 @@ class ConnectionRegistrar extends BaseRegistrar
      *
      * @param  string $name
      * @param  ObjectType $nodeType
-     * @param  Closure|null $resolve
      * @return array
      */
-    public function getInstance($name, ObjectType $nodeType, $resolve = null)
+    public function getInstance($name, ObjectType $nodeType)
     {
         $connection = new RelayConnectionType();
 
@@ -92,7 +87,7 @@ class ConnectionRegistrar extends BaseRegistrar
         $field = new ConnectionField([
             'args'    => RelayConnectionType::connectionArgs(),
             'type'    => $instance,
-            'resolve' => $resolve
+            'resolve' => null
         ]);
 
         if ($connection->interfaces) {
