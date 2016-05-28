@@ -5,6 +5,7 @@ namespace Nuwave\Relay\Schema\Registrars;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Relay\Support\Definition\RelayConnectionType;
+use Nuwave\Relay\Support\Definition\Fields\ConnectionField;
 
 class ConnectionRegistrar extends BaseRegistrar
 {
@@ -45,7 +46,7 @@ class ConnectionRegistrar extends BaseRegistrar
      * @param  string $name
      * @param  Closure|null $resolve
      * @param  boolean $fresh
-     * @return array
+     * @return \Nuwave\Relay\Support\Definition\Fields\ConnectionField
      */
     public function instance($name, $resolve = null, $fresh = false)
     {
@@ -88,11 +89,11 @@ class ConnectionRegistrar extends BaseRegistrar
         $connection->setPageInfoType($pageInfoType);
         $instance = $connection->toType();
 
-        $field = [
+        $field = new ConnectionField([
             'args'    => RelayConnectionType::connectionArgs(),
             'type'    => $instance,
             'resolve' => $resolve
-        ];
+        ]);
 
         if ($connection->interfaces) {
             InterfaceType::addImplementationToInterfaces($instance);

@@ -5,6 +5,7 @@ namespace Nuwave\Relay\Tests\Support\GraphQL\Queries;
 use GraphQL;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Relay\Tests\Support\Models\User;
+use Nuwave\Relay\Tests\Support\Models\Task;
 use Nuwave\Relay\Support\Definition\GraphQLQuery;
 
 class UserQuery extends GraphQLQuery
@@ -48,6 +49,7 @@ class UserQuery extends GraphQLQuery
         ]);
 
         $user->id = 1;
+        $user->tasks = factory(Task::class, 5)->make();
 
         return $user;
     }

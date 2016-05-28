@@ -2,6 +2,8 @@
 
 namespace Nuwave\Relay\Tests\Support\Models;
 
+use Illuminate\Database\Eloquent\Model;
+
 class Task extends Model
 {
     /**

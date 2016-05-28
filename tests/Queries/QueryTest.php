@@ -36,4 +36,33 @@ class QueryTest extends TestCase
 
         $this->assertEquals(['data' => $expected], $this->executeQuery($query));
     }
+
+    /**
+     * @test
+     */
+    public function itCanExecuteConnectionQuery()
+    {
+        $query = '{
+            userQuery {
+                name
+                tasks(order: "DESC") {
+                    edges {
+                        node {
+                            title
+                        }
+                    }
+                }
+            }
+        }';
+
+        $graphql = app('graphql');
+        $graphql->schema()->type('user', UserType::class);
+        $graphql->schema()->type('task', TaskType::class);
+        $graphql->schema()->query('userQuery', UserQuery::class);
+
+        $data = $this->executeQuery($query)['data'];
+        $this->assertEquals('foo', array_get($data, 'userQuery.name'));
+        $this->assertCount(5, array_get($data, 'userQuery.tasks.edges', []));
+        $this->assertEquals('foo', array_first(array_pluck(array_get($data, 'userQuery.tasks.edges', []), 'node.title')));
+    }
 }

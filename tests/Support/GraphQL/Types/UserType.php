@@ -39,6 +39,18 @@ class UserType extends GraphQLType
                 'description' => 'Email of the user.'
             ],
             'tasks' => GraphQL::connection('task')
+                ->args([
+                    'order' => [
+                        'type' => Type::string(),
+                        'description' => 'Sort order of tasks.'
+                    ]
+                ])
+                ->resolve(function ($parent, array $args) {
+                    return $parent->tasks->transform(function ($task) {
+                        return array_merge($task->toArray(), ['title' => 'foo']);
+                    });
+                })
+                ->field()
         ];
     }
 
