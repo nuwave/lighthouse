@@ -1,5 +1,13 @@
 {
     "name": "nuwave/lighthouse",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christopher Moore",
+            "email": "chris@nuwavecommerce.com"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
