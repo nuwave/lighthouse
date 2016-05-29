@@ -1,5 +1,5 @@
 {
-    "name": "nuwave/laravel-relay",
+    "name": "nuwave/lighthouse",
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
