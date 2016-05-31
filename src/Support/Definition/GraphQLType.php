@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Definition;
 
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Fluent;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Support\Interfaces\RelayType;
