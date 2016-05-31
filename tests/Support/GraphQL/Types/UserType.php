@@ -5,8 +5,10 @@ namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Types;
 use GraphQL;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Definition\GraphQLType;
+use Nuwave\Lighthouse\Support\Interfaces\RelayType;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
 
-class UserType extends GraphQLType
+class UserType extends GraphQLType implements RelayType
 {
     /**
      * Attributes of type.
@@ -19,6 +21,23 @@ class UserType extends GraphQLType
     ];
 
     /**
+     * Get model by id.
+     *
+     * Note: When the root 'node' query is called, this method
+     * will be used to resolve the type by providing the id.
+     *
+     * @param  mixed $id
+     * @return mixed
+     */
+    public function resolveById($id)
+    {
+        return factory(User::class)->make([
+            'id' => $id,
+            'email' => 'foo@bar.com'
+        ]);
+    }
+
+    /**
      * Type fields.
      *
      * @return array
@@ -26,10 +45,6 @@ class UserType extends GraphQLType
     public function fields()
     {
         return [
-            'id' => [
-                'type' => Type::nonNull(Type::string()),
-                'description' => 'ID of the user.'
-            ],
             'name' => [
                 'type' => Type::string(),
                 'description' => 'Name of the user.'

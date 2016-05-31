@@ -125,7 +125,7 @@ class GraphQLType extends Fluent
      */
     public function interfaces()
     {
-        return ($this instanceof RelayType) ? [app('graphql')->type('node')] : [];
+        return ($this instanceof RelayType && !$this instanceof GraphQLInterface) ? [app('graphql')->type('node')] : [];
     }
 
     /**

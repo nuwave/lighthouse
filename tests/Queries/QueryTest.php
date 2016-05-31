@@ -9,9 +9,12 @@ use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class QueryTest extends TestCase
 {
+    use GlobalIdTrait;
+
     /**
      * @test
      */
@@ -64,5 +67,36 @@ class QueryTest extends TestCase
         $this->assertEquals('foo', array_get($data, 'userQuery.name'));
         $this->assertCount(5, array_get($data, 'userQuery.tasks.edges', []));
         $this->assertEquals('foo', array_first(array_pluck(array_get($data, 'userQuery.tasks.edges', []), 'node.title')));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveNodeInterface()
+    {
+        $id = $this->encodeGlobalId(UserType::class, 1);
+        $query = '{
+            node(id:"'.$id.'") {
+                id
+                ... on User {
+                    email
+                }
+            }
+        }';
+
+        $expected = [
+            'node' => [
+                'id' => $id,
+                'email' => 'foo@bar.com',
+            ],
+        ];
+
+        $graphql = app('graphql');
+        $graphql->schema()->type('user', UserType::class);
+        $graphql->schema()->type('task', TaskType::class);
+        $graphql->schema()->query('userQuery', UserQuery::class);
+
+        $data = $this->executeQuery($query)['data'];
+        $this->assertEquals($expected, $data);
     }
 }
