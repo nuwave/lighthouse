@@ -16,3 +16,10 @@ $factory->define($namespace.'Task', function (Faker\Generator $faker) {
         'completed' => 'false'
     ];
 });
+
+$factory->define($namespace.'Post', function (Faker\Generator $faker) {
+    return [
+        'title' => $faker->sentence,
+        'content' => $faker->paragraph
+    ];
+});

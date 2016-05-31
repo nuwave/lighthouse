@@ -6,6 +6,7 @@ use GraphQL;
 use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\PostType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 use Nuwave\Lighthouse\Tests\TestCase;
@@ -75,6 +76,7 @@ class QueryTest extends TestCase
     public function itCanResolveNodeInterface()
     {
         $id = $this->encodeGlobalId(UserType::class, 1);
+
         $query = '{
             node(id:"'.$id.'") {
                 id
@@ -95,6 +97,37 @@ class QueryTest extends TestCase
         $graphql->schema()->type('user', UserType::class);
         $graphql->schema()->type('task', TaskType::class);
         $graphql->schema()->query('userQuery', UserQuery::class);
+
+        $data = $this->executeQuery($query)['data'];
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itCanResolveNodeWithoutRegularIdAttribute()
+    {
+        $id = $this->encodeGlobalId(PostType::class, 1);
+
+        $query = '{
+            node(id:"'.$id.'") {
+                id
+                ... on Post {
+                    title
+                }
+            }
+        }';
+
+        $expected = [
+            'node' => [
+                'id' => $id,
+                'title' => 'Foobar',
+            ],
+        ];
+
+        $graphql = app('graphql');
+        $graphql->schema()->type('post', PostType::class);
 
         $data = $this->executeQuery($query)['data'];
         $this->assertEquals($expected, $data);
