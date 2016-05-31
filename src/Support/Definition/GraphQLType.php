@@ -5,11 +5,12 @@ namespace Nuwave\Lighthouse\Support\Definition;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Fluent;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Support\Interfaces\RelayType;
 
 class GraphQLType extends Fluent
 {
     use GlobalIdTrait;
-    
+
     /**
      * Type fields.
      *
@@ -21,6 +22,17 @@ class GraphQLType extends Fluent
     }
 
     /**
+     * Get the identifier of the type.
+     *
+     * @param  mixed $obj
+     * @return mixed
+     */
+    public function getIdentifier($obj)
+    {
+        return $obj->id;
+    }
+
+    /**
      * Get the attributes of the type.
      *
      * @return array
@@ -29,7 +41,7 @@ class GraphQLType extends Fluent
     {
         $attributes = array_merge($this->attributes, [
             'fields' => function () {
-                return $this->fields();
+                return $this instanceof RelayType ? array_merge($this->getRelayIdField(), $this->fields()) : $this->fields();
             }
         ]);
 
@@ -38,6 +50,24 @@ class GraphQLType extends Fluent
         }
 
         return $attributes;
+    }
+
+    /**
+     * Relay global identifier field.
+     *
+     * @return array
+     */
+    protected function getRelayIdField()
+    {
+        return [
+            'id' => [
+                'type' => Type::nonNull(Type::id()),
+                'description' => 'ID of type.',
+                'resolve' => function ($obj) {
+                    return $this->encodeGlobalId(get_called_class(), $this->getIdentifier($obj));
+                },
+            ],
+        ];
     }
 
     /**
