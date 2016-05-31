@@ -50,10 +50,10 @@ class NodeType extends GraphQLInterface
      */
     protected function extractType($obj)
     {
-        if (is_array($obj)) {
-            return $obj['graphqlType'];
+        if (is_object($obj)) {
+            return $obj->graphqlType;
         }
 
-        return $obj->graphqlType;
+        return $obj['graphqlType'];
     }
 }

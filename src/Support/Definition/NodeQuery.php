@@ -37,28 +37,24 @@ class NodeQuery extends GraphQLQuery
      *
      * @param  string $root
      * @param  array $args
-     * @return Illuminate\Database\Eloquent\Model|array
+     * @return Illuminate\Database\Eloquent\Model|array|null
      */
     public function resolve($root, array $args, ResolveInfo $info)
     {
         list($typeClass, $id) = $this->decodeGlobalId($args['id']);
 
-        foreach (config('lighthouse.schema.types') as $type => $class) {
-            if ($typeClass == $class) {
-                $objectType = app($typeClass);
+        return app('graphql')->types()->filter(function ($type) use ($typeClass) {
+            return $typeClass === $type->namespace;
+        })->transform(function ($type, $name) use ($id) {
+            $model = app($type->namespace)->resolveById($id);
 
-                $model = $objectType->resolveById($id);
-
-                if (is_array($model)) {
-                    $model['graphqlType'] = $type;
-                } elseif (is_object($model)) {
-                    $model->graphqlType = $type;
-                }
-
-                return $model;
+            if (is_array($model)) {
+                $model['graphqlType'] = $name;
+            } elseif (is_object($model)) {
+                $model->graphqlType = $name;
             }
-        }
 
-        return null;
+            return $model;
+        })->first();
     }
 }
