@@ -55,6 +55,11 @@ class GraphQL
      */
     public function buildSchema()
     {
+        // Initialize types
+        $this->types()->each(function ($type, $key) {
+            $this->type($key);
+        });
+
         $queryFields = $this->queries()->merge($this->connections()->toArray());
         $mutationFields = $this->mutations();
 
