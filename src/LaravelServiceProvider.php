@@ -34,6 +34,10 @@ class LaravelServiceProvider extends ServiceProvider
         $this->app->singleton('graphql', function ($app) {
             return new GraphQL($app);
         });
+
+        $this->commands([
+            Support\Console\Commands\SchemaCommand::class,
+        ]);
     }
 
     /**
