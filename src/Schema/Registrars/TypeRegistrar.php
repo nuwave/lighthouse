@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
+use GraphQL\Type\Definition\InterfaceType;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Definition\EloquentType;
 use Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound;
