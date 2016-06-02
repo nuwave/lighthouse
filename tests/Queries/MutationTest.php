@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations\UpdateEmailRelayMutation;
+use Illuminate\Support\MessageBag;
 
 class MutationTest extends TestCase
 {
@@ -40,7 +41,6 @@ class MutationTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanResolveRelayMutation()
     {
@@ -78,5 +78,41 @@ class MutationTest extends TestCase
         $graphql->schema()->mutation('updateEmail', UpdateEmailRelayMutation::class);
 
         $this->assertEquals(['data' => $expected], $this->executeQuery($query, $variables));
+    }
+
+    /**
+     * @test
+     */
+    public function itAppliesRulesToArgs()
+    {
+        $id = $this->encodeGlobalId(UserType::class, 'foo');
+
+        $query = 'mutation UpdateUserEmailRelay($input: UpdateUserPasswordRelayInput!) {
+            updateEmail(input: $input) {
+                user {
+                    email
+                }
+                clientMutationId
+            }
+        }';
+
+        $variables = [
+            'input' => [
+                'id' => $id,
+                'email' => 'foo',
+                'clientMutationId' => 'abcde'
+            ]
+        ];
+
+        $graphql = app('graphql');
+        $graphql->schema()->type('user', UserType::class);
+        $graphql->schema()->type('task', TaskType::class);
+        $graphql->schema()->mutation('updateEmail', UpdateEmailRelayMutation::class);
+
+        $data = $this->executeQuery($query, $variables);
+        $errors = array_get($data, 'errors.0.validation');
+
+        $this->assertInstanceOf(MessageBag::class, $errors);
+        $this->assertContains('email', $errors->keys());
     }
 }
