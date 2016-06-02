@@ -76,10 +76,6 @@ class GraphQLField extends Fluent
         $arguments = func_get_args();
         $args = $this->args();
 
-        if ($this instanceof RelayMutation) {
-            $args = $this->inputFields();
-        }
-
         return collect($args)
             ->transform(function ($arg, $name) use ($arguments) {
                 if (isset($arg['rules'])) {
@@ -103,11 +99,11 @@ class GraphQLField extends Fluent
      */
     protected function getResolver()
     {
-        if (!method_exists($this, 'resolve')) {
+        if (!method_exists($this, 'resolve') && !method_exists($this, 'relayResolve')) {
             return null;
         }
 
-        $resolver = array($this, 'resolve');
+        $resolver = method_exists($this, 'resolve') ? array($this, 'resolve') : array($this, 'relayResolve');
 
         return function () use ($resolver) {
             $arguments = func_get_args();
@@ -165,7 +161,7 @@ class GraphQLField extends Fluent
     public function __get($key)
     {
         $attributes = $this->getAttributes();
-        
+
         return isset($attributes[$key]) ? $attributes[$key]:null;
     }
 

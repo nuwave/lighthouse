@@ -1,15 +1,23 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Definition;
+namespace Nuwave\Relay\Support\Definition;
 
+use Validator;
 use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Interfaces\RelayMutation;
+use GraphQL\Type\Definition\InputObjectType;
+use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
-class GraphQLMutation extends GraphQLField
+abstract class RelayMutation extends GraphQLMutation
 {
+    /**
+     * Type being mutated is RelayType.
+     *
+     * @var boolean
+     */
+    protected $mutatesRelayType = true;
+
     /**
      * Mutation id sent from client.
      *
@@ -24,12 +32,8 @@ class GraphQLMutation extends GraphQLField
      */
     public function type()
     {
-        if (! $this instanceof RelayMutation) {
-            return parent::type();
-        }
-
         return new ObjectType([
-            'name' => ucfirst($this->attributes['name']) . 'Payload',
+            'name' => ucfirst($this->name()) . 'Payload',
             'fields' => array_merge($this->outputFields(), [
                     'clientMutationId' => [
                         'type' => Type::nonNull(Type::string()),
@@ -42,42 +46,20 @@ class GraphQLMutation extends GraphQLField
     }
 
     /**
-     * Get the attributes of the field.
+     * Generate Relay compliant arguments.
      *
      * @return array
      */
-    public function getAttributes()
-    {
-        if (! $this instanceof RelayMutation) {
-            return parent::getAttributes();
-        }
-
-        $attributes = array_merge($this->attributes, [
-            'args' => $this->relayArgs()
-        ], $this->attributes());
-
-        $attributes['type'] = $this->type();
-        $attributes['resolve'] = $this->getResolver();
-
-        return $attributes;
-    }
-
-    /**
-     * Get list of relay arguments.
-     *
-     * @return array
-     */
-    protected function relayArgs()
+    public function args()
     {
         $inputType = new InputObjectType([
-            'name' => ucfirst($this->attributes['name'].'Input'),
-            'fields' => array_merge($this->args(), [
+            'name' => ucfirst($this->name()) . 'Input',
+            'fields' => array_merge($this->inputFields(), [
                 'clientMutationId' => [
-                    'type' => Type::nonNull(Type::string()),
+                    'type' => Type::nonNull(Type::string())
                 ]
             ])
         ]);
-
         return [
             'input' => [
                 'type' => Type::nonNull($inputType)
@@ -88,14 +70,14 @@ class GraphQLMutation extends GraphQLField
     /**
      * Resolve mutation.
      *
-     * @param  mixed $_
-     * @param  array $args
+     * @param  mixed       $_
+     * @param  array       $args
      * @param  ResolveInfo $info
      * @return array
      */
-    public function relayResolve($_, $args, ResolveInfo $info)
+    public function resolve($_, $args, ResolveInfo $info)
     {
-        if (isset($args['input']['id'])) {
+        if ($this->mutatesRelayType && isset($args['input']['id'])) {
             $args['input']['relay_id'] = $args['input']['id'];
             $args['input']['id'] = $this->decodeRelayId($args['input']['id']);
         }
@@ -115,4 +97,34 @@ class GraphQLMutation extends GraphQLField
     {
         return array_get($arguments, '1.input', []);
     }
+
+    /**
+     * Perform mutation.
+     *
+     * @param  array       $input
+     * @param  ResolveInfo $info
+     * @return array
+     */
+    abstract protected function mutateAndGetPayload(array $input, ResolveInfo $info);
+
+    /**
+     * List of available input fields.
+     *
+     * @return array
+     */
+    abstract protected function inputFields();
+
+    /**
+     * List of output fields.
+     *
+     * @return array
+     */
+    abstract protected function outputFields();
+
+    /**
+     * Get name of mutation.
+     *
+     * @return string
+     */
+    abstract protected function name();
 }

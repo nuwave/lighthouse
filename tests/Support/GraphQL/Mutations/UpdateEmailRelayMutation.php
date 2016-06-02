@@ -1,0 +1,78 @@
+<?php
+
+namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations;
+
+use GraphQL;
+use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
+use Nuwave\Lighthouse\Support\Interfaces\RelayMutation;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\Type;
+
+class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
+{
+    /**
+     * Attributes of mutation.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'name' => 'UpdateUserPasswordRelay'
+    ];
+
+    /**
+     * Available arguments on mutation.
+     *
+     * @return array
+     */
+    public function args()
+    {
+        return [
+            'id' => [
+                'name' => 'id',
+                'type' => Type::nonNull(Type::string()),
+            ],
+            'email' => [
+                'name' => 'email',
+                'type' => Type::nonNull(Type::string()),
+                'rules' => ['email']
+            ]
+        ];
+    }
+
+    /**
+     * List of output fields.
+     *
+     * @return array
+     */
+    public function outputFields()
+    {
+        return [
+            'user' => [
+                'type' => GraphQL::type('user'),
+                'resolve' => function ($user) {
+                    return $user;
+                }
+            ]
+        ];
+    }
+
+    /**
+     * Resolve the mutation.
+     *
+     * @param  array  $args
+     * @param  ResolveInfo $info
+     * @return mixed
+     */
+    public function mutateAndGetPayload(array $args, ResolveInfo $info)
+    {
+        $user = factory(User::class)->make([
+            'email' => 'foo@example.com'
+        ]);
+
+        $user->email = $args['email'];
+
+        return $user;
+    }
+}
