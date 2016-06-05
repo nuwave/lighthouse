@@ -115,7 +115,7 @@ class RelayConnectionType extends GraphQLType
         if ($collection instanceof LengthAwarePaginator) {
             $page = $collection->currentPage();
 
-            $collection->each(function ($item, $x) use ($page) {
+            $collection->values()->each(function ($item, $x) use ($page) {
                 $cursor        = ($x + 1) * $page;
                 $encodedCursor = $this->encodeGlobalId('arrayconnection', $cursor);
                 if (is_array($item)) {
