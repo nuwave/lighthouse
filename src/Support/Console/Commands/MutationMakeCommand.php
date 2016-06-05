@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class MutationMakeCommand extends GeneratorCommand
 {
