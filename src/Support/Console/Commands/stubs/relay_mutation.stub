@@ -2,10 +2,13 @@
 
 namespace DummyNamespace;
 
+use GraphQL;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
+use Nuwave\Lighthouse\Support\Interfaces\RelayMutation;
 
-class DummyClass extends GraphQLMutation
+class DummyClass extends GraphQLMutation implements RelayMutation
 {
     /**
      * Attributes of mutation.
@@ -15,16 +18,6 @@ class DummyClass extends GraphQLMutation
     protected $attributes = [
         'name' => 'DummyClass'
     ];
-
-    /**
-     * Type that mutation returns.
-     *
-     * @return ObjectType
-     */
-    public function type()
-    {
-        // return GraphQL::type('type');
-    }
 
     /**
      * Available arguments on mutation.
@@ -37,14 +30,24 @@ class DummyClass extends GraphQLMutation
     }
 
     /**
+     * List of output fields.
+     *
+     * @return array
+     */
+    public function outputFields()
+    {
+        return [];
+    }
+
+    /**
      * Resolve the mutation.
      *
-     * @param  mixed $root
      * @param  array  $args
+     * @param  ResolveInfo $info
      * @return mixed
      */
-    public function resolve($root, array $args)
+    public function mutateAndGetPayload(array $args, ResolveInfo $info)
     {
-        //TODO: Resolve mutation
+        //TODO: Perform mutation.
     }
 }

@@ -11,7 +11,7 @@ class FieldMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:lighthouse:field';
+    protected $name = 'lighthouse:field';
 
     /**
      * The console command description.

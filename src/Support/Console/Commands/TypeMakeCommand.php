@@ -14,7 +14,7 @@ class TypeMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:lighthouse:type';
+    protected $name = 'lighthouse:type';
 
     /**
      * The console command description.
@@ -37,6 +37,10 @@ class TypeMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('relay')) {
+            return __DIR__.'/stubs/relay_type.stub';
+        }
+
         return __DIR__.'/stubs/type.stub';
     }
 
@@ -77,6 +81,7 @@ class TypeMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['relay', null, InputOption::VALUE_OPTIONAL, 'Generate a Relay GraphQL type.'],
             ['model', null, InputOption::VALUE_OPTIONAL, 'Generate a Eloquent GraphQL type.'],
         ];
     }

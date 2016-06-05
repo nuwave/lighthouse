@@ -5,7 +5,6 @@ namespace DummyNamespace;
 use GraphQL;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Definition\GraphQLField;
-use Nuwave\Lighthouse\Traits\GlobalIdTrait;
 
 class DummyClass extends GraphQLField
 {

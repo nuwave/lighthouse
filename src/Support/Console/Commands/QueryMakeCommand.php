@@ -11,7 +11,7 @@ class QueryMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:lighthouse:query';
+    protected $name = 'lighthouse:query';
 
     /**
      * The console command description.

@@ -11,7 +11,7 @@ class MutationMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'make:lighthouse:mutation';
+    protected $name = 'lighthouse:mutation';
 
     /**
      * The console command description.
@@ -34,6 +34,10 @@ class MutationMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('relay')) {
+            return __DIR__.'/stubs/relay_mutation.stub';
+        }
+
         return __DIR__.'/stubs/mutation.stub';
     }
 
@@ -46,5 +50,17 @@ class MutationMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return config('lighthouse.namespaces.mutations');
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['relay', null, InputOption::VALUE_OPTIONAL, 'Generate a Relay Mutation.'],
+        ];
     }
 }
