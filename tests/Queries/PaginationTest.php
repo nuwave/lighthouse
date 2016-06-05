@@ -105,23 +105,23 @@ class PaginationTest extends DBTestCase
         $this->assertEquals($this->tasks->get(1)->title, array_get($edges, '1.node.title'));
         $this->assertNotNull(array_get($edges, '1.cursor'));
 
-        // $after = array_get($edges, '1.cursor');
-        // $query = $this->getQuery($id, $first, $after);
-        // $data = $this->executeQuery($query);
-        // $edges = array_get($data, 'data.node.tasks.edges');
-        //
-        // $this->assertCount(2, $edges);
-        // $this->assertEquals($this->tasks->get(2)->title, array_get($edges, '0.node.title'));
-        // $this->assertEquals($this->tasks->get(3)->title, array_get($edges, '1.node.title'));
-        //
-        // $after = array_get($edges, '1.cursor');
-        // $query = $this->getQuery($id, $first, $after);
-        // $data = $this->executeQuery($query);
-        // $edges = array_get($data, 'data.node.tasks.edges');
-        //
-        // $this->assertCount(2, $edges);
-        // $this->assertEquals($this->tasks->get(4)->title, array_get($edges, '0.node.title'));
-        // $this->assertEquals($this->tasks->get(5)->title, array_get($edges, '1.node.title'));
+        $after = array_get($edges, '1.cursor');
+        $query = $this->getQuery($id, $first, $after);
+        $data = $this->executeQuery($query);
+        $edges = array_get($data, 'data.node.tasks.edges');
+
+        $this->assertCount(2, $edges);
+        $this->assertEquals($this->tasks->get(2)->title, array_get($edges, '0.node.title'));
+        $this->assertEquals($this->tasks->get(3)->title, array_get($edges, '1.node.title'));
+
+        $after = array_get($edges, '1.cursor');
+        $query = $this->getQuery($id, $first, $after);
+        $data = $this->executeQuery($query);
+        $edges = array_get($data, 'data.node.tasks.edges');
+
+        $this->assertCount(2, $edges);
+        $this->assertEquals($this->tasks->get(4)->title, array_get($edges, '0.node.title'));
+        $this->assertEquals($this->tasks->get(5)->title, array_get($edges, '1.node.title'));
     }
 
     /**
@@ -214,7 +214,7 @@ class UserStubCollectionType extends GraphQLType implements RelayType
             ],
             'tasks' => GraphQL::connection('task')
                 ->resolve(function (User $user, array $args) {
-                    return $user->tasks;
+                    return $user->tasks->paginate($args);
                 })->field()
         ];
     }

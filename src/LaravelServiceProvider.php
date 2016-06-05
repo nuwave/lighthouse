@@ -2,10 +2,15 @@
 
 namespace Nuwave\Lighthouse;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class LaravelServiceProvider extends ServiceProvider
 {
+    use GlobalIdTrait;
+
     /**
      * Bootstrap any application services.
      *
@@ -42,6 +47,8 @@ class LaravelServiceProvider extends ServiceProvider
             Support\Console\Commands\QueryMakeCommand::class,
             Support\Console\Commands\TypeMakeCommand::class,
         ]);
+
+        $this->registerMacro();
     }
 
     /**
@@ -71,5 +78,32 @@ class LaravelServiceProvider extends ServiceProvider
         } elseif (is_string($schema)) {
             require_once $schema;
         }
+    }
+
+    /**
+     * Register pagination macro.
+     *
+     * @return void
+     */
+    protected function registerMacro()
+    {
+        $name = $this->app['config']->get('lighthouse.controller') ?: 'paginate';
+
+        $decodeCursor = function (array $args) {
+            return $this->decodeCursor($args);
+        };
+
+        Collection::macro($name, function (array $args) use ($decodeCursor) {
+            $first = isset($args['first']) ? $args['first'] : 15;
+            $after = $decodeCursor($args);
+            $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
+
+            return new LengthAwarePaginator(
+                collect($this->items)->forPage($currentPage, $first),
+                count($this->items),
+                $first,
+                $currentPage
+            );
+        });
     }
 }

@@ -20,6 +20,7 @@ return [
 
     'cache' => storage_path('lighthouse/cache'),
     'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
+    'pagination_macro' => 'paginate',
     // 'model_path' => 'App\\Models',
     // 'camel_case' => false,
 
