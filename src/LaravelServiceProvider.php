@@ -37,6 +37,10 @@ class LaravelServiceProvider extends ServiceProvider
 
         $this->commands([
             Support\Console\Commands\SchemaCommand::class,
+            Support\Console\Commands\FieldMakeCommand::class,
+            Support\Console\Commands\MutationMakeCommand::class,
+            Support\Console\Commands\QueryMakeCommand::class,
+            Support\Console\Commands\TypeMakeCommand::class,
         ]);
     }
 
