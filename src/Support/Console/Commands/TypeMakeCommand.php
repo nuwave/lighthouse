@@ -81,7 +81,7 @@ class TypeMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['relay', null, InputOption::VALUE_OPTIONAL, 'Generate a Relay GraphQL type.'],
+            ['relay', null, InputOption::VALUE_NONE, 'Generate a Relay GraphQL type.'],
             ['model', null, InputOption::VALUE_OPTIONAL, 'Generate a Eloquent GraphQL type.'],
         ];
     }

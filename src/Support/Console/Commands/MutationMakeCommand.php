@@ -61,7 +61,7 @@ class MutationMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['relay', null, InputOption::VALUE_OPTIONAL, 'Generate a Relay Mutation.'],
+            ['relay', null, InputOption::VALUE_NONE, 'Generate a Relay Mutation.'],
         ];
     }
 }
