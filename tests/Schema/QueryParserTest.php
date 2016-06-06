@@ -40,6 +40,25 @@ class QueryParserTest extends TestCase
         $graphql->setQuery($this->query());
 
         $relationships = $graphql->eagerLoad();
+        $this->assertCount(4, $relationships);
+        $this->assertContains('tasks', $relationships);
+        $this->assertContains('tasks.items', $relationships);
+        $this->assertContains('tasks.items.assigned', $relationships);
+        $this->assertContains('friends', $relationships);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanLimitDepthOfEagerLoad()
+    {
+        $graphql = app('graphql');
+        $graphql->schema()->type('user', UserType::class);
+        $graphql->schema()->type('task', TaskType::class);
+        $graphql->schema()->query('userQuery', UserQuery::class);
+        $graphql->setQuery($this->query());
+
+        $relationships = $graphql->eagerLoad(2);
         $this->assertCount(3, $relationships);
         $this->assertContains('tasks', $relationships);
         $this->assertContains('tasks.items', $relationships);
@@ -64,6 +83,14 @@ class QueryParserTest extends TestCase
                                 edges {
                                     node {
                                         foo
+                                        bar
+                                        assigned(first: 5) {
+                                            edges {
+                                                node {
+                                                    email
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }

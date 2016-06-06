@@ -183,12 +183,20 @@ class GraphQL
     /**
      * Get list of available connections to eager load.
      *
+     * @param  integer $depth
      * @return array
      */
-    public function eagerLoad()
+    public function eagerLoad($depth = null)
     {
         return $this->parser()->connections()
             ->pluck('path')
+            ->filter(function ($path) use ($depth) {
+                if (is_null($depth)) {
+                    return true;
+                }
+
+                return count(explode('.', $path)) <= $depth;
+            })
             ->toArray();
     }
 
