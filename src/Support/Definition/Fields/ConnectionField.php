@@ -24,10 +24,10 @@ class ConnectionField extends Fluent
      * Encode/Decode connection cursor.
      *
      * @param  Closure $encode
-     * @param  Closure $decode
+     * @param  Closure|null $decode
      * @return self
      */
-    public function cursor(Closure $encode, Closure $decode)
+    public function cursor(Closure $encode, Closure $decode = null)
     {
         $name = $this->get('type')->name;
 

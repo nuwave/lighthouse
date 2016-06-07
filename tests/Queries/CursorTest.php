@@ -124,8 +124,6 @@ class UserCursorType extends GraphQLType implements RelayType
                     return $user->tasks->paginate($args);
                 })->cursor(function ($item, $index, $page) {
                     return $index === 0 ? 'foo' : 'bar';
-                }, function ($cursor) {
-                    return null;
                 })->field()
         ];
     }

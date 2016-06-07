@@ -148,10 +148,10 @@ class SchemaBuilder
      *
      * @param  string  $name
      * @param  Closure $encoder
-     * @param  Closure $decoder
+     * @param  Closure|null $decoder
      * @return boolean
      */
-    public function cursor($name, Closure $encoder, Closure $decoder)
+    public function cursor($name, Closure $encoder, Closure $decoder = null)
     {
         return $this->getCursorRegistrar()->register($name, $encoder, $decoder);
     }

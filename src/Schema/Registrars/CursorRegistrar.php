@@ -26,10 +26,10 @@ class CursorRegistrar
      *
      * @param  string  $name
      * @param  Closure $encode
-     * @param  Closure $decode
+     * @param  Closure|null $decode
      * @return boolean
      */
-    public function register($name, Closure $encode, Closure $decode)
+    public function register($name, Closure $encode, Closure $decode = null)
     {
         $this->collection->put($name, [
             'encode' => $encode,
