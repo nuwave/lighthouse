@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Support\Traits\Container;
 use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\EdgeRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\QueryRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\CursorRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\MutationRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar;
 
@@ -44,6 +45,13 @@ trait CentralRegistrar
      * @var MutationRegistrar
      */
     protected $mutationRegistrar;
+
+    /**
+     * Cursor registrar.
+     *
+     * @var CursorRegistrar
+     */
+    protected $cursorRegistrar;
 
     /**
      * Set local instance of type registrar.
@@ -163,5 +171,29 @@ trait CentralRegistrar
         }
 
         return $this->mutationRegistrar;
+    }
+
+    /**
+     * Set local instance of cursor registrar.
+     *
+     * @param CursorRegistrar $registrar
+     */
+    public function setCursorRegistrar(CursorRegistrar $registrar)
+    {
+        $this->cursorRegistrar = $registrar;
+    }
+
+    /**
+     * Get instance of cursor registrar.
+     *
+     * @return CursorRegistrar
+     */
+    public function getCursorRegistrar()
+    {
+        if (! $this->cursorRegistrar) {
+            $this->cursorRegistrar = app(CursorRegistrar::class);
+        }
+
+        return $this->cursorRegistrar;
     }
 }

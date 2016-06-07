@@ -114,10 +114,11 @@ class RelayConnectionType extends GraphQLType
     {
         if ($collection instanceof LengthAwarePaginator) {
             $page = $collection->currentPage();
+            $encoder = app('graphql')->cursorEncoder($this->name);
 
-            $collection->values()->each(function ($item, $x) use ($page) {
+            $collection->values()->each(function ($item, $x) use ($page, $encoder) {
                 $cursor        = ($x + 1) * $page;
-                $encodedCursor = $this->encodeGlobalId('arrayconnection', $cursor);
+                $encodedCursor = is_callable($encoder) ? $encoder($item, $x, $page) : $this->encodeGlobalId('arrayconnection', $cursor);
                 if (is_array($item)) {
                     $item['relayCursor'] = $encodedCursor;
                 } else {
@@ -141,6 +142,12 @@ class RelayConnectionType extends GraphQLType
      */
     protected function getCursorId($cursor)
     {
+        $decoder = app('graphql')->cursorEncoder($this->name);
+
+        if (is_callable($decoder)) {
+            return $decoder($cursor);
+        }
+
         return (int)$this->decodeRelayId($cursor);
     }
 

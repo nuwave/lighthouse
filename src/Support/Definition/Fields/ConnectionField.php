@@ -21,6 +21,22 @@ class ConnectionField extends Fluent
     }
 
     /**
+     * Encode/Decode connection cursor.
+     *
+     * @param  Closure $encode
+     * @param  Closure $decode
+     * @return self
+     */
+    public function cursor(Closure $encode, Closure $decode)
+    {
+        $name = $this->get('type')->name;
+
+        app('graphql')->schema()->cursor($name, $encode, $decode);
+
+        return $this;
+    }
+
+    /**
      * Add agruments to field.
      *
      * @param  array  $args

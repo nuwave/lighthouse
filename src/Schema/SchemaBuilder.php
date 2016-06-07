@@ -144,6 +144,19 @@ class SchemaBuilder
     }
 
     /**
+     * Add cursor to registrar.
+     *
+     * @param  string  $name
+     * @param  Closure $encoder
+     * @param  Closure $decoder
+     * @return boolean
+     */
+    public function cursor($name, Closure $encoder, Closure $decoder)
+    {
+        return $this->getCursorRegistrar()->register($name, $encoder, $decoder);
+    }
+
+    /**
      * Get type field from registrar.
      *
      * @param  string $name
@@ -190,5 +203,27 @@ class SchemaBuilder
     public function edgeInstance($name, $type = null, $fresh = false)
     {
         return $this->getEdgeRegistrar()->instance($name, $fresh, $type);
+    }
+
+    /**
+     * Get encoder for connection edge.
+     *
+     * @param  string $name
+     * @return Closure
+     */
+    public function encoder($name)
+    {
+        return $this->getCursorRegistrar()->encoder($name);
+    }
+
+    /**
+     * Get encoder for connection edge.
+     *
+     * @param  string $name
+     * @return Closure
+     */
+    public function decoder($name)
+    {
+        return $this->getCursorRegistrar()->decoder($name);
     }
 }

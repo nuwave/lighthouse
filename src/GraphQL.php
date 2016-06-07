@@ -141,6 +141,28 @@ class GraphQL
     }
 
     /**
+     * Get cursor encoder for connection edge.
+     *
+     * @param  string $name
+     * @return Closure
+     */
+    public function cursorEncoder($name)
+    {
+        return $this->schema()->encoder($name);
+    }
+
+    /**
+     * Get cursor decoder for connection edge.
+     *
+     * @param  string $name
+     * @return Closure
+     */
+    public function cursorDecoder($name)
+    {
+        return $this->schema()->decoder($name);
+    }
+
+    /**
      * Get collection of registered types.
      *
      * @return \Illuminate\Support\Collection

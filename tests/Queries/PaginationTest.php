@@ -85,7 +85,6 @@ class PaginationTest extends DBTestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanPaginateConnectionWithCollection()
     {

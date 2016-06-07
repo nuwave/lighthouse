@@ -77,7 +77,6 @@ class EloquentTypeTest extends DBTestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanQueryEloquentType()
     {
