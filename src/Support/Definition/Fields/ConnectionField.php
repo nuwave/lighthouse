@@ -4,9 +4,17 @@ namespace Nuwave\Lighthouse\Support\Definition\Fields;
 
 use Closure;
 use Illuminate\Support\Fluent;
+use Nuwave\Lighthouse\Schema\Generators\ConnectionResolveGenerator as Resolver;
 
 class ConnectionField extends Fluent
 {
+    /**
+     * Connection auto resolver.
+     *
+     * @var Resolver
+     */
+    protected $resolver;
+
     /**
      * Set resolve function on field.
      *
@@ -53,12 +61,55 @@ class ConnectionField extends Fluent
     }
 
     /**
+     * Auto resolve the connection.
+     *
+     * @param  string $name
+     * @return Closure
+     */
+    protected function autoResolve($name)
+    {
+        if (! $name) {
+            $connection = $this->get('type')->name;
+
+            throw new \Exception("A name must be provided for [$connection] when auto resolving.");
+        }
+
+        return function ($root, array $args, $info) use ($name) {
+            return $this->getResolver()->resolve($root, $args, $info, $name);
+        };
+    }
+
+    /**
+     * Set local instance of resolver.
+     *
+     * @param Resolver $resolver
+     */
+    public function setResolver(Resolver $resolver)
+    {
+        $this->resolver = $resolver;
+    }
+
+    /**
+     * Get instance of resolver.
+     *
+     * @return Resolver
+     */
+    protected function getResolver()
+    {
+        return $this->resolver ?: app(Resolver::class);
+    }
+
+    /**
      * Convert to GraphQL field.
      *
      * @return array
      */
-    public function field()
+    public function field($name = null)
     {
+        if (! $this->get('resolve')) {
+            $this->__set('resolve', $this->autoResolve($name));
+        }
+
         return $this->toArray();
     }
 }
