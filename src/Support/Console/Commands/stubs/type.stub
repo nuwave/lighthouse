@@ -14,8 +14,8 @@ class DummyClass extends GraphQLType
      * @var array
      */
     protected $attributes = [
-        'name' => 'User',
-        'description' => 'A user.'
+        'name' => '',
+        'description' => ''
     ];
 
     /**
