@@ -65,6 +65,7 @@ class PaginationTest extends DBTestCase
         $this->assertEquals(6, array_get($data, 'data.node.tasks.pageInfo.total'));
         $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.count'));
         $this->assertEquals(1, array_get($data, 'data.node.tasks.pageInfo.currentPage'));
+        $this->assertEquals(3, array_get($data, 'data.node.tasks.pageInfo.lastPage'));
         $this->assertNotNull(array_get($edges, '1.cursor'));
 
         $after = array_get($edges, '1.cursor');
@@ -78,6 +79,7 @@ class PaginationTest extends DBTestCase
         $this->assertEquals(6, array_get($data, 'data.node.tasks.pageInfo.total'));
         $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.count'));
         $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.currentPage'));
+        $this->assertEquals(3, array_get($data, 'data.node.tasks.pageInfo.lastPage'));
 
         $after = array_get($edges, '1.cursor');
         $query = $this->getQuery($id, $first, $after);
@@ -90,6 +92,7 @@ class PaginationTest extends DBTestCase
         $this->assertEquals(6, array_get($data, 'data.node.tasks.pageInfo.total'));
         $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.count'));
         $this->assertEquals(3, array_get($data, 'data.node.tasks.pageInfo.currentPage'));
+        $this->assertEquals(3, array_get($data, 'data.node.tasks.pageInfo.lastPage'));
     }
 
     /**
@@ -155,6 +158,7 @@ class PaginationTest extends DBTestCase
                             total
                             count
                             currentPage
+                            lastPage
                         }
                         edges {
                             cursor

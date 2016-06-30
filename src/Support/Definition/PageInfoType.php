@@ -110,6 +110,17 @@ class PageInfoType extends GraphQLType
                     return null;
                 }
             ],
+            'lastPage' => [
+                'type' => Type::int(),
+                'description' => 'Last page in connection.',
+                'resolve' => function ($collection) {
+                    if ($collection instanceof LengthAwarePaginator) {
+                        return $collection->lastPage();
+                    }
+
+                    return null;
+                }
+            ],
         ];
     }
 }
