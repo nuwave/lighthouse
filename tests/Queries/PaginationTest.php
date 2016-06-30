@@ -62,6 +62,9 @@ class PaginationTest extends DBTestCase
         $this->assertCount(2, $edges);
         $this->assertEquals($this->tasks->get(0)->title, array_get($edges, '0.node.title'));
         $this->assertEquals($this->tasks->get(1)->title, array_get($edges, '1.node.title'));
+        $this->assertEquals(6, array_get($data, 'data.node.tasks.pageInfo.total'));
+        $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.count'));
+        $this->assertEquals(1, array_get($data, 'data.node.tasks.pageInfo.currentPage'));
         $this->assertNotNull(array_get($edges, '1.cursor'));
 
         $after = array_get($edges, '1.cursor');
@@ -72,6 +75,9 @@ class PaginationTest extends DBTestCase
         $this->assertCount(2, $edges);
         $this->assertEquals($this->tasks->get(2)->title, array_get($edges, '0.node.title'));
         $this->assertEquals($this->tasks->get(3)->title, array_get($edges, '1.node.title'));
+        $this->assertEquals(6, array_get($data, 'data.node.tasks.pageInfo.total'));
+        $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.count'));
+        $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.currentPage'));
 
         $after = array_get($edges, '1.cursor');
         $query = $this->getQuery($id, $first, $after);
@@ -81,6 +87,9 @@ class PaginationTest extends DBTestCase
         $this->assertCount(2, $edges);
         $this->assertEquals($this->tasks->get(4)->title, array_get($edges, '0.node.title'));
         $this->assertEquals($this->tasks->get(5)->title, array_get($edges, '1.node.title'));
+        $this->assertEquals(6, array_get($data, 'data.node.tasks.pageInfo.total'));
+        $this->assertEquals(2, array_get($data, 'data.node.tasks.pageInfo.count'));
+        $this->assertEquals(3, array_get($data, 'data.node.tasks.pageInfo.currentPage'));
     }
 
     /**
@@ -142,6 +151,11 @@ class PaginationTest extends DBTestCase
             node(id:"'.$id.'") {
                 ... on User {
                     tasks('.$args.') {
+                        pageInfo {
+                            total
+                            count
+                            currentPage
+                        }
                         edges {
                             cursor
                             node {

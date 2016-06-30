@@ -76,7 +76,40 @@ class PageInfoType extends GraphQLType
 
                     return null;
                 }
-            ]
+            ],
+            'total' => [
+                'type' => Type::int(),
+                'description' => 'Total number of node in connection.',
+                'resolve' => function ($collection) {
+                    if ($collection instanceof LengthAwarePaginator) {
+                        return $collection->total();
+                    }
+
+                    return null;
+                }
+            ],
+            'count' => [
+                'type' => Type::int(),
+                'description' => 'Count of nodes in current request.',
+                'resolve' => function ($collection) {
+                    if ($collection instanceof LengthAwarePaginator) {
+                        return $collection->count();
+                    }
+
+                    return null;
+                }
+            ],
+            'currentPage' => [
+                'type' => Type::int(),
+                'description' => 'Current page of request.',
+                'resolve' => function ($collection) {
+                    if ($collection instanceof LengthAwarePaginator) {
+                        return $collection->currentPage();
+                    }
+
+                    return null;
+                }
+            ],
         ];
     }
 }
