@@ -19,7 +19,8 @@ trait RelayConnection
     {
         $first = isset($args['first']) ? $args['first'] : 15;
         $after = $this->decodeCursor($args);
-        $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
+        $page = isset($args['page']) ? $args['page'] : 1;
+        $currentPage = $first && $after ? floor(($first + $after) / $first) : $page;
 
         return $query->paginate($first, ['*'], 'page', $currentPage);
     }

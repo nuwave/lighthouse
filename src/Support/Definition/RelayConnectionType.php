@@ -100,6 +100,9 @@ class RelayConnectionType extends GraphQLType
             ],
             'last' => [
                 'type' => Type::int()
+            ],
+            'page' => [
+                'type' => Type::int(),
             ]
         ];
     }
