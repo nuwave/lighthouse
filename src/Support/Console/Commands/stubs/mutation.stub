@@ -13,7 +13,7 @@ class DummyClass extends GraphQLMutation
      * @var array
      */
     protected $attributes = [
-        'name' => 'DummyClass'
+        'name' => 'DummyCamelClass'
     ];
 
     /**

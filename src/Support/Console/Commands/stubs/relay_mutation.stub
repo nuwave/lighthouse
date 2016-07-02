@@ -16,7 +16,7 @@ class DummyClass extends GraphQLMutation implements RelayMutation
      * @var array
      */
     protected $attributes = [
-        'name' => 'DummyClass'
+        'name' => 'DummyCamelClass'
     ];
 
     /**
