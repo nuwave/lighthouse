@@ -20,6 +20,7 @@ class LaravelServiceProvider extends ServiceProvider
     {
         $this->publishes([__DIR__ . '/../config/config.php' => config_path('lighthouse.php')]);
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'lighthouse');
+        $this->loadViewsFrom(realpath(__DIR__.'/Support/Console/Commands/stubs'), 'lighthouse');
 
         if (config('lighthouse.controller')) {
             require_once __DIR__.'/Support/Http/routes.php';

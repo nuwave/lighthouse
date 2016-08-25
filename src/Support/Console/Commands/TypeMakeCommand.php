@@ -64,7 +64,6 @@ class TypeMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         if ($model = $this->option('model')) {
-            $this->setViewPath();
             $stub = $this->getEloquentStub($model);
         } else {
             $stub = $this->files->get($this->getStub());
@@ -87,19 +86,6 @@ class TypeMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Set config view paths.
-     *
-     * @return void
-     */
-    protected function setViewPath()
-    {
-        $paths = config('view.paths');
-        $paths[] = realpath(__DIR__.'/stubs');
-
-        config(['view.paths' => $paths]);
-    }
-
-    /**
      * Generate stub from eloquent type.
      *
      * @param  string $model
@@ -118,7 +104,7 @@ class TypeMakeCommand extends GeneratorCommand
 
         $fields = $this->getTypeFields($model);
 
-        return "<?php\n\n" . view('eloquent', compact('model', 'shortName', 'fields'))->render();
+        return "<?php\n\n" . view('lighthouse::eloquent', compact('model', 'shortName', 'fields'))->render();
     }
 
     /**
