@@ -102,9 +102,12 @@ class TypeMakeCommand extends GeneratorCommand
             $model = config('lighthouse.model_path') . "\\" . $model;
         }
 
+        $relay = $this->option('relay');
         $fields = $this->getTypeFields($model);
 
-        return "<?php\n\n" . view('lighthouse::eloquent', compact('model', 'shortName', 'fields'))->render();
+        return "<?php\n\n" . view('lighthouse::eloquent', compact(
+            'model', 'shortName', 'fields', 'relay'
+        ))->render();
     }
 
     /**

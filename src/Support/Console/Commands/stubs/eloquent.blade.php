@@ -2,11 +2,11 @@ namespace DummyNamespace;
 
 use GraphQL;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Definition\RelayType;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Definition\GraphQLType;
+use Nuwave\Lighthouse\Support\Interfaces\RelayType;
 use {{ $model }};
 
-class DummyClass extends RelayType
+class DummyClass extends GraphQLType{{ $relay ? ' implements RelayType' : '' }}
 {
     /**
      * Attributes of Type.
