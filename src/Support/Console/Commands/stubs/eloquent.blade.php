@@ -18,6 +18,7 @@ class DummyClass extends GraphQLType{{ $relay ? ' implements RelayType' : '' }}
         'description' => '',
     ];
 
+    @if($relay)
     /**
      * Get customer by id.
      *
@@ -31,13 +32,14 @@ class DummyClass extends GraphQLType{{ $relay ? ' implements RelayType' : '' }}
     {
         return {{ $shortName }}::findOrFail($id);
     }
+    @endif
 
     /**
      * Available fields of Type.
      *
      * @return array
      */
-    public function relayFields()
+    public function fields()
     {
         return [
 @foreach($fields as $key => $field)

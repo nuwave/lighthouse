@@ -267,7 +267,7 @@ class EloquentType
         if ($class == $namespace . 'NonNull') {
             return 'Type::nonNull('. $this->getRawType($type->getWrappedType()) .')';
         } elseif ($class == $namespace . 'IDType') {
-            return 'Type::id()';
+            return 'Type::nonNull(Type::id())';
         } elseif ($class == $namespace . 'IntType') {
             return 'Type::int()';
         } elseif ($class == $namespace . 'BooleanType') {
