@@ -22,8 +22,8 @@ return [
     'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
     'pagination_macro' => 'paginate',
     'route' => [],
-    // 'model_path' => 'App\\Models',
-    // 'camel_case' => false,
+    'model_path' => 'App\\Models',
+    'camel_case' => false,
 
     'globalId' => [
         'encode' => null,
