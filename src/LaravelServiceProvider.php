@@ -23,7 +23,7 @@ class LaravelServiceProvider extends ServiceProvider
         $this->loadViewsFrom(realpath(__DIR__.'/Support/Console/Commands/stubs'), 'lighthouse');
 
         if (config('lighthouse.controller')) {
-            require_once __DIR__.'/Support/Http/routes.php';
+            require __DIR__.'/Support/Http/routes.php';
         }
 
         $this->registerNodes();
@@ -78,7 +78,7 @@ class LaravelServiceProvider extends ServiceProvider
         if (is_callable($schema)) {
             $schema();
         } elseif (is_string($schema)) {
-            require_once $schema;
+            require $schema;
         }
     }
 

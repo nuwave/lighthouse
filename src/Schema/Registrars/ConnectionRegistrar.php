@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
+use ReflectionClass;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use Nuwave\Lighthouse\Support\Definition\RelayConnectionType;
@@ -111,7 +112,7 @@ class ConnectionRegistrar extends BaseRegistrar
     protected function instanceName($name)
     {
         if ($name instanceof Connection) {
-            return strtolower(get_class($name));
+            return (new ReflectionClass($name))->getName();
         }
 
         return $name;
