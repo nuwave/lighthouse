@@ -171,7 +171,7 @@ class SchemaBuilder
      * Extract type instance from registrar.
      *
      * @param  string $name
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return ObjectType
      */
     public function typeInstance($name, $fresh = false)
@@ -184,7 +184,7 @@ class SchemaBuilder
      *
      * @param  string $name
      * @param  string|null $parent
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return ObjectType
      */
     public function connectionInstance($name, $parent = null, $fresh = false)
@@ -197,7 +197,7 @@ class SchemaBuilder
      *
      * @param  string $name
      * @param  ObjectType|null $type
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return ObjectType
      */
     public function edgeInstance($name, $type = null, $fresh = false)

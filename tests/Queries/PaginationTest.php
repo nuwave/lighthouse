@@ -181,7 +181,7 @@ class PaginationTest extends DBTestCase
      * Get connection query.
      *
      * @param  string $id
-     * @param  integer $first
+     * @param  int $first
      * @return string
      */
     protected function getQuery($id, $first, $after = null)

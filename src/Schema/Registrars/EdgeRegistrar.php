@@ -36,7 +36,7 @@ class EdgeRegistrar extends BaseRegistrar
      * Get instance of edge type.
      *
      * @param  string $name
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @param  ObjectType|null $type
      * @return \GraphQL\Type\Definition\ObjectType|null
      */

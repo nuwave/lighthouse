@@ -30,7 +30,7 @@ class TypeRegistrar extends BaseRegistrar
      * Get instance of type.
      *
      * @param  string $name
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return \GraphQL\Type\Definition\ObjectType
      */
     public function instance($name, $fresh = false)

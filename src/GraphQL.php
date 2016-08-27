@@ -100,7 +100,7 @@ class GraphQL
      * Extract instance from type registrar.
      *
      * @param  string $name
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return ObjectType
      */
     public function type($name, $fresh = false)
@@ -113,7 +113,7 @@ class GraphQL
      *
      * @param  string $name
      * @param  string|null $parent
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return ObjectType
      */
     public function connection($name, $parent = null, $fresh = false)
@@ -133,7 +133,7 @@ class GraphQL
      *
      * @param  string $name
      * @param  ObjectType $type
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return ObjectType
      */
     public function edge($name, ObjectType $type = null, $fresh = false)

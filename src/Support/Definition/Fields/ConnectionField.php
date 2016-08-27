@@ -48,7 +48,7 @@ class ConnectionField extends Fluent
      * Add agruments to field.
      *
      * @param  array  $args
-     * @param  boolean $append
+     * @param  bool $append
      * @return self
      */
     public function args(array $args, $append = true)
