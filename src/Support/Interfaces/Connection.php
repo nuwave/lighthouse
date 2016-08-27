@@ -11,7 +11,7 @@ interface Connection
      *
      * @return string
      */
-    public function name();
+    public function type();
 
     /**
      * Get available arguments for connection.

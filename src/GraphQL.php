@@ -119,7 +119,7 @@ class GraphQL
     public function connection($name, $parent = null, $fresh = false)
     {
         $connection = $this->schema()->connectionInstance($name, $parent, $fresh);
-        $connectionName = $name instanceof Connection ? $name->name() : $name;
+        $connectionName = $name instanceof Connection ? $name->type() : $name;
 
         if (! $this->connections()->has($connectionName)) {
             $this->schema()->connection($connectionName, $connection);

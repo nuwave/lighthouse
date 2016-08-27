@@ -13,7 +13,7 @@ class TaskConnection implements Connection
      *
      * @return string
      */
-    public function name()
+    public function type()
     {
         return 'task';
     }

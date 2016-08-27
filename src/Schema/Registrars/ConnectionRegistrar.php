@@ -110,7 +110,7 @@ class ConnectionRegistrar extends BaseRegistrar
     protected function getName($name)
     {
         if ($name instanceof Connection) {
-            return $name->name();
+            return $name->type();
         }
 
         return $name;
