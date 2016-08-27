@@ -296,7 +296,7 @@ class EloquentType
      * Check if field should be skipped.
      *
      * @param  string $field
-     * @return boolean
+     * @return bool
      */
     protected function skipField($name = '')
     {

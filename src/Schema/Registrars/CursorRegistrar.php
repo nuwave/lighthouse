@@ -27,7 +27,7 @@ class CursorRegistrar
      * @param  string  $name
      * @param  Closure $encode
      * @param  Closure|null $decode
-     * @return boolean
+     * @return bool
      */
     public function register($name, Closure $encode, Closure $decode = null)
     {

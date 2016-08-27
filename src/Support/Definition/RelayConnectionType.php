@@ -236,7 +236,7 @@ class RelayConnectionType extends GraphQLType
      * Dynamically check if an attribute is set.
      *
      * @param  string  $key
-     * @return boolean
+     * @return bool
      */
     public function __isset($key)
     {

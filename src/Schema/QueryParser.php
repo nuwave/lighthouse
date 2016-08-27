@@ -122,7 +122,7 @@ class QueryParser
      * Determine if selection is a Field
      *
      * @param  mixed  $selection
-     * @return boolean
+     * @return bool
      */
     public function isField($selection)
     {

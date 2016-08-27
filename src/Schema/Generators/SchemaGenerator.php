@@ -8,7 +8,7 @@ class SchemaGenerator
      * Generate relay schema.json file.
      *
      * @param  string $version
-     * @return boolean
+     * @return bool
      */
     public function build($version = '4.12')
     {

@@ -149,7 +149,7 @@ class SchemaBuilder
      * @param  string  $name
      * @param  Closure $encoder
      * @param  Closure|null $decoder
-     * @return boolean
+     * @return bool
      */
     public function cursor($name, Closure $encoder, Closure $decoder = null)
     {

@@ -98,7 +98,7 @@ class ConnectionGenerator
      * Determine if field has selection set.
      *
      * @param  Field   $field
-     * @return boolean
+     * @return bool
      */
     protected function hasChildren($field)
     {
@@ -109,7 +109,7 @@ class ConnectionGenerator
      * Determine if name is a relay edge.
      *
      * @param  string  $name
-     * @return boolean
+     * @return bool
      */
     protected function isEdge($name)
     {
@@ -120,7 +120,7 @@ class ConnectionGenerator
      * Determine if selection is a Field
      *
      * @param  mixed  $selection
-     * @return boolean
+     * @return bool
      */
     public function isField($selection)
     {
