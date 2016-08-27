@@ -51,13 +51,14 @@ class ConnectionRegistrar extends BaseRegistrar
      */
     public function instance($name, $parent = null, $fresh = false)
     {
-        $typeName = $this->getName($name);
+        $instanceName = $this->instanceName($name);
+        $typeName = $this->typeName($name);
 
-        if (! $fresh && $this->instances->has($typeName)) {
-            return $this->instances->get($typeName);
+        if (! $fresh && $this->instances->has($instanceName)) {
+            return $this->instances->get($instanceName);
         }
 
-        $key = $parent ? $parent.'.'.$typeName : $typeName;
+        $key = $parent ? $parent.'.'.$instanceName : $instanceName;
         $nodeType = $this->getSchema()->typeInstance($typeName);
         $instance = $this->getInstance($name, $nodeType);
 
@@ -77,12 +78,12 @@ class ConnectionRegistrar extends BaseRegistrar
     {
         $isConnection = $name instanceof Connection;
         $connection = new RelayConnectionType();
-        $typeName = $this->getName($name);
-        $connectionName = (!preg_match('/Connection$/', $typeName)) ? $typeName.'Connection' : $typeName;
+        $instanceName = $this->instanceName($name);
+        $connectionName = (!preg_match('/Connection$/', $instanceName)) ? $instanceName.'Connection' : $instanceName;
         $connection->setName(studly_case($connectionName));
 
         $pageInfoType = $this->getSchema()->typeInstance('pageInfo');
-        $edgeType = $this->getSchema()->edgeInstance($typeName, $nodeType);
+        $edgeType = $this->getSchema()->edgeInstance($instanceName, $nodeType);
 
         $connection->setEdgeType($edgeType);
         $connection->setPageInfoType($pageInfoType);
@@ -107,7 +108,22 @@ class ConnectionRegistrar extends BaseRegistrar
      * @param  mixed $name
      * @return string
      */
-    protected function getName($name)
+    protected function instanceName($name)
+    {
+        if ($name instanceof Connection) {
+            return strtolower(get_class($name));
+        }
+
+        return $name;
+    }
+
+    /**
+     * Extract name.
+     *
+     * @param  mixed $name
+     * @return string
+     */
+    protected function typeName($name)
     {
         if ($name instanceof Connection) {
             return $name->type();
