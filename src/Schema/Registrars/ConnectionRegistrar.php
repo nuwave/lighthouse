@@ -54,7 +54,7 @@ class ConnectionRegistrar extends BaseRegistrar
         $typeName = $this->getName($name);
 
         if (! $fresh && $this->instances->has($typeName)) {
-            return $this->instances->get($name);
+            return $this->instances->get($typeName);
         }
 
         $key = $parent ? $parent.'.'.$typeName : $typeName;
