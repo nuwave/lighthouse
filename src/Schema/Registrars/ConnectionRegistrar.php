@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\InterfaceType;
 use Nuwave\Lighthouse\Support\Definition\RelayConnectionType;
 use Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField;
+use Nuwave\Lighthouse\Support\Interfaces\Connection;
 
 class ConnectionRegistrar extends BaseRegistrar
 {
@@ -45,17 +46,19 @@ class ConnectionRegistrar extends BaseRegistrar
      *
      * @param  string $name
      * @param  string|null $parent
-     * @param  boolean $fresh
+     * @param  bool $fresh
      * @return \Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField
      */
     public function instance($name, $parent = null, $fresh = false)
     {
-        if (! $fresh && $this->instances->has($name)) {
+        $typeName = $this->getName($name);
+
+        if (! $fresh && $this->instances->has($typeName)) {
             return $this->instances->get($name);
         }
 
-        $key = $parent ? $parent.'.'.$anme : $name;
-        $nodeType = $this->getSchema()->typeInstance($name);
+        $key = $parent ? $parent.'.'.$typeName : $typeName;
+        $nodeType = $this->getSchema()->typeInstance($typeName);
         $instance = $this->getInstance($name, $nodeType);
 
         $this->instances->put($key, $instance);
@@ -72,22 +75,23 @@ class ConnectionRegistrar extends BaseRegistrar
      */
     public function getInstance($name, ObjectType $nodeType)
     {
+        $isConnection = $name instanceof Connection;
         $connection = new RelayConnectionType();
-
-        $connectionName = (!preg_match('/Connection$/', $name)) ? $name.'Connection' : $name;
+        $typeName = $this->getName($name);
+        $connectionName = (!preg_match('/Connection$/', $typeName)) ? $typeName.'Connection' : $typeName;
         $connection->setName(studly_case($connectionName));
 
         $pageInfoType = $this->getSchema()->typeInstance('pageInfo');
-        $edgeType = $this->getSchema()->edgeInstance($name, $nodeType);
+        $edgeType = $this->getSchema()->edgeInstance($typeName, $nodeType);
 
         $connection->setEdgeType($edgeType);
         $connection->setPageInfoType($pageInfoType);
         $instance = $connection->toType();
 
         $field = new ConnectionField([
-            'args'    => RelayConnectionType::connectionArgs(),
+            'args'    => $isConnection ? array_merge($name->args(), RelayConnectionType::connectionArgs()) : RelayConnectionType::connectionArgs(),
             'type'    => $instance,
-            'resolve' => null
+            'resolve' => $isConnection ? array($name, 'resolve') : null
         ]);
 
         if ($connection->interfaces) {
@@ -95,5 +99,20 @@ class ConnectionRegistrar extends BaseRegistrar
         }
 
         return $field;
+    }
+
+    /**
+     * Extract name.
+     *
+     * @param  mixed $name
+     * @return string
+     */
+    protected function getName($name)
+    {
+        if ($name instanceof Connection) {
+            return $name->name();
+        }
+
+        return $name;
     }
 }

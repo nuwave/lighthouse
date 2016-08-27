@@ -7,7 +7,7 @@ use GraphQL\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
-use Nuwave\Lighthouse\Support\Traits\Container\MutationRegistrar;
+use Nuwave\Lighthouse\Support\Interfaces\Connection;
 use Nuwave\Lighthouse\Support\Cache\FileStore;
 use Nuwave\Lighthouse\Schema\Field;
 use Nuwave\Lighthouse\Schema\QueryParser;
@@ -73,7 +73,7 @@ class GraphQL
      * Generate type from collection of fields.
      *
      * @param  Collection $fields
-     * @param  array     $options
+     * @param  $string    $name
      * @return \GraphQL\Type\Definition\ObjectType|null
      */
     protected function generateSchemaType(Collection $fields, $name)
@@ -119,9 +119,10 @@ class GraphQL
     public function connection($name, $parent = null, $fresh = false)
     {
         $connection = $this->schema()->connectionInstance($name, $parent, $fresh);
+        $connectionName = $name instanceof Connection ? $name->name() : $name;
 
-        if (! $this->connections()->has($name)) {
-            $this->schema()->connection($name, $connection);
+        if (! $this->connections()->has($connectionName)) {
+            $this->schema()->connection($connectionName, $connection);
         }
 
         return $connection;
