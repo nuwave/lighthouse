@@ -1,0 +1,42 @@
+<?php
+
+namespace DummyNamespace;
+
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Interfaces\Connection;
+
+class DummyClass implements Connection
+{
+    /**
+     * Get name of connection.
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return '';
+    }
+
+    /**
+     * Available connection arguments.
+     *
+     * @return array
+     */
+    public function args()
+    {
+        return [];
+    }
+
+    /**
+     * Resolve connection.
+     *
+     * @param  mixed  $parent
+     * @param  array  $args
+     * @param  ResolveInfo $info
+     * @return mixed
+     */
+    public function resolve($parent, array $args, ResolveInfo $info)
+    {
+        // TODO: Resolve connection
+    }
+}

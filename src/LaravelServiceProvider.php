@@ -47,6 +47,7 @@ class LaravelServiceProvider extends ServiceProvider
             Support\Console\Commands\MutationMakeCommand::class,
             Support\Console\Commands\QueryMakeCommand::class,
             Support\Console\Commands\TypeMakeCommand::class,
+            Support\Console\Commands\ConnectionMakeCommand::class,
         ]);
 
         $this->registerMacro();

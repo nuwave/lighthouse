@@ -12,10 +12,11 @@ return [
     |
     */
     'namespaces' => [
-        'mutations' => 'App\\Http\\GraphQL\\Mutations',
-        'queries'   => 'App\\Http\\GraphQL\\Queries',
-        'types'     => 'App\\Http\\GraphQL\\Types',
-        'fields'    => 'App\\Http\\GraphQL\\Fields',
+        'mutations'   => 'App\\Http\\GraphQL\\Mutations',
+        'queries'     => 'App\\Http\\GraphQL\\Queries',
+        'types'       => 'App\\Http\\GraphQL\\Types',
+        'fields'      => 'App\\Http\\GraphQL\\Fields',
+        'connections' => 'App\\Http\\GraphQL\\Connections',
     ],
 
     'cache' => storage_path('lighthouse/cache'),
