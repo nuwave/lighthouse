@@ -112,7 +112,9 @@ class ConnectionRegistrar extends BaseRegistrar
     protected function instanceName($name)
     {
         if ($name instanceof Connection) {
-            return (new ReflectionClass($name))->getName();
+            $class = (new ReflectionClass($name))->getName();
+
+            return strtolower(snake_case((str_replace('\\', '_', $class))));
         }
 
         return $name;
