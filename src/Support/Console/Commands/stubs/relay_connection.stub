@@ -12,7 +12,7 @@ class DummyClass implements Connection
      *
      * @return string
      */
-    public function name()
+    public function type()
     {
         return '';
     }
