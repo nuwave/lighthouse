@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use Closure;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 trait RelayConnection
@@ -23,5 +24,19 @@ trait RelayConnection
         $currentPage = $first && $after ? floor(($first + $after) / $first) : $page;
 
         return $query->paginate($first, ['*'], 'page', $currentPage);
+    }
+
+    /**
+     * Get edge connectino.
+     *
+     * @param  Closure $closure
+     * @return $this
+     */
+    public function getEdge(Closure $closure)
+    {
+        $cursor = $closure();
+        $this->relayCursor = $this->encodeGlobalId('arrayconnection', $cursor);
+
+        return $this;
     }
 }
