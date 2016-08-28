@@ -3,14 +3,17 @@
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use ReflectionClass;
+use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Schema\Registrars\BaseRegistrar;
 use Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator;
 use Nuwave\Lighthouse\Support\Interfaces\ConnectionEdge;
 use Nuwave\Lighthouse\Support\Definition\Fields\EdgeField;
-use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class EdgeRegistrar extends BaseRegistrar
 {
+    use GlobalIdTrait;
+
     /**
      * Collection of registered type instances.
      *
@@ -52,7 +55,7 @@ class EdgeRegistrar extends BaseRegistrar
         }
 
         if ($name instanceof ConnectionEdge) {
-            $intance = $this->createEdge($name);
+            $instance = $this->createEdge($name);
             $this->instances->put($instanceName, $instance);
 
             return $instance;
@@ -91,8 +94,12 @@ class EdgeRegistrar extends BaseRegistrar
 
         return new EdgeField([
             'type' => $this->createInstance($edge->name(), $graphqlType),
-            'resolve' => function ($payload) {
-                return call_user_func_array([$edge, 'cursor'], [$payload]);
+            'resolve' => function ($payload) use ($edge) {
+                $model = $edge->edge($payload);
+                $cursor = call_user_func_array([$edge, 'cursor'], [$payload]);
+                $model->relayCursor = $this->encodeGlobalId('arrayconnection', $cursor);
+
+                return $model;
             },
         ]);
     }
