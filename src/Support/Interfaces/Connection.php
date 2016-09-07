@@ -6,8 +6,18 @@ use GraphQL\Type\Definition\ResolveInfo;
 
 interface Connection
 {
+
+
     /**
-     * Get name of connection.
+     * get the name of the connection. if this is
+     * null it will default to the full classname including namespaces
+     * @return string
+     */
+    public function name();
+
+
+    /**
+     * Get the type of connection.
      *
      * @return string
      */
