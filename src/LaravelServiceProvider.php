@@ -90,7 +90,7 @@ class LaravelServiceProvider extends ServiceProvider
      */
     protected function registerMacro()
     {
-        $name = $this->app['config']->get('lighthouse.controller') ?: 'paginate';
+        $name = $this->app['config']->get('lighthouse.pagination_macro') ?: 'paginate';
 
         $decodeCursor = function (array $args) {
             return $this->decodeCursor($args);
