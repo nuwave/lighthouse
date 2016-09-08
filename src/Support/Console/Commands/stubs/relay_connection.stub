@@ -11,9 +11,11 @@ class DummyClass implements Connection
     /**
      * Get the name of the connection.
      * Note: Connection names must be unique
+     *
      * @return string
      */
-    public function name(){
+    public function name()
+    {
         return (new ReflectionClass(new static))->getName();
     }
 

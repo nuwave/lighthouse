@@ -11,6 +11,7 @@ interface Connection
     /**
      * Get the name of the connection.
      * Note: Connection names must be unique
+     *
      * @return string
      */
     public function name();

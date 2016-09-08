@@ -10,8 +10,9 @@ class TaskConnection implements Connection
 {
 
     /**
-     * get the name of the connection. if this is
-     * null it will default to the full classname including namespaces
+     * Get the name of the connection.
+     * Note: Connection names must be unique
+     *
      * @return string
      */
     public function name()
