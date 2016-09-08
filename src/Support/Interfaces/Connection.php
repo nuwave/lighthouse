@@ -6,8 +6,18 @@ use GraphQL\Type\Definition\ResolveInfo;
 
 interface Connection
 {
+
+
     /**
-     * Get name of connection.
+     * Get the name of the connection.
+     * Note: Connection names must be unique
+     * @return string
+     */
+    public function name();
+
+
+    /**
+     * Get the type of connection.
      *
      * @return string
      */
