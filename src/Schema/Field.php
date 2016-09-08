@@ -53,7 +53,7 @@ class Field
     /**
      * Attach middleware to field.
      *
-     * @param array $attributes
+     * @param array $middleware
      */
     public function addMiddleware(array $middleware)
     {

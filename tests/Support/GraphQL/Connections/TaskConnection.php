@@ -8,6 +8,17 @@ use Nuwave\Lighthouse\Tests\Support\Models\Task;
 
 class TaskConnection implements Connection
 {
+
+    /**
+     * get the name of the connection. if this is
+     * null it will default to the full classname including namespaces
+     * @return string
+     */
+    public function name()
+    {
+        return "TaskConnection";
+    }
+
     /**
      * Get name of connection.
      *
@@ -42,4 +53,5 @@ class TaskConnection implements Connection
             $query->where('id', $parent->id);
         })->getConnection($args);
     }
+
 }
