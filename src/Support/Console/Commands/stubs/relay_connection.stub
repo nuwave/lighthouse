@@ -16,7 +16,7 @@ class DummyClass implements Connection
      */
     public function name()
     {
-        return (new ReflectionClass(new static))->getName();
+        return 'DummyClass';
     }
 
     /**
