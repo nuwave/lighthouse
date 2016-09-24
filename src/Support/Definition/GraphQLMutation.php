@@ -103,7 +103,7 @@ class GraphQLMutation extends GraphQLField
 
         $this->clientMutationId = $args['input']['clientMutationId'];
 
-        return $this->mutateAndGetPayload($args['input'], $info);
+        return $this->mutateAndGetPayload($args['input'], $context, $info);
     }
 
     /**

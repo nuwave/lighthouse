@@ -23,9 +23,9 @@ trait QueryExecutor
      * @param  mixed $rootValue
      * @return array
      */
-    public function execute($query, $variables = [], $rootValue = null)
+    public function execute($query, $context = null, $variables = [], $rootValue = null)
     {
-        $result = $this->queryAndReturnResult($query, $variables, $rootValue);
+        $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
         if (!empty($result->errors)) {
             return [
@@ -45,9 +45,9 @@ trait QueryExecutor
      * @param  mixed $rootValue
      * @return array
      */
-    public function queryAndReturnResult($query, $variables = [], $rootValue = null)
+    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
-        return GraphQL::executeAndReturnResult($this->buildSchema(), $query, $rootValue, $variables);
+        return GraphQL::executeAndReturnResult($this->buildSchema(), $query, $rootValue, $context, $variables);
     }
 
     /**
