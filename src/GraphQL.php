@@ -39,6 +39,13 @@ class GraphQL
     protected $cache;
 
     /**
+     * Types that implement interfaces.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $typesWithInterfaces;
+
+    /**
      * Create new instance of graphql container.
      *
      * @param \Illuminate\Contracts\Foundation\Application $app
@@ -46,6 +53,7 @@ class GraphQL
     public function __construct($app)
     {
         $this->app = $app;
+        $this->typesWithInterfaces = collect();
     }
 
     /**
@@ -57,22 +65,23 @@ class GraphQL
     {
         // Initialize types
         $this->types()->each(function ($type, $key) {
-            if (!in_array($type->name, ['node', 'pageInfo'])) {
-                dd(get_class_methods($this->type($key)));
+            $type = $this->type($key);
+
+            if (method_exists($type, 'getInterfaces') && !empty($type->getInterfaces())) {
+                $this->typesWithInterfaces->push($type);
             }
-            $this->type($key);
         });
 
         $queryFields = $this->queries()->merge($this->connections()->toArray());
         $mutationFields = $this->mutations();
 
         $queryType = $this->generateSchemaType($queryFields, 'Query');
-        dd('here');
         $mutationType = $this->generateSchemaType($mutationFields, 'Mutation');
 
         return new Schema([
             'query' => $queryType,
             'mutation' => $mutationType,
+            'types' => $this->typesWithInterfaces->all(),
         ]);
     }
 
