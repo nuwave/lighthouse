@@ -90,4 +90,30 @@ trait ScalarTypes
             'description' => $description,
         ], $config);
     }
+
+    /**
+     * Non null field.
+     *
+     * @param  array $wrappedType
+     * @return array
+     */
+    public function nonNull($wrappedType)
+    {
+        return array_merge($wrappedType, [
+            'type' => Type::nonNull($wrappedType['type'])
+        ]);
+    }
+
+    /**
+     * List type field.
+     *
+     * @param  array $wrappedType
+     * @return array
+     */
+    public function listOf($wrappedType)
+    {
+        return array_merge($wrappedType, [
+            'type' => Type::listOf($wrappedType['type'])
+        ]);
+    }
 }
