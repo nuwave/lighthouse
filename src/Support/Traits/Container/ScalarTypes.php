@@ -9,70 +9,70 @@ trait ScalarTypes
     /**
      * ID field.
      *
-     * @param  string $description
+     * @param  array $config
      * @return array
      */
-    public function id($description = '')
+    public function id($config = [])
     {
-        return [
+        return array_merge([
             'type' => Type::id(),
             'description' => $description,
-        ];
+        ], $config);
     }
 
     /**
      * String field.
      *
-     * @param  string $description
+     * @param  array $config
      * @return array
      */
-    public function string($description = '')
+    public function string($config = [])
     {
-        return [
+        return array_merge([
             'type' => Type::string(),
             'description' => $description,
-        ];
+        ], $config);
     }
 
     /**
      * Integer field.
      *
-     * @param  string $description
+     * @param  array $config
      * @return array
      */
-    public function int($description = '')
+    public function int($config = [])
     {
-        return [
+        return array_merge([
             'type' => Type::int(),
             'description' => $description,
-        ];
+        ], $config);
     }
 
     /**
      * Boolean field.
      *
-     * @param  string $description
+     * @param  array $config
      * @return array
      */
-    public function boolean($description = '')
+    public function boolean($config = [])
     {
-        return [
+        return array_merge([
             'type' => Type::boolean(),
             'description' => $description,
-        ];
+        ], $config);
     }
 
     /**
      * Float field.
      *
-     * @param  string $description
+     * @param  array $config
      * @return array
      */
-    public function float($description = '')
+    public function float($config = [])
     {
-        return [
+        return array_merge([
             'type' => Type::float(),
             'description' => $description,
-        ];
+        ], $config);
     }
 }
