@@ -57,6 +57,9 @@ class GraphQL
     {
         // Initialize types
         $this->types()->each(function ($type, $key) {
+            if (!in_array($type->name, ['node', 'pageInfo'])) {
+                dd(get_class_methods($this->type($key)));
+            }
             $this->type($key);
         });
 
@@ -64,9 +67,13 @@ class GraphQL
         $mutationFields = $this->mutations();
 
         $queryType = $this->generateSchemaType($queryFields, 'Query');
+        dd('here');
         $mutationType = $this->generateSchemaType($mutationFields, 'Mutation');
 
-        return new Schema($queryType, $mutationType);
+        return new Schema([
+            'query' => $queryType,
+            'mutation' => $mutationType,
+        ]);
     }
 
     /**

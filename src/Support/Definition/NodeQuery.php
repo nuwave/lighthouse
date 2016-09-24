@@ -37,9 +37,10 @@ class NodeQuery extends GraphQLQuery
      *
      * @param  string $root
      * @param  array $args
+     * @param  mixed $context
      * @return Illuminate\Database\Eloquent\Model|array|null
      */
-    public function resolve($root, array $args, ResolveInfo $info)
+    public function resolve($root, array $args, $context, ResolveInfo $info)
     {
         list($typeClass, $id) = $this->decodeGlobalId($args['id']);
 

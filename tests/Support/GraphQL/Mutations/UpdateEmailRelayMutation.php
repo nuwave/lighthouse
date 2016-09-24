@@ -62,10 +62,11 @@ class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
      * Resolve the mutation.
      *
      * @param  array  $args
+     * @param  mixed  $context
      * @param  ResolveInfo $info
      * @return mixed
      */
-    public function mutateAndGetPayload(array $args, ResolveInfo $info)
+    public function mutateAndGetPayload(array $args, $context, ResolveInfo $info)
     {
         $user = factory(User::class)->make([
             'email' => 'foo@example.com'

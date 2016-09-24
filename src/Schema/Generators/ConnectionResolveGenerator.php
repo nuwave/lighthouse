@@ -14,13 +14,14 @@ class ConnectionResolveGenerator
     /**
      * Attempt to auto-resolve connection.
      *
-     * @param  mixed      $root
-     * @param  array       $args
+     * @param  mixed $root
+     * @param  array $args
+     * @param  mixed $context
      * @param  ResolveInfo $info
-     * @param  string      $name
+     * @param  string $name
      * @return LengthAwarePaginator
      */
-    public function resolve($root, array $args, ResolveInfo $info, $name)
+    public function resolve($root, array $args, $context, ResolveInfo $info, $name)
     {
         $items = $this->getItems($root, $info, $name);
 

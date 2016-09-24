@@ -17,8 +17,9 @@ interface RelayMutation
      * Perform mutation.
      *
      * @param  array $input
+     * @param  mixed $context
      * @param  \GraphQL\Type\Definition\ResolveInfo $info
      * @return array
      */
-    public function mutateAndGetPayload(array $input, ResolveInfo $info);
+    public function mutateAndGetPayload(array $input, $context, ResolveInfo $info);
 }

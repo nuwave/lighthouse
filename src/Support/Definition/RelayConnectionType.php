@@ -167,8 +167,8 @@ class RelayConnectionType extends GraphQLType
             'name' => ucfirst($this->name),
             'description' => 'A connection to a list of items.',
             'fields' => $fields,
-            'resolve' => function ($root, $args, ResolveInfo $info) {
-                return $this->resolve($root, $args, $info, $this->name);
+            'resolve' => function ($root, $args, $context, ResolveInfo $info) {
+                return $this->resolve($root, $args, $context, $info, $this->name);
             }
         ];
     }

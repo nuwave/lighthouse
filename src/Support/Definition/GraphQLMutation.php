@@ -90,10 +90,11 @@ class GraphQLMutation extends GraphQLField
      *
      * @param  mixed $_
      * @param  array $args
+     * @param  mixed $context
      * @param  ResolveInfo $info
      * @return array
      */
-    public function relayResolve($_, $args, ResolveInfo $info)
+    public function relayResolve($_, $args, $context, ResolveInfo $info)
     {
         if (isset($args['input']['id'])) {
             $args['input']['relay_id'] = $args['input']['id'];

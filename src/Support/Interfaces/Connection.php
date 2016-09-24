@@ -36,8 +36,9 @@ interface Connection
      *
      * @param  mixed       $parent
      * @param  array       $args
+     * @param  mixed       $context
      * @param  ResolveInfo $info
      * @return mixed
      */
-    public function resolve($parent, array $args, ResolveInfo $info);
+    public function resolve($parent, array $args, $context, ResolveInfo $info);
 }

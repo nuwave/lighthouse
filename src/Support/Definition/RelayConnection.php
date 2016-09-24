@@ -35,8 +35,9 @@ abstract class RelayConnection
      *
      * @param  mixed       $parent
      * @param  array       $args
+     * @param  mixex       $context
      * @param  ResolveInfo $info
      * @return mixed
      */
-    abstract public function resolve($parent, array $args, ResolveInfo $info);
+    abstract public function resolve($parent, array $args, $context, ResolveInfo $info);
 }

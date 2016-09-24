@@ -72,10 +72,11 @@ abstract class RelayMutation extends GraphQLMutation
      *
      * @param  mixed       $_
      * @param  array       $args
+     * @param  mixed       $context
      * @param  ResolveInfo $info
      * @return array
      */
-    public function resolve($_, $args, ResolveInfo $info)
+    public function resolve($_, $args, $context, ResolveInfo $info)
     {
         if ($this->mutatesRelayType && isset($args['input']['id'])) {
             $args['input']['relay_id'] = $args['input']['id'];
@@ -102,10 +103,11 @@ abstract class RelayMutation extends GraphQLMutation
      * Perform mutation.
      *
      * @param  array       $input
+     * @param  mixed       $context
      * @param  ResolveInfo $info
      * @return array
      */
-    abstract protected function mutateAndGetPayload(array $input, ResolveInfo $info);
+    abstract protected function mutateAndGetPayload(array $input, $context, ResolveInfo $info);
 
     /**
      * List of available input fields.

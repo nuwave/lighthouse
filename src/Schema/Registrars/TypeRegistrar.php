@@ -44,10 +44,6 @@ class TypeRegistrar extends BaseRegistrar
 
         $this->instances->put($name, $instance);
 
-        if ($type->interfaces) {
-            InterfaceType::addImplementationToInterfaces($instance);
-        }
-
         return $instance;
     }
 
