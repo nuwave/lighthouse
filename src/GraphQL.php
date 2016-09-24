@@ -7,6 +7,7 @@ use GraphQL\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
+use Nuwave\Lighthouse\Support\Traits\Container\ScalarTypes;
 use Nuwave\Lighthouse\Support\Interfaces\Connection;
 use Nuwave\Lighthouse\Support\Cache\FileStore;
 use Nuwave\Lighthouse\Schema\Field;
@@ -15,7 +16,7 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 class GraphQL
 {
-    use QueryExecutor;
+    use QueryExecutor, ScalarTypes;
 
     /**
      * Instance of application.
