@@ -9,11 +9,14 @@ trait ScalarTypes
     /**
      * ID field.
      *
-     * @param  array $config
+     * @param  array|string $config
      * @return array
      */
-    public function id($config = [])
+    public function id($config)
     {
+        $description = is_string($config) ? $config : '';
+        $config = is_array($config) ? $config : [];
+         
         return array_merge([
             'type' => Type::id(),
             'description' => $description,
@@ -23,11 +26,14 @@ trait ScalarTypes
     /**
      * String field.
      *
-     * @param  array $config
+     * @param  array|string $config
      * @return array
      */
-    public function string($config = [])
+    public function string($config)
     {
+        $description = is_string($config) ? $config : '';
+        $config = is_array($config) ? $config : [];
+        
         return array_merge([
             'type' => Type::string(),
             'description' => $description,
@@ -37,11 +43,14 @@ trait ScalarTypes
     /**
      * Integer field.
      *
-     * @param  array $config
+     * @param  array|string $config
      * @return array
      */
-    public function int($config = [])
+    public function int($config)
     {
+        $description = is_string($config) ? $config : '';
+        $config = is_array($config) ? $config : [];
+        
         return array_merge([
             'type' => Type::int(),
             'description' => $description,
@@ -51,11 +60,14 @@ trait ScalarTypes
     /**
      * Boolean field.
      *
-     * @param  array $config
+     * @param  array|string $config
      * @return array
      */
-    public function boolean($config = [])
+    public function boolean($config)
     {
+        $description = is_string($config) ? $config : '';
+        $config = is_array($config) ? $config : [];
+        
         return array_merge([
             'type' => Type::boolean(),
             'description' => $description,
@@ -65,11 +77,14 @@ trait ScalarTypes
     /**
      * Float field.
      *
-     * @param  array $config
+     * @param  array|string $config
      * @return array
      */
-    public function float($config = [])
+    public function float($config)
     {
+        $description = is_string($config) ? $config : '';
+        $config = is_array($config) ? $config : [];
+        
         return array_merge([
             'type' => Type::float(),
             'description' => $description,
