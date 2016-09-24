@@ -74,8 +74,8 @@ class ConnectionField extends Fluent
             throw new \Exception("A name must be provided for [$connection] when auto resolving.");
         }
 
-        return function ($root, array $args, $info) use ($name) {
-            return $this->getResolver()->resolve($root, $args, $info, $name);
+        return function ($root, array $args, $context, $info) use ($name) {
+            return $this->getResolver()->resolve($root, $args, $context, $info, $name);
         };
     }
 
