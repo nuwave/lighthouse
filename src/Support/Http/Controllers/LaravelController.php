@@ -38,6 +38,6 @@ class LaravelController extends Controller
             $variables = json_decode($variables, true);
         }
 
-        return app('graphql')->execute($query, $variables);
+        return app('graphql')->execute($query, null, $variables);
     }
 }
