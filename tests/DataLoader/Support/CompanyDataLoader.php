@@ -2,21 +2,26 @@
 
 namespace Nuwave\Lighthouse\Tests\DataLoader\Support;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader;
 
-class CompanyDataLoader
+class CompanyDataLoader extends GraphQLDataLoader
 {
     /**
-     * Pre-resolve data.
+     * Available child loaders.
      *
-     * @param  mixed $parent
-     * @param  ResolveInfo|array  $fields
-     * @return null
+     * @var array
      */
-    public function resolve($parent, $info)
+    protected $children = [
+        'users' => UserDataLoader::class,
+    ];
+
+    /**
+     * Get short name of data loader.
+     *
+     * @return string
+     */
+    public function getName()
     {
-        dd($info);
-        // TODO: Resolve dataloader.
-        return $parent;
+        return 'company';
     }
 }

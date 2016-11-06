@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\DBTestCase;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataLoader;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\UserDataLoader;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Prophecy\Argument;
 
@@ -73,8 +74,50 @@ class DataLoaderTest extends DBTestCase
      */
     public function itCanExtractAllFieldsFromQuery()
     {
+        $query = $this->getQuery();
+        $dataLoader = $this->prophesize(CompanyDataLoader::class);
+        $this->app->instance(CompanyDataLoader::class, $dataLoader->reveal());
+
+        $dataLoader->resolve(
+            Argument::type(Company::class),
+            $this->getAllFields()
+        )
+        ->shouldBeCalled()
+        ->willReturn(null);
+
+        $this->executeQuery($query);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolveChildDataLoader()
+    {
+        $query = $this->getQuery();
+        $fields = $this->getAllFields();
+        $dataLoader = $this->prophesize(UserDataLoader::class);
+        $this->app->instance(UserDataLoader::class, $dataLoader->reveal());
+
+        $dataLoader->companyUsers(
+            Argument::type(Company::class),
+            array_get($fields, 'users')
+        )
+        ->shouldBeCalled()
+        ->willReturn(null);
+
+        $this->executeQuery($query);
+    }
+
+    /**
+     * Get query.
+     *
+     * @return string
+     */
+    protected function getQuery()
+    {
         $id = $this->encodeGlobalId(CompanyType::class, $this->company->id);
-        $query = '{
+
+        return '{
             companyQuery(id: "'.$id.'") {
                 name
                 users(first:5) {
@@ -95,18 +138,6 @@ class DataLoaderTest extends DBTestCase
                 }
             }
         }';
-
-        $dataLoader = $this->prophesize(CompanyDataLoader::class);
-        $this->app->instance(CompanyDataLoader::class, $dataLoader->reveal());
-
-        $dataLoader->resolve(
-            Argument::type(Company::class),
-            $this->getAllFields()
-        )
-        ->shouldBeCalled()
-        ->willReturn(null);
-
-        $this->executeQuery($query);
     }
 
     /**
@@ -114,7 +145,7 @@ class DataLoaderTest extends DBTestCase
      *
      * @return array
      */
-    public function getAllFields()
+    protected function getAllFields()
     {
         return [
             'name' => [
