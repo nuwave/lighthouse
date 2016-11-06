@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Support\Interfaces\Connection;
 use Nuwave\Lighthouse\Support\Cache\FileStore;
 use Nuwave\Lighthouse\Schema\Field;
 use Nuwave\Lighthouse\Schema\QueryParser;
+use Nuwave\Lighthouse\Schema\FieldParser;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 class GraphQL
@@ -292,5 +293,15 @@ class GraphQL
     public function parser()
     {
         return new QueryParser($this->schema(), $this->query);
+    }
+
+    /**
+     * Resolve instance of field parser.
+     *
+     * @return \Nuwave\Lighthouse\Schema\FieldParser
+     */
+    public function fieldParser()
+    {
+        return app(FieldParser::class);
     }
 }

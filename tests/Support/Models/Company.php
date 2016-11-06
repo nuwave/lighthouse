@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Tests\Support\Models;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Traits\RelayConnection;
 
-class User extends Model
+class Company extends Model
 {
     use RelayConnection;
 
@@ -15,26 +15,16 @@ class User extends Model
      * @var array
      */
     protected $fillable = [
-        'company_id', 'name', 'email',
+        'name',
     ];
 
     /**
-     * User's assigned tasks.
+     * Company employees.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function tasks()
+    public function users()
     {
-        return $this->hasMany(Task::class);
-    }
-
-    /**
-     * User assigned company.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
+        return $this->hasMany(User::class);
     }
 }
