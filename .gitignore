@@ -1,3 +1,4 @@
+.env
 composer.phar
 composer.lock
 vendor
