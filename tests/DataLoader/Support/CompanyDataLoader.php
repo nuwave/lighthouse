@@ -14,14 +14,4 @@ class CompanyDataLoader extends GraphQLDataLoader
     protected $children = [
         'users' => UserDataLoader::class,
     ];
-
-    /**
-     * Get short name of data loader.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return 'company';
-    }
 }

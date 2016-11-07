@@ -160,6 +160,17 @@ class GraphQL
     }
 
     /**
+     * Extract Data Loader from IoC container.
+     *
+     * @param  string $name
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     */
+    public function dataLoader($name)
+    {
+        return $this->schema()->dataLoaderInstance($name);
+    }
+
+    /**
      * Get cursor encoder for connection edge.
      *
      * @param  string $name

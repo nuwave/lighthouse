@@ -8,14 +8,13 @@ use Nuwave\Lighthouse\Tests\Support\Models\Company;
 class UserDataLoader extends GraphQLDataLoader
 {
     /**
-     * Get short name of data loader.
+     * Available child loaders.
      *
-     * @return string
+     * @var array
      */
-    public function getName()
-    {
-        return 'user';
-    }
+    protected $children = [
+        'tasks' => TaskDataLoader::class,
+    ];
 
     /**
      * Resolve company users.
@@ -26,6 +25,6 @@ class UserDataLoader extends GraphQLDataLoader
      */
     public function companyUsers($company, array $fields)
     {
-        return null;
+        return $company->users()->get();
     }
 }

@@ -5,12 +5,13 @@ namespace Nuwave\Lighthouse\Tests\DataLoader;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\Support\Models\Task;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\CompanyType;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\UserType;
 use Nuwave\Lighthouse\Tests\DBTestCase;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataLoader;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\UserDataLoader;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\TaskDataLoader;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Prophecy\Argument;
 
@@ -60,13 +61,29 @@ class DataLoaderTest extends DBTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        parent::getEnvironmentSetUp($app);
+
         $app['config']->set('lighthouse.schema.register', function () {
             $graphql = app('graphql');
             $graphql->schema()->type('company', CompanyType::class);
             $graphql->schema()->type('user', UserType::class);
             $graphql->schema()->type('task', TaskType::class);
             $graphql->schema()->query('companyQuery', Support\CompanyQuery::class);
+            $graphql->schema()->dataLoader('company', CompanyDataLoader::class);
+            $graphql->schema()->dataLoader('user', UserDataLoader::class);
+            $graphql->schema()->dataLoader('task', TaskDataLoader::class);
         });
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveInstanceOfDataLoader()
+    {
+        $graphql = app('graphql');
+        $this->assertInstanceOf(CompanyDataLoader::class, $graphql->dataLoader('company'));
+        $this->assertInstanceOf(UserDataLoader::class, $graphql->dataLoader('user'));
+        $this->assertInstanceOf(TaskDataLoader::class, $graphql->dataLoader('task'));
     }
 
     /**
@@ -100,12 +117,49 @@ class DataLoaderTest extends DBTestCase
 
         $dataLoader->companyUsers(
             Argument::type(Company::class),
+            array_get($fields, 'users.args'),
             array_get($fields, 'users')
         )
         ->shouldBeCalled()
         ->willReturn(null);
 
         $this->executeQuery($query);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUseDataLoadersToResolveTypes()
+    {
+        $userDataLoader = $this->prophesize(UserDataLoader::class);
+        app()->instance(UserDataLoader::class, $userDataLoader->reveal());
+
+        $this->executeQuery($this->getQuery());
+
+        $userDataLoader->loadDataByKey('company', $this->company->id)->shouldHaveBeenCalled();
+    }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itCanResolveNestedData()
+    {
+        $queries = 0;
+        \DB::listen(function ($query) use (&$queries) {
+            $queries++;
+        });
+
+        $query = $this->executeQuery($this->getQuery());
+        $data = array_get($query, 'data.companyQuery');
+
+        $this->assertEquals(3, $queries);
+        $this->assertCount(5, array_get($data, 'users.edges'));
+        $this->assertCount(2, array_get($data, 'users.edges.0.node.tasks.edges', []));
+        $this->assertCount(2, array_get($data, 'users.edges.1.node.tasks.edges', []));
+        $this->assertCount(2, array_get($data, 'users.edges.2.node.tasks.edges', []));
+        $this->assertCount(2, array_get($data, 'users.edges.3.node.tasks.edges', []));
+        $this->assertCount(2, array_get($data, 'users.edges.4.node.tasks.edges', []));
     }
 
     /**

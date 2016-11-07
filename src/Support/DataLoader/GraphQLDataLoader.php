@@ -4,15 +4,46 @@ namespace Nuwave\Lighthouse\Support\DataLoader;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 abstract class GraphQLDataLoader
 {
+    /**
+     * Name of Data Loader.
+     *
+     * @var string
+     */
+    protected $name = '';
+
+    /**
+     * Prefetched data.
+     *
+     * @var array
+     */
+    protected $data = [];
+
     /**
      * Available child loaders.
      *
      * @var array
      */
     protected $children = [];
+
+    /**
+     * Resolve data.
+     *
+     * @param  string $key
+     * @param  mixed  $root
+     * @return mixed
+     */
+    public function load($key, $root)
+    {
+        if ($dataLoader = $this->getChildLoader($key)) {
+            return $dataLoader->loadDataByKey($this->getName(), $this->getKey($root));
+        }
+
+        return null;
+    }
 
     /**
      * Prefetch data to load in resolvers.
@@ -33,26 +64,115 @@ abstract class GraphQLDataLoader
     }
 
     /**
+     * Get key for root object.
+     *
+     * @param  mixed $root
+     * @return mixed
+     */
+    public function getKey($root)
+    {
+        if ($root instanceof Model) {
+            return $root->getKey();
+        }
+    }
+
+    /**
      * Resolve child loader.
      *
      * @param  mixed $root
      * @param  array $fields
      * @return mixed
      */
-    function resolveChildren($root, array $fields)
+    public function resolveChildren($root, array $fields)
     {
         collect($fields)->each(function ($field, $key) use ($root) {
             if ($dataLoader = $this->getChildLoader($key)) {
                 $method = $this->getChildResolveMethod($key, $root);
-                $child = method_exists($dataLoader, $method) ?
-                    call_user_func_array([$dataLoader, $method], [$root, $field])
+                $children = method_exists($dataLoader, $method) ?
+                    call_user_func_array([$dataLoader, $method], [$root, array_get($field, 'args', []), $field])
                     : null;
 
-                if ($child) {
-                    $this->resolveChildren($child, $field);
+                if ($children) {
+                    if ($root instanceof Collection) {
+                        $children = $children->each(function ($child) use ($dataLoader, $key) {
+                            $dataLoader->storeDataByKey(
+                                $this->getName(),
+                                $this->getKey($child),
+                                $child->getAttribute($key)
+                            );
+                        })
+                        ->pluck($key)
+                        ->collapse();
+                    } else {
+                        $dataLoader->storeDataByKey($this->getName(), $this->getKey($root), $children);
+                    }
+
+                    $dataLoader->resolveChildren($children, array_get(
+                        $field,
+                        'children.edges.children.node.children',
+                        array_get($field, 'children', $field))
+                    );
                 }
             }
         });
+    }
+
+    /**
+     * Get all stored data.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function allData()
+    {
+        return collect($this->data);
+    }
+
+    /**
+     * Load data by key.
+     *
+     * @param  string $name
+     * @param  mixed $key
+     * @return mixed
+     */
+    public function loadDataByKey($name, $key)
+    {
+        return array_get($this->data, "{$name}.{$key}");
+    }
+
+    /**
+     * Store data by id.
+     *
+     * @param  string $name
+     * @param  mixed  $key
+     * @param  mixed  $data
+     * @return void
+     */
+    public function storeDataByKey($name, $key, $data)
+    {
+        $this->data[$name] = isset($this->data[$name])
+            ? array_add($this->data[$name], $key, $data)
+            : [$key => $data];
+    }
+
+    /**
+     * Set name of Data Loader.
+     *
+     * @param string $name
+     * @return void
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Get short name of data loader.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -110,11 +230,4 @@ abstract class GraphQLDataLoader
 
         return camel_case($name.'_'.str_plural($key));
     }
-
-    /**
-     * Get short name of data loader.
-     *
-     * @return string
-     */
-    abstract public function getName();
 }
