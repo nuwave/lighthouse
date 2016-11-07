@@ -45,7 +45,7 @@ class EloquentTypeTest extends DBTestCase
 
         $this->assertEquals('User', $type->name);
         $this->assertEquals([
-            'id', 'name', 'email', 'created_at', 'updated_at',
+            'id', 'company_id', 'name', 'email', 'created_at', 'updated_at',
         ], $fieldKeys);
         $this->assertInstanceOf(IDType::class, $this->getFieldType('id', $fields));
         $this->assertInstanceOf(StringType::class, $this->getFieldType('name', $fields));

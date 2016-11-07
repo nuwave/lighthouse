@@ -1,0 +1,25 @@
+<?php
+
+namespace DummyNamespace;
+
+use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader;
+
+class DummyClass extends GraphQLDataLoader
+{
+    /**
+     * Available fields and associated DataLoaders.
+     *
+     * @var array
+     */
+    protected $children = [];
+
+    /**
+     * Create new instance of DataLoader.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        // ...
+    }
+}

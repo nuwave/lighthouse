@@ -23,3 +23,7 @@ $factory->define($namespace.'Post', function (Faker\Generator $faker) {
         'content' => $faker->paragraph
     ];
 });
+
+$factory->define($namespace.'Company', function (Faker\Generator $faker) {
+    return ['name' => $faker->company];
+});

@@ -31,7 +31,7 @@ class ConnectionResolveGenerator
             return $items;
         }
 
-        return $items->paginate($args);
+        return $items->toConnection($args);
     }
 
     /**

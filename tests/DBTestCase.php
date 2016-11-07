@@ -29,5 +29,14 @@ class DBTestCase extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', [
+            'driver' => env('DB_CONNECTION', 'mysql'),
+            'host' => env('DB_HOST', 'localhost'),
+            'database' => env('DB_DATABASE', 'lighthouse'),
+            'username' => env('DB_USERNAME', 'lighthouse'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset'  => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+        ]);
     }
 }

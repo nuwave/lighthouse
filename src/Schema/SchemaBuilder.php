@@ -157,6 +157,18 @@ class SchemaBuilder
     }
 
     /**
+     * Add Data Loader to registrar.
+     *
+     * @param  string $name
+     * @param  string $loader
+     * @return bool
+     */
+    public function dataLoader($name, $loader)
+    {
+        return $this->getDataLoaderRegistrar()->register($name, $loader);
+    }
+
+    /**
      * Get type field from registrar.
      *
      * @param  string $name
@@ -203,6 +215,17 @@ class SchemaBuilder
     public function edgeInstance($name, $type = null, $fresh = false)
     {
         return $this->getEdgeRegistrar()->instance($name, $fresh, $type);
+    }
+
+    /**
+     * Add Data Loader to registrar.
+     *
+     * @param  string $name
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     */
+    public function dataLoaderInstance($name)
+    {
+        return $this->getDataLoaderRegistrar()->instance($name);
     }
 
     /**

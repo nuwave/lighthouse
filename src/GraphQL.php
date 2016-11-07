@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Support\Interfaces\Connection;
 use Nuwave\Lighthouse\Support\Cache\FileStore;
 use Nuwave\Lighthouse\Schema\Field;
 use Nuwave\Lighthouse\Schema\QueryParser;
+use Nuwave\Lighthouse\Schema\FieldParser;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 
 class GraphQL
@@ -159,6 +160,17 @@ class GraphQL
     }
 
     /**
+     * Extract Data Loader from IoC container.
+     *
+     * @param  string $name
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     */
+    public function dataLoader($name)
+    {
+        return $this->schema()->dataLoaderInstance($name);
+    }
+
+    /**
      * Get cursor encoder for connection edge.
      *
      * @param  string $name
@@ -292,5 +304,15 @@ class GraphQL
     public function parser()
     {
         return new QueryParser($this->schema(), $this->query);
+    }
+
+    /**
+     * Resolve instance of field parser.
+     *
+     * @return \Nuwave\Lighthouse\Schema\FieldParser
+     */
+    public function fieldParser()
+    {
+        return app(FieldParser::class);
     }
 }

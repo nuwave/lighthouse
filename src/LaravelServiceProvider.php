@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 
 class LaravelServiceProvider extends ServiceProvider
 {
@@ -90,7 +91,7 @@ class LaravelServiceProvider extends ServiceProvider
      */
     protected function registerMacro()
     {
-        $name = $this->app['config']->get('lighthouse.pagination_macro') ?: 'paginate';
+        $name = $this->app['config']->get('lighthouse.pagination_macro') ?: 'toConnection';
 
         $decodeCursor = function (array $args) {
             return $this->decodeCursor($args);
@@ -107,6 +108,18 @@ class LaravelServiceProvider extends ServiceProvider
                 $first,
                 $currentPage
             );
+        });
+
+        Collection::macro('fetch', function ($relations) {
+            if (count($this->items) > 0) {
+                if (is_string($relations)) {
+                    $relations = [$relations];
+                }
+
+                $query = $this->first()->newQuery()->with($relations);
+                $this->items = app(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
+            }
+            return $this;
         });
     }
 }
