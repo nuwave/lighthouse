@@ -17,7 +17,7 @@ return [
         'types'       => 'App\\Http\\GraphQL\\Types',
         'fields'      => 'App\\Http\\GraphQL\\Fields',
         'connections' => 'App\\Http\\GraphQL\\Connections',
-        'dataLoaders' => 'App\\Http\\GraphQL\\DataLoaders',
+        'dataloaders' => 'App\\Http\\GraphQL\\DataLoaders',
     ],
 
     'cache' => storage_path('lighthouse/cache'),
