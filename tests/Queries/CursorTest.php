@@ -121,7 +121,7 @@ class UserCursorType extends GraphQLType implements RelayType
             ],
             'tasks' => GraphQL::connection('task')
                 ->resolve(function (User $user, array $args) {
-                    return $user->tasks->paginate($args);
+                    return $user->tasks->toConnection($args);
                 })->cursor(function ($item, $index, $page) {
                     return $index === 0 ? 'foo' : 'bar';
                 })->field()

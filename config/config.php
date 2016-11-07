@@ -17,11 +17,12 @@ return [
         'types'       => 'App\\Http\\GraphQL\\Types',
         'fields'      => 'App\\Http\\GraphQL\\Fields',
         'connections' => 'App\\Http\\GraphQL\\Connections',
+        'dataLoaders' => 'App\\Http\\GraphQL\\DataLoaders',
     ],
 
     'cache' => storage_path('lighthouse/cache'),
     'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
-    'pagination_macro' => 'paginate',
+    'pagination_macro' => 'toConnection',
     'route' => [],
     'model_path' => 'App\\Models',
     'camel_case' => false,
