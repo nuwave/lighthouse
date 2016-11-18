@@ -23,3 +23,16 @@ if (! function_exists('schema')) {
         return GraphQL::schema();
     }
 }
+
+if (! function_exists('dataLoader')) {
+    /**
+     * Get instance of dataLoader.
+     *
+     * @param  string $loader
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     */
+    function dataLoader($loader)
+    {
+        return GraphQL::dataLoader($loader);
+    }
+}

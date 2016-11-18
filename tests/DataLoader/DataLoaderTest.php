@@ -84,6 +84,10 @@ class DataLoaderTest extends DBTestCase
         $this->assertInstanceOf(CompanyDataLoader::class, $graphql->dataLoader('company'));
         $this->assertInstanceOf(UserDataLoader::class, $graphql->dataLoader('user'));
         $this->assertInstanceOf(TaskDataLoader::class, $graphql->dataLoader('task'));
+
+        $this->assertInstanceOf(CompanyDataLoader::class, dataLoader('company'));
+        $this->assertInstanceOf(UserDataLoader::class, dataLoader('user'));
+        $this->assertInstanceOf(TaskDataLoader::class, dataLoader('task'));
     }
 
     /**
