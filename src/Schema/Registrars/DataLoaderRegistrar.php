@@ -2,17 +2,23 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
+use Nuwave\Lighthouse\Support\Traits\Container\SchemaClassRegistrar;
+
 class DataLoaderRegistrar
 {
+    use SchemaClassRegistrar;
+
     /**
      * Add Data Loader to registrar.
      *
-     * @param  string            $name
-     * @param  string $loader
+     * @param  string $name
+     * @param  string $namespace
      * @return bool
      */
-    public function register($name, $loader)
+    public function register($name, $namespace)
     {
+        $loader = $this->getClassName($namespace);
+
         app()->singleton($loader);
         app()->alias($loader, $this->alias($name));
 

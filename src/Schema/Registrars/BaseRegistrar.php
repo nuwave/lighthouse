@@ -4,9 +4,12 @@ namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use Nuwave\Lighthouse\Schema\Field;
 use Nuwave\Lighthouse\Schema\SchemaBuilder as Schema;
+use Nuwave\Lighthouse\Support\Traits\Container\SchemaClassRegistrar;
 
 abstract class BaseRegistrar
 {
+    use SchemaClassRegistrar;
+
     /**
      * Collection of registered definitions.
      *
@@ -81,32 +84,6 @@ abstract class BaseRegistrar
         $field->addMiddleware($this->schema->getMiddlewareStack());
 
         return $field;
-    }
-
-    /**
-     * Get class name.
-     *
-     * @param  string $namespace
-     * @return string
-     */
-    protected function getClassName($namespace)
-    {
-        $current = $this->schema->getNamespace();
-
-        return empty(trim($current)) ? $namespace : trim($current, '\\') . '\\' . $namespace;
-    }
-
-    /**
-     * Set local instance of schema container.
-     *
-     * @param Schema $schema
-     * @return self
-     */
-    public function setSchema(Schema $schema)
-    {
-        $this->schema = $schema;
-
-        return $this;
     }
 
     /**

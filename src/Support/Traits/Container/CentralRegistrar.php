@@ -212,6 +212,10 @@ trait CentralRegistrar
      */
     public function getDataLoaderRegistrar()
     {
-        return app(DataLoaderRegistrar::class);
+        if (! $this->loaderRegistrar) {
+            $this->loaderRegistrar = app(DataLoaderRegistrar::class)->setSchema($this);
+        }
+
+        return $this->loaderRegistrar;
     }
 }
