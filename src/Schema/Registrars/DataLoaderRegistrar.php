@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
-use Nuwave\Lighthouse\Support\Traits\Container\SchemaClassRegistrar;
+use Nuwave\Lighthouse\Support\Traits\Container\SchemaClassRegistrar as ClassRegistrar;
 
 class DataLoaderRegistrar
 {
-    use SchemaClassRegistrar;
+    use ClassRegistrar;
 
     /**
      * Add Data Loader to registrar.
