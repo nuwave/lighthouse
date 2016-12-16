@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\Language\AST\SelectionSet;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\Field as GraphQLField;
+use GraphQL\Language\AST\Variable;
 use GraphQL\Language\AST\FragmentDefinition;
 use GraphQL\Language\AST\FragmentSpread;
 
@@ -70,7 +71,13 @@ class FieldParser
         $args = [];
 
         foreach ($field->arguments as $argument) {
-            $args[$argument->name->value] = $argument->value->value;
+            if ($argument->value instanceof Variable) {
+                // TODO: Get rid of request helper
+                $args[$argument->name->value] = array_get(request()->get('variables', []), $argument->name->value);
+            } else {
+                $args[$argument->name->value] = $argument->value->value;
+            }
+
         }
 
         return array_merge([
