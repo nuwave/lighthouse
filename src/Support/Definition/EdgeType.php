@@ -73,8 +73,10 @@ class EdgeType extends GraphQLType
      */
     public function toArray()
     {
+        $name = preg_replace("/Edge$/i", "", $this->name).'Edge';
+        
         return [
-            'name' => ucfirst($this->name).'Edge',
+            'name' => studly_case($name),
             'description' => 'An edge in a connection.',
             'fields' => $this->fields(),
         ];
