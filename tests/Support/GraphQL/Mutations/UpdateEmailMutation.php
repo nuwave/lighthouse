@@ -10,15 +10,6 @@ use GraphQL\Type\Definition\Type;
 class UpdateEmailMutation extends GraphQLMutation
 {
     /**
-     * Attributes of mutation.
-     *
-     * @var array
-     */
-    protected $attributes = [
-        'name' => 'UpdateUserPassword'
-    ];
-
-    /**
      * Type that mutation returns.
      *
      * @return ObjectType

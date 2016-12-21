@@ -6,7 +6,6 @@ use GraphQL;
 use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
 use Nuwave\Lighthouse\Support\Interfaces\RelayMutation;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 
@@ -18,7 +17,7 @@ class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
      * @var array
      */
     protected $attributes = [
-        'name' => 'UpdateUserPasswordRelay'
+        'name' => 'updateEmail'
     ];
 
     /**

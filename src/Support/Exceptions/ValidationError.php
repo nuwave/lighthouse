@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Exceptions;
 
-use GraphQL\Error;
+use GraphQL\Error\Error;
 
 class ValidationError extends Error
 {
@@ -21,7 +21,7 @@ class ValidationError extends Error
     public function setValidator($validator)
     {
         $this->validator = $validator;
-        
+
         return $this;
     }
 

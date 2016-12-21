@@ -46,7 +46,7 @@ class MutationTest extends TestCase
     {
         $id = $this->encodeGlobalId(UserType::class, 'foo');
 
-        $query = 'mutation UpdateUserEmailRelay($input: UpdateUserPasswordRelayInput!) {
+        $query = 'mutation UpdateUserEmailRelay($input: UpdateEmailInput!) {
             updateEmail(input: $input) {
                 user {
                     email
@@ -87,7 +87,7 @@ class MutationTest extends TestCase
     {
         $id = $this->encodeGlobalId(UserType::class, 'foo');
 
-        $query = 'mutation UpdateUserEmailRelay($input: UpdateUserPasswordRelayInput!) {
+        $query = 'mutation UpdateUserEmailRelay($input: UpdateEmailInput!) {
             updateEmail(input: $input) {
                 user {
                     email
