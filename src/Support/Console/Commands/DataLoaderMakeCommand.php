@@ -4,28 +4,28 @@ namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 
-class DataFetcherMakeCommand extends GeneratorCommand
+class DataLoaderMakeCommand extends GeneratorCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'lighthouse:datafetcher';
+    protected $name = 'lighthouse:dataloader';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate a GraphQL DataFetcher.';
+    protected $description = 'Generate a GraphQL DataLoader.';
 
     /**
      * The type of class being generated.
      *
      * @var string
      */
-    protected $type = 'DataFetcher';
+    protected $type = 'DataLoader';
 
     /**
      * Get the stub file for the generator.
@@ -34,7 +34,7 @@ class DataFetcherMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/datafetcher.stub';
+        return __DIR__.'/stubs/dataloader.stub';
     }
 
     /**
@@ -45,7 +45,7 @@ class DataFetcherMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return config('lighthouse.namespaces.datafetchers') ?: config('lighthouse.namespaces.dataloaders');
+        return config('lighthouse.namespaces.dataloaders');
     }
 
     /**

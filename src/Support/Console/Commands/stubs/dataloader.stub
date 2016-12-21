@@ -1,0 +1,18 @@
+<?php
+
+namespace DummyNamespace;
+
+use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader;
+
+class DummyClass extends GraphQLDataLoader
+{
+    /**
+     * Resolve keys.
+     *
+     * @return void
+     */
+    public function resolve()
+    {
+        // Resolve $this->keys
+    }
+}
