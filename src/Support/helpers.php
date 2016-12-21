@@ -36,3 +36,16 @@ if (! function_exists('dataFetcher')) {
         return GraphQL::dataFetcher($loader);
     }
 }
+
+if (! function_exists('dataLoader')) {
+    /**
+     * Get instance of data loader.
+     *
+     * @param  string $loader
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     */
+    function dataLoader($loader)
+    {
+        return GraphQL::dataLoader($loader);
+    }
+}

@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Schema\Registrars\EdgeRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\QueryRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\CursorRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\MutationRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\DataLoaderRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\DataFetcherRegistrar;
 
@@ -60,6 +61,13 @@ trait CentralRegistrar
      * @var DataFetcherRegistrar
      */
     protected $fetcherRegistrar;
+
+    /**
+     * Data Loader registrar.
+     *
+     * @var DataLoaderRegistrar
+     */
+    protected $loaderRegistrar;
 
     /**
      * Set local instance of type registrar.
@@ -217,5 +225,19 @@ trait CentralRegistrar
         }
 
         return $this->fetcherRegistrar;
+    }
+
+    /**
+     * Get instance of Data Fetcher registrar.
+     *
+     * @return DataFetcherRegistrar
+     */
+    public function getDataLoaderRegistrar()
+    {
+        if (! $this->loaderRegistrar) {
+            $this->loaderRegistrar = app(DataLoaderRegistrar::class)->setSchema($this);
+        }
+
+        return $this->loaderRegistrar;
     }
 }

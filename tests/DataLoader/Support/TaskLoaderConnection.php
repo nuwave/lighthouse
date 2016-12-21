@@ -17,6 +17,6 @@ class TaskLoaderConnection extends TaskFetcherConnection
      */
     public function resolve($parent, array $args, $context, ResolveInfo $info)
     {
-        return dataFetcher('task')->load($parent->id, $parent, $args);
+        return dataLoader('task')->load($parent->id, $parent, $args);
     }
 }

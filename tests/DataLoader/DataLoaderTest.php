@@ -63,7 +63,7 @@ class DataLoaderTest extends DBTestCase
             $graphql->schema()->type('user', Support\UserLoaderType::class);
             $graphql->schema()->type('task', TaskType::class);
             $graphql->schema()->query('companyQuery', Support\CompanyLoaderQuery::class);
-            $graphql->schema()->dataFetcher('task', Support\UserTaskDataLoader::class);
+            $graphql->schema()->dataLoader('task', Support\UserTaskDataLoader::class);
         });
     }
 
