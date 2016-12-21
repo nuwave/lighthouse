@@ -17,6 +17,13 @@ class DBTestCase extends TestCase
             '--database' => 'testing',
             '--realpath' => realpath(__DIR__.'/Support/migrations')
         ]);
+
+        $this->beforeApplicationDestroyed(function () {
+            $this->artisan('migrate:rollback', [
+                '--database' => 'testing',
+                '--realpath' => realpath(__DIR__.'/Support/migrations')
+            ]);
+        });
     }
 
     /**
