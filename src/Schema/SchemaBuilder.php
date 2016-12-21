@@ -157,15 +157,15 @@ class SchemaBuilder
     }
 
     /**
-     * Add Data Loader to registrar.
+     * Add Data fetcher to registrar.
      *
      * @param  string $name
-     * @param  string $loader
+     * @param  string $fetcher
      * @return bool
      */
-    public function dataLoader($name, $loader)
+    public function dataFetcher($name, $fetcher)
     {
-        return $this->getDataLoaderRegistrar()->register($name, $loader);
+        return $this->getDataFetcherRegistrar()->register($name, $fetcher);
     }
 
     /**
@@ -221,11 +221,11 @@ class SchemaBuilder
      * Add Data Loader to registrar.
      *
      * @param  string $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
-    public function dataLoaderInstance($name)
+    public function dataFetcherInstance($name)
     {
-        return $this->getDataLoaderRegistrar()->instance($name);
+        return $this->getDataFetcherRegistrar()->instance($name);
     }
 
     /**

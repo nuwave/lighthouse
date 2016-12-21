@@ -3,30 +3,29 @@
 namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Input\InputOption;
 
-class MutationMakeCommand extends GeneratorCommand
+class DataFetcherMakeCommand extends GeneratorCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'lighthouse:dataloader';
+    protected $name = 'lighthouse:datafetcher';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate a GraphQL DataLoader.';
+    protected $description = 'Generate a GraphQL DataFetcher.';
 
     /**
      * The type of class being generated.
      *
      * @var string
      */
-    protected $type = 'DataLoader';
+    protected $type = 'DataFetcher';
 
     /**
      * Get the stub file for the generator.
@@ -35,7 +34,7 @@ class MutationMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/dataloader.stub';
+        return __DIR__.'/stubs/datafetcher.stub';
     }
 
     /**
@@ -46,7 +45,7 @@ class MutationMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return config('lighthouse.namespaces.dataloaders');
+        return config('lighthouse.namespaces.datafetchers');
     }
 
     /**

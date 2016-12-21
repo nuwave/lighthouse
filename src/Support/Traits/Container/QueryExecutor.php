@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Traits\Container;
 
-use GraphQL\Error;
+use GraphQL\Error\Error;
 use GraphQL\GraphQL;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 

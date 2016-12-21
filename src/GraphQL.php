@@ -163,11 +163,11 @@ class GraphQL
      * Extract Data Loader from IoC container.
      *
      * @param  string $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
-    public function dataLoader($name)
+    public function dataFetcher($name)
     {
-        return $this->schema()->dataLoaderInstance($name);
+        return $this->schema()->dataFetcherInstance($name);
     }
 
     /**

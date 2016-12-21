@@ -6,10 +6,10 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class GraphQLDataLoader
+abstract class GraphQLDataFetcher
 {
     /**
-     * Name of Data Loader.
+     * Name of Data Fetcher.
      *
      * @var string
      */
@@ -23,7 +23,7 @@ abstract class GraphQLDataLoader
     protected $data = [];
 
     /**
-     * Available child loaders.
+     * Available child data fetchers.
      *
      * @var array
      */
@@ -38,8 +38,8 @@ abstract class GraphQLDataLoader
      */
     public function load($key, $root)
     {
-        if ($dataLoader = $this->getChildLoader($key)) {
-            return $dataLoader->loadDataByKey($this->getName(), $this->getKey($root));
+        if ($dataFetcher = $this->getChildFetcher($key)) {
+            return $dataFetcher->loadDataByKey($this->getName(), $this->getKey($root));
         }
 
         return null;
@@ -77,7 +77,7 @@ abstract class GraphQLDataLoader
     }
 
     /**
-     * Resolve child loader.
+     * Resolve child data fetcher.
      *
      * @param  mixed $root
      * @param  array $fields
@@ -86,16 +86,16 @@ abstract class GraphQLDataLoader
     public function resolveChildren($root, array $fields)
     {
         collect($fields)->each(function ($field, $key) use ($root) {
-            if ($dataLoader = $this->getChildLoader($key)) {
+            if ($dataFetcher = $this->getChildFetcher($key)) {
                 $method = $this->getChildResolveMethod($key, $root);
-                $children = method_exists($dataLoader, $method) ?
-                    call_user_func_array([$dataLoader, $method], [$root, array_get($field, 'args', []), $field])
+                $children = method_exists($dataFetcher, $method) ?
+                    call_user_func_array([$dataFetcher, $method], [$root, array_get($field, 'args', []), $field])
                     : null;
 
                 if ($children) {
                     if ($root instanceof Collection) {
-                        $children = $children->each(function ($child) use ($dataLoader, $key) {
-                            $dataLoader->storeDataByKey(
+                        $children = $children->each(function ($child) use ($dataFetcher, $key) {
+                            $dataFetcher->storeDataByKey(
                                 $this->getName(),
                                 $this->getKey($child),
                                 $child->getAttribute($key)
@@ -104,10 +104,10 @@ abstract class GraphQLDataLoader
                         ->pluck($key)
                         ->collapse();
                     } else {
-                        $dataLoader->storeDataByKey($this->getName(), $this->getKey($root), $children);
+                        $dataFetcher->storeDataByKey($this->getName(), $this->getKey($root), $children);
                     }
 
-                    $dataLoader->resolveChildren($children, array_get(
+                    $dataFetcher->resolveChildren($children, array_get(
                         $field,
                         'children.edges.children.node.children',
                         array_get($field, 'children', $field))
@@ -155,7 +155,7 @@ abstract class GraphQLDataLoader
     }
 
     /**
-     * Set name of Data Loader.
+     * Set name of Data Fetcher.
      *
      * @param string $name
      * @return void
@@ -166,7 +166,7 @@ abstract class GraphQLDataLoader
     }
 
     /**
-     * Get short name of data loader.
+     * Get short name of data fetcher.
      *
      * @return string
      */
@@ -176,25 +176,25 @@ abstract class GraphQLDataLoader
     }
 
     /**
-     * Determine if child data loader is available.
+     * Determine if child data fetcher is available.
      *
      * @param  string  $key
      * @return boolean
      */
-    protected function hasChildLoader($key)
+    protected function hasChildFetcher($key)
     {
         return isset($this->children[$key]);
     }
 
     /**
-     * Get child DataLoader by key.
+     * Get child DataFetcher by key.
      *
      * @param  string $key
      * @return self
      */
-    protected function getChildLoader($key)
+    protected function getChildFetcher($key)
     {
-        if (!$this->hasChildLoader($key)) {
+        if (!$this->hasChildFetcher($key)) {
             return null;
         }
 
@@ -202,7 +202,7 @@ abstract class GraphQLDataLoader
     }
 
     /**
-     * Get name of method to resolve child data loader.
+     * Get name of method to resolve child data fetcher.
      *
      * @param  string $key
      * @param  mixed $root
@@ -218,7 +218,7 @@ abstract class GraphQLDataLoader
     }
 
     /**
-     * Generate method name to call on child data loader.
+     * Generate method name to call on child data fetcher.
      *
      * @param  string  $key
      * @param  boolean $plural

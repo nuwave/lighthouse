@@ -2,19 +2,19 @@
 
 namespace DummyNamespace;
 
-use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader;
+use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher;
 
-class DummyClass extends GraphQLDataLoader
+class DummyClass extends GraphQLDataFetcher
 {
     /**
-     * Available fields and associated DataLoaders.
+     * Available fields and associated DataFetchers.
      *
      * @var array
      */
     protected $children = [];
 
     /**
-     * Create new instance of DataLoader.
+     * Create new instance of DataFetcher.
      *
      * @return void
      */

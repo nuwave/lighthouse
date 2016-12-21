@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Tests\DataLoader\Support;
 
-use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader;
+use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher;
 
-class TaskDataLoader extends GraphQLDataLoader
+class TaskDataFetcher extends GraphQLDataFetcher
 {
     /**
      * Resolve company users.

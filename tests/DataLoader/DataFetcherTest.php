@@ -9,13 +9,13 @@ use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\UserType;
 use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataLoader;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\UserDataLoader;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\TaskDataLoader;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataFetcher;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\UserDataFetcher;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\TaskDataFetcher;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Prophecy\Argument;
 
-class DataLoaderTest extends DBTestCase
+class DataFetcherTest extends DBTestCase
 {
     use GlobalIdTrait;
 
@@ -69,25 +69,25 @@ class DataLoaderTest extends DBTestCase
             $graphql->schema()->type('user', UserType::class);
             $graphql->schema()->type('task', TaskType::class);
             $graphql->schema()->query('companyQuery', Support\CompanyQuery::class);
-            $graphql->schema()->dataLoader('company', CompanyDataLoader::class);
-            $graphql->schema()->dataLoader('user', UserDataLoader::class);
-            $graphql->schema()->dataLoader('task', TaskDataLoader::class);
+            $graphql->schema()->dataFetcher('company', CompanyDataFetcher::class);
+            $graphql->schema()->dataFetcher('user', UserDataFetcher::class);
+            $graphql->schema()->dataFetcher('task', TaskDataFetcher::class);
         });
     }
 
     /**
      * @test
      */
-    public function itCanResolveInstanceOfDataLoader()
+    public function itCanResolveInstanceOfDataFetcher()
     {
         $graphql = app('graphql');
-        $this->assertInstanceOf(CompanyDataLoader::class, $graphql->dataLoader('company'));
-        $this->assertInstanceOf(UserDataLoader::class, $graphql->dataLoader('user'));
-        $this->assertInstanceOf(TaskDataLoader::class, $graphql->dataLoader('task'));
+        $this->assertInstanceOf(CompanyDataFetcher::class, $graphql->dataFetcher('company'));
+        $this->assertInstanceOf(UserDataFetcher::class, $graphql->dataFetcher('user'));
+        $this->assertInstanceOf(TaskDataFetcher::class, $graphql->dataFetcher('task'));
 
-        $this->assertInstanceOf(CompanyDataLoader::class, dataLoader('company'));
-        $this->assertInstanceOf(UserDataLoader::class, dataLoader('user'));
-        $this->assertInstanceOf(TaskDataLoader::class, dataLoader('task'));
+        $this->assertInstanceOf(CompanyDataFetcher::class, dataFetcher('company'));
+        $this->assertInstanceOf(UserDataFetcher::class, dataFetcher('user'));
+        $this->assertInstanceOf(TaskDataFetcher::class, dataFetcher('task'));
     }
 
     /**
@@ -96,10 +96,10 @@ class DataLoaderTest extends DBTestCase
     public function itCanExtractAllFieldsFromQuery()
     {
         $query = $this->getQuery();
-        $dataLoader = $this->prophesize(CompanyDataLoader::class);
-        $this->app->instance(CompanyDataLoader::class, $dataLoader->reveal());
+        $dataFetcher = $this->prophesize(CompanyDataFetcher::class);
+        $this->app->instance(CompanyDataFetcher::class, $dataFetcher->reveal());
 
-        $dataLoader->resolve(
+        $dataFetcher->resolve(
             Argument::type(Company::class),
             $this->getAllFields()
         )
@@ -112,14 +112,14 @@ class DataLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itResolveChildDataLoader()
+    public function itResolveChildDataFetcher()
     {
         $query = $this->getQuery();
         $fields = $this->getAllFields();
-        $dataLoader = $this->prophesize(UserDataLoader::class);
-        $this->app->instance(UserDataLoader::class, $dataLoader->reveal());
+        $dataFetcher = $this->prophesize(UserDataFetcher::class);
+        $this->app->instance(UserDataFetcher::class, $dataFetcher->reveal());
 
-        $dataLoader->companyUsers(
+        $dataFetcher->companyUsers(
             Argument::type(Company::class),
             array_get($fields, 'users.args'),
             array_get($fields, 'users')
@@ -133,14 +133,14 @@ class DataLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanUseDataLoadersToResolveTypes()
+    public function itCanUseDataFetchersToResolveTypes()
     {
-        $userDataLoader = $this->prophesize(UserDataLoader::class);
-        app()->instance(UserDataLoader::class, $userDataLoader->reveal());
+        $userDataFetcher = $this->prophesize(UserDataFetcher::class);
+        app()->instance(UserDataFetcher::class, $userDataFetcher->reveal());
 
         $this->executeQuery($this->getQuery());
 
-        $userDataLoader->loadDataByKey('company', $this->company->id)->shouldHaveBeenCalled();
+        $userDataFetcher->loadDataByKey('company', $this->company->id)->shouldHaveBeenCalled();
     }
 
     /**

@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataLoader;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataFetcher;
 
 class CompanyQuery extends GraphQLQuery
 {
@@ -49,6 +49,6 @@ class CompanyQuery extends GraphQLQuery
         $company = Company::find($this->decodeRelayId($args['id']));
         $fields = graphql()->fieldParser()->fetch($info);
 
-        return app(CompanyDataLoader::class)->resolve($company, $fields);
+        return app(CompanyDataFetcher::class)->resolve($company, $fields);
     }
 }

@@ -50,6 +50,6 @@ class UserConnection implements Connection
      */
     public function resolve($parent, array $args, $context, ResolveInfo $info)
     {
-        return graphql()->dataLoader('company')->load('users', $parent);
+        return graphql()->dataFetcher('company')->load('users', $parent);
     }
 }

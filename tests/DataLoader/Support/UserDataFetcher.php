@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Tests\DataLoader\Support;
 
-use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader;
+use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
 
-class UserDataLoader extends GraphQLDataLoader
+class UserDataFetcher extends GraphQLDataFetcher
 {
     /**
      * Available child loaders.
@@ -13,7 +13,7 @@ class UserDataLoader extends GraphQLDataLoader
      * @var array
      */
     protected $children = [
-        'tasks' => TaskDataLoader::class,
+        'tasks' => TaskDataFetcher::class,
     ];
 
     /**

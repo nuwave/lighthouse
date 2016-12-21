@@ -24,15 +24,15 @@ if (! function_exists('schema')) {
     }
 }
 
-if (! function_exists('dataLoader')) {
+if (! function_exists('dataFetcher')) {
     /**
-     * Get instance of dataLoader.
+     * Get instance of data fetcher.
      *
      * @param  string $loader
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
-    function dataLoader($loader)
+    function dataFetcher($loader)
     {
-        return GraphQL::dataLoader($loader);
+        return GraphQL::dataFetcher($loader);
     }
 }

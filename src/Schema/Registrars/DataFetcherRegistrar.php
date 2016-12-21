@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use Nuwave\Lighthouse\Support\Traits\Container\SchemaClassRegistrar as ClassRegistrar;
 
-class DataLoaderRegistrar
+class DataFetcherRegistrar
 {
     use ClassRegistrar;
 
@@ -35,7 +35,7 @@ class DataLoaderRegistrar
      * Extract Data Loader from IoC Container.
      *
      * @param  string $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
     public function instance($name)
     {
@@ -50,6 +50,6 @@ class DataLoaderRegistrar
      */
     protected function alias($name)
     {
-        return 'graphql.dataloader.'.$name;
+        return 'graphql.datafetcher.'.$name;
     }
 }

@@ -50,6 +50,6 @@ class TaskConnection implements Connection
      */
     public function resolve($parent, array $args, $context, ResolveInfo $info)
     {
-        return graphql()->dataLoader('user')->load('tasks', $parent);
+        return graphql()->dataFetcher('user')->load('tasks', $parent);
     }
 }
