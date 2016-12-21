@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Tests\DataLoader\Support;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Interfaces\Connection;
 
-class TaskConnection implements Connection
+class TaskFetcherConnection implements Connection
 {
 
     /**

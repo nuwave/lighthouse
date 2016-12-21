@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Tests\DataLoader;
 
+use Nuwave\Lighthouse\Tests\DataLoader\Support\UserFetcherType;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\Support\Models\Task;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\UserType;
 use Nuwave\Lighthouse\Tests\DBTestCase;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataFetcher;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\UserDataFetcher;
@@ -66,7 +66,7 @@ class DataFetcherTest extends DBTestCase
         $app['config']->set('lighthouse.schema.register', function () {
             $graphql = app('graphql');
             $graphql->schema()->type('company', CompanyType::class);
-            $graphql->schema()->type('user', UserType::class);
+            $graphql->schema()->type('user', UserFetcherType::class);
             $graphql->schema()->type('task', TaskType::class);
             $graphql->schema()->query('companyQuery', Support\CompanyQuery::class);
             $graphql->schema()->dataFetcher('company', CompanyDataFetcher::class);

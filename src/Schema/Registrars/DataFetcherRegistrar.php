@@ -24,7 +24,7 @@ class DataFetcherRegistrar
 
         $instance = app($this->alias($name));
 
-        if (empty($instance->getName())) {
+        if (method_exists($instance, 'getName') && empty($instance->getName())) {
             $instance->setName($name);
         }
 

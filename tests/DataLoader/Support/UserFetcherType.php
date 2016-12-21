@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 use Nuwave\Lighthouse\Support\Interfaces\RelayType;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
 
-class UserType extends GraphQLType implements RelayType
+class UserFetcherType extends GraphQLType implements RelayType
 {
     /**
      * Attributes of type.
@@ -53,7 +53,7 @@ class UserType extends GraphQLType implements RelayType
                 'type' => Type::string(),
                 'description' => 'Email of the user.'
             ],
-            'tasks' => GraphQL::connection(new TaskConnection())->field()
+            'tasks' => GraphQL::connection(new TaskFetcherConnection())->field()
         ];
     }
 
