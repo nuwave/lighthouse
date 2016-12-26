@@ -114,6 +114,8 @@ class GraphQLMutation extends GraphQLField
      */
     protected function getInput(array $arguments)
     {
-        return array_get($arguments, '1.input', []);
+        return $this instanceof RelayMutation
+            ? array_get($arguments, '1.input', [])
+            : array_get($arguments, 1);
     }
 }
