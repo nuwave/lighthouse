@@ -42,7 +42,7 @@ class GraphQLType extends Fluent
     {
         $attributes = array_merge($this->attributes, [
             'fields' => function () {
-                return $this instanceof RelayType ? array_merge($this->getRelayIdField(), $this->fields()) : $this->fields();
+                return $this instanceof RelayType ? array_merge($this->getRelayIdField(), $this->getFields()) : $this->getFields();
             }
         ]);
 
