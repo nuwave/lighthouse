@@ -29,7 +29,7 @@ class GraphQL
     /**
      * Instance of schema builder.
      *
-     * @var SchemaBuilder
+     * @var Schema\SchemaBuilder
      */
     protected $schema;
 
@@ -266,7 +266,7 @@ class GraphQL
     /**
      * Set local instance of schema.
      *
-     * @param SchemaBuilder $schema
+     * @param Schema\SchemaBuilder $schema
      */
     public function setSchema(SchemaBuilder $schema)
     {
@@ -276,7 +276,7 @@ class GraphQL
     /**
      * Get instance of schema builder.
      *
-     * @return SchemaBuilder
+     * @return Schema\SchemaBuilder
      */
     public function schema()
     {
