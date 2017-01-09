@@ -99,12 +99,31 @@ class SchemaBuilder
      * Add query to registrar.
      *
      * @param  string $name
+/**
+     * Add query to registrar.
+     *
+     * @param  string $name
      * @param  string $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function query($name, $namespace)
     {
         return $this->getQueryRegistrar()->register($name, $namespace);
+    }
+
+    /**
+     * Add queries to registrar.
+     *
+     * @param  array $queries
+     * @return \Nuwave\Lighthouse\Schema\Field[]
+     */
+    public function queries(array $queries){
+        $registered = [];
+        foreach($queries as $name => $namespace){
+            $registered[] = $this->query($name, $namespace);
+        }
+        
+        return $registered;
     }
 
     /**
@@ -120,6 +139,22 @@ class SchemaBuilder
     }
 
     /**
+     * Add mutations to registrar.
+     *
+     * @param  array $mutations
+     * @return \Nuwave\Lighthouse\Schema\Field[]
+     */
+    public function mutations(array $mutations)
+    {
+        $registered = [];
+        foreach ($mutations as $name => $namespace) {
+            $registered[] = $this->mutation($name, $namespace);
+        }
+
+        return $registered;
+    }
+
+    /**
      * Add type to registrar.
      *
      * @param  string $name
@@ -132,6 +167,22 @@ class SchemaBuilder
     }
 
     /**
+     * Add types to registrar.
+     *
+     * @param  array $types
+     * @return \Nuwave\Lighthouse\Schema\Field[]
+     */
+    public function types(array $types)
+    {
+        $registered = [];
+        foreach ($types as $name => $namespace) {
+            $registered[] = $this->type($name, $namespace);
+        }
+        
+        return $registered;
+    }
+
+    /**
      * Add connection to registrar.
      *
      * @param  string $name
@@ -141,6 +192,22 @@ class SchemaBuilder
     public function connection($name, $field)
     {
         return $this->getConnectionRegistrar()->register($name, $field);
+    }
+
+    /**
+     * Add connections to registrar.
+     *
+     * @param  array $connections
+     * @return \Nuwave\Lighthouse\Schema\Field[]
+     */
+    public function connections(array $connections)
+    {
+        $registered = [];
+        foreach ($connections as $name => $namespace) {
+            $registered[] = $this->connection($name, $namespace);
+        }
+
+        return $registered;
     }
 
     /**
