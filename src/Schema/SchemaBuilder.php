@@ -119,10 +119,11 @@ class SchemaBuilder
      */
     public function queries(array $queries){
         $registered = [];
-        foreach($queries as $name => $namespace){
+
+        foreach($queries as $name => $namespace) {
             $registered[] = $this->query($name, $namespace);
         }
-        
+
         return $registered;
     }
 
@@ -147,6 +148,7 @@ class SchemaBuilder
     public function mutations(array $mutations)
     {
         $registered = [];
+
         foreach ($mutations as $name => $namespace) {
             $registered[] = $this->mutation($name, $namespace);
         }
@@ -175,10 +177,11 @@ class SchemaBuilder
     public function types(array $types)
     {
         $registered = [];
+
         foreach ($types as $name => $namespace) {
             $registered[] = $this->type($name, $namespace);
         }
-        
+
         return $registered;
     }
 
@@ -203,6 +206,7 @@ class SchemaBuilder
     public function connections(array $connections)
     {
         $registered = [];
+        
         foreach ($connections as $name => $namespace) {
             $registered[] = $this->connection($name, $namespace);
         }

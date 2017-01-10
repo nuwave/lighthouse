@@ -161,6 +161,9 @@ class EloquentType
      */
     public function schemaFields()
     {
+        $platform = $this->model->getConnection()->getDoctrineSchemaManager()->getDatabasePlatform();
+        $platform->registerDoctrineTypeMapping('enum', 'string');
+
         $table = $this->model->getTable();
         $schema = $this->model->getConnection()->getSchemaBuilder();
         $columns = collect($schema->getColumnListing($table));
