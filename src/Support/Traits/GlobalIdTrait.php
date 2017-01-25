@@ -84,7 +84,9 @@ trait GlobalIdTrait
             return $resolver($args);
         }
 
-        return isset($args['after']) ? $this->getCursorId($args['after']) : 0;
+        return isset($args['after']) && !empty($args['after'])
+            ? $this->getCursorId($args['after'])
+            : 0;
     }
 
     /**
