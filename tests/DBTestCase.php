@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Tests;
 
-use Nuwave\Lighthouse\Tests\TestCase;
-
 class DBTestCase extends TestCase
 {
     /**
@@ -13,17 +11,10 @@ class DBTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate', [
+        $this->loadMigrationsFrom([
             '--database' => 'testing',
             '--realpath' => realpath(__DIR__.'/Support/migrations')
         ]);
-
-        $this->beforeApplicationDestroyed(function () {
-            $this->artisan('migrate:rollback', [
-                '--database' => 'testing',
-                '--realpath' => realpath(__DIR__.'/Support/migrations')
-            ]);
-        });
     }
 
     /**
