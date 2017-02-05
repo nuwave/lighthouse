@@ -98,7 +98,7 @@ class DataLoaderTest extends DBTestCase
      */
     protected function getQuery()
     {
-        $id = $this->encodeGlobalId(CompanyType::class, $this->company->id);
+        $id = $this->encodeGlobalId(Support\CompanyType::class, $this->company->id);
 
         return '{
             companyQuery(id: "'.$id.'") {
