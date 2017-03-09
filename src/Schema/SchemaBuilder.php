@@ -99,10 +99,6 @@ class SchemaBuilder
      * Add query to registrar.
      *
      * @param  string $name
-/**
-     * Add query to registrar.
-     *
-     * @param  string $name
      * @param  string $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
@@ -117,11 +113,41 @@ class SchemaBuilder
      * @param  array $queries
      * @return \Nuwave\Lighthouse\Schema\Field[]
      */
-    public function queries(array $queries){
+    public function queries(array $queries)
+    {
         $registered = [];
 
-        foreach($queries as $name => $namespace) {
+        foreach ($queries as $name => $namespace) {
             $registered[] = $this->query($name, $namespace);
+        }
+
+        return $registered;
+    }
+
+    /**
+     * Add subscription to registrar.
+     *
+     * @param  string $name
+     * @param  string $namespace
+     * @return \Nuwave\Lighthouse\Schema\Field
+     */
+    public function subscription($name, $namespace)
+    {
+        return $this->getSubscriptionRegistrar()->register($name, $namespace);
+    }
+
+    /**
+     * Add subscriptions to registrar.
+     *
+     * @param  array $subscriptions
+     * @return \Nuwave\Lighthouse\Schema\Field[]
+     */
+    public function subscriptions(array $subscriptions)
+    {
+        $registered = [];
+
+        foreach ($subscriptions as $name => $namespace) {
+            $registered[] = $this->subscription($name, $namespace);
         }
 
         return $registered;
@@ -206,7 +232,7 @@ class SchemaBuilder
     public function connections(array $connections)
     {
         $registered = [];
-        
+
         foreach ($connections as $name => $namespace) {
             $registered[] = $this->connection($name, $namespace);
         }

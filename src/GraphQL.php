@@ -76,13 +76,16 @@ class GraphQL
 
         $queryFields = $this->queries()->merge($this->connections()->toArray());
         $mutationFields = $this->mutations();
+        $subscriptionFields = $this->subscriptions();
 
         $queryType = $this->generateSchemaType($queryFields, 'Query');
         $mutationType = $this->generateSchemaType($mutationFields, 'Mutation');
+        $subscriptionType = $this->generateSchemaType($subscriptionFields, 'Subscription');
 
         return new Schema([
             'query' => $queryType,
             'mutation' => $mutationType,
+            'subscription' => $subscriptionType,
             'types' => $this->typesWithInterfaces->all(),
         ]);
     }
@@ -221,6 +224,16 @@ class GraphQL
     public function queries()
     {
         return collect($this->schema()->getQueryRegistrar()->all());
+    }
+
+    /**
+     * Get collection of registered subscriptions.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function subscriptions()
+    {
+        return collect($this->schema()->getSubscriptionRegistrar()->all());
     }
 
     /**

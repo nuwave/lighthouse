@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Schema\Registrars\MutationRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\DataLoaderRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\DataFetcherRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\SubscriptionRegistrar;
 
 trait CentralRegistrar
 {
@@ -40,6 +41,13 @@ trait CentralRegistrar
      * @var QueryRegistrar
      */
     protected $queryRegistrar;
+
+    /**
+     * Subscription registrar.
+     *
+     * @var SubscriptionRegistrar
+     */
+    protected $subscriptionRegistrar;
 
     /**
      * Mutation registrar.
@@ -163,6 +171,20 @@ trait CentralRegistrar
         }
 
         return $this->queryRegistrar;
+    }
+
+    /**
+     * Get instance of subscription registrar.
+     *
+     * @return SubscriptionRegistrar
+     */
+    public function getSubscriptionRegistrar()
+    {
+        if (! $this->subscriptionRegistrar) {
+            $this->subscriptionRegistrar = app(SubscriptionRegistrar::class)->setSchema($this);
+        }
+
+        return $this->subscriptionRegistrar;
     }
 
     /**
