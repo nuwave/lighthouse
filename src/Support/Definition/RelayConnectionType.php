@@ -47,6 +47,13 @@ class RelayConnectionType extends GraphQLType
     protected $name = '';
 
     /**
+     * The description of the connection (i.e. `A connection between the User and it's Tasks`)
+     *
+     * @var string
+     */
+    protected $description = 'A connection to a list of items.';
+
+    /**
      * Special fields present on this connection type.
      *
      * @return array
@@ -165,7 +172,7 @@ class RelayConnectionType extends GraphQLType
 
         return [
             'name' => ucfirst($this->name),
-            'description' => 'A connection to a list of items.',
+            'description' => $this->description,
             'fields' => $fields,
             'resolve' => function ($root, $args, $context, ResolveInfo $info) {
                 return $this->resolve($root, $args, $context, $info, $this->name);
@@ -197,6 +204,16 @@ class RelayConnectionType extends GraphQLType
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * Set description of connection.
+     *
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 
     /**
