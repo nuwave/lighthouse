@@ -105,14 +105,14 @@ class LaravelServiceProvider extends ServiceProvider
             $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
 
             if($this instanceof Relation){
-                $builder = $this->getQuery();
-                $items = $builder->forPage($currentPage, $first)->get();
+                $count = $this->getQuery()->count();
+                $items = $this->getQuery()->forPage($currentPage, $first)->get();
             } else {
-                $builder = $this;
-                $items = $builder->forPage($currentPage, $first);
+                $count = $this->count();
+                $items = $this->forPage($currentPage, $first);
             }
 
-            return new LengthAwarePaginator($items, $builder->count(), $first, $currentPage);
+            return new LengthAwarePaginator($items, $count, $first, $currentPage);
         };
 
         Collection::macro($name, $connectionMacro);
