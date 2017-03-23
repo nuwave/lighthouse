@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 
 class LaravelServiceProvider extends ServiceProvider
 {
@@ -97,18 +98,25 @@ class LaravelServiceProvider extends ServiceProvider
             return $this->decodeCursor($args);
         };
 
-        Collection::macro($name, function (array $args) use ($decodeCursor) {
-            $first = isset($args['first']) ? $args['first'] : 15;
-            $after = $decodeCursor($args);
+        $connectionMacro = function (array $args) use ($decodeCursor) {
+
+            $first       = isset($args['first']) ? $args['first'] : 15;
+            $after       = $decodeCursor($args);
             $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
 
-            return new LengthAwarePaginator(
-                collect($this->items)->forPage($currentPage, $first),
-                count($this->items),
-                $first,
-                $currentPage
-            );
-        });
+            if($this instanceof Relation){
+                $builder = $this->getQuery();
+                $items = $builder->forPage($currentPage, $first)->get();
+            } else {
+                $builder = $this;
+                $items = $builder->forPage($currentPage, $first);
+            }
+
+            return new LengthAwarePaginator($items, $builder->count(), $first, $currentPage);
+        };
+
+        Collection::macro($name, $connectionMacro);
+        Relation::macro($name, $connectionMacro);
 
         Collection::macro('fetch', function ($relations) {
             if (count($this->items) > 0) {
