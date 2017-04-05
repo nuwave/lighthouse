@@ -83,6 +83,10 @@ class ConnectionRegistrar extends BaseRegistrar
         $connectionName = (!preg_match('/Connection$/', $instanceName)) ? $instanceName.'Connection' : $instanceName;
         $connection->setName(studly_case($connectionName));
 
+        if($isConnection && is_callable([$name, 'description'])) {
+            $connection->setDescription($name->description());
+        }
+
         $pageInfoType = $this->getSchema()->typeInstance('pageInfo');
         $edgeType = $this->getSchema()->edgeInstance($instanceName, $nodeType);
 
