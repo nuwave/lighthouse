@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use Closure;
-use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 trait RelayConnection
 {

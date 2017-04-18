@@ -43,10 +43,10 @@ class FieldParser
 
         foreach ($selectionSet->selections as $selectionAST) {
             if ($selectionAST instanceof GraphQLField) {
-                $fields[$selectionAST->name->value] = $descend > 0 && !empty($selectionAST->selectionSet)
+                $fields[$selectionAST->name->value] = $descend > 0 && ! empty($selectionAST->selectionSet)
                     ? $this->buildField($selectionAST, ['children' => $this->foldSelectionSet($selectionAST->selectionSet, $descend - 1)])
                     : $this->buildField($selectionAST);
-            } else if ($selectionAST instanceof FragmentSpread) {
+            } elseif ($selectionAST instanceof FragmentSpread) {
                 $spreadName = $selectionAST->name->value;
                 if (isset($this->fragments[$spreadName])) {
                     /** @var FragmentDefinition $fragment */
@@ -77,7 +77,6 @@ class FieldParser
             } else {
                 $args[$argument->name->value] = $argument->value->value;
             }
-
         }
 
         return array_merge([

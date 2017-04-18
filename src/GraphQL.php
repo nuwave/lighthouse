@@ -69,7 +69,7 @@ class GraphQL
         $this->types()->each(function ($type, $key) {
             $type = $this->type($key);
 
-            if (method_exists($type, 'getInterfaces') && !empty($type->getInterfaces())) {
+            if (method_exists($type, 'getInterfaces') && ! empty($type->getInterfaces())) {
                 $this->typesWithInterfaces->push($type);
             }
         });
@@ -108,7 +108,7 @@ class GraphQL
         });
 
         if (! $typeFields->count()) {
-            return null;
+            return;
         }
 
         return new ObjectType([
@@ -259,7 +259,7 @@ class GraphQL
     /**
      * Get list of available connections to eager load.
      *
-     * @param  integer $depth
+     * @param  int $depth
      * @return array
      */
     public function eagerLoad($depth = null)
@@ -293,7 +293,7 @@ class GraphQL
      */
     public function schema()
     {
-        if (!$this->schema) {
+        if (! $this->schema) {
             $this->schema = app(SchemaBuilder::class);
         }
 

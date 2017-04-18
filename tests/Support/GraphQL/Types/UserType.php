@@ -17,7 +17,7 @@ class UserType extends GraphQLType implements RelayType
      */
     protected $attributes = [
         'name' => 'User',
-        'description' => 'A user.'
+        'description' => 'A user.',
     ];
 
     /**
@@ -33,7 +33,7 @@ class UserType extends GraphQLType implements RelayType
     {
         return factory(User::class)->make([
             'id' => $id,
-            'email' => 'foo@bar.com'
+            'email' => 'foo@bar.com',
         ]);
     }
 
@@ -47,25 +47,25 @@ class UserType extends GraphQLType implements RelayType
         return [
             'name' => [
                 'type' => Type::string(),
-                'description' => 'Name of the user.'
+                'description' => 'Name of the user.',
             ],
             'email' => [
                 'type' => Type::string(),
-                'description' => 'Email of the user.'
+                'description' => 'Email of the user.',
             ],
             'tasks' => GraphQL::connection('task')
                 ->args([
                     'order' => [
                         'type' => Type::string(),
-                        'description' => 'Sort order of tasks.'
-                    ]
+                        'description' => 'Sort order of tasks.',
+                    ],
                 ])
                 ->resolve(function ($parent, array $args) {
                     return $parent->tasks->transform(function ($task) {
                         return array_merge($task->toArray(), ['title' => 'foo']);
                     });
                 })
-                ->field()
+                ->field(),
         ];
     }
 

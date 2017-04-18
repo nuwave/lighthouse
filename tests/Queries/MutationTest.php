@@ -27,8 +27,8 @@ class MutationTest extends TestCase
 
         $expected = [
             'updateEmail' => [
-                'email' => 'foo@bar.com'
-            ]
+                'email' => 'foo@bar.com',
+            ],
         ];
 
         $graphql = app('graphql');
@@ -58,18 +58,18 @@ class MutationTest extends TestCase
         $expected = [
             'updateEmail' => [
                 'user' => [
-                    'email' => 'foo@bar.com'
+                    'email' => 'foo@bar.com',
                 ],
                 'clientMutationId' => 'abcde',
-            ]
+            ],
         ];
 
         $variables = [
             'input' => [
                 'id' => $id,
                 'email' => 'foo@bar.com',
-                'clientMutationId' => 'abcde'
-            ]
+                'clientMutationId' => 'abcde',
+            ],
         ];
 
         $graphql = app('graphql');
@@ -100,8 +100,8 @@ class MutationTest extends TestCase
             'input' => [
                 'id' => $id,
                 'email' => 'foo',
-                'clientMutationId' => 'abcde'
-            ]
+                'clientMutationId' => 'abcde',
+            ],
         ];
 
         $graphql = app('graphql');

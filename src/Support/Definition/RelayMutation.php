@@ -2,26 +2,24 @@
 
 namespace Nuwave\Relay\Support\Definition;
 
-use Validator;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\InputObjectType;
-use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 abstract class RelayMutation extends GraphQLMutation
 {
     /**
      * Type being mutated is RelayType.
      *
-     * @var boolean
+     * @var bool
      */
     protected $mutatesRelayType = true;
 
     /**
      * Mutation id sent from client.
      *
-     * @var integer|null
+     * @var int|null
      */
     protected $clientMutationId = null;
 
@@ -33,15 +31,15 @@ abstract class RelayMutation extends GraphQLMutation
     public function type()
     {
         return new ObjectType([
-            'name' => ucfirst($this->name()) . 'Payload',
+            'name' => ucfirst($this->name()).'Payload',
             'fields' => array_merge($this->outputFields(), [
                     'clientMutationId' => [
                         'type' => Type::nonNull(Type::string()),
                         'resolve' => function () {
                             return $this->clientMutationId;
-                        }
-                    ]
-                ])
+                        },
+                    ],
+                ]),
         ]);
     }
 
@@ -53,17 +51,18 @@ abstract class RelayMutation extends GraphQLMutation
     public function args()
     {
         $inputType = new InputObjectType([
-            'name' => ucfirst($this->name()) . 'Input',
+            'name' => ucfirst($this->name()).'Input',
             'fields' => array_merge($this->inputFields(), [
                 'clientMutationId' => [
-                    'type' => Type::nonNull(Type::string())
-                ]
-            ])
+                    'type' => Type::nonNull(Type::string()),
+                ],
+            ]),
         ]);
+
         return [
             'input' => [
-                'type' => Type::nonNull($inputType)
-            ]
+                'type' => Type::nonNull($inputType),
+            ],
         ];
     }
 

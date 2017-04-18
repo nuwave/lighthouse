@@ -62,7 +62,7 @@ class EdgeType extends GraphQLType
 
                     return $edge->relayCursor;
                 },
-            ]
+            ],
         ];
     }
 
@@ -73,8 +73,8 @@ class EdgeType extends GraphQLType
      */
     public function toArray()
     {
-        $name = preg_replace("/Edge$/i", "", $this->name).'Edge';
-        
+        $name = preg_replace('/Edge$/i', '', $this->name).'Edge';
+
         return [
             'name' => studly_case($name),
             'description' => 'An edge in a connection.',

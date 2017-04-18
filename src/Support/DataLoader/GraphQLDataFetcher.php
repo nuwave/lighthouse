@@ -42,7 +42,7 @@ abstract class GraphQLDataFetcher
             return $dataFetcher->loadDataByKey($this->getName(), $this->getKey($root));
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -179,7 +179,7 @@ abstract class GraphQLDataFetcher
      * Determine if child data fetcher is available.
      *
      * @param  string  $key
-     * @return boolean
+     * @return bool
      */
     protected function hasChildFetcher($key)
     {
@@ -194,8 +194,8 @@ abstract class GraphQLDataFetcher
      */
     protected function getChildFetcher($key)
     {
-        if (!$this->hasChildFetcher($key)) {
-            return null;
+        if (! $this->hasChildFetcher($key)) {
+            return;
         }
 
         return app($this->children[$key]);
@@ -221,7 +221,7 @@ abstract class GraphQLDataFetcher
      * Generate method name to call on child data fetcher.
      *
      * @param  string  $key
-     * @param  boolean $plural
+     * @param  bool $plural
      * @return string
      */
     protected function generateMethodName($key, $plural = false)

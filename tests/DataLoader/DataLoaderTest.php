@@ -37,12 +37,12 @@ class DataLoaderTest extends DBTestCase
         $this->company = factory(Company::class)->create();
 
         $this->users = factory(User::class, 5)->create([
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
         $this->users->each(function ($user) {
             factory(Task::class, 5)->create([
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
         });
     }

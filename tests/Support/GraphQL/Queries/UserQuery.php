@@ -45,7 +45,7 @@ class UserQuery extends GraphQLQuery
     public function resolve($root, array $args)
     {
         $user = factory(User::class)->make([
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
 
         $user->id = 1;

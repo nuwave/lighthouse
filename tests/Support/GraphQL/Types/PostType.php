@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Types;
 
-use GraphQL;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 use Nuwave\Lighthouse\Support\Interfaces\RelayType;
@@ -17,7 +16,7 @@ class PostType extends GraphQLType implements RelayType
      */
     protected $attributes = [
         'name' => 'Post',
-        'description' => 'A post that does not have a regular id field.'
+        'description' => 'A post that does not have a regular id field.',
     ];
 
     /**
@@ -47,16 +46,16 @@ class PostType extends GraphQLType implements RelayType
         return [
             'title' => [
                 'type' => Type::string(),
-                'description' => 'Title of the post.'
+                'description' => 'Title of the post.',
             ],
             'content' => [
                 'type' => Type::string(),
-                'description' => 'Content of the post.'
+                'description' => 'Content of the post.',
             ],
             'user_id' => [
                 'type' => Type::int(),
-                'description' => 'ID of user who wrote the post.'
-            ]
+                'description' => 'ID of user who wrote the post.',
+            ],
         ];
     }
 }

@@ -39,7 +39,7 @@ class CursorTest extends DBTestCase
         $this->user = factory(User::class)->create();
 
         $this->tasks = factory(Task::class, 6)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
     }
 
@@ -100,7 +100,7 @@ class UserCursorType extends GraphQLType implements RelayType
 {
     protected $attributes = [
         'name' => 'User',
-        'description' => 'A user.'
+        'description' => 'A user.',
     ];
 
     public function resolveById($id)
@@ -113,18 +113,18 @@ class UserCursorType extends GraphQLType implements RelayType
         return [
             'name' => [
                 'type' => Type::string(),
-                'description' => 'Name of the user.'
+                'description' => 'Name of the user.',
             ],
             'email' => [
                 'type' => Type::string(),
-                'description' => 'Email of the user.'
+                'description' => 'Email of the user.',
             ],
             'tasks' => GraphQL::connection('task')
                 ->resolve(function (User $user, array $args) {
                     return $user->tasks->toConnection($args);
                 })->cursor(function ($item, $index, $page) {
                     return $index === 0 ? 'foo' : 'bar';
-                })->field()
+                })->field(),
         ];
     }
 }
@@ -133,7 +133,7 @@ class TaskCursorType extends GraphQLType implements RelayType
 {
     protected $attributes = [
         'name' => 'Task',
-        'description' => 'A user task.'
+        'description' => 'A user task.',
     ];
 
     public function resolveById($id)
@@ -146,16 +146,16 @@ class TaskCursorType extends GraphQLType implements RelayType
         return [
             'title' => [
                 'type' => Type::string(),
-                'description' => 'Title of task.'
+                'description' => 'Title of task.',
             ],
             'description' => [
                 'type' => Type::string(),
-                'description' => 'Description of task.'
+                'description' => 'Description of task.',
             ],
             'completed' => [
                 'type' => Type::boolean(),
-                'description' => 'Completed status.'
-            ]
+                'description' => 'Completed status.',
+            ],
         ];
     }
 }

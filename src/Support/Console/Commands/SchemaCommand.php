@@ -49,7 +49,7 @@ class SchemaCommand extends Command
     {
         $data = $this->generator->build();
 
-        if (!isset($data['data']['__schema'])) {
+        if (! isset($data['data']['__schema'])) {
             $this->error('There was an error when attempting to generate the schema file.');
             $this->line(json_encode($data));
         }

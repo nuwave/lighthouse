@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\Command;
-use Nuwave\Lighthouse\Support\SchemaGenerator;
 use Nuwave\Lighthouse\Support\Cache\FileStore;
 
 class CacheCommand extends Command

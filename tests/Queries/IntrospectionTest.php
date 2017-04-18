@@ -41,11 +41,11 @@ class IntrospectionTest extends TestCase
                         'kind' => 'NON_NULL',
                         'ofType' => [
                             'name' => 'ID',
-                            'kind' => 'SCALAR'
-                        ]
-                    ]
-                ]]
-            ]
+                            'kind' => 'SCALAR',
+                        ],
+                    ],
+                ]],
+            ],
         ];
 
         $response = $this->executeQuery($query);
@@ -84,8 +84,8 @@ class IntrospectionTest extends TestCase
                         'ofType' => [
                             'name' => 'PageInfo',
                             'kind' => 'OBJECT',
-                        ]
-                    ]
+                        ],
+                    ],
                 ], [
                     'name' => 'edges',
                     'type' => [
@@ -93,11 +93,11 @@ class IntrospectionTest extends TestCase
                         'kind' => 'LIST',
                         'ofType' => [
                             'name' => 'TaskEdge',
-                            'kind' => 'OBJECT'
-                        ]
-                    ]
-                ]]
-            ]
+                            'kind' => 'OBJECT',
+                        ],
+                    ],
+                ]],
+            ],
         ];
 
         $graphql = app('graphql');

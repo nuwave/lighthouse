@@ -32,7 +32,7 @@ class FileStore
             return unserialize(file_get_contents($this->getPath($name)));
         }
 
-        return null;
+        return;
     }
 
     /**

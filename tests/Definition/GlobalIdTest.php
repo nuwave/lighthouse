@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Tests\Definition;
 
-use Crypt;
 use Illuminate\Encryption\Encrypter;
 use Nuwave\Lighthouse\Tests\TestCase;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;

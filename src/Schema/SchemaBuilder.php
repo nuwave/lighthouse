@@ -60,7 +60,7 @@ class SchemaBuilder
         }
 
         if (isset($attributes['namespace'])) {
-            $this->namespace  .= '\\' . trim($attributes['namespace'], '\\');
+            $this->namespace .= '\\'.trim($attributes['namespace'], '\\');
         }
 
         $callback();

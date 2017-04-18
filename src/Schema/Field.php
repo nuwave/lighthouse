@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Closure;
 use Illuminate\Support\Collection;
 
 class Field
@@ -69,7 +68,7 @@ class Field
     {
         return [
             'namespace' => $this->namespace,
-            'middleware' => $this->middleware
+            'middleware' => $this->middleware,
         ];
     }
 

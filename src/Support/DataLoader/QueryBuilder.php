@@ -49,7 +49,7 @@ class QueryBuilder
         })->collapse()->toArray();
 
         $sql = $queries->map(function ($query) {
-            return '(' . $query->toSql() . ')';
+            return '('.$query->toSql().')';
         })->implode(' UNION ALL ');
 
         $table = $related->getTable();

@@ -49,6 +49,6 @@ return [
         'output' => storage_path('lighthouse/schema.json'),
         'register' => function () {
             //
-        }
+        },
     ],
 ];

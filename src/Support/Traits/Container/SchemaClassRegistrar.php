@@ -29,6 +29,6 @@ trait SchemaClassRegistrar
     {
         $current = $this->schema->getNamespace();
 
-        return empty(trim($current)) ? $namespace : trim($current, '\\') . '\\' . $namespace;
+        return empty(trim($current)) ? $namespace : trim($current, '\\').'\\'.$namespace;
     }
 }

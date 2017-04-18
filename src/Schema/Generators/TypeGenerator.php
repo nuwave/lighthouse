@@ -18,7 +18,7 @@ class TypeGenerator
             $type = substr(get_class($type), (strrpos(get_class($type), '\\')) + 1);
         }
 
-        $method = 'get' . studly_case($type);
+        $method = 'get'.studly_case($type);
 
         if (! method_exists($this, $method)) {
             throw new \Exception("Type generator for [{$type}] does not exist.");

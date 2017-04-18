@@ -6,5 +6,4 @@ use Illuminate\Support\Fluent;
 
 class Connection extends Fluent
 {
-
 }

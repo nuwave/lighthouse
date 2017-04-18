@@ -89,7 +89,7 @@ class EloquentTypeTest extends DBTestCase
         $expected = [
             'userQuery' => [
                 'name' => 'foo',
-            ]
+            ],
         ];
 
         $graphql = app('graphql');

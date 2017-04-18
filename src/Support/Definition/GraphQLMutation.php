@@ -13,7 +13,7 @@ class GraphQLMutation extends GraphQLField
     /**
      * Mutation id sent from client.
      *
-     * @var integer|null
+     * @var int|null
      */
     protected $clientMutationId = null;
 
@@ -29,15 +29,15 @@ class GraphQLMutation extends GraphQLField
         }
 
         return new ObjectType([
-            'name' => ucfirst($this->attributes['name']) . 'Payload',
+            'name' => ucfirst($this->attributes['name']).'Payload',
             'fields' => array_merge($this->outputFields(), [
                     'clientMutationId' => [
                         'type' => Type::nonNull(Type::string()),
                         'resolve' => function () {
                             return $this->clientMutationId;
-                        }
-                    ]
-                ])
+                        },
+                    ],
+                ]),
         ]);
     }
 
@@ -53,7 +53,7 @@ class GraphQLMutation extends GraphQLField
         }
 
         $attributes = array_merge($this->attributes, [
-            'args' => $this->relayArgs()
+            'args' => $this->relayArgs(),
         ], $this->attributes());
 
         $attributes['type'] = $this->type();
@@ -74,14 +74,14 @@ class GraphQLMutation extends GraphQLField
             'fields' => array_merge($this->args(), [
                 'clientMutationId' => [
                     'type' => Type::nonNull(Type::string()),
-                ]
-            ])
+                ],
+            ]),
         ]);
 
         return [
             'input' => [
-                'type' => Type::nonNull($inputType)
-            ]
+                'type' => Type::nonNull($inputType),
+            ],
         ];
     }
 

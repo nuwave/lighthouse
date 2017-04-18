@@ -8,7 +8,7 @@ trait GlobalIdTrait
      * Create global id.
      *
      * @param  string $type
-     * @param  string|integer $id
+     * @param  string|int $id
      * @return string
      */
     public function encodeGlobalId($type, $id)
@@ -19,7 +19,7 @@ trait GlobalIdTrait
             return $resolver($type, $id);
         }
 
-        return base64_encode($type . ':' . $id);
+        return base64_encode($type.':'.$id);
     }
 
     /**
@@ -30,7 +30,7 @@ trait GlobalIdTrait
      */
     public function decodeGlobalId($id)
     {
-        return explode(":", base64_decode($id));
+        return explode(':', base64_decode($id));
     }
 
     /**
@@ -48,6 +48,7 @@ trait GlobalIdTrait
         }
 
         list($type, $id) = $this->decodeGlobalId($id);
+
         return $id;
     }
 
@@ -74,7 +75,7 @@ trait GlobalIdTrait
      * Decode cursor from query arguments.
      *
      * @param  array  $args
-     * @return integer
+     * @return int
      */
     protected function decodeCursor(array $args)
     {
@@ -84,7 +85,7 @@ trait GlobalIdTrait
             return $resolver($args);
         }
 
-        return isset($args['after']) && !empty($args['after'])
+        return isset($args['after']) && ! empty($args['after'])
             ? $this->getCursorId($args['after'])
             : 0;
     }
@@ -93,7 +94,7 @@ trait GlobalIdTrait
      * Get id from encoded cursor.
      *
      * @param  string $cursor
-     * @return integer
+     * @return int
      */
     protected function getCursorId($cursor)
     {
@@ -103,6 +104,6 @@ trait GlobalIdTrait
             return $resolver($cursor);
         }
 
-        return (int)$this->decodeRelayId($cursor);
+        return (int) $this->decodeRelayId($cursor);
     }
 }

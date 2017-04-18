@@ -17,7 +17,7 @@ class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
      * @var array
      */
     protected $attributes = [
-        'name' => 'updateEmail'
+        'name' => 'updateEmail',
     ];
 
     /**
@@ -35,8 +35,8 @@ class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
             'email' => [
                 'name' => 'email',
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['email']
-            ]
+                'rules' => ['email'],
+            ],
         ];
     }
 
@@ -52,8 +52,8 @@ class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
                 'type' => GraphQL::type('user'),
                 'resolve' => function ($user) {
                     return $user;
-                }
-            ]
+                },
+            ],
         ];
     }
 
@@ -68,7 +68,7 @@ class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
     public function mutateAndGetPayload(array $args, $context, ResolveInfo $info)
     {
         $user = factory(User::class)->make([
-            'email' => 'foo@example.com'
+            'email' => 'foo@example.com',
         ]);
 
         $user->email = $args['email'];

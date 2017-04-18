@@ -10,7 +10,7 @@ trait RelayModel
      * Note: Can be used if your Eloquent model doesn't
      * have an id field.
      *
-     * @return integer
+     * @return int
      */
     public function getIdAttribute()
     {

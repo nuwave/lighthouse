@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\ResolveInfo;
 
 class EloquentType
 {
@@ -51,7 +50,7 @@ class EloquentType
     /**
      * If fields should be camel cased.
      *
-     * @var boolean
+     * @var bool
      */
     protected $camelCase = false;
 
@@ -62,11 +61,11 @@ class EloquentType
      */
     public function __construct(Model $model, $name = '')
     {
-        $this->name         = $name;
-        $this->fields       = collect();
+        $this->name = $name;
+        $this->fields = collect();
         $this->hiddenFields = collect($model->getHidden())->flip();
-        $this->model        = $model;
-        $this->camelCase    = config('lighthouse.camel_case', false);
+        $this->model = $model;
+        $this->camelCase = config('lighthouse.camel_case', false);
     }
 
     /**
@@ -100,7 +99,7 @@ class EloquentType
             'description' => $this->getDescription(),
             'fields'      => function () {
                 return $this->fields->toArray();
-            }
+            },
         ]);
     }
 
@@ -138,7 +137,7 @@ class EloquentType
     public function eloquentFields(Collection $fields)
     {
         $fields->each(function ($field, $key) {
-            if (!$this->skipField($key)) {
+            if (! $this->skipField($key)) {
                 $data = [];
                 $data['type'] = $field['type'];
                 $data['description'] = isset($field['description']) ? $field['description'] : null;
@@ -169,7 +168,7 @@ class EloquentType
         $columns = collect($schema->getColumnListing($table));
 
         $columns->each(function ($column) use ($table, $schema) {
-            if (!$this->skipField($column)) {
+            if (! $this->skipField($column)) {
                 $this->generateField(
                     $column,
                     $schema->getColumnType($table, $column)
@@ -196,7 +195,7 @@ class EloquentType
         })->map(function ($field) use ($namespace, $generator) {
             return [
                 'type' => $generator->fromType($field['type']),
-                'description' => $field['description']
+                'description' => $field['description'],
             ];
         });
     }
@@ -267,15 +266,15 @@ class EloquentType
         $class = get_class($type);
         $namespace = 'GraphQL\\Type\\Definition\\';
 
-        if ($class == $namespace . 'NonNull') {
-            return 'Type::nonNull('. $this->getRawType($type->getWrappedType()) .')';
-        } elseif ($class == $namespace . 'IDType') {
+        if ($class == $namespace.'NonNull') {
+            return 'Type::nonNull('.$this->getRawType($type->getWrappedType()).')';
+        } elseif ($class == $namespace.'IDType') {
             return 'Type::nonNull(Type::id())';
-        } elseif ($class == $namespace . 'IntType') {
+        } elseif ($class == $namespace.'IntType') {
             return 'Type::int()';
-        } elseif ($class == $namespace . 'BooleanType') {
+        } elseif ($class == $namespace.'BooleanType') {
             return 'Type::bool()';
-        } elseif ($class == $namespace . 'FloatType') {
+        } elseif ($class == $namespace.'FloatType') {
             return 'Type::float()';
         }
 
@@ -318,13 +317,13 @@ class EloquentType
      */
     protected function getModelResolve($key)
     {
-        $method = 'resolve' . studly_case($key) . 'Field';
+        $method = 'resolve'.studly_case($key).'Field';
 
         if (method_exists($this->model, $method)) {
-            return array($this->model, $method);
+            return [$this->model, $method];
         }
 
-        return null;
+        return;
     }
 
     /**

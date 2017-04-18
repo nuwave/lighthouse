@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use ReflectionClass;
 use GraphQL\Type\Definition\ObjectType;
-use Nuwave\Lighthouse\Schema\Registrars\BaseRegistrar;
 use Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator;
 use Nuwave\Lighthouse\Support\Interfaces\ConnectionEdge;
 use Nuwave\Lighthouse\Support\Definition\Fields\EdgeField;
@@ -67,7 +66,7 @@ class EdgeRegistrar extends BaseRegistrar
             return $instance;
         }
 
-        return null;
+        return;
     }
 
     /**

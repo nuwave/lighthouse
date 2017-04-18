@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
-use GraphQL\Type\Definition\InterfaceType;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Definition\EloquentType;
 use Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound;
@@ -35,7 +34,7 @@ class TypeRegistrar extends BaseRegistrar
      */
     public function instance($name, $fresh = false)
     {
-        if (!$fresh && $this->instances->has($name)) {
+        if (! $fresh && $this->instances->has($name)) {
             return $this->instances->get($name);
         }
 

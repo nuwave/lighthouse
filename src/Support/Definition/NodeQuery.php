@@ -27,8 +27,8 @@ class NodeQuery extends GraphQLQuery
         return [
             'id' => [
                 'name' => 'id',
-                'type' => Type::nonNull(Type::id())
-            ]
+                'type' => Type::nonNull(Type::id()),
+            ],
         ];
     }
 
