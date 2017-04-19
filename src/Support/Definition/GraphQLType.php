@@ -43,7 +43,7 @@ class GraphQLType extends Fluent
         $attributes = array_merge($this->attributes, [
             'fields' => function () {
                 return $this instanceof RelayType ? array_merge($this->getRelayIdField(), $this->getFields()) : $this->getFields();
-            }
+            },
         ]);
 
         if (sizeof($this->interfaces())) {
@@ -82,15 +82,15 @@ class GraphQLType extends Fluent
     {
         if (isset($field['resolve'])) {
             return $field['resolve'];
-        } else if (method_exists($this, 'resolve'.studly_case($name).'Field')) {
-            $resolver = array($this, 'resolve'.studly_case($name).'Field');
+        } elseif (method_exists($this, 'resolve'.studly_case($name).'Field')) {
+            $resolver = [$this, 'resolve'.studly_case($name).'Field'];
 
             return function () use ($resolver) {
                 return call_user_func_array($resolver, func_get_args());
             };
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -125,7 +125,7 @@ class GraphQLType extends Fluent
      */
     public function interfaces()
     {
-        return ($this instanceof RelayType && !$this instanceof GraphQLInterface) ? [app('graphql')->type('node')] : [];
+        return ($this instanceof RelayType && ! $this instanceof GraphQLInterface) ? [app('graphql')->type('node')] : [];
     }
 
     /**
@@ -158,7 +158,7 @@ class GraphQLType extends Fluent
     {
         $attributes = $this->getAttributes();
 
-        return isset($attributes[$key]) ? $attributes[$key]:null;
+        return isset($attributes[$key]) ? $attributes[$key] : null;
     }
 
     /**

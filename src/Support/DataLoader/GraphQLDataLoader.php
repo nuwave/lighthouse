@@ -23,7 +23,7 @@ abstract class GraphQLDataLoader
     /**
      * Check if data has been loaded.
      *
-     * @var boolean
+     * @var bool
      */
     protected $hasLoaded = false;
 
@@ -51,7 +51,7 @@ abstract class GraphQLDataLoader
         ]);
 
         return new Deferred(function () use ($key, $root, $args) {
-            if (!$this->hasLoaded) {
+            if (! $this->hasLoaded) {
                 $this->resolve();
                 $this->hasLoaded = true;
             }

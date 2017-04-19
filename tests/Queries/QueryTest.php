@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Tests\Queries;
 
 use GraphQL;
-use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\PostType;
@@ -29,8 +28,8 @@ class QueryTest extends TestCase
 
         $expected = [
             'userQuery' => [
-                'name' => 'foo'
-            ]
+                'name' => 'foo',
+            ],
         ];
 
         $graphql = app('graphql');

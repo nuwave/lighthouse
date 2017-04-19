@@ -43,12 +43,12 @@ class DataFetcherTest extends DBTestCase
         $this->company = factory(Company::class)->create();
 
         $this->users = factory(User::class, 5)->create([
-            'company_id' => $this->company->id
+            'company_id' => $this->company->id,
         ]);
 
         $this->users->each(function ($user) {
             factory(Task::class, 5)->create([
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
         });
     }
@@ -208,12 +208,12 @@ class DataFetcherTest extends DBTestCase
         return [
             'name' => [
                 'parent' => false,
-                'args' => []
+                'args' => [],
             ],
             'users' => [
                 'parent' => true,
                 'args' => [
-                    'first' => '5'
+                    'first' => '5',
                 ],
                 'children' => [
                     'edges' => [
@@ -226,16 +226,16 @@ class DataFetcherTest extends DBTestCase
                                 'children' => [
                                     'name' => [
                                         'parent' => false,
-                                        'args' => []
+                                        'args' => [],
                                     ],
                                     'email' => [
                                         'parent' => false,
-                                        'args' => []
+                                        'args' => [],
                                     ],
                                     'tasks' => [
                                         'parent' => true,
                                         'args' => [
-                                            'first' => '2'
+                                            'first' => '2',
                                         ],
                                         'children' => [
                                             'edges' => [
@@ -248,24 +248,24 @@ class DataFetcherTest extends DBTestCase
                                                         'children' => [
                                                             'title' => [
                                                                 'parent' => false,
-                                                                'args' => []
+                                                                'args' => [],
                                                             ],
                                                             'description' => [
                                                                 'parent' => false,
-                                                                'args' => []
-                                                            ]
-                                                        ]
-                                                    ]
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                                                'args' => [],
+                                                            ],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

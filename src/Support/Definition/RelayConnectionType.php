@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 
 class RelayConnectionType extends GraphQLType
 {
@@ -26,7 +25,7 @@ class RelayConnectionType extends GraphQLType
     protected $pageInfoType;
 
     /**
-     * The edge resolver for this connection type
+     * The edge resolver for this connection type.
      *
      * @var \Closure
      */
@@ -47,7 +46,7 @@ class RelayConnectionType extends GraphQLType
     protected $name = '';
 
     /**
-     * The description of the connection (i.e. `A connection between the User and it's Tasks`)
+     * The description of the connection (i.e. `A connection between the User and it's Tasks`).
      *
      * @var string
      */
@@ -84,7 +83,7 @@ class RelayConnectionType extends GraphQLType
                 'resolve' => function ($collection) {
                     return $this->injectCursor($collection);
                 },
-            ]
+            ],
         ];
     }
 
@@ -97,20 +96,20 @@ class RelayConnectionType extends GraphQLType
     {
         return [
             'after' => [
-                'type' => Type::string()
+                'type' => Type::string(),
             ],
             'first' => [
-                'type' => Type::int()
+                'type' => Type::int(),
             ],
             'before' => [
-                'type' => Type::string()
+                'type' => Type::string(),
             ],
             'last' => [
-                'type' => Type::int()
+                'type' => Type::int(),
             ],
             'page' => [
                 'type' => Type::int(),
-            ]
+            ],
         ];
     }
 
@@ -127,7 +126,7 @@ class RelayConnectionType extends GraphQLType
             $encoder = app('graphql')->cursorEncoder($this->name);
 
             $collection->values()->each(function ($item, $x) use ($page, $encoder) {
-                $cursor        = ($x + 1) * $page;
+                $cursor = ($x + 1) * $page;
                 $encodedCursor = is_callable($encoder) ? $encoder($item, $x, $page) : $this->encodeGlobalId('arrayconnection', $cursor);
                 if (is_array($item)) {
                     $item['relayCursor'] = $encodedCursor;
@@ -148,7 +147,7 @@ class RelayConnectionType extends GraphQLType
      * Get id from encoded cursor.
      *
      * @param  string $cursor
-     * @return integer
+     * @return int
      */
     protected function getCursorId($cursor)
     {
@@ -158,7 +157,7 @@ class RelayConnectionType extends GraphQLType
             return $decoder($cursor);
         }
 
-        return (int)$this->decodeRelayId($cursor);
+        return (int) $this->decodeRelayId($cursor);
     }
 
     /**
@@ -176,7 +175,7 @@ class RelayConnectionType extends GraphQLType
             'fields' => $fields,
             'resolve' => function ($root, $args, $context, ResolveInfo $info) {
                 return $this->resolve($root, $args, $context, $info, $this->name);
-            }
+            },
         ];
     }
 
@@ -267,6 +266,6 @@ class RelayConnectionType extends GraphQLType
      */
     public function type()
     {
-        return null;
+        return;
     }
 }

@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataFetcher;
 
 class CompanyQuery extends GraphQLQuery
 {
@@ -31,7 +30,7 @@ class CompanyQuery extends GraphQLQuery
         return [
             'id' => [
                 'type' => Type::nonNull(Type::string()),
-            ]
+            ],
         ];
     }
 

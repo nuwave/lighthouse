@@ -12,7 +12,7 @@ class SchemaGenerator
      */
     public function build($version = '4.12')
     {
-        $query = file_get_contents(__DIR__.'/../../../assets/introspection-'. $version .'.txt');
+        $query = file_get_contents(__DIR__.'/../../../assets/introspection-'.$version.'.txt');
         $data = app('graphql')->execute($query);
 
         if (isset($data['data']['__schema'])) {
@@ -47,7 +47,7 @@ class SchemaGenerator
      */
     protected function makeDirectory($dir)
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
     }

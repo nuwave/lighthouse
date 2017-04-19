@@ -13,7 +13,7 @@ class DBTestCase extends TestCase
 
         $this->loadMigrationsFrom([
             '--database' => 'testing',
-            '--realpath' => realpath(__DIR__.'/Support/migrations')
+            '--realpath' => realpath(__DIR__.'/Support/migrations'),
         ]);
     }
 

@@ -16,7 +16,7 @@ class GraphQLTypeTest extends TestCase
     public function itCanTransformToType()
     {
         app('graphql')->schema()->type('task', TaskType::class);
-        
+
         $userType = new UserType;
         $type = $userType->toType();
 

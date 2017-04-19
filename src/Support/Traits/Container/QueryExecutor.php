@@ -27,10 +27,10 @@ trait QueryExecutor
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
-        if (!empty($result->errors)) {
+        if (! empty($result->errors)) {
             return [
                 'data' => $result->data,
-                'errors' => array_map([$this, 'formatError'], $result->errors)
+                'errors' => array_map([$this, 'formatError'], $result->errors),
             ];
         }
 
@@ -61,7 +61,7 @@ trait QueryExecutor
         $error = ['message' => $e->getMessage()];
         $locations = $e->getLocations();
 
-        if (!empty($locations)) {
+        if (! empty($locations)) {
             $error['locations'] = array_map(function ($location) {
                 return $location->toArray();
             }, $locations);

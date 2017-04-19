@@ -34,8 +34,8 @@ class UpdateEmailMutation extends GraphQLMutation
             'email' => [
                 'name' => 'email',
                 'type' => Type::nonNull(Type::string()),
-                'rules' => ['email']
-            ]
+                'rules' => ['email'],
+            ],
         ];
     }
 
@@ -49,7 +49,7 @@ class UpdateEmailMutation extends GraphQLMutation
     public function resolve($root, array $args)
     {
         $user = factory(User::class)->make([
-            'email' => 'foo@example.com'
+            'email' => 'foo@example.com',
         ]);
 
         $user->email = $args['email'];

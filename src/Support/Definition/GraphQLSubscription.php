@@ -10,7 +10,7 @@ abstract class GraphQLSubscription extends GraphQLQuery
      * @param  array $args
      * @param  mixed $request
      * @param  \Illuminate\Support\Collection $context
-     * @return boolean
+     * @return bool
      */
     abstract public function canSubscribe(array $args, $request, $context);
 
@@ -19,7 +19,7 @@ abstract class GraphQLSubscription extends GraphQLQuery
      *
      * @param  array $args
      * @param  \Illuminate\Support\Collection $context
-     * @return boolean
+     * @return bool
      */
     abstract public function filter(array $args, $context);
 }

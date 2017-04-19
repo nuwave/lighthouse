@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Traits\RelayConnection;
 class Task extends Model
 {
     use RelayConnection;
-    
+
     /**
      * The attributes that are mass assignable.
      *

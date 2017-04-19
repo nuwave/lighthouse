@@ -3,9 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Definition;
 
 use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Traits\GlobalIdTrait;
 
 class PageInfoType extends GraphQLType
 {
@@ -16,7 +14,7 @@ class PageInfoType extends GraphQLType
      */
     protected $attributes = [
         'name' => 'PageInfo',
-        'description' => 'Information to aid in pagination.'
+        'description' => 'Information to aid in pagination.',
     ];
 
     /**
@@ -36,7 +34,7 @@ class PageInfoType extends GraphQLType
                     }
 
                     return false;
-                }
+                },
             ],
             'hasPreviousPage' => [
                 'type' => Type::nonNull(Type::boolean()),
@@ -47,7 +45,7 @@ class PageInfoType extends GraphQLType
                     }
 
                     return false;
-                }
+                },
             ],
             'startCursor' => [
                 'type' => Type::string(),
@@ -60,8 +58,8 @@ class PageInfoType extends GraphQLType
                         );
                     }
 
-                    return null;
-                }
+                    return;
+                },
             ],
             'endCursor' => [
                 'type' => Type::string(),
@@ -74,8 +72,8 @@ class PageInfoType extends GraphQLType
                         );
                     }
 
-                    return null;
-                }
+                    return;
+                },
             ],
             'total' => [
                 'type' => Type::int(),
@@ -85,8 +83,8 @@ class PageInfoType extends GraphQLType
                         return $collection->total();
                     }
 
-                    return null;
-                }
+                    return;
+                },
             ],
             'count' => [
                 'type' => Type::int(),
@@ -96,8 +94,8 @@ class PageInfoType extends GraphQLType
                         return $collection->count();
                     }
 
-                    return null;
-                }
+                    return;
+                },
             ],
             'currentPage' => [
                 'type' => Type::int(),
@@ -107,8 +105,8 @@ class PageInfoType extends GraphQLType
                         return $collection->currentPage();
                     }
 
-                    return null;
-                }
+                    return;
+                },
             ],
             'lastPage' => [
                 'type' => Type::int(),
@@ -118,8 +116,8 @@ class PageInfoType extends GraphQLType
                         return $collection->lastPage();
                     }
 
-                    return null;
-                }
+                    return;
+                },
             ],
         ];
     }

@@ -10,12 +10,12 @@ class ConnectionGenerator
     /**
      * Current depth.
      *
-     * @var integer
+     * @var int
      */
     protected $depth = 0;
 
     /**
-     * Current path;
+     * Current path;.
      *
      * @var array
      */
@@ -27,7 +27,7 @@ class ConnectionGenerator
      * @var array
      */
     protected $relayEdges = [
-        'pageInfo', 'edges', 'node'
+        'pageInfo', 'edges', 'node',
     ];
 
     /**
@@ -72,16 +72,16 @@ class ConnectionGenerator
             if ($this->hasChildren($field)) {
                 $name = $field->name->value;
 
-                if (!$this->isEdge($name)) {
+                if (! $this->isEdge($name)) {
                     $this->path[] = $name;
-                    
+
                     $key = implode('.', $this->path);
 
                     $connection = new Connection([
                         'name' => $name,
                         'root' => $root,
                         'path' => $key,
-                        'arguments' => $field->arguments ? $this->getArguments($field->arguments) : []
+                        'arguments' => $field->arguments ? $this->getArguments($field->arguments) : [],
                     ]);
 
                     $this->connections->put($key, $connection);
@@ -102,7 +102,7 @@ class ConnectionGenerator
      */
     protected function hasChildren($field)
     {
-        return $this->isField($field) && isset($field->selectionSet) && !empty($field->selectionSet->selections);
+        return $this->isField($field) && isset($field->selectionSet) && ! empty($field->selectionSet->selections);
     }
 
     /**
@@ -117,7 +117,7 @@ class ConnectionGenerator
     }
 
     /**
-     * Determine if selection is a Field
+     * Determine if selection is a Field.
      *
      * @param  mixed  $selection
      * @return bool

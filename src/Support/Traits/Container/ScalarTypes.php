@@ -100,7 +100,7 @@ trait ScalarTypes
     public function nonNull($wrappedType)
     {
         return array_merge($wrappedType, [
-            'type' => Type::nonNull($wrappedType['type'])
+            'type' => Type::nonNull($wrappedType['type']),
         ]);
     }
 
@@ -113,7 +113,7 @@ trait ScalarTypes
     public function listOf($wrappedType)
     {
         return array_merge($wrappedType, [
-            'type' => Type::listOf($wrappedType['type'])
+            'type' => Type::listOf($wrappedType['type']),
         ]);
     }
 }

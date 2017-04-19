@@ -52,7 +52,7 @@ class TypeRegistrarTest extends TestCase
     {
         $this->registrar->register('user', UserType::class);
         $instance = $this->registrar->instance('user');
-        
+
         $this->assertInstanceOf(ObjectType::class, $instance);
         $this->assertEquals('User', $instance->name);
     }

@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Dotenv\Dotenv;
 
 class TestCase extends BaseTestCase
 {

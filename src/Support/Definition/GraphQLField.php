@@ -1,4 +1,5 @@
 <?php
+
 namespace Nuwave\Lighthouse\Support\Definition;
 
 use Illuminate\Support\Fluent;
@@ -36,7 +37,7 @@ class GraphQLField extends Fluent
      */
     public function type()
     {
-        return null;
+        return;
     }
 
     /**
@@ -57,7 +58,7 @@ class GraphQLField extends Fluent
     public function getAttributes()
     {
         $attributes = array_merge($this->attributes, [
-            'args' => $this->args()
+            'args' => $this->args(),
         ], $this->attributes());
 
         $attributes['type'] = $this->type();
@@ -82,9 +83,11 @@ class GraphQLField extends Fluent
                     if (is_callable($arg['rules'])) {
                         return call_user_func_array($arg['rules'], $arguments);
                     }
+
                     return $arg['rules'];
                 }
-                return null;
+
+                return;
             })
             ->merge(call_user_func_array([$this, 'rules'], $arguments))
             ->reject(function ($arg) {
@@ -99,11 +102,11 @@ class GraphQLField extends Fluent
      */
     protected function getResolver()
     {
-        if (!method_exists($this, 'resolve') && !method_exists($this, 'relayResolve')) {
-            return null;
+        if (! method_exists($this, 'resolve') && ! method_exists($this, 'relayResolve')) {
+            return;
         }
 
-        $resolver = method_exists($this, 'resolve') ? array($this, 'resolve') : array($this, 'relayResolve');
+        $resolver = method_exists($this, 'resolve') ? [$this, 'resolve'] : [$this, 'relayResolve'];
 
         return function () use ($resolver) {
             $arguments = func_get_args();
@@ -162,7 +165,7 @@ class GraphQLField extends Fluent
     {
         $attributes = $this->getAttributes();
 
-        return isset($attributes[$key]) ? $attributes[$key]:null;
+        return isset($attributes[$key]) ? $attributes[$key] : null;
     }
 
     /**

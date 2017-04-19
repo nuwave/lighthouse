@@ -13,7 +13,7 @@ class NodeType extends GraphQLInterface
      */
     protected $attributes = [
         'name' => 'Node',
-        'description' => 'An object with an ID.'
+        'description' => 'An object with an ID.',
     ];
 
     /**
@@ -26,8 +26,8 @@ class NodeType extends GraphQLInterface
         return [
             'id' => [
                 'type' => Type::nonNull(Type::id()),
-                'description' => 'The id of the object.'
-            ]
+                'description' => 'The id of the object.',
+            ],
         ];
     }
 

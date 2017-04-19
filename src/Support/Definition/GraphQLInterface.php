@@ -13,14 +13,15 @@ class GraphQLInterface extends GraphQLType
      */
     protected function getTypeResolver()
     {
-        if (!method_exists($this, 'resolveType')) {
-            return null;
+        if (! method_exists($this, 'resolveType')) {
+            return;
         }
 
-        $resolver = array($this, 'resolveType');
+        $resolver = [$this, 'resolveType'];
 
         return function () use ($resolver) {
             $args = func_get_args();
+
             return call_user_func_array($resolver, $args);
         };
     }

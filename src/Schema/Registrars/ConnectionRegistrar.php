@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
-use ReflectionClass;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use Nuwave\Lighthouse\Support\Definition\RelayConnectionType;
@@ -80,10 +79,10 @@ class ConnectionRegistrar extends BaseRegistrar
         $isConnection = $name instanceof Connection;
         $connection = new RelayConnectionType();
         $instanceName = $this->instanceName($name);
-        $connectionName = (!preg_match('/Connection$/', $instanceName)) ? $instanceName.'Connection' : $instanceName;
+        $connectionName = (! preg_match('/Connection$/', $instanceName)) ? $instanceName.'Connection' : $instanceName;
         $connection->setName(studly_case($connectionName));
 
-        if($isConnection && is_callable([$name, 'description'])) {
+        if ($isConnection && is_callable([$name, 'description'])) {
             $connection->setDescription($name->description());
         }
 
@@ -97,7 +96,7 @@ class ConnectionRegistrar extends BaseRegistrar
         $field = new ConnectionField([
             'args'    => $isConnection ? array_merge($name->args(), RelayConnectionType::connectionArgs()) : RelayConnectionType::connectionArgs(),
             'type'    => $instance,
-            'resolve' => $isConnection ? array($name, 'resolve') : null
+            'resolve' => $isConnection ? [$name, 'resolve'] : null,
         ]);
 
         if ($connection->interfaces) {

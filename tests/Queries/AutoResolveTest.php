@@ -40,7 +40,7 @@ class AutoResolveTest extends DBTestCase
         $this->user = factory(User::class)->create();
 
         $this->tasks = factory(Task::class, 6)->create([
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
 
         $graphql = app('graphql');
@@ -89,7 +89,7 @@ class UserStubType extends GraphQLType implements RelayType
 {
     protected $attributes = [
         'name' => 'User',
-        'description' => 'A user.'
+        'description' => 'A user.',
     ];
 
     public function resolveById($id)
@@ -102,13 +102,13 @@ class UserStubType extends GraphQLType implements RelayType
         return [
             'name' => [
                 'type' => Type::string(),
-                'description' => 'Name of the user.'
+                'description' => 'Name of the user.',
             ],
             'email' => [
                 'type' => Type::string(),
-                'description' => 'Email of the user.'
+                'description' => 'Email of the user.',
             ],
-            'tasks' => GraphQL::connection('task')->field('tasks')
+            'tasks' => GraphQL::connection('task')->field('tasks'),
         ];
     }
 }

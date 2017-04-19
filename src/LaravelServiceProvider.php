@@ -19,8 +19,8 @@ class LaravelServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([__DIR__ . '/../config/config.php' => config_path('lighthouse.php')]);
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'lighthouse');
+        $this->publishes([__DIR__.'/../config/config.php' => config_path('lighthouse.php')]);
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
         $this->loadViewsFrom(realpath(__DIR__.'/Support/Console/Commands/stubs'), 'lighthouse');
 
         if (config('lighthouse.controller')) {
@@ -119,6 +119,7 @@ class LaravelServiceProvider extends ServiceProvider
                 $query = $this->first()->newQuery()->with($relations);
                 $this->items = app(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
             }
+
             return $this;
         });
     }

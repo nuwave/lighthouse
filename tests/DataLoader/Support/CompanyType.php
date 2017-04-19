@@ -15,7 +15,7 @@ class CompanyType extends GraphQLType
      */
     protected $attributes = [
         'name' => 'Company',
-        'description' => 'A company.'
+        'description' => 'A company.',
     ];
 
     /**
@@ -28,7 +28,7 @@ class CompanyType extends GraphQLType
         return [
             'name' => [
                 'type' => Type::string(),
-                'description' => 'Name of company.'
+                'description' => 'Name of company.',
             ],
             'users' => GraphQL::connection(new UserConnection)->field(),
         ];

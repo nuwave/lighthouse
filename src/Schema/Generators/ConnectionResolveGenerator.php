@@ -27,7 +27,7 @@ class ConnectionResolveGenerator
 
         if (is_array($items)) {
             $items = collect($items);
-        } else if (! $items instanceof Collection) {
+        } elseif (! $items instanceof Collection) {
             return $items;
         }
 

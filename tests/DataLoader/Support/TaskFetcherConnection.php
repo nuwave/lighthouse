@@ -7,16 +7,15 @@ use Nuwave\Lighthouse\Support\Interfaces\Connection;
 
 class TaskFetcherConnection implements Connection
 {
-
     /**
      * Get the name of the connection.
-     * Note: Connection names must be unique
+     * Note: Connection names must be unique.
      *
      * @return string
      */
     public function name()
     {
-        return "UserTaskConnection";
+        return 'UserTaskConnection';
     }
 
     /**

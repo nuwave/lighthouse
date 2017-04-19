@@ -8,16 +8,15 @@ use Nuwave\Lighthouse\Tests\Support\Models\Task;
 
 class TaskConnection implements Connection
 {
-
     /**
      * Get the name of the connection.
-     * Note: Connection names must be unique
+     * Note: Connection names must be unique.
      *
      * @return string
      */
     public function name()
     {
-        return "TaskConnection";
+        return 'TaskConnection';
     }
 
     /**
@@ -55,5 +54,4 @@ class TaskConnection implements Connection
             $query->where('id', $parent->id);
         })->getConnection($args);
     }
-
 }

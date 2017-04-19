@@ -99,13 +99,13 @@ class TypeMakeCommand extends GeneratorCommand
         if (starts_with($model, $rootNamespace)) {
             $shortName = (new ReflectionClass($model))->getShortName();
         } else {
-            $model = config('lighthouse.model_path') . "\\" . $model;
+            $model = config('lighthouse.model_path').'\\'.$model;
         }
 
         $relay = $this->option('relay');
         $fields = $this->getTypeFields($model);
 
-        return "<?php\n\n" . view('lighthouse::eloquent', compact('model', 'shortName', 'fields', 'relay'))->render();
+        return "<?php\n\n".view('lighthouse::eloquent', compact('model', 'shortName', 'fields', 'relay'))->render();
     }
 
     /**
