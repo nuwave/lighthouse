@@ -1,7 +1,7 @@
 {
     "name": "nuwave/lighthouse",
     "type": "library",
-    "keywords" :[
+    "keywords": [
         "api",
         "graphql",
         "laravel"
@@ -13,6 +13,16 @@
             "email": "chris@nuwavecommerce.com"
         }
     ],
+    "require": {
+        "illuminate/console": "^5.2",
+        "illuminate/contracts": "^5.2",
+        "illuminate/database": "^5.2",
+        "illuminate/http": "^5.2",
+        "illuminate/pagination": "^5.2",
+        "illuminate/routing": "^5.2",
+        "illuminate/support": "^5.2",
+        "webonyx/graphql-php": "^0.9"
+    },
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
@@ -22,25 +32,18 @@
         ]
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.8|~5.0",
-        "orchestra/testbench": "^3.2",
-        "orchestra/database" : "^3.2",
         "doctrine/dbal": "^2.5",
-        "friendsofphp/php-cs-fixer": "~1"
+        "friendsofphp/php-cs-fixer": "~1",
+        "orchestra/database": "^3.2",
+        "orchestra/testbench": "^3.2",
+        "phpunit/phpunit": "~4.8 || ~5.0"
     },
     "autoload-dev": {
         "psr-4": {
             "Nuwave\\Lighthouse\\Tests\\": "tests/"
         }
     },
-    "require": {
-        "webonyx/graphql-php": "^0.9",
-        "illuminate/support": "^5.2",
-        "illuminate/database": "^5.2",
-        "illuminate/contracts": "^5.2",
-        "illuminate/routing": "^5.2",
-        "illuminate/http": "^5.2",
-        "illuminate/console": "^5.2",
-        "illuminate/pagination": "^5.2"
+    "config": {
+        "sort-packages": true
     }
 }
