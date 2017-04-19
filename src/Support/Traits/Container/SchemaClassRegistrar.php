@@ -7,6 +7,13 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 trait SchemaClassRegistrar
 {
     /**
+     * The Schema Builder.
+     *
+     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
+     */
+    protected $schema;
+
+    /**
      * Set local instance of schema container.
      *
      * @param SchemaBuilder $schema
