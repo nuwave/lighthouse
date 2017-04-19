@@ -124,7 +124,7 @@ class ConnectionGenerator
      */
     public function isField($selection)
     {
-        return is_object($selection) && $selection instanceof Field;
+        return $selection instanceof Field;
     }
 
     /**

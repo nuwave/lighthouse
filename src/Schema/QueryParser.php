@@ -125,7 +125,7 @@ class QueryParser
      */
     public function isField($selection)
     {
-        return is_object($selection) && $selection instanceof QueryField;
+        return $selection instanceof QueryField;
     }
 
     /**
