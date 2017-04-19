@@ -36,7 +36,7 @@
         "friendsofphp/php-cs-fixer": "~1",
         "orchestra/database": "^3.2",
         "orchestra/testbench": "^3.2",
-        "phpunit/phpunit": "~4.8|~5.0"
+        "phpunit/phpunit": "~4.8 || ~5.0"
     },
     "autoload-dev": {
         "psr-4": {
