@@ -1,6 +1,11 @@
 {
     "name": "nuwave/lighthouse",
     "type": "library",
+    "keywords" :[
+        "api",
+        "graphql",
+        "laravel"
+    ],
     "license": "MIT",
     "authors": [
         {
