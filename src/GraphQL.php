@@ -264,16 +264,16 @@ class GraphQL
      */
     public function eagerLoad($depth = null)
     {
-        return $this->parser()->connections()
-            ->pluck('path')
-            ->filter(function ($path) use ($depth) {
-                if (is_null($depth)) {
-                    return true;
-                }
+        $collection = $this->parser()->connections()->pluck('path');
 
+        if ($depth !== null) {
+            $depth = (int) $depth;
+            $collection = $collection->filter(function ($path) use ($depth) {
                 return count(explode('.', $path)) <= $depth;
-            })
-            ->toArray();
+            });
+        }
+
+        return $collection->toArray();
     }
 
     /**
