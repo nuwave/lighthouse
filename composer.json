@@ -42,5 +42,8 @@
         "psr-4": {
             "Nuwave\\Lighthouse\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
