@@ -12,6 +12,13 @@ use GraphQL\Language\AST\FragmentSpread;
 class FieldParser
 {
     /**
+     * The fragments.
+     *
+     * @var array
+     */
+    protected $fragments;
+
+    /**
      * Prefetch data.
      *
      * @param  ResolveInfo $info
