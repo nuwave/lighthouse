@@ -13,6 +13,16 @@
             "email": "chris@nuwavecommerce.com"
         }
     ],
+    "require": {
+        "webonyx/graphql-php": "^0.9",
+        "illuminate/support": "^5.2",
+        "illuminate/database": "^5.2",
+        "illuminate/contracts": "^5.2",
+        "illuminate/routing": "^5.2",
+        "illuminate/http": "^5.2",
+        "illuminate/console": "^5.2",
+        "illuminate/pagination": "^5.2"
+    },
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
@@ -32,15 +42,5 @@
         "psr-4": {
             "Nuwave\\Lighthouse\\Tests\\": "tests/"
         }
-    },
-    "require": {
-        "webonyx/graphql-php": "^0.9",
-        "illuminate/support": "^5.2",
-        "illuminate/database": "^5.2",
-        "illuminate/contracts": "^5.2",
-        "illuminate/routing": "^5.2",
-        "illuminate/http": "^5.2",
-        "illuminate/console": "^5.2",
-        "illuminate/pagination": "^5.2"
     }
 }
