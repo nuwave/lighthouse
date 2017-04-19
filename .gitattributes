@@ -1,5 +1,7 @@
 * text=auto
 
+/assets export-ignore
+ /tests export-ignore
 .editorconfig export-ignore
 .php_cs export-ignore
 .styleci.yml export-ignore
