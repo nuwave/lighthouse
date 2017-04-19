@@ -4,3 +4,4 @@ composer.lock
 vendor
 .idea
 .php_cs.cache
+phpunit.xml
