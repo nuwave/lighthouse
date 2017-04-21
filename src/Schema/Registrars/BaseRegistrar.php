@@ -86,6 +86,6 @@ abstract class BaseRegistrar
      */
     public function getSchema()
     {
-        return $this->schema ?: app(Schema::class);
+        return $this->schema ?: new Schema;
     }
 }

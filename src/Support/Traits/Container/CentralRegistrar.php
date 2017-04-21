@@ -95,7 +95,7 @@ trait CentralRegistrar
     public function getTypeRegistrar()
     {
         if (! $this->typeRegistrar) {
-            $this->typeRegistrar = app(TypeRegistrar::class)->setSchema($this);
+            $this->typeRegistrar = (new TypeRegistrar)->setSchema($this);
         }
 
         return $this->typeRegistrar;
@@ -119,7 +119,7 @@ trait CentralRegistrar
     public function getEdgeRegistrar()
     {
         if (! $this->edgeRegistrar) {
-            $this->edgeRegistrar = app(EdgeRegistrar::class)->setSchema($this);
+            $this->edgeRegistrar = (new EdgeRegistrar)->setSchema($this);
         }
 
         return $this->edgeRegistrar;
@@ -143,7 +143,7 @@ trait CentralRegistrar
     public function getConnectionRegistrar()
     {
         if (! $this->connectionRegistrar) {
-            $this->connectionRegistrar = app(ConnectionRegistrar::class)->setSchema($this);
+            $this->connectionRegistrar = (new ConnectionRegistrar)->setSchema($this);
         }
 
         return $this->connectionRegistrar;
@@ -167,7 +167,7 @@ trait CentralRegistrar
     public function getQueryRegistrar()
     {
         if (! $this->queryRegistrar) {
-            $this->queryRegistrar = app(QueryRegistrar::class)->setSchema($this);
+            $this->queryRegistrar = (new QueryRegistrar)->setSchema($this);
         }
 
         return $this->queryRegistrar;
@@ -181,7 +181,7 @@ trait CentralRegistrar
     public function getSubscriptionRegistrar()
     {
         if (! $this->subscriptionRegistrar) {
-            $this->subscriptionRegistrar = app(SubscriptionRegistrar::class)->setSchema($this);
+            $this->subscriptionRegistrar = (new SubscriptionRegistrar)->setSchema($this);
         }
 
         return $this->subscriptionRegistrar;
@@ -205,7 +205,7 @@ trait CentralRegistrar
     public function getMutationRegistrar()
     {
         if (! $this->mutationRegistrar) {
-            $this->mutationRegistrar = app(MutationRegistrar::class)->setSchema($this);
+            $this->mutationRegistrar = (new MutationRegistrar)->setSchema($this);
         }
 
         return $this->mutationRegistrar;
@@ -229,7 +229,7 @@ trait CentralRegistrar
     public function getCursorRegistrar()
     {
         if (! $this->cursorRegistrar) {
-            $this->cursorRegistrar = app(CursorRegistrar::class);
+            $this->cursorRegistrar = new CursorRegistrar;
         }
 
         return $this->cursorRegistrar;
@@ -243,7 +243,7 @@ trait CentralRegistrar
     public function getDataFetcherRegistrar()
     {
         if (! $this->fetcherRegistrar) {
-            $this->fetcherRegistrar = app(DataFetcherRegistrar::class)->setSchema($this);
+            $this->fetcherRegistrar = (new DataFetcherRegistrar)->setSchema($this);
         }
 
         return $this->fetcherRegistrar;
@@ -257,7 +257,7 @@ trait CentralRegistrar
     public function getDataLoaderRegistrar()
     {
         if (! $this->loaderRegistrar) {
-            $this->loaderRegistrar = app(DataLoaderRegistrar::class)->setSchema($this);
+            $this->loaderRegistrar = (new DataLoaderRegistrar)->setSchema($this);
         }
 
         return $this->loaderRegistrar;

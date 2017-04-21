@@ -96,7 +96,7 @@ class ConnectionField extends Fluent
      */
     protected function getResolver()
     {
-        return $this->resolver ?: app(Resolver::class);
+        return $this->resolver ?: new Resolver;
     }
 
     /**

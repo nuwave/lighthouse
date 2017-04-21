@@ -117,7 +117,7 @@ class LaravelServiceProvider extends ServiceProvider
                 }
 
                 $query = $this->first()->newQuery()->with($relations);
-                $this->items = app(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
+                $this->items = (new QueryBuilder)->eagerLoadRelations($query, $this->items);
             }
 
             return $this;

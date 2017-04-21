@@ -387,6 +387,6 @@ class EloquentType
      */
     public function typeGenerator()
     {
-        return $this->typeGenerator ?: app(TypeGenerator::class);
+        return $this->typeGenerator ?: new TypeGenerator;
     }
 }
