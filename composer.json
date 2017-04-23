@@ -13,6 +13,10 @@
             "email": "chris@nuwavecommerce.com"
         }
     ],
+    "support": {
+        "issues": "https://github.com/nuwave/lighthouse/issues",
+        "source": "https://github.com/nuwave/lighthouse"
+    },
     "require": {
         "php": ">=5.5.9",
         "illuminate/console": "^5.2",
