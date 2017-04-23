@@ -1,7 +1,7 @@
 <?php
 
+use Symfony\CS\Config;
 use Symfony\CS\Finder;
-use Symfony\CS\Config\Config;
 use Symfony\CS\FixerInterface;
 
 $fixers = [
