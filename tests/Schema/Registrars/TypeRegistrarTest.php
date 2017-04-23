@@ -40,8 +40,8 @@ class TypeRegistrarTest extends TestCase
         $field = $this->registrar->register('foo', 'FooClass');
 
         $this->assertCount(1, $this->registrar->all());
-        $this->assertEquals('foo', $field->name);
-        $this->assertEquals('FooClass', $field->namespace);
+        $this->assertSame('foo', $field->name);
+        $this->assertSame('FooClass', $field->namespace);
         $this->assertSame($field, $this->registrar->get('foo'));
     }
 
@@ -54,7 +54,7 @@ class TypeRegistrarTest extends TestCase
         $instance = $this->registrar->instance('user');
 
         $this->assertInstanceOf(ObjectType::class, $instance);
-        $this->assertEquals('User', $instance->name);
+        $this->assertSame('User', $instance->name);
     }
 
     /**
@@ -66,7 +66,7 @@ class TypeRegistrarTest extends TestCase
         $instance = GraphQL::type('user');
 
         $this->assertInstanceOf(ObjectType::class, $instance);
-        $this->assertEquals('User', $instance->name);
+        $this->assertSame('User', $instance->name);
     }
 
     /**
@@ -78,7 +78,7 @@ class TypeRegistrarTest extends TestCase
         $instance = graphql()->type('user');
 
         $this->assertInstanceOf(ObjectType::class, $instance);
-        $this->assertEquals('User', $instance->name);
+        $this->assertSame('User', $instance->name);
     }
 
     /**

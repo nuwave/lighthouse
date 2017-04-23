@@ -60,8 +60,8 @@ class CursorTest extends DBTestCase
         $edges = array_get($data, 'data.node.tasks.edges');
 
         $this->assertCount(2, $edges);
-        $this->assertEquals('foo', array_get($edges, '0.cursor'));
-        $this->assertEquals('bar', array_get($edges, '1.cursor'));
+        $this->assertSame('foo', array_get($edges, '0.cursor'));
+        $this->assertSame('bar', array_get($edges, '1.cursor'));
     }
 
     /**
