@@ -322,8 +322,6 @@ class EloquentType
         if (method_exists($this->model, $method)) {
             return [$this->model, $method];
         }
-
-        return;
     }
 
     /**

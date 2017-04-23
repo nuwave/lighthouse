@@ -41,8 +41,6 @@ abstract class GraphQLDataFetcher
         if ($dataFetcher = $this->getChildFetcher($key)) {
             return $dataFetcher->loadDataByKey($this->getName(), $this->getKey($root));
         }
-
-        return;
     }
 
     /**
@@ -194,11 +192,9 @@ abstract class GraphQLDataFetcher
      */
     protected function getChildFetcher($key)
     {
-        if (! $this->hasChildFetcher($key)) {
-            return;
+        if ($this->hasChildFetcher($key)) {
+            return app($this->children[$key]);
         }
-
-        return app($this->children[$key]);
     }
 
     /**

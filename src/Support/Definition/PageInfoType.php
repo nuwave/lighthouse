@@ -71,8 +71,6 @@ class PageInfoType extends GraphQLType
                             $collection->lastItem() * $collection->currentPage()
                         );
                     }
-
-                    return;
                 },
             ],
             'total' => [
@@ -82,8 +80,6 @@ class PageInfoType extends GraphQLType
                     if ($collection instanceof LengthAwarePaginator) {
                         return $collection->total();
                     }
-
-                    return;
                 },
             ],
             'count' => [
@@ -93,8 +89,6 @@ class PageInfoType extends GraphQLType
                     if ($collection instanceof LengthAwarePaginator) {
                         return $collection->count();
                     }
-
-                    return;
                 },
             ],
             'currentPage' => [
@@ -104,8 +98,6 @@ class PageInfoType extends GraphQLType
                     if ($collection instanceof LengthAwarePaginator) {
                         return $collection->currentPage();
                     }
-
-                    return;
                 },
             ],
             'lastPage' => [
@@ -115,8 +107,6 @@ class PageInfoType extends GraphQLType
                     if ($collection instanceof LengthAwarePaginator) {
                         return $collection->lastPage();
                     }
-
-                    return;
                 },
             ],
         ];

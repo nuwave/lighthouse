@@ -266,6 +266,6 @@ class RelayConnectionType extends GraphQLType
      */
     public function type()
     {
-        return;
+        //
     }
 }

@@ -31,8 +31,6 @@ class FileStore
         if (file_exists($this->getPath($name))) {
             return unserialize(file_get_contents($this->getPath($name)));
         }
-
-        return;
     }
 
     /**
