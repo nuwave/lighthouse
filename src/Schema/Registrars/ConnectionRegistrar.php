@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Definition\RelayConnectionType;
 use Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField;
 use Nuwave\Lighthouse\Support\Interfaces\Connection;
@@ -24,7 +25,7 @@ class ConnectionRegistrar extends BaseRegistrar
     {
         parent::__construct();
 
-        $this->instances = collect();
+        $this->instances = new Collection;
     }
 
     /**

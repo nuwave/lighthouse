@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\Language\Parser;
 use GraphQL\Language\Source;
 use GraphQL\Language\AST\Field as QueryField;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Generators\ConnectionGenerator;
 
 class QueryParser
@@ -46,7 +47,7 @@ class QueryParser
         $selectionSet = $this->getSelectionSet();
         $operation = $this->getOperation();
 
-        return collect($selectionSet)->flatMap(function ($selection) use ($operation) {
+        return Collection::make($selectionSet)->flatMap(function ($selection) use ($operation) {
             if ($field = $this->getField($selection, $operation)) {
                 return $field->middleware;
             }
@@ -65,7 +66,7 @@ class QueryParser
         $selectionSet = $this->getSelectionSet();
         $operation = $this->getOperation();
 
-        return collect($selectionSet)->flatMap(function ($selection) use ($operation) {
+        return Collection::make($selectionSet)->flatMap(function ($selection) use ($operation) {
             if ($field = $this->getField($selection, $operation)) {
                 if (isset($selection->selectionSet) && ! empty($selection->selectionSet->selections)) {
                     return (new ConnectionGenerator)->build(

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
 use GraphQL\Deferred;
+use Illuminate\Support\Collection;
 
 abstract class GraphQLDataLoader
 {
@@ -32,7 +33,7 @@ abstract class GraphQLDataLoader
      */
     public function __construct()
     {
-        $this->keys = collect();
+        $this->keys = new Collection;
     }
 
     /**

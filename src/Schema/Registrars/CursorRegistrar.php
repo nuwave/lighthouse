@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use Closure;
+use Illuminate\Support\Collection;
 
 class CursorRegistrar
 {
@@ -18,7 +19,7 @@ class CursorRegistrar
      */
     public function __construct()
     {
-        $this->collection = collect();
+        $this->collection = new Collection;
     }
 
     /**

@@ -62,8 +62,8 @@ class EloquentType
     public function __construct(Model $model, $name = '')
     {
         $this->name = $name;
-        $this->fields = collect();
-        $this->hiddenFields = collect($model->getHidden())->flip();
+        $this->fields = new Collection;
+        $this->hiddenFields = Collection::make($model->getHidden())->flip();
         $this->model = $model;
         $this->camelCase = config('lighthouse.camel_case', false);
     }
@@ -86,12 +86,12 @@ class EloquentType
         }
 
         if (method_exists($this->model, 'graphqlFields')) {
-            $this->eloquentFields(collect($this->model->graphqlFields()));
+            $this->eloquentFields(new Collection($this->model->graphqlFields()));
         }
 
         if (method_exists($this->model, $this->getTypeMethod())) {
             $method = $this->getTypeMethod();
-            $this->eloquentFields(collect($this->model->{$method}()));
+            $this->eloquentFields(new Collection($this->model->{$method}()));
         }
 
         return new ObjectType([
@@ -113,12 +113,12 @@ class EloquentType
         $this->schemaFields();
 
         if (method_exists($this->model, 'graphqlFields')) {
-            $this->eloquentFields(collect($this->model->graphqlFields()));
+            $this->eloquentFields(new Collection($this->model->graphqlFields()));
         }
 
         if (method_exists($this->model, $this->getTypeMethod())) {
             $method = $this->getTypeMethod();
-            $this->eloquentFields(collect($this->model->{$method}()));
+            $this->eloquentFields(new Collection($this->model->{$method}()));
         }
 
         return $this->fields->transform(function ($field, $key) {
@@ -165,7 +165,7 @@ class EloquentType
 
         $table = $this->model->getTable();
         $schema = $this->model->getConnection()->getSchemaBuilder();
-        $columns = collect($schema->getColumnListing($table));
+        $columns = new Collection($schema->getColumnListing($table));
 
         $columns->each(function ($column) use ($table, $schema) {
             if (! $this->skipField($column)) {

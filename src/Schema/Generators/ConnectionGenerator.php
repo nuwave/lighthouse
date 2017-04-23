@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Generators;
 
 use GraphQL\Language\AST\Field;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Connection;
 
 class ConnectionGenerator
@@ -42,7 +43,7 @@ class ConnectionGenerator
      */
     public function __construct()
     {
-        $this->connections = collect();
+        $this->connections = new Collection;
     }
 
     /**
@@ -135,7 +136,7 @@ class ConnectionGenerator
      */
     public function getArguments(array $arguments)
     {
-        return collect($arguments)->flatMap(function ($argument) {
+        return Collection::make($arguments)->flatMap(function ($argument) {
             return [$argument->name->value => $argument->value->value];
         })->toArray();
     }

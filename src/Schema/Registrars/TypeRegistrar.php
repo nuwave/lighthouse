@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Definition\EloquentType;
 use Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound;
 
@@ -22,7 +23,7 @@ class TypeRegistrar extends BaseRegistrar
     {
         parent::__construct();
 
-        $this->instances = collect();
+        $this->instances = new Collection;
     }
 
     /**

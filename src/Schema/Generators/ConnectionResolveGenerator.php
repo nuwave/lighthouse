@@ -26,7 +26,7 @@ class ConnectionResolveGenerator
         $items = $this->getItems($root, $info, $name);
 
         if (is_array($items)) {
-            $items = collect($items);
+            $items = new Collection($items);
         } elseif (! $items instanceof Collection) {
             return $items;
         }
@@ -53,7 +53,7 @@ class ConnectionResolveGenerator
         } elseif (is_object($collection) && method_exists($collection, 'get')) {
             return $collection->get($name);
         } elseif (is_array($collection) && isset($collection[$name])) {
-            return collect($collection[$name]);
+            return new Collection($collection[$name]);
         }
 
         return [];
@@ -70,7 +70,7 @@ class ConnectionResolveGenerator
         $camel = config('relay.camel_case');
         $fields = array_get($info->getFieldSelection(2), 'edges.node');
 
-        return collect($fields)->reject(function ($value) {
+        return Collection::make($fields)->reject(function ($value) {
             is_array($value);
         })->keys()->transform(function ($value) use ($camel) {
             return $camel ? snake_case($value) : $value;

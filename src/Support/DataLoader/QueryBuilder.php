@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
 use Closure;
+use Illuminate\Support\Collection;
 use ReflectionMethod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -70,7 +71,7 @@ class QueryBuilder
      */
     protected function getQueries(Builder $builder, array $models, $name, Closure $constraints)
     {
-        return collect($models)->map(function ($model) use ($builder, $name, $constraints) {
+        return Collection::make($models)->map(function ($model) use ($builder, $name, $constraints) {
             $relation = $builder->getRelation($name);
 
             $relation->addEagerConstraints([$model]);
