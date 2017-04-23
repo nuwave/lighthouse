@@ -1,15 +1,40 @@
+sudo: false
+
+services:
+  - mysql
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 language: php
 
-php:
-  - 5.4
-  - 5.5
-  - 5.6
-  - 7.0
-  - 7.1
-  - hhvm
+env:
+  global:
+    - DB_DATABASE="test" DB_USERNAME="root"
 
-before_script:
+matrix:
+  include:
+    - php: 5.5.9
+      env: LARAVEL='^5.2'
+    - php: 5.5
+      env: LARAVEL='^5.2'
+    - php: 5.6
+      env: LARAVEL='^5.2'
+    - php: 7.0
+      env: LARAVEL='^5.2'
+    - php: 7.1
+      env: LARAVEL='^5.2'
+  fast_finish: true
+
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction --dev
+  - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
 
-script: phpunit
+install:
+  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
+
+script:
+  - vendor/bin/phpunit
+

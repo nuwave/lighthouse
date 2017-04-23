@@ -18,13 +18,6 @@ abstract class BaseRegistrar
     protected $collection;
 
     /**
-     * GraphQL schema builder.
-     *
-     * @var Schema
-     */
-    protected $schema;
-
-    /**
      * Create new instance of registrar.
      */
     public function __construct()
