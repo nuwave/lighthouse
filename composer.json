@@ -19,13 +19,13 @@
     },
     "require": {
         "php": ">=5.5.9",
-        "illuminate/console": "^5.2",
-        "illuminate/contracts": "^5.2",
-        "illuminate/database": "^5.2",
-        "illuminate/http": "^5.2",
-        "illuminate/pagination": "^5.2",
-        "illuminate/routing": "^5.2",
-        "illuminate/support": "^5.2",
+        "illuminate/console": "^5.2 || ^5.3",
+        "illuminate/contracts": "^5.2 || ^5.3",
+        "illuminate/database": "^5.2 || ^5.3",
+        "illuminate/http": "^5.2 || ^5.3",
+        "illuminate/pagination": "^5.2 || ^5.3",
+        "illuminate/routing": "^5.2 || ^5.3",
+        "illuminate/support": "^5.2 || ^5.3",
         "webonyx/graphql-php": "^0.9"
     },
     "autoload": {
@@ -39,8 +39,8 @@
     "require-dev": {
         "doctrine/dbal": "^2.5",
         "friendsofphp/php-cs-fixer": "~1",
-        "orchestra/database": "^3.2",
-        "orchestra/testbench": "^3.2",
+        "orchestra/database": "^3.2 || ^3.3",
+        "orchestra/testbench": "^3.2 || ^3.3",
         "phpunit/phpunit": "~4.8 || ~5.0"
     },
     "autoload-dev": {

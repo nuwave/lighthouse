@@ -25,6 +25,14 @@ matrix:
       env: LARAVEL='^5.2'
     - php: 7.1
       env: LARAVEL='^5.2'
+    - php: 5.6.4
+      env: LARAVEL='^5.3'
+    - php: 5.6
+      env: LARAVEL='^5.3'
+    - php: 7.0
+      env: LARAVEL='^5.3'
+    - php: 7.1
+      env: LARAVEL='^5.3'
   fast_finish: true
 
 before_install:
