@@ -32,7 +32,7 @@ class ConnectionGenerator
     ];
 
     /**
-     * Colleciton of connections.
+     * Collection of connections.
      *
      * @var \Illuminate\Support\Collection
      */

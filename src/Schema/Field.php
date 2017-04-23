@@ -82,8 +82,8 @@ class Field
     {
         $middlewares = is_array($middlewares) ? $middlewares : [$middlewares];
 
-        foreach ($middlewares as $middlware) {
-            $this->attachMiddleware($middlware);
+        foreach ($middlewares as $middleware) {
+            $this->attachMiddleware($middleware);
         }
 
         return $this;
