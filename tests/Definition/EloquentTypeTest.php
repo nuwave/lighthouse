@@ -44,7 +44,7 @@ class EloquentTypeTest extends DBTestCase
         $fields = is_callable($type->config['fields']) ? $type->config['fields']() : $type->config['fields'];
         $fieldKeys = array_keys($fields);
 
-        $this->assertEquals('User', $type->name);
+        $this->assertSame('User', $type->name);
         $this->assertEquals([
             'id', 'company_id', 'name', 'email', 'created_at', 'updated_at',
         ], $fieldKeys);

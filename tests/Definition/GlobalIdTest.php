@@ -53,7 +53,7 @@ class GlobalIdTest extends TestCase
         });
 
         $field = new GraphQLFieldStub;
-        $this->assertEquals('foo', $field->encodeGlobalId($type, $id));
+        $this->assertSame('foo', $field->encodeGlobalId($type, $id));
     }
 
     /**
@@ -71,7 +71,7 @@ class GlobalIdTest extends TestCase
         });
 
         $field = new GraphQLFieldStub;
-        $this->assertEquals('bar', $field->decodeRelayId($globalId));
+        $this->assertSame('bar', $field->decodeRelayId($globalId));
     }
 
     /**
@@ -89,7 +89,7 @@ class GlobalIdTest extends TestCase
         });
 
         $field = new GraphQLFieldStub;
-        $this->assertEquals('baz', $field->decodeRelayType($globalId));
+        $this->assertSame('baz', $field->decodeRelayType($globalId));
     }
 }
 

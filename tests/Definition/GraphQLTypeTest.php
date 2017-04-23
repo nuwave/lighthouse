@@ -20,7 +20,7 @@ class GraphQLTypeTest extends TestCase
         $userType = new UserType;
         $type = $userType->toType();
 
-        $this->assertEquals('User', $type->name);
+        $this->assertSame('User', $type->name);
         $this->assertInstanceOf(ObjectType::class, $type);
     }
 }

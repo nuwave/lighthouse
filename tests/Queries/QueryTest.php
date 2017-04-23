@@ -64,9 +64,9 @@ class QueryTest extends TestCase
         $graphql->schema()->query('userQuery', UserQuery::class);
 
         $data = $this->executeQuery($query)['data'];
-        $this->assertEquals('foo', array_get($data, 'userQuery.name'));
+        $this->assertSame('foo', array_get($data, 'userQuery.name'));
         $this->assertCount(5, array_get($data, 'userQuery.tasks.edges', []));
-        $this->assertEquals('foo', array_first(array_pluck(array_get($data, 'userQuery.tasks.edges', []), 'node.title')));
+        $this->assertSame('foo', array_first(array_pluck(array_get($data, 'userQuery.tasks.edges', []), 'node.title')));
     }
 
     /**

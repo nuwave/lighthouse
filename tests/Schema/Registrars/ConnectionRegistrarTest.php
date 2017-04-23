@@ -67,12 +67,12 @@ class ConnectionRegistrarTest extends TestCase
         $connectionField = $this->registrar->instance('user');
         $connectionType = $connectionField['type'];
         $this->assertInstanceof(ObjectType::class, $connectionType);
-        $this->assertEquals('UserConnection', $connectionType->name);
+        $this->assertSame('UserConnection', $connectionType->name);
         $this->assertContains('pageInfo', array_keys($connectionType->config['fields']));
         $this->assertContains('edges', array_keys($connectionType->config['fields']));
 
         $edge = $this->edgeRegistrar->instance('user');
         $this->assertInstanceOf(ObjectType::class, $edge);
-        $this->assertEquals('UserEdge', $edge->name);
+        $this->assertSame('UserEdge', $edge->name);
     }
 }
