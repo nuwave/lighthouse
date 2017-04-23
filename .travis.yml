@@ -44,7 +44,7 @@ install:
   - travis_retry composer install --prefer-dist --no-interaction --no-suggest
 
 script:
-  - vendor/bin/phpunit
+  - composer run test:ci
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
