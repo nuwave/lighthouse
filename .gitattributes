@@ -2,6 +2,7 @@
 
 /assets export-ignore
  /tests export-ignore
+ .codecov.yml export-ignore
 .editorconfig export-ignore
 .php_cs export-ignore
 .styleci.yml export-ignore
