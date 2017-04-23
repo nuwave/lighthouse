@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Field;
 use Nuwave\Lighthouse\Schema\SchemaBuilder as Schema;
 use Nuwave\Lighthouse\Support\Traits\Container\SchemaClassRegistrar;
@@ -22,7 +23,7 @@ abstract class BaseRegistrar
      */
     public function __construct()
     {
-        $this->collection = collect();
+        $this->collection = new Collection;
     }
 
     /**

@@ -85,7 +85,7 @@ abstract class GraphQLDataFetcher
      */
     public function resolveChildren($root, array $fields)
     {
-        collect($fields)->each(function ($field, $key) use ($root) {
+        Collection::make($fields)->each(function ($field, $key) use ($root) {
             if ($dataFetcher = $this->getChildFetcher($key)) {
                 $method = $this->getChildResolveMethod($key, $root);
                 $children = method_exists($dataFetcher, $method) ?
@@ -124,7 +124,7 @@ abstract class GraphQLDataFetcher
      */
     public function allData()
     {
-        return collect($this->data);
+        return new Collection($this->data);
     }
 
     /**

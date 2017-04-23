@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\Definition;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Support\Interfaces\RelayType;
@@ -100,7 +101,7 @@ class GraphQLType extends Fluent
      */
     public function getFields()
     {
-        return collect($this->fields())->transform(function ($field, $name) {
+        return Collection::make($this->fields())->transform(function ($field, $name) {
             if (is_string($field)) {
                 $field = app($field);
                 $field->name = $name;

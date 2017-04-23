@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Tests\Definition;
 
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\DBTestCase;
@@ -68,7 +69,7 @@ class EloquentTypeTest extends DBTestCase
 
         $cache = $this->prophesize(FileStore::class);
         $this->app->instance(FileStore::class, $cache->reveal());
-        $cache->get('User')->willReturn(collect(['foo' => 'bar']));
+        $cache->get('User')->willReturn(new Collection(['foo' => 'bar']));
         $cache->store()->shouldNotBeCalled();
 
         $eloquentType = new EloquentType($user, 'user');

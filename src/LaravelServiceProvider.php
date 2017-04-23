@@ -103,7 +103,7 @@ class LaravelServiceProvider extends ServiceProvider
             $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
 
             return new LengthAwarePaginator(
-                collect($this->items)->forPage($currentPage, $first),
+                Collection::make($this->items)->forPage($currentPage, $first),
                 count($this->items),
                 $first,
                 $currentPage

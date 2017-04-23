@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
+use Illuminate\Support\Collection;
 use ReflectionClass;
 use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator;
@@ -34,7 +35,7 @@ class EdgeRegistrar extends BaseRegistrar
     {
         parent::__construct();
 
-        $this->instances = collect();
+        $this->instances = new Collection;
     }
 
     /**

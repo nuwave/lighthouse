@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Definition;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
@@ -77,7 +78,7 @@ class GraphQLField extends Fluent
         $arguments = func_get_args();
         $args = $this->args();
 
-        return collect($args)
+        return Collection::make($args)
             ->transform(function ($arg, $name) use ($arguments) {
                 if (isset($arg['rules'])) {
                     if (is_callable($arg['rules'])) {

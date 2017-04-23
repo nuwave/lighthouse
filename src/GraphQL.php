@@ -55,7 +55,7 @@ class GraphQL
     public function __construct($app)
     {
         $this->app = $app;
-        $this->typesWithInterfaces = collect();
+        $this->typesWithInterfaces = new Collection;
     }
 
     /**
@@ -213,7 +213,7 @@ class GraphQL
      */
     public function types()
     {
-        return collect($this->schema()->getTypeRegistrar()->all());
+        return new Collection($this->schema()->getTypeRegistrar()->all());
     }
 
     /**
@@ -223,7 +223,7 @@ class GraphQL
      */
     public function queries()
     {
-        return collect($this->schema()->getQueryRegistrar()->all());
+        return new Collection($this->schema()->getQueryRegistrar()->all());
     }
 
     /**
@@ -233,7 +233,7 @@ class GraphQL
      */
     public function subscriptions()
     {
-        return collect($this->schema()->getSubscriptionRegistrar()->all());
+        return new Collection($this->schema()->getSubscriptionRegistrar()->all());
     }
 
     /**
@@ -243,7 +243,7 @@ class GraphQL
      */
     public function mutations()
     {
-        return collect($this->schema()->getMutationRegistrar()->all());
+        return new Collection($this->schema()->getMutationRegistrar()->all());
     }
 
     /**
@@ -253,7 +253,7 @@ class GraphQL
      */
     public function connections()
     {
-        return collect($this->schema()->getConnectionRegistrar()->all());
+        return new Collection($this->schema()->getConnectionRegistrar()->all());
     }
 
     /**
