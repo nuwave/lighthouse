@@ -66,8 +66,6 @@ class EdgeRegistrar extends BaseRegistrar
 
             return $instance;
         }
-
-        return;
     }
 
     /**

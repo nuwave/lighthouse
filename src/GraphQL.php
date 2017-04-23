@@ -107,14 +107,12 @@ class GraphQL
             return $field;
         });
 
-        if (! $typeFields->count()) {
-            return;
+        if ($typeFields->count()) {
+            return new ObjectType([
+                'name' => $name,
+                'fields' => $typeFields->toArray(),
+            ]);
         }
-
-        return new ObjectType([
-            'name' => $name,
-            'fields' => $typeFields->toArray(),
-        ]);
     }
 
     /**

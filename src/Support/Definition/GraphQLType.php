@@ -90,8 +90,6 @@ class GraphQLType extends Fluent
                 return call_user_func_array($resolver, func_get_args());
             };
         }
-
-        return;
     }
 
     /**

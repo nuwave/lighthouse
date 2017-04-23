@@ -38,7 +38,7 @@ class GraphQLField extends Fluent
      */
     public function type()
     {
-        return;
+        //
     }
 
     /**
