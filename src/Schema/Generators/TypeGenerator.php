@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Generators;
 
+use Exception;
 use GraphQL\Type\Definition\Type;
 
 class TypeGenerator
@@ -9,8 +10,9 @@ class TypeGenerator
     /**
      * Get type definition.
      *
-     * @param  mixed $type
-     * @return \GraphQL\Type\Definition\ScalarType
+     * @param  mixed  $type
+     * @return mixed
+     * @throws \Exception
      */
     public function fromType($type)
     {
@@ -21,7 +23,7 @@ class TypeGenerator
         $method = 'get'.studly_case($type);
 
         if (! method_exists($this, $method)) {
-            throw new \Exception("Type generator for [{$type}] does not exist.");
+            throw new Exception("Type generator for [{$type}] does not exist.");
         }
 
         return call_user_func([$this, $method]);
@@ -38,7 +40,7 @@ class TypeGenerator
     }
 
     /**
-     * Get StrinType instance.
+     * Get StringType instance.
      *
      * @return \GraphQL\Type\Definition\StringType
      */

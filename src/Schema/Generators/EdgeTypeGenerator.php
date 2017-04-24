@@ -2,17 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\Generators;
 
-use Nuwave\Lighthouse\Support\Definition\EdgeType;
 use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Lighthouse\Support\Definition\EdgeType;
 
 class EdgeTypeGenerator
 {
     /**
      * Generate a new edge type.
      *
-     * @param string $name
-     * @param ObjectType $type
-     * @return ObjectType
+     * @param  string  $name
+     * @param  \GraphQL\Type\Definition\ObjectType  $type
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function build($name, ObjectType $type)
     {

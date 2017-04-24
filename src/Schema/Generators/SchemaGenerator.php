@@ -7,7 +7,7 @@ class SchemaGenerator
     /**
      * Generate relay schema.json file.
      *
-     * @param  string $version
+     * @param  string  $version
      * @return bool
      */
     public function build($version = '4.12')
@@ -28,8 +28,8 @@ class SchemaGenerator
     /**
      * Put to a file path.
      *
-     * @param  string $path
-     * @param  string $contents
+     * @param  string  $path
+     * @param  string  $contents
      * @return mixed
      */
     protected function put($path, $contents)
@@ -42,7 +42,7 @@ class SchemaGenerator
     /**
      * Make a directory tree recursively.
      *
-     * @param  string $dir
+     * @param  string  $dir
      * @return void
      */
     protected function makeDirectory($dir)
