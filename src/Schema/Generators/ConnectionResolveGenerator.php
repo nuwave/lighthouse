@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Generators;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class ConnectionResolveGenerator
@@ -14,12 +14,12 @@ class ConnectionResolveGenerator
     /**
      * Attempt to auto-resolve connection.
      *
-     * @param  mixed $root
-     * @param  array $args
-     * @param  mixed $context
-     * @param  ResolveInfo $info
-     * @param  string $name
-     * @return LengthAwarePaginator
+     * @param  mixed  $root
+     * @param  array  $args
+     * @param  mixed  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  string  $name
+     * @return array|\Illuminate\Support\Collection
      */
     public function resolve($root, array $args, $context, ResolveInfo $info, $name)
     {
@@ -35,10 +35,10 @@ class ConnectionResolveGenerator
     }
 
     /**
-     * @param             $collection
-     * @param ResolveInfo $info
-     * @param             $name
-     * @return Collection|array
+     * @param  mixed  $collection
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  string  $name
+     * @return array|\Illuminate\Support\Collection|mixed
      */
     protected function getItems($collection, ResolveInfo $info, $name)
     {
@@ -62,7 +62,7 @@ class ConnectionResolveGenerator
     /**
      * Select only certain fields on queries instead of all fields.
      *
-     * @param ResolveInfo $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
      * @return array
      */
     protected function getSelectFields(ResolveInfo $info)

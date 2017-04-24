@@ -28,7 +28,9 @@ class ConnectionGenerator
      * @var array
      */
     protected $relayEdges = [
-        'pageInfo', 'edges', 'node',
+        'edges',
+        'node',
+        'pageInfo',
     ];
 
     /**
@@ -40,6 +42,7 @@ class ConnectionGenerator
 
     /**
      * Create new instance of connection generator.
+     * @return void
      */
     public function __construct()
     {
@@ -50,7 +53,7 @@ class ConnectionGenerator
      * Build collection of connections from request.
      *
      * @param  array  $selectionSet
-     * @param  string $root
+     * @param  string  $root
      * @return array
      */
     public function build(array $selectionSet, $root = '')
@@ -63,8 +66,8 @@ class ConnectionGenerator
     /**
      * Parse arguments.
      *
-     * @param  array $selectionSet
-     * @param  string $root
+     * @param  array  $selectionSet
+     * @param  string  $root
      * @return void
      */
     protected function extractConnections(array $selectionSet = [], $root = '')
@@ -98,10 +101,10 @@ class ConnectionGenerator
     /**
      * Determine if field has selection set.
      *
-     * @param  Field   $field
+     * @param  \GraphQL\Language\AST\Field  $field
      * @return bool
      */
-    protected function hasChildren($field)
+    protected function hasChildren(Field $field)
     {
         return $this->isField($field) && isset($field->selectionSet) && ! empty($field->selectionSet->selections);
     }
@@ -131,7 +134,7 @@ class ConnectionGenerator
     /**
      * Set arguments of selection.
      *
-     * @param array $arguments
+     * @param  array  $arguments
      * @return array
      */
     public function getArguments(array $arguments)
