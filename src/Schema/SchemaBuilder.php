@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
-use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Support\Traits\Container\CentralRegistrar;
 
 class SchemaBuilder
@@ -38,6 +37,7 @@ class SchemaBuilder
      * Set current namespace.
      *
      * @param string $namespace
+     * @return void
      */
     public function setNamespace($namespace)
     {
@@ -48,7 +48,7 @@ class SchemaBuilder
      * Group child elements.
      *
      * @param  array   $attributes
-     * @param  Closure $callback
+     * @param  \Closure $callback
      * @return void
      */
     public function group(array $attributes, Closure $callback)
@@ -78,7 +78,7 @@ class SchemaBuilder
      * Get instance of query parser.
      *
      * @param  string $query
-     * @return self
+     * @return \Nuwave\Lighthouse\Schema\QueryParser
      */
     public function parse($query = '')
     {
@@ -244,8 +244,8 @@ class SchemaBuilder
      * Add cursor to registrar.
      *
      * @param  string  $name
-     * @param  Closure $encoder
-     * @param  Closure|null $decoder
+     * @param  \Closure $encoder
+     * @param  \Closure|null $decoder
      * @return bool
      */
     public function cursor($name, Closure $encoder, Closure $decoder = null)
@@ -293,7 +293,7 @@ class SchemaBuilder
      *
      * @param  string $name
      * @param  bool $fresh
-     * @return ObjectType
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function typeInstance($name, $fresh = false)
     {
@@ -306,7 +306,7 @@ class SchemaBuilder
      * @param  string $name
      * @param  string|null $parent
      * @param  bool $fresh
-     * @return ObjectType
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function connectionInstance($name, $parent = null, $fresh = false)
     {
@@ -317,9 +317,9 @@ class SchemaBuilder
      * Extract edge instance from registrar.
      *
      * @param  string $name
-     * @param  ObjectType|null $type
+     * @param  \GraphQL\Type\Definition\ObjectType|null $type
      * @param  bool $fresh
-     * @return ObjectType
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function edgeInstance($name, $type = null, $fresh = false)
     {
@@ -341,7 +341,7 @@ class SchemaBuilder
      * Extract Data Loader instance from registrar.
      *
      * @param  string $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
     public function dataLoaderInstance($name)
     {
@@ -352,7 +352,7 @@ class SchemaBuilder
      * Get encoder for connection edge.
      *
      * @param  string $name
-     * @return Closure
+     * @return \Closure
      */
     public function encoder($name)
     {
@@ -363,7 +363,7 @@ class SchemaBuilder
      * Get encoder for connection edge.
      *
      * @param  string $name
-     * @return Closure
+     * @return \Closure
      */
     public function decoder($name)
     {

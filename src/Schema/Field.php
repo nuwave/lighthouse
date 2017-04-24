@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Illuminate\Support\Collection;
-
 class Field
 {
     /**
@@ -32,6 +30,7 @@ class Field
      *
      * @param string $name
      * @param string $namespace
+     * @return void
      */
     public function __construct($name, $namespace)
     {
@@ -53,6 +52,7 @@ class Field
      * Attach middleware to field.
      *
      * @param array $middleware
+     * @return, void
      */
     public function addMiddleware(array $middleware)
     {
@@ -76,7 +76,7 @@ class Field
      * Attach middleware(s) to field.
      *
      * @param  array|string $middlewares
-     * @return self
+     * @return $this
      */
     public function middleware($middlewares)
     {

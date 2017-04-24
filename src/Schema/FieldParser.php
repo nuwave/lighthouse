@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Language\AST\SelectionSet;
-use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Language\AST\Field as GraphQLField;
 use GraphQL\Language\AST\Variable;
-use GraphQL\Language\AST\FragmentDefinition;
+use GraphQL\Language\AST\SelectionSet;
 use GraphQL\Language\AST\FragmentSpread;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\FragmentDefinition;
+use GraphQL\Language\AST\Field as GraphQLField;
 
 class FieldParser
 {
@@ -21,9 +21,9 @@ class FieldParser
     /**
      * Prefetch data.
      *
-     * @param  ResolveInfo $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo $info
      * @param  int $depth
-     * @return void
+     * @return array
      */
     public function fetch(ResolveInfo $info, $depth = 999999)
     {
@@ -40,7 +40,7 @@ class FieldParser
     /**
      * Fold field selection set.
      *
-     * @param  SelectionSet $selectionSet
+     * @param  \GraphQL\Language\AST\SelectionSet $selectionSet
      * @param  int          $descend
      * @return array
      */
@@ -69,7 +69,7 @@ class FieldParser
     /**
      * Build field output.
      *
-     * @param  GraphQLField  $field
+     * @param  \GraphQL\Language\AST\Field  $field
      * @param  array $data
      * @return array
      */
