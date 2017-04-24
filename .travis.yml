@@ -11,7 +11,7 @@ language: php
 
 env:
   global:
-    - DB_DATABASE="test" DB_USERNAME="root"
+    - COVERAGE=0 DB_DATABASE="test" DB_USERNAME="root"
 
 matrix:
   include:
@@ -32,11 +32,12 @@ matrix:
     - php: 7.0
       env: LARAVEL='^5.3'
     - php: 7.1
-      env: LARAVEL='^5.3'
+      env: COVERAGE=1 LARAVEL='^5.3'
   fast_finish: true
 
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - if [[ $COVERAGE = 0 ]]; then phpenv config-rm xdebug.ini; fi
   - travis_retry composer self-update
   - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
 
@@ -47,4 +48,4 @@ script:
   - composer run test:ci
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
