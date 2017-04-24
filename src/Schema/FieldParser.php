@@ -21,8 +21,8 @@ class FieldParser
     /**
      * Prefetch data.
      *
-     * @param  \GraphQL\Type\Definition\ResolveInfo $info
-     * @param  int $depth
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  int  $depth
      * @return array
      */
     public function fetch(ResolveInfo $info, $depth = 999999)
@@ -40,8 +40,8 @@ class FieldParser
     /**
      * Fold field selection set.
      *
-     * @param  \GraphQL\Language\AST\SelectionSet $selectionSet
-     * @param  int          $descend
+     * @param  \GraphQL\Language\AST\SelectionSet  $selectionSet
+     * @param  int  $descend
      * @return array
      */
     protected function foldSelectionSet(SelectionSet $selectionSet, $descend)
@@ -70,7 +70,7 @@ class FieldParser
      * Build field output.
      *
      * @param  \GraphQL\Language\AST\Field  $field
-     * @param  array $data
+     * @param  array  $data
      * @return array
      */
     protected function buildField(GraphQLField $field, $data = [])

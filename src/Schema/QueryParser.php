@@ -27,8 +27,8 @@ class QueryParser
     /**
      * Create new instance of query parser.
      *
-     * @param \Nuwave\Lighthouse\Schema\SchemaBuilder $schema
-     * @param string $query
+     * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schema
+     * @param  string  $query
      * @return void
      */
     public function __construct(SchemaBuilder $schema, $query = '')
@@ -132,8 +132,8 @@ class QueryParser
     /**
      * Find field by operation and name.
      *
-     * @param  mixed $selection
-     * @param  string $operation
+     * @param  mixed  $selection
+     * @param  string  $operation
      * @return \Nuwave\Lighthouse\Schema\Field|null
      */
     public function getField($selection, $operation = 'query')
