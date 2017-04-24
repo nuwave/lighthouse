@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Definition\EloquentType;
 use Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound;
 
@@ -18,6 +18,7 @@ class TypeRegistrar extends BaseRegistrar
 
     /**
      * Create new instance of type registrar.
+     * @return void
      */
     public function __construct()
     {
@@ -29,8 +30,8 @@ class TypeRegistrar extends BaseRegistrar
     /**
      * Get instance of type.
      *
-     * @param  string $name
-     * @param  bool $fresh
+     * @param  string  $name
+     * @param  bool  $fresh
      * @return \GraphQL\Type\Definition\ObjectType
      */
     public function instance($name, $fresh = false)
@@ -50,8 +51,9 @@ class TypeRegistrar extends BaseRegistrar
     /**
      * Check if type is registered.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return \Nuwave\Lighthouse\Schema\Field
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound
      */
     protected function getType($name)
     {
