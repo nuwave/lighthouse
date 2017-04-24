@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\Parser;
 use GraphQL\Language\Source;
-use GraphQL\Language\AST\Field as QueryField;
 use Illuminate\Support\Collection;
+use GraphQL\Language\AST\Field as QueryField;
 use Nuwave\Lighthouse\Schema\Generators\ConnectionGenerator;
 
 class QueryParser
@@ -25,9 +25,11 @@ class QueryParser
     protected $query;
 
     /**
-     * Create new instance of queyr parser.
+     * Create new instance of query parser.
      *
-     * @param SchemaBuilder $schema
+     * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schema
+     * @param  string  $query
+     * @return void
      */
     public function __construct(SchemaBuilder $schema, $query = '')
     {
@@ -38,9 +40,7 @@ class QueryParser
     /**
      * Parse middleware from query.
      *
-     * @param  string $query
-     * @param  string $operation
-     * @return self
+     * @return \Illuminate\Support\Collection
      */
     public function middleware()
     {
@@ -132,9 +132,9 @@ class QueryParser
     /**
      * Find field by operation and name.
      *
-     * @param  string $name
-     * @param  string $operation
-     * @return array
+     * @param  mixed  $selection
+     * @param  string  $operation
+     * @return \Nuwave\Lighthouse\Schema\Field|null
      */
     public function getField($selection, $operation = 'query')
     {

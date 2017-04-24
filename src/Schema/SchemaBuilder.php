@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
-use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Support\Traits\Container\CentralRegistrar;
 
 class SchemaBuilder
@@ -37,7 +36,8 @@ class SchemaBuilder
     /**
      * Set current namespace.
      *
-     * @param string $namespace
+     * @param  string  $namespace
+     * @return void
      */
     public function setNamespace($namespace)
     {
@@ -47,8 +47,8 @@ class SchemaBuilder
     /**
      * Group child elements.
      *
-     * @param  array   $attributes
-     * @param  Closure $callback
+     * @param  array  $attributes
+     * @param  \Closure  $callback
      * @return void
      */
     public function group(array $attributes, Closure $callback)
@@ -77,8 +77,8 @@ class SchemaBuilder
     /**
      * Get instance of query parser.
      *
-     * @param  string $query
-     * @return self
+     * @param  string  $query
+     * @return \Nuwave\Lighthouse\Schema\QueryParser
      */
     public function parse($query = '')
     {
@@ -98,8 +98,8 @@ class SchemaBuilder
     /**
      * Add query to registrar.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function query($name, $namespace)
@@ -110,7 +110,7 @@ class SchemaBuilder
     /**
      * Add queries to registrar.
      *
-     * @param  array $queries
+     * @param  array  $queries
      * @return \Nuwave\Lighthouse\Schema\Field[]
      */
     public function queries(array $queries)
@@ -127,8 +127,8 @@ class SchemaBuilder
     /**
      * Add subscription to registrar.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function subscription($name, $namespace)
@@ -139,7 +139,7 @@ class SchemaBuilder
     /**
      * Add subscriptions to registrar.
      *
-     * @param  array $subscriptions
+     * @param  array  $subscriptions
      * @return \Nuwave\Lighthouse\Schema\Field[]
      */
     public function subscriptions(array $subscriptions)
@@ -156,8 +156,8 @@ class SchemaBuilder
     /**
      * Add mutation to registrar.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function mutation($name, $namespace)
@@ -168,7 +168,7 @@ class SchemaBuilder
     /**
      * Add mutations to registrar.
      *
-     * @param  array $mutations
+     * @param  array  $mutations
      * @return \Nuwave\Lighthouse\Schema\Field[]
      */
     public function mutations(array $mutations)
@@ -185,8 +185,8 @@ class SchemaBuilder
     /**
      * Add type to registrar.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function type($name, $namespace)
@@ -197,7 +197,7 @@ class SchemaBuilder
     /**
      * Add types to registrar.
      *
-     * @param  array $types
+     * @param  array  $types
      * @return \Nuwave\Lighthouse\Schema\Field[]
      */
     public function types(array $types)
@@ -214,8 +214,8 @@ class SchemaBuilder
     /**
      * Add connection to registrar.
      *
-     * @param  string $name
-     * @param  array $field
+     * @param  string  $name
+     * @param  array  $field
      * @return array
      */
     public function connection($name, $field)
@@ -226,7 +226,7 @@ class SchemaBuilder
     /**
      * Add connections to registrar.
      *
-     * @param  array $connections
+     * @param  array  $connections
      * @return \Nuwave\Lighthouse\Schema\Field[]
      */
     public function connections(array $connections)
@@ -244,8 +244,8 @@ class SchemaBuilder
      * Add cursor to registrar.
      *
      * @param  string  $name
-     * @param  Closure $encoder
-     * @param  Closure|null $decoder
+     * @param  \Closure  $encoder
+     * @param  \Closure|null  $decoder
      * @return bool
      */
     public function cursor($name, Closure $encoder, Closure $decoder = null)
@@ -256,8 +256,8 @@ class SchemaBuilder
     /**
      * Add Data fetcher to registrar.
      *
-     * @param  string $name
-     * @param  string $fetcher
+     * @param  string  $name
+     * @param  string  $fetcher
      * @return bool
      */
     public function dataFetcher($name, $fetcher)
@@ -268,8 +268,8 @@ class SchemaBuilder
     /**
      * Add Data loader to registrar.
      *
-     * @param  string $name
-     * @param  string $loader
+     * @param  string  $name
+     * @param  string  $loader
      * @return bool
      */
     public function dataLoader($name, $loader)
@@ -280,7 +280,7 @@ class SchemaBuilder
     /**
      * Get type field from registrar.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function getTypeField($name)
@@ -291,9 +291,9 @@ class SchemaBuilder
     /**
      * Extract type instance from registrar.
      *
-     * @param  string $name
-     * @param  bool $fresh
-     * @return ObjectType
+     * @param  string  $name
+     * @param  bool  $fresh
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function typeInstance($name, $fresh = false)
     {
@@ -303,10 +303,10 @@ class SchemaBuilder
     /**
      * Extract connection instance from registrar.
      *
-     * @param  string $name
-     * @param  string|null $parent
-     * @param  bool $fresh
-     * @return ObjectType
+     * @param  string  $name
+     * @param  string|null  $parent
+     * @param  bool  $fresh
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function connectionInstance($name, $parent = null, $fresh = false)
     {
@@ -316,10 +316,10 @@ class SchemaBuilder
     /**
      * Extract edge instance from registrar.
      *
-     * @param  string $name
-     * @param  ObjectType|null $type
-     * @param  bool $fresh
-     * @return ObjectType
+     * @param  string  $name
+     * @param  \GraphQL\Type\Definition\ObjectType|null  $type
+     * @param  bool  $fresh
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function edgeInstance($name, $type = null, $fresh = false)
     {
@@ -329,7 +329,7 @@ class SchemaBuilder
     /**
      * Extract Data Fetcher instance from registrar.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
     public function dataFetcherInstance($name)
@@ -340,8 +340,8 @@ class SchemaBuilder
     /**
      * Extract Data Loader instance from registrar.
      *
-     * @param  string $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
+     * @param  string  $name
+     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
     public function dataLoaderInstance($name)
     {
@@ -351,8 +351,8 @@ class SchemaBuilder
     /**
      * Get encoder for connection edge.
      *
-     * @param  string $name
-     * @return Closure
+     * @param  string  $name
+     * @return \Closure
      */
     public function encoder($name)
     {
@@ -362,8 +362,8 @@ class SchemaBuilder
     /**
      * Get encoder for connection edge.
      *
-     * @param  string $name
-     * @return Closure
+     * @param  string  $name
+     * @return \Closure
      */
     public function decoder($name)
     {

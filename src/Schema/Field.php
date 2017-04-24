@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Illuminate\Support\Collection;
-
 class Field
 {
     /**
@@ -30,8 +28,9 @@ class Field
     /**
      * Create in instance of schema field.
      *
-     * @param string $name
-     * @param string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
+     * @return void
      */
     public function __construct($name, $namespace)
     {
@@ -52,7 +51,8 @@ class Field
     /**
      * Attach middleware to field.
      *
-     * @param array $middleware
+     * @param  array  $middleware
+     * @return, void
      */
     public function addMiddleware(array $middleware)
     {
@@ -75,8 +75,8 @@ class Field
     /**
      * Attach middleware(s) to field.
      *
-     * @param  array|string $middlewares
-     * @return self
+     * @param  array|string  $middlewares
+     * @return $this
      */
     public function middleware($middlewares)
     {
@@ -92,7 +92,7 @@ class Field
     /**
      * Add middleware to collection.
      *
-     * @param  string $middleware
+     * @param  string  $middleware
      * @return void
      */
     protected function attachMiddleware($middleware)
