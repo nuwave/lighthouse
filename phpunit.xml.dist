@@ -10,7 +10,7 @@
          stopOnFailure="false"
          syntaxCheck="false"
          verbose="true"
-        >
+>
     <testsuites>
         <testsuite name="Package Test Suite">
             <directory>./tests/</directory>
@@ -34,7 +34,7 @@
     </logging>
     <php>
         <!-- Strong Password Generator (https://strongpasswordgenerator.com/) -->
-        <env name="APP_KEY" value="O4JYm19Y7qXbllmw5zng88a4MlUmW0uq" />
+        <env name="APP_KEY" value="O4JYm19Y7qXbllmw5zng88a4MlUmW0uq"/>
         <!-- <env name="DB_CONNECTION" value="sqlite" /> -->
     </php>
 </phpunit>
