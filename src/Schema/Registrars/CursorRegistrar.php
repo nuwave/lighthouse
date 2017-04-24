@@ -16,6 +16,7 @@ class CursorRegistrar
 
     /**
      * Create new instance of registrar.
+     * @return void
      */
     public function __construct()
     {
@@ -26,8 +27,8 @@ class CursorRegistrar
      * Register new cursor.
      *
      * @param  string  $name
-     * @param  Closure $encode
-     * @param  Closure|null $decode
+     * @param  \Closure  $encode
+     * @param  \Closure|null  $decode
      * @return bool
      */
     public function register($name, Closure $encode, Closure $decode = null)
@@ -43,8 +44,8 @@ class CursorRegistrar
     /**
      * Get encoder for type.
      *
-     * @param  string $name
-     * @return Closure|null
+     * @param  string  $name
+     * @return \Closure|null
      */
     public function encoder($name)
     {
@@ -56,8 +57,8 @@ class CursorRegistrar
     /**
      * Get decoder for type.
      *
-     * @param  string $name
-     * @return Closure|null
+     * @param  string  $name
+     * @return \Closure|null
      */
     public function decoder($name)
     {

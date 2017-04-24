@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
+use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
-use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Interfaces\Connection;
 use Nuwave\Lighthouse\Support\Definition\RelayConnectionType;
 use Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField;
-use Nuwave\Lighthouse\Support\Interfaces\Connection;
 
 class ConnectionRegistrar extends BaseRegistrar
 {
@@ -20,6 +20,7 @@ class ConnectionRegistrar extends BaseRegistrar
 
     /**
      * Create new instance of connection registrar.
+     * @return void
      */
     public function __construct()
     {
@@ -31,7 +32,7 @@ class ConnectionRegistrar extends BaseRegistrar
     /**
      * Add type to registrar.
      *
-     * @param  string $name
+     * @param  string  $name
      * @param  array  $field
      * @return array
      */
@@ -45,9 +46,9 @@ class ConnectionRegistrar extends BaseRegistrar
     /**
      * Get instance of connection type.
      *
-     * @param  string $name
-     * @param  string|null $parent
-     * @param  bool $fresh
+     * @param  string  $name
+     * @param  string|null  $parent
+     * @param  bool  $fresh
      * @return \Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField
      */
     public function instance($name, $parent = null, $fresh = false)
@@ -71,8 +72,8 @@ class ConnectionRegistrar extends BaseRegistrar
     /**
      * Generate connection field.
      *
-     * @param  string $name
-     * @param  ObjectType $nodeType
+     * @param  string  $name
+     * @param  \GraphQL\Type\Definition\ObjectType  $nodeType
      * @return array
      */
     public function getInstance($name, ObjectType $nodeType)
@@ -110,7 +111,7 @@ class ConnectionRegistrar extends BaseRegistrar
     /**
      * Extract name.
      *
-     * @param  mixed $name
+     * @param  mixed  $name
      * @return string
      */
     protected function instanceName($name)
@@ -125,7 +126,7 @@ class ConnectionRegistrar extends BaseRegistrar
     /**
      * Extract name.
      *
-     * @param  mixed $name
+     * @param  mixed  $name
      * @return string
      */
     protected function typeName($name)

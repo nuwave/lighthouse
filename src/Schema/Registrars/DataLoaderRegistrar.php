@@ -11,8 +11,8 @@ class DataLoaderRegistrar
     /**
      * Add Data Loader to registrar.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
      * @return bool
      */
     public function register($name, $namespace)
@@ -28,7 +28,7 @@ class DataLoaderRegistrar
     /**
      * Extract Data Loader from IoC Container.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
      */
     public function instance($name)
@@ -39,7 +39,7 @@ class DataLoaderRegistrar
     /**
      * Get alias of Data Loader.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return string
      */
     protected function alias($name)

@@ -20,6 +20,7 @@ abstract class BaseRegistrar
 
     /**
      * Create new instance of registrar.
+     * @return void
      */
     public function __construct()
     {
@@ -29,8 +30,8 @@ abstract class BaseRegistrar
     /**
      * Add type to registrar.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     public function register($name, $namespace)
@@ -45,8 +46,7 @@ abstract class BaseRegistrar
     /**
      * Resolve instance of requested field.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
      * @return \Nuwave\Lighthouse\Schema\Field|null
      */
     public function get($name)
@@ -67,8 +67,8 @@ abstract class BaseRegistrar
     /**
      * Get field and attach necessary middleware.
      *
-     * @param  string $name
-     * @param  string $namespace
+     * @param  string  $name
+     * @param  string  $namespace
      * @return \Nuwave\Lighthouse\Schema\Field
      */
     protected function createField($name, $namespace)
@@ -83,7 +83,7 @@ abstract class BaseRegistrar
     /**
      * Get instance of schema.
      *
-     * @return Schema
+     * @return \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     public function getSchema()
     {

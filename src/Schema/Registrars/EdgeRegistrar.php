@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Registrars;
 
-use Illuminate\Support\Collection;
 use ReflectionClass;
+use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ObjectType;
-use Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator;
-use Nuwave\Lighthouse\Support\Interfaces\ConnectionEdge;
-use Nuwave\Lighthouse\Support\Definition\Fields\EdgeField;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Support\Interfaces\ConnectionEdge;
+use Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator;
+use Nuwave\Lighthouse\Support\Definition\Fields\EdgeField;
 
 class EdgeRegistrar extends BaseRegistrar
 {
@@ -24,12 +24,13 @@ class EdgeRegistrar extends BaseRegistrar
     /**
      * EdgeType generator.
      *
-     * @var EdgeTypeGenerator
+     * @var \Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator
      */
     protected $generator;
 
     /**
      * Create new instance of type registrar.
+     * @return void
      */
     public function __construct()
     {
@@ -41,9 +42,9 @@ class EdgeRegistrar extends BaseRegistrar
     /**
      * Get instance of edge type.
      *
-     * @param  string $name
-     * @param  bool $fresh
-     * @param  ObjectType|null $type
+     * @param  string  $name
+     * @param  bool  $fresh
+     * @param  ObjectType|null  $type
      * @return \GraphQL\Type\Definition\ObjectType|null
      */
     public function instance($name, $fresh = false, ObjectType $type = null)
@@ -71,9 +72,9 @@ class EdgeRegistrar extends BaseRegistrar
     /**
      * Store new instance of edge.
      *
-     * @param  string $name
-     * @param  ObjectType $type
-     * @return ObjectType
+     * @param  string  $name
+     * @param  \GraphQL\Type\Definition\ObjectType  $type
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function createInstance($name, $type)
     {
@@ -83,7 +84,7 @@ class EdgeRegistrar extends BaseRegistrar
     /**
      * Create edge instance.
      *
-     * @param  ConnectionEdge $edge
+     * @param  \Nuwave\Lighthouse\Support\Interfaces\ConnectionEdge  $edge
      * @return EdgeField
      */
     protected function createEdge(ConnectionEdge $edge)
@@ -105,7 +106,8 @@ class EdgeRegistrar extends BaseRegistrar
     /**
      * Set local instance of generator.
      *
-     * @param EdgeTypeGenerator $generator
+     * @param  \Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator  $generator
+     * @return void
      */
     public function setGenerator(EdgeTypeGenerator $generator)
     {
@@ -115,7 +117,7 @@ class EdgeRegistrar extends BaseRegistrar
     /**
      * Get instance of edge generator.
      *
-     * @return EdgeTypeGenerator
+     * @return \Nuwave\Lighthouse\Schema\Generators\EdgeTypeGenerator
      */
     public function getGenerator()
     {
