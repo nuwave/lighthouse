@@ -292,7 +292,7 @@ class GraphQL
     public function schema()
     {
         if (! $this->schema) {
-            $this->schema = app(SchemaBuilder::class);
+            $this->schema = new SchemaBuilder;
         }
 
         return $this->schema;
@@ -335,6 +335,6 @@ class GraphQL
      */
     public function fieldParser()
     {
-        return app(FieldParser::class);
+        return new FieldParser;
     }
 }
