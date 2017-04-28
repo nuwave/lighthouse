@@ -50,8 +50,7 @@ before_install:
   - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
 
 install:
-  - if [[ $LARAVEL != '^5.4' ]]; then travis_retry composer update --prefer-dist --no-interaction --no-suggest; fi
-  - if [[ $LARAVEL = '^5.4' ]]; then travis_retry composer update --prefer-dist --no-interaction --no-suggest --prefer-lowest; fi
+  - ravis_retry composer update --prefer-dist --no-interaction --no-suggest --prefer-lowest
 
 script:
   - composer run test:ci

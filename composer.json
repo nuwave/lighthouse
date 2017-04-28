@@ -39,8 +39,8 @@
     "require-dev": {
         "doctrine/dbal": "^2.5",
         "friendsofphp/php-cs-fixer": "~1",
-        "orchestra/database": "^3.2 || ^3.3 || ^3.3@dev",
-        "orchestra/testbench": "^3.2 || ^3.3 || ^3.3@dev",
+        "orchestra/database": "^3.2 || ^3.3@dev",
+        "orchestra/testbench": "^3.2 || ^3.3@dev",
         "phpunit/phpunit": "~4.8 || ~5.0"
     },
     "autoload-dev": {
