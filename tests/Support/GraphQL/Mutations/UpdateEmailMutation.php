@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations;
 
-use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
-use Nuwave\Lighthouse\Tests\Support\Models\User;
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
 
 class UpdateEmailMutation extends GraphQLMutation
 {

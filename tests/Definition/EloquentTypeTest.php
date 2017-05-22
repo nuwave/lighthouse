@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse\Tests\Definition;
 
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
-use Nuwave\Lighthouse\Tests\Support\Models\User;
-use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Support\Definition\EloquentType;
-use Nuwave\Lighthouse\Support\Cache\FileStore;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\StringType;
+use Nuwave\Lighthouse\Tests\DBTestCase;
+use Nuwave\Lighthouse\Support\Cache\FileStore;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Definition\EloquentType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 
 class EloquentTypeTest extends DBTestCase
 {

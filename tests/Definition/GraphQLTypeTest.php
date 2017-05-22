@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Tests\Definition;
 
-use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Tests\TestCase;
+use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 
 class GraphQLTypeTest extends TestCase
 {

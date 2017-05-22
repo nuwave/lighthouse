@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Tests\Queries;
 
-use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
+use Illuminate\Support\MessageBag;
 use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations\UpdateEmailRelayMutation;
-use Illuminate\Support\MessageBag;
 
 class MutationTest extends TestCase
 {

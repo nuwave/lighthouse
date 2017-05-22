@@ -4,13 +4,13 @@ namespace Nuwave\Lighthouse\Tests\Queries;
 
 use GraphQL;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Interfaces\RelayType;
-use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\Support\Models\Task;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Connections\TaskConnection;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Interfaces\RelayType;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
+use Nuwave\Lighthouse\Support\Definition\GraphQLType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Connections\TaskConnection;
 
 class PaginationTest extends DBTestCase
 {

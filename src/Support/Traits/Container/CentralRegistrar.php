@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\Traits\Container;
 
-use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\EdgeRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\QueryRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\CursorRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\MutationRegistrar;
-use Nuwave\Lighthouse\Schema\Registrars\DataLoaderRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\DataLoaderRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\DataFetcherRegistrar;
 use Nuwave\Lighthouse\Schema\Registrars\SubscriptionRegistrar;
 

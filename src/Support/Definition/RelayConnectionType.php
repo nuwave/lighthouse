@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Support\Definition;
 
 use Closure;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class RelayConnectionType extends GraphQLType

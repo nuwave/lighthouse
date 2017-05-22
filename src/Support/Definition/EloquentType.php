@@ -3,12 +3,12 @@
 namespace Nuwave\Lighthouse\Support\Definition;
 
 use ReflectionClass;
-use Nuwave\Lighthouse\Schema\Generators\TypeGenerator;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\IDType;
 use GraphQL\Type\Definition\ObjectType;
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Schema\Generators\TypeGenerator;
 
 class EloquentType
 {

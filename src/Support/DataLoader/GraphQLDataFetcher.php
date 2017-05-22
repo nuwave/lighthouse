@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class GraphQLDataFetcher
 {

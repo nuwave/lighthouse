@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Definition;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ResolveInfo;
 
 class NodeQuery extends GraphQLQuery
 {

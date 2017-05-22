@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Tests\Queries;
 
 use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 
 class IntrospectionTest extends TestCase
 {

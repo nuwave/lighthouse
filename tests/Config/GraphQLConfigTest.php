@@ -3,10 +3,10 @@
 namespace Nuwave\Lighthouse\Tests\Config;
 
 use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
+use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
-use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations\UpdateEmailMutation;
 
 class GraphQLConfigTest extends TestCase
 {

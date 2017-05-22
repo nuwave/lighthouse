@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Tests\Schema\Registrars;
 
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
-use Nuwave\Lighthouse\Schema\Registrars\EdgeRegistrar;
-use Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar;
 use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Lighthouse\Support\Definition\PageInfoType;
 use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Registrars\EdgeRegistrar;
+use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
+use Nuwave\Lighthouse\Support\Definition\PageInfoType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Schema\Registrars\ConnectionRegistrar;
 
 class ConnectionRegistrarTest extends TestCase
 {

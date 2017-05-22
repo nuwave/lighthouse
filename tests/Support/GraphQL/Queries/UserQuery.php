@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Queries;
 
 use GraphQL;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\Support\Models\Task;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 
 class UserQuery extends GraphQLQuery
