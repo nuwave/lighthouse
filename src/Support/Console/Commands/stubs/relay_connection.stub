@@ -52,4 +52,14 @@ class DummyClass implements Connection
     {
         // TODO: Resolve connection
     }
+    
+    /**
+     * Get name of connection.
+     *
+     * @return string
+     */
+    public function type()
+    {
+        // TODO: Implement type() method.
+    }
 }
