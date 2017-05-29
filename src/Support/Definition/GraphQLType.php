@@ -105,15 +105,13 @@ class GraphQLType extends Fluent
                 $field->name = $name;
 
                 return $field->toArray();
-            } else {
-                $resolver = $this->getFieldResolver($name, $field);
-
-                if ($resolver) {
-                    $field['resolve'] = $resolver;
-                }
-
-                return $field;
             }
+
+            if ($resolver = $this->getFieldResolver($name, $field)) {
+                $field['resolve'] = $resolver;
+            }
+
+            return $field;
         })->toArray();
     }
 
