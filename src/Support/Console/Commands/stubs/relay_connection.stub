@@ -20,7 +20,7 @@ class DummyClass implements Connection
     }
 
     /**
-     * Get name of connection.
+     * Get type the connection returns.
      *
      * @return string
      */
