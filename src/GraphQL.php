@@ -29,14 +29,14 @@ class GraphQL
     /**
      * Instance of schema builder.
      *
-     * @var Schema\SchemaBuilder
+     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     protected $schema;
 
     /**
      * Instance of cache.
      *
-     * @var FileStore
+     * @var \Nuwave\Lighthouse\Support\Cache\FileStore
      */
     protected $cache;
 
@@ -120,7 +120,7 @@ class GraphQL
      *
      * @param  string $name
      * @param  bool $fresh
-     * @return ObjectType
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     public function type($name, $fresh = false)
     {
@@ -133,7 +133,7 @@ class GraphQL
      * @param  string $name
      * @param  string|null $parent
      * @param  bool $fresh
-     * @return ObjectType
+     * @return \Nuwave\Lighthouse\Support\Definition\Fields\ConnectionField
      */
     public function connection($name, $parent = null, $fresh = false)
     {
@@ -153,7 +153,7 @@ class GraphQL
      * @param  string $name
      * @param  ObjectType $type
      * @param  bool $fresh
-     * @return ObjectType
+     * @return \Nuwave\Lighthouse\Support\Definition\Fields\EdgeField
      */
     public function edge($name, ObjectType $type = null, $fresh = false)
     {
@@ -277,7 +277,7 @@ class GraphQL
     /**
      * Set local instance of schema.
      *
-     * @param Schema\SchemaBuilder $schema
+     * @param \Nuwave\Lighthouse\Schema\SchemaBuilder $schema
      */
     public function setSchema(SchemaBuilder $schema)
     {
@@ -287,7 +287,7 @@ class GraphQL
     /**
      * Get instance of schema builder.
      *
-     * @return Schema\SchemaBuilder
+     * @return \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     public function schema()
     {
@@ -301,7 +301,7 @@ class GraphQL
     /**
      * Set local instance of cache.
      *
-     * @param FileStore $cache [description]
+     * @param \Nuwave\Lighthouse\Support\Cache\FileStore $cache
      */
     public function setCache(FileStore $cache)
     {
@@ -311,7 +311,7 @@ class GraphQL
     /**
      * Get instance of cache.
      *
-     * @return FileStore
+     * @return \Nuwave\Lighthouse\Support\Cache\FileStore
      */
     public function cache()
     {
@@ -321,7 +321,7 @@ class GraphQL
     /**
      * Get instance of query parser.
      *
-     * @return QueryParser
+     * @return \Nuwave\Lighthouse\Schema\QueryParser
      */
     public function parser()
     {
