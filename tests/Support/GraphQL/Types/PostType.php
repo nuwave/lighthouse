@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Definition\GraphQLType;
-use Nuwave\Lighthouse\Support\Interfaces\RelayType;
 use Nuwave\Lighthouse\Tests\Support\Models\Post;
+use Nuwave\Lighthouse\Support\Interfaces\RelayType;
+use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 
 class PostType extends GraphQLType implements RelayType
 {

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class LaravelController extends Controller
 {

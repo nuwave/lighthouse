@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
 use Closure;
-use Illuminate\Support\Collection;
 use ReflectionMethod;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\Model;
 
 class QueryBuilder
 {

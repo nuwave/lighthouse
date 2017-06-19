@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Tests\Schema\Registrars;
 
 use GraphQL;
-use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
+use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Registrars\TypeRegistrar;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Support\Exceptions\GraphQLTypeInstanceNotFound;
 
 class TypeRegistrarTest extends TestCase

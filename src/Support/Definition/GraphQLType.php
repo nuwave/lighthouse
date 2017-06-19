@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Support\Definition;
 
-use GraphQL\Type\Definition\ObjectType;
+use Illuminate\Support\Fluent;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Fluent;
-use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
+use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Support\Interfaces\RelayType;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class GraphQLType extends Fluent
 {

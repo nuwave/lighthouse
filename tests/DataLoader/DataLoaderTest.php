@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Tests\DataLoader;
 
 use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
-use Nuwave\Lighthouse\Tests\Support\Models\User;
 use Nuwave\Lighthouse\Tests\Support\Models\Task;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
 

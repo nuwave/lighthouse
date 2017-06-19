@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Mutations;
 
 use GraphQL;
-use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
-use Nuwave\Lighthouse\Support\Interfaces\RelayMutation;
-use Nuwave\Lighthouse\Tests\Support\Models\User;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Interfaces\RelayMutation;
+use Nuwave\Lighthouse\Support\Definition\GraphQLMutation;
 
 class UpdateEmailRelayMutation extends GraphQLMutation implements RelayMutation
 {

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Definition;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 

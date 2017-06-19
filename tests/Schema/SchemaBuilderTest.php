@@ -3,10 +3,10 @@
 namespace Nuwave\Lighthouse\Tests\Schema;
 
 use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
 
 class SchemaBuilderTest extends TestCase
 {

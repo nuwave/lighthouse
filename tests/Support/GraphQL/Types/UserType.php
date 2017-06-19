@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Types;
 
 use GraphQL;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Definition\GraphQLType;
-use Nuwave\Lighthouse\Support\Interfaces\RelayType;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Interfaces\RelayType;
+use Nuwave\Lighthouse\Support\Definition\GraphQLType;
 
 class UserType extends GraphQLType implements RelayType
 {

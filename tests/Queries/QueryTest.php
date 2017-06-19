@@ -3,13 +3,13 @@
 namespace Nuwave\Lighthouse\Tests\Queries;
 
 use GraphQL;
+use Nuwave\Lighthouse\Tests\TestCase;
 use Nuwave\Lighthouse\Tests\Support\Models\User;
-use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\PostType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
+use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\UserType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Queries\UserQuery;
-use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 
 class QueryTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Tests\DataLoader\Support;
 
-use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
+use Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher;
 
 class UserDataFetcher extends GraphQLDataFetcher
 {

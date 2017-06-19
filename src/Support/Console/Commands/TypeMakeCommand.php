@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use ReflectionClass;
-use Nuwave\Lighthouse\Support\Definition\EloquentType;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Nuwave\Lighthouse\Support\Definition\EloquentType;
 
 class TypeMakeCommand extends GeneratorCommand
 {

@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Tests\DataLoader\Support;
 use GraphQL;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
+use Nuwave\Lighthouse\Support\Definition\GraphQLQuery;
 
 class CompanyQuery extends GraphQLQuery
 {

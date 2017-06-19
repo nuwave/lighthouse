@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Traits\Container;
 
-use GraphQL\Error\Error;
 use GraphQL\GraphQL;
+use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 trait QueryExecutor

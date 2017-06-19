@@ -4,16 +4,16 @@ namespace Nuwave\Lighthouse;
 
 use Closure;
 use GraphQL\Schema;
-use GraphQL\Type\Definition\ObjectType;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
-use Nuwave\Lighthouse\Support\Traits\Container\ScalarTypes;
-use Nuwave\Lighthouse\Support\Interfaces\Connection;
-use Nuwave\Lighthouse\Support\Cache\FileStore;
 use Nuwave\Lighthouse\Schema\Field;
-use Nuwave\Lighthouse\Schema\QueryParser;
+use GraphQL\Type\Definition\ObjectType;
 use Nuwave\Lighthouse\Schema\FieldParser;
+use Nuwave\Lighthouse\Schema\QueryParser;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Support\Cache\FileStore;
+use Nuwave\Lighthouse\Support\Interfaces\Connection;
+use Nuwave\Lighthouse\Support\Traits\Container\ScalarTypes;
+use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
 
 class GraphQL
 {

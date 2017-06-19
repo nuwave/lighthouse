@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Tests\Support\GraphQL\Connections;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Interfaces\Connection;
 use Nuwave\Lighthouse\Tests\Support\Models\Task;
+use Nuwave\Lighthouse\Support\Interfaces\Connection;
 
 class TaskConnection implements Connection
 {

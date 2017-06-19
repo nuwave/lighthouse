@@ -2,18 +2,18 @@
 
 namespace Nuwave\Lighthouse\Tests\DataLoader;
 
-use Nuwave\Lighthouse\Tests\DataLoader\Support\UserFetcherType;
-use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Prophecy\Argument;
+use Nuwave\Lighthouse\Tests\DBTestCase;
 use Nuwave\Lighthouse\Tests\Support\Models\Task;
+use Nuwave\Lighthouse\Tests\Support\Models\User;
+use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
 use Nuwave\Lighthouse\Tests\Support\Models\Company;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyType;
 use Nuwave\Lighthouse\Tests\Support\GraphQL\Types\TaskType;
-use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataFetcher;
-use Nuwave\Lighthouse\Tests\DataLoader\Support\UserDataFetcher;
 use Nuwave\Lighthouse\Tests\DataLoader\Support\TaskDataFetcher;
-use Nuwave\Lighthouse\Support\Traits\GlobalIdTrait;
-use Prophecy\Argument;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\UserDataFetcher;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\UserFetcherType;
+use Nuwave\Lighthouse\Tests\DataLoader\Support\CompanyDataFetcher;
 
 class DataFetcherTest extends DBTestCase
 {
