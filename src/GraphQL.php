@@ -4,16 +4,21 @@ namespace Nuwave\Lighthouse;
 
 use Closure;
 use GraphQL\Schema;
+use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\DirectiveLocation;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
-use Nuwave\Lighthouse\Support\Traits\Container\ScalarTypes;
-use Nuwave\Lighthouse\Support\Interfaces\Connection;
-use Nuwave\Lighthouse\Support\Cache\FileStore;
 use Nuwave\Lighthouse\Schema\Field;
 use Nuwave\Lighthouse\Schema\QueryParser;
 use Nuwave\Lighthouse\Schema\FieldParser;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Support\Cache\FileStore;
+use Nuwave\Lighthouse\Support\Interfaces\Connection;
+use Nuwave\Lighthouse\Support\Traits\Container\ScalarTypes;
+use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
 
 class GraphQL
 {
@@ -87,6 +92,10 @@ class GraphQL
             'mutation' => $mutationType,
             'subscription' => $subscriptionType,
             'types' => $this->typesWithInterfaces->all(),
+            'directives' => array_merge(
+                GraphQLBase::getInternalDirectives(),
+                [$this->connectionDirective()]
+            )
         ]);
     }
 
@@ -113,6 +122,30 @@ class GraphQL
                 'fields' => $typeFields->toArray(),
             ]);
         }
+    }
+
+    /**
+     * Generate a connection directive
+     * TODO: Allow directives to be added to the schema by the user.
+     * Currently this allows the use of the connection directive in Apollo client.
+     *
+     * @return Directive
+     */
+    protected function connectionDirective()
+    {
+        return new Directive([
+            'name' => 'connection',
+            'description' => '',
+            'locations' => [DirectiveLocation::FIELD, DirectiveLocation::FIELD_DEFINITION],
+            'args' => [
+                new FieldArgument([
+                    'name' => 'key',
+                    'type' => Type::string(),
+                    'description' => '',
+                    'defaultValue' => ''
+                ])
+            ]
+        ]);
     }
 
     /**
