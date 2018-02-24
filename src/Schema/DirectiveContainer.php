@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+
 class DirectiveContainer
 {
     /**
@@ -46,5 +49,29 @@ class DirectiveContainer
         }
 
         return $handler;
+    }
+
+    /**
+     * Get handler for node.
+     *
+     * @param  Node   $node
+     * @return mixed
+     */
+    public function forNode(Node $node)
+    {
+        $directives = data_get($node, 'directives');
+
+        if (count($directives) > 1) {
+            throw new DirectiveException(sprintf(
+                "Nodes can only have 1 assigned directive. %s has %s directives [%s]",
+                data_get($node, 'name.value'),
+                count($directives),
+                collect($directives)->map(function ($directive) {
+                    return $directive->name->value;
+                })->implode(", ")
+            ));
+        }
+
+        return $this->handler($directives[0]->name->value);
     }
 }
