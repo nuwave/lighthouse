@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Tests\Resolvers;
 
 use GraphQL\Language\Parser;
 
-use Nuwave\Lighthouse\Resolvers\EnumResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
 use Nuwave\Lighthouse\Tests\TestCase;
 
 use GraphQL\Type\Definition\EnumType;

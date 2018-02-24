@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Tests\Resolvers;
 
 use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Resolvers\ScalarResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 
 use GraphQL\Type\Definition\ScalarType;
 

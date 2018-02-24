@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Resolvers;
+namespace Nuwave\Lighthouse\Schema\Resolvers;
 
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ArgumentNode;
