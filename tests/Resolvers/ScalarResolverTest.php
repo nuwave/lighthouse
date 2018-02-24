@@ -16,7 +16,10 @@ class ScalarResolverTest extends TestCase
      */
     public function itCanResolveScalarType()
     {
-        $schema = $this->parseSchema();
+        $schema = $this->parse('
+        # Email address scalar
+        scalar Email @scalar(class: "EmailScalar")
+        ');
 
         $scalar = collect($schema->definitions)->filter(function ($def) {
             return $def instanceof ScalarTypeDefinitionNode;

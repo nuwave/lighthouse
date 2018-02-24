@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Tests\Resolvers;
 
+use GraphQL\Language\Parser;
+
 use Nuwave\Lighthouse\Resolvers\EnumResolver;
 use Nuwave\Lighthouse\Tests\TestCase;
 
@@ -16,7 +18,14 @@ class EnumResolverTest extends TestCase
      */
     public function itCanResolveEnumTypes()
     {
-        $schema = $this->parseSchema();
+        $schema = $this->parse('
+        enum Role {
+            # Admin user type.
+            ADMIN @enum(value: "admin")
+            # Employee user type.
+            EMPLOYEE @enum(value: "employee")
+        }
+        ');
 
         $enum = collect($schema->definitions)->filter(function ($def) {
             return $def instanceof EnumTypeDefinitionNode;

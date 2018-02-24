@@ -70,4 +70,15 @@ class TestCase extends BaseTestCase
     {
         return Parser::parse($this->loadSchema($schema));
     }
+
+    /**
+     * Parse raw schema.
+     *
+     * @param  string $schema
+     * @return \GraphQL\Language\AST\DocumentNode
+     */
+    protected function parse(string $schema)
+    {
+        return Parser::parse($schema);
+    }
 }
