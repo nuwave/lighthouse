@@ -2,8 +2,10 @@
 
 namespace Nuwave\Lighthouse\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\Directives\ScalarDirective;
+
+use Illuminate\Support\ServiceProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -14,7 +16,7 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // 1. Stitch together schemas
+        $this->registerDirectives();
         $this->registerSchema();
         // 2. Parse schema into document node
         // 3. Register Types, Interfaces, Queries, etc...
@@ -41,6 +43,18 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function registerSchema()
     {
-        $schema = app('graphql')->stitcher()->stitch();
+        $schema = app('graphql')->stitcher()->stitch(
+            config('lighthouse.global_id_field', '_id')
+        );
+    }
+
+    /**
+     * Register Lighthouse directives.
+     *
+     * @return void
+     */
+    public function registerDirectives()
+    {
+        directives()->register('scalar', new ScalarDirective);
     }
 }
