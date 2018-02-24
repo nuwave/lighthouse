@@ -1,8 +1,11 @@
 .env
+.php_cs.cache
 composer.phar
 composer.lock
-build
-vendor
-.idea
-.php_cs.cache
 phpunit.xml
+
+.idea/
+.code/
+build/
+storage/
+vendor/
