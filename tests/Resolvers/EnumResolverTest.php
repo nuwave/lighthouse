@@ -5,6 +5,8 @@ namespace Nuwave\Lighthouse\Tests\Resolvers;
 use Nuwave\Lighthouse\Resolvers\EnumResolver;
 use Nuwave\Lighthouse\Tests\TestCase;
 
+use GraphQL\Type\Definition\EnumType;
+
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 
 class EnumResolverTest extends TestCase
@@ -22,6 +24,7 @@ class EnumResolverTest extends TestCase
             return EnumResolver::resolve($enum);
         })->first();
 
+        $this->assertInstanceOf(EnumType::class, $enum);
         $this->assertEquals([
             'name' => 'Role',
             'values' => [

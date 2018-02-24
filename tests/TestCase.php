@@ -35,6 +35,21 @@ class TestCase extends BaseTestCase
     }
 
     /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     *
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set(
+            'lighthouse.namespaces.scalars',
+            'Nuwave\\Lighthouse\\Tests\\Utils\\Scalars'
+        );
+    }
+
+    /**
      * Load schema from directory.
      *
      * @param  string $schema

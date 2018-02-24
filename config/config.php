@@ -17,6 +17,7 @@ return [
         'queries'     => 'App\\Http\\GraphQL\\Queries',
         'types'       => 'App\\Http\\GraphQL\\Types',
         'fields'      => 'App\\Http\\GraphQL\\Fields',
+        'scalars'     => 'App\\Http\\GraphQL\\Scalars',
         'connections' => 'App\\Http\\GraphQL\\Connections',
         'dataloaders' => 'App\\Http\\GraphQL\\DataLoaders',
     ],

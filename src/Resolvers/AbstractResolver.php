@@ -2,11 +2,50 @@
 
 namespace Nuwave\Lighthouse\Resolvers;
 
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Type\Definition\Type;
 
 abstract class AbstractResolver
 {
+    /**
+     * Instance of node to resolve.
+     *
+     * @var Node
+     */
+    protected $node;
+
+    /**
+     * Create a new instace of node resolver.
+     *
+     * @param Node $node
+     */
+    public function __construct(Node $node)
+    {
+        $this->node = $node;
+    }
+
+    /**
+     * Resolve node type from node.
+     *
+     * @param  Node $node
+     * @return Type
+     */
+    public static function resolve(Node $node)
+    {
+        $instance = new static($node);
+
+        return $instance->generate();
+    }
+
+    /**
+     * Generate a GraphQL type from a node.
+     *
+     * @var Type
+     */
+    public abstract function generate();
+
     /**
      * Check if object type definition has a specified directive.
      *
@@ -70,7 +109,7 @@ abstract class AbstractResolver
     }
 
     /**
-     * Get the enum description from provided argument(s).
+     * Get the node description from provided argument(s).
      *
      * @param DirectiveNode $node
      * @param string        $key

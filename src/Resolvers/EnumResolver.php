@@ -13,30 +13,7 @@ class EnumResolver extends AbstractResolver
      *
      * @var EnumTypeDefinitionNode
      */
-    protected $enum;
-
-    /**
-     * Create a new instace of enum resolver.
-     *
-     * @param EnumTypeDefinitionNode $enum
-     */
-    public function __construct(EnumTypeDefinitionNode $enum)
-    {
-        $this->enum = $enum;
-    }
-
-    /**
-     * Resolve enum type from node.
-     *
-     * @param  EnumTypeDefinitionNode $enum
-     * @return EnumType
-     */
-    public static function resolve(EnumTypeDefinitionNode $enum)
-    {
-        $instance = new static($enum);
-
-        return $instance->generate();
-    }
+    protected $node;
 
     /**
      * Generate a new EnumType instance.
@@ -60,7 +37,7 @@ class EnumResolver extends AbstractResolver
      */
     public function getName()
     {
-        return $this->enum->name->value;
+        return $this->node->name->value;
     }
 
     /**
@@ -70,7 +47,7 @@ class EnumResolver extends AbstractResolver
      */
     public function getValues()
     {
-        return collect($this->enum->values)
+        return collect($this->node->values)
             ->mapWithKeys(function (EnumValueDefinitionNode $node) {
                 return [$this->getEnumValueKey($node) => $this->parseEnumNode($node)];
             })->toArray();
