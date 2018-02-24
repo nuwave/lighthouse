@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Providers;
 
 use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\Directives\ScalarDirective;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 
 use Illuminate\Support\ServiceProvider;
 

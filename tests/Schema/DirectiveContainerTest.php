@@ -5,8 +5,7 @@ namespace Nuwave\Lighthouse\Tests\Schema;
 use GraphQL\Language\Parser;
 
 use Nuwave\Lighthouse\Tests\TestCase;
-
-use Nuwave\Lighthouse\Schema\Directives\ScalarDirective;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class DirectiveContainerTest extends TestCase
