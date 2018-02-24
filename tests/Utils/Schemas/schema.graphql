@@ -1,0 +1,6 @@
+enum Role {
+  # Admin user type.
+	ADMIN @enum(value: "admin")
+  # Employee user type.
+	EMPLOYEE @enum(value: "employee")
+}

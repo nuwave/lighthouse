@@ -2,22 +2,12 @@
 
 namespace Nuwave\Lighthouse\Tests;
 
+use GraphQL\Language\Parser;
+
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
-    /**
-     * Set up test environment.
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->withFactories(__DIR__.'/Support/Database/Factories');
-    }
-
     /**
      * Get package providers.
      *
@@ -28,7 +18,7 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            \Nuwave\Lighthouse\LaravelServiceProvider::class,
+            \Nuwave\Lighthouse\LighthouseServiceProvider::class,
         ];
     }
 
@@ -41,20 +31,28 @@ class TestCase extends BaseTestCase
      */
     protected function getPackageAliases($app)
     {
-        return [
-            'GraphQL' => \Nuwave\Lighthouse\Support\Facades\GraphQLFacade::class,
-        ];
+        return [];
     }
 
     /**
-     * Execute query.
+     * Load schema from directory.
      *
-     * @param  string $query
-     * @param  array|null $variables
-     * @return array
+     * @param  string $schema
+     * @return string
      */
-    protected function executeQuery($query, array $variables = null)
+    protected function loadSchema($schema = "schema.graphql")
     {
-        return app('graphql')->execute($query, null, $variables);
+        return file_get_contents(__DIR__."/Utils/Schemas/{$schema}");
+    }
+
+    /**
+     * Get parsed schema.
+     *
+     * @param  string $schema
+     * @return \GraphQL\Language\AST\DocumentNode
+     */
+    protected function parseSchema($schema = "schema.graphql")
+    {
+        return Parser::parse($this->loadSchema($schema));
     }
 }
