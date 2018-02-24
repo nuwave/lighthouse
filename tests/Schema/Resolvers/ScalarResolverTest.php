@@ -1,12 +1,11 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Resolvers;
+namespace Nuwave\Lighthouse\Tests\Schema\Resolvers;
 
 use Nuwave\Lighthouse\Tests\TestCase;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 
 use GraphQL\Type\Definition\ScalarType;
-
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 
 class ScalarResolverTest extends TestCase

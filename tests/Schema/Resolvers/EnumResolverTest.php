@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Resolvers;
+namespace Nuwave\Lighthouse\Tests\Schema\Resolvers;
 
 use GraphQL\Language\Parser;
 
