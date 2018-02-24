@@ -12,6 +12,7 @@ return [
     |
     */
     'namespaces' => [
+        'models'      => 'App\\Models',
         'mutations'   => 'App\\Http\\GraphQL\\Mutations',
         'queries'     => 'App\\Http\\GraphQL\\Queries',
         'types'       => 'App\\Http\\GraphQL\\Types',
@@ -20,35 +21,51 @@ return [
         'dataloaders' => 'App\\Http\\GraphQL\\DataLoaders',
     ],
 
-    'cache' => storage_path('lighthouse/cache'),
+     /*
+     |--------------------------------------------------------------------------
+     | GraphQL Controller
+     |--------------------------------------------------------------------------
+     |
+     | Specify which controller (and method) you want to handle GraphQL requests.
+     |
+     */
     'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
-    'pagination_macro' => 'toConnection',
-    'route' => [],
-    'model_path' => 'App\\Models',
-    'camel_case' => false,
 
-    'globalId' => [
-        'encode' => null,
-        'decodeId' => null,
-        'decodeType' => null,
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Relay Connections
+    |--------------------------------------------------------------------------
+    |
+    | Lighthouse provides a collection macro to assist in generating Relay connections
+    | from a collection. You can select which name you would like to assign to
+    | this maco.
+    |
+    */
+    'connection_macro' => 'toConnection',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global ID
+    |--------------------------------------------------------------------------
+    |
+    | When creating a GraphQL type that is Relay compliant, provide a named field
+    | for the Node identifier.
+    |
+    */
+    'global_id_field' => '_id',
 
     /*
     |--------------------------------------------------------------------------
     | Schema declaration
     |--------------------------------------------------------------------------
     |
-    | This is a path that points to where your Relay schema is located
-    | relative to the app path. You should define your entire Relay
-    | schema in this file. Declare any Relay queries, mutations,
-    | and types here instead of laravel-graphql config file.
+    | This is a path that points to where your GraphQL schema is located
+    | relative to the app path. You should define your entire GraphQL
+    | schema in this file (additional files may be imported).
     |
     */
-
     'schema' => [
         'output' => storage_path('lighthouse/schema.json'),
-        'register' => function () {
-            //
-        },
+        'register' => base_path("routes/graphql/schema.graphql"),
     ],
 ];
