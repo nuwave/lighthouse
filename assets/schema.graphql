@@ -1,0 +1,30 @@
+interface Node {
+  # Global identifier that can be used to resolve any Node implementation.
+  _id: ID!
+}
+
+type PageInfo {
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: String
+
+  # When paginating forwards, the cursor to continue.
+  endCursor: String
+
+  # Total number of node in connection.
+  total: Int
+
+  # Count of nodes in current request.
+  count: Int
+
+  # Current page of request.
+  currentPage: Int
+
+  # Last page in connection.
+  lastPage: Int
+}
