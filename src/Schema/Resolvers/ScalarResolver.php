@@ -3,10 +3,18 @@
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Type\Definition\ScalarType;
 
 class ScalarResolver extends AbstractResolver
 {
+    /**
+     * Scalar node type.
+     *
+     * @var ScalarTypeDefinitionNode
+     */
+    protected $node;
+
     /**
      * Generate instance of scalar type.
      *
@@ -15,9 +23,10 @@ class ScalarResolver extends AbstractResolver
     public function generate()
     {
         $directive = $this->getDirective($this->node, 'scalar');
-        $className = config('lighthouse.namespaces.scalars').'\\'.$this->getClassName($directive);
+        $className = $directive ? $this->getClassName($directive) : ucfirst($this->node->name->value);
+        $namespace = config('lighthouse.namespaces.scalars').'\\'.$className;
 
-        return app($className);
+        return app($namespace);
     }
 
     /**
@@ -32,7 +41,7 @@ class ScalarResolver extends AbstractResolver
         return $this->directiveArgValue(
             $directive,
             'class',
-            ucfirst($this->node->name->value).'ScalarType'
+            ucfirst($this->node->name->value)
         );
     }
 }
