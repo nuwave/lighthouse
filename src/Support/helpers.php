@@ -12,6 +12,18 @@ if (! function_exists('graphql')) {
     }
 }
 
+if (! function_exists('schema')) {
+    /**
+     * Get instance of schema container.
+     *
+     * @return \Nuwave\Lighthouse\Schema\SchemaBuilder
+     */
+    function schema()
+    {
+        return graphql()->schema();
+    }
+}
+
 if (! function_exists('directives')) {
     /**
      * Get instance of directives container.
@@ -20,6 +32,6 @@ if (! function_exists('directives')) {
      */
     function directives()
     {
-        return app('graphql')->directives();
+        return graphql()->directives();
     }
 }
