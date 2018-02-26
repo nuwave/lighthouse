@@ -5,9 +5,11 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\InterfaceResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 
 class SchemaBuilder
 {
@@ -101,7 +103,8 @@ class SchemaBuilder
 
         return collect(array_merge(
             $this->enums,
-            $this->interfaces
+            $this->interfaces,
+            $this->scalars
         ));
     }
 
@@ -112,6 +115,7 @@ class SchemaBuilder
     {
         $this->setEnums();
         $this->setInterfaces();
+        $this->setScalars();
     }
 
     /**
@@ -137,6 +141,21 @@ class SchemaBuilder
                 return $def instanceof InterfaceTypeDefinitionNode;
             })->map(function (InterfaceTypeDefinitionNode $interface) {
                 return InterfaceResolver::resolve($interface);
+            })->toArray();
+    }
+
+    /**
+     * Set scalar types.
+     */
+    protected function setScalars()
+    {
+        $this->scalars = collect($this->document->definitions)
+            ->filter(function ($def) {
+                return $def instanceof ScalarTypeDefinitionNode;
+            })->map(function (ScalarTypeDefinitionNode $scalar) {
+                return count($scalar->directives)
+                    ? directives()->forNode($scalar)
+                    : ScalarResolver::resolver($scalar);
             })->toArray();
     }
 }

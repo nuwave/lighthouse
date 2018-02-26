@@ -77,8 +77,9 @@ class DirectiveFactory
             ));
         }
 
-        // TODO: This should return the handler and not the resolved type.
-        return $this->handler($directives[0]->name->value);
+        $handler = $this->handler($directives[0]->name->value);
+
+        return $handler->resolve($node);
     }
 
     /**

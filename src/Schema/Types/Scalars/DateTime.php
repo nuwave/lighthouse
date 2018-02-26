@@ -8,7 +8,7 @@ use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 
-class DateTimeScalar extends ScalarType
+class DateTime extends ScalarType
 {
     public $name = 'DateTime';
 

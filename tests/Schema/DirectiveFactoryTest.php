@@ -25,10 +25,8 @@ class DirectiveFactoryTest extends TestCase
     {
         $schema = 'scalar Email @scalar(class: "EmailScalar")';
         $document = Parser::parse($schema);
-        $handler = directives()->forNode($document->definitions[0]);
-        $scalar = $handler->resolve($document->definitions[0]);
+        $scalar = directives()->forNode($document->definitions[0]);
 
-        $this->assertInstanceOf(ScalarDirective::class, $handler);
         $this->assertInstanceOf(ScalarType::class, $scalar);
     }
 
