@@ -126,7 +126,6 @@ class SchemaBuilderTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanResolveQueries()
     {

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Schema\Types\GraphQLField;
 
 class MutationResolver extends FieldResolver
 {
@@ -14,11 +15,11 @@ class MutationResolver extends FieldResolver
      */
     public function generate()
     {
-        return [
+        return GraphQLField::toArray([
             'args' => $this->getArgs()->toArray(),
             'type' => $this->getType(),
             'resolve' => $this->resolver,
-        ];
+        ]);
     }
 
     /**

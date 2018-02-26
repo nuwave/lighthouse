@@ -19,6 +19,22 @@ class MutationFactory
         return directives()->hasResolver($mutation)
             ? directives()->fieldResolver($mutation)
             // TODO: Create default mutation resolver if no directive is provided
-            : MutationResolver::resolve($mutation);
+            : MutationResolver::resolve($mutation, self::resolver($mutation));
+    }
+
+    /**
+     * Attempt to get resolver for mutation name.
+     *
+     * @param FieldDefinitionNode $mutation
+     *
+     * @return \Closure
+     */
+    public static function resolver(FieldDefinitionNode $mutation)
+    {
+        $class = config('lighthouse.namespaces.mutations').'\\'.$mutation->name->value;
+
+        $mutation = app($class);
+
+        return (new \ReflectionClass($mutation))->getMethod('resolve')->getClosure($mutation);
     }
 }
