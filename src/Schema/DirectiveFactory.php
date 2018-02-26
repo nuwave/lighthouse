@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-class DirectiveContainer
+class DirectiveFactory
 {
     /**
      * Collection of registered directives.

@@ -2,15 +2,15 @@
 
 namespace Nuwave\Lighthouse;
 
+use Nuwave\Lighthouse\Schema\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\DirectiveContainer;
 
 class GraphQL
 {
     /**
      * Directive container.
      *
-     * @var DirectiveContainer
+     * @var DirectiveFactory
      */
     protected $directives;
 
@@ -33,12 +33,12 @@ class GraphQL
     /**
      * Get an instance of the directive container.
      *
-     * @return DirectiveContainer
+     * @return DirectiveFactory
      */
     public function directives()
     {
-        if (!$this->directives) {
-            $this->directives = app(DirectiveContainer::class);
+        if (! $this->directives) {
+            $this->directives = app(DirectiveFactory::class);
         }
 
         return $this->directives;
@@ -51,7 +51,7 @@ class GraphQL
      */
     public function stitcher()
     {
-        if (!$this->stitcher) {
+        if (! $this->stitcher) {
             $this->stitcher = app(SchemaStitcher::class);
         }
 

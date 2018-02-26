@@ -47,5 +47,7 @@ class LighthouseServiceProvider extends ServiceProvider
     {
         directives()->register('scalar', new \Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective());
         directives()->register('hasMany', new \Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective());
+        directives()->register('can', new \Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective());
+        directives()->register('event', new \Nuwave\Lighthouse\Schema\Directives\Fields\EventDirective());
     }
 }

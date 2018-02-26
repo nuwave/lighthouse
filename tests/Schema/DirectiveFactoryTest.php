@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Tests\TestCase;
 
-class DirectiveContainerTest extends TestCase
+class DirectiveFactoryTest extends TestCase
 {
     /**
      * @test
@@ -75,5 +75,21 @@ class DirectiveContainerTest extends TestCase
 
         $document = Parser::parse($schema);
         directives()->fieldResolver($document->definitions[0]->fields[0]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanGetCollectionOfFieldMiddleware()
+    {
+        $schema = '
+        type Foo {
+            bar: String @can(if: ["viewBar"]) @event
+        }
+        ';
+
+        $document = Parser::parse($schema);
+        $middleware = directives()->fieldMiddleware($document->definitions[0]->fields[0]);
+        $this->assertCount(2, $middleware);
     }
 }
