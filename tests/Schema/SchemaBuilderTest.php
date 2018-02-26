@@ -106,22 +106,42 @@ class SchemaBuilderTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanResolveMutations()
     {
         $schema = '
         type Mutation {
-            createFoo(bar: String! baz: String): Foo
+            createFoo(bar: String! baz: String): String
         }
         ';
 
-        $types = schema()->register($schema);
-        $mutation = $types->first();
+        $mutation = schema()->register($schema)->first();
+
         $this->assertArrayHasKey('args', $mutation);
         $this->assertArrayHasKey('type', $mutation);
         $this->assertArrayHasKey('resolve', $mutation);
         $this->assertArrayHasKey('bar', $mutation['args']);
         $this->assertArrayHasKey('baz', $mutation['args']);
+    }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itCanResolveQueries()
+    {
+        $schema = '
+        type Query {
+            foo(bar: String! baz: String): String
+        }
+        ';
+
+        $query = schema()->register($schema)->first();
+
+        $this->assertArrayHasKey('args', $query);
+        $this->assertArrayHasKey('type', $query);
+        $this->assertArrayHasKey('resolve', $query);
+        $this->assertArrayHasKey('bar', $query['args']);
+        $this->assertArrayHasKey('baz', $query['args']);
     }
 }

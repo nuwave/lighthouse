@@ -11,6 +11,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\MutationFactory;
+use Nuwave\Lighthouse\Schema\QueryFactory;
 
 class SchemaBuilder
 {
@@ -108,7 +109,8 @@ class SchemaBuilder
             $this->scalars,
             $this->types,
             $this->input,
-            $this->mutations
+            $this->mutations,
+            $this->queries
         ));
     }
 
@@ -123,6 +125,7 @@ class SchemaBuilder
         $this->setObjectTypes();
         $this->setInputTypes();
         $this->setMutations();
+        $this->setQueries();
     }
 
     /**
@@ -168,7 +171,7 @@ class SchemaBuilder
     {
         $this->types = $this->objectTypes()
         ->filter(function (ObjectTypeDefinitionNode $objectType) {
-            return 'Mutation' !== $objectType->name->value;
+            return ! in_array($objectType->name->value, ['Mutation', 'Query']);
         })->map(function (ObjectTypeDefinitionNode $objectType) {
             return NodeFactory::objectType($objectType);
         })->toArray();
@@ -198,6 +201,21 @@ class SchemaBuilder
             return collect($objectType->fields)->toArray();
         })->collapse()->mapWithKeys(function (FieldDefinitionNode $mutation) {
             return [data_get($mutation, 'name.value') => MutationFactory::resolve($mutation)];
+        })->toArray();
+    }
+
+    /**
+     * Set mutation fields.
+     */
+    protected function setQueries()
+    {
+        $this->queries = $this->objectTypes()
+        ->filter(function (ObjectTypeDefinitionNode $objectType) {
+            return 'Query' === $objectType->name->value;
+        })->map(function (ObjectTypeDefinitionNode $objectType) {
+            return collect($objectType->fields)->toArray();
+        })->collapse()->mapWithKeys(function (FieldDefinitionNode $mutation) {
+            return [data_get($mutation, 'name.value') => QueryFactory::resolve($mutation)];
         })->toArray();
     }
 
