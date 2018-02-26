@@ -127,7 +127,9 @@ class SchemaBuilder
             ->filter(function ($def) {
                 return $def instanceof EnumTypeDefinitionNode;
             })->map(function (EnumTypeDefinitionNode $enum) {
-                return EnumResolver::resolve($enum);
+                return count($enum->directives)
+                    ? directives()->forNode($enum)
+                    : EnumResolver::resolve($enum);
             })->toArray();
     }
 
@@ -140,7 +142,9 @@ class SchemaBuilder
             ->filter(function ($def) {
                 return $def instanceof InterfaceTypeDefinitionNode;
             })->map(function (InterfaceTypeDefinitionNode $interface) {
-                return InterfaceResolver::resolve($interface);
+                return count($interface->directives)
+                    ? directives()->forNode($interface)
+                    : InterfaceResolver::resolve($interface);
             })->toArray();
     }
 
