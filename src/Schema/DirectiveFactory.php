@@ -4,7 +4,9 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -152,6 +154,22 @@ class DirectiveFactory
             return $this->handler($directive->name->value);
         })->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
+        });
+    }
+
+    /**
+     * Get middleware for field arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function argMiddleware(InputValueDefinitionNode $arg)
+    {
+        return collect($arg->directives)->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->filter(function ($handler) {
+            return $handler instanceof ArgMiddleware;
         });
     }
 }

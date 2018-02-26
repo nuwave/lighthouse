@@ -57,7 +57,7 @@ class MutationFactoryTest extends TestCase
     {
         $schema = Parser::parse('
         type Mutation {
-            foo(bar: String! @validate(rules:["min:4"]) baz: Int @validate(rules:["min:2"])): String!
+            foo(bar: String! @validate(rules:["min:4"]) baz: Int @validate(rules:["min:2", "max:8"])): String!
         }
         ');
 

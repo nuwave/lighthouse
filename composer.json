@@ -27,6 +27,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.10",
+        "illuminate/validation": "^5.4",
         "orchestra/testbench": "^3.6",
         "phpunit/phpunit": "^7.0"
     },

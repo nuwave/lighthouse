@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLField;
@@ -31,11 +32,17 @@ class MutationResolver extends FieldResolver
     {
         return collect($this->field->arguments)
             ->mapWithKeys(function (InputValueDefinitionNode $arg) {
-                // TODO: Check for argument directives. Use resolver if defined,
-                // wrap w/ middleware (i.e., rules)
-                return [$arg->name->value => [
-                    'type' => NodeResolver::resolve($arg->type),
-                ]];
+                $args = directives()->argMiddleware($arg)
+                    ->reduce(function ($type, $middlware) use ($arg) {
+                        $directive = collect($arg->directives)
+                            ->first(function (DirectiveNode $directive) use ($middlware) {
+                                return $directive->name->value === $middlware::name();
+                            });
+
+                        return $middlware->handle($arg, $directive, $type);
+                    }, ['type' => NodeResolver::resolve($arg->type)]);
+
+                return [$arg->name->value => $args];
             });
     }
 
