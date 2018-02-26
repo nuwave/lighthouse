@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Tests\Schema;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Tests\TestCase;
 
@@ -56,5 +57,26 @@ class SchemaBuilderTest extends TestCase
         $this->app['config']->set('lighthouse.namespaces.scalars', 'Nuwave\Lighthouse\Schema\Types\Scalars');
         $types = schema()->register($schema);
         $this->assertInstanceOf(ScalarType::class, $types->first());
+    }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itCanResolveObjectTypes()
+    {
+        $schema = '
+        type Foo {
+            # bar attribute of Foo
+            bar: String!
+        }
+        ';
+
+        $types = schema()->register($schema);
+        $this->assertInstanceOf(ObjectType::class, $types->first());
+
+        $config = $types->first()->config;
+        $this->assertEquals('Foo', array_get($config, 'name'));
+        $this->assertEquals('bar attribute of Foo', array_get($config, 'fields.bar.description'));
     }
 }

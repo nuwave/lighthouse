@@ -4,9 +4,11 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\InterfaceResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\ObjectTypeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 
 class NodeFactory
@@ -51,5 +53,19 @@ class NodeFactory
         return count($interface->directives)
             ? directives()->forNode($interface)->resolve($interface)
             : InterfaceResolver::resolve($interface);
+    }
+
+    /**
+     * Resolve object type definition to type.
+     *
+     * @param ObjectTypeDefinitionNode $objectType
+     *
+     * @return \GraphQL\Type\Definition\ObjectType
+     */
+    public static function objectType(ObjectTypeDefinitionNode $objectType)
+    {
+        return count($objectType->directives)
+            ? directives()->forNode($objectType)->resolve($objectType)
+            : ObjectTypeResolver::resolve($objectType);
     }
 }
