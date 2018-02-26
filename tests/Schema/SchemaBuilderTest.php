@@ -76,7 +76,10 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(ObjectType::class, $types->first());
 
         $config = $types->first()->config;
-        $this->assertEquals('Foo', array_get($config, 'name'));
-        $this->assertEquals('bar attribute of Foo', array_get($config, 'fields.bar.description'));
+        $this->assertEquals('Foo', data_get($config, 'name'));
+        $this->assertInstanceOf(\Closure::class, data_get($config, 'fields'));
+
+        $fields = $config['fields']();
+        $this->assertEquals('bar attribute of Foo', array_get($fields, 'bar.description'));
     }
 }

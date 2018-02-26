@@ -26,7 +26,9 @@ class ObjectTypeResolver extends AbstractResolver
     {
         $config = [
             'name' => $this->getName(),
-            'fields' => $this->getFields()->toArray(),
+            'fields' => function () {
+                return $this->getFields()->toArray();
+            },
         ];
 
         return new ObjectType($config);
