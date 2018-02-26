@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Tests\Schema;
 
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
@@ -61,7 +62,6 @@ class SchemaBuilderTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanResolveObjectTypes()
     {
@@ -81,5 +81,26 @@ class SchemaBuilderTest extends TestCase
 
         $fields = $config['fields']();
         $this->assertEquals('bar attribute of Foo', array_get($fields, 'bar.description'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveInputObjectTypes()
+    {
+        $schema = '
+        input CreateFoo {
+            foo: String!
+            bar: Int
+        }
+        ';
+
+        $types = schema()->register($schema);
+        $this->assertInstanceOf(InputType::class, $types->first());
+
+        $config = $types->first()->config;
+        $this->assertEquals('CreateFoo', data_get($config, 'name'));
+        $this->assertArrayHasKey('foo', data_get($config, 'fields'));
+        $this->assertArrayHasKey('bar', data_get($config, 'fields'));
     }
 }

@@ -15,7 +15,7 @@ class FieldTypeResolver
      *
      * @return mixed
      */
-    public static function resolve(FieldDefinitionNode $field)
+    public static function resolve($field)
     {
         return (new static())->resolveNodeType($field->type);
     }

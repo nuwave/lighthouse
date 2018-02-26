@@ -3,10 +3,12 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\InputObjectTypeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\InterfaceResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ObjectTypeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
@@ -67,5 +69,19 @@ class NodeFactory
         return count($objectType->directives)
             ? directives()->forNode($objectType)->resolve($objectType)
             : ObjectTypeResolver::resolve($objectType);
+    }
+
+    /**
+     * Resolve input type definition to type.
+     *
+     * @param InputObjectTypeDefinitionNode $inputType
+     *
+     * @return \GraphQL\Type\Definition\InputObjectType
+     */
+    public static function inputObjectType(InputObjectTypeDefinitionNode $inputType)
+    {
+        return count($inputType->directives)
+            ? directives()->forNode($inputType)->resolve($inputType)
+            : InputObjectTypeResolver::resolve($inputType);
     }
 }

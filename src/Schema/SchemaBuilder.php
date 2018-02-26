@@ -4,13 +4,11 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
-use Nuwave\Lighthouse\Schema\Resolvers\InterfaceResolver;
-use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 
 class SchemaBuilder
 {
@@ -106,7 +104,8 @@ class SchemaBuilder
             $this->enums,
             $this->interfaces,
             $this->scalars,
-            $this->types
+            $this->types,
+            $this->input
         ));
     }
 
@@ -119,6 +118,7 @@ class SchemaBuilder
         $this->setInterfaces();
         $this->setScalars();
         $this->setObjectTypes();
+        $this->setInputTypes();
     }
 
     /**
@@ -170,6 +170,19 @@ class SchemaBuilder
                 return $def instanceof ObjectTypeDefinitionNode;
             })->map(function (ObjectTypeDefinitionNode $objectType) {
                 return NodeFactory::objectType($objectType);
+            })->toArray();
+    }
+
+    /**
+     * Set input types.
+     */
+    protected function setInputTypes()
+    {
+        $this->input = collect($this->document->definitions)
+            ->filter(function ($def) {
+                return $def instanceof InputObjectTypeDefinitionNode;
+            })->map(function (InputObjectTypeDefinitionNode $input) {
+                return NodeFactory::inputObjectType($input);
             })->toArray();
     }
 }
