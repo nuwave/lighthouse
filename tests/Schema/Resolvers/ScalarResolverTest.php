@@ -2,11 +2,10 @@
 
 namespace Nuwave\Lighthouse\Tests\Schema\Resolvers;
 
-use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
-
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Type\Definition\ScalarType;
+use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
+use Nuwave\Lighthouse\Tests\TestCase;
 
 class ScalarResolverTest extends TestCase
 {
@@ -17,7 +16,7 @@ class ScalarResolverTest extends TestCase
     {
         $schema = $this->parse('
         # Email address scalar
-        scalar Email @scalar(class: "EmailScalar")
+        scalar Email @scalar(class: "Email")
         ');
 
         $scalar = collect($schema->definitions)->filter(function ($def) {
@@ -27,7 +26,7 @@ class ScalarResolverTest extends TestCase
         })->first();
 
         $this->assertInstanceOf(ScalarType::class, $scalar);
-        $this->assertEquals("Email", $scalar->name);
-        $this->assertEquals("Email address.", $scalar->description);
+        $this->assertEquals('Email', $scalar->name);
+        $this->assertEquals('Email address.', $scalar->description);
     }
 }

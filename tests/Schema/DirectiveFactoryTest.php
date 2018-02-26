@@ -23,9 +23,10 @@ class DirectiveFactoryTest extends TestCase
      */
     public function itGetsLighthouseHandlerForScalar()
     {
-        $schema = 'scalar Email @scalar(class: "EmailScalar")';
+        $schema = 'scalar Email @scalar(class: "Email")';
         $document = Parser::parse($schema);
-        $scalar = directives()->forNode($document->definitions[0]);
+        $definition = $document->definitions[0];
+        $scalar = directives()->forNode($definition)->resolve($definition);
 
         $this->assertInstanceOf(ScalarType::class, $scalar);
     }
