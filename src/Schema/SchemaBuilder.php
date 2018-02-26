@@ -4,11 +4,13 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Schema\MutationFactory;
 
 class SchemaBuilder
 {
@@ -105,7 +107,8 @@ class SchemaBuilder
             $this->interfaces,
             $this->scalars,
             $this->types,
-            $this->input
+            $this->input,
+            $this->mutations
         ));
     }
 
@@ -119,6 +122,7 @@ class SchemaBuilder
         $this->setScalars();
         $this->setObjectTypes();
         $this->setInputTypes();
+        $this->setMutations();
     }
 
     /**
@@ -126,12 +130,11 @@ class SchemaBuilder
      */
     protected function setEnums()
     {
-        $this->enums = collect($this->document->definitions)
-            ->filter(function ($def) {
-                return $def instanceof EnumTypeDefinitionNode;
-            })->map(function (EnumTypeDefinitionNode $enum) {
-                return NodeFactory::enum($enum);
-            })->toArray();
+        $this->enums = $this->definitions()->filter(function ($def) {
+            return $def instanceof EnumTypeDefinitionNode;
+        })->map(function (EnumTypeDefinitionNode $enum) {
+            return NodeFactory::enum($enum);
+        })->toArray();
     }
 
     /**
@@ -139,12 +142,11 @@ class SchemaBuilder
      */
     protected function setInterfaces()
     {
-        $this->interfaces = collect($this->document->definitions)
-            ->filter(function ($def) {
-                return $def instanceof InterfaceTypeDefinitionNode;
-            })->map(function (InterfaceTypeDefinitionNode $interface) {
-                return NodeFactory::interface($interface);
-            })->toArray();
+        $this->interfaces = $this->definitions()->filter(function ($def) {
+            return $def instanceof InterfaceTypeDefinitionNode;
+        })->map(function (InterfaceTypeDefinitionNode $interface) {
+            return NodeFactory::interface($interface);
+        })->toArray();
     }
 
     /**
@@ -152,12 +154,11 @@ class SchemaBuilder
      */
     protected function setScalars()
     {
-        $this->scalars = collect($this->document->definitions)
-            ->filter(function ($def) {
-                return $def instanceof ScalarTypeDefinitionNode;
-            })->map(function (ScalarTypeDefinitionNode $scalar) {
-                return NodeFactory::scalar($scalar);
-            })->toArray();
+        $this->scalars = $this->definitions()->filter(function ($def) {
+            return $def instanceof ScalarTypeDefinitionNode;
+        })->map(function (ScalarTypeDefinitionNode $scalar) {
+            return NodeFactory::scalar($scalar);
+        })->toArray();
     }
 
     /**
@@ -165,12 +166,12 @@ class SchemaBuilder
      */
     protected function setObjectTypes()
     {
-        $this->types = collect($this->document->definitions)
-            ->filter(function ($def) {
-                return $def instanceof ObjectTypeDefinitionNode;
-            })->map(function (ObjectTypeDefinitionNode $objectType) {
-                return NodeFactory::objectType($objectType);
-            })->toArray();
+        $this->types = $this->objectTypes()
+        ->filter(function (ObjectTypeDefinitionNode $objectType) {
+            return 'Mutation' !== $objectType->name->value;
+        })->map(function (ObjectTypeDefinitionNode $objectType) {
+            return NodeFactory::objectType($objectType);
+        })->toArray();
     }
 
     /**
@@ -178,11 +179,47 @@ class SchemaBuilder
      */
     protected function setInputTypes()
     {
-        $this->input = collect($this->document->definitions)
-            ->filter(function ($def) {
-                return $def instanceof InputObjectTypeDefinitionNode;
-            })->map(function (InputObjectTypeDefinitionNode $input) {
-                return NodeFactory::inputObjectType($input);
-            })->toArray();
+        $this->input = $this->definitions()->filter(function ($def) {
+            return $def instanceof InputObjectTypeDefinitionNode;
+        })->map(function (InputObjectTypeDefinitionNode $input) {
+            return NodeFactory::inputObjectType($input);
+        })->toArray();
+    }
+
+    /**
+     * Set mutation fields.
+     */
+    protected function setMutations()
+    {
+        $this->mutations = $this->objectTypes()
+        ->filter(function (ObjectTypeDefinitionNode $objectType) {
+            return 'Mutation' === $objectType->name->value;
+        })->map(function (ObjectTypeDefinitionNode $objectType) {
+            return collect($objectType->fields)->toArray();
+        })->collapse()->mapWithKeys(function (FieldDefinitionNode $mutation) {
+            return [data_get($mutation, 'name.value') => MutationFactory::resolve($mutation)];
+        })->toArray();
+    }
+
+    /**
+     * Get definitions from document.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function definitions()
+    {
+        return collect($this->document->definitions);
+    }
+
+    /**
+     * Get object types from document.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function objectTypes()
+    {
+        return $this->definitions()->filter(function ($def) {
+            return $def instanceof ObjectTypeDefinitionNode;
+        });
     }
 }
