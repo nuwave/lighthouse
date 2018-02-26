@@ -43,4 +43,37 @@ class DirectiveContainerTest extends TestCase
         $document = Parser::parse($schema);
         $handler = directives()->forNode($document->definitions[0]);
     }
+
+    /**
+     * @test
+     */
+    public function itCanCheckIfFieldHasAResolverDirective()
+    {
+        $schema = '
+        type Foo {
+            bar: [Bar!]! @hasMany
+        }
+        ';
+
+        $document = Parser::parse($schema);
+        $hasResolver = directives()->hasResolver($document->definitions[0]->fields[0]);
+        $this->assertTrue($hasResolver);
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsExceptionsWhenMultipleFieldResolverDirectives()
+    {
+        $this->expectException(DirectiveException::class);
+
+        $schema = '
+        type Foo {
+            bar: [Bar!]! @hasMany @hasMany
+        }
+        ';
+
+        $document = Parser::parse($schema);
+        directives()->fieldResolver($document->definitions[0]->fields[0]);
+    }
 }

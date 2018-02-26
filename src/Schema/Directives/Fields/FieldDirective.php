@@ -2,8 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-// NOTE: Field directives can be resolvers or middleware
+use GraphQL\Language\AST\FieldDefinitionNode;
+
 abstract class FieldDirective
 {
-
+    /**
+     * Resolve the field directive.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return mixed
+     */
+    abstract public function handle(FieldDefinitionNode $field);
 }
