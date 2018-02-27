@@ -2,19 +2,16 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 interface ArgMiddleware
 {
     /**
      * Resolve the field directive.
      *
-     * @param InputValueDefinitionNode $arg
-     * @param DirectiveNode            $directive
-     * @param array                    $value
+     * @param ArgumentValue $argument
      *
      * @return array
      */
-    public function handle(InputValueDefinitionNode $arg, DirectiveNode $directive, array $value);
+    public function handle(ArgumentValue $argument);
 }

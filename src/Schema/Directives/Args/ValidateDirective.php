@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ListValueNode;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
 class ValidateDirective implements ArgMiddleware
@@ -23,20 +23,19 @@ class ValidateDirective implements ArgMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param InputValueDefinitionNode $arg
-     * @param DirectiveNode            $directive
-     * @param array                    $value
+     * @param ArgumentValue $value
      *
      * @return array
      */
-    public function handle(InputValueDefinitionNode $arg, DirectiveNode $directive, array $value)
+    public function handle(ArgumentValue $value)
     {
-        $value['rules'] = array_merge(
-            array_get($arg, 'rules', []),
-            $this->getRules($directive)
+        $current = $value->getValue();
+        $current['rules'] = array_merge(
+            array_get($value->getArg(), 'rules', []),
+            $this->getRules($value->getDirective())
         );
 
-        return $value;
+        return $value->setValue($current);
     }
 
     /**

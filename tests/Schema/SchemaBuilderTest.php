@@ -106,12 +106,18 @@ class SchemaBuilderTest extends TestCase
 
     /**
      * @test
+     * @group failing
      */
     public function itCanResolveMutations()
     {
+        $this->app['config']->set(
+            'lighthouse.namespaces.mutations',
+            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+        );
+
         $schema = '
         type Mutation {
-            createFoo(bar: String! baz: String): String
+            foo(bar: String! baz: String): String
         }
         ';
 

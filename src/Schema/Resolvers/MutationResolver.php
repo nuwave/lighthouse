@@ -6,6 +6,7 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLField;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class MutationResolver extends FieldResolver
 {
@@ -32,17 +33,17 @@ class MutationResolver extends FieldResolver
     {
         return collect($this->field->arguments)
             ->mapWithKeys(function (InputValueDefinitionNode $arg) {
-                $args = directives()->argMiddleware($arg)
-                    ->reduce(function ($type, $middlware) use ($arg) {
-                        $directive = collect($arg->directives)
-                            ->first(function (DirectiveNode $directive) use ($middlware) {
-                                return $directive->name->value === $middlware::name();
-                            });
+                $value = directives()->argMiddleware($arg)
+                    ->reduce(function (ArgumentValue $value, $middleware) use ($arg) {
+                        return $middleware->handle(
+                            $value->setArg($arg)->setMiddlewareDirective($middleware::name())
+                        );
+                    }, ArgumentValue::init(
+                        $this->field,
+                        NodeResolver::resolve($arg->type)
+                    ));
 
-                        return $middlware->handle($arg, $directive, $type);
-                    }, ['type' => NodeResolver::resolve($arg->type)]);
-
-                return [$arg->name->value => $args];
+                return [$arg->name->value => $value->getValue()];
             });
     }
 

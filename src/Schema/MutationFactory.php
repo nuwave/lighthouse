@@ -31,7 +31,7 @@ class MutationFactory
      */
     public static function resolver(FieldDefinitionNode $mutation)
     {
-        $class = config('lighthouse.namespaces.mutations').'\\'.$mutation->name->value;
+        $class = config('lighthouse.namespaces.mutations').'\\'.studly_case($mutation->name->value);
 
         $mutation = app($class);
 
