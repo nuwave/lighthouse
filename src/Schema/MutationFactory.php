@@ -17,8 +17,7 @@ class MutationFactory
     public static function resolve(FieldDefinitionNode $mutation)
     {
         return directives()->hasResolver($mutation)
-            ? directives()->fieldResolver($mutation)
-            // TODO: Create default mutation resolver if no directive is provided
+            ? directives()->fieldResolver($mutation)->handle($mutation)
             : MutationResolver::resolve($mutation, self::resolver($mutation));
     }
 

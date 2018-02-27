@@ -64,4 +64,25 @@ class MutationFactoryTest extends TestCase
         $type = MutationFactory::resolve($schema->definitions[0]->fields[0]);
         $type['resolve'](null, $this->args);
     }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itCanResolveCustomNamespace()
+    {
+        $schema = Parser::parse('
+        type Mutation {
+            foo(bar: String! baz: Int): String! @mutation(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Mutations\\\Bar")
+        }
+        ');
+
+        $type = MutationFactory::resolve($schema->definitions[0]->fields[0]);
+        $this->assertArrayHasKey('args', $type);
+        $this->assertArrayHasKey('type', $type);
+        $this->assertArrayHasKey('resolve', $type);
+
+        $this->assertInstanceOf(\Closure::class, $type['resolve']);
+        $this->assertEquals('1 foo', $type['resolve'](null, $this->args));
+    }
 }

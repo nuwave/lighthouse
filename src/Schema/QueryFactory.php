@@ -18,7 +18,7 @@ class QueryFactory
     {
         return directives()->hasResolver($mutation)
             ? directives()->fieldResolver($mutation)
-            // TODO: Create default mutation resolver if no directive is provided
+            // TODO: Create default query resolver if no directive is provided
             : QueryResolver::resolve($mutation);
     }
 }
