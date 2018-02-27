@@ -32,7 +32,6 @@ class MethodDirectiveTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itWillCallAMethodWithArgsToResolveField()
     {
