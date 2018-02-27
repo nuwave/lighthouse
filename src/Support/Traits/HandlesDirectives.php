@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ListValueNode;
 
 trait HandlesDirectives
 {
@@ -37,6 +38,18 @@ trait HandlesDirectives
             return $arg->name->value === $name;
         });
 
-        return $arg ? $arg->value->value : $default;
+        if (! $arg) {
+            return $default;
+        }
+
+        $value = $arg->value;
+
+        if ($value instanceof ListValueNode) {
+            return collect($value->values)->map(function ($node) {
+                return $node->value;
+            })->toArray();
+        }
+
+        return $value->value;
     }
 }

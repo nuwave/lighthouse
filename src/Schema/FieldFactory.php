@@ -15,9 +15,14 @@ class FieldFactory
      */
     public static function convert(FieldDefinitionNode $field)
     {
-        return directives()->hasResolver($field)
+        $resolve = directives()->hasResolver($field)
             ? directives()->fieldResolver($field)->handle($field)
             : static::resolver($field);
+
+        return directives()->fieldMiddleware($field)
+            ->reduce(function ($resolver, $middleware) use ($field) {
+                return $middleware->handle($field, $resolver);
+            }, $resolve);
     }
 
     /**

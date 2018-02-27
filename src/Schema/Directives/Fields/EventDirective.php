@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
