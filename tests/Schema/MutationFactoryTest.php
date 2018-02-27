@@ -89,7 +89,6 @@ class MutationFactoryTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanFireAnEventAfterAMutation()
     {
