@@ -16,9 +16,16 @@ class MutationFactory
      */
     public static function resolve(FieldDefinitionNode $mutation)
     {
-        return directives()->hasResolver($mutation)
+        $type = directives()->hasResolver($mutation)
             ? directives()->fieldResolver($mutation)->handle($mutation)
             : MutationResolver::resolve($mutation, self::resolver($mutation));
+
+        $type['resolve'] = directives()->fieldMiddleware($mutation)
+            ->reduce(function ($resolver, $middleware) use ($mutation) {
+                return $middleware->handle($mutation, $resolver);
+            }, $type['resolve']);
+
+        return $type;
     }
 
     /**

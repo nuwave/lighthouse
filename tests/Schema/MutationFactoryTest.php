@@ -3,9 +3,11 @@
 namespace Nuwave\Lighthouse\Tests\Schema;
 
 use GraphQL\Language\Parser;
+use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Schema\MutationFactory;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 use Nuwave\Lighthouse\Tests\TestCase;
+use Nuwave\Lighthouse\Tests\Utils\Events\Foo;
 
 class MutationFactoryTest extends TestCase
 {
@@ -67,7 +69,6 @@ class MutationFactoryTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanResolveCustomNamespace()
     {
@@ -84,5 +85,34 @@ class MutationFactoryTest extends TestCase
 
         $this->assertInstanceOf(\Closure::class, $type['resolve']);
         $this->assertEquals('1 foo', $type['resolve'](null, $this->args));
+    }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itCanFireAnEventAfterAMutation()
+    {
+        $expected = 'foo 1';
+        $schema = Parser::parse('
+        type Mutation {
+            foo(bar: String! baz: Int ): String! @event(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Events\\\Foo")
+        }
+        ');
+
+        Event::fake();
+
+        $type = MutationFactory::resolve($schema->definitions[0]->fields[0]);
+        $this->assertArrayHasKey('args', $type);
+        $this->assertArrayHasKey('type', $type);
+        $this->assertArrayHasKey('resolve', $type);
+        $this->assertInstanceOf(\Closure::class, $type['resolve']);
+
+        $assert = $type['resolve'](null, $this->args);
+
+        $this->assertEquals($expected, $assert);
+        Event::assertDispatched(Foo::class, function ($e) use ($expected) {
+            return $e->value === $expected;
+        });
     }
 }

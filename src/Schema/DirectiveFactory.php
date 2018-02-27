@@ -83,20 +83,6 @@ class DirectiveFactory
     }
 
     /**
-     * Get resolver for field.
-     *
-     * @param FieldDefinitionNode $field
-     *
-     * @return mixed
-     */
-    public function forField(FieldDefinitionNode $field)
-    {
-        // 1. Check if field has a resolver.
-        // 2. Use default or directive resolver.
-        // 3. Wrap resolver in middlware.
-    }
-
-    /**
      * Check if field has a resolver directive.
      *
      * @param FieldDefinitionNode $field

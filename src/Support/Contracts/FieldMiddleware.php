@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 
 interface FieldMiddleware
@@ -10,8 +11,9 @@ interface FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldDefinitionNode $field
+     * @param Closure             $resolver
      *
-     * @return \Closure
+     * @return Closure
      */
-    public function handle(FieldDefinitionNode $field);
+    public function handle(FieldDefinitionNode $field, Closure $resolver);
 }
