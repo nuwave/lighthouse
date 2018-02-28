@@ -134,6 +134,11 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveQueries()
     {
+        $this->app['config']->set(
+            'lighthouse.namespaces.queries',
+            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+        );
+
         $schema = '
         type Query {
             foo(bar: String! baz: String): String
@@ -173,6 +178,11 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendQuery()
     {
+        $this->app['config']->set(
+            'lighthouse.namespaces.queries',
+            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+        );
+
         $schema = '
         type Query {
             bar: String!

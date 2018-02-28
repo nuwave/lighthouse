@@ -51,6 +51,7 @@ class LighthouseServiceProvider extends ServiceProvider
         // i.e., directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective::class);
         //
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\AuthDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\EventDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective::class);

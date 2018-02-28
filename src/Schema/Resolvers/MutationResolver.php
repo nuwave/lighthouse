@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLField;

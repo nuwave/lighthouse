@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Schema\Types\GraphQLField;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class QueryResolver extends FieldResolver
 {
@@ -14,11 +16,11 @@ class QueryResolver extends FieldResolver
      */
     public function generate()
     {
-        return [
+        return GraphQLField::toArray([
             'args' => $this->getArgs()->toArray(),
             'type' => $this->getType(),
             'resolve' => $this->resolver,
-        ];
+        ]);
     }
 
     /**
@@ -30,11 +32,17 @@ class QueryResolver extends FieldResolver
     {
         return collect($this->field->arguments)
             ->mapWithKeys(function (InputValueDefinitionNode $arg) {
-                // TODO: Check for argument directives. Use resolver if defined,
-                // wrap w/ middleware (i.e., rules)
-                return [$arg->name->value => [
-                    'type' => NodeResolver::resolve($arg->type),
-                ]];
+                $value = directives()->argMiddleware($arg)
+                    ->reduce(function (ArgumentValue $value, $middleware) use ($arg) {
+                        return $middleware->handle(
+                            $value->setArg($arg)->setMiddlewareDirective($middleware->name())
+                        );
+                    }, ArgumentValue::init(
+                        $this->field,
+                        NodeResolver::resolve($arg->type)
+                    ));
+
+                return [$arg->name->value => $value->getValue()];
             });
     }
 
