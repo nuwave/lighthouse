@@ -7,5 +7,4 @@ phpunit.xml
 .idea/
 .code/
 build/
-storage/
 vendor/
