@@ -38,10 +38,19 @@ trait HandlesDirectives
             return $arg->name->value === $name;
         });
 
-        if (! $arg) {
-            return $default;
-        }
+        return $arg ? $this->argValue($arg) : $default;
+    }
 
+    /**
+     * Get argument's value.
+     *
+     * @param mixed $arg
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    protected function argValue($arg, $default = null)
+    {
         $value = $arg->value;
 
         if ($value instanceof ListValueNode) {

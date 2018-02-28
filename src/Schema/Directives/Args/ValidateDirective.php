@@ -4,12 +4,14 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\ListValueNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class ValidateDirective implements ArgMiddleware
 {
+    use HandlesDirectives;
+
     /**
      * Directive name.
      *
@@ -48,13 +50,7 @@ class ValidateDirective implements ArgMiddleware
     protected function getRules(DirectiveNode $directive)
     {
         return collect($directive->arguments)->map(function (ArgumentNode $arg) {
-            return $arg->value;
-        })->filter(function ($value) {
-            return $value instanceof ListValueNode;
-        })->map(function (ListValueNode $list) {
-            return collect($list->values)->map(function ($node) {
-                return $node->value;
-            })->toArray();
+            return $this->argValue($arg);
         })->collapse()->toArray();
     }
 }
