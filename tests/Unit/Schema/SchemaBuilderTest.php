@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Schema;
+namespace Nuwave\Lighthouse\Tests\Unit\Unit\Schema;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputType;

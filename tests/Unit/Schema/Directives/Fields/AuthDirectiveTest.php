@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Schema\Directives\Fields;
+namespace Nuwave\Lighthouse\Tests\Unit\Schema\Directives\Fields;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Nuwave\Lighthouse\Tests\TestCase;

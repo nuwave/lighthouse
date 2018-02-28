@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Schema\Utils;
+namespace Nuwave\Lighthouse\Tests\Unit\Schema\Utils;
 
 use PHPUnit\Framework\TestCase;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Schema\Resolvers;
+namespace Nuwave\Lighthouse\Tests\Unit\Schema\Resolvers;
 
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Type\Definition\ScalarType;

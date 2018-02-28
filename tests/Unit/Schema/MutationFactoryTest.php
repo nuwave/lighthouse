@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Schema;
+namespace Nuwave\Lighthouse\Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use Illuminate\Support\Facades\Event;
