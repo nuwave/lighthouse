@@ -31,12 +31,13 @@ class DirectiveFactory
     /**
      * Regsiter a new directive handler.
      *
-     * @param string $name
-     * @param [type] $handler
+     * @param string $handler
      */
-    public function register($name, $handler)
+    public function register($handler)
     {
-        $this->directives->put($name, $handler);
+        $directive = app($handler);
+
+        $this->directives->put($directive->name(), $directive);
     }
 
     /**

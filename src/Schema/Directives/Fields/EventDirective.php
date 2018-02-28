@@ -12,6 +12,16 @@ class EventDirective implements FieldMiddleware
     use HandlesDirectives;
 
     /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return 'event';
+    }
+
+    /**
      * Resolve the field directive.
      *
      * @param FieldDefinitionNode $field

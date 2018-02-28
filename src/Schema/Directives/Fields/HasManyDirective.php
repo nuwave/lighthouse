@@ -9,6 +9,16 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class HasManyDirective implements FieldResolver
 {
     /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return 'hasMany';
+    }
+
+    /**
      * Resolve the field directive.
      *
      * @param FieldDefinitionNode $field

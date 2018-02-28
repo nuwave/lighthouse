@@ -15,7 +15,7 @@ class ValidateDirective implements ArgMiddleware
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'validate';
     }

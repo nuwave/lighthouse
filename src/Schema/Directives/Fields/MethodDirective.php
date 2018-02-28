@@ -12,6 +12,16 @@ class MethodDirective implements FieldResolver
     use HandlesDirectives;
 
     /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return 'method';
+    }
+
+    /**
      * Resolve the field directive.
      *
      * @param FieldDefinitionNode $field

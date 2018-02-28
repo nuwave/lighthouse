@@ -46,12 +46,17 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function registerDirectives()
     {
-        directives()->register(ValidateDirective::name(), new ValidateDirective());
-        directives()->register('can', new \Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective());
-        directives()->register('event', new \Nuwave\Lighthouse\Schema\Directives\Fields\EventDirective());
-        directives()->register('hasMany', new \Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective());
-        directives()->register('method', new \Nuwave\Lighthouse\Schema\Directives\Fields\MethodDirective());
-        directives()->register('mutation', new \Nuwave\Lighthouse\Schema\Directives\Fields\MutationDirective());
-        directives()->register('scalar', new \Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective());
+        // TODO: Register directives w/ namespace only and add required `name` function
+        // to all directives (makes it easier to find field/node directives)
+        //
+        // i.e., directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective::class);
+        //
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\EventDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MethodDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MutationDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective::class);
     }
 }

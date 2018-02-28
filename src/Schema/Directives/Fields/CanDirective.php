@@ -13,6 +13,16 @@ class CanDirective implements FieldMiddleware
     use HandlesDirectives;
 
     /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return 'can';
+    }
+
+    /**
      * Resolve the field directive.
      *
      * @param FieldDefinitionNode $field

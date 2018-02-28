@@ -36,7 +36,7 @@ class MutationResolver extends FieldResolver
                 $value = directives()->argMiddleware($arg)
                     ->reduce(function (ArgumentValue $value, $middleware) use ($arg) {
                         return $middleware->handle(
-                            $value->setArg($arg)->setMiddlewareDirective($middleware::name())
+                            $value->setArg($arg)->setMiddlewareDirective($middleware->name())
                         );
                     }, ArgumentValue::init(
                         $this->field,
