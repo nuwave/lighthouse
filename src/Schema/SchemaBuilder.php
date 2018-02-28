@@ -118,6 +118,28 @@ class SchemaBuilder
     }
 
     /**
+     * Resolve instance by name.
+     *
+     * @param string $type
+     *
+     * @return mixed
+     */
+    public function instance($type)
+    {
+        return collect(array_merge(
+            $this->types,
+            $this->input,
+            $this->scalars,
+            $this->enums,
+            $this->mutations,
+            $this->queries,
+            $this->interfaces
+        ))->first(function ($instance) use ($type) {
+            return $instance->name === $type;
+        });
+    }
+
+    /**
      * Set schema types.
      */
     protected function setTypes()

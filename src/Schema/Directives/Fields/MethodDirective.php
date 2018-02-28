@@ -30,9 +30,6 @@ class MethodDirective implements FieldResolver
      */
     public function handle(FieldDefinitionNode $field)
     {
-        // TODO: Look into creating a static method on Resolvers and Middleware
-        // to return a name so we can use a $this->getDirective() or
-        // $this->getArgument() methods w/o having to search for the directive by name.
         $method = $this->directiveArgValue(
             $this->fieldDirective($field, 'method'),
             'name'
