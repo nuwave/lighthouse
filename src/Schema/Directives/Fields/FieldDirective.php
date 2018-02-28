@@ -54,7 +54,7 @@ class FieldDirective implements FieldResolver
 
         if (! $class) {
             throw new DirectiveException(sprintf(
-                'Directive [%s] must have a class argument.',
+                'Directive [%s] must have a `class` argument.',
                 $directive->name->value
             ));
         }
@@ -75,7 +75,7 @@ class FieldDirective implements FieldResolver
 
         if (! $method) {
             throw new DirectiveException(sprintf(
-                'Directive [%s] must have a method argument.',
+                'Directive [%s] must have a `method` argument.',
                 $directive->name->value
             ));
         }
