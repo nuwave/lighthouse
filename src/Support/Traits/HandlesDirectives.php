@@ -16,7 +16,7 @@ trait HandlesDirectives
      *
      * @return DirectiveNode
      */
-    protected function fieldDirective(FieldDefinitionNode $field, $name = null)
+    protected function fieldDirective(FieldDefinitionNode $field, $name)
     {
         return collect($field->directives)->first(function (DirectiveNode $directive) use ($name) {
             return $directive->name->value === $name;
