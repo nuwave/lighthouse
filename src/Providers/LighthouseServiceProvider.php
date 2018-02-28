@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -57,6 +56,7 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MethodDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MutationDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\ResolverDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective::class);
     }
 }
