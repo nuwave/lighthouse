@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class HasManyDirective implements FieldResolver
@@ -33,9 +34,18 @@ class HasManyDirective implements FieldResolver
         $relation = $this->getRelationshipName($field);
         $resolver = $this->getResolver($field);
 
+        if (! in_array($resolver, ['default', 'paginator', 'relay'])) {
+            throw new DirectiveException(sprintf(
+                '[%s] is not a valid `type` on `hasMany` directive [`paginator`, `relay`, `default`].',
+                $resolver
+            ));
+        }
+
         switch ($resolver) {
             case 'paginator':
                 return $this->paginatorResolver($relation);
+            case 'relay':
+                return $this->connectionResolver($relation);
             default:
                 return $this->defaultResolver($relation);
         }
@@ -82,11 +92,27 @@ class HasManyDirective implements FieldResolver
      */
     protected function defaultResolver($relation)
     {
-        return function ($parent, array $args) use ($field, $relation) {
+        return function ($parent, array $args) use ($relation) {
             // TODO: Wrap w/ data loader to prevent N+1
             $builder = call_user_func([$parent, $relation]);
             // TODO: Create scopeGqlQuery scope to allow adjustments for $args.
             return $builder->get();
+        };
+    }
+
+    /**
+     * Use connection resolver for field.
+     *
+     * @param string $relation
+     *
+     * @return \Closure
+     */
+    protected function connectionResolver($relation)
+    {
+        return function ($parent, array $args) use ($relation) {
+            $builder = call_user_func([$parent, $relation]);
+
+            return $builder->relayConnection($args);
         };
     }
 

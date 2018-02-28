@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Tests\Utils\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Nuwave\Lighthouse\Support\Traits\HasRelayConnections;
+use Nuwave\Lighthouse\Support\Traits\IsRelayConnection;
 
 class User extends Authenticatable
 {
-    use HasRelayConnections;
+    use IsRelayConnection;
 
     public function tasks()
     {

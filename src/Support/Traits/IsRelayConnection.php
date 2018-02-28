@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-trait HasRelayConnections
+trait IsRelayConnection
 {
     use HandlesGlobalId;
 

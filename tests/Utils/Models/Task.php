@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Tests\Utils\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Support\Traits\HasRelayConnections;
+use Nuwave\Lighthouse\Support\Traits\IsRelayConnection;
 
 class Task extends Model
 {
-    use HasRelayConnections;
+    use IsRelayConnection;
 
     public function user()
     {
