@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Tests\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Tests\TestCase;
 
-class ResolverDirectiveTest extends TestCase
+class FieldDirectiveTest extends TestCase
 {
     /**
      * @test
@@ -14,7 +14,7 @@ class ResolverDirectiveTest extends TestCase
     {
         $schema = '
         type Foo {
-            bar: String! @resolver(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
+            bar: String! @field(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
         }
         ';
 

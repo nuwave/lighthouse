@@ -53,10 +53,10 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\EventDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MethodDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MutationDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\ResolverDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective::class);
     }
 }
