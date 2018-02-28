@@ -1,17 +1,17 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
+namespace Nuwave\Lighthouse\Support\Contracts;
 
 use GraphQL\Language\AST\Node;
 
-abstract class NodeDirective
+interface NodeResolver
 {
     /**
      * Name of the directive.
      *
-     * @var string
+     * @return string
      */
-    abstract public function name();
+    public function name();
 
     /**
      * Resolve the node directive.
@@ -20,5 +20,5 @@ abstract class NodeDirective
      *
      * @return mixed
      */
-    abstract public function resolve(Node $node);
+    public function resolve(Node $node);
 }

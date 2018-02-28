@@ -5,8 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
+use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 
-class ScalarDirective extends NodeDirective
+class ScalarDirective implements NodeResolver
 {
     /**
      * Name of the directive.
