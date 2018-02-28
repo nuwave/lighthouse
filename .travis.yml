@@ -11,7 +11,7 @@ language: php
 
 env:
   global:
-    - COVERAGE=0 DB_DATABASE="test" DB_USERNAME="root"
+    - COVERAGE=0 DB_DATABASE="lighthouse" DB_USERNAME="root" DB_PASSWORD="root"
 
 matrix:
   include:
@@ -24,7 +24,7 @@ matrix:
   fast_finish: true
 
 before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS lighthouse;'
   - if [[ $COVERAGE = 0 ]]; then phpenv config-rm xdebug.ini; fi
   - travis_retry composer self-update
   - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
