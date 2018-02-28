@@ -30,12 +30,15 @@ class HasManyDirective implements FieldResolver
      */
     public function handle(FieldDefinitionNode $field)
     {
-        return function ($parent, array $args) use ($field) {
-            // TODO: Wrap w/ data loader to prevent N+1
-            $builder = call_user_func([$parent, $this->getRelationshipName($field)]);
-            // TODO: Create scopeGqlQuery scope to allow adjustments for $args.
-            return $builder->get();
-        };
+        $relation = $this->getRelationshipName($field);
+        $resolver = $this->getResolver($field);
+
+        switch ($resolver) {
+            case 'paginator':
+                return $this->paginatorResolver($relation);
+            default:
+                return $this->defaultResolver($relation);
+        }
     }
 
     /**
@@ -52,5 +55,54 @@ class HasManyDirective implements FieldResolver
             'relation',
             $field->name->value
         );
+    }
+
+    /**
+     * Get resolver type.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return string
+     */
+    protected function getResolver(FieldDefinitionNode $field)
+    {
+        return $this->directiveArgValue(
+            $this->fieldDirective($field, $this->name()),
+            'type',
+            'default'
+        );
+    }
+
+    /**
+     * Use default resolver for field.
+     *
+     * @param string $relation
+     *
+     * @return \Closure
+     */
+    protected function defaultResolver($relation)
+    {
+        return function ($parent, array $args) use ($field, $relation) {
+            // TODO: Wrap w/ data loader to prevent N+1
+            $builder = call_user_func([$parent, $relation]);
+            // TODO: Create scopeGqlQuery scope to allow adjustments for $args.
+            return $builder->get();
+        };
+    }
+
+    /**
+     * Use paginator resolver for field.
+     *
+     * @param string $relation
+     *
+     * @return \Closure
+     */
+    protected function paginatorResolver($relation)
+    {
+        return function ($parent, array $args) use ($relation) {
+            $builder = call_user_func([$parent, $relation]);
+
+            return $builder->paginatorConnection($args);
+        };
     }
 }

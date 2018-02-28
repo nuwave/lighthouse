@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Tests\Integration\Schema\Directives\Fields;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Tests\DBTestCase;
 use Nuwave\Lighthouse\Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Tests\Utils\Models\User;
@@ -56,5 +57,29 @@ class HasManyDirectiveTest extends DBTestCase
         $tasks = $resolver($this->user, []);
 
         $this->assertCount(3, $tasks);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryHasManyPaginator()
+    {
+        $schema = '
+        type User {
+            tasks(first: Int! page: Int): [Task!]! @hasMany(type:"paginator")
+        }
+        ';
+
+        $type = schema()->register($schema)->first();
+        $resolver = array_get($type->config['fields'](), 'tasks.resolve');
+        $tasks = $resolver($this->user, ['first' => 2, 'page' => 2]);
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
+        $this->assertEquals(1, $tasks->count());
+        $this->assertEquals(3, $tasks->total());
+        $this->assertFalse($tasks->hasMorePages());
+
+        // TODO: Change resolve type in schema to type UserTaskPaginator
+        // w/ PaginatorInfo & UserTaskData fields
     }
 }

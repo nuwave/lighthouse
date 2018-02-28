@@ -25,4 +25,20 @@ trait HasRelayConnections
 
         return $query->paginate($first, ['*'], 'page', $currentPage);
     }
+
+    /**
+     * Paginate connection w/ query args.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array                                 $args
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePaginatorConnection($query, array $args)
+    {
+        $first = data_get($args, 'first', 15);
+        $page = data_get($args, 'page', 1);
+
+        return $query->paginate($first, ['*'], 'page', $page);
+    }
 }
