@@ -103,7 +103,8 @@ class FieldTypeResolver
      */
     protected function convertCustomType(NamedTypeNode $node)
     {
-        // TODO: Resolve custom types...
-        return Type::string();
+        return function () use ($node) {
+            return schema()->instance($node->name->value);
+        };
     }
 }
