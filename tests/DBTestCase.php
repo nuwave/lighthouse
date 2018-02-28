@@ -32,7 +32,7 @@ class DBTestCase extends TestCase
             'port' => env('DB_PORT', '3306'),
             'prefix' => '',
             'username' => env('DB_USERNAME', 'testing'),
-            'password' => env('DB_PASSWORD', 'secret'),
+            'password' => env('DB_PASSWORD', ''),
         ];
 
         $app['config']->set('database.default', 'lighthouse');
