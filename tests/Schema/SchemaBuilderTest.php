@@ -148,4 +148,64 @@ class SchemaBuilderTest extends TestCase
         $this->assertArrayHasKey('bar', $query['args']);
         $this->assertArrayHasKey('baz', $query['args']);
     }
+
+    /**
+     * @test
+     */
+    public function itCanExtendObjectTypes()
+    {
+        $schema = '
+        type Foo {
+            bar: String!
+        }
+        extend type Foo {
+            baz: String!
+        }
+        ';
+
+        $type = schema()->register($schema)->first();
+        $fields = $type->config['fields']();
+        $this->assertArrayHasKey('baz', $fields);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanExtendQuery()
+    {
+        $schema = '
+        type Query {
+            bar: String!
+        }
+        extend type Query {
+            baz: String!
+        }
+        ';
+
+        $queries = schema()->register($schema)->toArray();
+        $this->assertArrayHasKey('baz', $queries);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanExtendMutation()
+    {
+        $this->app['config']->set(
+            'lighthouse.namespaces.mutations',
+            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+        );
+
+        $schema = '
+        type Mutation {
+            foo: String!
+        }
+        extend type Mutation {
+            bar: String!
+        }
+        ';
+
+        $mutations = schema()->register($schema)->toArray();
+        $this->assertArrayHasKey('bar', $mutations);
+    }
 }

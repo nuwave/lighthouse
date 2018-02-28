@@ -9,7 +9,9 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Schema\ExtensionFactory;
 use Nuwave\Lighthouse\Schema\MutationFactory;
 use Nuwave\Lighthouse\Schema\QueryFactory;
 
@@ -126,6 +128,9 @@ class SchemaBuilder
         $this->setInputTypes();
         $this->setMutations();
         $this->setQueries();
+        $this->attachTypeExtensions();
+        $this->attachMutationExtensions();
+        $this->attachQueryExtensions();
     }
 
     /**
@@ -217,6 +222,56 @@ class SchemaBuilder
         })->collapse()->mapWithKeys(function (FieldDefinitionNode $mutation) {
             return [data_get($mutation, 'name.value') => QueryFactory::resolve($mutation)];
         })->toArray();
+    }
+
+    /**
+     * Attach extensions to types.
+     */
+    protected function attachTypeExtensions()
+    {
+        $this->definitions()->filter(function ($def) {
+            return $def instanceof TypeExtensionDefinitionNode;
+        })->each(function (TypeExtensionDefinitionNode $extension) {
+            collect($this->types)->filter(function ($type) use ($extension) {
+                return $type->name === $extension->definition->name->value;
+            })->each(function ($type) use ($extension) {
+                ExtensionFactory::extend($extension, $type);
+            });
+        });
+    }
+
+    /**
+     * Attach extensions to mutations.
+     */
+    protected function attachMutationExtensions()
+    {
+        $this->definitions()->filter(function ($def) {
+            return $def instanceof TypeExtensionDefinitionNode;
+        })->filter(function (TypeExtensionDefinitionNode $extension) {
+            return 'Mutation' === $extension->definition->name->value;
+        })->each(function (TypeExtensionDefinitionNode $extension) {
+            $this->mutations = array_merge(
+                $this->mutations,
+                ExtensionFactory::extractFields($extension)
+            );
+        });
+    }
+
+    /**
+     * Attach extensions to queries.
+     */
+    protected function attachQueryExtensions()
+    {
+        $this->definitions()->filter(function ($def) {
+            return $def instanceof TypeExtensionDefinitionNode;
+        })->filter(function (TypeExtensionDefinitionNode $extension) {
+            return 'Query' === $extension->definition->name->value;
+        })->each(function (TypeExtensionDefinitionNode $extension) {
+            $this->queries = array_merge(
+                $this->queries,
+                ExtensionFactory::extractFields($extension)
+            );
+        });
     }
 
     /**
