@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema;
+namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;

@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Tests\Schema;
 
 use GraphQL\Language\Parser;
 use Illuminate\Support\Facades\Event;
-use Nuwave\Lighthouse\Schema\MutationFactory;
+use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 use Nuwave\Lighthouse\Tests\TestCase;
 use Nuwave\Lighthouse\Tests\Utils\Events\Foo;

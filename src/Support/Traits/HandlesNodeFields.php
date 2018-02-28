@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\FieldFactory;
+use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
 
 trait HandlesNodeFields

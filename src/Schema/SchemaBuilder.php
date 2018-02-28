@@ -11,9 +11,10 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Schema\ExtensionFactory;
-use Nuwave\Lighthouse\Schema\MutationFactory;
-use Nuwave\Lighthouse\Schema\QueryFactory;
+use Nuwave\Lighthouse\Schema\Factories\ExtensionFactory;
+use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
+use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use Nuwave\Lighthouse\Schema\Factories\QueryFactory;
 
 class SchemaBuilder
 {

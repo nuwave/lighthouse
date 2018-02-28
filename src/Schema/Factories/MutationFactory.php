@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema;
+namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\MutationResolver;

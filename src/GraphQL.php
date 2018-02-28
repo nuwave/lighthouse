@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse;
 
-use Nuwave\Lighthouse\Schema\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 
