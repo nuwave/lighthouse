@@ -117,7 +117,7 @@ class SchemaBuilder
             $this->mutations,
             $this->queries
         ))->map(function ($type) {
-            if ($type instanceof Type) {
+            if ($type instanceof Type && array_has($type->config, 'fields')) {
                 $fields = is_callable($type->config['fields'])
                     ? $type->config['fields']()
                     : $type->config['fields'];

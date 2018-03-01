@@ -19,7 +19,7 @@ class RenameDirectiveTest extends TestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $fields = $type->config['fields']();
+        $fields = $type->config['fields'];
         $resolver = array_get($fields, 'fooBar.resolve');
         $this->assertEquals('bar', $resolver(['foo_bar' => 'bar', 'fooBar' => 'baz'], []));
     }
@@ -35,8 +35,7 @@ class RenameDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
         $this->expectException(DirectiveException::class);
-        $fields = $type->config['fields']();
+        $type = schema()->register($schema)->first();
     }
 }

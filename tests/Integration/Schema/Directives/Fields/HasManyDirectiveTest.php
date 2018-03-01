@@ -51,10 +51,13 @@ class HasManyDirectiveTest extends DBTestCase
         type User {
             tasks: [Task!]! @hasMany
         }
+        type Task {
+            foo: String
+        }
         ';
 
         $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'](), 'tasks.resolve');
+        $resolver = array_get($type->config['fields'], 'tasks.resolve');
         $tasks = $resolver($this->user, []);
 
         $this->assertCount(3, $tasks);
@@ -69,10 +72,13 @@ class HasManyDirectiveTest extends DBTestCase
         type User {
             tasks(first: Int! page: Int): [Task!]! @hasMany(type:"paginator")
         }
+        type Task {
+            foo: String
+        }
         ';
 
         $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'](), 'tasks.resolve');
+        $resolver = array_get($type->config['fields'], 'tasks.resolve');
         $tasks = $resolver($this->user, ['first' => 2, 'page' => 2]);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
@@ -93,10 +99,13 @@ class HasManyDirectiveTest extends DBTestCase
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type:"relay")
         }
+        type Task {
+            foo: String
+        }
         ';
 
         $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'](), 'tasks.resolve');
+        $resolver = array_get($type->config['fields'], 'tasks.resolve');
         $tasks = $resolver($this->user, ['first' => 2]);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
@@ -117,10 +126,12 @@ class HasManyDirectiveTest extends DBTestCase
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
         }
+        type Task {
+            foo: String
+        }
         ';
 
-        $type = schema()->register($schema)->first();
         $this->expectException(DirectiveException::class);
-        $resolver = array_get($type->config['fields'](), 'tasks.resolve');
+        $type = schema()->register($schema)->first();
     }
 }

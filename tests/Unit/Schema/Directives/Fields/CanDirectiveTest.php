@@ -18,7 +18,7 @@ class CanDirectiveTest extends TestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $fields = $type->config['fields']();
+        $fields = $type->config['fields'];
         $resolver = array_get($fields, 'bar.resolve');
         // TODO: Use prophecy to ensure middleware is called
         $this->assertTrue(true);

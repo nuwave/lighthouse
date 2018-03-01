@@ -20,7 +20,7 @@ class ExtensionFactory
     public static function extend(TypeExtensionDefinitionNode $extension, $type)
     {
         $instance = new static();
-        $typeFields = $type->config['fields']();
+        $typeFields = is_callable($type->config['fields']) ? $type->config['fields']() : $type->config['fields'];
         $fields = $instance->getNodeFields($extension->definition->fields)->toArray();
         $type->config['fields'] = function () use ($typeFields, $fields) {
             return array_merge($typeFields, $fields);

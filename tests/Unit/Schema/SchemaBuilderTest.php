@@ -166,7 +166,7 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $fields = $type->config['fields']();
+        $fields = $type->config['fields'];
         $this->assertArrayHasKey('baz', $fields);
     }
 
