@@ -28,3 +28,29 @@ type PageInfo {
   # Last page in connection.
   lastPage: Int
 }
+
+type PaginatorInfo {
+  # Total count of available items in the page.
+  count: Int!
+
+  # Current pagination page.
+  currentPage: Int!
+
+  # Index of first item in the current page.
+  firstItem: Int!
+
+  # If collection has more pages.
+  hasMorePages: Boolean!
+
+  # Index of last item in the current page.
+  lastItem: Int!
+
+  # Last page number of the collection.
+  lastPage: Int!
+
+  # Number of items per page in the collection.
+  perPage: Int!
+
+  # Total items available in the collection.
+  total: Int!
+}
