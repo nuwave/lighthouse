@@ -35,7 +35,7 @@ class AuthDirective implements FieldResolver
             'guard'
         );
 
-        return QueryResolver::resolve($value->field(), function () use ($guard) {
+        return QueryResolver::resolve($value->getField(), function () use ($guard) {
             return auth($guard)->user();
         });
     }

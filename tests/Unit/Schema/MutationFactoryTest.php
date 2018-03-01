@@ -42,7 +42,10 @@ class MutationFactoryTest extends TestCase
         }
         ');
 
-        $type = MutationFactory::resolve($schema->definitions[0]->fields[0]);
+        $type = MutationFactory::resolve(
+            $schema->definitions[0]->fields[0],
+            $schema->definitions[0]
+        );
         $this->assertArrayHasKey('args', $type);
         $this->assertArrayHasKey('type', $type);
         $this->assertArrayHasKey('resolve', $type);
@@ -63,7 +66,10 @@ class MutationFactoryTest extends TestCase
         ');
 
         $this->expectException(ValidationError::class);
-        $type = MutationFactory::resolve($schema->definitions[0]->fields[0]);
+        $type = MutationFactory::resolve(
+            $schema->definitions[0]->fields[0],
+            $schema->definitions[0]
+        );
         $type['resolve'](null, $this->args);
     }
 
@@ -78,7 +84,10 @@ class MutationFactoryTest extends TestCase
         }
         ');
 
-        $type = MutationFactory::resolve($schema->definitions[0]->fields[0]);
+        $type = MutationFactory::resolve(
+            $schema->definitions[0]->fields[0],
+            $schema->definitions[0]
+        );
         $this->assertArrayHasKey('args', $type);
         $this->assertArrayHasKey('type', $type);
         $this->assertArrayHasKey('resolve', $type);
@@ -101,7 +110,10 @@ class MutationFactoryTest extends TestCase
 
         Event::fake();
 
-        $type = MutationFactory::resolve($schema->definitions[0]->fields[0]);
+        $type = MutationFactory::resolve(
+            $schema->definitions[0]->fields[0],
+            $schema->definitions[0]
+        );
         $this->assertArrayHasKey('args', $type);
         $this->assertArrayHasKey('type', $type);
         $this->assertArrayHasKey('resolve', $type);

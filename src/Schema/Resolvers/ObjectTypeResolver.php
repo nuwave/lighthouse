@@ -51,6 +51,6 @@ class ObjectTypeResolver extends AbstractResolver
      */
     protected function getFields()
     {
-        return $this->getNodeFields(data_get($this->node, 'fields', []));
+        return $this->getNodeFields($this->node);
     }
 }

@@ -21,7 +21,7 @@ class ExtensionFactory
     {
         $instance = new static();
         $typeFields = is_callable($type->config['fields']) ? $type->config['fields']() : $type->config['fields'];
-        $fields = $instance->getNodeFields($extension->definition->fields)->toArray();
+        $fields = $instance->getNodeFields($extension->definition)->toArray();
         $type->config['fields'] = function () use ($typeFields, $fields) {
             return array_merge($typeFields, $fields);
         };
@@ -40,6 +40,6 @@ class ExtensionFactory
     {
         $instance = new static();
 
-        return $instance->getNodeFields($extension->definition->fields)->toArray();
+        return $instance->getNodeFields($extension->definition)->toArray();
     }
 }

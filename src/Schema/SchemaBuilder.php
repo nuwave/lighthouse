@@ -241,29 +241,39 @@ class SchemaBuilder
      */
     protected function setMutations()
     {
-        $this->mutations = $this->objectTypes()
-        ->filter(function (ObjectTypeDefinitionNode $objectType) {
-            return 'Mutation' === $objectType->name->value;
-        })->map(function (ObjectTypeDefinitionNode $objectType) {
-            return collect($objectType->fields)->toArray();
-        })->collapse()->mapWithKeys(function (FieldDefinitionNode $mutation) {
-            return [data_get($mutation, 'name.value') => MutationFactory::resolve($mutation)];
-        })->toArray();
+        $mutationNode = $this->objectTypes()
+            ->first(function (ObjectTypeDefinitionNode $objectType) {
+                return 'Mutation' === $objectType->name->value;
+            });
+
+        if (! $mutationNode) {
+            return;
+        }
+
+        $this->mutations = collect($mutationNode->fields)
+            ->mapWithKeys(function (FieldDefinitionNode $mutation) use ($mutationNode) {
+                return [data_get($mutation, 'name.value') => MutationFactory::resolve($mutation, $mutationNode)];
+            })->toArray();
     }
 
     /**
-     * Set mutation fields.
+     * Set query fields.
      */
     protected function setQueries()
     {
-        $this->queries = $this->objectTypes()
-        ->filter(function (ObjectTypeDefinitionNode $objectType) {
-            return 'Query' === $objectType->name->value;
-        })->map(function (ObjectTypeDefinitionNode $objectType) {
-            return collect($objectType->fields)->toArray();
-        })->collapse()->mapWithKeys(function (FieldDefinitionNode $mutation) {
-            return [data_get($mutation, 'name.value') => QueryFactory::resolve($mutation)];
-        })->toArray();
+        $queryNode = $this->objectTypes()
+            ->first(function (ObjectTypeDefinitionNode $objectType) {
+                return 'Query' === $objectType->name->value;
+            });
+
+        if (! $queryNode) {
+            return;
+        }
+
+        $this->queries = collect($queryNode->fields)
+            ->mapWithKeys(function (FieldDefinitionNode $query) use ($queryNode) {
+                return [data_get($query, 'name.value') => QueryFactory::resolve($query, $queryNode)];
+            })->toArray();
     }
 
     /**

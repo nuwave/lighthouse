@@ -3,7 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\Resolvers\QueryResolver;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class QueryFactory
 {
@@ -11,13 +13,14 @@ class QueryFactory
      * Convert field definition to query.
      *
      * @param FieldDefinitionNode $query
+     * @param Node                $node
      *
      * @return array
      */
-    public static function resolve(FieldDefinitionNode $query)
+    public static function resolve(FieldDefinitionNode $query, Node $node)
     {
         $type = directives()->hasResolver($query)
-            ? directives()->fieldResolver($query)->handle($query)
+            ? directives()->fieldResolver($query)->handle(FieldValue::init($node, $query))
             : QueryResolver::resolve($query, self::resolver($query));
 
         $type['resolve'] = directives()->fieldMiddleware($query)
