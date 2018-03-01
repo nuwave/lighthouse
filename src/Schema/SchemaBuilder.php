@@ -11,10 +11,12 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Factories\ExtensionFactory;
 use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\QueryFactory;
+use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
 
 class SchemaBuilder
 {
@@ -114,7 +116,26 @@ class SchemaBuilder
             $this->input,
             $this->mutations,
             $this->queries
-        ));
+        ))->map(function ($type) {
+            if ($type instanceof Type) {
+                $fields = is_callable($type->config['fields'])
+                    ? $type->config['fields']()
+                    : $type->config['fields'];
+
+                $type->config['fields'] = collect($fields)->map(function ($field, $name) {
+                    $type = array_get($field, 'type');
+
+                    array_set($field, 'type', is_callable($type)
+                        ? FieldTypeResolver::unpack($type())
+                        : FieldTypeResolver::unpack($type)
+                    );
+
+                    return $field;
+                })->toArray();
+            }
+
+            return $type;
+        });
     }
 
     /**

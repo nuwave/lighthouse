@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Type\Definition\ListOfType;
+use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
 
 class FieldTypeResolver
@@ -18,6 +20,18 @@ class FieldTypeResolver
     public static function resolve($field)
     {
         return (new static())->resolveNodeType($field->type);
+    }
+
+    /**
+     * Unpack type.
+     *
+     * @param mixed $type
+     *
+     * @return Type
+     */
+    public static function unpack($type)
+    {
+        return (new static())->unpackNodeType($type);
     }
 
     /**
@@ -56,6 +70,33 @@ class FieldTypeResolver
     }
 
     /**
+     * Unpack and resolve node type.
+     *
+     * @param mixed $type
+     * @param array $wrappers
+     *
+     * @return Type
+     */
+    public function unpackNodeType($type, array $wrappers = [])
+    {
+        $type = is_callable($type) ? $type() : $type;
+
+        if ($type instanceof ListOfType) {
+            return $this->unpackNodeType($type->getWrappedType(), array_merge($wrappers, ['ListOfType']));
+        } elseif ($type instanceof NonNull) {
+            return $this->unpackNodeType($type->getWrappedType(), array_merge($wrappers, ['NonNull']));
+        }
+
+        return collect($wrappers)
+            ->reverse()
+            ->reduce(function ($innerType, $wrapper) {
+                return 'ListOfType' === $wrapper
+                    ? Type::listOf($innerType)
+                    : Type::nonNull($innerType);
+            }, $type);
+    }
+
+    /**
      * Extract type from node definition.
      *
      * @param mixed $node
@@ -90,21 +131,21 @@ class FieldTypeResolver
             case 'String':
                 return Type::string();
             default:
-                return $this->convertCustomType($node);
+                return $this->convertCustomType($node->name->value);
         }
     }
 
     /**
      * Convert custom node type.
      *
-     * @param NamedTypeNode $node
+     * @param string $name
      *
      * @return mixed
      */
-    protected function convertCustomType(NamedTypeNode $node)
+    protected function convertCustomType($name)
     {
-        return function () use ($node) {
-            return schema()->instance($node->name->value);
+        return function () use ($name) {
+            return schema()->instance($name);
         };
     }
 }
