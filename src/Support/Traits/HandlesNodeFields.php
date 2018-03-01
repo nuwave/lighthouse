@@ -6,6 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 trait HandlesNodeFields
 {
@@ -19,11 +20,11 @@ trait HandlesNodeFields
     protected function getNodeFields(Node $node)
     {
         return collect($node->fields)->mapWithKeys(function (FieldDefinitionNode $field) use ($node) {
-            return [$field->name->value => [
-                'type' => FieldTypeResolver::resolve($field),
-                'description' => trim(str_replace("\n", '', data_get($field, 'description', ''))),
-                'resolve' => FieldFactory::convert($field, $node),
-            ]];
+            $type = FieldTypeResolver::resolve($field);
+            $description = trim(str_replace("\n", '', data_get($field, 'description', '')));
+            $value = FieldValue::init($type, $node, $field, $description);
+
+            return [$field->name->value => FieldFactory::convert($value)];
         });
     }
 }

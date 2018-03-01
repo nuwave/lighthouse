@@ -19,16 +19,17 @@ class QueryFactory
      */
     public static function resolve(FieldDefinitionNode $query, Node $node)
     {
-        $type = directives()->hasResolver($query)
-            ? directives()->fieldResolver($query)->handle(FieldValue::init($node, $query))
+        $value = FieldValue::init(schema()->instance('Query'), $node, $query, '');
+        $field = directives()->hasResolver($query)
+            ? directives()->fieldResolver($query)->handle($value)
             : QueryResolver::resolve($query, self::resolver($query));
 
-        $type['resolve'] = directives()->fieldMiddleware($query)
+        $field['resolve'] = directives()->fieldMiddleware($query)
             ->reduce(function ($resolver, $middleware) use ($query) {
                 return $middleware->handle($query, $resolver);
-            }, $type['resolve']);
+            }, $field['resolve']);
 
-        return $type;
+        return $field;
     }
 
     /**

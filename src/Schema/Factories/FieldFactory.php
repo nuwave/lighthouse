@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class FieldFactory
@@ -11,21 +10,24 @@ class FieldFactory
     /**
      * Convert field definition to type.
      *
-     * @param FieldDefinitionNode $field
-     * @param Node                $node
+     * @param FieldValue $value
      *
      * @return array
      */
-    public static function convert(FieldDefinitionNode $field, Node $node)
+    public static function convert(FieldValue $value)
     {
-        $resolve = directives()->hasResolver($field)
-            ? directives()->fieldResolver($field)->handle(FieldValue::init($node, $field))
-            : static::resolver($field);
+        $resolve = directives()->hasResolver($value->getField())
+            ? directives()->fieldResolver($value->getField())->handle($value)
+            : static::resolver($value->getField());
 
-        return directives()->fieldMiddleware($field)
-            ->reduce(function ($resolver, $middleware) use ($field) {
-                return $middleware->handle($field, $resolver);
-            }, $resolve);
+        return [
+            'type' => $value->getType(),
+            'description' => $value->getDescription(),
+            'resolve' => directives()->fieldMiddleware($value->getField())
+                ->reduce(function ($resolver, $middleware) use ($value) {
+                    return $middleware->handle($value->getField(), $resolver);
+                }, $resolve),
+        ];
     }
 
     /**

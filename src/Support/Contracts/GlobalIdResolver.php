@@ -19,5 +19,5 @@ interface GlobalIdResolver
      *
      * @return mixed
      */
-    public function resolve($id, $globalId);
+    public function resolve($id, $globalId); // TODO: Switch this out w/ a NodeValue
 }
