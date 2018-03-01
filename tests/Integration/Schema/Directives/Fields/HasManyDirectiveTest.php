@@ -92,6 +92,7 @@ class HasManyDirectiveTest extends DBTestCase
 
     /**
      * @test
+     * @group failing
      */
     public function itCanQueryHasManyRelayConnection()
     {
@@ -107,6 +108,7 @@ class HasManyDirectiveTest extends DBTestCase
         $type = schema()->register($schema)->first();
         $resolver = array_get($type->config['fields'], 'tasks.resolve');
         $tasks = $resolver($this->user, ['first' => 2]);
+        dd($tasks->count(), $tasks->total());
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
         $this->assertEquals(2, $tasks->count());

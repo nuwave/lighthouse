@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
@@ -24,14 +25,14 @@ class MethodDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldDefinitionNode $field
+     * @param FieldValue $value
      *
      * @return \Closure
      */
-    public function handle(FieldDefinitionNode $field)
+    public function handle(FieldValue $value)
     {
         $method = $this->directiveArgValue(
-            $this->fieldDirective($field, 'method'),
+            $this->fieldDirective($value->getField(), 'method'),
             'name'
         );
 

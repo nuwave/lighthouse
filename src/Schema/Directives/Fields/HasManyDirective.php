@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -25,14 +25,14 @@ class HasManyDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldDefinitionNode $field
+     * @param FieldValue $value
      *
      * @return \Closure
      */
-    public function handle(FieldDefinitionNode $field)
+    public function handle(FieldValue $value)
     {
-        $relation = $this->getRelationshipName($field);
-        $resolver = $this->getResolver($field);
+        $relation = $this->getRelationshipName($value->getField());
+        $resolver = $this->getResolver($value->getField());
 
         if (! in_array($resolver, ['default', 'paginator', 'relay'])) {
             throw new DirectiveException(sprintf(

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\QueryResolver;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
@@ -24,18 +24,18 @@ class AuthDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldDefinitionNode $field
+     * @param FieldValue $value
      *
      * @return \Closure
      */
-    public function handle(FieldDefinitionNode $field)
+    public function handle(FieldValue $value)
     {
         $guard = $this->directiveArgValue(
-            $this->fieldDirective($field, $this->name()),
+            $this->fieldDirective($value->getField(), $this->name()),
             'guard'
         );
 
-        return QueryResolver::resolve($field, function () use ($guard) {
+        return QueryResolver::resolve($value->field(), function () use ($guard) {
             return auth($guard)->user();
         });
     }

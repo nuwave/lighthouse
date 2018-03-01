@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -25,13 +25,13 @@ class FieldDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldDefinitionNode $field
+     * @param FieldValue $value
      *
      * @return \Closure
      */
-    public function handle(FieldDefinitionNode $field)
+    public function handle(FieldValue $value)
     {
-        $directive = $this->fieldDirective($field, $this->name());
+        $directive = $this->fieldDirective($value->getField(), $this->name());
         $className = $this->getClassName($directive);
         $method = $this->getMethod($directive);
         $instance = app($className);

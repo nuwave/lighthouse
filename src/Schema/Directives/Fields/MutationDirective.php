@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\MutationResolver;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -25,22 +25,22 @@ class MutationDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldDefinitionNode $field
+     * @param FieldValue $value
      *
      * @return \Closure
      */
-    public function handle(FieldDefinitionNode $field)
+    public function handle(FieldValue $value)
     {
-        $namespace = $this->directiveArgValue($this->fieldDirective($field, 'mutation'), 'class');
+        $namespace = $this->directiveArgValue($this->fieldDirective($value->getField(), 'mutation'), 'class');
 
         if (! $namespace) {
             throw new DirectiveException(sprintf(
                 'The `mutation` directive on %s needs to include a `class` argument',
-                $field->name->value
+                $value->getField()->name->value
             ));
         }
 
-        return MutationResolver::resolve($field, $this->getResolver($namespace));
+        return MutationResolver::resolve($value->getField(), $this->getResolver($namespace));
     }
 
     /**
