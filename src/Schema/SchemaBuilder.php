@@ -131,8 +131,6 @@ class SchemaBuilder
             $this->input,
             $this->scalars,
             $this->enums,
-            $this->mutations,
-            $this->queries,
             $this->interfaces
         ))->first(function ($instance) use ($type) {
             return $instance->name === $type;
