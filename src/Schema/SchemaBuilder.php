@@ -110,7 +110,11 @@ class SchemaBuilder
             $this->unpackType($type);
         });
 
-        return collect($this->getRegisteredTypes());
+        return collect(array_merge(
+            $this->getRegisteredTypes(),
+            $this->mutations,
+            $this->queries
+        ));
     }
 
     /**

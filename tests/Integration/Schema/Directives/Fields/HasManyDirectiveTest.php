@@ -93,7 +93,6 @@ class HasManyDirectiveTest extends DBTestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanQueryHasManyRelayConnection()
     {
