@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
 use Nuwave\Lighthouse\Support\Traits\CanExtendTypes;
@@ -101,17 +102,15 @@ class SchemaBuilder
 
         $this->setTypes($document);
 
-        return collect(array_merge(
-            $this->enums,
-            $this->interfaces,
-            $this->scalars,
-            $this->types,
-            $this->input,
+        collect(array_merge(
+            $this->getRegisteredTypes(),
             $this->mutations,
             $this->queries
-        ))->map(function ($type) {
-            return $this->unpackType($type);
+        ))->each(function ($type) {
+            $this->unpackType($type);
         });
+
+        return collect($this->getRegisteredTypes());
     }
 
     /**
@@ -127,6 +126,18 @@ class SchemaBuilder
         ->first(function ($instance) use ($type) {
             return $instance->name === $type;
         });
+    }
+
+    /**
+     * Add type to register.
+     *
+     * @param ObjectType|array $type
+     */
+    public function type($type)
+    {
+        $this->types = is_array($type)
+            ? array_merge($this->types, $type)
+            : array_merge($this->types, [$type]);
     }
 
     /**
@@ -181,7 +192,7 @@ class SchemaBuilder
      *
      * @return mixed
      */
-    protected function unpackType($type)
+    public function unpackType($type)
     {
         if ($type instanceof Type && array_has($type->config, 'fields')) {
             $fields = is_callable($type->config['fields'])

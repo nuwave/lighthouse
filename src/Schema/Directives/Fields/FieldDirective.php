@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -35,10 +36,17 @@ class FieldDirective implements FieldResolver
         $className = $this->getClassName($directive);
         $method = $this->getMethod($directive);
         $instance = app($className);
+        $data = $this->argValue(collect($directive->arguments)->first(function ($arg) {
+            return 'args' === data_get($arg, 'name.value');
+        }));
 
-        return (new \ReflectionClass($instance))
+        $closure = (new \ReflectionClass($instance))
             ->getMethod($method)
             ->getClosure($instance);
+
+        return function ($root, array $args, $context = null, ResolveInfo $info = null) use ($closure, $data) {
+            return $closure($root, array_merge($args, ['directive' => $data]), $context, $info);
+        };
     }
 
     /**

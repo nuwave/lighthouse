@@ -28,6 +28,24 @@ class FieldDirectiveTest extends TestCase
     /**
      * @test
      */
+    public function itCanResolveFieldWithMergedArgs()
+    {
+        $schema = '
+        type Foo {
+            bar: String! @field(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
+        }
+        ';
+
+        $type = schema()->register($schema)->first();
+        $fields = $type->config['fields'];
+        $resolve = array_get($fields, 'bar.resolve');
+
+        $this->assertEquals('foo.baz', $resolve(null, []));
+    }
+
+    /**
+     * @test
+     */
     public function itThrowsAnErrorIfNoClassIsDefined()
     {
         $schema = '

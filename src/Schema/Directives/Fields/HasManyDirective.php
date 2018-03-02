@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -96,21 +98,29 @@ class HasManyDirective implements FieldResolver
     {
         $schema = sprintf(
             'type %s { node: %s cursor: String! }
-            type %s { pageInfo: PageInfo! edges: [%s] @field(class: "%s" method: "%s" args: ["%s"]) }',
-            $this->connectionTypeName($value),
-            $this->connectionEdgeName($value),
+            type %s { pageInfo: PageInfo! edges: [%s] @field(class: "%s" method: "%s") }',
             $this->connectionEdgeName($value),
             $this->unpackNodeToString($value->getField()),
+            $this->connectionTypeName($value),
+            $this->connectionEdgeName($value),
             addslashes(self::class),
-            'connectionResolver',
-            $relation
+            'connectionResolver'
         );
 
-        // TODO: Add arguments to field
-        // 1. Get Type to swap out w/ $value
-        // 2. Register edge type w/ schema
-        // 3. Set resolver directive w/ $relation as argument
-        dd($this->getObjectTypes($this->parseSchema($schema)));
+        collect($this->getObjectTypes($this->parseSchema($schema)))
+            ->each(function ($type) use ($value) {
+                schema()->type(schema()->unpackType($type));
+
+                if (ends_with($type->name, 'Connection')) {
+                    $value->setType($type);
+                }
+            });
+
+        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation) {
+            $builder = call_user_func([$parent, $relation]);
+
+            return $builder->relayConnection($args);
+        };
     }
 
     /**
@@ -139,10 +149,8 @@ class HasManyDirective implements FieldResolver
      */
     protected function connectionResolver($relation)
     {
-        return function ($parent, array $args) use ($relation) {
-            $builder = call_user_func([$parent, $relation]);
-
-            return $builder->relayConnection($args);
+        return function (LengthAwarePaginator $root, array $args, $context = null, ResolveInfo $info = null) {
+            return ['pageInfo' => $root, 'edges' => $root->items()];
         };
     }
 

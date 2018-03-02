@@ -7,36 +7,39 @@ class SchemaStitcher
     /**
      * Stitch together schema documents.
      *
-     * @param  string $globalId
-     * @param  string|null $path
+     * @param string      $globalId
+     * @param string|null $path
+     *
      * @return string
      */
     public function stitch($globalId, $path = null)
     {
         $lighthouse = $this->lighthouseSchema($globalId);
-        $app = $path ? $this->appSchema($path) : "";
+        $app = $path ? $this->appSchema($path) : '';
 
-        return $lighthouse . $app;
+        return $lighthouse.$app;
     }
 
     /**
      * Get Lighthouse schema.
      *
-     * @param  string $globalId
+     * @param string $globalId
+     *
      * @return string
      */
-    protected function lighthouseSchema($globalId)
+    public function lighthouseSchema($globalId = '_id')
     {
         $path = realpath(__DIR__.'/../../../assets/schema.graphql');
         $schema = file_get_contents($path);
 
-        return str_replace("_id", $globalId, $schema);
+        return str_replace('_id', $globalId, $schema);
     }
 
     /**
      * Get application schema.
      *
-     * @param  string $path
+     * @param string $path
+     *
      * @return string
      */
     protected function appSchema($path)
@@ -44,9 +47,9 @@ class SchemaStitcher
         $schema = file_get_contents($path);
 
         $imports = collect(explode("\n", $schema))->filter(function ($line) {
-            return strpos(trim($line), "#import") === 0;
+            return 0 === strpos(trim($line), '#import');
         })->map(function ($import) {
-            return trim(str_replace("#import", "", $import));
+            return trim(str_replace('#import', '', $import));
         })->map(function ($file) use ($path) {
             return $this->appSchema(realpath(dirname($path).'/'.$file));
         })->implode("\n");

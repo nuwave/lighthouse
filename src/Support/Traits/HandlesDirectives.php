@@ -52,7 +52,11 @@ trait HandlesDirectives
      */
     protected function argValue($arg, $default = null)
     {
-        $value = $arg->value;
+        $value = data_get($arg, 'value');
+
+        if (! $value) {
+            return $default;
+        }
 
         if ($value instanceof ListValueNode) {
             return collect($value->values)->map(function ($node) {
