@@ -78,7 +78,12 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        // Need lighthouse schema to resolve PaginatorInfo type
+        $type = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema)
+            ->first(function ($type) {
+                return 'User' === $type->name;
+            });
+
         $resolver = array_get($type->config['fields'], 'tasks.resolve');
         $tasks = $resolver($this->user, ['first' => 2, 'page' => 2]);
 
@@ -86,9 +91,6 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertEquals(1, $tasks->count());
         $this->assertEquals(3, $tasks->total());
         $this->assertFalse($tasks->hasMorePages());
-
-        // TODO: Change resolve type in schema to type UserTaskPaginator
-        // w/ PaginatorInfo & UserTaskData fields
     }
 
     /**
@@ -105,6 +107,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
+        // Need lighthouse schema to resolve PageInfo type
         $type = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema)
             ->first(function ($type) {
                 return 'User' === $type->name;

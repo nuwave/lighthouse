@@ -46,9 +46,9 @@ class HasManyDirective implements FieldResolver
 
         switch ($resolver) {
             case 'paginator':
-                return $this->paginatorResolver($relation);
+                return $this->paginatorTypeResolver($relation, $value);
             case 'relay':
-                return $this->connectionType($relation, $value);
+                return $this->connectionTypeResolver($relation, $value);
             default:
                 return $this->defaultResolver($relation);
         }
@@ -92,9 +92,9 @@ class HasManyDirective implements FieldResolver
      * @param string     $relation
      * @param FieldValue $value
      *
-     * @return FieldValue
+     * @return \Closure
      */
-    protected function connectionType($relation, FieldValue $value)
+    protected function connectionTypeResolver($relation, FieldValue $value)
     {
         $schema = sprintf(
             'type %s { node: %s cursor: String! }
@@ -120,6 +120,40 @@ class HasManyDirective implements FieldResolver
             $builder = call_user_func([$parent, $relation]);
 
             return $builder->relayConnection($args);
+        };
+    }
+
+    /**
+     * Get paginator type resolver.
+     *
+     * @param string     $relation
+     * @param FieldValue $value
+     *
+     * @return \Closure
+     */
+    protected function paginatorTypeResolver($relation, FieldValue $value)
+    {
+        $schema = sprintf(
+            'type %s { paginatorInfo: PaginatorInfo! data: [%s!]! @field(class: "%s" method: "%s") }',
+            $this->paginatorTypeName($value),
+            $this->unpackNodeToString($value->getField()),
+            addslashes(self::class),
+            'paginatorResolver'
+        );
+
+        collect($this->getObjectTypes($this->parseSchema($schema)))
+            ->each(function ($type) use ($value) {
+                schema()->type(schema()->unpackType($type));
+
+                if (ends_with($type->name, 'Paginator')) {
+                    $value->setType($type);
+                }
+            });
+
+        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation) {
+            $builder = call_user_func([$parent, $relation]);
+
+            return $builder->paginatorConnection($args);
         };
     }
 
@@ -150,6 +184,7 @@ class HasManyDirective implements FieldResolver
     protected function connectionResolver($relation)
     {
         return function (LengthAwarePaginator $root, array $args, $context = null, ResolveInfo $info = null) {
+            // TODO: Need to add cursor to edges...
             return ['pageInfo' => $root, 'edges' => $root->items()];
         };
     }
@@ -157,17 +192,28 @@ class HasManyDirective implements FieldResolver
     /**
      * Use paginator resolver for field.
      *
-     * @param string $relation
-     *
      * @return \Closure
      */
-    protected function paginatorResolver($relation)
+    protected function paginatorResolver()
     {
-        return function ($parent, array $args) use ($relation) {
-            $builder = call_user_func([$parent, $relation]);
-
-            return $builder->paginatorConnection($args);
+        return function (LengthAwarePaginator $root, array $args, $context = null, ResolveInfo $info = null) {
+            return ['pageInfo' => $root, 'data' => $root->items()];
         };
+    }
+
+    /**
+     * Get paginator type name.
+     *
+     * @param FieldValue $value
+     *
+     * @return string
+     */
+    protected function paginatorTypeName(FieldValue $value)
+    {
+        $parent = $value->getNode()->name->value;
+        $child = str_singular($value->getField()->name->value);
+
+        return studly_case($parent.'_'.$child.'_Paginator');
     }
 
     /**
