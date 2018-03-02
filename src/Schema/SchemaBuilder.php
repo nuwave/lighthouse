@@ -3,23 +3,16 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Factories\ExtensionFactory;
-use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
-use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Schema\Factories\QueryFactory;
 use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
+use Nuwave\Lighthouse\Support\Traits\CanExtendTypes;
+use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 
 class SchemaBuilder
 {
+    use CanExtendTypes, CanParseTypes;
+
     /**
      * Collection of schema enums.
      *
@@ -104,9 +97,9 @@ class SchemaBuilder
      */
     public function register($schema)
     {
-        $this->document = Parser::parse($schema);
+        $document = Parser::parse($schema);
 
-        $this->setTypes();
+        $this->setTypes($document);
 
         return collect(array_merge(
             $this->enums,
@@ -117,24 +110,7 @@ class SchemaBuilder
             $this->mutations,
             $this->queries
         ))->map(function ($type) {
-            if ($type instanceof Type && array_has($type->config, 'fields')) {
-                $fields = is_callable($type->config['fields'])
-                    ? $type->config['fields']()
-                    : $type->config['fields'];
-
-                $type->config['fields'] = collect($fields)->map(function ($field, $name) {
-                    $type = array_get($field, 'type');
-
-                    array_set($field, 'type', is_callable($type)
-                        ? FieldTypeResolver::unpack($type())
-                        : FieldTypeResolver::unpack($type)
-                    );
-
-                    return $field;
-                })->toArray();
-            }
-
-            return $type;
+            return $this->unpackType($type);
         });
     }
 
@@ -147,204 +123,83 @@ class SchemaBuilder
      */
     public function instance($type)
     {
-        return collect(array_merge(
-            $this->types,
-            $this->input,
-            $this->scalars,
-            $this->enums,
-            $this->interfaces
-        ))->first(function ($instance) use ($type) {
+        return collect($this->getRegisteredTypes())
+        ->first(function ($instance) use ($type) {
             return $instance->name === $type;
         });
     }
 
     /**
      * Set schema types.
+     *
+     * @param DocumentNode $document
      */
-    protected function setTypes()
+    protected function setTypes(DocumentNode $document)
     {
-        $this->setEnums();
-        $this->setInterfaces();
-        $this->setScalars();
-        $this->setObjectTypes();
-        $this->setInputTypes();
-        $this->setMutations();
-        $this->setQueries();
-        $this->attachTypeExtensions();
-        $this->attachMutationExtensions();
-        $this->attachQueryExtensions();
+        $this->enums = $this->getEnums($document);
+        $this->interfaces = $this->getInterfaces($document);
+        $this->scalars = $this->getScalars($document);
+        $this->types = $this->getObjectTypes($document);
+        $this->input = $this->getInputTypes($document);
+        $this->mutations = $this->getMutations($document);
+        $this->queries = $this->getQueries($document);
+
+        $this->attachTypeExtensions(
+            $this->definitions($document),
+            $this->getRegisteredTypes()
+        );
+
+        $this->mutations = array_merge($this->mutations, $this->getMutationExtensions(
+            $this->definitions($document)
+        ));
+
+        $this->queries = array_merge($this->queries, $this->getQueryExtensions(
+            $this->definitions($document)
+        ));
     }
 
     /**
-     * Set enum types.
+     * Get registered types.
+     *
+     * @return array
      */
-    protected function setEnums()
+    protected function getRegisteredTypes()
     {
-        $this->enums = $this->definitions()->filter(function ($def) {
-            return $def instanceof EnumTypeDefinitionNode;
-        })->map(function (EnumTypeDefinitionNode $enum) {
-            return NodeFactory::enum($enum);
-        })->toArray();
+        return array_merge(
+            $this->types,
+            $this->input,
+            $this->scalars,
+            $this->enums,
+            $this->interfaces
+        );
     }
 
     /**
-     * Set interface types.
+     * Unpack type (fields and type).
+     *
+     * @param mixed $type
+     *
+     * @return mixed
      */
-    protected function setInterfaces()
+    protected function unpackType($type)
     {
-        $this->interfaces = $this->definitions()->filter(function ($def) {
-            return $def instanceof InterfaceTypeDefinitionNode;
-        })->map(function (InterfaceTypeDefinitionNode $interface) {
-            return NodeFactory::interface($interface);
-        })->toArray();
-    }
+        if ($type instanceof Type && array_has($type->config, 'fields')) {
+            $fields = is_callable($type->config['fields'])
+                ? $type->config['fields']()
+                : $type->config['fields'];
 
-    /**
-     * Set scalar types.
-     */
-    protected function setScalars()
-    {
-        $this->scalars = $this->definitions()->filter(function ($def) {
-            return $def instanceof ScalarTypeDefinitionNode;
-        })->map(function (ScalarTypeDefinitionNode $scalar) {
-            return NodeFactory::scalar($scalar);
-        })->toArray();
-    }
+            $type->config['fields'] = collect($fields)->map(function ($field, $name) {
+                $type = array_get($field, 'type');
 
-    /**
-     * Set object types.
-     */
-    protected function setObjectTypes()
-    {
-        $this->types = $this->objectTypes()
-        ->filter(function (ObjectTypeDefinitionNode $objectType) {
-            return ! in_array($objectType->name->value, ['Mutation', 'Query']);
-        })->map(function (ObjectTypeDefinitionNode $objectType) {
-            return NodeFactory::objectType($objectType);
-        })->toArray();
-    }
+                array_set($field, 'type', is_callable($type)
+                    ? FieldTypeResolver::unpack($type())
+                    : FieldTypeResolver::unpack($type)
+                );
 
-    /**
-     * Set input types.
-     */
-    protected function setInputTypes()
-    {
-        $this->input = $this->definitions()->filter(function ($def) {
-            return $def instanceof InputObjectTypeDefinitionNode;
-        })->map(function (InputObjectTypeDefinitionNode $input) {
-            return NodeFactory::inputObjectType($input);
-        })->toArray();
-    }
-
-    /**
-     * Set mutation fields.
-     */
-    protected function setMutations()
-    {
-        $mutationNode = $this->objectTypes()
-            ->first(function (ObjectTypeDefinitionNode $objectType) {
-                return 'Mutation' === $objectType->name->value;
-            });
-
-        if (! $mutationNode) {
-            return;
+                return $field;
+            })->toArray();
         }
 
-        $this->mutations = collect($mutationNode->fields)
-            ->mapWithKeys(function (FieldDefinitionNode $mutation) use ($mutationNode) {
-                return [data_get($mutation, 'name.value') => MutationFactory::resolve($mutation, $mutationNode)];
-            })->toArray();
-    }
-
-    /**
-     * Set query fields.
-     */
-    protected function setQueries()
-    {
-        $queryNode = $this->objectTypes()
-            ->first(function (ObjectTypeDefinitionNode $objectType) {
-                return 'Query' === $objectType->name->value;
-            });
-
-        if (! $queryNode) {
-            return;
-        }
-
-        $this->queries = collect($queryNode->fields)
-            ->mapWithKeys(function (FieldDefinitionNode $query) use ($queryNode) {
-                return [data_get($query, 'name.value') => QueryFactory::resolve($query, $queryNode)];
-            })->toArray();
-    }
-
-    /**
-     * Attach extensions to types.
-     */
-    protected function attachTypeExtensions()
-    {
-        $this->definitions()->filter(function ($def) {
-            return $def instanceof TypeExtensionDefinitionNode;
-        })->each(function (TypeExtensionDefinitionNode $extension) {
-            collect($this->types)->filter(function ($type) use ($extension) {
-                return $type->name === $extension->definition->name->value;
-            })->each(function ($type) use ($extension) {
-                ExtensionFactory::extend($extension, $type);
-            });
-        });
-    }
-
-    /**
-     * Attach extensions to mutations.
-     */
-    protected function attachMutationExtensions()
-    {
-        $this->definitions()->filter(function ($def) {
-            return $def instanceof TypeExtensionDefinitionNode;
-        })->filter(function (TypeExtensionDefinitionNode $extension) {
-            return 'Mutation' === $extension->definition->name->value;
-        })->each(function (TypeExtensionDefinitionNode $extension) {
-            $this->mutations = array_merge(
-                $this->mutations,
-                ExtensionFactory::extractFields($extension)
-            );
-        });
-    }
-
-    /**
-     * Attach extensions to queries.
-     */
-    protected function attachQueryExtensions()
-    {
-        $this->definitions()->filter(function ($def) {
-            return $def instanceof TypeExtensionDefinitionNode;
-        })->filter(function (TypeExtensionDefinitionNode $extension) {
-            return 'Query' === $extension->definition->name->value;
-        })->each(function (TypeExtensionDefinitionNode $extension) {
-            $this->queries = array_merge(
-                $this->queries,
-                ExtensionFactory::extractFields($extension)
-            );
-        });
-    }
-
-    /**
-     * Get definitions from document.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function definitions()
-    {
-        return collect($this->document->definitions);
-    }
-
-    /**
-     * Get object types from document.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function objectTypes()
-    {
-        return $this->definitions()->filter(function ($def) {
-            return $def instanceof ObjectTypeDefinitionNode;
-        });
+        return $type;
     }
 }

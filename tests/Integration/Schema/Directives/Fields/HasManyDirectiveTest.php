@@ -106,6 +106,7 @@ class HasManyDirectiveTest extends DBTestCase
         ';
 
         $type = schema()->register($schema)->first();
+        dd($type);
         $resolver = array_get($type->config['fields'], 'tasks.resolve');
         $tasks = $resolver($this->user, ['first' => 2]);
         // dd($tasks->count(), $tasks->total());

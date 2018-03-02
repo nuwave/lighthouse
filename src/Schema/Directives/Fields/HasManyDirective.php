@@ -45,7 +45,7 @@ class HasManyDirective implements FieldResolver
             case 'paginator':
                 return $this->paginatorResolver($relation);
             case 'relay':
-                return $this->connectionResolver($relation);
+                return $this->connectionResolver($relation, $value);
             default:
                 return $this->defaultResolver($relation);
         }
@@ -103,12 +103,24 @@ class HasManyDirective implements FieldResolver
     /**
      * Use connection resolver for field.
      *
-     * @param string $relation
+     * @param string     $relation
+     * @param FieldValue $value
      *
      * @return \Closure
      */
-    protected function connectionResolver($relation)
+    protected function connectionResolver($relation, FieldValue $value)
     {
+        $schema = sprintf(
+            'type %s { node: %s cursor: String! }
+            type %s { pageInfo: PageInfo! edges: [%s] }',
+            $this->connectionTypeName($value),
+            $this->connectionEdgeName($value),
+            $this->connectionEdgeName($value),
+            $this->unpackNodeToString($value->getField())
+        );
+        // TODO: Add arguments to field
+        dd(schema()->register($schema));
+
         return function ($parent, array $args) use ($relation) {
             $builder = call_user_func([$parent, $relation]);
 
@@ -130,5 +142,35 @@ class HasManyDirective implements FieldResolver
 
             return $builder->paginatorConnection($args);
         };
+    }
+
+    /**
+     * Get connection type name.
+     *
+     * @param FieldValue $value
+     *
+     * @return string
+     */
+    protected function connectionTypeName(FieldValue $value)
+    {
+        $parent = $value->getNode()->name->value;
+        $child = str_singular($value->getField()->name->value);
+
+        return studly_case($parent.'_'.$child.'_Connection');
+    }
+
+    /**
+     * Get connection edge name.
+     *
+     * @param FieldValue $value
+     *
+     * @return string
+     */
+    protected function connectionEdgeName(FieldValue $value)
+    {
+        $parent = $value->getNode()->name->value;
+        $child = str_singular($value->getField()->name->value);
+
+        return studly_case($parent.'_'.$child.'_Edge');
     }
 }

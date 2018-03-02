@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListValueNode;
+use GraphQL\Language\AST\Node;
 
 trait HandlesDirectives
 {
@@ -60,5 +61,43 @@ trait HandlesDirectives
         }
 
         return $value->value;
+    }
+
+    /**
+     * Unpack field definition type.
+     *
+     * @param Node $node
+     *
+     * @return string
+     */
+    protected function unpackNodeToString(Node $node)
+    {
+        if (in_array($node->kind, ['ListType', 'NonNullType', 'FieldDefinition'])) {
+            return $this->unpackNodeToString($node->type);
+        }
+
+        return $node->name->value;
+    }
+
+    /**
+     * Convert node to schema string.
+     *
+     * @param Node  $node
+     * @param array $wrappers
+     *
+     * @return string
+     */
+    protected function nodeToString(Node $node, $wrappers = [])
+    {
+        if ('NonNullType' === $node->kind) {
+            return $this->nodeToString($node->type, array_merge($wrappers, ['%s!']));
+        } elseif ('ListType' === $node->kind) {
+            return $this->nodeToString($node->type, array_merge($wrappers, ['[%s]']));
+        }
+
+        return str_replace('%s', '', collect(array_merge($wrappers, [$node->name->value]))
+            ->reduce(function ($string, $type) {
+                return sprintf($string, $type);
+            }, '%s'));
     }
 }
