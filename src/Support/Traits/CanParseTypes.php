@@ -9,12 +9,25 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\QueryFactory;
 
 trait CanParseTypes
 {
+    /**
+     * Parse schema to definitions.
+     *
+     * @param string $schema
+     *
+     * @return DocumentNode
+     */
+    public function parseSchema($schema)
+    {
+        return Parser::parse($schema);
+    }
+
     /**
      * Set enum types.
      *
@@ -44,8 +57,6 @@ trait CanParseTypes
             return $def instanceof InterfaceTypeDefinitionNode;
         })->map(function (InterfaceTypeDefinitionNode $interface) {
             return NodeFactory::interface($interface);
-        })->each(function ($interface) {
-            array_push($this->interfaces, $interface);
         })->toArray();
     }
 
@@ -62,8 +73,6 @@ trait CanParseTypes
             return $def instanceof ScalarTypeDefinitionNode;
         })->map(function (ScalarTypeDefinitionNode $scalar) {
             return NodeFactory::scalar($scalar);
-        })->each(function ($scalar) {
-            array_push($this->scalars, $scalar);
         })->toArray();
     }
 
@@ -81,8 +90,6 @@ trait CanParseTypes
             return ! in_array($objectType->name->value, ['Mutation', 'Query']);
         })->map(function (ObjectTypeDefinitionNode $objectType) {
             return NodeFactory::objectType($objectType);
-        })->each(function ($type) {
-            array_push($this->types, $type);
         })->toArray();
     }
 

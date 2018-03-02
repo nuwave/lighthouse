@@ -97,7 +97,7 @@ class SchemaBuilder
      */
     public function register($schema)
     {
-        $document = Parser::parse($schema);
+        $document = $this->parseSchema($schema);
 
         $this->setTypes($document);
 

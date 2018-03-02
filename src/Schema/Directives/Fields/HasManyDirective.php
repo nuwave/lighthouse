@@ -6,11 +6,12 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class HasManyDirective implements FieldResolver
 {
-    use HandlesDirectives;
+    use CanParseTypes, HandlesDirectives;
 
     /**
      * Name of the directive.
@@ -45,7 +46,7 @@ class HasManyDirective implements FieldResolver
             case 'paginator':
                 return $this->paginatorResolver($relation);
             case 'relay':
-                return $this->connectionResolver($relation, $value);
+                return $this->connectionType($relation, $value);
             default:
                 return $this->defaultResolver($relation);
         }
@@ -84,6 +85,35 @@ class HasManyDirective implements FieldResolver
     }
 
     /**
+     * Get connection type.
+     *
+     * @param string     $relation
+     * @param FieldValue $value
+     *
+     * @return FieldValue
+     */
+    protected function connectionType($relation, FieldValue $value)
+    {
+        $schema = sprintf(
+            'type %s { node: %s cursor: String! }
+            type %s { pageInfo: PageInfo! edges: [%s] @field(class: "%s" method: "%s" args: ["%s"]) }',
+            $this->connectionTypeName($value),
+            $this->connectionEdgeName($value),
+            $this->connectionEdgeName($value),
+            $this->unpackNodeToString($value->getField()),
+            addslashes(self::class),
+            'connectionResolver',
+            $relation
+        );
+
+        // TODO: Add arguments to field
+        // 1. Get Type to swap out w/ $value
+        // 2. Register edge type w/ schema
+        // 3. Set resolver directive w/ $relation as argument
+        dd($this->getObjectTypes($this->parseSchema($schema)));
+    }
+
+    /**
      * Use default resolver for field.
      *
      * @param string $relation
@@ -103,24 +133,12 @@ class HasManyDirective implements FieldResolver
     /**
      * Use connection resolver for field.
      *
-     * @param string     $relation
-     * @param FieldValue $value
+     * @param string $relation
      *
      * @return \Closure
      */
-    protected function connectionResolver($relation, FieldValue $value)
+    protected function connectionResolver($relation)
     {
-        $schema = sprintf(
-            'type %s { node: %s cursor: String! }
-            type %s { pageInfo: PageInfo! edges: [%s] }',
-            $this->connectionTypeName($value),
-            $this->connectionEdgeName($value),
-            $this->connectionEdgeName($value),
-            $this->unpackNodeToString($value->getField())
-        );
-        // TODO: Add arguments to field
-        dd(schema()->register($schema));
-
         return function ($parent, array $args) use ($relation) {
             $builder = call_user_func([$parent, $relation]);
 
