@@ -5,15 +5,19 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Schema\Types\ConnectionField;
+use Nuwave\Lighthouse\Schema\Types\PaginatorField;
+use Nuwave\Lighthouse\Schema\Utils\PageInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class HasManyDirective implements FieldResolver
 {
-    use CanParseTypes, HandlesDirectives;
+    use CanParseTypes, HandlesDirectives, HandlesGlobalId;
 
     /**
      * Name of the directive.
@@ -98,13 +102,15 @@ class HasManyDirective implements FieldResolver
     {
         $schema = sprintf(
             'type %s { node: %s cursor: String! }
-            type %s { pageInfo: PageInfo! edges: [%s] @field(class: "%s" method: "%s") }',
+            type %s { pageInfo: PageInfo! @field(class: "%s" method: "%s") edges: [%s] @field(class: "%s" method: "%s") }',
             $this->connectionEdgeName($value),
             $this->unpackNodeToString($value->getField()),
             $this->connectionTypeName($value),
+            addslashes(ConnectionField::class),
+            'pageInfoResolver',
             $this->connectionEdgeName($value),
-            addslashes(self::class),
-            'connectionResolver'
+            addslashes(ConnectionField::class),
+            'edgeResolver'
         );
 
         collect($this->getObjectTypes($this->parseSchema($schema)))
@@ -134,11 +140,13 @@ class HasManyDirective implements FieldResolver
     protected function paginatorTypeResolver($relation, FieldValue $value)
     {
         $schema = sprintf(
-            'type %s { paginatorInfo: PaginatorInfo! data: [%s!]! @field(class: "%s" method: "%s") }',
+            'type %s { paginatorInfo: PaginatorInfo! @field(class: "%s" method: "%s") data: [%s!]! @field(class: "%s" method: "%s") }',
             $this->paginatorTypeName($value),
+            addslashes(PaginatorField::class),
+            'paginatorInfoResolver',
             $this->unpackNodeToString($value->getField()),
-            addslashes(self::class),
-            'paginatorResolver'
+            addslashes(PaginatorField::class),
+            'dataResolver'
         );
 
         collect($this->getObjectTypes($this->parseSchema($schema)))
@@ -171,33 +179,6 @@ class HasManyDirective implements FieldResolver
             $builder = call_user_func([$parent, $relation]);
             // TODO: Create scopeGqlQuery scope to allow adjustments for $args.
             return $builder->get();
-        };
-    }
-
-    /**
-     * Use connection resolver for field.
-     *
-     * @param string $relation
-     *
-     * @return \Closure
-     */
-    protected function connectionResolver($relation)
-    {
-        return function (LengthAwarePaginator $root, array $args, $context = null, ResolveInfo $info = null) {
-            // TODO: Need to add cursor to edges...
-            return ['pageInfo' => $root, 'edges' => $root->items()];
-        };
-    }
-
-    /**
-     * Use paginator resolver for field.
-     *
-     * @return \Closure
-     */
-    protected function paginatorResolver()
-    {
-        return function (LengthAwarePaginator $root, array $args, $context = null, ResolveInfo $info = null) {
-            return ['pageInfo' => $root, 'data' => $root->items()];
         };
     }
 

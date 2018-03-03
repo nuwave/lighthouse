@@ -33,7 +33,8 @@ class MethodDirective implements FieldResolver
     {
         $method = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), 'method'),
-            'name'
+            'name',
+            $value->getField()->name->value
         );
 
         return function ($root, array $args, $context = null, ResolveInfo $info = null) use ($method) {

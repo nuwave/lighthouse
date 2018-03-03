@@ -79,18 +79,31 @@ class HasManyDirectiveTest extends DBTestCase
         ';
 
         // Need lighthouse schema to resolve PaginatorInfo type
-        $type = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema)
-            ->first(function ($type) {
-                return 'User' === $type->name;
-            });
+        $types = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema);
+        $root = $types->first(function ($root) {
+            return 'User' === $root->name;
+        });
+        $paginator = $types->first(function ($type) {
+            return 'UserTaskPaginator' === $type->name;
+        });
 
-        $resolver = array_get($type->config['fields'], 'tasks.resolve');
-        $tasks = $resolver($this->user, ['first' => 2, 'page' => 2]);
+        $resolver = array_get($root->config['fields'], 'tasks.resolve');
+        $tasks = $resolver($this->user, ['first' => 2]);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
-        $this->assertEquals(1, $tasks->count());
+        $this->assertEquals(2, $tasks->count());
         $this->assertEquals(3, $tasks->total());
-        $this->assertFalse($tasks->hasMorePages());
+        $this->assertTrue($tasks->hasMorePages());
+
+        $resolver = array_get($paginator->config['fields'], 'data.resolve');
+        $data = $resolver($tasks, []);
+        $this->assertCount(2, $data);
+
+        $resolver = array_get($paginator->config['fields'], 'paginatorInfo.resolve');
+        $pageInfo = $resolver($tasks, []);
+        $this->assertTrue($pageInfo['hasMorePages']);
+        $this->assertEquals(1, $pageInfo['currentPage']);
+        $this->assertEquals(2, $pageInfo['perPage']);
     }
 
     /**
@@ -108,18 +121,32 @@ class HasManyDirectiveTest extends DBTestCase
         ';
 
         // Need lighthouse schema to resolve PageInfo type
-        $type = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema)
-            ->first(function ($type) {
-                return 'User' === $type->name;
-            });
+        $types = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema);
+        $root = $types->first(function ($root) {
+            return 'User' === $root->name;
+        });
+        $connection = $types->first(function ($type) {
+            return 'UserTaskConnection' === $type->name;
+        });
 
-        $resolver = array_get($type->config['fields'], 'tasks.resolve');
+        $resolver = array_get($root->config['fields'], 'tasks.resolve');
         $tasks = $resolver($this->user, ['first' => 2]);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
         $this->assertEquals(2, $tasks->count());
         $this->assertEquals(3, $tasks->total());
         $this->assertTrue($tasks->hasMorePages());
+
+        $resolver = array_get($connection->config['fields'], 'edges.resolve');
+        $edges = $resolver($tasks, []);
+        $this->assertCount(2, $edges);
+
+        $resolver = array_get($connection->config['fields'], 'pageInfo.resolve');
+        $pageInfo = $resolver($tasks, []);
+        $this->assertEquals($edges->first()['cursor'], $pageInfo['startCursor']);
+        $this->assertEquals($edges->last()['cursor'], $pageInfo['endCursor']);
+        $this->assertTrue($pageInfo['hasNextPage']);
+        $this->assertFalse($pageInfo['hasPreviousPage']);
     }
 
     /**
