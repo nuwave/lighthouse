@@ -11,6 +11,40 @@ use ReflectionMethod;
 class QueryBuilder
 {
     /**
+     * Eager load count on collection of models.
+     *
+     * Thanks to marcus13371337
+     * https://github.com/laravel/framework/issues/17845#issuecomment-313701089
+     *
+     * @param Builder $builder
+     * @param array   $models
+     *
+     * @return array
+     */
+    public function eagerLoadCount(Builder $builder, array $models)
+    {
+        $ids = [];
+        $key = $models[0]->getKeyName();
+        foreach ($models as $model) {
+            $ids[] = $model->{ $key };
+        }
+        $results = $builder->whereIn($key, $ids)->get();
+
+        $dictionary = [];
+        foreach ($results as $result) {
+            $dictionary[$result->{ $key }] = $result;
+        }
+
+        foreach ($models as $model) {
+            if (isset($dictionary[$model->{ $key }])) {
+                $model->forceFill($dictionary[$model->{ $key }]->toArray());
+            }
+        }
+
+        return $models;
+    }
+
+    /**
      * Eager load relationships on collection.
      *
      * @param Builder $builder

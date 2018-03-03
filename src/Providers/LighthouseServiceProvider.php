@@ -76,5 +76,18 @@ class LighthouseServiceProvider extends ServiceProvider
 
             return $this;
         });
+
+        Collection::macro('fetchCount', function ($relations) {
+            if (count($this->items) > 0) {
+                if (is_string($relations)) {
+                    $relations = [$relations];
+                }
+
+                $query = $this->first()->newQuery()->withCount($relations);
+                $this->items = app(QueryBuilder::class)->eagerLoadCount($query, $this->items);
+            }
+
+            return $this;
+        });
     }
 }

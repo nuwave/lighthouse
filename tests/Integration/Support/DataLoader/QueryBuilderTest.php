@@ -19,19 +19,20 @@ class QueryBuilderTest extends DBTestCase
     public function setUp()
     {
         parent::setUp();
-
+        $count = 4;
         $users = factory(User::class, 3)->create();
-        $users->each(function ($user) {
-            factory(Task::class, 5)->create([
+        $users->each(function ($user) use (&$count) {
+            factory(Task::class, $count)->create([
                 'user_id' => $user->getKey(),
             ]);
+            ++$count;
         });
     }
 
     /**
      * @test
      */
-    public function itCanPaginateCollectionOfRelationships()
+    public function itCanLoadRelationshipsWithLimitsOnCollection()
     {
         $users = User::all();
         $users->fetch(['tasks' => function ($q) {
@@ -44,5 +45,17 @@ class QueryBuilderTest extends DBTestCase
         $this->assertEquals($users[0]->getKey(), $users[0]->tasks->first()->user_id);
         $this->assertEquals($users[1]->getKey(), $users[1]->tasks->first()->user_id);
         $this->assertEquals($users[2]->getKey(), $users[2]->tasks->first()->user_id);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanLoadCountOnCollection()
+    {
+        $users = User::all();
+        $users->fetchCount(['tasks']);
+        $this->assertEquals($users[0]->tasks_count, 4);
+        $this->assertEquals($users[1]->tasks_count, 5);
+        $this->assertEquals($users[2]->tasks_count, 6);
     }
 }
