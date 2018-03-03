@@ -2,12 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class MethodDirective implements FieldResolver
+class BelongsTo implements FieldResolver
 {
     use HandlesDirectives;
 
@@ -18,7 +17,7 @@ class MethodDirective implements FieldResolver
      */
     public function name()
     {
-        return 'method';
+        return 'belongsTo';
     }
 
     /**
@@ -30,14 +29,14 @@ class MethodDirective implements FieldResolver
      */
     public function handle(FieldValue $value)
     {
-        $method = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), 'method'),
-            'name',
+        $relation = $this->directiveArgValue(
+            $this->fieldDirective($value->getField(), 'belongsTo'),
+            'relation',
             $value->getField()->name->value
         );
 
-        return function ($root, array $args, $context = null, ResolveInfo $info = null) use ($method) {
-            return call_user_func_array([$root, $method], [$args, $context, $info]);
+        return function ($root, array $args) use ($relation) {
+            return $root->{$relation};
         };
     }
 }
