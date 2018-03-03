@@ -2,8 +2,10 @@
 
 namespace Nuwave\Lighthouse\Providers;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -14,8 +16,8 @@ class LighthouseServiceProvider extends ServiceProvider
     {
         $this->registerDirectives();
         $this->registerSchema();
+        $this->registerMacros();
         // 2. Parse schema into document node
-        // 3. Register Types, Interfaces, Queries, etc...
     }
 
     /**
@@ -56,5 +58,23 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MutationDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\RenameDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective::class);
+    }
+
+    /**
+     * Register lighthouse macros.
+     */
+    public function registerMacros()
+    {
+        Collection::macro('fetch', function ($relations) {
+            if (count($this->items) > 0) {
+                if (is_string($relations)) {
+                    $relations = [$relations];
+                }
+                $query = $this->first()->newQuery()->with($relations);
+                $this->items = app(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
+            }
+
+            return $this;
+        });
     }
 }

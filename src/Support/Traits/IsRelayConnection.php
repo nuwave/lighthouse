@@ -41,4 +41,23 @@ trait IsRelayConnection
 
         return $query->paginate($first, ['*'], 'page', $page);
     }
+
+    /**
+     * Load connection w/ args.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array                                 $args
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeLoadConnection($query, array $args)
+    {
+        $first = isset($args['first']) ? $args['first'] : 15;
+        $after = $this->decodeCursor($args);
+        $page = isset($args['page']) ? $args['page'] : 1;
+        $currentPage = $first && $after ? floor(($first + $after) / $first) : $page;
+        $skip = $first * $currentPage;
+
+        return $query->take($first)->skip($skip);
+    }
 }
