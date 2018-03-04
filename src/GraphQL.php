@@ -2,13 +2,17 @@
 
 namespace Nuwave\Lighthouse;
 
+use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
+use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
 {
+    use CanFormatError;
+
     /**
      * Schema builder.
      *
@@ -29,6 +33,51 @@ class GraphQL
      * @var SchemaStitcher
      */
     protected $stitcher;
+
+    /**
+     * Execute GraphQL query.
+     *
+     * @param string $query
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
+     *
+     * @return array
+     */
+    public function execute($query, $context = null, $variables = [], $rootValue = null)
+    {
+        $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
+
+        if (! empty($result->errors)) {
+            return [
+                'data' => $result->data,
+                'errors' => array_map([$this, 'formatError'], $result->errors),
+            ];
+        }
+
+        return ['data' => $result->data];
+    }
+
+    /**
+     * Execute GraphQL query.
+     *
+     * @param string $query
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     */
+    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
+    {
+        return GraphQLBase::executeAndReturnResult(
+            $this->buildSchema(),
+            $query,
+            $rootValue,
+            $context,
+            $variables
+        );
+    }
 
     /**
      * Build a new schema instance.
