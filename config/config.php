@@ -12,12 +12,12 @@ return [
     |
     */
     'namespaces' => [
-        'models'      => 'App\\Models',
-        'mutations'   => 'App\\Http\\GraphQL\\Mutations',
-        'queries'     => 'App\\Http\\GraphQL\\Queries',
-        'types'       => 'App\\Http\\GraphQL\\Types',
-        'fields'      => 'App\\Http\\GraphQL\\Fields',
-        'scalars'     => 'App\\Http\\GraphQL\\Scalars',
+        'models' => 'App\\Models',
+        'mutations' => 'App\\Http\\GraphQL\\Mutations',
+        'queries' => 'App\\Http\\GraphQL\\Queries',
+        'types' => 'App\\Http\\GraphQL\\Types',
+        'fields' => 'App\\Http\\GraphQL\\Fields',
+        'scalars' => 'App\\Http\\GraphQL\\Scalars',
         'connections' => 'App\\Http\\GraphQL\\Connections',
         'dataloaders' => 'App\\Http\\GraphQL\\DataLoaders',
     ],
@@ -30,7 +30,7 @@ return [
      | Specify which controller (and method) you want to handle GraphQL requests.
      |
      */
-    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
+    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
 
     /*
     |--------------------------------------------------------------------------
@@ -67,6 +67,6 @@ return [
     */
     'schema' => [
         'output' => storage_path('lighthouse/schema.json'),
-        'register' => base_path("routes/graphql/schema.graphql"),
+        'register' => base_path('routes/graphql/schema.graphql'),
     ],
 ];

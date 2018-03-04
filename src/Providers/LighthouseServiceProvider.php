@@ -14,6 +14,13 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->publishes([__DIR__.'/../../config/config.php' => config_path('lighthouse.php')]);
+        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
+
+        if (config('lighthouse.controller')) {
+            require realpath(__DIR__.'/../Support/Http/routes.php');
+        }
+
         $this->registerDirectives();
         $this->registerSchema();
         $this->registerMacros();
