@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\LengthAwarePaginator;
 use ReflectionMethod;
 
 class QueryBuilder
@@ -49,14 +50,22 @@ class QueryBuilder
      *
      * @param Builder $builder
      * @param array   $models
+     * @param int     $perPage
+     * @param int     $page
      *
      * @return array
      */
-    public function eagerLoadRelations(Builder $builder, array $models)
+    public function eagerLoadRelations(Builder $builder, array $models, $perPage = null, $page = null)
     {
         foreach ($builder->getEagerLoads() as $name => $constraints) {
             if (false === strpos($name, '.')) {
-                $models = $this->loadRelation($builder, $models, $name, $constraints);
+                $paginated = ! is_null($perPage) && ! is_null($page);
+                $models = $this->loadRelation($builder, $constraints, $models, [
+                    'name' => $name,
+                    'perPage' => $perPage,
+                    'page' => $page,
+                    'paginated' => $paginated,
+                ]);
             }
         }
 
@@ -67,32 +76,53 @@ class QueryBuilder
      * Eagerly load the relationship on a set of models.
      *
      * @param Builder $builder
-     * @param array   $models
-     * @param string  $name
      * @param Closure $constraints
+     * @param array   $models
+     * @param array   $options
      *
      * @return array
      */
-    protected function loadRelation(Builder $builder, array $models, $name, Closure $constraints)
+    protected function loadRelation(Builder $builder, Closure $constraints, array $models, array $options)
     {
-        $relation = $builder->getRelation($name);
-        $queries = $this->getQueries($builder, $models, $name, $constraints);
-
+        $relation = $builder->getRelation($options['name']);
+        $queries = $this->getQueries($builder, $models, $options['name'], $constraints);
         $related = $queries->first()->getModel();
 
-        $bindings = $queries->map(function ($query) {
-            return $query->getBindings();
+        $bindings = $queries->map(function ($query) use ($options) {
+            return $query->when($options['paginated'], function ($q) use ($options) {
+                $q->forPage($options['page'], $options['perPage']);
+            })->getBindings();
         })->collapse()->toArray();
 
-        $sql = $queries->map(function ($query) {
+        $sql = $queries->map(function ($query) use ($options) {
+            return $query->when($options['paginated'], function ($q) use ($options) {
+                $q->forPage($options['page'], $options['perPage']);
+            });
+        })->map(function ($query) {
             return '('.$query->toSql().')';
         })->implode(' UNION ALL ');
 
         $table = $related->getTable();
         $results = \DB::select("SELECT `{$table}`.* FROM ({$sql}) AS `{$table}`", $bindings);
         $hydrated = $this->hydrate($related, $relation, $results);
+        $matched = $relation->match($models, $related->newCollection($hydrated), $options['name']);
 
-        return $relation->match($models, $related->newCollection($hydrated), $name);
+        if ($options['paginated']) {
+            foreach ($matched as $model) {
+                $total = $model->getAttribute($options['name'].'_count');
+                $paginator = app()->makeWith(LengthAwarePaginator::class, [
+                    'items' => $model->getRelation($options['name']),
+                    'total' => $total,
+                    'perPage' => $options['perPage'],
+                    'currentPage' => $options['page'],
+                    'options' => [],
+                ]);
+
+                $model->setRelation($options['name'], $paginator);
+            }
+        }
+
+        return $matched;
     }
 
     /**

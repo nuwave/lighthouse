@@ -89,5 +89,20 @@ class LighthouseServiceProvider extends ServiceProvider
 
             return $this;
         });
+
+        Collection::macro('fetchForPage', function ($perPage, $page, $relations) {
+            if (count($this->items) > 0) {
+                if (is_string($relations)) {
+                    $relations = [$relations];
+                }
+
+                $this->items = $this->fetchCount($relations)->items;
+                $query = $this->first()->newQuery()->with($relations);
+                $this->items = app(QueryBuilder::class)
+                    ->eagerLoadRelations($query, $this->items, $perPage, $page);
+            }
+
+            return $this;
+        });
     }
 }

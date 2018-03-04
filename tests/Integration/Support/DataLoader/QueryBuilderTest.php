@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Tests\Integration\Support\DataLoader;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nuwave\Lighthouse\Tests\DBTestCase;
 use Nuwave\Lighthouse\Tests\Utils\Models\Task;
@@ -57,5 +56,24 @@ class QueryBuilderTest extends DBTestCase
         $this->assertEquals($users[0]->tasks_count, 4);
         $this->assertEquals($users[1]->tasks_count, 5);
         $this->assertEquals($users[2]->tasks_count, 6);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanPaginateRelationshipOnCollection()
+    {
+        $users = User::all();
+        $users->fetchForPage(2, 1, ['tasks']);
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $users[0]->tasks);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $users[1]->tasks);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $users[2]->tasks);
+        $this->assertCount(2, $users[0]->tasks);
+        $this->assertCount(2, $users[1]->tasks);
+        $this->assertCount(2, $users[2]->tasks);
+        $this->assertEquals($users[0]->getKey(), $users[0]->tasks[0]->user_id);
+        $this->assertEquals($users[1]->getKey(), $users[1]->tasks[0]->user_id);
+        $this->assertEquals($users[2]->getKey(), $users[2]->tasks[0]->user_id);
     }
 }
