@@ -110,6 +110,11 @@ class GraphQLField
 
         return function () use ($resolver) {
             $arguments = func_get_args();
+
+            if (isset($arguments[1])) {
+                $arguments[1] = $this->resolveArgs($arguments[1]);
+            }
+
             $rules = call_user_func_array([$this, 'getRules'], $arguments);
 
             if (sizeof($rules)) {
@@ -122,6 +127,30 @@ class GraphQLField
 
             return call_user_func_array($resolver, $arguments);
         };
+    }
+
+    /**
+     * Resolve argument(s).
+     *
+     * @param array $args
+     *
+     * @return array
+     */
+    protected function resolveArgs(array $args)
+    {
+        $resolvers = collect($this->args())->filter(function ($arg) {
+            return array_has($arg, 'resolve');
+        });
+
+        if ($resolvers->isEmpty()) {
+            return $args;
+        }
+
+        return collect($args)->map(function ($arg, $key) use ($resolvers) {
+            return $resolvers->has($key)
+                ? $resolvers->get($key)['resolve']($arg)
+                : $arg;
+        })->toArray();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Closure;
 use GraphQL\Language\AST\DirectiveNode as Directive;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
 use GraphQL\Language\AST\InputValueDefinitionNode as Argument;
@@ -123,6 +124,21 @@ class ArgumentValue
             });
 
         return $this;
+    }
+
+    /**
+     * Set a argument resolver.
+     *
+     * @param Closure $resolver
+     *
+     * @return self
+     */
+    public function setResolver(Closure $resolver)
+    {
+        $current = $this->getValue();
+        $current['resolve'] = $resolver;
+
+        return $this->setValue($current);
     }
 
     /**
