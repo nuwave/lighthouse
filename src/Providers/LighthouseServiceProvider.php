@@ -56,6 +56,7 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MethodDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MutationDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\QueryDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\RenameDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ModelDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective::class);

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse;
 
+use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
@@ -29,13 +30,19 @@ class GraphQL
      */
     protected $stitcher;
 
+    /**
+     * Build a new schema instance.
+     *
+     * @return Schema
+     */
     public function buildSchema()
     {
-        // 1. Register directives
-        // 2. Get stitched schema
-        // 3. Parse schema into documentnode
-        // 4. Pass node to schema container to parse
-        // 5. Build GraphQL Schema.
+        return $this->schema()->build(
+            $this->stitcher()->stitch(
+                config('lighthouse.global_id_field', '_id'),
+                config('lighthouse.schema.register')
+            )
+        );
     }
 
     /**

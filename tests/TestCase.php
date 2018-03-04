@@ -81,4 +81,25 @@ class TestCase extends BaseTestCase
     {
         return Parser::parse($schema);
     }
+
+    /**
+     * Store file contents.
+     *
+     * @param string $fileName
+     * @param string $contents
+     *
+     * @return string
+     */
+    protected function store($fileName, $contents)
+    {
+        $path = __DIR__.'/storage/'.$fileName;
+
+        if (file_exists(__DIR__.'/storage/'.$fileName)) {
+            unlink($path);
+        }
+
+        file_put_contents($path, $contents);
+
+        return $path;
+    }
 }

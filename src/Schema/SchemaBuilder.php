@@ -87,12 +87,14 @@ class SchemaBuilder
     public function build($schema)
     {
         $this->register($schema);
+        $registered = $this->getRegisteredTypes();
+        $query = collect($registered)->firstWhere('name', 'Query');
+        $mutation = collect($registered)->firstWhere('name', 'Mutation');
+        $types = collect($registered)->filter(function ($type) {
+            return ! in_array($type->name, ['Query', 'Mutation']);
+        })->toArray();
 
-        return new Schema([
-            'query' => $this->generateQuery(),
-            'mutation' => $this->generateMutation(),
-            'types' => $this->getRegisteredTypes(),
-        ]);
+        return new Schema(compact('query', 'mutation', 'types'));
     }
 
     /**
@@ -107,11 +109,11 @@ class SchemaBuilder
         $document = $this->parseSchema($schema);
 
         $this->setTypes($document);
+        $this->setQuery();
+        $this->setMutation();
 
         collect(array_merge(
-            $this->getRegisteredTypes(),
-            $this->mutations,
-            $this->queries
+            $this->getRegisteredTypes()
         ))->each(function ($type) {
             $this->unpackType($type);
         });
@@ -121,6 +123,28 @@ class SchemaBuilder
             $this->mutations,
             $this->queries
         ));
+    }
+
+    public function setQuery()
+    {
+        $query = collect($this->getRegisteredTypes())
+            ->first(function ($type) {
+                return 'Query' === $type->name;
+            }, $this->generateQuery());
+
+        $query->config['fields'] = $this->queries;
+        $this->type($query);
+    }
+
+    public function setMutation()
+    {
+        $mutation = collect($this->getRegisteredTypes())
+            ->first(function ($type) {
+                return 'Mutation' === $type->name;
+            }, $this->generateMutation());
+
+        $mutation->config['fields'] = $this->mutations;
+        $this->type($mutation);
     }
 
     public function generateMutation()

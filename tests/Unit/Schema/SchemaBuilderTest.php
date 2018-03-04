@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Unit\Schema;
+namespace Tests\Unit\Schema;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputType;
@@ -28,7 +28,8 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $types = schema()->register($schema);
-        $this->assertInstanceOf(EnumType::class, $types->first());
+
+        $this->assertInstanceOf(EnumType::class, $types->firstWhere('name', 'Role'));
     }
 
     /**
@@ -44,7 +45,7 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $types = schema()->register($schema);
-        $this->assertInstanceOf(InterfaceType::class, $types->first());
+        $this->assertInstanceOf(InterfaceType::class, $types->firstWhere('name', 'Foo'));
     }
 
     /**
@@ -58,7 +59,7 @@ class SchemaBuilderTest extends TestCase
 
         $this->app['config']->set('lighthouse.namespaces.scalars', 'Nuwave\Lighthouse\Schema\Types\Scalars');
         $types = schema()->register($schema);
-        $this->assertInstanceOf(ScalarType::class, $types->first());
+        $this->assertInstanceOf(ScalarType::class, $types->firstWhere('name', 'DateTime'));
     }
 
     /**
@@ -74,9 +75,9 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $types = schema()->register($schema);
-        $this->assertInstanceOf(ObjectType::class, $types->first());
+        $this->assertInstanceOf(ObjectType::class, $types->firstWhere('name', 'Foo'));
 
-        $config = $types->first()->config;
+        $config = $types->firstWhere('name', 'Foo')->config;
         $this->assertEquals('Foo', data_get($config, 'name'));
         $this->assertEquals('bar attribute of Foo', array_get($config, 'fields.bar.description'));
     }
@@ -94,9 +95,9 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $types = schema()->register($schema);
-        $this->assertInstanceOf(InputType::class, $types->first());
+        $this->assertInstanceOf(InputType::class, $types->firstWhere('name', 'CreateFoo'));
 
-        $config = $types->first()->config;
+        $config = $types->firstWhere('name', 'CreateFoo')->config;
         $this->assertEquals('CreateFoo', data_get($config, 'name'));
         $this->assertArrayHasKey('foo', data_get($config, 'fields'));
         $this->assertArrayHasKey('bar', data_get($config, 'fields'));
@@ -118,7 +119,8 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $mutation = schema()->register($schema)->first();
+        $type = schema()->register($schema)->firstWhere('name', 'Mutation');
+        $mutation = $type->config['fields']['foo'];
 
         $this->assertArrayHasKey('args', $mutation);
         $this->assertArrayHasKey('type', $mutation);
@@ -143,7 +145,8 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $query = schema()->register($schema)->first();
+        $type = schema()->register($schema)->firstWhere('name', 'Query');
+        $query = $type->config['fields']['foo'];
 
         $this->assertArrayHasKey('args', $query);
         $this->assertArrayHasKey('type', $query);
