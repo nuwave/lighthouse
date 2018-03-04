@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Utils\Resolvers;
+namespace Tests\Utils\Resolvers;
 
 use GraphQL\Type\Definition\ResolveInfo;
 

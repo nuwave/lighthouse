@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests;
+namespace Tests;
 
 class DBTestCase extends TestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Unit\Schema\Directives\Fields;
+namespace Tests\Unit\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Tests\TestCase;
+use Tests\TestCase;
 
 class RenameDirectiveTest extends TestCase
 {

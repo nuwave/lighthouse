@@ -1,15 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Unit\Schema\Resolvers;
-
-use GraphQL\Language\Parser;
-
-use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
-use Nuwave\Lighthouse\Tests\TestCase;
-
-use GraphQL\Type\Definition\EnumType;
+namespace Tests\Unit\Schema\Resolvers;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\EnumType;
+use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
+use Tests\TestCase;
 
 class EnumResolverTest extends TestCase
 {
@@ -39,13 +36,13 @@ class EnumResolverTest extends TestCase
             'values' => [
                 'ADMIN' => [
                     'value' => 'admin',
-                    'description' => 'Admin user type.'
+                    'description' => 'Admin user type.',
                 ],
                 'EMPLOYEE' => [
                     'value' => 'employee',
-                    'description' => 'Employee user type.'
-                ]
-            ]
+                    'description' => 'Employee user type.',
+                ],
+            ],
         ], $enum->config);
     }
 }

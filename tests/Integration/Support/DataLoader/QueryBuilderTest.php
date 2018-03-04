@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Integration\Support\DataLoader;
+namespace Tests\Integration\Support\DataLoader;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\Tests\Utils\Models\User;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
 class QueryBuilderTest extends DBTestCase
 {

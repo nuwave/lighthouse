@@ -1,13 +1,13 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Unit\Schema;
+namespace Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
-use Nuwave\Lighthouse\Tests\TestCase;
-use Nuwave\Lighthouse\Tests\Utils\Events\Foo;
+use Tests\TestCase;
+use Tests\Utils\Events\Foo;
 
 class MutationFactoryTest extends TestCase
 {
@@ -27,7 +27,7 @@ class MutationFactoryTest extends TestCase
 
         $this->app['config']->set(
             'lighthouse.namespaces.mutations',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Mutations'
         );
     }
 
@@ -80,7 +80,7 @@ class MutationFactoryTest extends TestCase
     {
         $schema = Parser::parse('
         type Mutation {
-            foo(bar: String! baz: Int): String! @mutation(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Mutations\\\Bar")
+            foo(bar: String! baz: Int): String! @mutation(class:"Tests\\\Utils\\\Mutations\\\Bar")
         }
         ');
 
@@ -104,7 +104,7 @@ class MutationFactoryTest extends TestCase
         $expected = 'foo 1';
         $schema = Parser::parse('
         type Mutation {
-            foo(bar: String! baz: Int ): String! @event(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Events\\\Foo")
+            foo(bar: String! baz: Int ): String! @event(class:"Tests\\\Utils\\\Events\\\Foo")
         }
         ');
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Unit\Schema\Utils;
+namespace Tests\Unit\Schema\Utils;
 
-use PHPUnit\Framework\TestCase;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
+use PHPUnit\Framework\TestCase;
 
 class SchemaStitcherTest extends TestCase
 {
     /**
-     * Schema stitcher
+     * Schema stitcher.
      *
      * @var SchemaStitcher
      */
@@ -21,7 +21,7 @@ class SchemaStitcherTest extends TestCase
     {
         $this->stitcher = new SchemaStitcher();
 
-        if (!is_dir(__DIR__.'/schema')) {
+        if (! is_dir(__DIR__.'/schema')) {
             mkdir(__DIR__.'/schema');
         }
 
@@ -31,13 +31,13 @@ class SchemaStitcherTest extends TestCase
             foo: String!
         }');
 
-        file_put_contents(__DIR__.'/schema/bar.graphql','
+        file_put_contents(__DIR__.'/schema/bar.graphql', '
         #import ./baz.graphql
         type Bar {
             bar: String!
         }');
 
-        file_put_contents(__DIR__.'/schema/baz.graphql','
+        file_put_contents(__DIR__.'/schema/baz.graphql', '
         type Baz {
             baz: String!
         }');
@@ -62,8 +62,8 @@ class SchemaStitcherTest extends TestCase
      */
     public function itStitchesLighthouseSchema()
     {
-        $schema = $this->stitcher->stitch("_id");
-        $hasNode = strpos($schema, 'interface Node') !== false;
+        $schema = $this->stitcher->stitch('_id');
+        $hasNode = false !== strpos($schema, 'interface Node');
 
         $this->assertTrue($hasNode);
     }
@@ -73,9 +73,9 @@ class SchemaStitcherTest extends TestCase
      */
     public function itConcatsSchemas()
     {
-        $schema = $this->stitcher->stitch("_id", __DIR__.'/schema/baz.graphql');
-        $hasNode = strpos($schema, 'interface Node') !== false;
-        $hasBaz = strpos($schema, 'type Baz') !== false;
+        $schema = $this->stitcher->stitch('_id', __DIR__.'/schema/baz.graphql');
+        $hasNode = false !== strpos($schema, 'interface Node');
+        $hasBaz = false !== strpos($schema, 'type Baz');
 
         $this->assertTrue($hasNode);
         $this->assertTrue($hasBaz);
@@ -86,15 +86,15 @@ class SchemaStitcherTest extends TestCase
      */
     public function itCanImportSchemas()
     {
-        $schema = $this->stitcher->stitch("_id", __DIR__.'/foo.graphql');
-        $hasNode = strpos($schema, 'interface Node') !== false;
-        $hasFoo = strpos($schema, 'type Foo') !== false;
-        $hasBar = strpos($schema, 'type Bar') !== false;
-        $hasBaz = strpos($schema, 'type Baz') !== false;
+        $schema = $this->stitcher->stitch('_id', __DIR__.'/foo.graphql');
+        $hasNode = false !== strpos($schema, 'interface Node');
+        $hasFoo = false !== strpos($schema, 'type Foo');
+        $hasBar = false !== strpos($schema, 'type Bar');
+        $hasBaz = false !== strpos($schema, 'type Baz');
 
-        $this->assertTrue($hasNode, "Schema does not include type Node");
-        $this->assertTrue($hasFoo, "Schema does not include type Foo");
-        $this->assertTrue($hasBar, "Schema does not include type Bar");
-        $this->assertTrue($hasBaz, "Schema does not include type Baz");
+        $this->assertTrue($hasNode, 'Schema does not include type Node');
+        $this->assertTrue($hasFoo, 'Schema does not include type Foo');
+        $this->assertTrue($hasBar, 'Schema does not include type Bar');
+        $this->assertTrue($hasBaz, 'Schema does not include type Baz');
     }
 }

@@ -1,14 +1,14 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Directives\Fields;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\Tests\Utils\Models\User;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
 class HasManyDirectiveTest extends DBTestCase
 {

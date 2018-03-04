@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Utils\Mutations;
+namespace Tests\Utils\Mutations;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\Mutation;

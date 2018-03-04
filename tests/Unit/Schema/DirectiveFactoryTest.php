@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Unit\Schema;
+namespace Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Tests\TestCase;
+use Tests\TestCase;
 
 class DirectiveFactoryTest extends TestCase
 {

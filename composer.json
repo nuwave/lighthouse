@@ -41,7 +41,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Nuwave\\Lighthouse\\Tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "scripts": {

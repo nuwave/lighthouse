@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Integration\Models;
+namespace Tests\Integration\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Tests\Utils\Models\User;
+use Tests\DBTestCase;
+use Tests\Utils\Models\User;
 
 class UserTest extends DBTestCase
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Directives\Fields;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Nuwave\Lighthouse\Tests\DBTestCase;
-use Nuwave\Lighthouse\Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\Tests\Utils\Models\User;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
+use Tests\Utils\Models\User;
 
 class BelongsToTest extends DBTestCase
 {

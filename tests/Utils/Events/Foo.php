@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Utils\Events;
+namespace Tests\Utils\Events;
 
 class Foo
 {

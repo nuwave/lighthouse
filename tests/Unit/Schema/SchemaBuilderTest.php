@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Unit\Unit\Schema;
+namespace Tests\Unit\Unit\Schema;
 
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputType;
@@ -8,7 +8,7 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\Tests\TestCase;
+use Tests\TestCase;
 
 class SchemaBuilderTest extends TestCase
 {
@@ -109,7 +109,7 @@ class SchemaBuilderTest extends TestCase
     {
         $this->app['config']->set(
             'lighthouse.namespaces.mutations',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Mutations'
         );
 
         $schema = '
@@ -134,7 +134,7 @@ class SchemaBuilderTest extends TestCase
     {
         $this->app['config']->set(
             'lighthouse.namespaces.queries',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Mutations'
         );
 
         $schema = '
@@ -178,7 +178,7 @@ class SchemaBuilderTest extends TestCase
     {
         $this->app['config']->set(
             'lighthouse.namespaces.queries',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Mutations'
         );
 
         $schema = '
@@ -201,7 +201,7 @@ class SchemaBuilderTest extends TestCase
     {
         $this->app['config']->set(
             'lighthouse.namespaces.mutations',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Mutations'
         );
 
         $schema = '
@@ -224,12 +224,12 @@ class SchemaBuilderTest extends TestCase
     {
         $this->app['config']->set(
             'lighthouse.namespaces.queries',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Mutations'
         );
 
         $this->app['config']->set(
             'lighthouse.namespaces.mutations',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Mutations'
         );
 
         $schema = '

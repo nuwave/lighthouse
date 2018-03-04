@@ -2,7 +2,7 @@
 
 use Faker\Generator as Faker;
 
-$factory->define(Nuwave\Lighthouse\Tests\Utils\Models\User::class, function (Faker $faker) {
+$factory->define(Tests\Utils\Models\User::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Utils\Scalars;
+namespace Tests\Utils\Scalars;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\StringValueNode;

@@ -1,9 +1,8 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests;
+namespace Tests;
 
 use GraphQL\Language\Parser;
-
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -11,7 +10,7 @@ class TestCase extends BaseTestCase
     /**
      * Get package providers.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return array
      */
@@ -25,7 +24,7 @@ class TestCase extends BaseTestCase
     /**
      * Get package aliases.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return array
      */
@@ -37,25 +36,24 @@ class TestCase extends BaseTestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
-     *
-     * @return void
+     * @param \Illuminate\Foundation\Application $app
      */
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set(
             'lighthouse.namespaces.scalars',
-            'Nuwave\\Lighthouse\\Tests\\Utils\\Scalars'
+            'Tests\\Utils\\Scalars'
         );
     }
 
     /**
      * Load schema from directory.
      *
-     * @param  string $schema
+     * @param string $schema
+     *
      * @return string
      */
-    protected function loadSchema($schema = "schema.graphql")
+    protected function loadSchema($schema = 'schema.graphql')
     {
         return file_get_contents(__DIR__."/Utils/Schemas/{$schema}");
     }
@@ -63,10 +61,11 @@ class TestCase extends BaseTestCase
     /**
      * Get parsed schema.
      *
-     * @param  string $schema
+     * @param string $schema
+     *
      * @return \GraphQL\Language\AST\DocumentNode
      */
-    protected function parseSchema($schema = "schema.graphql")
+    protected function parseSchema($schema = 'schema.graphql')
     {
         return Parser::parse($this->loadSchema($schema));
     }
@@ -74,7 +73,8 @@ class TestCase extends BaseTestCase
     /**
      * Parse raw schema.
      *
-     * @param  string $schema
+     * @param string $schema
+     *
      * @return \GraphQL\Language\AST\DocumentNode
      */
     protected function parse(string $schema)

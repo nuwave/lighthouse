@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Utils\Models;
+namespace Tests\Utils\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Nuwave\Lighthouse\Support\Traits\IsRelayConnection;

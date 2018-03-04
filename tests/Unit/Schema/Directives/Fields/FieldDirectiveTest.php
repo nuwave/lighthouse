@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests\Unit\Schema\Directives\Fields;
+namespace Tests\Unit\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Tests\TestCase;
+use Tests\TestCase;
 
 class FieldDirectiveTest extends TestCase
 {
@@ -14,7 +14,7 @@ class FieldDirectiveTest extends TestCase
     {
         $schema = '
         type Foo {
-            bar: String! @field(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
+            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
         }
         ';
 
@@ -32,7 +32,7 @@ class FieldDirectiveTest extends TestCase
     {
         $schema = '
         type Foo {
-            bar: String! @field(class:"Nuwave\\\Lighthouse\\\Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
+            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
         }
         ';
 
