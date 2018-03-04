@@ -54,6 +54,7 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function registerDirectives()
     {
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Args\BcryptDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\AuthDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\BelongsTo::class);
