@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
 use Nuwave\Lighthouse\Support\Traits\CanExtendTypes;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
@@ -86,7 +86,13 @@ class SchemaBuilder
      */
     public function build($schema)
     {
-        // ...
+        $this->register($schema);
+
+        return new Schema([
+            'query' => $this->generateQuery(),
+            'mutation' => $this->generateMutation(),
+            'types' => $this->getRegisteredTypes(),
+        ]);
     }
 
     /**
@@ -115,6 +121,22 @@ class SchemaBuilder
             $this->mutations,
             $this->queries
         ));
+    }
+
+    public function generateMutation()
+    {
+        return new ObjectType([
+            'name' => 'Mutation',
+            'fields' => $this->mutations,
+        ]);
+    }
+
+    public function generateQuery()
+    {
+        return new ObjectType([
+            'name' => 'Query',
+            'fields' => $this->queries,
+        ]);
     }
 
     /**

@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Tests\TestCase;
 
 class SchemaBuilderTest extends TestCase
@@ -214,5 +215,32 @@ class SchemaBuilderTest extends TestCase
 
         $mutations = schema()->register($schema)->toArray();
         $this->assertArrayHasKey('bar', $mutations);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanGenerateGraphQLSchema()
+    {
+        $this->app['config']->set(
+            'lighthouse.namespaces.queries',
+            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+        );
+
+        $this->app['config']->set(
+            'lighthouse.namespaces.mutations',
+            'Nuwave\\Lighthouse\\Tests\\Utils\\Mutations'
+        );
+
+        $schema = '
+        type Query {
+            foo: String!
+        }
+        type Mutation {
+            foo: String!
+        }
+        ';
+
+        $this->assertInstanceOf(Schema::class, schema()->build($schema));
     }
 }
