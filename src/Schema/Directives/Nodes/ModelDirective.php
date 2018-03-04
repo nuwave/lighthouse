@@ -2,10 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use Nuwave\Lighthouse\Support\Contracts\GlobalIdResolver;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 
-class ModelDirective implements GlobalIdResolver
+class ModelDirective implements NodeMiddleware
 {
+    use CanParseTypes;
+
     /**
      * Directive name.
      *
@@ -17,15 +21,29 @@ class ModelDirective implements GlobalIdResolver
     }
 
     /**
-     * Resolve node by global id.
+     * Handle type construction.
      *
-     * @param mixed  $id
-     * @param string $globalId
+     * @param NodeValue $value
      *
-     * @return mixed
+     * @return NodeValue
      */
-    public function resolve($id, $globalId)
+    public function handle(NodeValue $value)
     {
-        // TODO: Resolve model by id.
+        // 1. Create query types for model...
+        $schemaTxt = '
+        input {{model}}WhereNotNull {
+
+        }
+        input {{model}}InputType {}
+        ';
+
+        $schema = str_replace('{{model}}', $value->getType()->name, $schemaTxt);
+
+        collect($this->getInputTypes($this->parseSchema($schema)))
+            ->each(function ($type) {
+                schema()->type($type);
+            });
+        // 2. Register node resolver w/ schema...
+        return $value;
     }
 }

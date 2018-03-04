@@ -12,76 +12,102 @@ use Nuwave\Lighthouse\Schema\Resolvers\InputObjectTypeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\InterfaceResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ObjectTypeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 class NodeFactory
 {
     /**
      * Resolve enum definition to type.
      *
-     * @param EnumTypeDefinitionNode $enum
+     * @param NodeValue $value
      *
      * @return \GraphQL\Type\Definition\EnumType
      */
-    public static function enum(EnumTypeDefinitionNode $enum)
+    public static function enum(NodeValue $value)
     {
-        return count($enum->directives)
-            ? directives()->forNode($enum)->resolve($enum)
-            : EnumResolver::resolve($enum);
+        $type = directives()->hasNodeResolver($value->getNode())
+            ? directives()->forNode($value->getNode())->resolve($value->getNode())
+            : EnumResolver::resolve($value->getNode());
+
+        return self::applyMiddleware($value->setType($type))->getType();
     }
 
     /**
      * Resolve scalar definition to type.
      *
-     * @param ScalarTypeDefinitionNode $scalar
+     * @param NodeValue $value
      *
      * @return \GraphQL\Type\Definition\ScalarType
      */
-    public static function scalar(ScalarTypeDefinitionNode $scalar)
+    public static function scalar(NodeValue $value)
     {
-        return count($scalar->directives)
-            ? directives()->forNode($scalar)->resolve($scalar)
-            : ScalarResolver::resolve($scalar);
+        $type = directives()->hasNodeResolver($value->getNode())
+            ? directives()->forNode($value->getNode())->resolve($value->getNode())
+            : ScalarResolver::resolve($value->getNode());
+
+        return self::applyMiddleware($value->setType($type))->getType();
     }
 
     /**
      * Resolve interface definition to type.
      *
-     * @param InterfaceTypeDefinitionNode $interface
+     * @param NodeValue $value
      *
      * @return \GraphQL\Type\Definition\InterfaceType
      */
-    public static function interface(InterfaceTypeDefinitionNode $interface)
+    public static function interface(NodeValue $value)
     {
-        return count($interface->directives)
-            ? directives()->forNode($interface)->resolve($interface)
-            : InterfaceResolver::resolve($interface);
+        $type = directives()->hasNodeResolver($value->getNode())
+            ? directives()->forNode($value->getNode())->resolve($value->getNode())
+            : InterfaceResolver::resolve($value->getNode());
+
+        return self::applyMiddleware($value->setType($type))->getType();
     }
 
     /**
      * Resolve object type definition to type.
      *
-     * @param ObjectTypeDefinitionNode $objectType
+     * @param NodeValue $value
      *
      * @return \GraphQL\Type\Definition\ObjectType
      */
-    public static function objectType(ObjectTypeDefinitionNode $objectType)
+    public static function objectType(NodeValue $value)
     {
-        return count($objectType->directives)
-            ? directives()->forNode($objectType)->resolve($objectType)
-            : ObjectTypeResolver::resolve($objectType);
+        $type = directives()->hasNodeResolver($value->getNode())
+            ? directives()->forNode($value->getNode())->resolve($value->getNode())
+            : ObjectTypeResolver::resolve($value->getNode());
+
+        return self::applyMiddleware($value->setType($type))->getType();
     }
 
     /**
      * Resolve input type definition to type.
      *
-     * @param InputObjectTypeDefinitionNode $inputType
+     * @param NodeValue $value
      *
      * @return \GraphQL\Type\Definition\InputObjectType
      */
-    public static function inputObjectType(InputObjectTypeDefinitionNode $inputType)
+    public static function inputObjectType(NodeValue $value)
     {
-        return count($inputType->directives)
-            ? directives()->forNode($inputType)->resolve($inputType)
-            : InputObjectTypeResolver::resolve($inputType);
+        $type = directives()->hasNodeResolver($value->getNode())
+            ? directives()->forNode($value->getNode())->resolve($value->getNode())
+            : InputObjectTypeResolver::resolve($value->getNode());
+
+        return self::applyMiddleware($value->setType($type))->getType();
+    }
+
+    /**
+     * Apply node middleware.
+     *
+     * @param NodeValue $value
+     *
+     * @return NodeValue
+     */
+    public static function applyMiddleware(NodeValue $value)
+    {
+        return directives()->nodeMiddleware($value->getNode())
+            ->reduce(function ($value, $middleware) {
+                return $middleware->handle($value);
+            }, $value);
     }
 }

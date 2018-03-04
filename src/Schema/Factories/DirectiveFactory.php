@@ -9,6 +9,8 @@ use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class DirectiveFactory
@@ -52,10 +54,26 @@ class DirectiveFactory
         $handler = $this->directives->get($name);
 
         if (! $handler) {
-            throw new \Exception("No directive has been registered for [{$name}]");
+            throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
         return $handler;
+    }
+
+    /**
+     * Check if field has a resolver directive.
+     *
+     * @param Node $node
+     *
+     * @return bool
+     */
+    public function hasNodeResolver(Node $node)
+    {
+        return collect($node->directives)->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->reduce(function ($has, $handler) {
+            return $handler instanceof NodeResolver ? true : $has;
+        }, false);
     }
 
     /**
@@ -67,9 +85,13 @@ class DirectiveFactory
      */
     public function forNode(Node $node)
     {
-        $directives = data_get($node, 'directives');
+        $resolvers = collect($node->directives)->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->filter(function ($handler) {
+            return $handler instanceof NodeResolver;
+        });
 
-        if (count($directives) > 1) {
+        if ($resolvers->count() > 1) {
             throw new DirectiveException(sprintf(
                 'Nodes can only have 1 assigned directive. %s has %s directives [%s]',
                 data_get($node, 'name.value'),
@@ -80,7 +102,23 @@ class DirectiveFactory
             ));
         }
 
-        return $this->handler($directives[0]->name->value);
+        return $resolvers->first();
+    }
+
+    /**
+     * Get middleware for field.
+     *
+     * @param Node $node
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function nodeMiddleware(Node $node)
+    {
+        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->filter(function ($handler) {
+            return $handler instanceof NodeMiddleware;
+        });
     }
 
     /**

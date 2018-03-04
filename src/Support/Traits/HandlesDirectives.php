@@ -12,6 +12,21 @@ trait HandlesDirectives
     /**
      * Get directive by name.
      *
+     * @param Node   $node
+     * @param string $name
+     *
+     * @return DirectiveNode
+     */
+    protected function nodeDirective(Node $node, $name)
+    {
+        return collect($node->directives)->first(function (DirectiveNode $directive) use ($name) {
+            return $directive->name->value === $name;
+        });
+    }
+
+    /**
+     * Get directive by name.
+     *
      * @param FieldDefinitionNode $field
      * @param string              $name
      *

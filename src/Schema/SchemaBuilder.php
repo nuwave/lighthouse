@@ -151,13 +151,21 @@ class SchemaBuilder
      */
     protected function setTypes(DocumentNode $document)
     {
-        $this->enums = $this->getEnums($document);
-        $this->interfaces = $this->getInterfaces($document);
-        $this->scalars = $this->getScalars($document);
-        $this->types = $this->getObjectTypes($document);
-        $this->input = $this->getInputTypes($document);
-        $this->mutations = $this->getMutations($document);
-        $this->queries = $this->getQueries($document);
+        $enums = $this->getEnums($document);
+        $interfaces = $this->getInterfaces($document);
+        $scalars = $this->getScalars($document);
+        $types = $this->getObjectTypes($document);
+        $inputs = $this->getInputTypes($document);
+        $mutations = $this->getMutations($document);
+        $queries = $this->getQueries($document);
+
+        $this->enums = array_merge($this->enums, $enums);
+        $this->interfaces = array_merge($this->interfaces, $interfaces);
+        $this->scalars = array_merge($this->scalars, $scalars);
+        $this->types = array_merge($this->types, $types);
+        $this->input = array_merge($this->input, $inputs);
+        $this->mutations = array_merge($this->mutations, $mutations);
+        $this->queries = array_merge($this->queries, $queries);
 
         $this->attachTypeExtensions(
             $this->definitions($document),

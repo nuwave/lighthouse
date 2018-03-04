@@ -13,6 +13,7 @@ use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\QueryFactory;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 trait CanParseTypes
 {
@@ -40,7 +41,7 @@ trait CanParseTypes
         return $this->definitions($document)->filter(function ($def) {
             return $def instanceof EnumTypeDefinitionNode;
         })->map(function (EnumTypeDefinitionNode $enum) {
-            return NodeFactory::enum($enum);
+            return NodeFactory::enum(NodeValue::init($enum));
         })->toArray();
     }
 
@@ -56,7 +57,7 @@ trait CanParseTypes
         return $this->definitions($document)->filter(function ($def) {
             return $def instanceof InterfaceTypeDefinitionNode;
         })->map(function (InterfaceTypeDefinitionNode $interface) {
-            return NodeFactory::interface($interface);
+            return NodeFactory::interface(NodeValue::init($interface));
         })->toArray();
     }
 
@@ -72,7 +73,7 @@ trait CanParseTypes
         return $this->definitions($document)->filter(function ($def) {
             return $def instanceof ScalarTypeDefinitionNode;
         })->map(function (ScalarTypeDefinitionNode $scalar) {
-            return NodeFactory::scalar($scalar);
+            return NodeFactory::scalar(NodeValue::init($scalar));
         })->toArray();
     }
 
@@ -89,7 +90,7 @@ trait CanParseTypes
         ->filter(function (ObjectTypeDefinitionNode $objectType) {
             return ! in_array($objectType->name->value, ['Mutation', 'Query']);
         })->map(function (ObjectTypeDefinitionNode $objectType) {
-            return NodeFactory::objectType($objectType);
+            return NodeFactory::objectType(NodeValue::init($objectType));
         })->toArray();
     }
 
@@ -105,7 +106,7 @@ trait CanParseTypes
         return $this->definitions($document)->filter(function ($def) {
             return $def instanceof InputObjectTypeDefinitionNode;
         })->map(function (InputObjectTypeDefinitionNode $input) {
-            return NodeFactory::inputObjectType($input);
+            return NodeFactory::inputObjectType(NodeValue::init($input));
         })->toArray();
     }
 
