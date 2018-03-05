@@ -15,7 +15,7 @@ trait RelayConnection
      * @param  array  $args
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeGetConnection($query, array $args)
+    public function scopeGetGqlConnection($query, array $args)
     {
         $first = isset($args['first']) ? $args['first'] : 15;
         $after = $this->decodeCursor($args);
@@ -32,7 +32,7 @@ trait RelayConnection
      * @param  array  $args
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeLoadConnection($query, array $args)
+    public function scopeLoadGqlConnection($query, array $args)
     {
         $first = isset($args['first']) ? $args['first'] : 15;
         $after = $this->decodeCursor($args);
