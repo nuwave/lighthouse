@@ -19,10 +19,11 @@ trait HandlesNodeFields
      */
     protected function getNodeFields(Node $node)
     {
-        return collect($node->fields)->mapWithKeys(function (FieldDefinitionNode $field) use ($node) {
-            $type = FieldTypeResolver::resolve($field);
-            $description = trim(str_replace("\n", '', data_get($field, 'description', '')));
-            $value = FieldValue::init($type, $node, $field, $description);
+        return collect($node->fields)
+        ->mapWithKeys(function (FieldDefinitionNode $field) use ($node) {
+            $value = (new FieldValue($node, $field));
+            $value->setType(FieldTypeResolver::resolve($value))
+                ->setDescription(trim(str_replace("\n", '', data_get($field, 'description', ''))));
 
             return [$field->name->value => FieldFactory::convert($value)];
         });

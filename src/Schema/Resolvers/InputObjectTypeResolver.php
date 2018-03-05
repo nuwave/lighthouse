@@ -51,7 +51,7 @@ class InputObjectTypeResolver extends AbstractResolver
         return collect(data_get($this->node, 'fields', []))
             ->mapWithKeys(function (InputValueDefinitionNode $input) {
                 return [$input->name->value => [
-                    'type' => FieldTypeResolver::resolve($input),
+                    'type' => FieldTypeResolver::resolveInput($input),
                     'description' => trim(str_replace("\n", '', data_get($input, 'description', ''))),
                 ]];
             });

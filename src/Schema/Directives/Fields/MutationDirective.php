@@ -40,7 +40,9 @@ class MutationDirective implements FieldResolver
             ));
         }
 
-        return MutationResolver::resolve($value->getField(), $this->getResolver($namespace));
+        return $value->setResolver(
+            MutationResolver::resolve($value->getField(), $this->getResolver($namespace))
+        );
     }
 
     /**

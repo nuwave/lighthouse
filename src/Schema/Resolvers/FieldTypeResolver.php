@@ -2,24 +2,39 @@
 
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class FieldTypeResolver
 {
     /**
      * Parse type from node.
      *
-     * @param FieldDefinitionNode $field
+     * @param FieldValue $value
      *
-     * @return mixed
+     * @return FieldValue
      */
-    public static function resolve($field)
+    public static function resolve(FieldValue $value)
     {
-        return (new static())->resolveNodeType($field->type);
+        return $value->setType(
+            (new static())->resolveNodeType($value->getField())
+        );
+    }
+
+    /**
+     * Parse type from input.
+     *
+     * @param InputValueDefinitionNode $input
+     *
+     * @return Type
+     */
+    public static function resolveInput(InputValueDefinitionNode $input)
+    {
+        return (new static())->resolveNodeType($input);
     }
 
     /**

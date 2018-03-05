@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
 use GraphQL\Language\AST\Node;
 
@@ -29,6 +30,13 @@ class FieldValue
     protected $node;
 
     /**
+     * Field resolver closure.
+     *
+     * @var \Closure
+     */
+    protected $resolver;
+
+    /**
      * Current description.
      *
      * @var string
@@ -38,14 +46,12 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param mixed  $type
      * @param Node   $node
      * @param Field  $field
      * @param string $description
      */
-    public function __construct($type, Node $node, Field $field, $description = '')
+    public function __construct(Node $node, Field $field, $description = '')
     {
-        $this->type = $type;
         $this->node = $node;
         $this->field = $field;
         $this->description = $description;
@@ -54,16 +60,15 @@ class FieldValue
     /**
      * Initialize new field value.
      *
-     * @param mixed  $type
      * @param Node   $node
      * @param Field  $field
      * @param string $description
      *
      * @return self
      */
-    public static function init($type, Node $node, Field $field, $description = '')
+    public static function init(Node $node, Field $field, $description = '')
     {
-        return new static($type, $node, $field, $description);
+        return new static($node, $field, $description);
     }
 
     /**
@@ -78,6 +83,18 @@ class FieldValue
         $this->type = $type;
 
         return $this;
+    }
+
+    /**
+     * Set current resolver.
+     *
+     * @param Closure $resolver
+     */
+    public function setResolver(Closure $resolver)
+    {
+        $this->resolver = $resolver;
+
+        return $self;
     }
 
     /**
@@ -122,6 +139,16 @@ class FieldValue
     public function getField()
     {
         return $this->field;
+    }
+
+    /**
+     * Get field resolver.
+     *
+     * @return Closure
+     */
+    public function getResolver()
+    {
+        return $this->resolver;
     }
 
     /**

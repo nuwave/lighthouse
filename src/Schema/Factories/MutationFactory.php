@@ -19,17 +19,26 @@ class MutationFactory
      */
     public static function resolve(FieldDefinitionNode $mutation, Node $node)
     {
-        $value = FieldValue::init(schema()->instance('mutation'), $node, $mutation, '');
-        $field = directives()->hasResolver($mutation)
-            ? directives()->fieldResolver($mutation)->handle($value)
-            : MutationResolver::resolve($mutation, self::resolver($mutation));
+        $value = new FieldValue($node, $mutation, '');
 
-        $field['resolve'] = directives()->fieldMiddleware($mutation)
-            ->reduce(function ($resolver, $middleware) use ($mutation) {
-                return $middleware->handle($mutation, $resolver);
-            }, $field['resolve']);
+        if (directives()->hasResolver($mutation)) {
+            directives()->fieldResolver($mutation)->handle($value);
+        } else {
+            $value->setResolver(
+                MutationResolver::resolve($mutation, self::resolver($mutation))
+            );
+        }
 
-        return $field;
+        directives()->fieldMiddleware($mutation)
+            ->reduce(function ($value, $middleware) {
+                return $middleware->handle($value);
+            }, $value);
+
+        return [
+            'type' => $value->getType(),
+            'description' => $value->getDescription(),
+            'resolve' => $value->getResolver(),
+        ];
     }
 
     /**
