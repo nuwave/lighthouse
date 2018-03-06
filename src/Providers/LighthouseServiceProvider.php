@@ -60,6 +60,7 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\BelongsTo::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CreateDirective::class);
+        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\DeleteDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\EventDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective::class);
         directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective::class);
