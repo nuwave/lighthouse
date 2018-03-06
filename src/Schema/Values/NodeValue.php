@@ -102,4 +102,24 @@ class NodeValue
     {
         return $this->type;
     }
+
+    /**
+     * Get the name of the node.
+     *
+     * @return string
+     */
+    public function getNodeName()
+    {
+        return data_get($this->getNode(), 'name.value');
+    }
+
+    /**
+     * Get fields for node.
+     *
+     * @return array
+     */
+    public function getNodeFields()
+    {
+        return data_get($this->getNode(), 'fields', []);
+    }
 }

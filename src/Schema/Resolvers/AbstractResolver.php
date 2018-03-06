@@ -2,41 +2,43 @@
 
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 abstract class AbstractResolver
 {
     /**
      * Instance of node to resolve.
      *
-     * @var Node
+     * @var NodeValue
      */
-    protected $node;
+    protected $value;
 
     /**
      * Create a new instace of node resolver.
      *
-     * @param Node $node
+     * @param NodeValue $value
      */
-    public function __construct(Node $node)
+    public function __construct(NodeValue $value)
     {
-        $this->node = $node;
+        $this->value = $value;
     }
 
     /**
      * Resolve node type from node.
      *
-     * @param  Node $node
-     * @return Type
+     * @param NodeValue $value
+     *
+     * @return NodeValue
      */
-    public static function resolve(Node $node)
+    public static function resolve(NodeValue $value)
     {
-        $instance = new static($node);
+        $instance = new static($value);
 
-        return $instance->generate();
+        return $value->setType($instance->generate());
     }
 
     /**
@@ -44,12 +46,12 @@ abstract class AbstractResolver
      *
      * @var Type
      */
-    public abstract function generate();
+    abstract public function generate();
 
     /**
      * Check if object type definition has a specified directive.
      *
-     * @param  mixed $node
+     * @param mixed  $node
      * @param string $name
      *
      * @return bool
@@ -65,8 +67,9 @@ abstract class AbstractResolver
     /**
      * Check if node has any of the provided directives.
      *
-     * @param  mixed $node
-     * @param  array $names
+     * @param mixed $node
+     * @param array $names
+     *
      * @return bool
      */
     protected function hasAnyDirective($node, array $names = [])
@@ -94,7 +97,7 @@ abstract class AbstractResolver
     /**
      * Find field directive by name.
      *
-     * @param mixed $node
+     * @param mixed  $node
      * @param string $name
      * @param mixed  $default
      *
@@ -130,11 +133,12 @@ abstract class AbstractResolver
     /**
      * Strip description of invalid characters.
      *
-     * @param  string $description
+     * @param string $description
+     *
      * @return string
      */
-    protected function safeDescription($description = "")
+    protected function safeDescription($description = '')
     {
-        return trim(str_replace(["\n", "\t"], "", $description));
+        return trim(str_replace(["\n", "\t"], '', $description));
     }
 }

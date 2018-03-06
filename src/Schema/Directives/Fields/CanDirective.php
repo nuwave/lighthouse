@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Closure;
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
@@ -25,35 +25,38 @@ class CanDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldDefinitionNode $field
-     * @param Closure             $resolver
+     * @param FieldValue $value
      *
      * @return Closure
      */
-    public function handle(FieldDefinitionNode $field, Closure $resolver)
+    public function handle(FieldValue $value)
     {
         $policies = $this->directiveArgValue(
-            $this->fieldDirective($field, 'can'),
+            $this->fieldDirective($value->getField(), 'can'),
             'if'
         );
 
-        return function () use ($policies, $resolver) {
-            $args = func_get_args();
-            $resolved = call_user_func_array($resolver, $args);
+        $resolver = $value->getResolver();
 
-            $can = collect($policies)->reduce(function ($allowed, $policy) use ($resolved) {
-                if (! auth()->user()->can($policy, $resolved)) {
-                    return false;
+        return $value->setResolver(
+            function () use ($policies, $resolver) {
+                $args = func_get_args();
+                $root = $args[0];
+
+                $can = collect($policies)->reduce(function ($allowed, $policy) use ($root) {
+                    if (! auth()->user()->can($policy, get_class($root))) {
+                        return false;
+                    }
+
+                    return $allowed;
+                }, true);
+
+                if (! $can) {
+                    throw new Error('Not authorized to access resource');
                 }
 
-                return $allowed;
-            }, true);
-
-            if (! $can) {
-                throw new Error('Not authorized to access resource');
+                return call_user_func_array($resolver, $args);
             }
-
-            return $resolved;
-        };
+        );
     }
 }

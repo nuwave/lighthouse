@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Resolvers\QueryResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -27,7 +26,7 @@ class QueryDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value)
     {
@@ -40,7 +39,7 @@ class QueryDirective implements FieldResolver
             ));
         }
 
-        return QueryResolver::resolve($value->getField(), $this->getResolver($value, $namespace));
+        return $value->setResolver($this->getResolver($value, $namespace));
     }
 
     /**

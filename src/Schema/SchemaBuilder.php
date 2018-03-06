@@ -3,37 +3,19 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
-use Nuwave\Lighthouse\Support\Traits\CanExtendTypes;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 
 class SchemaBuilder
 {
-    use CanExtendTypes, CanParseTypes;
-
-    /**
-     * Collection of schema enums.
-     *
-     * @var array
-     */
-    protected $enums = [];
-
-    /**
-     * Collection of schema scalars.
-     *
-     * @var array
-     */
-    protected $scalars = [];
-
-    /**
-     * Collection of schema interfaces.
-     *
-     * @var array
-     */
-    protected $interfaces = [];
+    use CanParseTypes;
 
     /**
      * Collection of schema types.
@@ -41,41 +23,6 @@ class SchemaBuilder
      * @var array
      */
     protected $types = [];
-
-    /**
-     * Collection of schema input.
-     *
-     * @var array
-     */
-    protected $input = [];
-
-    /**
-     * Collection of schema unions.
-     *
-     * @var array
-     */
-    protected $unions = [];
-
-    /**
-     * Collection of schema queries.
-     *
-     * @var array
-     */
-    protected $queries = [];
-
-    /**
-     * Collection of schema mutations.
-     *
-     * @var array
-     */
-    protected $mutations = [];
-
-    /**
-     * Document node to parse.
-     *
-     * @var DocumentNode
-     */
-    protected $document;
 
     /**
      * Generate a GraphQL Schema.
@@ -86,11 +33,11 @@ class SchemaBuilder
      */
     public function build($schema)
     {
-        $this->register($schema);
-        $registered = $this->getRegisteredTypes();
-        $query = collect($registered)->firstWhere('name', 'Query');
-        $mutation = collect($registered)->firstWhere('name', 'Mutation');
-        $types = collect($registered)->filter(function ($type) {
+        $types = $this->register($schema);
+        $query = $types->firstWhere('name', 'Query');
+        $mutation = $types->firstWhere('name', 'Mutation');
+
+        $types = $types->filter(function ($type) {
             return ! in_array($type->name, ['Query', 'Mutation']);
         })->toArray();
 
@@ -109,58 +56,15 @@ class SchemaBuilder
         $document = $this->parseSchema($schema);
 
         $this->setTypes($document);
-        $this->setQuery();
-        $this->setMutation();
+        $this->extendTypes($document);
 
-        collect(array_merge(
-            $this->getRegisteredTypes()
-        ))->each(function ($type) {
-            $this->unpackType($type);
-        });
+        while ($this->hasPackedTypes()) {
+            collect($this->types)->each(function ($type) {
+                $this->unpackType($type);
+            });
+        }
 
-        return collect(array_merge(
-            $this->getRegisteredTypes(),
-            $this->mutations,
-            $this->queries
-        ));
-    }
-
-    public function setQuery()
-    {
-        $query = collect($this->getRegisteredTypes())
-            ->first(function ($type) {
-                return 'Query' === $type->name;
-            }, $this->generateQuery());
-
-        $query->config['fields'] = $this->queries;
-        $this->type($query);
-    }
-
-    public function setMutation()
-    {
-        $mutation = collect($this->getRegisteredTypes())
-            ->first(function ($type) {
-                return 'Mutation' === $type->name;
-            }, $this->generateMutation());
-
-        $mutation->config['fields'] = $this->mutations;
-        $this->type($mutation);
-    }
-
-    public function generateMutation()
-    {
-        return new ObjectType([
-            'name' => 'Mutation',
-            'fields' => $this->mutations,
-        ]);
-    }
-
-    public function generateQuery()
-    {
-        return new ObjectType([
-            'name' => 'Query',
-            'fields' => $this->queries,
-        ]);
+        return collect($this->types);
     }
 
     /**
@@ -172,7 +76,7 @@ class SchemaBuilder
      */
     public function instance($type)
     {
-        return collect($this->getRegisteredTypes())
+        return collect($this->types)
         ->first(function ($instance) use ($type) {
             return $instance->name === $type;
         });
@@ -197,50 +101,78 @@ class SchemaBuilder
      */
     protected function setTypes(DocumentNode $document)
     {
-        $enums = $this->getEnums($document);
-        $interfaces = $this->getInterfaces($document);
-        $scalars = $this->getScalars($document);
-        $types = $this->getObjectTypes($document);
-        $inputs = $this->getInputTypes($document);
-        $mutations = $this->getMutations($document);
-        $queries = $this->getQueries($document);
+        $types = collect($document->definitions)->reject(function ($node) {
+            return $node instanceof TypeExtensionDefinitionNode;
+        })->map(function (Node $node) {
+            return app(NodeFactory::class)->handle(new NodeValue($node));
+        })->toArray();
 
-        $this->enums = array_merge($this->enums, $enums);
-        $this->interfaces = array_merge($this->interfaces, $interfaces);
-        $this->scalars = array_merge($this->scalars, $scalars);
+        // NOTE: We don't assign this above because new types may be
+        // declared by directives.
         $this->types = array_merge($this->types, $types);
-        $this->input = array_merge($this->input, $inputs);
-        $this->mutations = array_merge($this->mutations, $mutations);
-        $this->queries = array_merge($this->queries, $queries);
-
-        $this->attachTypeExtensions(
-            $this->definitions($document),
-            $this->getRegisteredTypes()
-        );
-
-        $this->mutations = array_merge($this->mutations, $this->getMutationExtensions(
-            $this->definitions($document)
-        ));
-
-        $this->queries = array_merge($this->queries, $this->getQueryExtensions(
-            $this->definitions($document)
-        ));
     }
 
     /**
-     * Get registered types.
+     * Extend registered types.
      *
-     * @return array
+     * @param DocumentNode $document
      */
-    protected function getRegisteredTypes()
+    protected function extendTypes(DocumentNode $document)
     {
-        return array_merge(
-            $this->types,
-            $this->input,
-            $this->scalars,
-            $this->enums,
-            $this->interfaces
-        );
+        collect($document->definitions)->filter(function ($def) {
+            return $def instanceof TypeExtensionDefinitionNode;
+        })->each(function (TypeExtensionDefinitionNode $extension) {
+            $name = $extension->definition->name->value;
+
+            if ($type = collect($this->types)->firstWhere('name', $name)) {
+                app(NodeFactory::class)->extend($extension, $type);
+            }
+        });
+    }
+
+    /**
+     * Check if schema still has packed types.
+     *
+     * @return bool
+     */
+    protected function hasPackedTypes()
+    {
+        return collect($this->types)->reduce(function ($packed, $type) {
+            return $packed ?: $this->isTypePacked($type);
+        }, false);
+    }
+
+    /**
+     * Check if type has been unpacked.
+     *
+     * @param Type $type
+     *
+     * @return bool
+     */
+    protected function isTypePacked(Type $type)
+    {
+        if (is_callable(array_get($type->config, 'fields'))) {
+            return true;
+        }
+
+        return collect(array_get($type->config, 'fields'), [])->reduce(function ($packed, $field) {
+            if ($packed) {
+                return true;
+            } elseif (is_callable(array_get($field, 'type'))) {
+                return true;
+            }
+
+            $fieldType = array_get($field, 'type');
+            if (method_exists($fieldType, 'getWrappedType')) {
+                $wrappedType = $fieldType->getWrappedType();
+
+                return is_callable($wrappedType);
+            }
+
+            return false;
+        }, false);
+
+        return false;
     }
 
     /**
@@ -250,7 +182,7 @@ class SchemaBuilder
      *
      * @return mixed
      */
-    public function unpackType($type)
+    protected function unpackType($type)
     {
         if ($type instanceof Type && array_has($type->config, 'fields')) {
             $fields = is_callable($type->config['fields'])

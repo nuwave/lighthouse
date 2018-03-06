@@ -26,7 +26,7 @@ class MethodDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value)
     {
@@ -36,8 +36,8 @@ class MethodDirective implements FieldResolver
             $value->getField()->name->value
         );
 
-        return function ($root, array $args, $context = null, ResolveInfo $info = null) use ($method) {
+        return $value->setResolver(function ($root, array $args, $context = null, ResolveInfo $info = null) use ($method) {
             return call_user_func_array([$root, $method], [$args, $context, $info]);
-        };
+        });
     }
 }

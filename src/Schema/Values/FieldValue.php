@@ -50,7 +50,7 @@ class FieldValue
      * @param Field  $field
      * @param string $description
      */
-    public function __construct(Node $node, Field $field, $description = '')
+    public function __construct(Node $node, $field, $description = '')
     {
         $this->node = $node;
         $this->field = $field;
@@ -94,7 +94,7 @@ class FieldValue
     {
         $this->resolver = $resolver;
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -158,6 +158,26 @@ class FieldValue
      */
     public function getDescription()
     {
-        return $this->description;
+        return $this->description ?: trim(str_replace("\n", '', $this->getField()->description));
+    }
+
+    /**
+     * Get field name.
+     *
+     * @return string
+     */
+    public function getFieldName()
+    {
+        return $this->getField()->name->value;
+    }
+
+    /**
+     * Get field's node name.
+     *
+     * @return string
+     */
+    public function getNodeName()
+    {
+        return data_get($this->getNode(), 'name.value');
     }
 }

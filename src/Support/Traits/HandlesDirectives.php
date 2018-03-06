@@ -32,7 +32,7 @@ trait HandlesDirectives
      *
      * @return DirectiveNode
      */
-    protected function fieldDirective(FieldDefinitionNode $field, $name)
+    protected function fieldDirective($field, $name)
     {
         return collect($field->directives)->first(function (DirectiveNode $directive) use ($name) {
             return $directive->name->value === $name;
@@ -118,5 +118,17 @@ trait HandlesDirectives
             ->reduce(function ($string, $type) {
                 return sprintf($string, $type);
             }, '%s'));
+    }
+
+    /**
+     * Strip description of invalid characters.
+     *
+     * @param string $description
+     *
+     * @return string
+     */
+    protected function safeDescription($description = '')
+    {
+        return trim(str_replace(["\n", "\t"], '', $description));
     }
 }

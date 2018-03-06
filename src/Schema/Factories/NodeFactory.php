@@ -3,19 +3,109 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Resolvers\EnumResolver;
-use Nuwave\Lighthouse\Schema\Resolvers\InputObjectTypeResolver;
-use Nuwave\Lighthouse\Schema\Resolvers\InterfaceResolver;
-use Nuwave\Lighthouse\Schema\Resolvers\ObjectTypeResolver;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class NodeFactory
 {
+    use HandlesDirectives;
+
+    /**
+     * Transform node to type.
+     *
+     * @param NodeValue $value
+     *
+     * @return Type
+     */
+    public function handle(NodeValue $value)
+    {
+        $value = $this->hasResolver($value)
+            ? $this->useResolver($value)
+            : $this->transform($value);
+
+        return $this->applyMiddleware($value)->getType();
+    }
+
+    /**
+     * Extend type definition.
+     *
+     * @param Extension $extension
+     * @param Type      $type
+     *
+     * @return Type
+     */
+    public function extend(Extension $extension, Type $type)
+    {
+        $typeFields = value($type->config['fields']);
+        $extendedFields = $this->getFields(new NodeValue($extension->definition));
+        $type->config['fields'] = array_merge($typeFields, $extendedFields);
+
+        return $type;
+    }
+
+    /**
+     * Check if node has a resolver directive.
+     *
+     * @param NodeValue $value
+     *
+     * @return bool
+     */
+    protected function hasResolver(NodeValue $value)
+    {
+        return directives()->hasNodeResolver($value->getNode());
+    }
+
+    /**
+     * Use directive resolver to transform type.
+     *
+     * @param NodeValue $value
+     *
+     * @return NodeValue
+     */
+    protected function useResolver(NodeValue $value)
+    {
+        return directives()->forNode($value->getNode())
+            ->resolve($value);
+    }
+
+    /**
+     * Transform value to type.
+     *
+     * @param NodeValue $value
+     *
+     * @return NodeValue
+     */
+    protected function transform(NodeValue $value)
+    {
+        switch (get_class($value->getNode())) {
+            case EnumTypeDefinitionNode::class:
+                return $this->enum($value);
+            case ScalarTypeDefinitionNode::class:
+                return $this->scalar($value);
+            case InterfaceTypeDefinitionNode::class:
+                return $this->interface($value);
+            case ObjectTypeDefinitionNode::class:
+                return $this->objectType($value);
+            case InputObjectTypeDefinitionNode::class:
+                return $this->inputObjectType($value);
+            default:
+                throw new \Exception("Unknown node [{$value->getNodeName()}]");
+        }
+    }
+
     /**
      * Resolve enum definition to type.
      *
@@ -23,13 +113,26 @@ class NodeFactory
      *
      * @return \GraphQL\Type\Definition\EnumType
      */
-    public static function enum(NodeValue $value)
+    public function enum(NodeValue $value)
     {
-        $type = directives()->hasNodeResolver($value->getNode())
-            ? directives()->forNode($value->getNode())->resolve($value->getNode())
-            : EnumResolver::resolve($value->getNode());
+        $enum = new EnumType([
+            'name' => $value->getNodeName(),
+            'values' => collect($value->getNode()->values)
+                ->mapWithKeys(function (EnumValueDefinitionNode $field) {
+                    $directive = $this->fieldDirective($field, 'enum');
 
-        return self::applyMiddleware($value->setType($type))->getType();
+                    if (! $directive) {
+                        return [];
+                    }
+
+                    return [$field->name->value => [
+                        'value' => $this->directiveArgValue($directive, 'value'),
+                        'description' => $this->safeDescription($field->description),
+                    ]];
+                })->toArray(),
+        ]);
+
+        return $value->setType($enum);
     }
 
     /**
@@ -39,13 +142,9 @@ class NodeFactory
      *
      * @return \GraphQL\Type\Definition\ScalarType
      */
-    public static function scalar(NodeValue $value)
+    public function scalar(NodeValue $value)
     {
-        $type = directives()->hasNodeResolver($value->getNode())
-            ? directives()->forNode($value->getNode())->resolve($value->getNode())
-            : ScalarResolver::resolve($value->getNode());
-
-        return self::applyMiddleware($value->setType($type))->getType();
+        return ScalarResolver::resolve($value);
     }
 
     /**
@@ -53,15 +152,16 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\InterfaceType
+     * @return NodeValue
      */
-    public static function interface(NodeValue $value)
+    public function interface(NodeValue $value)
     {
-        $type = directives()->hasNodeResolver($value->getNode())
-            ? directives()->forNode($value->getNode())->resolve($value->getNode())
-            : InterfaceResolver::resolve($value->getNode());
+        $interface = new InterfaceType([
+            'name' => $value->getNodeName(),
+            'fields' => $this->getFields($value),
+        ]);
 
-        return self::applyMiddleware($value->setType($type))->getType();
+        return $value->setType($interface);
     }
 
     /**
@@ -69,15 +169,16 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\ObjectType
+     * @return NodeValue
      */
-    public static function objectType(NodeValue $value)
+    public function objectType(NodeValue $value)
     {
-        $type = directives()->hasNodeResolver($value->getNode())
-            ? directives()->forNode($value->getNode())->resolve($value->getNode())
-            : ObjectTypeResolver::resolve($value->getNode());
+        $objectType = new ObjectType([
+            'name' => $value->getNodeName(),
+            'fields' => $this->getFields($value),
+        ]);
 
-        return self::applyMiddleware($value->setType($type))->getType();
+        return $value->setType($objectType);
     }
 
     /**
@@ -85,15 +186,37 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\InputObjectType
+     * @return NodeValue
      */
-    public static function inputObjectType(NodeValue $value)
+    public function inputObjectType(NodeValue $value)
     {
-        $type = directives()->hasNodeResolver($value->getNode())
-            ? directives()->forNode($value->getNode())->resolve($value->getNode())
-            : InputObjectTypeResolver::resolve($value->getNode());
+        $inputType = new InputObjectType([
+            'name' => $value->getNodeName(),
+            'fields' => $this->getFields($value),
+        ]);
 
-        return self::applyMiddleware($value->setType($type))->getType();
+        return $value->setType($inputType);
+    }
+
+    /**
+     * Get fields for node.
+     *
+     * @param NodeValue $value
+     *
+     * @return array
+     */
+    protected function getFields(NodeValue $value)
+    {
+        $factory = $this->fieldFactory();
+
+        return collect($value->getNodeFields())
+            ->mapWithKeys(function ($field) use ($factory, $value) {
+                $fieldValue = new FieldValue($value->getNode(), $field);
+
+                return [
+                    $fieldValue->getFieldName() => $factory->handle($fieldValue),
+                ];
+            })->toArray();
     }
 
     /**
@@ -103,11 +226,21 @@ class NodeFactory
      *
      * @return NodeValue
      */
-    public static function applyMiddleware(NodeValue $value)
+    protected function applyMiddleware(NodeValue $value)
     {
         return directives()->nodeMiddleware($value->getNode())
             ->reduce(function ($value, $middleware) {
                 return $middleware->handle($value);
             }, $value);
+    }
+
+    /**
+     * Get instance of field factory.
+     *
+     * @return FieldFactory
+     */
+    protected function fieldFactory()
+    {
+        return app(FieldFactory::class);
     }
 }

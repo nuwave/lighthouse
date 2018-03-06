@@ -5,6 +5,7 @@ namespace Tests\Unit\Schema;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\TestCase;
 
@@ -26,7 +27,9 @@ class DirectiveFactoryTest extends TestCase
         $schema = 'scalar Email @scalar(class: "Email")';
         $document = Parser::parse($schema);
         $definition = $document->definitions[0];
-        $scalar = directives()->forNode($definition)->resolve($definition);
+        $scalar = directives()->forNode($definition)
+            ->resolve(new NodeValue($definition))
+            ->getType();
 
         $this->assertInstanceOf(ScalarType::class, $scalar);
     }

@@ -39,7 +39,10 @@ class ModelDirective implements NodeMiddleware
 
         $schema = str_replace('{{model}}', $value->getType()->name, $schemaTxt);
 
-        collect($this->getInputTypes($this->parseSchema($schema)))
+        collect($this->parseSchema($schema)->definitions)
+            ->map(function ($node) {
+                return $this->convertNode($node);
+            })
             ->each(function ($type) {
                 schema()->type($type);
             });

@@ -69,7 +69,7 @@ class DirectiveFactory
      */
     public function hasNodeResolver(Node $node)
     {
-        return collect($node->directives)->map(function (DirectiveNode $directive) {
+        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
             return $this->handler($directive->name->value);
         })->reduce(function ($has, $handler) {
             return $handler instanceof NodeResolver ? true : $has;
@@ -85,7 +85,7 @@ class DirectiveFactory
      */
     public function forNode(Node $node)
     {
-        $resolvers = collect($node->directives)->map(function (DirectiveNode $directive) {
+        $resolvers = collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
             return $this->handler($directive->name->value);
         })->filter(function ($handler) {
             return $handler instanceof NodeResolver;
@@ -128,7 +128,7 @@ class DirectiveFactory
      *
      * @return bool
      */
-    public function hasResolver(FieldDefinitionNode $field)
+    public function hasResolver($field)
     {
         return collect($field->directives)->map(function (DirectiveNode $directive) {
             return $this->handler($directive->name->value);
@@ -144,7 +144,7 @@ class DirectiveFactory
      *
      * @return mixed
      */
-    public function fieldResolver(FieldDefinitionNode $field)
+    public function fieldResolver($field)
     {
         $resolvers = collect($field->directives)->map(function (DirectiveNode $directive) {
             return $this->handler($directive->name->value);
@@ -173,7 +173,7 @@ class DirectiveFactory
      *
      * @return \Illuminate\Support\Collection
      */
-    public function fieldMiddleware(FieldDefinitionNode $field)
+    public function fieldMiddleware($field)
     {
         return collect($field->directives)->map(function (DirectiveNode $directive) {
             return $this->handler($directive->name->value);

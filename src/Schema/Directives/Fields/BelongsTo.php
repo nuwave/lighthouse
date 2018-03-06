@@ -35,8 +35,8 @@ class BelongsTo implements FieldResolver
             $value->getField()->name->value
         );
 
-        return function ($root, array $args) use ($relation) {
+        return $value->setResolver(function ($root, array $args) use ($relation) {
             return $root->{$relation};
-        };
+        });
     }
 }

@@ -42,8 +42,8 @@ class RenameDirective implements FieldResolver
             ));
         }
 
-        return function ($parent, array $args) use ($attribute) {
+        return $value->setResolver(function ($parent, array $args) use ($attribute) {
             return data_get($parent, $attribute);
-        };
+        });
     }
 }

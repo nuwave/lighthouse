@@ -18,7 +18,7 @@ interface FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value);
 }

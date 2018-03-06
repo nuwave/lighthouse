@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Providers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 
 class LighthouseServiceProvider extends ServiceProvider

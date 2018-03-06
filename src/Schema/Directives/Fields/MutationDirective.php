@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Resolvers\MutationResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -27,11 +26,14 @@ class MutationDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value)
     {
-        $namespace = $this->directiveArgValue($this->fieldDirective($value->getField(), 'mutation'), 'class');
+        $namespace = $this->directiveArgValue(
+            $this->fieldDirective($value->getField(), 'mutation'),
+            'class'
+        );
 
         if (! $namespace) {
             throw new DirectiveException(sprintf(
@@ -40,9 +42,7 @@ class MutationDirective implements FieldResolver
             ));
         }
 
-        return $value->setResolver(
-            MutationResolver::resolve($value->getField(), $this->getResolver($namespace))
-        );
+        return $value->setResolver($this->getResolver($namespace));
     }
 
     /**

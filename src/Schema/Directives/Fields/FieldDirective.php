@@ -28,7 +28,7 @@ class FieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value)
     {
@@ -44,9 +44,9 @@ class FieldDirective implements FieldResolver
             ->getMethod($method)
             ->getClosure($instance);
 
-        return function ($root, array $args, $context = null, ResolveInfo $info = null) use ($closure, $data) {
+        return $value->setResolver(function ($root, array $args, $context = null, ResolveInfo $info = null) use ($closure, $data) {
             return $closure($root, array_merge($args, ['directive' => $data]), $context, $info);
-        };
+        });
     }
 
     /**

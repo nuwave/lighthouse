@@ -4,10 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
-use Nuwave\Lighthouse\Schema\Utils\PageInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -34,7 +32,7 @@ class HasManyDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value)
     {
@@ -50,11 +48,17 @@ class HasManyDirective implements FieldResolver
 
         switch ($resolver) {
             case 'paginator':
-                return $this->paginatorTypeResolver($relation, $value);
+                return $value->setResolver(
+                    $this->paginatorTypeResolver($relation, $value)
+                );
             case 'relay':
-                return $this->connectionTypeResolver($relation, $value);
+                return $value->setResolver(
+                    $this->connectionTypeResolver($relation, $value)
+                );
             default:
-                return $this->defaultResolver($relation);
+                return $value->setResolver(
+                    $this->defaultResolver($relation)
+                );
         }
     }
 
@@ -113,9 +117,12 @@ class HasManyDirective implements FieldResolver
             'edgeResolver'
         );
 
-        collect($this->getObjectTypes($this->parseSchema($schema)))
+        collect($this->parseSchema($schema)->definitions)
+            ->map(function ($node) {
+                return $this->convertNode($node);
+            })
             ->each(function ($type) use ($value) {
-                schema()->type(schema()->unpackType($type));
+                schema()->type($type);
 
                 if (ends_with($type->name, 'Connection')) {
                     $value->setType($type);
@@ -149,9 +156,12 @@ class HasManyDirective implements FieldResolver
             'dataResolver'
         );
 
-        collect($this->getObjectTypes($this->parseSchema($schema)))
+        collect($this->parseSchema($schema)->definitions)
+            ->map(function ($node) {
+                return $this->convertNode($node);
+            })
             ->each(function ($type) use ($value) {
-                schema()->type(schema()->unpackType($type));
+                schema()->type($type);
 
                 if (ends_with($type->name, 'Paginator')) {
                     $value->setType($type);

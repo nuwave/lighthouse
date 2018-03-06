@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 
 class ScalarDirective implements NodeResolver
@@ -22,12 +21,12 @@ class ScalarDirective implements NodeResolver
     /**
      * Resolve the node directive.
      *
-     * @param ScalarTypeDefinitionNode $node
+     * @param NodeValue $value
      *
      * @return mixed
      */
-    public function resolve(Node $node)
+    public function resolve(NodeValue $value)
     {
-        return ScalarResolver::resolve($node);
+        return ScalarResolver::resolve($value);
     }
 }

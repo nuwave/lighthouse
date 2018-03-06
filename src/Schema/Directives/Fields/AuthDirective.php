@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Resolvers\QueryResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -26,7 +25,7 @@ class AuthDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value)
     {
@@ -35,7 +34,7 @@ class AuthDirective implements FieldResolver
             'guard'
         );
 
-        return QueryResolver::resolve($value->getField(), function () use ($guard) {
+        return $value->setResolver(function () use ($guard) {
             return auth($guard)->user();
         });
     }

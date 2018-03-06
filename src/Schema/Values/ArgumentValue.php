@@ -6,16 +6,10 @@ use Closure;
 use GraphQL\Language\AST\DirectiveNode as Directive;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
 use GraphQL\Language\AST\InputValueDefinitionNode as Argument;
+use GraphQL\Type\Definition\Type;
 
 class ArgumentValue
 {
-    /**
-     * Value context.
-     *
-     * @var mixed
-     */
-    protected $context;
-
     /**
      * Current input argument.
      *
@@ -45,28 +39,22 @@ class ArgumentValue
     protected $value;
 
     /**
-     * Create a new argument value instance.
+     * Set current arg type.
      *
-     * @param Field $field
-     * @param array $value
+     * @var Type
      */
-    public function __construct(Field $field, array $value)
-    {
-        $this->field = $field;
-        $this->value = $value;
-    }
+    protected $type;
 
     /**
-     * Initialize new argument value.
+     * Create a new argument value instance.
      *
-     * @param Field $field
-     * @param array $value
-     *
-     * @return self
+     * @param Field    $field
+     * @param Argument $arg
      */
-    public static function init(Field $field, $value)
+    public function __construct(Field $field, Argument $arg)
     {
-        return new static($field, ['type' => $value]);
+        $this->field = $field;
+        $this->arg = $arg;
     }
 
     /**
@@ -98,9 +86,28 @@ class ArgumentValue
     }
 
     /**
+     * Get current argument type.
+     *
+     * @param Type $type
+     *
+     * @return self
+     */
+    public function setType(Type $type)
+    {
+        $this->type = $type;
+
+        $value = $this->getValue();
+        $value['type'] = $type;
+
+        return $this->setValue($value);
+    }
+
+    /**
      * Set the current value.
      *
      * @param array $value
+     *
+     * @return self
      */
     public function setValue(array $value)
     {
@@ -162,6 +169,16 @@ class ArgumentValue
     }
 
     /**
+     * Get the current argument type.
+     *
+     * @return Type
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Get the current value.
      *
      * @return array
@@ -169,5 +186,15 @@ class ArgumentValue
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * Get argument name.
+     *
+     * @return string
+     */
+    public function getArgName()
+    {
+        return $this->getArg()->name->value;
     }
 }

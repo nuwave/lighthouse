@@ -13,6 +13,26 @@ use Tests\TestCase;
 class SchemaBuilderTest extends TestCase
 {
     /**
+     * Get test environment setup.
+     *
+     * @param mixed $app
+     */
+    public function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set(
+            'lighthouse.namespaces.queries',
+            'Tests\\Utils\\Mutations'
+        );
+
+        $app['config']->set(
+            'lighthouse.namespaces.mutations',
+            'Tests\\Utils\\Mutations'
+        );
+    }
+
+    /**
      * @test
      */
     public function itCanResolveEnumTypes()
@@ -108,11 +128,6 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveMutations()
     {
-        $this->app['config']->set(
-            'lighthouse.namespaces.mutations',
-            'Tests\\Utils\\Mutations'
-        );
-
         $schema = '
         type Mutation {
             foo(bar: String! baz: String): String
@@ -134,11 +149,6 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveQueries()
     {
-        $this->app['config']->set(
-            'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
-        );
-
         $schema = '
         type Query {
             foo(bar: String! baz: String): String
@@ -179,22 +189,18 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendQuery()
     {
-        $this->app['config']->set(
-            'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
-        );
-
         $schema = '
         type Query {
-            bar: String!
+            foo: String!
         }
         extend type Query {
-            baz: String!
+            bar: String!
         }
         ';
 
-        $queries = schema()->register($schema)->toArray();
-        $this->assertArrayHasKey('baz', $queries);
+        $type = schema()->register($schema)->firstWhere('name', 'Query');
+        $fields = $type->config['fields'];
+        $this->assertArrayHasKey('bar', $fields);
     }
 
     /**
@@ -202,11 +208,6 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendMutation()
     {
-        $this->app['config']->set(
-            'lighthouse.namespaces.mutations',
-            'Tests\\Utils\\Mutations'
-        );
-
         $schema = '
         type Mutation {
             foo: String!
@@ -216,8 +217,9 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $mutations = schema()->register($schema)->toArray();
-        $this->assertArrayHasKey('bar', $mutations);
+        $type = schema()->register($schema)->firstWhere('name', 'Mutation');
+        $fields = $type->config['fields'];
+        $this->assertArrayHasKey('bar', $fields);
     }
 
     /**
@@ -225,16 +227,6 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanGenerateGraphQLSchema()
     {
-        $this->app['config']->set(
-            'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $this->app['config']->set(
-            'lighthouse.namespaces.mutations',
-            'Tests\\Utils\\Mutations'
-        );
-
         $schema = '
         type Query {
             foo: String!
