@@ -27,7 +27,7 @@ class CanDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
-     * @return Closure
+     * @return FieldValue
      */
     public function handle(FieldValue $value)
     {
