@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Schema\Types\GraphQLField;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
@@ -38,7 +39,7 @@ class FieldFactory
             $field['args'] = $args->toArray();
         }
 
-        return $field;
+        return GraphQLField::toArray($field);
     }
 
     /**

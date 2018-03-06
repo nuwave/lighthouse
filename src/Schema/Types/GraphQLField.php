@@ -44,6 +44,16 @@ class GraphQLField
     }
 
     /**
+     * Get field description.
+     *
+     * @return string
+     */
+    public function description()
+    {
+        return array_get($this->attributes, 'description');
+    }
+
+    /**
      * Rules to apply to field.
      *
      * @return array
@@ -63,6 +73,7 @@ class GraphQLField
         $attributes['args'] = $this->args();
         $attributes['type'] = $this->type();
         $attributes['resolve'] = $this->getResolver();
+        $attributes['description'] = $this->description();
 
         return $attributes;
     }

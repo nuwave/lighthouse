@@ -32,7 +32,9 @@ class ArgumentFactory
     {
         return directives()->argMiddleware($value->getArg())
             ->reduce(function (ArgumentValue $value, $middleware) {
-                return $middleware->handle($value);
+                return $middleware->handle(
+                    $value->setMiddlewareDirective($middleware->name())
+                );
             }, $value);
     }
 }
