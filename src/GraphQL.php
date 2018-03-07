@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
@@ -26,6 +27,13 @@ class GraphQL
      * @var DirectiveFactory
      */
     protected $directives;
+
+    /**
+     * Middleware manager.
+     *
+     * @var MiddlewareManager
+     */
+    protected $middleware;
 
     /**
      * Schema Stitcher.
@@ -120,6 +128,20 @@ class GraphQL
         }
 
         return $this->directives;
+    }
+
+    /**
+     * Get instance of middle manager.
+     *
+     * @return MiddlewareManager
+     */
+    public function middleware()
+    {
+        if (! $this->middleware) {
+            $this->middleware = app(MiddlewareManager::class);
+        }
+
+        return $this->middleware;
     }
 
     /**

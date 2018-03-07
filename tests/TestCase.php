@@ -44,6 +44,16 @@ class TestCase extends BaseTestCase
             'lighthouse.namespaces.scalars',
             'Tests\\Utils\\Scalars'
         );
+
+        $app['config']->set(
+            'lighthouse.namespaces.queries',
+            'Tests\\Utils\\Mutations'
+        );
+
+        $app['config']->set(
+            'lighthouse.namespaces.mutations',
+            'Tests\\Utils\\Mutations'
+        );
     }
 
     /**
