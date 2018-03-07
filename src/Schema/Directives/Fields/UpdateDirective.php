@@ -8,11 +8,10 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class DeleteDirective implements FieldResolver
+class UpdateDirective implements FieldResolver
 {
-    use HandlesDirectives, HandlesGlobalId;
+    use HandlesDirectives;
 
     /**
      * Name of the directive.
@@ -21,7 +20,7 @@ class DeleteDirective implements FieldResolver
      */
     public function name()
     {
-        return 'delete';
+        return 'update';
     }
 
     /**
@@ -47,7 +46,7 @@ class DeleteDirective implements FieldResolver
 
         if (! $class) {
             throw new DirectiveException(sprintf(
-                'The `delete` directive on %s [%s] must have a `model` argument',
+                'The `update` directive on %s [%s] must have a `model` argument',
                 $value->getNodeName(),
                 $value->getFieldName()
             ));
@@ -55,7 +54,7 @@ class DeleteDirective implements FieldResolver
 
         if (! $idArg) {
             new DirectiveException(sprintf(
-                'The `delete` requires that you have an `ID` field on %s',
+                'The `update` requires that you have an `ID` field on %s',
                 $value->getNodeName()
             ));
         }
@@ -65,7 +64,9 @@ class DeleteDirective implements FieldResolver
             $model = $class::find($id);
 
             if ($model) {
-                $model->delete();
+                $attrs = collect($args)->except([$idArg])->toArray();
+                $model->fill($attrs);
+                $model->save();
             }
 
             return $model;
