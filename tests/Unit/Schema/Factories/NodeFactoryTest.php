@@ -120,7 +120,6 @@ class NodeFactoryTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanTransformInputObjectTypes()
     {

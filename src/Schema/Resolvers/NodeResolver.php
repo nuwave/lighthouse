@@ -89,21 +89,7 @@ class NodeResolver
             case 'String':
                 return Type::string();
             default:
-                return $this->convertCustomType($node->name->value);
+                return schema()->instance($node->name->value);
         }
-    }
-
-    /**
-     * Convert custom node type.
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
-    protected function convertCustomType($name)
-    {
-        return function () use ($name) {
-            return schema()->instance($name);
-        };
     }
 }

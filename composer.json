@@ -18,12 +18,13 @@
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
-        "webonyx/graphql-php": "^0.11.5",
-        "illuminate/support": "^5.4",
-        "illuminate/routing": "^5.4",
-        "illuminate/pagination": "^5.4",
+        "illuminate/contracts": "^5.4",
         "illuminate/http": "^5.4",
-        "illuminate/contracts": "^5.4"
+        "illuminate/pagination": "^5.4",
+        "illuminate/routing": "^5.4",
+        "illuminate/support": "^5.4",
+        "opis/closure": "^3.0",
+        "webonyx/graphql-php": "^0.11.5"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.10",

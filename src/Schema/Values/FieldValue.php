@@ -5,13 +5,14 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
 use GraphQL\Language\AST\Node;
+use GraphQL\Type\Definition\Type;
 
 class FieldValue
 {
     /**
      * Current type.
      *
-     * @var mixed
+     * @var Closure
      */
     protected $type;
 
@@ -74,7 +75,7 @@ class FieldValue
     /**
      * Set current description.
      *
-     * @param mixed $type
+     * @param Closure|Type $type
      *
      * @return self
      */
@@ -114,7 +115,7 @@ class FieldValue
     /**
      * Get current type.
      *
-     * @return mixed
+     * @return Closure|Type
      */
     public function getType()
     {

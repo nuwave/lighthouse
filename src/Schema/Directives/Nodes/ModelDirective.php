@@ -30,22 +30,22 @@ class ModelDirective implements NodeMiddleware
     public function handle(NodeValue $value)
     {
         // 1. Create query types for model...
-        $schemaTxt = '
-        input {{model}}WhereNotNull {
-
-        }
-        input {{model}}InputType {}
-        ';
-
-        $schema = str_replace('{{model}}', $value->getType()->name, $schemaTxt);
-
-        collect($this->parseSchema($schema)->definitions)
-            ->map(function ($node) {
-                return $this->convertNode($node);
-            })
-            ->each(function ($type) {
-                schema()->type($type);
-            });
+        // $schemaTxt = '
+        // input {{model}}WhereNotNull {
+        //
+        // }
+        // input {{model}}InputType {}
+        // ';
+        //
+        // $schema = str_replace('{{model}}', $value->getType()->name, $schemaTxt);
+        //
+        // collect($this->parseSchema($schema)->definitions)
+        //     ->map(function ($node) {
+        //         return $this->convertNode($node);
+        //     })
+        //     ->each(function ($type) {
+        //         schema()->type($type);
+        //     });
         // 2. Register node resolver w/ schema...
         return $value;
     }

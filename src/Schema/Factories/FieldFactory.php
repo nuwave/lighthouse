@@ -19,7 +19,9 @@ class FieldFactory
      */
     public function handle(FieldValue $value)
     {
-        $value->setType(NodeResolver::resolve($value->getField()->type));
+        $value->setType(function () use ($value) {
+            return NodeResolver::resolve($value->getField()->type);
+        });
 
         $this->hasResolver($value)
             ? $this->useResolver($value)

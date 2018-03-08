@@ -111,15 +111,11 @@ class GraphQLField
      */
     protected function getResolver()
     {
-        if (! array_has($this->attributes, 'resolve')
-            && ! array_has($this->attributes, 'relayResolve')
-        ) {
+        if (! array_has($this->attributes, 'resolve')) {
             return;
         }
 
-        $resolver = array_get($this->attributes, 'resolve', array_get($this->attributes, 'relayResolve'));
-
-        return function () use ($resolver) {
+        return function () {
             $arguments = func_get_args();
 
             if (isset($arguments[1])) {
@@ -136,7 +132,10 @@ class GraphQLField
                 }
             }
 
-            return call_user_func_array($resolver, $arguments);
+            return call_user_func_array(
+                array_get($this->attributes, 'resolve'),
+                $arguments
+            );
         };
     }
 

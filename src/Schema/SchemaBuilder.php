@@ -12,10 +12,11 @@ use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
+use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class SchemaBuilder
 {
-    use CanParseTypes;
+    use CanParseTypes, HandlesTypes;
 
     /**
      * Collection of schema types.
@@ -58,7 +59,7 @@ class SchemaBuilder
         $this->setTypes($document);
         $this->extendTypes($document);
 
-        while ($this->hasPackedTypes()) {
+        while ($this->hasPackedTypes($this->types)) {
             collect($this->types)->each(function ($type) {
                 $this->unpackType($type);
             });
@@ -95,6 +96,36 @@ class SchemaBuilder
     }
 
     /**
+     * Serialize AST.
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        $schema = collect($this->types)->map(function ($type) {
+            return $this->serializeableType($type);
+        })->toArray();
+
+        return serialize($schema);
+    }
+
+    /**
+     * Unserialize AST.
+     *
+     * @param string $schema
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function unserialize($schema)
+    {
+        $this->types = collect(unserialize($schema))->map(function ($type) {
+            return $this->unpackType($type);
+        });
+
+        return collect($this->types);
+    }
+
+    /**
      * Set schema types.
      *
      * @param DocumentNode $document
@@ -128,79 +159,5 @@ class SchemaBuilder
                 app(NodeFactory::class)->extend($extension, $type);
             }
         });
-    }
-
-    /**
-     * Check if schema still has packed types.
-     *
-     * @return bool
-     */
-    protected function hasPackedTypes()
-    {
-        return collect($this->types)->reduce(function ($packed, $type) {
-            return $packed ?: $this->isTypePacked($type);
-        }, false);
-    }
-
-    /**
-     * Check if type has been unpacked.
-     *
-     * @param Type $type
-     *
-     * @return bool
-     */
-    protected function isTypePacked(Type $type)
-    {
-        if (is_callable(array_get($type->config, 'fields'))) {
-            return true;
-        }
-
-        return collect(array_get($type->config, 'fields'), [])->reduce(function ($packed, $field) {
-            if ($packed) {
-                return true;
-            } elseif (is_callable(array_get($field, 'type'))) {
-                return true;
-            }
-
-            $fieldType = array_get($field, 'type');
-            if (method_exists($fieldType, 'getWrappedType')) {
-                $wrappedType = $fieldType->getWrappedType();
-
-                return is_callable($wrappedType);
-            }
-
-            return false;
-        }, false);
-
-        return false;
-    }
-
-    /**
-     * Unpack type (fields and type).
-     *
-     * @param mixed $type
-     *
-     * @return mixed
-     */
-    protected function unpackType($type)
-    {
-        if ($type instanceof Type && array_has($type->config, 'fields')) {
-            $fields = is_callable($type->config['fields'])
-                ? $type->config['fields']()
-                : $type->config['fields'];
-
-            $type->config['fields'] = collect($fields)->map(function ($field, $name) {
-                $type = array_get($field, 'type');
-
-                array_set($field, 'type', is_callable($type)
-                    ? FieldTypeResolver::unpack($type())
-                    : FieldTypeResolver::unpack($type)
-                );
-
-                return $field;
-            })->toArray();
-        }
-
-        return $type;
     }
 }
