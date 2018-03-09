@@ -3,6 +3,18 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Directive registry
+    |--------------------------------------------------------------------------
+    |
+    | This package allows you to create your own server-side directives. Change
+    | these values to register the directory that will hold all of your
+    | custom directives.
+    |
+    */
+    'directives' => [__DIR__.'../app/Http/GraphQL/Directives'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Namespace registry
     |--------------------------------------------------------------------------
     |

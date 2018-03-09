@@ -43,6 +43,7 @@ class LighthouseServiceProvider extends ServiceProvider
     public function registerSchema()
     {
         directives()->load(realpath(__DIR__.'/../Schema/Directives/'), 'Nuwave\\Lighthouse\\');
+        directives()->load(config('lighthouse.directives', []));
 
         $schema = app('graphql')->stitcher()->stitch(
             config('lighthouse.global_id_field', '_id')

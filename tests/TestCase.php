@@ -40,6 +40,8 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app['config']->set('lighthouse.directives', []);
+
         $app['config']->set(
             'lighthouse.namespaces.scalars',
             'Tests\\Utils\\Scalars'
