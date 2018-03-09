@@ -113,11 +113,11 @@ class FieldFactory
      */
     protected function mutationResolver(FieldValue $value)
     {
-        $class = config('lighthouse.namespaces.mutations').'\\'.studly_case($value->getFieldName());
+        return function ($obj, array $args, $context = null, $info = null) use ($value) {
+            $class = config('lighthouse.namespaces.mutations').'\\'.studly_case($value->getFieldName());
 
-        $mutation = app($class);
-
-        return (new \ReflectionClass($mutation))->getMethod('resolve')->getClosure($mutation);
+            return (new $class($obj, $args, $context, $info))->resolve();
+        };
     }
 
     /**
@@ -129,11 +129,11 @@ class FieldFactory
      */
     protected function queryResolver(FieldValue $value)
     {
-        $class = config('lighthouse.namespaces.queries').'\\'.studly_case($value->getFieldName());
+        return function ($obj, array $args, $context = null, $info = null) use ($value) {
+            $class = config('lighthouse.namespaces.queries').'\\'.studly_case($value->getFieldName());
 
-        $query = app($class);
-
-        return (new \ReflectionClass($query))->getMethod('resolve')->getClosure($query);
+            return (new $class($obj, $args, $context, $info))->resolve();
+        };
     }
 
     /**

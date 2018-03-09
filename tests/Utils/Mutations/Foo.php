@@ -2,23 +2,17 @@
 
 namespace Tests\Utils\Mutations;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\Mutation;
+use Nuwave\Lighthouse\Support\Schema\GraphQLMutation;
 
-class Foo implements Mutation
+class Foo extends GraphQLMutation
 {
     /**
      * Resolve the mutation.
      *
-     * @param mixed            $root
-     * @param array            $args
-     * @param mixed            $context
-     * @param ResolveInfo|null $info
-     *
      * @return mixed
      */
-    public function resolve($root, array $args, $context = null, ResolveInfo $info = null)
+    public function resolve()
     {
-        return array_get($args, 'bar').' '.array_get($args, 'baz');
+        return array_get($this->args, 'bar').' '.array_get($this->args, 'baz');
     }
 }

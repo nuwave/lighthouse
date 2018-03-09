@@ -7,18 +7,29 @@ use Nuwave\Lighthouse\Support\Contracts\Mutation;
 
 class Bar implements Mutation
 {
+    protected $obj;
+
+    protected $args;
+
+    protected $context;
+
+    protected $info;
+
+    public function __construct($obj, $args, $context, $info)
+    {
+        $this->obj = $obj;
+        $this->args = $args;
+        $this->context = $context;
+        $this->info = $info;
+    }
+
     /**
      * Resolve the mutation.
      *
-     * @param mixed            $root
-     * @param array            $args
-     * @param mixed            $context
-     * @param ResolveInfo|null $info
-     *
      * @return mixed
      */
-    public function resolve($root, array $args, $context = null, ResolveInfo $info = null)
+    public function resolve()
     {
-        return array_get($args, 'baz').' '.array_get($args, 'bar');
+        return array_get($this->args, 'baz').' '.array_get($this->args, 'bar');
     }
 }
