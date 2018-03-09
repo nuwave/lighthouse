@@ -21,10 +21,8 @@ class LighthouseServiceProvider extends ServiceProvider
             require realpath(__DIR__.'/../Support/Http/routes.php');
         }
 
-        $this->registerDirectives();
         $this->registerSchema();
         $this->registerMacros();
-        // 2. Parse schema into document node
     }
 
     /**
@@ -44,33 +42,11 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function registerSchema()
     {
+        directives()->load(realpath(__DIR__.'/../Schema/Directives/'), 'Nuwave\\Lighthouse\\');
+
         $schema = app('graphql')->stitcher()->stitch(
             config('lighthouse.global_id_field', '_id')
         );
-    }
-
-    /**
-     * Register Lighthouse directives.
-     */
-    public function registerDirectives()
-    {
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Args\BcryptDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\AuthDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\BelongsTo::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CanDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\CreateDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\DeleteDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\EventDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\HasManyDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\InjectDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MethodDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\MiddlewareDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\RenameDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Fields\UpdateDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ModelDirective::class);
-        directives()->register(\Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective::class);
     }
 
     /**

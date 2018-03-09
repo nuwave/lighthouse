@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Symfony\Component\Finder\Finder;
 
 class DirectiveFactory
 {
@@ -28,6 +29,43 @@ class DirectiveFactory
     public function __construct()
     {
         $this->directives = collect();
+    }
+
+    /**
+     * Register all of the commands in the given directory.
+     *
+     * https://github.com/laravel/framework/blob/5.5/src/Illuminate/Foundation/Console/Kernel.php#L190-L224
+     *
+     * @param array|string $paths
+     * @param string|null  $namespace
+     */
+    public function load($paths, $namespace = null)
+    {
+        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
+        $paths = array_filter($paths, function ($path) {
+            return is_dir($path);
+        });
+
+        if (empty($paths)) {
+            return;
+        }
+
+        $namespace = $namespace ?: app()->getNamespace();
+        $path = starts_with($namespace, 'Nuwave\\Lighthouse')
+            ? realpath(__DIR__.'/../../')
+            : app_path();
+
+        foreach ((new Finder())->in($paths)->files() as $directive) {
+            $directive = $namespace.str_replace(
+                ['/', '.php'],
+                ['\\', ''],
+                str_after($directive->getPathname(), $path.DIRECTORY_SEPARATOR)
+            );
+
+            if (! (new \ReflectionClass($directive))->isAbstract()) {
+                $this->register($directive);
+            }
+        }
     }
 
     /**
