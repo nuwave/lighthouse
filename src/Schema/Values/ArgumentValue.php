@@ -7,6 +7,7 @@ use GraphQL\Language\AST\DirectiveNode as Directive;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
 use GraphQL\Language\AST\InputValueDefinitionNode as Argument;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class ArgumentValue
 {
@@ -27,7 +28,7 @@ class ArgumentValue
     /**
      * Current field.
      *
-     * @var Field
+     * @var FieldValue
      */
     protected $field;
 
@@ -48,10 +49,10 @@ class ArgumentValue
     /**
      * Create a new argument value instance.
      *
-     * @param Field    $field
-     * @param Argument $arg
+     * @param FieldValue $field
+     * @param Argument   $arg
      */
-    public function __construct(Field $field, Argument $arg)
+    public function __construct(FieldValue $field, Argument $arg)
     {
         $this->field = $field;
         $this->arg = $arg;

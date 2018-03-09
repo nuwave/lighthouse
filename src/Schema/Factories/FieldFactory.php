@@ -149,7 +149,7 @@ class FieldFactory
 
         return collect(data_get($value->getField(), 'arguments', []))
             ->mapWithKeys(function (InputValueDefinitionNode $arg) use ($factory, $value) {
-                $argValue = new ArgumentValue($value->getField(), $arg);
+                $argValue = new ArgumentValue($value, $arg);
 
                 return [$argValue->getArgName() => $factory->handle($argValue)];
             });
