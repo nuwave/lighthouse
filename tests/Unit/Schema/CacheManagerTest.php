@@ -8,7 +8,6 @@ class CacheManagerTest extends TestCase
 {
     /**
      * @test
-     * @group failing
      */
     public function itCanCacheSchema()
     {
