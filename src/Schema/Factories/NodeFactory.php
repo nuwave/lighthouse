@@ -211,7 +211,7 @@ class NodeFactory
 
         return collect($value->getNodeFields())
             ->mapWithKeys(function ($field) use ($factory, $value) {
-                $fieldValue = new FieldValue($value->getNode(), $field);
+                $fieldValue = new FieldValue($value, $field);
 
                 return [
                     $fieldValue->getFieldName() => $factory->handle($fieldValue),

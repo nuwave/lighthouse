@@ -201,7 +201,7 @@ class HasManyDirective implements FieldResolver
      */
     protected function paginatorTypeName(FieldValue $value)
     {
-        $parent = $value->getNode()->name->value;
+        $parent = $value->getNodeName();
         $child = str_singular($value->getField()->name->value);
 
         return studly_case($parent.'_'.$child.'_Paginator');
@@ -216,7 +216,7 @@ class HasManyDirective implements FieldResolver
      */
     protected function connectionTypeName(FieldValue $value)
     {
-        $parent = $value->getNode()->name->value;
+        $parent = $value->getNodeName();
         $child = str_singular($value->getField()->name->value);
 
         return studly_case($parent.'_'.$child.'_Connection');
@@ -231,7 +231,7 @@ class HasManyDirective implements FieldResolver
      */
     protected function connectionEdgeName(FieldValue $value)
     {
-        $parent = $value->getNode()->name->value;
+        $parent = $value->getNodeName();
         $child = str_singular($value->getField()->name->value);
 
         return studly_case($parent.'_'.$child.'_Edge');

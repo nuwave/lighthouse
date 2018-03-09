@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
-use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 class FieldValue
 {
@@ -26,7 +26,7 @@ class FieldValue
     /**
      * Current node (type).
      *
-     * @var Node
+     * @var NodeValue
      */
     protected $node;
 
@@ -47,11 +47,11 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param Node   $node
-     * @param Field  $field
-     * @param string $description
+     * @param NodeValue $node
+     * @param Field     $field
+     * @param string    $description
      */
-    public function __construct(Node $node, $field, $description = '')
+    public function __construct(NodeValue $node, $field, $description = '')
     {
         $this->node = $node;
         $this->field = $field;
@@ -61,13 +61,13 @@ class FieldValue
     /**
      * Initialize new field value.
      *
-     * @param Node   $node
-     * @param Field  $field
-     * @param string $description
+     * @param NodeValue $node
+     * @param Field     $field
+     * @param string    $description
      *
      * @return self
      */
-    public static function init(Node $node, Field $field, $description = '')
+    public static function init(NodeValue $node, Field $field, $description = '')
     {
         return new static($node, $field, $description);
     }
@@ -125,7 +125,7 @@ class FieldValue
     /**
      * Get current node.
      *
-     * @return Node
+     * @return NodeValue
      */
     public function getNode()
     {
@@ -179,6 +179,6 @@ class FieldValue
      */
     public function getNodeName()
     {
-        return data_get($this->getNode(), 'name.value');
+        return $this->getNode()->getNodeName();
     }
 }
