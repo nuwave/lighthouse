@@ -23,7 +23,7 @@ class GraphQLTest extends TestCase
             updated_at: String!
         }
         type Query {
-            user: User! @query(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
+            user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
         }
         ');
 
