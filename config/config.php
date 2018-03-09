@@ -11,7 +11,7 @@ return [
     | custom directives.
     |
     */
-    'directives' => [__DIR__.'../app/Http/GraphQL/Directives'],
+    'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
 
     /*
     |--------------------------------------------------------------------------
