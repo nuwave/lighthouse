@@ -46,7 +46,8 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->load(config('lighthouse.directives', []));
 
         $schema = app('graphql')->stitcher()->stitch(
-            config('lighthouse.global_id_field', '_id')
+            config('lighthouse.global_id_field', '_id'),
+            config('lighthouse.schema.register')
         );
     }
 
