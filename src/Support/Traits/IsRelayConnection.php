@@ -36,7 +36,7 @@ trait IsRelayConnection
      */
     public function scopePaginatorConnection($query, array $args)
     {
-        $first = data_get($args, 'first', 15);
+        $first = data_get($args, 'count', 15);
         $page = data_get($args, 'page', 1);
 
         return $query->paginate($first, ['*'], 'page', $page);

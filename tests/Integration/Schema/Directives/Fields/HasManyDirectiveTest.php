@@ -71,7 +71,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks(first: Int! page: Int): [Task!]! @hasMany(type:"paginator")
+            tasks: [Task!]! @hasMany(type:"paginator")
         }
         type Task {
             foo: String
@@ -88,7 +88,7 @@ class HasManyDirectiveTest extends DBTestCase
         });
 
         $resolver = array_get($root->config['fields'], 'tasks.resolve');
-        $tasks = $resolver($this->user, ['first' => 2]);
+        $tasks = $resolver($this->user, ['count' => 2]);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
         $this->assertEquals(2, $tasks->count());
@@ -113,7 +113,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks(first: Int! after: Int): [Task!]! @hasMany(type:"relay")
+            tasks: [Task!]! @hasMany(type:"relay")
         }
         type Task {
             foo: String

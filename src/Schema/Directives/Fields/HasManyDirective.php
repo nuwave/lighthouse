@@ -105,7 +105,8 @@ class HasManyDirective implements FieldResolver
     protected function connectionTypeResolver($relation, FieldValue $value)
     {
         $schema = sprintf(
-            'type %s { node: %s cursor: String! }
+            'type Connection { connection(first: Int! after: String): String }
+            type %s { node: %s cursor: String! }
             type %s { pageInfo: PageInfo! @field(class: "%s" method: "%s") edges: [%s] @field(class: "%s" method: "%s") }',
             $this->connectionEdgeName($value),
             $this->unpackNodeToString($value->getField()),
@@ -118,9 +119,18 @@ class HasManyDirective implements FieldResolver
         );
 
         collect($this->parseSchema($schema)->definitions)
-            ->map(function ($node) {
+            ->map(function ($node) use ($value) {
+                if ('Connection' === $node->name->value) {
+                    $connectionField = data_get($node, 'fields.0');
+                    $field = $value->getField();
+                    $field->arguments = $connectionField->arguments->merge($field->arguments);
+
+                    return null;
+                }
+
                 return $this->convertNode($node);
             })
+            ->filter()
             ->each(function ($type) use ($value) {
                 schema()->type($type);
 
@@ -147,7 +157,8 @@ class HasManyDirective implements FieldResolver
     protected function paginatorTypeResolver($relation, FieldValue $value)
     {
         $schema = sprintf(
-            'type %s { paginatorInfo: PaginatorInfo! @field(class: "%s" method: "%s") data: [%s!]! @field(class: "%s" method: "%s") }',
+            'type Paginator { paginator(count: Int! page: Int): String }
+            type %s { paginatorInfo: PaginatorInfo! @field(class: "%s" method: "%s") data: [%s!]! @field(class: "%s" method: "%s") }',
             $this->paginatorTypeName($value),
             addslashes(PaginatorField::class),
             'paginatorInfoResolver',
@@ -157,9 +168,18 @@ class HasManyDirective implements FieldResolver
         );
 
         collect($this->parseSchema($schema)->definitions)
-            ->map(function ($node) {
+            ->map(function ($node) use ($value) {
+                if ('Paginator' === $node->name->value) {
+                    $paginatorField = data_get($node, 'fields.0');
+                    $field = $value->getField();
+                    $field->arguments = $paginatorField->arguments->merge($field->arguments);
+
+                    return null;
+                }
+
                 return $this->convertNode($node);
             })
+            ->filter()
             ->each(function ($type) use ($value) {
                 schema()->type($type);
 
