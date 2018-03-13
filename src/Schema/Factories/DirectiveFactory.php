@@ -42,9 +42,11 @@ class DirectiveFactory
     public function load($paths, $namespace = null)
     {
         $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
-        $paths = array_filter($paths, function ($path) {
+        $paths = array_map(function ($path) {
+            return realpath($path);
+        }, array_filter($paths, function ($path) {
             return is_dir($path);
-        });
+        }));
 
         if (empty($paths)) {
             return;
