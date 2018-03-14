@@ -57,7 +57,7 @@ class HasManyDirective implements FieldResolver
                 );
             default:
                 return $value->setResolver(
-                    $this->defaultResolver($relation)
+                    $this->defaultResolver($relation, $value)
                 );
         }
     }
@@ -104,6 +104,7 @@ class HasManyDirective implements FieldResolver
      */
     protected function connectionTypeResolver($relation, FieldValue $value)
     {
+        $scopes = $this->getScopes($value);
         $schema = sprintf(
             'type Connection { connection(first: Int! after: String): String }
             type %s { node: %s cursor: String! }
@@ -139,10 +140,14 @@ class HasManyDirective implements FieldResolver
                 }
             });
 
-        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation) {
+        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
             $builder = call_user_func([$parent, $relation]);
 
-            return $builder->relayConnection($args);
+            return $builder->when(! empty($scopes), function ($q) use ($scopes, $args) {
+                foreach ($scopes as $scope) {
+                    call_user_func_array([$q, $scope], [$args]);
+                }
+            })->relayConnection($args);
         };
     }
 
@@ -156,6 +161,7 @@ class HasManyDirective implements FieldResolver
      */
     protected function paginatorTypeResolver($relation, FieldValue $value)
     {
+        $scopes = $this->getScopes($value);
         $schema = sprintf(
             'type Paginator { paginator(count: Int! page: Int): String }
             type %s { paginatorInfo: PaginatorInfo! @field(class: "%s" method: "%s") data: [%s!]! @field(class: "%s" method: "%s") }',
@@ -188,27 +194,38 @@ class HasManyDirective implements FieldResolver
                 }
             });
 
-        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation) {
+        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
             $builder = call_user_func([$parent, $relation]);
 
-            return $builder->paginatorConnection($args);
+            return $builder->when(! empty($scopes), function ($q) use ($scopes, $args) {
+                foreach ($scopes as $scope) {
+                    call_user_func_array([$q, $scope], [$args]);
+                }
+            })->paginatorConnection($args);
         };
     }
 
     /**
      * Use default resolver for field.
      *
-     * @param string $relation
+     * @param FieldValue $value
+     * @param string     $relation
      *
      * @return \Closure
      */
-    protected function defaultResolver($relation)
+    protected function defaultResolver($relation, FieldValue $value)
     {
-        return function ($parent, array $args) use ($relation) {
+        $scopes = $this->getScopes($value);
+
+        return function ($parent, array $args) use ($relation, $scopes) {
             // TODO: Wrap w/ data loader to prevent N+1
             $builder = call_user_func([$parent, $relation]);
             // TODO: Create scopeGqlQuery scope to allow adjustments for $args.
-            return $builder->get();
+            return $builder->when(! empty($scopes), function ($q) use ($scopes, $args) {
+                foreach ($scopes as $scope) {
+                    call_user_func_array([$q, $scope], [$args]);
+                }
+            })->get();
         };
     }
 
@@ -255,5 +272,21 @@ class HasManyDirective implements FieldResolver
         $child = str_singular($value->getField()->name->value);
 
         return studly_case($parent.'_'.$child.'_Edge');
+    }
+
+    /**
+     * Get scope(s) to run on connection.
+     *
+     * @param FieldValue $value
+     *
+     * @return array
+     */
+    protected function getScopes(FieldValue $value)
+    {
+        return $this->directiveArgValue(
+            $this->fieldDirective($value->getField(), 'hasMany'),
+            'scopes',
+            []
+        );
     }
 }
