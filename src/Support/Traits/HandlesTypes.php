@@ -66,6 +66,10 @@ trait HandlesTypes
      */
     protected function unpackType($type)
     {
+        if (! isset($type->config['fields'])) {
+            return $type;
+        }
+
         $fields = $type->config['fields'];
 
         if ($fields instanceof SerializableClosure) {
