@@ -84,6 +84,16 @@ class SchemaBuilder
     }
 
     /**
+     * Get all registered types.
+     *
+     * @return array
+     */
+    public function types()
+    {
+        return $this->types;
+    }
+
+    /**
      * Add type to register.
      *
      * @param ObjectType|array $type
