@@ -22,7 +22,7 @@ class CacheManager
 
         file_put_contents(
             config('lighthouse.cache'),
-            "<?php\nreturn ".var_export(AST::toArray($document).';', true),
+            "<?php\nreturn ".var_export(AST::toArray($document), true).';',
             LOCK_EX
         );
 
