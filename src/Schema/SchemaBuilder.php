@@ -54,7 +54,9 @@ class SchemaBuilder
      */
     public function register($schema)
     {
-        $document = $this->parseSchema($schema);
+        $document = $schema instanceof DocumentNode
+            ? $schema
+            : $this->parseSchema($schema);
 
         $this->setTypes($document);
         $this->extendTypes($document);

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\Schema\CacheManager;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -13,6 +14,13 @@ use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 class GraphQL
 {
     use CanFormatError;
+
+    /**
+     * Cache manager.
+     *
+     * @var CacheManager
+     */
+    protected $cache;
 
     /**
      * Schema builder.
@@ -94,12 +102,14 @@ class GraphQL
      */
     public function buildSchema()
     {
-        return $this->schema()->build(
-            $this->stitcher()->stitch(
+        $schema = $this->cache()->get(function () {
+            return $this->stitcher()->stitch(
                 config('lighthouse.global_id_field', '_id'),
                 config('lighthouse.schema.register')
-            )
-        );
+            );
+        });
+
+        return $this->schema()->build($schema);
     }
 
     /**
@@ -142,6 +152,20 @@ class GraphQL
         }
 
         return $this->middleware;
+    }
+
+    /**
+     * Get instance of cache manager.
+     *
+     * @return CacheManager
+     */
+    public function cache()
+    {
+        if (! $this->cache) {
+            $this->cache = app(CacheManager::class);
+        }
+
+        return $this->cache;
     }
 
     /**
