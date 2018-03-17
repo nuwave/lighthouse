@@ -207,6 +207,22 @@ class DirectiveFactory
     }
 
     /**
+     * Check if field has a resolver directive.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return bool
+     */
+    public function hasFieldMiddleware($field)
+    {
+        return collect($field->directives)->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->reduce(function ($has, $handler) {
+            return $handler instanceof FieldMiddleware ? true : $has;
+        }, false);
+    }
+
+    /**
      * Get middleware for field.
      *
      * @param FieldDefinitionNode $field

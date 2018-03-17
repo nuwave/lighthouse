@@ -30,13 +30,19 @@ class FieldFactory
         $field = [
             'type' => $value->getType(),
             'description' => $value->getDescription(),
-            'resolve' => directives()->fieldMiddleware($value->getField())
-                ->reduce(function ($value, $middleware) {
-                    return $middleware->handle($value);
-                }, $value)->getResolver(),
         ];
 
+        $resolve = directives()->fieldMiddleware($value->getField())
+            ->reduce(function ($value, $middleware) {
+                return $middleware->handle($value);
+            }, $value)->getResolver();
+
+        if ($resolve) {
+            $field['resolve'] = $resolve;
+        }
+
         $args = $this->getArgs($value);
+
         if (! $args->isEmpty()) {
             $field['args'] = $args->toArray();
         }
@@ -93,10 +99,15 @@ class FieldFactory
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return \Closure|null
      */
     protected function defaultResolver(FieldValue $value)
     {
+        if (! directives()->hasFieldMiddleware($value->getField())) {
+            // Use graphql-php default resolver
+            return;
+        }
+
         $name = $value->getFieldName();
 
         return function ($parent, array $args) use ($name) {
