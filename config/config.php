@@ -49,7 +49,7 @@ return [
     | Schema Cache
     |--------------------------------------------------------------------------
     |
-    | Specify if the GraphQL schema should be cached.
+    | Specify where the GraphQL schema should be cached.
     |
     */
     'cache' => null,
