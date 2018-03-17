@@ -115,7 +115,7 @@ class NodeFactoryTest extends TestCase
 
         $this->assertInstanceOf(ObjectType::class, $type);
         $this->assertEquals('User', $type->name);
-        $this->assertArrayHasKey('foo', $type->config['fields']);
+        $this->assertArrayHasKey('foo', $type->config['fields']());
     }
 
     /**
@@ -134,6 +134,6 @@ class NodeFactoryTest extends TestCase
 
         $this->assertInstanceOf(InputObjectType::class, $type);
         $this->assertEquals('UserInput', $type->name);
-        $this->assertArrayHasKey('foo', $type->config['fields']);
+        $this->assertArrayHasKey('foo', $type->config['fields']());
     }
 }

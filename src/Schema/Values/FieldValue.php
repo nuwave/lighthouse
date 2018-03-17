@@ -89,9 +89,9 @@ class FieldValue
     /**
      * Set current resolver.
      *
-     * @param Closure $resolver
+     * @param Closure|null $resolver
      */
-    public function setResolver(Closure $resolver)
+    public function setResolver(Closure $resolver = null)
     {
         $this->resolver = $resolver;
 

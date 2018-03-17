@@ -51,7 +51,9 @@ class NodeFactory
     {
         $typeFields = value($type->config['fields']);
         $extendedFields = $this->getFields(new NodeValue($extension->definition));
-        $type->config['fields'] = array_merge($typeFields, $extendedFields);
+        $type->config['fields'] = function () use ($typeFields, $extendedFields) {
+            return array_merge($typeFields, $extendedFields);
+        };
 
         return $type;
     }
@@ -175,7 +177,9 @@ class NodeFactory
     {
         $objectType = new ObjectType([
             'name' => $value->getNodeName(),
-            'fields' => $this->getFields($value),
+            'fields' => function () use ($value) {
+                return $this->getFields($value);
+            },
         ]);
 
         return $value->setType($objectType);
@@ -192,7 +196,9 @@ class NodeFactory
     {
         $inputType = new InputObjectType([
             'name' => $value->getNodeName(),
-            'fields' => $this->getFields($value),
+            'fields' => function () use ($value) {
+                return $this->getFields($value);
+            },
         ]);
 
         return $value->setType($inputType);
