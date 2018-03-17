@@ -58,7 +58,7 @@ class HasManyDirectiveTest extends DBTestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'], 'tasks.resolve');
+        $resolver = array_get($type->config['fields'](), 'tasks.resolve');
         $tasks = $resolver($this->user, []);
 
         $this->assertCount(3, $tasks);
@@ -83,11 +83,13 @@ class HasManyDirectiveTest extends DBTestCase
         $root = $types->first(function ($root) {
             return 'User' === $root->name;
         });
-        $paginator = $types->first(function ($type) {
+        $root->config['fields']();
+
+        $paginator = collect(schema()->types())->first(function ($type) {
             return 'UserTaskPaginator' === $type->name;
         });
 
-        $resolver = array_get($root->config['fields'], 'tasks.resolve');
+        $resolver = array_get($root->config['fields'](), 'tasks.resolve');
         $tasks = $resolver($this->user, ['count' => 2]);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
@@ -95,11 +97,11 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertEquals(3, $tasks->total());
         $this->assertTrue($tasks->hasMorePages());
 
-        $resolver = array_get($paginator->config['fields'], 'data.resolve');
+        $resolver = array_get($paginator->config['fields'](), 'data.resolve');
         $data = $resolver($tasks, []);
         $this->assertCount(2, $data);
 
-        $resolver = array_get($paginator->config['fields'], 'paginatorInfo.resolve');
+        $resolver = array_get($paginator->config['fields'](), 'paginatorInfo.resolve');
         $pageInfo = $resolver($tasks, []);
         $this->assertTrue($pageInfo['hasMorePages']);
         $this->assertEquals(1, $pageInfo['currentPage']);
@@ -125,11 +127,13 @@ class HasManyDirectiveTest extends DBTestCase
         $root = $types->first(function ($root) {
             return 'User' === $root->name;
         });
-        $connection = $types->first(function ($type) {
+        $root->config['fields']();
+
+        $connection = collect(schema()->types())->first(function ($type) {
             return 'UserTaskConnection' === $type->name;
         });
 
-        $resolver = array_get($root->config['fields'], 'tasks.resolve');
+        $resolver = array_get($root->config['fields'](), 'tasks.resolve');
         $tasks = $resolver($this->user, ['first' => 2]);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
@@ -137,11 +141,11 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertEquals(3, $tasks->total());
         $this->assertTrue($tasks->hasMorePages());
 
-        $resolver = array_get($connection->config['fields'], 'edges.resolve');
+        $resolver = array_get($connection->config['fields'](), 'edges.resolve');
         $edges = $resolver($tasks, []);
         $this->assertCount(2, $edges);
 
-        $resolver = array_get($connection->config['fields'], 'pageInfo.resolve');
+        $resolver = array_get($connection->config['fields'](), 'pageInfo.resolve');
         $pageInfo = $resolver($tasks, []);
         $this->assertEquals($edges->first()['cursor'], $pageInfo['startCursor']);
         $this->assertEquals($edges->last()['cursor'], $pageInfo['endCursor']);
@@ -165,5 +169,6 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->expectException(DirectiveException::class);
         $type = schema()->register($schema)->first();
+        $type->config['fields']();
     }
 }

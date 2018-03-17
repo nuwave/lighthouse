@@ -53,7 +53,7 @@ class BelongsToTest extends DBTestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'], 'user.resolve');
+        $resolver = array_get($type->config['fields'](), 'user.resolve');
         $user = $resolver($this->task, []);
 
         $this->assertInstanceOf(User::class, $user);
@@ -74,7 +74,7 @@ class BelongsToTest extends DBTestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'], 'bar.resolve');
+        $resolver = array_get($type->config['fields'](), 'bar.resolve');
         $user = $resolver($this->task, []);
 
         $this->assertInstanceOf(User::class, $user);

@@ -25,7 +25,7 @@ class MethodDirectiveTest extends TestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $fields = $type->config['fields'];
+        $fields = $type->config['fields']();
         $resolver = array_get($fields, 'bar.resolve');
         $this->assertEquals('baz', $resolver($root, []));
     }
@@ -49,7 +49,7 @@ class MethodDirectiveTest extends TestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $fields = $type->config['fields'];
+        $fields = $type->config['fields']();
         $resolver = array_get($fields, 'bar.resolve');
         $this->assertEquals('foo', $resolver($root, ['baz' => 'foo']));
     }

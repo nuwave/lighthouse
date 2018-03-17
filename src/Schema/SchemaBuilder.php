@@ -6,10 +6,8 @@ use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Schema\Resolvers\FieldTypeResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
@@ -42,7 +40,11 @@ class SchemaBuilder
             return ! in_array($type->name, ['Query', 'Mutation']);
         })->toArray();
 
-        return new Schema(compact('query', 'mutation', 'types'));
+        $typeLoader = function ($name) {
+            return $this->instance($name);
+        };
+
+        return new Schema(compact('query', 'mutation', 'types', 'typeLoader'));
     }
 
     /**
@@ -60,12 +62,6 @@ class SchemaBuilder
 
         $this->setTypes($document);
         $this->extendTypes($document);
-
-        while ($this->hasPackedTypes($this->types)) {
-            collect($this->types)->each(function ($type) {
-                $this->unpackType($type);
-            });
-        }
 
         return collect($this->types);
     }

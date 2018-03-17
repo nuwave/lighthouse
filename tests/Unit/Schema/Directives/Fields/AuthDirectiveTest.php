@@ -27,7 +27,7 @@ class AuthDirectiveTest extends TestCase
         ';
 
         $query = schema()->register($schema)->firstWhere('name', 'Query');
-        $resolver = array_get($query->config['fields'], 'user.resolve');
+        $resolver = array_get($query->config['fields'](), 'user.resolve');
         $this->assertEquals('bar', data_get($resolver(), 'foo'));
     }
 }

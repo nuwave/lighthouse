@@ -22,6 +22,10 @@ class MiddlewareDirectiveTest extends TestCase
             }
         ');
 
+        collect(schema()->types())->each(function ($type) {
+            $type->config['fields']();
+        });
+
         $query = 'query FooQuery { foo }';
         $middleware = graphql()->middleware()->forRequest($query);
         $this->assertCount(2, $middleware);

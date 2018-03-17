@@ -99,7 +99,7 @@ class SchemaBuilderTest extends TestCase
 
         $config = $types->firstWhere('name', 'Foo')->config;
         $this->assertEquals('Foo', data_get($config, 'name'));
-        $this->assertEquals('bar attribute of Foo', array_get($config, 'fields.bar.description'));
+        $this->assertEquals('bar attribute of Foo', array_get($config['fields'](), 'bar.description'));
     }
 
     /**
@@ -118,9 +118,10 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(InputType::class, $types->firstWhere('name', 'CreateFoo'));
 
         $config = $types->firstWhere('name', 'CreateFoo')->config;
+        $fields = $config['fields']();
         $this->assertEquals('CreateFoo', data_get($config, 'name'));
-        $this->assertArrayHasKey('foo', data_get($config, 'fields'));
-        $this->assertArrayHasKey('bar', data_get($config, 'fields'));
+        $this->assertArrayHasKey('foo', $fields);
+        $this->assertArrayHasKey('bar', $fields);
     }
 
     /**
@@ -135,7 +136,7 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $type = schema()->register($schema)->firstWhere('name', 'Mutation');
-        $mutation = $type->config['fields']['foo'];
+        $mutation = $type->config['fields']()['foo'];
 
         $this->assertArrayHasKey('args', $mutation);
         $this->assertArrayHasKey('type', $mutation);
@@ -156,7 +157,7 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $type = schema()->register($schema)->firstWhere('name', 'Query');
-        $query = $type->config['fields']['foo'];
+        $query = $type->config['fields']()['foo'];
 
         $this->assertArrayHasKey('args', $query);
         $this->assertArrayHasKey('type', $query);
@@ -180,7 +181,7 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $type = schema()->register($schema)->first();
-        $fields = $type->config['fields'];
+        $fields = $type->config['fields']();
         $this->assertArrayHasKey('baz', $fields);
     }
 
@@ -199,7 +200,7 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $type = schema()->register($schema)->firstWhere('name', 'Query');
-        $fields = $type->config['fields'];
+        $fields = $type->config['fields']();
         $this->assertArrayHasKey('bar', $fields);
     }
 
@@ -218,7 +219,7 @@ class SchemaBuilderTest extends TestCase
         ';
 
         $type = schema()->register($schema)->firstWhere('name', 'Mutation');
-        $fields = $type->config['fields'];
+        $fields = $type->config['fields']();
         $this->assertArrayHasKey('bar', $fields);
     }
 
