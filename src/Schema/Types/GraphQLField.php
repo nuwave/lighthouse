@@ -115,28 +115,36 @@ class GraphQLField
             return;
         }
 
-        return function () {
-            $arguments = func_get_args();
+        return [$this, 'resolve'];
+    }
 
-            if (isset($arguments[1])) {
-                $arguments[1] = $this->resolveArgs($arguments[1]);
+    /**
+     * Resolve field.
+     *
+     * @return mixed
+     */
+    public function resolve()
+    {
+        $arguments = func_get_args();
+
+        if (isset($arguments[1])) {
+            $arguments[1] = $this->resolveArgs($arguments[1]);
+        }
+
+        $rules = call_user_func_array([$this, 'getRules'], $arguments);
+
+        if (sizeof($rules)) {
+            $input = $this->getInput($arguments);
+            $validator = validator($input, $rules);
+            if ($validator->fails()) {
+                throw with(new ValidationError('validation'))->setValidator($validator);
             }
+        }
 
-            $rules = call_user_func_array([$this, 'getRules'], $arguments);
-
-            if (sizeof($rules)) {
-                $input = $this->getInput($arguments);
-                $validator = validator($input, $rules);
-                if ($validator->fails()) {
-                    throw with(new ValidationError('validation'))->setValidator($validator);
-                }
-            }
-
-            return call_user_func_array(
-                array_get($this->attributes, 'resolve'),
-                $arguments
-            );
-        };
+        return call_user_func_array(
+            array_get($this->attributes, 'resolve'),
+            $arguments
+        );
     }
 
     /**
