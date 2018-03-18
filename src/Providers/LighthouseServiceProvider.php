@@ -35,6 +35,10 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         $this->app->alias('graphql', GraphQL::class);
+
+        $this->commands([
+            \Nuwave\Lighthouse\Support\Console\Commands\CacheCommand::class,
+        ]);
     }
 
     /**
