@@ -11,14 +11,7 @@ abstract class BatchLoader
      *
      * @var \Illuminate\Support\Collection
      */
-    protected $keys;
-
-    /**
-     * Arguments passed in to loader.
-     *
-     * @var array
-     */
-    protected $args = [];
+    protected $keys = [];
 
     /**
      * Check if data has been loaded.
@@ -28,38 +21,24 @@ abstract class BatchLoader
     protected $hasLoaded = false;
 
     /**
-     * Create new instance of data loader.
-     */
-    public function __construct()
-    {
-        $this->keys = collect();
-    }
-
-    /**
      * Load object by key.
      *
-     * @param mixed  $key
-     * @param string $relation
-     * @param mixed  $root
-     * @param array  $args
+     * @param mixed $key
+     * @param array $data
      *
      * @return Deferred
      */
-    public function load($key, $relation, $root = null, array $args = [])
+    public function load($key, array $data = [])
     {
-        $this->keys->put($key, [
-            'root' => $root,
-            'args' => $args,
-            'relation' => $relation,
-        ]);
+        $this->keys[$key] = $data;
 
-        return new Deferred(function () use ($key, $root, $args) {
+        return new Deferred(function () use ($key) {
             if (! $this->hasLoaded) {
                 $this->resolve();
                 $this->hasLoaded = true;
             }
 
-            return array_get($this->keys->toArray(), "$key.value");
+            return array_get($this->keys, "$key.value");
         });
     }
 
@@ -71,19 +50,9 @@ abstract class BatchLoader
      */
     protected function set($key, $value)
     {
-        if ($field = $this->keys->get($key)) {
-            $this->keys->put($key, array_merge($field, ['value' => $value]));
+        if ($field = array_get($this->keys, $key)) {
+            $this->keys[$key] = array_merge($field, compact('value'));
         }
-    }
-
-    /**
-     * Get stored keys.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getKeys()
-    {
-        return $this->keys->keys();
     }
 
     /**

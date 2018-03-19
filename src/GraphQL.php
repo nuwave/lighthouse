@@ -103,6 +103,24 @@ class GraphQL
     }
 
     /**
+     * Batch field resolver.
+     *
+     * @param string $abstract
+     * @param mixed  $key
+     * @param array  $data
+     *
+     * @return \GraphQL\Deferred
+     */
+    public function batch($abstract, $key, array $data = [])
+    {
+        $instance = app()->has($abstract)
+            ? resolve($abstract)
+            : app()->instance($abstract, resolve($abstract));
+
+        return $instance->load($key, $data);
+    }
+
+    /**
      * Get an instance of the schema builder.
      *
      * @return SchemaBuilder

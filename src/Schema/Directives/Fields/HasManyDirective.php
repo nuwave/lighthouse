@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -141,13 +142,10 @@ class HasManyDirective implements FieldResolver
             });
 
         return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
-            $builder = call_user_func([$parent, $relation]);
-
-            return $builder->when(! empty($scopes), function ($q) use ($scopes, $args) {
-                foreach ($scopes as $scope) {
-                    call_user_func_array([$q, $scope], [$args]);
-                }
-            })->relayConnection($args);
+            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
+                compact('relation', 'root', 'args', 'scopes'),
+                ['type' => 'relay']
+            ));
         };
     }
 
@@ -195,13 +193,10 @@ class HasManyDirective implements FieldResolver
             });
 
         return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
-            $builder = call_user_func([$parent, $relation]);
-
-            return $builder->when(! empty($scopes), function ($q) use ($scopes, $args) {
-                foreach ($scopes as $scope) {
-                    call_user_func_array([$q, $scope], [$args]);
-                }
-            })->paginatorConnection($args);
+            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
+                compact('relation', 'root', 'args', 'scopes'),
+                ['type' => 'paginator']
+            ));
         };
     }
 
@@ -218,14 +213,10 @@ class HasManyDirective implements FieldResolver
         $scopes = $this->getScopes($value);
 
         return function ($parent, array $args) use ($relation, $scopes) {
-            // TODO: Wrap w/ data loader to prevent N+1
-            $builder = call_user_func([$parent, $relation]);
-            // TODO: Create scopeGqlQuery scope to allow adjustments for $args.
-            return $builder->when(! empty($scopes), function ($q) use ($scopes, $args) {
-                foreach ($scopes as $scope) {
-                    call_user_func_array([$q, $scope], [$args]);
-                }
-            })->get();
+            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
+                compact('relation', 'root', 'args', 'scopes'),
+                ['type' => 'default']
+            ));
         };
     }
 

@@ -11,26 +11,31 @@ class HasManyLoader extends BatchLoader
      */
     public function resolve()
     {
-        $this->keys->map(function ($item) {
-            // Dataloaders can be nested in different levels of the query,
-            // and therefore can be called with different arguments. Here
-            // we are grouping them by their arguments and then resolving to
-            // ensure we query the data correctly.
+        collect($this->keys)->map(function ($item) {
             return array_merge($item, ['json' => json_encode($item['args'])]);
         })->groupBy('json')->each(function ($items) {
-            $relation = data_get($items->first(), 'relation');
+            $first = $items->first();
+            $relation = $first['relation'];
 
-            $items->pluck('root')->fetch(['relation' => function ($q) use ($items) {
-                // Lighthouse ships with a collection helper called "fetch". This
-                // allows us to lazy eager load data on a collection. However,
-                // unlike the built in "load" function, this will eager load AND
-                // allow limitations (such as "take" or "skip").
-                $q->loadConnection(array_get($items->first(), 'args', []));
-            }])->each(function ($user) {
-                // Finally, we need to set the value for the provided key. When
-                // the GraphQL query is executed, it will grab the value from
-                // for the key when resolving the field.
-                $this->set($user->id, $user->tasks);
+            $items->pluck('root')->fetch([$relation => function ($q) use ($first) {
+                $args = $first['args'];
+                $type = $first['type'];
+                $scopes = array_get($first, 'scopes', []);
+
+                foreach ($scopes as $scope) {
+                    call_user_func_array([$q, $scope], [$args]);
+                }
+
+                switch ($type) {
+                    case 'relay':
+                        return $q->relayConnection($args);
+                    case 'paginator':
+                        return $q->paginatorConnection($args);
+                    default:
+                        return $q->get();
+                }
+            }])->each(function ($model) use ($relation) {
+                $this->set($model->id, $model->getRelation($relation));
             });
         });
     }
