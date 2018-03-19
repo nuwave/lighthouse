@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\DataLoader\Loaders\BelongsToLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class BelongsTo implements FieldResolver
@@ -36,7 +37,11 @@ class BelongsTo implements FieldResolver
         );
 
         return $value->setResolver(function ($root, array $args) use ($relation) {
-            return $root->{$relation};
+            return graphql()->batch(BelongsToLoader::class, $root->getKey(), [
+                'relation' => $relation,
+                'root' => $root,
+                'args' => $args,
+            ]);
         });
     }
 }
