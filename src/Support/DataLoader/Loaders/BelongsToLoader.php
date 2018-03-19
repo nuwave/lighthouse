@@ -17,7 +17,7 @@ class BelongsToLoader extends BatchLoader
             $relation = array_get($items->first(), 'relation');
             $models = $items->pluck('root');
 
-            $models->load([$relation]);
+            $models->fetch([$relation]);
             $models->each(function ($model) use ($relation) {
                 $this->set($model->id, $model->getRelation($relation));
             });

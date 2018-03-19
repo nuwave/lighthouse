@@ -17,7 +17,7 @@ class HasManyLoader extends BatchLoader
             $first = $items->first();
             $relation = $first['relation'];
 
-            $items->pluck('root')->fetch([$relation => function ($q) use ($first) {
+            $items->pluck('parent')->fetch([$relation => function ($q) use ($first) {
                 $args = $first['args'];
                 $type = $first['type'];
                 $scopes = array_get($first, 'scopes', []);

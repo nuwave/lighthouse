@@ -143,9 +143,9 @@ class HasManyDirective implements FieldResolver
 
         return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
             return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
-                compact('relation', 'root', 'args', 'scopes'),
+                compact('relation', 'parent', 'args', 'scopes'),
                 ['type' => 'relay']
-            ));
+            ), camel_case($parent->getTable().'_'.$relation));
         };
     }
 
@@ -194,9 +194,9 @@ class HasManyDirective implements FieldResolver
 
         return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
             return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
-                compact('relation', 'root', 'args', 'scopes'),
+                compact('relation', 'parent', 'args', 'scopes'),
                 ['type' => 'paginator']
-            ));
+            ), camel_case($parent->getTable().'_'.$relation));
         };
     }
 
@@ -214,9 +214,9 @@ class HasManyDirective implements FieldResolver
 
         return function ($parent, array $args) use ($relation, $scopes) {
             return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
-                compact('relation', 'root', 'args', 'scopes'),
+                compact('relation', 'parent', 'args', 'scopes'),
                 ['type' => 'default']
-            ));
+            ), camel_case($parent->getTable().'_'.$relation));
         };
     }
 
