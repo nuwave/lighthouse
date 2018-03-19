@@ -16,8 +16,9 @@ class HasManyLoader extends BatchLoader
         })->groupBy('json')->each(function ($items) {
             $first = $items->first();
             $relation = $first['relation'];
+            $parents = $items->pluck('parent');
 
-            $items->pluck('parent')->fetch([$relation => function ($q) use ($first) {
+            $parents->fetch([$relation => function ($q) use ($first) {
                 $args = $first['args'];
                 $type = $first['type'];
                 $scopes = array_get($first, 'scopes', []);
@@ -32,9 +33,11 @@ class HasManyLoader extends BatchLoader
                     case 'paginator':
                         return $q->paginatorConnection($args);
                     default:
-                        return $q->get();
+                        return $q;
                 }
-            }])->each(function ($model) use ($relation) {
+            }]);
+
+            $parents->each(function ($model) use ($relation) {
                 $this->set($model->id, $model->getRelation($relation));
             });
         });
