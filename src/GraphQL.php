@@ -65,6 +65,16 @@ class GraphQL
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
         if (! empty($result->errors)) {
+            foreach ($result->errors as $error) {
+                if ($error instanceof \Exception) {
+                    info('GraphQL Error:', [
+                        'code' => $error->getCode(),
+                        'message' => $error->getMessage(),
+                        'trace' => $error->getTraceAsString(),
+                    ]);
+                }
+            }
+
             return [
                 'data' => $result->data,
                 'errors' => array_map([$this, 'formatError'], $result->errors),
@@ -110,6 +120,26 @@ class GraphQL
         });
 
         return $this->schema()->build($schema);
+    }
+
+    /**
+     * Batch field resolver.
+     *
+     * @param string $abstract
+     * @param mixed  $key
+     * @param array  $data
+     * @param string $name
+     *
+     * @return \GraphQL\Deferred
+     */
+    public function batch($abstract, $key, array $data = [], $name = null)
+    {
+        $name = $name ?: $abstract;
+        $instance = app()->has($name)
+            ? resolve($name)
+            : app()->instance($name, resolve($abstract));
+
+        return $instance->load($key, $data);
     }
 
     /**
