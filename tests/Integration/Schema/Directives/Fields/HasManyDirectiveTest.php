@@ -55,13 +55,16 @@ class HasManyDirectiveTest extends DBTestCase
         type Task {
             foo: String
         }
+        type Query {
+            user: User @auth
+        }
         ';
 
-        $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'](), 'tasks.resolve');
-        $tasks = $resolver($this->user, []);
+        $this->be($this->user);
 
-        $this->assertCount(3, $tasks);
+        $result = $this->execute($schema, '{ user { tasks { id } } }');
+
+        $this->assertCount(3, array_get($result->data, 'user.tasks'));
     }
 
     /**
@@ -74,38 +77,21 @@ class HasManyDirectiveTest extends DBTestCase
             tasks: [Task!]! @hasMany(type:"paginator")
         }
         type Task {
-            foo: String
+            id: Int!
+        }
+        type Query {
+            user: User @auth
         }
         ';
 
-        // Need lighthouse schema to resolve PaginatorInfo type
-        $types = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema);
-        $root = $types->first(function ($root) {
-            return 'User' === $root->name;
-        });
-        $root->config['fields']();
+        $result = $this->execute($schema, '
+        { user { tasks(count: 2) { paginatorInfo { total count hasMorePages } data { id } } } }
+        ', true);
 
-        $paginator = collect(schema()->types())->first(function ($type) {
-            return 'UserTaskPaginator' === $type->name;
-        });
-
-        $resolver = array_get($root->config['fields'](), 'tasks.resolve');
-        $tasks = $resolver($this->user, ['count' => 2]);
-
-        $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
-        $this->assertEquals(2, $tasks->count());
-        $this->assertEquals(3, $tasks->total());
-        $this->assertTrue($tasks->hasMorePages());
-
-        $resolver = array_get($paginator->config['fields'](), 'data.resolve');
-        $data = $resolver($tasks, []);
-        $this->assertCount(2, $data);
-
-        $resolver = array_get($paginator->config['fields'](), 'paginatorInfo.resolve');
-        $pageInfo = $resolver($tasks, []);
-        $this->assertTrue($pageInfo['hasMorePages']);
-        $this->assertEquals(1, $pageInfo['currentPage']);
-        $this->assertEquals(2, $pageInfo['perPage']);
+        $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertEquals(3, array_get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertTrue(array_get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.data'));
     }
 
     /**
@@ -118,39 +104,19 @@ class HasManyDirectiveTest extends DBTestCase
             tasks: [Task!]! @hasMany(type:"relay")
         }
         type Task {
-            foo: String
+            id: Int!
+        }
+        type Query {
+            user: User @auth
         }
         ';
 
-        // Need lighthouse schema to resolve PageInfo type
-        $types = schema()->register((new SchemaStitcher())->lighthouseSchema()."\n".$schema);
-        $root = $types->first(function ($root) {
-            return 'User' === $root->name;
-        });
-        $root->config['fields']();
+        $result = $this->execute($schema, '
+        { user { tasks(first: 2) { pageInfo { hasNextPage } edges { node { id } } } } }
+        ', true);
 
-        $connection = collect(schema()->types())->first(function ($type) {
-            return 'UserTaskConnection' === $type->name;
-        });
-
-        $resolver = array_get($root->config['fields'](), 'tasks.resolve');
-        $tasks = $resolver($this->user, ['first' => 2]);
-
-        $this->assertInstanceOf(LengthAwarePaginator::class, $tasks);
-        $this->assertEquals(2, $tasks->count());
-        $this->assertEquals(3, $tasks->total());
-        $this->assertTrue($tasks->hasMorePages());
-
-        $resolver = array_get($connection->config['fields'](), 'edges.resolve');
-        $edges = $resolver($tasks, []);
-        $this->assertCount(2, $edges);
-
-        $resolver = array_get($connection->config['fields'](), 'pageInfo.resolve');
-        $pageInfo = $resolver($tasks, []);
-        $this->assertEquals($edges->first()['cursor'], $pageInfo['startCursor']);
-        $this->assertEquals($edges->last()['cursor'], $pageInfo['endCursor']);
-        $this->assertTrue($pageInfo['hasNextPage']);
-        $this->assertFalse($pageInfo['hasPreviousPage']);
+        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
     }
 
     /**

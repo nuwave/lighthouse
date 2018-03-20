@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use GraphQL\Executor\Executor;
 use GraphQL\Language\Parser;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -93,6 +94,24 @@ class TestCase extends BaseTestCase
     protected function parse(string $schema)
     {
         return Parser::parse($schema);
+    }
+
+    /**
+     * Execute query/mutation.
+     *
+     * @param string $schema
+     * @param string $query
+     * @param string $lighthouse
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     */
+    protected function execute($schema, $query, $lighthouse = false)
+    {
+        $schema = $lighthouse
+            ? file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'))."\n".$schema
+            : $schema;
+
+        return Executor::execute(schema()->build($schema), $this->parse($query));
     }
 
     /**

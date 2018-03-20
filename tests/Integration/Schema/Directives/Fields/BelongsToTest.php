@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema\Directives\Fields;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Task;
+use Tests\Utils\Models\Company;
 use Tests\Utils\Models\User;
 
 class BelongsToTest extends DBTestCase
@@ -19,11 +19,11 @@ class BelongsToTest extends DBTestCase
     protected $user;
 
     /**
-     * User's tasks.
+     * User's company.
      *
-     * @var Task
+     * @var Company
      */
-    protected $task;
+    protected $company;
 
     /**
      * Setup test environment.
@@ -32,9 +32,9 @@ class BelongsToTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create();
-        $this->task = factory(Task::class)->create([
-            'user_id' => $this->user->getKey(),
+        $this->company = factory(Company::class)->create();
+        $this->user = factory(User::class)->create([
+            'company_id' => $this->company->getKey(),
         ]);
     }
 
@@ -44,19 +44,21 @@ class BelongsToTest extends DBTestCase
     public function itCanResolveBelongsToRelationship()
     {
         $schema = '
-        type Task {
-            user: User! @belongsTo
+        type Company {
+            name: String!
         }
         type User {
-            foo: String!
+            company: Company @belongsTo
+        }
+        type Query {
+            user: User @auth
         }
         ';
 
-        $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'](), 'user.resolve');
-        $user = $resolver($this->task, []);
+        $this->be($this->user);
 
-        $this->assertInstanceOf(User::class, $user);
+        $result = $this->execute($schema, '{ user { company { name } } }');
+        $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
     }
 
     /**
@@ -65,18 +67,19 @@ class BelongsToTest extends DBTestCase
     public function itCanResolveBelongsToWithCustomName()
     {
         $schema = '
-        type Task {
-            bar: User! @belongsTo(relation:"user")
+        type Company {
+            name: String!
         }
         type User {
-            foo: String!
+            account: Company @belongsTo(relation: "company")
+        }
+        type Query {
+            user: User @auth
         }
         ';
 
-        $type = schema()->register($schema)->first();
-        $resolver = array_get($type->config['fields'](), 'bar.resolve');
-        $user = $resolver($this->task, []);
-
-        $this->assertInstanceOf(User::class, $user);
+        $this->be($this->user);
+        $result = $this->execute($schema, '{ user { account { name } } }');
+        $this->assertEquals($this->company->name, array_get($result->data, 'user.account.name'));
     }
 }

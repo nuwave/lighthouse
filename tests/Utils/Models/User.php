@@ -9,6 +9,11 @@ class User extends Authenticatable
 {
     use IsRelayConnection;
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
     public function tasks()
     {
         return $this->hasMany(Task::class);
