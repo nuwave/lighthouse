@@ -49,6 +49,14 @@
         "test" : "vendor/bin/phpunit --colors=always",
         "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml"
     },
+    "extra": {
+      "laravel": {
+          "providers": ["Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"],
+          "aliases": {
+            "graphql": "Nuwave\\Lighthouse\\GraphQL"
+        }
+      }
+    },
     "config": {
         "sort-packages": true
     }

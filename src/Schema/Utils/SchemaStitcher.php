@@ -44,7 +44,12 @@ class SchemaStitcher
      */
     protected function appSchema($path)
     {
-        $schema = file_get_contents($path);
+        try {
+            $schema = file_get_contents($path);
+        } catch (\Exception $e) {
+            // TODO: Publish demo/startup file with a minimal.
+            return '';
+        }
 
         $imports = collect(explode("\n", $schema))->filter(function ($line) {
             return 0 === strpos(trim($line), '#import');
