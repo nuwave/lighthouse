@@ -144,7 +144,12 @@ class QueryBuilder
 
             call_user_func_array($constraints, [$relation, $model]);
 
-            if (method_exists($relation, 'getSelectColumns')) {
+            if (method_exists($relation, 'shouldSelect')) {
+                $r = new ReflectionMethod(get_class($relation), 'shouldSelect');
+                $r->setAccessible(true);
+                $select = $r->invoke($relation, ['*']);
+                $relation->addSelect($select);
+            } elseif (method_exists($relation, 'getSelectColumns')) {
                 $r = new ReflectionMethod(get_class($relation), 'getSelectColumns');
                 $r->setAccessible(true);
                 $select = $r->invoke($relation, ['*']);
