@@ -30,6 +30,13 @@ class NodeValue
     protected $directive;
 
     /**
+     * Current namespace.
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
      * Create new instance of node value.
      *
      * @param Node $node
@@ -47,6 +54,20 @@ class NodeValue
     public static function init(Node $node)
     {
         return new static($node);
+    }
+
+    /**
+     * Set current node instance.
+     *
+     * @param Node $node
+     *
+     * @return self
+     */
+    public function setNode(Node $node)
+    {
+        $this->node = $node;
+
+        return $this;
     }
 
     /**
@@ -71,6 +92,16 @@ class NodeValue
     public function setDirective(DirectiveNode $directive)
     {
         $this->directive = $directive;
+    }
+
+    /**
+     * Set the current namespace.
+     *
+     * @param string $namespace
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
     }
 
     /**
@@ -101,6 +132,18 @@ class NodeValue
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Get current namespace.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    public function getNamespace($class = null)
+    {
+        return $class ? $this->namespace.'\\'.$class : $this->namespace;
     }
 
     /**

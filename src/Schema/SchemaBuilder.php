@@ -164,7 +164,9 @@ class SchemaBuilder
             $name = $extension->definition->name->value;
 
             if ($type = collect($this->types)->firstWhere('name', $name)) {
-                app(NodeFactory::class)->extend($extension, $type);
+                $value = new NodeValue($extension);
+
+                app(NodeFactory::class)->handle($value->setType($type));
             }
         });
     }

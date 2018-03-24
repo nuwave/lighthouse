@@ -40,25 +40,6 @@ class NodeFactory
     }
 
     /**
-     * Extend type definition.
-     *
-     * @param Extension $extension
-     * @param Type      $type
-     *
-     * @return Type
-     */
-    public function extend(Extension $extension, Type $type)
-    {
-        $typeFields = value($type->config['fields']);
-        $extendedFields = $this->getFields(new NodeValue($extension->definition));
-        $type->config['fields'] = function () use ($typeFields, $extendedFields) {
-            return array_merge($typeFields, $extendedFields);
-        };
-
-        return $type;
-    }
-
-    /**
      * Check if node has a resolver directive.
      *
      * @param NodeValue $value
@@ -103,6 +84,8 @@ class NodeFactory
                 return $this->objectType($value);
             case InputObjectTypeDefinitionNode::class:
                 return $this->inputObjectType($value);
+            case Extension::class:
+                return $this->extend($value);
             default:
                 throw new \Exception("Unknown node [{$value->getNodeName()}]");
         }
@@ -202,6 +185,28 @@ class NodeFactory
         ]);
 
         return $value->setType($inputType);
+    }
+
+    /**
+     * Extend type definition.
+     *
+     * @param NodeValue $value
+     *
+     * @return NodeValue
+     */
+    public function extend(NodeValue $value)
+    {
+        $value->setNode(
+            $value->getNode()->definition
+        );
+
+        $type = $value->getType();
+        $originalFields = value($type->config['fields']);
+        $type->config['fields'] = function () use ($originalFields, $value) {
+            return array_merge($originalFields, $this->getFields($value));
+        };
+
+        return $value;
     }
 
     /**

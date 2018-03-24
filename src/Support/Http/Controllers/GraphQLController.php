@@ -15,14 +15,9 @@ class GraphQLController extends Controller
      */
     public function __construct(Request $request)
     {
-        // TODO: Query for middleware
-        // if ($query = $request->get('query')) {
-        //     $middleware = app('graphql')->schema()
-        //         ->parse($query)
-        //         ->middleware();
-        //
-        //     $this->middleware($middleware->toArray());
-        // }
+        $this->middleware(graphql()->middleware()->forRequest(
+            $request->input('query', '')
+        ));
     }
 
     /**
@@ -30,7 +25,7 @@ class GraphQLController extends Controller
      *
      * @param Request $request
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function query(Request $request)
     {
