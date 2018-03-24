@@ -15,6 +15,8 @@ class GraphQLController extends Controller
      */
     public function __construct(Request $request)
     {
+        graphql()->prepSchema();
+
         $this->middleware(graphql()->middleware()->forRequest(
             $request->input('query', '')
         ));

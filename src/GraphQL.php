@@ -51,6 +51,21 @@ class GraphQL
     protected $stitcher;
 
     /**
+     * GraphQL Schema.
+     *
+     * @var Schema
+     */
+    protected $graphqlSchema;
+
+    /**
+     * Prepare graphql schema.
+     */
+    public function prepSchema()
+    {
+        $this->graphqlSchema = $this->buildSchema();
+    }
+
+    /**
      * Execute GraphQL query.
      *
      * @param string $query
@@ -96,8 +111,10 @@ class GraphQL
      */
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
+        $schema = $this->graphqlSchema ?: $this->buildSchema();
+
         return GraphQLBase::executeAndReturnResult(
-            $this->buildSchema(),
+            $schema,
             $query,
             $rootValue,
             $context,
