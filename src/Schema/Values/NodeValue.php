@@ -197,6 +197,9 @@ class NodeValue
     public function getInterfaces()
     {
         return collect($this->node->interfaces)
+            ->map(function ($interface) {
+                return $interface->name->value;
+            })
             ->merge($this->interfaces)
             ->unique()
             ->values()
