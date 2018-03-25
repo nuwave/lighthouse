@@ -62,6 +62,7 @@ class SchemaBuilder
 
         $this->setTypes($document);
         $this->extendTypes($document);
+        $this->injectNodeField();
 
         return collect($this->types);
     }
@@ -169,5 +170,26 @@ class SchemaBuilder
                 app(NodeFactory::class)->handle($value->setType($type));
             }
         });
+    }
+
+    /**
+     * Inject node field into Query.
+     */
+    protected function injectNodeField()
+    {
+        if (is_null(config('lighthouse.global_id_field'))) {
+            return;
+        }
+
+        if (! $query = $this->instance('Query')) {
+            return;
+        }
+
+        $this->extendTypes($this->parseSchema('
+        extend type Query {
+            node(id: ID!): Node
+                @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")
+        }
+        '));
     }
 }

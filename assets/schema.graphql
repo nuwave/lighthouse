@@ -1,4 +1,5 @@
-interface Node {
+# Node global interface
+interface Node @interface(resolver: "Nuwave\\Lighthouse\\Support\\Http\\GraphQL\\Interfaces\\NodeInterface@resolve") {
   # Global identifier that can be used to resolve any Node implementation.
   _id: ID!
 }

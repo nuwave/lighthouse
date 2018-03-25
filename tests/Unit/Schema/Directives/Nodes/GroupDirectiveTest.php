@@ -14,7 +14,7 @@ class GroupDirectiveTest extends TestCase
         $schema = '
         type Query {}
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
-            me: String @field(resolve: "Foo@bar")
+            me: String @field(resolver: "Foo@bar")
         }
         ';
 
@@ -24,14 +24,13 @@ class GroupDirectiveTest extends TestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanSetMiddleware()
     {
         $schema = '
         type Query {}
         extend type Query @group(middleware: ["foo", "bar"]) {
-            me: String @field(resolve: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
+            me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
         ';
 

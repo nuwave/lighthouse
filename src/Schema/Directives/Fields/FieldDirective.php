@@ -72,7 +72,7 @@ class FieldDirective implements FieldResolver
      */
     protected function getResolver(FieldValue $value, DirectiveNode $directive)
     {
-        if ($resolver = $this->directiveArgValue($directive, 'resolve')) {
+        if ($resolver = $this->directiveArgValue($directive, 'resolver')) {
             $className = array_get(explode('@', $resolver), '0');
 
             return $value->getNode()->getNamespace($className);
@@ -113,7 +113,7 @@ class FieldDirective implements FieldResolver
      */
     protected function getMethod(DirectiveNode $directive)
     {
-        if ($resolver = $this->directiveArgValue($directive, 'resolve')) {
+        if ($resolver = $this->directiveArgValue($directive, 'resolver')) {
             if ($method = array_get(explode('@', $resolver), '1')) {
                 return $method;
             }
