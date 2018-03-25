@@ -2,8 +2,12 @@
 
 namespace Nuwave\Lighthouse\Support\Http\GraphQL\Interfaces;
 
+use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+
 class NodeInterface
 {
+    use HandlesGlobalId;
+
     /**
      * Resolve node value.
      *
@@ -13,6 +17,6 @@ class NodeInterface
      */
     public function resolve($value)
     {
-        dd('NodeInterface', $value);
+        return graphql()->nodes()->resolveType($value);
     }
 }

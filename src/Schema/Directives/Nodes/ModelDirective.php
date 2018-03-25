@@ -4,11 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
+use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class ModelDirective implements NodeMiddleware
 {
-    use CanParseTypes;
+    use HandlesDirectives;
 
     /**
      * Directive name.
@@ -29,24 +29,47 @@ class ModelDirective implements NodeMiddleware
      */
     public function handle(NodeValue $value)
     {
-        // 1. Create query types for model...
-        // $schemaTxt = '
-        // input {{model}}WhereNotNull {
-        //
-        // }
-        // input {{model}}InputType {}
-        // ';
-        //
-        // $schema = str_replace('{{model}}', $value->getType()->name, $schemaTxt);
-        //
-        // collect($this->parseSchema($schema)->definitions)
-        //     ->map(function ($node) {
-        //         return $this->convertNode($node);
-        //     })
-        //     ->each(function ($type) {
-        //         schema()->type($type);
-        //     });
-        // 2. Register node resolver w/ schema...
+        $namespace = $this->getNamespace($value);
+
+        graphql()->nodes()->model(
+            $value->getNodeName(), $namespace
+        );
+
+        $this->registerInterface($value);
+
         return $value;
+    }
+
+    /**
+     * Get model namespace.
+     *
+     * @param NodeValue $value
+     *
+     * @return string
+     */
+    protected function getNamespace(NodeValue $value)
+    {
+        $namespace = $this->directiveArgValue(
+            $this->nodeDirective($value->getNode(), $this->name()),
+            'class'
+        );
+
+        if ($namespace) {
+            return $namespace;
+        }
+
+        return config('lighthouse.namespaces.models').'\\'.$value->getNodeName();
+    }
+
+    /**
+     * Register Node interface.
+     *
+     * @param NodeValue $value
+     */
+    protected function registerInterface(NodeValue $value)
+    {
+        if (! $value->hasInterface('Node')) {
+            $value->attachInterface('Node');
+        }
     }
 }

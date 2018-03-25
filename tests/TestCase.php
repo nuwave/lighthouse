@@ -58,6 +58,11 @@ class TestCase extends BaseTestCase
             'lighthouse.namespaces.mutations',
             'Tests\\Utils\\Mutations'
         );
+
+        $app['config']->set(
+            'lighthouse.namespaces.models',
+            'Tests\\Utils\\Models'
+        );
     }
 
     /**
@@ -102,10 +107,11 @@ class TestCase extends BaseTestCase
      * @param string $schema
      * @param string $query
      * @param string $lighthouse
+     * @param array  $variables
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function execute($schema, $query, $lighthouse = false)
+    protected function execute($schema, $query, $lighthouse = false, $variables = [])
     {
         $schema = $lighthouse
             ? file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'))."\n".$schema

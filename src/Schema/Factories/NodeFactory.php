@@ -36,7 +36,8 @@ class NodeFactory
             ? $this->useResolver($value)
             : $this->transform($value);
 
-        return $this->applyMiddleware($value)->getType();
+        return $this->applyMiddleware($this->attachInterfaces($value))
+            ->getType();
     }
 
     /**
@@ -228,6 +229,25 @@ class NodeFactory
                     $fieldValue->getFieldName() => $factory->handle($fieldValue),
                 ];
             })->toArray();
+    }
+
+    /**
+     * Attach interfaces to type.
+     *
+     * @param NodeValue $value
+     *
+     * @return NodeValue
+     */
+    protected function attachInterfaces(NodeValue $value)
+    {
+        $type = $value->getType();
+        $type->config['interfaces'] = function () use ($value) {
+            return collect($value->getInterfaces())->map(function ($interface) {
+                return schema()->instance($interface);
+            })->toArray();
+        };
+
+        return $value;
     }
 
     /**

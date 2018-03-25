@@ -37,6 +37,13 @@ class NodeValue
     protected $namespace;
 
     /**
+     * Registered interfaces.
+     *
+     * @var array
+     */
+    protected $interfaces = [];
+
+    /**
      * Create new instance of node value.
      *
      * @param Node $node
@@ -105,6 +112,22 @@ class NodeValue
     }
 
     /**
+     * Attach interface(s) to node.
+     *
+     * @param array|string $interface
+     *
+     * @return self
+     */
+    public function attachInterface($interface)
+    {
+        $interfaces = is_string($interface) ? [$interface] : $interface;
+
+        $this->interfaces = array_merge($this->interfaces, $interfaces);
+
+        return $this;
+    }
+
+    /**
      * Get current node.
      *
      * @return Node
@@ -164,5 +187,38 @@ class NodeValue
     public function getNodeFields()
     {
         return data_get($this->getNode(), 'fields', []);
+    }
+
+    /**
+     * Get list of interfaces for node.
+     *
+     * @return array
+     */
+    public function getInterfaces()
+    {
+        return collect($this->node->interfaces)
+            ->merge($this->interfaces)
+            ->unique()
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Check if node implements a interface.
+     *
+     * @param string $interface
+     *
+     * @return bool
+     */
+    public function hasInterface($interface)
+    {
+        return collect($this->node->interfaces)
+            ->reduce(function ($implements, $interfaceNode) use ($interface) {
+                if ($implements) {
+                    return true;
+                }
+
+                return data_get($interfaceNode, 'name.value') == $interface;
+            }, false);
     }
 }

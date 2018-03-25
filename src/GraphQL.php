@@ -7,6 +7,7 @@ use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\CacheManager;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
@@ -227,5 +228,22 @@ class GraphQL
         }
 
         return $this->stitcher;
+    }
+
+    /**
+     * Instance of Node container.
+     *
+     * @return NodeContainer
+     */
+    public function nodes()
+    {
+        if (! app()->has(NodeContainer::class)) {
+            return app()->instance(
+                NodeContainer::class,
+                resolve(NodeContainer::class)
+            );
+        }
+
+        return resolve(NodeContainer::class);
     }
 }
