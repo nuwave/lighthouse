@@ -6,6 +6,9 @@ use Closure;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Opis\Closure\SerializableClosure;
 
 trait HandlesTypes
@@ -161,5 +164,36 @@ trait HandlesTypes
                 throw new \Exception("Unknown Type [{$type}]");
             }
         }, $unpackedType);
+    }
+
+    /**
+     * Get fields for node.
+     *
+     * @param NodeValue $value
+     *
+     * @return array
+     */
+    protected function getFields(NodeValue $value)
+    {
+        $factory = $this->fieldFactory();
+
+        return collect($value->getNodeFields())
+            ->mapWithKeys(function ($field) use ($factory, $value) {
+                $fieldValue = new FieldValue($value, $field);
+
+                return [
+                    $fieldValue->getFieldName() => $factory->handle($fieldValue),
+                ];
+            })->toArray();
+    }
+
+    /**
+     * Get instance of field factory.
+     *
+     * @return FieldFactory
+     */
+    protected function fieldFactory()
+    {
+        return app(FieldFactory::class);
     }
 }

@@ -6,10 +6,11 @@ use GraphQL\Type\Definition\InterfaceType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class InterfaceDirective implements NodeResolver
 {
-    use HandlesDirectives;
+    use HandlesDirectives, HandlesTypes;
 
     /**
      * Name of the directive.
@@ -40,6 +41,9 @@ class InterfaceDirective implements NodeResolver
         return $value->setType(new InterfaceType([
             'name' => $value->getNodeName(),
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
+            'fields' => function () use ($value) {
+                return $this->getFields($value);
+            },
             'resolveType' => function ($value) use ($instance, $method) {
                 return call_user_func_array([$instance, $method], [$value]);
             },

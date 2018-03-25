@@ -29,6 +29,8 @@ class SchemaStitcher
      */
     public function lighthouseSchema($globalId = '_id')
     {
+        // TODO: Append Node if globalId is not null to avoid this check
+        $globalId = is_null($globalId) ? '_id' : $globalId;
         $path = realpath(__DIR__.'/../../../assets/schema.graphql');
         $schema = file_get_contents($path);
 

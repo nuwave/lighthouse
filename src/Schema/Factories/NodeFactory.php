@@ -15,13 +15,13 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class NodeFactory
 {
-    use HandlesDirectives;
+    use HandlesDirectives, HandlesTypes;
 
     /**
      * Transform node to type.
@@ -211,27 +211,6 @@ class NodeFactory
     }
 
     /**
-     * Get fields for node.
-     *
-     * @param NodeValue $value
-     *
-     * @return array
-     */
-    protected function getFields(NodeValue $value)
-    {
-        $factory = $this->fieldFactory();
-
-        return collect($value->getNodeFields())
-            ->mapWithKeys(function ($field) use ($factory, $value) {
-                $fieldValue = new FieldValue($value, $field);
-
-                return [
-                    $fieldValue->getFieldName() => $factory->handle($fieldValue),
-                ];
-            })->toArray();
-    }
-
-    /**
      * Attach interfaces to type.
      *
      * @param NodeValue $value
@@ -244,7 +223,7 @@ class NodeFactory
         $type->config['interfaces'] = function () use ($value) {
             return collect($value->getInterfaces())->map(function ($interface) {
                 return schema()->instance($interface);
-            })->toArray();
+            })->filter()->toArray();
         };
 
         return $value;
@@ -263,15 +242,5 @@ class NodeFactory
             ->reduce(function ($value, $middleware) {
                 return $middleware->handle($value);
             }, $value);
-    }
-
-    /**
-     * Get instance of field factory.
-     *
-     * @return FieldFactory
-     */
-    protected function fieldFactory()
-    {
-        return app(FieldFactory::class);
     }
 }
