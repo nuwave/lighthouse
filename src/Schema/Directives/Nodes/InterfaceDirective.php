@@ -35,6 +35,7 @@ class InterfaceDirective implements NodeResolver
             $this->nodeDirective($value->getNode(), $this->name()),
             'resolver'
         );
+
         $instance = app(array_get(explode('@', $resolver), '0'));
         $method = array_get(explode('@', $resolver), '1');
 

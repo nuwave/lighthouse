@@ -43,6 +43,7 @@ class TestCase extends BaseTestCase
     {
         $app['config']->set('lighthouse.directives', []);
         $app['config']->set('lighthouse.schema.register', null);
+        $app['config']->set('lighthouse.global_id_field', '_id');
 
         $app['config']->set(
             'lighthouse.namespaces.scalars',
@@ -113,9 +114,11 @@ class TestCase extends BaseTestCase
      */
     protected function execute($schema, $query, $lighthouse = false, $variables = [])
     {
-        $schema = $lighthouse
-            ? file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'))."\n".$schema
-            : $schema;
+        if ($lighthouse) {
+            $node = file_get_contents(realpath(__DIR__.'/../assets/node.graphql'));
+            $lighthouse = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
+            $schema = $node."\n".$lighthouse."\n".$schema;
+        }
 
         return Executor::execute(schema()->build($schema), $this->parse($query));
     }

@@ -68,7 +68,9 @@ class ModelDirective implements NodeMiddleware
      */
     protected function registerInterface(NodeValue $value)
     {
-        if (! $value->hasInterface('Node')) {
+        if (! $value->hasInterface('Node')
+            && ! is_null(config('lighthouse.global_id_field'))
+        ) {
             $value->attachInterface('Node');
         }
     }

@@ -141,12 +141,8 @@ class SchemaBuilder
      */
     protected function setTypes(DocumentNode $document)
     {
-        $globalIdField = config('lighthouse.global_id_field');
-
         $types = collect($document->definitions)->reject(function ($node) {
             return $node instanceof TypeExtensionDefinitionNode;
-        })->reject(function ($node) use ($globalIdField) {
-            return is_null($globalIdField) && 'Node' == $node->name->value;
         })->map(function (Node $node) {
             return app(NodeFactory::class)->handle(new NodeValue($node));
         })->toArray();
