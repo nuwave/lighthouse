@@ -14,6 +14,11 @@ class User extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
     public function tasks()
     {
         return $this->hasMany(Task::class);
