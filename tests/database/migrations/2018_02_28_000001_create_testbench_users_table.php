@@ -14,6 +14,7 @@ class CreateTestbenchCompaniesTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('company_id');
+            $table->unsignedInteger('team_id');
             $table->string('name');
             $table->string('email');
             $table->string('password');
