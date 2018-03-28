@@ -34,13 +34,6 @@ class BelongsToTest extends DBTestCase
     protected $company;
 
     /**
-     * User's team.
-     *
-     * @var Team
-     */
-    protected $team;
-
-    /**
      * Setup test environment.
      */
     protected function setUp()
