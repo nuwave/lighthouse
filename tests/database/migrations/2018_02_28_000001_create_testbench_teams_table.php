@@ -4,19 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchCompaniesTable extends Migration
+class CreateTestbenchTeamsTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('teams', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('company_id');
             $table->string('name');
-            $table->string('email');
-            $table->string('password');
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ class CreateTestbenchCompaniesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('users');
+        Schema::drop('teams');
     }
 }

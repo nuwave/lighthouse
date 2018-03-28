@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\BelongsToLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class BelongsTo implements FieldResolver
+class BelongsToDirective implements FieldResolver
 {
     use HandlesDirectives;
 
@@ -41,7 +41,7 @@ class BelongsTo implements FieldResolver
                 'relation' => $relation,
                 'root' => $root,
                 'args' => $args,
-            ]);
+            ], camel_case($root->getTable().'_'.$relation));
         });
     }
 }

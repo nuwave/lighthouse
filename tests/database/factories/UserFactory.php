@@ -2,11 +2,15 @@
 
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Team;
 
 $factory->define(Tests\Utils\Models\User::class, function (Faker $faker) {
     return [
         'company_id' => function () {
             return factory(Company::class)->create()->getKey();
+        },
+        'team_id' => function () {
+            return factory(Team::class)->create()->getKey();
         },
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
