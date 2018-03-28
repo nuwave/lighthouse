@@ -34,6 +34,13 @@ class BelongsToTest extends DBTestCase
     protected $company;
 
     /**
+     * User's team.
+     *
+     * @var Team
+     */
+    protected $team;
+
+    /**
      * Setup test environment.
      */
     protected function setUp()
@@ -95,7 +102,6 @@ class BelongsToTest extends DBTestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itCanResolveBelongsToRelationshipWithTwoRelation()
     {
@@ -116,6 +122,7 @@ class BelongsToTest extends DBTestCase
         ';
 
         $this->be($this->user);
+
         $result = $this->execute($schema, '{ user { company { name } team { name } } }');
         $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
         $this->assertEquals($this->team->name, array_get($result->data, 'user.team.name'));
