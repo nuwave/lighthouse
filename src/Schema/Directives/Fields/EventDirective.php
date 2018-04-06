@@ -29,7 +29,7 @@ class EventDirective implements FieldMiddleware
      *
      * @return Closure
      */
-    public function handle(FieldValue $value)
+    public function handleField(FieldValue $value)
     {
         $event = $this->getEvent($value->getField());
         $resolver = $value->getResolver();

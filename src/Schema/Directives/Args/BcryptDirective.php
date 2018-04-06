@@ -24,7 +24,7 @@ class BcryptDirective implements ArgMiddleware
      *
      * @return array
      */
-    public function handle(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value)
     {
         return $value->setResolver(function ($password) {
             return bcrypt($password);

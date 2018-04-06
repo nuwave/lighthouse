@@ -32,7 +32,7 @@ class FieldFactory
 
         $resolve = directives()->fieldMiddleware($value->getField())
             ->reduce(function ($value, $middleware) {
-                return $middleware->handle($value);
+                return $middleware->handleField($value);
             }, $value)->getResolver();
 
         if ($resolve) {
@@ -70,7 +70,7 @@ class FieldFactory
     protected function useResolver(FieldValue $value)
     {
         return directives()->fieldResolver($value->getField())
-            ->handle($value);
+            ->resolveField($value);
     }
 
     /**

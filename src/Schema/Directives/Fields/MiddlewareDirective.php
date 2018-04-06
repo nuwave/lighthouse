@@ -27,7 +27,7 @@ class MiddlewareDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function handleField(FieldValue $value)
     {
         $checks = $this->getChecks($value);
 

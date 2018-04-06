@@ -20,5 +20,5 @@ interface ArgMiddleware
      *
      * @return array
      */
-    public function handle(ArgumentValue $argument);
+    public function handleArgument(ArgumentValue $argument);
 }

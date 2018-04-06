@@ -28,7 +28,7 @@ class MethodDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function resolveField(FieldValue $value)
     {
         $method = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), 'method'),

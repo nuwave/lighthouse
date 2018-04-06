@@ -62,7 +62,7 @@ class NodeFactory
     protected function useResolver(NodeValue $value)
     {
         return directives()->forNode($value->getNode())
-            ->resolve($value);
+            ->resolveNode($value);
     }
 
     /**
@@ -240,7 +240,7 @@ class NodeFactory
     {
         return directives()->nodeMiddleware($value->getNode())
             ->reduce(function ($value, $middleware) {
-                return $middleware->handle($value);
+                return $middleware->handleNode($value);
             }, $value);
     }
 }

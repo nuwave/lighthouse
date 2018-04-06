@@ -28,7 +28,7 @@ class GlobalIdDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function handleField(FieldValue $value)
     {
         $type = $value->getNodeName();
         $resolver = $value->getResolver();

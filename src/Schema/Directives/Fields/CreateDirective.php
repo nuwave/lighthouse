@@ -28,7 +28,7 @@ class CreateDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function resolveField(FieldValue $value)
     {
         // TODO: create a model registry so we can auto-resolve this.
         $model = $this->directiveArgValue(

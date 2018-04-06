@@ -31,7 +31,7 @@ class DeleteDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function resolveField(FieldValue $value)
     {
         $idArg = $this->getIDField($value);
         $class = $this->directiveArgValue(

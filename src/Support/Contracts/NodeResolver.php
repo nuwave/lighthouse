@@ -20,5 +20,5 @@ interface NodeResolver
      *
      * @return mixed
      */
-    public function resolve(NodeValue $value);
+    public function resolveNode(NodeValue $value);
 }

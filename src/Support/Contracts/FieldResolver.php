@@ -20,5 +20,5 @@ interface FieldResolver
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value);
+    public function resolveField(FieldValue $value);
 }

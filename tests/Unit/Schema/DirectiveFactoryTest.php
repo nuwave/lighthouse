@@ -28,7 +28,7 @@ class DirectiveFactoryTest extends TestCase
         $document = Parser::parse($schema);
         $definition = $document->definitions[0];
         $scalar = directives()->forNode($definition)
-            ->resolve(new NodeValue($definition))
+            ->resolveNode(new NodeValue($definition))
             ->getType();
 
         $this->assertInstanceOf(ScalarType::class, $scalar);

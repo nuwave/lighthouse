@@ -28,7 +28,7 @@ class BelongsToDirective implements FieldResolver
      *
      * @return \Closure
      */
-    public function handle(FieldValue $value)
+    public function resolveField(FieldValue $value)
     {
         $relation = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), 'belongsTo'),

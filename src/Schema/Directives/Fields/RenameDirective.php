@@ -28,7 +28,7 @@ class RenameDirective implements FieldResolver
      *
      * @return \Closure
      */
-    public function handle(FieldValue $value)
+    public function resolveField(FieldValue $value)
     {
         $attribute = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), $this->name()),

@@ -27,7 +27,7 @@ class AuthDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function resolveField(FieldValue $value)
     {
         $guard = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), $this->name()),

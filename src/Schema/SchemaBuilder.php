@@ -17,6 +17,17 @@ class SchemaBuilder
     use CanParseTypes, HandlesTypes;
 
     /**
+     * Definition weights.
+     *
+     * @var array
+     */
+    protected $weights = [
+        \GraphQL\Language\AST\ScalarTypeDefinitionNode::class => 0,
+        \GraphQL\Language\AST\InterfaceTypeDefinitionNode::class => 1,
+        \GraphQL\Language\AST\UnionTypeDefinitionNode::class => 2,
+    ];
+
+    /**
      * Collection of schema types.
      *
      * @var array
@@ -143,6 +154,8 @@ class SchemaBuilder
     {
         $types = collect($document->definitions)->reject(function ($node) {
             return $node instanceof TypeExtensionDefinitionNode;
+        })->sortBy(function ($node) {
+            return array_get($this->weights, get_class($node), 9);
         })->map(function (Node $node) {
             return app(NodeFactory::class)->handle(new NodeValue($node));
         })->toArray();

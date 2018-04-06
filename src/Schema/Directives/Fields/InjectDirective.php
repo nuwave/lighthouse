@@ -28,7 +28,7 @@ class InjectDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function handleField(FieldValue $value)
     {
         $resolver = $value->getResolver();
         $attr = $this->directiveArgValue(

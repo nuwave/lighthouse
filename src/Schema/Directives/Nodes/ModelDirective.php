@@ -27,7 +27,7 @@ class ModelDirective implements NodeMiddleware
      *
      * @return NodeValue
      */
-    public function handle(NodeValue $value)
+    public function handleNode(NodeValue $value)
     {
         $namespace = $this->getNamespace($value);
 

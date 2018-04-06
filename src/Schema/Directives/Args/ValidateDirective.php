@@ -29,7 +29,7 @@ class ValidateDirective implements ArgMiddleware
      *
      * @return array
      */
-    public function handle(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value)
     {
         // TODO: Rename "getValue" to something more descriptive like "toArray"
         // and consider using for NodeValue/FieldValue.

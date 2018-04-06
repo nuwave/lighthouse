@@ -25,7 +25,7 @@ class ScalarDirective implements NodeResolver
      *
      * @return mixed
      */
-    public function resolve(NodeValue $value)
+    public function resolveNode(NodeValue $value)
     {
         return ScalarResolver::resolve($value);
     }

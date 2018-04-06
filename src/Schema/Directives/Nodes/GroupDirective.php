@@ -28,7 +28,7 @@ class GroupDirective implements NodeMiddleware
      *
      * @return NodeValue
      */
-    public function handle(NodeValue $value)
+    public function handleNode(NodeValue $value)
     {
         $this->setNamespace($value);
         $this->setMiddleware($value);

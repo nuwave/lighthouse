@@ -20,5 +20,5 @@ interface NodeMiddleware
      *
      * @return NodeValue
      */
-    public function handle(NodeValue $value);
+    public function handleNode(NodeValue $value);
 }

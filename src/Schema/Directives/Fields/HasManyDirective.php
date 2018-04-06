@@ -32,7 +32,7 @@ class HasManyDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function resolveField(FieldValue $value)
     {
         $relation = $this->getRelationshipName($value->getField());
         $resolver = $this->getResolver($value->getField());

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -29,7 +28,7 @@ class CanDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handle(FieldValue $value)
+    public function handleField(FieldValue $value)
     {
         $policies = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), 'can'),

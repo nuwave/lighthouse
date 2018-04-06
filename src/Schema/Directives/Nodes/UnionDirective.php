@@ -28,7 +28,7 @@ class UnionDirective implements NodeResolver
      *
      * @return mixed
      */
-    public function resolve(NodeValue $value)
+    public function resolveNode(NodeValue $value)
     {
         $resolver = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), $this->name()),
