@@ -54,7 +54,11 @@ class EventDirective implements FieldMiddleware
     {
         return $this->directiveArgValue(
             $this->fieldDirective($field, 'event'),
-            'class'
+            'fire',
+            $this->directiveArgValue(
+                $this->fieldDirective($field, 'event'),
+                'class'
+            )
         );
     }
 }
