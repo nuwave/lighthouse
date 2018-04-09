@@ -2,325 +2,168 @@
 
 namespace Nuwave\Lighthouse;
 
-use Closure;
-use GraphQL\Schema;
 use GraphQL\GraphQL as GraphQLBase;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Type\Definition\DirectiveLocation;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\Field;
-use Nuwave\Lighthouse\Schema\QueryParser;
-use Nuwave\Lighthouse\Schema\FieldParser;
+use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\Schema\CacheManager;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Support\Cache\FileStore;
-use Nuwave\Lighthouse\Support\Interfaces\Connection;
-use Nuwave\Lighthouse\Support\Traits\Container\ScalarTypes;
-use Nuwave\Lighthouse\Support\Traits\Container\QueryExecutor;
+use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
+use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
 {
-    use QueryExecutor, ScalarTypes;
+    use CanFormatError;
 
     /**
-     * Instance of application.
+     * Cache manager.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * Instance of schema builder.
-     *
-     * @var Schema\SchemaBuilder
-     */
-    protected $schema;
-
-    /**
-     * Instance of cache.
-     *
-     * @var FileStore
+     * @var CacheManager
      */
     protected $cache;
 
     /**
-     * Types that implement interfaces.
+     * Schema builder.
      *
-     * @var \Illuminate\Support\Collection
+     * @var SchemaBuilder
      */
-    protected $typesWithInterfaces;
+    protected $schema;
 
     /**
-     * Create new instance of graphql container.
+     * Directive container.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @var DirectiveFactory
      */
-    public function __construct($app)
+    protected $directives;
+
+    /**
+     * Middleware manager.
+     *
+     * @var MiddlewareManager
+     */
+    protected $middleware;
+
+    /**
+     * Schema Stitcher.
+     *
+     * @var SchemaStitcher
+     */
+    protected $stitcher;
+
+    /**
+     * GraphQL Schema.
+     *
+     * @var Schema
+     */
+    protected $graphqlSchema;
+
+    /**
+     * Prepare graphql schema.
+     */
+    public function prepSchema()
     {
-        $this->app = $app;
-        $this->typesWithInterfaces = new Collection;
+        $this->graphqlSchema = $this->buildSchema();
     }
 
     /**
-     * Generate GraphQL Schema.
+     * Execute GraphQL query.
      *
-     * @return \GraphQL\Schema
+     * @param string $query
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
+     *
+     * @return array
+     */
+    public function execute($query, $context = null, $variables = [], $rootValue = null)
+    {
+        $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
+
+        if (! empty($result->errors)) {
+            foreach ($result->errors as $error) {
+                if ($error instanceof \Exception) {
+                    info('GraphQL Error:', [
+                        'code' => $error->getCode(),
+                        'message' => $error->getMessage(),
+                        'trace' => $error->getTraceAsString(),
+                    ]);
+                }
+            }
+
+            return [
+                'data' => $result->data,
+                'errors' => array_map([$this, 'formatError'], $result->errors),
+            ];
+        }
+
+        return ['data' => $result->data];
+    }
+
+    /**
+     * Execute GraphQL query.
+     *
+     * @param string $query
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     */
+    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
+    {
+        $schema = $this->graphqlSchema ?: $this->buildSchema();
+
+        return GraphQLBase::executeAndReturnResult(
+            $schema,
+            $query,
+            $rootValue,
+            $context,
+            $variables
+        );
+    }
+
+    /**
+     * Build a new schema instance.
+     *
+     * @return Schema
      */
     public function buildSchema()
     {
-        // Initialize types
-        $this->types()->each(function ($type, $key) {
-            $type = $this->type($key);
-
-            if (method_exists($type, 'getInterfaces') && ! empty($type->getInterfaces())) {
-                $this->typesWithInterfaces->push($type);
-            }
+        $schema = $this->cache()->get(function () {
+            return $this->stitcher()->stitch(
+                config('lighthouse.global_id_field', '_id'),
+                config('lighthouse.schema.register')
+            );
         });
 
-        $queryFields = $this->queries()->merge($this->connections()->toArray());
-        $mutationFields = $this->mutations();
-        $subscriptionFields = $this->subscriptions();
-
-        $queryType = $this->generateSchemaType($queryFields, 'Query');
-        $mutationType = $this->generateSchemaType($mutationFields, 'Mutation');
-        $subscriptionType = $this->generateSchemaType($subscriptionFields, 'Subscription');
-
-        return new Schema([
-            'query' => $queryType,
-            'mutation' => $mutationType,
-            'subscription' => $subscriptionType,
-            'types' => $this->typesWithInterfaces->all(),
-            'directives' => array_merge(
-                GraphQLBase::getInternalDirectives(),
-                [$this->connectionDirective()]
-            )
-        ]);
+        return $this->schema()->build($schema);
     }
 
     /**
-     * Generate type from collection of fields.
+     * Batch field resolver.
      *
-     * @param  Collection $fields
-     * @param  $string    $name
-     * @return \GraphQL\Type\Definition\ObjectType|null
+     * @param string $abstract
+     * @param mixed  $key
+     * @param array  $data
+     * @param string $name
+     *
+     * @return \GraphQL\Deferred
      */
-    protected function generateSchemaType(Collection $fields, $name)
+    public function batch($abstract, $key, array $data = [], $name = null)
     {
-        $typeFields = $fields->map(function ($field, $key) {
-            if ($field instanceof Field) {
-                return app($field->namespace)->toArray();
-            }
+        $name = $name ?: $abstract;
+        $instance = app()->has($name)
+            ? resolve($name)
+            : app()->instance($name, resolve($abstract));
 
-            return $field;
-        });
-
-        if ($typeFields->count()) {
-            return new ObjectType([
-                'name' => $name,
-                'fields' => $typeFields->toArray(),
-            ]);
-        }
+        return $instance->load($key, $data);
     }
 
     /**
-     * Generate a connection directive
-     * TODO: Allow directives to be added to the schema by the user.
-     * Currently this allows the use of the connection directive in Apollo client.
+     * Get an instance of the schema builder.
      *
-     * @return Directive
-     */
-    protected function connectionDirective()
-    {
-        return new Directive([
-            'name' => 'connection',
-            'description' => '',
-            'locations' => [DirectiveLocation::FIELD, DirectiveLocation::FIELD_DEFINITION],
-            'args' => [
-                new FieldArgument([
-                    'name' => 'key',
-                    'type' => Type::string(),
-                    'description' => '',
-                    'defaultValue' => ''
-                ])
-            ]
-        ]);
-    }
-
-    /**
-     * Extract instance from type registrar.
-     *
-     * @param  string $name
-     * @param  bool $fresh
-     * @return ObjectType
-     */
-    public function type($name, $fresh = false)
-    {
-        return $this->schema()->typeInstance($name, $fresh);
-    }
-
-    /**
-     * Extract instance from connection registrar.
-     *
-     * @param  string $name
-     * @param  string|null $parent
-     * @param  bool $fresh
-     * @return ObjectType
-     */
-    public function connection($name, $parent = null, $fresh = false)
-    {
-        $connection = $this->schema()->connectionInstance($name, $parent, $fresh);
-        $connectionName = $name instanceof Connection ? $name->type() : $name;
-
-        if (! $this->connections()->has($connectionName)) {
-            $this->schema()->connection($connectionName, $connection);
-        }
-
-        return $connection;
-    }
-
-    /**
-     * Extract instance from edge registrar.
-     *
-     * @param  string $name
-     * @param  ObjectType $type
-     * @param  bool $fresh
-     * @return ObjectType
-     */
-    public function edge($name, ObjectType $type = null, $fresh = false)
-    {
-        return $this->schema()->edgeInstance($name, $type, $fresh);
-    }
-
-    /**
-     * Extract Data Fetcher from IoC container.
-     *
-     * @param  string $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
-     */
-    public function dataFetcher($name)
-    {
-        return $this->schema()->dataFetcherInstance($name);
-    }
-
-    /**
-     * Extract Data Loader from IoC container.
-     *
-     * @param  string $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
-     */
-    public function dataLoader($name)
-    {
-        return $this->schema()->dataLoaderInstance($name);
-    }
-
-    /**
-     * Get cursor encoder for connection edge.
-     *
-     * @param  string $name
-     * @return Closure
-     */
-    public function cursorEncoder($name)
-    {
-        return $this->schema()->encoder($name);
-    }
-
-    /**
-     * Get cursor decoder for connection edge.
-     *
-     * @param  string $name
-     * @return Closure
-     */
-    public function cursorDecoder($name)
-    {
-        return $this->schema()->decoder($name);
-    }
-
-    /**
-     * Get collection of registered types.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function types()
-    {
-        return new Collection($this->schema()->getTypeRegistrar()->all());
-    }
-
-    /**
-     * Get collection of registered queries.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function queries()
-    {
-        return new Collection($this->schema()->getQueryRegistrar()->all());
-    }
-
-    /**
-     * Get collection of registered subscriptions.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function subscriptions()
-    {
-        return new Collection($this->schema()->getSubscriptionRegistrar()->all());
-    }
-
-    /**
-     * Get collection of registered mutations.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function mutations()
-    {
-        return new Collection($this->schema()->getMutationRegistrar()->all());
-    }
-
-    /**
-     * Get collection of registered connections.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function connections()
-    {
-        return new Collection($this->schema()->getConnectionRegistrar()->all());
-    }
-
-    /**
-     * Get list of available connections to eager load.
-     *
-     * @param  int $depth
-     * @return array
-     */
-    public function eagerLoad($depth = null)
-    {
-        $collection = $this->parser()->connections()->pluck('path');
-
-        if ($depth !== null) {
-            $depth = (int) $depth;
-            $collection = $collection->filter(function ($path) use ($depth) {
-                return count(explode('.', $path)) <= $depth;
-            });
-        }
-
-        return $collection->toArray();
-    }
-
-    /**
-     * Set local instance of schema.
-     *
-     * @param Schema\SchemaBuilder $schema
-     */
-    public function setSchema(SchemaBuilder $schema)
-    {
-        $this->schema = $schema;
-    }
-
-    /**
-     * Get instance of schema builder.
-     *
-     * @return Schema\SchemaBuilder
+     * @return SchemaBuilder
      */
     public function schema()
     {
@@ -332,42 +175,75 @@ class GraphQL
     }
 
     /**
-     * Set local instance of cache.
+     * Get an instance of the directive container.
      *
-     * @param FileStore $cache [description]
+     * @return DirectiveFactory
      */
-    public function setCache(FileStore $cache)
+    public function directives()
     {
-        $this->cache = $cache;
+        if (! $this->directives) {
+            $this->directives = app(DirectiveFactory::class);
+        }
+
+        return $this->directives;
     }
 
     /**
-     * Get instance of cache.
+     * Get instance of middle manager.
      *
-     * @return FileStore
+     * @return MiddlewareManager
+     */
+    public function middleware()
+    {
+        if (! $this->middleware) {
+            $this->middleware = app(MiddlewareManager::class);
+        }
+
+        return $this->middleware;
+    }
+
+    /**
+     * Get instance of cache manager.
+     *
+     * @return CacheManager
      */
     public function cache()
     {
-        return $this->cache ?: app(FileStore::class);
+        if (! $this->cache) {
+            $this->cache = app(CacheManager::class);
+        }
+
+        return $this->cache;
     }
 
     /**
-     * Get instance of query parser.
+     * Get instance of schema stitcher.
      *
-     * @return QueryParser
+     * @return SchemaStitcher
      */
-    public function parser()
+    public function stitcher()
     {
-        return new QueryParser($this->schema(), $this->query);
+        if (! $this->stitcher) {
+            $this->stitcher = app(SchemaStitcher::class);
+        }
+
+        return $this->stitcher;
     }
 
     /**
-     * Resolve instance of field parser.
+     * Instance of Node container.
      *
-     * @return \Nuwave\Lighthouse\Schema\FieldParser
+     * @return NodeContainer
      */
-    public function fieldParser()
+    public function nodes()
     {
-        return app(FieldParser::class);
+        if (! app()->has(NodeContainer::class)) {
+            return app()->instance(
+                NodeContainer::class,
+                resolve(NodeContainer::class)
+            );
+        }
+
+        return resolve(NodeContainer::class);
     }
 }

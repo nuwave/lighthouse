@@ -3,6 +3,18 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Directive registry
+    |--------------------------------------------------------------------------
+    |
+    | This package allows you to create your own server-side directives. Change
+    | these values to register the directory that will hold all of your
+    | custom directives.
+    |
+    */
+    'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Namespace registry
     |--------------------------------------------------------------------------
     |
@@ -12,43 +24,54 @@ return [
     |
     */
     'namespaces' => [
-        'mutations'   => 'App\\Http\\GraphQL\\Mutations',
-        'queries'     => 'App\\Http\\GraphQL\\Queries',
-        'types'       => 'App\\Http\\GraphQL\\Types',
-        'fields'      => 'App\\Http\\GraphQL\\Fields',
-        'connections' => 'App\\Http\\GraphQL\\Connections',
-        'dataloaders' => 'App\\Http\\GraphQL\\DataLoaders',
+        'models' => 'App\\Models',
+        'mutations' => 'App\\Http\\GraphQL\\Mutations',
+        'queries' => 'App\\Http\\GraphQL\\Queries',
+        'scalars' => 'App\\Http\\GraphQL\\Scalars',
     ],
 
-    'cache' => storage_path('lighthouse/cache'),
-    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\LaravelController@query',
-    'pagination_macro' => 'toConnection',
-    'route' => [],
-    'model_path' => 'App\\Models',
-    'camel_case' => false,
+     /*
+     |--------------------------------------------------------------------------
+     | GraphQL Controller
+     |--------------------------------------------------------------------------
+     |
+     | Specify which controller (and method) you want to handle GraphQL requests.
+     |
+     */
+    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
 
-    'globalId' => [
-        'encode' => null,
-        'decodeId' => null,
-        'decodeType' => null,
-    ],
+    /*
+    |--------------------------------------------------------------------------
+    | Schema Cache
+    |--------------------------------------------------------------------------
+    |
+    | Specify where the GraphQL schema should be cached.
+    |
+    */
+    'cache' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global ID
+    |--------------------------------------------------------------------------
+    |
+    | When creating a GraphQL type that is Relay compliant, provide a named field
+    | for the Node identifier.
+    |
+    */
+    'global_id_field' => '_id',
 
     /*
     |--------------------------------------------------------------------------
     | Schema declaration
     |--------------------------------------------------------------------------
     |
-    | This is a path that points to where your Relay schema is located
-    | relative to the app path. You should define your entire Relay
-    | schema in this file. Declare any Relay queries, mutations,
-    | and types here instead of laravel-graphql config file.
+    | This is a path that points to where your GraphQL schema is located
+    | relative to the app path. You should define your entire GraphQL
+    | schema in this file (additional files may be imported).
     |
     */
-
     'schema' => [
-        'output' => storage_path('lighthouse/schema.json'),
-        'register' => function () {
-            //
-        },
+        'register' => base_path('routes/graphql/schema.graphql'),
     ],
 ];

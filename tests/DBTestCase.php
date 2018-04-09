@@ -1,40 +1,41 @@
 <?php
 
-namespace Nuwave\Lighthouse\Tests;
+namespace Tests;
 
 class DBTestCase extends TestCase
 {
     /**
-     * Set up the test environment.
+     * Setup the test environment.
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom([
-            '--database' => 'testing',
-            '--realpath' => realpath(__DIR__.'/Support/migrations'),
-        ]);
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->withFactories(__DIR__.'/database/factories');
+        $this->artisan('migrate', ['--database' => 'lighthouse']);
     }
 
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
-     *
-     * @return void
+     * @param \Illuminate\Foundation\Application $app
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('database.default', 'testing');
-        $app['config']->set('database.connections.testing', [
-            'driver' => env('DB_CONNECTION', 'mysql'),
-            'host' => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'lighthouse'),
-            'username' => env('DB_USERNAME', 'lighthouse'),
+        parent::getEnvironmentSetUp($app);
+
+        $connection = [
+            'driver' => 'mysql',
+            'database' => 'lighthouse',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'prefix' => '',
+            'username' => env('DB_USERNAME', 'testing'),
             'password' => env('DB_PASSWORD', ''),
-            'charset'  => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-        ]);
+        ];
+
+        $app['config']->set('database.default', 'lighthouse');
+        $app['config']->set('database.connections.lighthouse', $connection);
     }
 }

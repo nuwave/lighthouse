@@ -14,38 +14,24 @@ if (! function_exists('graphql')) {
 
 if (! function_exists('schema')) {
     /**
-     * Get instance of schema builder.
+     * Get instance of schema container.
      *
      * @return \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     function schema()
     {
-        return GraphQL::schema();
+        return graphql()->schema();
     }
 }
 
-if (! function_exists('dataFetcher')) {
+if (! function_exists('directives')) {
     /**
-     * Get instance of data fetcher.
+     * Get instance of directives container.
      *
-     * @param  string $loader
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
+     * @return \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
-    function dataFetcher($loader)
+    function directives()
     {
-        return GraphQL::dataFetcher($loader);
-    }
-}
-
-if (! function_exists('dataLoader')) {
-    /**
-     * Get instance of data loader.
-     *
-     * @param  string $loader
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataLoader
-     */
-    function dataLoader($loader)
-    {
-        return GraphQL::dataLoader($loader);
+        return graphql()->directives();
     }
 }

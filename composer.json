@@ -18,15 +18,19 @@
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
-        "php": ">=5.5.9",
-        "illuminate/console": "^5.2 || ^5.3",
-        "illuminate/contracts": "^5.2 || ^5.3",
-        "illuminate/database": "^5.2 || ^5.3",
-        "illuminate/http": "^5.2 || ^5.3",
-        "illuminate/pagination": "^5.2 || ^5.3",
-        "illuminate/routing": "^5.2 || ^5.3",
-        "illuminate/support": "^5.2 || ^5.3",
-        "webonyx/graphql-php": "^0.9"
+        "illuminate/contracts": "^5.4",
+        "illuminate/http": "^5.4",
+        "illuminate/pagination": "^5.4",
+        "illuminate/routing": "^5.4",
+        "illuminate/support": "^5.4",
+        "opis/closure": "^3.0",
+        "webonyx/graphql-php": "^0.11.5"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.10",
+        "illuminate/validation": "^5.4",
+        "orchestra/testbench": "^3.6",
+        "phpunit/phpunit": "^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -36,21 +40,22 @@
             "src/Support/helpers.php"
         ]
     },
-    "require-dev": {
-        "doctrine/dbal": "^2.5",
-        "friendsofphp/php-cs-fixer": "~1",
-        "orchestra/database": "^3.2 || ^3.3",
-        "orchestra/testbench": "^3.2 || ^3.3",
-        "phpunit/phpunit": "~4.8 || ~5.0"
-    },
     "autoload-dev": {
         "psr-4": {
-            "Nuwave\\Lighthouse\\Tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "scripts": {
         "test" : "vendor/bin/phpunit --colors=always",
         "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml"
+    },
+    "extra": {
+      "laravel": {
+          "providers": ["Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"],
+          "aliases": {
+            "graphql": "Nuwave\\Lighthouse\\GraphQL"
+        }
+      }
     },
     "config": {
         "sort-packages": true

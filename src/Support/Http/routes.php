@@ -1,6 +1,6 @@
 <?php
 
-$route = config('lighthouse.route') ?: [];
+$route = config('lighthouse.route', []);
 $controller = config('lighthouse.controller');
 
 Route::group($route, function () use ($controller) {

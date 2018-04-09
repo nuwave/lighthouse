@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\Command;
-use Nuwave\Lighthouse\Support\Cache\FileStore;
 
 class CacheCommand extends Command
 {
@@ -19,26 +18,7 @@ class CacheCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Cache Eloquent Types.';
-
-    /**
-     * Cache manager.
-     *
-     * @var \Nuwave\Lighthouse\Support\Cache\FileStore
-     */
-    protected $cache;
-
-    /**
-     * Create new instance of cache command.
-     *
-     * @param FileStore $cache
-     */
-    public function __construct(FileStore $cache)
-    {
-        parent::__construct();
-
-        $this->cache = $cache;
-    }
+    protected $description = 'Cache GraphQL AST.';
 
     /**
      * Execute the console command.
@@ -47,10 +27,19 @@ class CacheCommand extends Command
      */
     public function handle()
     {
-        $this->cache->flush();
+        if (! config('lighthouse.cache')) {
+            $this->error('The `lighthouse.cache` setting must be set to a file path.');
 
-        app('graphql')->schema();
+            return;
+        }
 
-        $this->info('Eloquent Types successfully cached.');
+        $schema = graphql()->stitcher()->stitch(
+            config('lighthouse.global_id_field', '_id'),
+            config('lighthouse.schema.register')
+        );
+
+        graphql()->cache()->set($schema);
+
+        $this->info('GraphQL AST successfully cached.');
     }
 }

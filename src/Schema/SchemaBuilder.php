@@ -2,371 +2,207 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Closure;
-use Nuwave\Lighthouse\Support\Traits\Container\CentralRegistrar;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
+use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class SchemaBuilder
 {
-    use CentralRegistrar;
+    use CanParseTypes, HandlesTypes;
 
     /**
-     * Current namespace.
+     * Definition weights.
      *
      * @var array
      */
-    protected $namespace = '';
+    protected $weights = [
+        \GraphQL\Language\AST\ScalarTypeDefinitionNode::class => 0,
+        \GraphQL\Language\AST\InterfaceTypeDefinitionNode::class => 1,
+        \GraphQL\Language\AST\UnionTypeDefinitionNode::class => 2,
+    ];
 
     /**
-     * Schema middleware stack.
+     * Collection of schema types.
      *
      * @var array
      */
-    protected $middlewareStack = [];
+    protected $types = [];
 
     /**
-     * Get current namespace.
+     * Generate a GraphQL Schema.
+     *
+     * @param string $schema
+     *
+     * @return mixed
+     */
+    public function build($schema)
+    {
+        $types = $this->register($schema);
+        $query = $types->firstWhere('name', 'Query');
+        $mutation = $types->firstWhere('name', 'Mutation');
+
+        $types = $types->filter(function ($type) {
+            return ! in_array($type->name, ['Query', 'Mutation']);
+        })->toArray();
+
+        $typeLoader = function ($name) {
+            return $this->instance($name);
+        };
+
+        return new Schema(compact('query', 'mutation', 'types', 'typeLoader'));
+    }
+
+    /**
+     * Parse schema definitions.
+     *
+     * @param string $schema
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function register($schema)
+    {
+        $document = $schema instanceof DocumentNode
+            ? $schema
+            : $this->parseSchema($schema);
+
+        $this->setTypes($document);
+        $this->extendTypes($document);
+        $this->injectNodeField();
+
+        return collect($this->types);
+    }
+
+    /**
+     * Resolve instance by name.
+     *
+     * @param string $type
+     *
+     * @return mixed
+     */
+    public function instance($type)
+    {
+        return collect($this->types)
+        ->first(function ($instance) use ($type) {
+            return $instance->name === $type;
+        });
+    }
+
+    /**
+     * Get all registered types.
+     *
+     * @return array
+     */
+    public function types()
+    {
+        return $this->types;
+    }
+
+    /**
+     * Add type to register.
+     *
+     * @param ObjectType|array $type
+     */
+    public function type($type)
+    {
+        $this->types = is_array($type)
+            ? array_merge($this->types, $type)
+            : array_merge($this->types, [$type]);
+    }
+
+    /**
+     * Serialize AST.
      *
      * @return string
      */
-    public function getNamespace()
+    public function serialize()
     {
-        return $this->namespace;
+        $schema = collect($this->types)->map(function ($type) {
+            return $this->serializeableType($type);
+        })->toArray();
+
+        return serialize($schema);
     }
 
     /**
-     * Set current namespace.
+     * Unserialize AST.
      *
-     * @param  string  $namespace
-     * @return void
+     * @param string $schema
+     *
+     * @return \Illuminate\Support\Collection
      */
-    public function setNamespace($namespace)
+    public function unserialize($schema)
     {
-        $this->namespace = $namespace;
+        $this->types = collect(unserialize($schema))->map(function ($type) {
+            return $this->unpackType($type);
+        });
+
+        return collect($this->types);
     }
 
     /**
-     * Group child elements.
+     * Set schema types.
      *
-     * @param  array  $attributes
-     * @param  \Closure  $callback
-     * @return void
+     * @param DocumentNode $document
      */
-    public function group(array $attributes, Closure $callback)
+    protected function setTypes(DocumentNode $document)
     {
-        $oldNamespace = $this->getNamespace();
+        $types = collect($document->definitions)->reject(function ($node) {
+            return $node instanceof TypeExtensionDefinitionNode;
+        })->sortBy(function ($node) {
+            return array_get($this->weights, get_class($node), 9);
+        })->map(function (Node $node) {
+            return app(NodeFactory::class)->handle(new NodeValue($node));
+        })->toArray();
 
-        if (isset($attributes['middleware'])) {
-            $this->middlewareStack[] = $attributes['middleware'];
+        // NOTE: We don't assign this above because new types may be
+        // declared by directives.
+        $this->types = array_merge($this->types, $types);
+    }
+
+    /**
+     * Extend registered types.
+     *
+     * @param DocumentNode $document
+     */
+    protected function extendTypes(DocumentNode $document)
+    {
+        collect($document->definitions)->filter(function ($def) {
+            return $def instanceof TypeExtensionDefinitionNode;
+        })->each(function (TypeExtensionDefinitionNode $extension) {
+            $name = $extension->definition->name->value;
+
+            if ($type = collect($this->types)->firstWhere('name', $name)) {
+                $value = new NodeValue($extension);
+
+                app(NodeFactory::class)->handle($value->setType($type));
+            }
+        });
+    }
+
+    /**
+     * Inject node field into Query.
+     */
+    protected function injectNodeField()
+    {
+        if (is_null(config('lighthouse.global_id_field'))) {
+            return;
         }
 
-        if (isset($attributes['namespace'])) {
-            $this->namespace .= '\\'.trim($attributes['namespace'], '\\');
+        if (! $query = $this->instance('Query')) {
+            return;
         }
 
-        $callback();
-
-        if (isset($attributes['middleware'])) {
-            array_pop($this->middlewareStack);
+        $this->extendTypes($this->parseSchema('
+        extend type Query {
+            node(id: ID!): Node
+                @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")
         }
-
-        if (isset($attributes['namespace'])) {
-            $this->namespace = $oldNamespace;
-        }
-    }
-
-    /**
-     * Get instance of query parser.
-     *
-     * @param  string  $query
-     * @return \Nuwave\Lighthouse\Schema\QueryParser
-     */
-    public function parse($query = '')
-    {
-        return new QueryParser($this, $query);
-    }
-
-    /**
-     * Get current middleware stack.
-     *
-     * @return array
-     */
-    public function getMiddlewareStack()
-    {
-        return $this->middlewareStack;
-    }
-
-    /**
-     * Add query to registrar.
-     *
-     * @param  string  $name
-     * @param  string  $namespace
-     * @return \Nuwave\Lighthouse\Schema\Field
-     */
-    public function query($name, $namespace)
-    {
-        return $this->getQueryRegistrar()->register($name, $namespace);
-    }
-
-    /**
-     * Add queries to registrar.
-     *
-     * @param  array  $queries
-     * @return \Nuwave\Lighthouse\Schema\Field[]
-     */
-    public function queries(array $queries)
-    {
-        $registered = [];
-
-        foreach ($queries as $name => $namespace) {
-            $registered[] = $this->query($name, $namespace);
-        }
-
-        return $registered;
-    }
-
-    /**
-     * Add subscription to registrar.
-     *
-     * @param  string  $name
-     * @param  string  $namespace
-     * @return \Nuwave\Lighthouse\Schema\Field
-     */
-    public function subscription($name, $namespace)
-    {
-        return $this->getSubscriptionRegistrar()->register($name, $namespace);
-    }
-
-    /**
-     * Add subscriptions to registrar.
-     *
-     * @param  array  $subscriptions
-     * @return \Nuwave\Lighthouse\Schema\Field[]
-     */
-    public function subscriptions(array $subscriptions)
-    {
-        $registered = [];
-
-        foreach ($subscriptions as $name => $namespace) {
-            $registered[] = $this->subscription($name, $namespace);
-        }
-
-        return $registered;
-    }
-
-    /**
-     * Add mutation to registrar.
-     *
-     * @param  string  $name
-     * @param  string  $namespace
-     * @return \Nuwave\Lighthouse\Schema\Field
-     */
-    public function mutation($name, $namespace)
-    {
-        return $this->getMutationRegistrar()->register($name, $namespace);
-    }
-
-    /**
-     * Add mutations to registrar.
-     *
-     * @param  array  $mutations
-     * @return \Nuwave\Lighthouse\Schema\Field[]
-     */
-    public function mutations(array $mutations)
-    {
-        $registered = [];
-
-        foreach ($mutations as $name => $namespace) {
-            $registered[] = $this->mutation($name, $namespace);
-        }
-
-        return $registered;
-    }
-
-    /**
-     * Add type to registrar.
-     *
-     * @param  string  $name
-     * @param  string  $namespace
-     * @return \Nuwave\Lighthouse\Schema\Field
-     */
-    public function type($name, $namespace)
-    {
-        return $this->getTypeRegistrar()->register($name, $namespace);
-    }
-
-    /**
-     * Add types to registrar.
-     *
-     * @param  array  $types
-     * @return \Nuwave\Lighthouse\Schema\Field[]
-     */
-    public function types(array $types)
-    {
-        $registered = [];
-
-        foreach ($types as $name => $namespace) {
-            $registered[] = $this->type($name, $namespace);
-        }
-
-        return $registered;
-    }
-
-    /**
-     * Add connection to registrar.
-     *
-     * @param  string  $name
-     * @param  array  $field
-     * @return array
-     */
-    public function connection($name, $field)
-    {
-        return $this->getConnectionRegistrar()->register($name, $field);
-    }
-
-    /**
-     * Add connections to registrar.
-     *
-     * @param  array  $connections
-     * @return \Nuwave\Lighthouse\Schema\Field[]
-     */
-    public function connections(array $connections)
-    {
-        $registered = [];
-
-        foreach ($connections as $name => $namespace) {
-            $registered[] = $this->connection($name, $namespace);
-        }
-
-        return $registered;
-    }
-
-    /**
-     * Add cursor to registrar.
-     *
-     * @param  string  $name
-     * @param  \Closure  $encoder
-     * @param  \Closure|null  $decoder
-     * @return bool
-     */
-    public function cursor($name, Closure $encoder, Closure $decoder = null)
-    {
-        return $this->getCursorRegistrar()->register($name, $encoder, $decoder);
-    }
-
-    /**
-     * Add Data fetcher to registrar.
-     *
-     * @param  string  $name
-     * @param  string  $fetcher
-     * @return bool
-     */
-    public function dataFetcher($name, $fetcher)
-    {
-        return $this->getDataFetcherRegistrar()->register($name, $fetcher);
-    }
-
-    /**
-     * Add Data loader to registrar.
-     *
-     * @param  string  $name
-     * @param  string  $loader
-     * @return bool
-     */
-    public function dataLoader($name, $loader)
-    {
-        return $this->getDataLoaderRegistrar()->register($name, $loader);
-    }
-
-    /**
-     * Get type field from registrar.
-     *
-     * @param  string  $name
-     * @return \Nuwave\Lighthouse\Schema\Field
-     */
-    public function getTypeField($name)
-    {
-        return $this->getTypeRegistrar()->get($name);
-    }
-
-    /**
-     * Extract type instance from registrar.
-     *
-     * @param  string  $name
-     * @param  bool  $fresh
-     * @return \GraphQL\Type\Definition\ObjectType
-     */
-    public function typeInstance($name, $fresh = false)
-    {
-        return $this->getTypeRegistrar()->instance($name, $fresh);
-    }
-
-    /**
-     * Extract connection instance from registrar.
-     *
-     * @param  string  $name
-     * @param  string|null  $parent
-     * @param  bool  $fresh
-     * @return \GraphQL\Type\Definition\ObjectType
-     */
-    public function connectionInstance($name, $parent = null, $fresh = false)
-    {
-        return $this->getConnectionRegistrar()->instance($name, $parent, $fresh);
-    }
-
-    /**
-     * Extract edge instance from registrar.
-     *
-     * @param  string  $name
-     * @param  \GraphQL\Type\Definition\ObjectType|null  $type
-     * @param  bool  $fresh
-     * @return \GraphQL\Type\Definition\ObjectType
-     */
-    public function edgeInstance($name, $type = null, $fresh = false)
-    {
-        return $this->getEdgeRegistrar()->instance($name, $fresh, $type);
-    }
-
-    /**
-     * Extract Data Fetcher instance from registrar.
-     *
-     * @param  string  $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
-     */
-    public function dataFetcherInstance($name)
-    {
-        return $this->getDataFetcherRegistrar()->instance($name);
-    }
-
-    /**
-     * Extract Data Loader instance from registrar.
-     *
-     * @param  string  $name
-     * @return \Nuwave\Lighthouse\Support\DataLoader\GraphQLDataFetcher
-     */
-    public function dataLoaderInstance($name)
-    {
-        return $this->getDataLoaderRegistrar()->instance($name);
-    }
-
-    /**
-     * Get encoder for connection edge.
-     *
-     * @param  string  $name
-     * @return \Closure
-     */
-    public function encoder($name)
-    {
-        return $this->getCursorRegistrar()->encoder($name);
-    }
-
-    /**
-     * Get encoder for connection edge.
-     *
-     * @param  string  $name
-     * @return \Closure
-     */
-    public function decoder($name)
-    {
-        return $this->getCursorRegistrar()->decoder($name);
+        '));
     }
 }
