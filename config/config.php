@@ -3,6 +3,22 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | LightHouse endpoint & middleware
+    |--------------------------------------------------------------------------
+    |
+    | Setup this values as required,
+    | default route endpoints its yourdomain.com/graphql
+    | setup middleware here for all request,
+    | setup more endpoints, ej: pointing to the controller value inside your route file
+    |
+    */
+    'route' => [
+        'prefix' => 'graphql',
+        // 'middleware' => ['web','api'],    // [ 'loghttp']
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Directive registry
     |--------------------------------------------------------------------------
     |
