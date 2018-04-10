@@ -40,7 +40,7 @@ class GraphQLController extends Controller
 
         return graphql()->execute(
             $query,
-            new Context($request, auth()->user()),
+            new Context($request, \Auth::user()),
             $variables
         );
     }
