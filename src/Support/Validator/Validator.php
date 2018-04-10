@@ -54,24 +54,17 @@ abstract class Validator
     /**
      * Process validator for field.
      *
-     * @param mixed                                $root
-     * @param array                                $args
-     * @param \Nuwave\Lighthouse\Schema\Context    $context
-     * @param \GraphQL\Type\Definition\ResolveInfo $info
-     *
-     * @return self
+     * @return bool
      */
-    public static function validate($root, array $args, $context, $info)
+    public function validate()
     {
-        $instance = new static($root, $args, $context, $info);
-
         $validator = validator(
-            $instance->args(),
-            $instance->rules(),
-            $instance->messages()
+            $this->args(),
+            $this->rules(),
+            $this->messages()
         );
 
-        if (! $instance->can()) {
+        if (! $this->can()) {
             throw new \Error('Unauthorized');
         } elseif ($validator->fails()) {
             throw with(new ValidationError('validation'))->setValidator($validator);

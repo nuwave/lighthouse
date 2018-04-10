@@ -54,7 +54,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
             $context = array_get($funcArgs, '2');
             $info = array_get($funcArgs, '3');
 
-            $validator::validate($root, $args, $context, $info);
+            app($validator, compact('root', 'args', 'context', 'info'))->validate();
 
             return call_user_func_array($resolver, $funcArgs);
         });
