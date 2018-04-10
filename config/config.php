@@ -12,10 +12,13 @@ return [
     | setup more endpoints, ej: pointing to the controller value inside your route file
     |
     */
+    'route_name' => 'graphql',
+
     'route' => [
-        'prefix' => 'graphql',
+        'prefix' => '',
         // 'middleware' => ['web','api'],    // [ 'loghttp']
     ],
+
 
     /*
     |--------------------------------------------------------------------------
