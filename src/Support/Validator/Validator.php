@@ -71,7 +71,7 @@ abstract class Validator
             $instance->messages()
         );
 
-        if (! $this->can()) {
+        if (! $instance->can()) {
             throw new \Error('Unauthorized');
         } elseif ($validator->fails()) {
             throw with(new ValidationError('validation'))->setValidator($validator);
