@@ -51,7 +51,7 @@ trait CanFormatError
         if ($this->errorHandler && is_callable($this->errorHandler)) {
             $handler = $this->errorHandler;
 
-            return $handler($error);
+            return $handler($error, $e);
         }
 
         return $error;
