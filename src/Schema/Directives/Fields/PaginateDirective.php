@@ -126,12 +126,15 @@ class PaginateDirective implements FieldResolver
      */
     protected function getScopes(FieldValue $value)
     {
-        return explode(
-            ',',
-           $this->directiveArgValue(
-                $this->fieldDirective($value->getField(), $this->name()),
-                'scopes',
-                []
+        return array_map(
+            'trim',
+            explode(
+                ',',
+                $this->directiveArgValue(
+                    $this->fieldDirective($value->getField(), $this->name()),
+                    'scopes',
+                    []
+                )
             )
         );
     }
