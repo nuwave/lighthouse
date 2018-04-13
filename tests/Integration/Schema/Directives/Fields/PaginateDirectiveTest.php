@@ -61,7 +61,7 @@ class PaginateDirectiveTest extends DBTestCase
             name: String!
         }
         type Query {
-            users: [User!]! @paginate(type: "connection" model: "User")
+            users: [User!]! @paginate(type: "relay" model: "User")
         }
         ';
 
