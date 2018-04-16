@@ -45,6 +45,14 @@ class FieldValue
     protected $description;
 
     /**
+     * Additional args to inject
+     * into resolver.
+     *
+     * @var array
+     */
+    protected $args = [];
+
+    /**
      * Create new field value instance.
      *
      * @param NodeValue $node
@@ -108,6 +116,23 @@ class FieldValue
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Inject field argument.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function injectArg($key, $value)
+    {
+        $this->args = array_merge($this->args, [
+            $key => $value,
+        ]);
 
         return $this;
     }
@@ -180,5 +205,26 @@ class FieldValue
     public function getNodeName()
     {
         return $this->getNode()->getNodeName();
+    }
+
+    /**
+     * Wrap resolver.
+     *
+     * @param Closure $resolver
+     *
+     * @return Closure
+     */
+    public function wrap(Closure $resolver)
+    {
+        if (empty($this->args)) {
+            return $resolver;
+        }
+
+        return function () use ($resolver) {
+            $args = func_get_args();
+            $args[1] = array_merge($args[1], $this->args);
+
+            return call_user_func_array($resolver, $args);
+        };
     }
 }

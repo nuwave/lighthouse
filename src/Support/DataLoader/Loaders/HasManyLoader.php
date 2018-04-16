@@ -28,6 +28,10 @@ class HasManyLoader extends BatchLoader
                 foreach ($scopes as $scope) {
                     call_user_func_array([$q, $scope], [$args]);
                 }
+
+                $q->when(isset($args['query.filter']), function ($q) use ($args) {
+                    return QueryFilter::build($q, $args);
+                });
             }];
 
             switch ($type) {
