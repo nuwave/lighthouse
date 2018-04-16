@@ -160,6 +160,16 @@ class ArgumentValue
     }
 
     /**
+     * Get current field.
+     *
+     * @return FieldValue
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
+
+    /**
      * Get current directive.
      *
      * @return Directive

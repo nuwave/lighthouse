@@ -30,19 +30,19 @@ class FieldFactory
             'description' => $value->getDescription(),
         ];
 
+        $args = $this->getArgs($value);
+
+        if (! $args->isEmpty()) {
+            $field['args'] = $args->toArray();
+        }
+
         $resolve = directives()->fieldMiddleware($value->getField())
             ->reduce(function ($value, $middleware) {
                 return $middleware->handleField($value);
             }, $value)->getResolver();
 
         if ($resolve) {
-            $field['resolve'] = $resolve;
-        }
-
-        $args = $this->getArgs($value);
-
-        if (! $args->isEmpty()) {
-            $field['args'] = $args->toArray();
+            $field['resolve'] = $value->wrap($resolve);
         }
 
         return GraphQLField::toArray($field);

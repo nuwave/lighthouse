@@ -13,7 +13,6 @@ class ValidatorTest extends TestCase
 {
     /**
      * @test
-     * @group failing
      */
     public function itCanWrapResolverWithValidation()
     {
@@ -29,18 +28,13 @@ class ValidatorTest extends TestCase
             };
         });
 
-        $document = $this->parse('
-        type Mutation {
-            foo(bar: String baz: Int): String @validate(validator: "foo.validator")
-        }
-        ');
-
-        $node = new NodeValue($document->definitions[0]);
-        $field = collect($node->getNodeFields())->map(function ($field) use ($node) {
-            return (new FieldValue($node, $field))->setResolver(function () {
-                return 'foo';
-            });
-        })->first();
+        $field = $this->getNodeField('
+            type Mutation {
+                foo(bar: String baz: Int): String @validate(validator: "foo.validator")
+            }
+            ')->setResolver(function () {
+            return 'foo';
+        });
 
         (new ValidateDirective())->handleField($field);
 

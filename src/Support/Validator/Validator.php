@@ -58,16 +58,18 @@ abstract class Validator
      */
     public function validate()
     {
+        if (! $this->can()) {
+            $this->handleUnauthorized();
+        }
+
         $validator = validator(
             $this->args(),
             $this->rules(),
             $this->messages()
         );
 
-        if (! $this->can()) {
-            throw new Error('Unauthorized');
-        } elseif ($validator->fails()) {
-            throw with(new ValidationError('validation'))->setValidator($validator);
+        if ($validator->fails()) {
+            $this->handleInvalid($validator);
         }
 
         return true;
@@ -97,6 +99,21 @@ abstract class Validator
     }
 
     /**
+     * Get input (or input argument).
+     *
+     * @param string|null $key
+     * @param mixed|null  $default
+     *
+     * @return \Illuminate\Support\Collection|mixed
+     */
+    protected function input($key = null, $default = null)
+    {
+        return $key
+            ? array_get($this->args, $key, $default)
+            : collect($this->args);
+    }
+
+    /**
      * Get validator messages.
      *
      * @return array
@@ -114,6 +131,24 @@ abstract class Validator
     protected function can()
     {
         return true;
+    }
+
+    /**
+     * Handle an unauthorized request.
+     */
+    protected function handleUnauthorized()
+    {
+        throw new Error('Unauthorized');
+    }
+
+    /**
+     * Handle an invalid request.
+     *
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     */
+    protected function handleInvalid($validator)
+    {
+        throw with(new ValidationError('validation'))->setValidator($validator);
     }
 
     /**

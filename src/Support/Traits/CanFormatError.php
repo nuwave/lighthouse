@@ -8,6 +8,23 @@ use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 trait CanFormatError
 {
     /**
+     * Error handler.
+     *
+     * @var \Closure
+     */
+    protected $errorHandler;
+
+    /**
+     * Set GraphQL error handler.
+     *
+     * @param \Closure $handler
+     */
+    public function error($handler)
+    {
+        $this->errorHandler = $handler;
+    }
+
+    /**
      * Format error for output.
      *
      * @param Error $e
@@ -29,6 +46,12 @@ trait CanFormatError
 
         if ($previous && $previous instanceof ValidationError) {
             $error['validation'] = $previous->getValidatorMessages();
+        }
+
+        if ($this->errorHandler && is_callable($this->errorHandler)) {
+            $handler = $this->errorHandler;
+
+            return $handler($error, $e);
         }
 
         return $error;

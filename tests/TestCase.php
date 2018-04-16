@@ -4,6 +4,9 @@ namespace Tests;
 
 use GraphQL\Executor\Executor;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -142,5 +145,48 @@ class TestCase extends BaseTestCase
         file_put_contents($path, $contents);
 
         return $path;
+    }
+
+    /**
+     * Get a node's field.
+     *
+     * @param string      $schema
+     * @param int         $index
+     * @param string|null $name
+     *
+     * @return FieldValue
+     */
+    protected function getNodeField($schema, $index = 0, $field = null)
+    {
+        $document = $this->parse($schema);
+        $node = new NodeValue($document->definitions[$index]);
+
+        if (is_null($field)) {
+            return new FieldValue($node, array_get($node->getNodeFields(), '0'));
+        }
+
+        return collect($node->getNodeFields())->filter(function ($nodeField) use ($field) {
+            return $nodeField->name->value === $field;
+        })->map(function ($field) use ($node) {
+            return new FieldValue($node, $field);
+        })->first();
+    }
+
+    /**
+     * Get field argument value.
+     *
+     * @param string     $name
+     * @param FieldValue $field
+     *
+     * @return ArgumentValue
+     */
+    protected function getFieldArg($name, FieldValue $field)
+    {
+        return collect(data_get($field->getField(), 'arguments', []))
+            ->filter(function ($arg) use ($name) {
+                return $arg->name->value === $name;
+            })->map(function ($arg) use ($field) {
+                return new ArgumentValue($field, $arg);
+            })->first();
     }
 }
