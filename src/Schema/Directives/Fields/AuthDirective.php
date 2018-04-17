@@ -35,7 +35,7 @@ class AuthDirective implements FieldResolver
         );
 
         return $value->setResolver(function () use ($guard) {
-            return auth()->guard($guard)->user();
+            return auth($guard)->user();
         });
     }
 }
