@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use ReflectionClass;
 use ReflectionMethod;
+use Illuminate\Support\Collection;
 
 class QueryBuilder
 {
@@ -105,7 +107,8 @@ class QueryBuilder
         $table = $related->getTable();
         $results = \DB::select("SELECT `{$table}`.* FROM ({$sql}) AS `{$table}`", $bindings);
         $hydrated = $this->hydrate($related, $relation, $results);
-        $matched = $relation->match($models, $related->newCollection($hydrated), $options['name']);
+        $collection = $this->loadDefaultWith($related->newCollection($hydrated));
+        $matched = $relation->match($models, $collection, $options['name']);
 
         if ($options['paginated']) {
             foreach ($matched as $model) {
@@ -182,5 +185,31 @@ class QueryBuilder
         }
 
         return $models;
+    }
+
+    /**
+     * Load default eager loads.
+     *
+     * @param  Collection $collection
+     *
+     * @return Collection
+     */
+    protected function loadDefaultWith(Collection $collection)
+    {
+        if ($collection->isNotEmpty()) {
+            $model = $collection->first();
+            $r = new ReflectionClass($model);
+            $p = $r->getProperty('with');
+            $p->setAccessible(true);
+            $with = array_filter($p->getValue($model), function ($relation) use ($model) {
+                return ! $model->relationLoaded($relation);
+            });
+
+            if (! empty($with)) {
+                $collection->load($with);
+            }
+        }
+
+        return $collection;
     }
 }
