@@ -75,3 +75,16 @@ if (! function_exists('app_path')) {
         return app()->basePath().'/app'.($path ? '/'.$path : $path);
     }
 }
+
+if (!function_exists('resolve')) {
+    /**
+     * Resolve a service from the container.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    function resolve($name)
+    {
+        return app($name);
+    }
+}
