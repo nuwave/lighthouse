@@ -103,7 +103,7 @@ class QueryBuilder
         })->implode(' UNION ALL ');
 
         $table = $related->getTable();
-        $results = \DB::select("SELECT `{$table}`.* FROM ({$sql}) AS `{$table}`", $bindings);
+        $results = app('db')->select("SELECT `{$table}`.* FROM ({$sql}) AS `{$table}`", $bindings);
         $hydrated = $this->hydrate($related, $relation, $results);
         $matched = $relation->match($models, $related->newCollection($hydrated), $options['name']);
 
