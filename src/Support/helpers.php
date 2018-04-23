@@ -12,6 +12,18 @@ if (! function_exists('graphql')) {
     }
 }
 
+if (! function_exists('auth')) {
+    /**
+     * Get instance of auth container.
+     *
+     * @return \Illuminate\Auth\AuthManager
+     */
+    function auth()
+    {
+        return app('auth');
+    }
+}
+
 if (! function_exists('schema')) {
     /**
      * Get instance of schema container.
@@ -73,5 +85,18 @@ if (! function_exists('app_path')) {
     function app_path($path = '')
     {
         return app()->basePath().'/app'.($path ? '/'.$path : $path);
+    }
+}
+
+if (!function_exists('resolve')) {
+    /**
+     * Resolve a service from the container.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    function resolve($name)
+    {
+        return app($name);
     }
 }
