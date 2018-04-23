@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -9,11 +10,15 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Resolvers\DirectiveResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -85,6 +90,8 @@ class NodeFactory
                 return $this->objectType($value);
             case InputObjectTypeDefinitionNode::class:
                 return $this->inputObjectType($value);
+            case DirectiveDefinitionNode::class:
+                return $this->clientDirective($value);
             case Extension::class:
                 return $this->extend($value);
             default:
@@ -186,6 +193,39 @@ class NodeFactory
         ]);
 
         return $value->setType($inputType);
+    }
+
+    /**
+     * Resolve client directive.
+     *
+     * @param NodeValue $value
+     *
+     * @return NodeValue
+     */
+    public function clientDirective(NodeValue $value)
+    {
+        $node = $value->getNode();
+        $args = $node->arguments
+            ? collect($node->arguments)->map(function ($input) {
+                return new FieldArgument([
+                    'name' => data_get($input, 'name.value'),
+                    'defaultValue' => data_get($input, 'defaultValue.value'),
+                    'description' => data_get($input, 'description'),
+                    'type' => NodeResolver::resolve(data_get($input, 'type')),
+                ]);
+            })->toArray()
+            : null;
+
+        $directive = new Directive([
+            'name' => $node->name->value,
+            'locations' => collect($node->locations)->map(function ($location) {
+                return $location->value;
+            })->toArray(),
+            'args' => $args,
+            'astNode' => $node,
+        ]);
+
+        return $value->setType($directive);
     }
 
     /**

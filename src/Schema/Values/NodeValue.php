@@ -84,7 +84,7 @@ class NodeValue
      *
      * @return self
      */
-    public function setType(Type $type)
+    public function setType($type)
     {
         $this->type = $type;
 

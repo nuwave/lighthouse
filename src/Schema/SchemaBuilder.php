@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
@@ -35,6 +36,13 @@ class SchemaBuilder
     protected $types = [];
 
     /**
+     * Custom (client) directives.
+     *
+     * @var array
+     */
+    protected $directives = [];
+
+    /**
      * Generate a GraphQL Schema.
      *
      * @param string $schema
@@ -51,11 +59,12 @@ class SchemaBuilder
             return ! in_array($type->name, ['Query', 'Mutation']);
         })->toArray();
 
+        $directives = $this->directives;
         $typeLoader = function ($name) {
             return $this->instance($name);
         };
 
-        return new Schema(compact('query', 'mutation', 'types', 'typeLoader'));
+        return new Schema(compact('query', 'mutation', 'types', 'directives', 'typeLoader'));
     }
 
     /**
@@ -73,6 +82,7 @@ class SchemaBuilder
 
         $this->setTypes($document);
         $this->extendTypes($document);
+        $this->setDirectives($document);
         $this->injectNodeField();
 
         return collect($this->types);
@@ -153,7 +163,8 @@ class SchemaBuilder
     protected function setTypes(DocumentNode $document)
     {
         $types = collect($document->definitions)->reject(function ($node) {
-            return $node instanceof TypeExtensionDefinitionNode;
+            return $node instanceof TypeExtensionDefinitionNode
+                || $node instanceof DirectiveDefinitionNode;
         })->sortBy(function ($node) {
             return array_get($this->weights, get_class($node), 9);
         })->map(function (Node $node) {
@@ -163,6 +174,22 @@ class SchemaBuilder
         // NOTE: We don't assign this above because new types may be
         // declared by directives.
         $this->types = array_merge($this->types, $types);
+    }
+
+    /**
+     * Set custom client directives.
+     *
+     * @param DocumentNode $document
+     *
+     * @return array
+     */
+    protected function setDirectives(DocumentNode $document)
+    {
+        $this->directives = collect($document->definitions)->filter(function ($node) {
+            return $node instanceof DirectiveDefinitionNode;
+        })->map(function (Node $node) {
+            return app(NodeFactory::class)->handle(new NodeValue($node));
+        })->toArray();
     }
 
     /**
