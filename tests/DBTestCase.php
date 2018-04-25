@@ -13,7 +13,7 @@ class DBTestCase extends TestCase
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
         $this->withFactories(__DIR__.'/database/factories');
-        $this->artisan('migrate', ['--database' => 'lighthouse']);
+        $this->artisan('migrate', ['--database' => env('DB_DATABASE', 'lighthouse')]);
     }
 
     /**
@@ -27,7 +27,7 @@ class DBTestCase extends TestCase
 
         $connection = [
             'driver' => 'mysql',
-            'database' => 'lighthouse',
+            'database' => env('DB_DATABASE', 'lighthouse'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'prefix' => '',
@@ -35,7 +35,7 @@ class DBTestCase extends TestCase
             'password' => env('DB_PASSWORD', ''),
         ];
 
-        $app['config']->set('database.default', 'lighthouse');
-        $app['config']->set('database.connections.lighthouse', $connection);
+        $app['config']->set('database.default', env('DB_DATABASE', 'lighthouse'));
+        $app['config']->set('database.connections.'.env('DB_DATABASE', 'lighthouse'), $connection);
     }
 }

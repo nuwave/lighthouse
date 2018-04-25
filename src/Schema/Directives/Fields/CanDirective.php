@@ -48,7 +48,7 @@ class CanDirective implements FieldMiddleware
                 $model = $model ?: get_class($args[0]);
 
                 $can = collect($policies)->reduce(function ($allowed, $policy) use ($model) {
-                    if (! \Auth::user()->can($policy, $model)) {
+                    if (! app('auth')->user()->can($policy, $model)) {
                         return false;
                     }
 
