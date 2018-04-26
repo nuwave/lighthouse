@@ -34,11 +34,11 @@ class ConnectionField
         $hasPreviousPage = $root->currentPage() > 1;
         $startCursor = $this->encodeGlobalId(
             'arrayconnection',
-            $root->firstItem() * $root->currentPage()
+            $root->firstItem()
         );
         $endCursor = $this->encodeGlobalId(
             'arrayconnection',
-            $root->lastItem() * $root->currentPage()
+            $root->lastItem()
         );
 
         return compact(
