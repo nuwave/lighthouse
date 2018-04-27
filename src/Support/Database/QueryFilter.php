@@ -66,7 +66,7 @@ class QueryFilter
                 'resolveArgs' => array_get($filter, 'resolveArgs', []),
             ]);
 
-            $resolve($query, $key, $resolveArgs);
+            $query = $resolve($query, $key, $resolveArgs);
         }
 
         return $query;
