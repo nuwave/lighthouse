@@ -57,7 +57,7 @@ class PaginateDirective implements FieldResolver
             $model = config('lighthouse.namespaces.models').'\\'.$model;
         }
 
-        $resolver = 'connection' == $type
+        $resolver = in_array($type, ['relay', 'connection'])
             ? $this->connectionTypeResolver($value, $model)
             : $this->paginatorTypeResolver($value, $model);
 
