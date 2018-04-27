@@ -34,11 +34,11 @@ class ConnectionField
         $hasPreviousPage = $root->currentPage() > 1;
         $startCursor = $this->encodeGlobalId(
             'arrayconnection',
-            $root->firstItem() * $root->currentPage()
+            $root->firstItem()
         );
         $endCursor = $this->encodeGlobalId(
             'arrayconnection',
-            $root->lastItem() * $root->currentPage()
+            $root->lastItem()
         );
 
         return compact(
@@ -69,10 +69,10 @@ class ConnectionField
         $context = null,
         ResolveInfo $info = null
     ) {
-        $page = $root->currentPage();
+        $first = $root->firstItem();
 
-        return $root->values()->map(function ($item, $x) use ($page) {
-            $cursor = ($x + 1) * $page;
+        return $root->values()->map(function ($item, $x) use ($first) {
+            $cursor = $first + $x;
             $encodedCursor = $this->encodeGlobalId('arrayconnection', $cursor);
 
             return ['cursor' => $encodedCursor, 'node' => $item];
