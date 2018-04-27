@@ -37,7 +37,7 @@ class HasManyDirective implements FieldResolver
         $relation = $this->getRelationshipName($value->getField());
         $resolver = $this->getResolver($value->getField());
 
-        if (! in_array($resolver, ['default', 'paginator', 'relay'])) {
+        if (! in_array($resolver, ['default', 'paginator', 'relay', 'connection'])) {
             throw new DirectiveException(sprintf(
                 '[%s] is not a valid `type` on `hasMany` directive [`paginator`, `relay`, `default`].',
                 $resolver
@@ -49,6 +49,7 @@ class HasManyDirective implements FieldResolver
                 return $value->setResolver(
                     $this->paginatorTypeResolver($relation, $value)
                 );
+            case 'connection':
             case 'relay':
                 return $value->setResolver(
                     $this->connectionTypeResolver($relation, $value)
