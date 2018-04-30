@@ -11,6 +11,7 @@ use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\ServerRequest;
 use Nuwave\Lighthouse\Schema\Context;
 use Illuminate\Contracts\Auth\UserProvider;
+use ReflectionClass;
 
 class WebSocketController{
 
