@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Providers;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Broadcasting\BroadcastManager;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 use Nuwave\Lighthouse\Support\WebSockets\WebSocketServer;

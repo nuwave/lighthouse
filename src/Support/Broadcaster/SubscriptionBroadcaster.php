@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\Broadcaster;
 use Ratchet\Client;
 use Ratchet\Client\WebSocket;
 use Nuwave\Lighthouse\Support\WebSockets\Protocol;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class SubscriptionBroadcaster extends Broadcaster
 {
