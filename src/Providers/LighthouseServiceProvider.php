@@ -59,6 +59,13 @@ class LighthouseServiceProvider extends ServiceProvider
                 return $auth->createUserProvider($config['provider'] ?: null);
             });
 
+        $this->app->when('Nuwave\Lighthouse\Support\WebSockets\WebSocketController')
+            ->needs('$resourceServer')
+            ->give(function ($app) {
+                if (array_key_exists($app, 'League\OAuth2\Server\ResourceServer')) return $app['League\OAuth2\Server\ResourceServer'];
+                else return null;
+            });
+
         $this->app->bind('Ratchet\WebSocket\WsServerInterface', function($app){
             return new WebSocketServer($this->app['Nuwave\Lighthouse\Support\WebSockets\WebSocketController']);
         });
