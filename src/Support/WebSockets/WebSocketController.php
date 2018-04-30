@@ -26,8 +26,8 @@ class WebSocketController{
     /**
      * The Passport Token Repository
      *
-	 * @var Laravel\Passport\TokenRepository
-	 */
+     * @var Laravel\Passport\TokenRepository
+     */
     protected $tokenRepository;
 
     /**
@@ -52,13 +52,17 @@ class WebSocketController{
     protected $connStorage;
 
     public function __construct($resourceServer = null, $tokenRepository = null, UserProvider $userProvider){
-    	$this->subscriptions = [];
-    	$this->connStorage = new \SplObjectStorage();
-    	$this->resourceServer = $resourceServer;
-    	$this->tokenRepository = $tokenRepository;
-    	$this->userProvider = $userProvider;
+        $this->subscriptions = [];
+        $this->connStorage = new \SplObjectStorage();
+        $this->resourceServer = $resourceServer;
+        $this->tokenRepository = $tokenRepository;
+        $this->userProvider = $userProvider;
 
-    	graphql()->prepSchema();
+        \Log::info(json_encode($resourceServer));
+        \Log::info(json_encode($tokenRepository));
+        \Log::info(json_encode($userProvider));
+
+        graphql()->prepSchema();
     }
 
         /**
@@ -68,14 +72,15 @@ class WebSocketController{
      */
     public function handleConnectionInit(ConnectionInterface $conn, array $data){
         try {
-        	$payload = array_get($data, 'payload');
-  			$psr = new ServerRequest("ws", "", $payload, null, '1.1', []);
+            $payload = array_get($data, 'payload');
+            $psr = new ServerRequest("ws", "", $payload, null, '1.1', []);
+            $auth = null;
 
-			if ($psr->hasHeader('authorization') && $this->resourceServer != null){
-	            $psr = $this->resourceServer->validateAuthenticatedRequest($psr);
-	            $auth = $psr->getHeader('authorization');
-			}
-			
+            if ($psr->hasHeader('authorization') && $this->resourceServer != null){
+                $psr = $this->resourceServer->validateAuthenticatedRequest($psr);
+                $auth = $psr->getHeader('authorization');
+            }
+            
             $this->connStorage->offsetSet($conn, ['auth' => $auth]);
             $response = [
                 'type'    => Protocol::GQL_CONNECTION_ACK,
@@ -123,30 +128,34 @@ class WebSocketController{
                 $data['index'] = key($this->subscriptions[$data['name']]);
 
                 $connData = $this->connStorage->offsetExists($conn) ?
-                	$this->connStorage->offsetGet($conn) : [];
+                    $this->connStorage->offsetGet($conn) : [];
 
                 $connData['subscriptions'][$data['id']] = $data;
 
                 $this->connStorage->offsetSet($conn, $connData);
             } else {
 
-            	$connData = $this->connStorage->offsetExists($conn) ? $this->connStorage->offsetGet($conn) : [];
-            	$user = $this->getUser($connData['auth']);
-                $this->authUser($user);
+                $connData = $this->connStorage->offsetExists($conn) ? $this->connStorage->offsetGet($conn) : [];
+                $user = null;
+                
+                if (array_key_exists('auth', $connData)){
+                    $user = $this->getUser($connData['auth']);
+                    $this->authUser($user);                    
+                }
 
-            	$result = graphql()->execute(
-			        $query,
-			        new Context(null, $user),
-			        $variables
-			    );
+                $result = graphql()->execute(
+                    $query,
+                    new Context(null, $user),
+                    $variables
+                );
 
-		        $response = [
-		            'type'    => Protocol::GQL_DATA,
-		            'id'      => $data['id'],
-		            'payload' => "test",
-		        ];
+                $response = [
+                    'type'    => Protocol::GQL_DATA,
+                    'id'      => $data['id'],
+                    'payload' => "test",
+                ];
 
-		        $conn->send(json_encode($response));
+                $conn->send(json_encode($response));
 
                 $response = [
                     'type' => Protocol::GQL_COMPLETE,
@@ -207,9 +216,12 @@ class WebSocketController{
                 $conn = $subscription['conn'];
 
                 $connData = $this->connStorage->offsetExists($conn) ? $this->connStorage->offsetGet($conn) : [];
+                $user = null;
 
-                $user = $this->getUser($connData['auth']);
-                $this->authUser($user);
+                if (array_key_exists('auth', $connData)){
+                    $user = $this->getUser($connData['auth']);
+                    $this->authUser($user);                    
+                }
                 
                 $result = graphql()->execute(
                     $query,
@@ -252,7 +264,8 @@ class WebSocketController{
 
     public function getUser($authHeader){
         $psr = new ServerRequest("ws", "", $authHeader != null ? ['authorization' => $authHeader] : [], null, '1.1', []);
-
+        $user = null;
+        
         if ($psr->hasHeader('authorization') && $this->resourceServer != null && $this->tokenRepository != null){
             $psr = $this->resourceServer->validateAuthenticatedRequest($psr);
             $auth = $psr->getAttributes();
@@ -264,11 +277,13 @@ class WebSocketController{
         return $user;
     }
 
-    public function authUser($user){
-        if (app('auth')->user() != $user){
-            if ($user == null) app('auth')->logout();
-            else app('auth')->setUser($user);
+    public function authUser($user = null){
+        if ($user == null){
+            app('auth')->logout();
+            return;
         }
+
+        app('auth')->setUser($user);
     }
 
     /**
