@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
@@ -89,7 +90,10 @@ class PaginateDirective implements FieldResolver
                 call_user_func_array([$query, $scope], [$args]);
             }
 
-            return $query->paginate($first, ['*'], 'page', $page);
+            Paginator::currentPageResolver(function() use ($page) {
+                return $page;
+            });
+            return $query->paginate($first);
         };
     }
 
@@ -118,7 +122,10 @@ class PaginateDirective implements FieldResolver
                 call_user_func_array([$query, $scope], [$args]);
             }
 
-            return $query->paginate($first, ['*'], 'page', $page);
+            Paginator::currentPageResolver(function() use ($page) {
+                return $page;
+            });
+            return $query->paginate($first);
         };
     }
 
