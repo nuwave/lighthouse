@@ -66,6 +66,11 @@ abstract class GraphQLSubscription implements ShouldBroadcast
      */
     abstract public function resolve();
 
+    public function broadcastOn()
+    {
+        return get_class($this);
+    }
+
     /**
      * Prepare the instance for serialization.
      *

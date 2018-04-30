@@ -47,7 +47,6 @@ return [
     'namespaces' => [
         'models' => 'App\\Models',
         'mutations' => 'App\\Http\\GraphQL\\Mutations',
-        'subscriptions' => 'App\\Http\\GraphQL\\Subscriptions',
         'queries' => 'App\\Http\\GraphQL\\Queries',
         'scalars' => 'App\\Http\\GraphQL\\Scalars',
     ],
