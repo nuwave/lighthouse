@@ -31,18 +31,18 @@ class WebSocketServer implements MessageComponentInterface, WsServerInterface{
         $data = json_decode($message, true);
         switch ($data['type']) {
             case Protocol::GQL_CONNECTION_INIT:
-                $controller->handleConnectionInit($conn, $data);
+                $this->controller->handleConnectionInit($conn, $data);
                 break;
             case Protocol::GQL_START:
-                $controller->handleStart($conn, $data);
+                $this->controller->handleStart($conn, $data);
                 break;
             case Protocol::GQL_DATA:
                 if ($conn->remoteAddress != "127.0.0.1")
                     throw new Exception("Can't accept data from " . $conn->remoteAddress);
-                $controller->handleData($data);
+                $this->controller->handleData($data);
                 break;
             case Protocol::GQL_STOP:
-                $controller->handleStop($conn, $data);
+                $this->controller->handleStop($conn, $data);
                 break;
         }
     }
