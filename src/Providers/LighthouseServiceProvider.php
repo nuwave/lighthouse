@@ -46,8 +46,8 @@ class LighthouseServiceProvider extends ServiceProvider
             ->needs('Illuminate\Contracts\Auth\UserProvider')
             ->give(function ($app) {
                 $auth = $this->app['auth'];
-                $driver = $auth->getDefaultDriver();
-                $config = $this->app['config']["auth.guards.{$driver}"];
+                $guard =  app('config')['lighthouse.auth_guard'] ?: $auth->getDefaultDriver();
+                $config = $this->app['config']["auth.guards.{$guard}"];
                 return $auth->createUserProvider($config['provider'] ?: null);
             });
 

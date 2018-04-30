@@ -38,9 +38,10 @@ class GraphQLController extends Controller
             $variables = json_decode($variables, true);
         }
 
+        $guard = app('config')['lighthouse.auth_guard'] ?: app('auth')->getDefaultDriver();
         return graphql()->execute(
             $query,
-            new Context($request, app('auth')->user()),
+            new Context($request, app('auth')->guard($guard)->user()),
             $variables
         );
     }
