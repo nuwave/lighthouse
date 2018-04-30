@@ -2,9 +2,7 @@ query IntrospectionQuery {
     __schema {
       queryType { name }
       mutationType { name }
-#      Currently this package does not support subscriptions...
-#      but maybe in the future!
-#      subscriptionType { name }
+      subscriptionType { name }
       types {
         ...FullType
       }
