@@ -6,7 +6,7 @@ use Ratchet\Client\WebSocket;
 use Nuwave\Lighthouse\Support\WebSockets\Protocol;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 
-class SubscriptionBroadcaster extends Broadcaster
+class SubscriptionBroadcaster implements Broadcaster
 {
     /**
      * {@inheritdoc}
