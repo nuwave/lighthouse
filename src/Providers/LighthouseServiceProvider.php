@@ -66,6 +66,14 @@ class LighthouseServiceProvider extends ServiceProvider
                 else return null;
             });
 
+        $this->app->when('Nuwave\Lighthouse\Support\WebSockets\WebSocketController')
+            ->needs('$tokenRepository')
+            ->give(function ($app) {
+                if (array_key_exists('Laravel\Passport\TokenRepository', $app)) return $app['Laravel\Passport\TokenRepository'];
+                else return null;
+            });
+
+
         $this->app->bind('Ratchet\WebSocket\WsServerInterface', function($app){
             return new WebSocketServer($this->app['Nuwave\Lighthouse\Support\WebSockets\WebSocketController']);
         });

@@ -9,9 +9,7 @@ use GraphQL\Type\Schema;
 use Ratchet\ConnectionInterface;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\ServerRequest;
-// use League\OAuth2\Server\ResourceServer;
 use Nuwave\Lighthouse\Schema\Context;
-use Laravel\Passport\TokenRepository;
 use Illuminate\Contracts\Auth\UserProvider;
 
 class WebSocketController{
@@ -51,7 +49,7 @@ class WebSocketController{
      */
     protected $connStorage;
 
-    public function __construct($resourceServer = null, TokenRepository $tokenRepository, UserProvider $userProvider){
+    public function __construct($resourceServer = null, $tokenRepository = null, UserProvider $userProvider){
     	$this->subscriptions = [];
     	$this->connStorage = new \SplObjectStorage();
     	$this->resourceServer = $resourceServer;
@@ -253,7 +251,7 @@ class WebSocketController{
     public function getUser($authHeader){
         $psr = new ServerRequest("ws", "", $authHeader != null ? ['authorization' => $authHeader] : [], null, '1.1', []);
 
-        if ($psr->hasHeader('authorization') && $this->resourceServer != null){
+        if ($psr->hasHeader('authorization') && $this->resourceServer != null && $this->tokenRepository != null){
             $psr = $this->resourceServer->validateAuthenticatedRequest($psr);
             $auth = $psr->getAttributes();
 
