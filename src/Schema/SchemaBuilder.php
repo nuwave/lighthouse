@@ -54,9 +54,10 @@ class SchemaBuilder
         $types = $this->register($schema);
         $query = $types->firstWhere('name', 'Query');
         $mutation = $types->firstWhere('name', 'Mutation');
+        $subscription = $types->firstWhere('name', 'Subscription');
 
         $types = $types->filter(function ($type) {
-            return ! in_array($type->name, ['Query', 'Mutation']);
+            return ! in_array($type->name, ['Query', 'Mutation', 'Subscription']);
         })->toArray();
 
         $directives = $this->directives;
@@ -64,7 +65,7 @@ class SchemaBuilder
             return $this->instance($name);
         };
 
-        return new Schema(compact('query', 'mutation', 'types', 'directives', 'typeLoader'));
+        return new Schema(compact('query', 'mutation', 'subscription', 'types', 'directives', 'typeLoader'));
     }
 
     /**

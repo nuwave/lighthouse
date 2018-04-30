@@ -87,6 +87,8 @@ class FieldFactory
                 return $this->mutationResolver($value);
             case 'Query':
                 return $this->queryResolver($value);
+            case 'Subscription':
+                return $this->subscriptionResolver($value);
             default:
                 return $this->defaultResolver($value);
         }
@@ -142,6 +144,26 @@ class FieldFactory
             $class = config('lighthouse.namespaces.queries').'\\'.studly_case($value->getFieldName());
 
             return (new $class($obj, $args, $context, $info))->resolve();
+        };
+    }
+
+    /**
+     * Get default subscription resolver.
+     *
+     * @param FieldValue $value
+     *
+     * @return \Closure
+     */
+    protected function subscriptionResolver(FieldValue $value)
+    {
+        return function ($obj, array $args, $context = null, $info = null) use ($value) {
+            $class = config('lighthouse.namespaces.subscriptions').'\\'.studly_case($value->getFieldName());
+            
+            if (class_exists($class)){
+                return (new $class($obj, $args, $context, $info))->resolve();
+            }
+
+            return $context->event;           
         };
     }
 
