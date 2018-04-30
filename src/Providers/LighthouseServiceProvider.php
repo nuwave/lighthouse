@@ -7,14 +7,20 @@ use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 use Nuwave\Lighthouse\Support\WebSockets\WebSocketServer;
+use Nuwave\Lighthouse\Support\Broadcaster\SubscriptionBroadcaster;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
      */
-    public function boot()
+    public function boot(BroadcastManager $broadcastManager)
     {
+
+        $broadcastManager->extend('lighthouse', function (Application $app, array $config) {
+            return new SubscriptionBroadcaster;
+        });
+
         $this->publishes([__DIR__.'/../../config/config.php' => config_path('lighthouse.php')]);
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
 

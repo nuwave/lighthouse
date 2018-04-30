@@ -15,7 +15,7 @@ class WebSocketCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'lighthouse:websocket {port=8080}';
+    protected $signature = 'lighthouse:websocket';
 
     /**
      * The console command description.
@@ -56,7 +56,7 @@ class WebSocketCommand extends Command
                      $this->server
                  )
              ),
-             $this->argument('port')
+             app('config')['broadcasting.connections.graphql.port']
         );
         $server->run();
     }

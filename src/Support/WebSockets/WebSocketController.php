@@ -201,7 +201,7 @@ class WebSocketController{
                 
 				$result = graphql()->execute(
 		            $query,
-		            new Context(null, $user, $event->event),
+		            new Context(null, $user, $event),
 		            $variables
 		        );
 

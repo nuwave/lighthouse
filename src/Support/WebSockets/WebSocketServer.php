@@ -37,6 +37,8 @@ class WebSocketServer implements MessageComponentInterface, WsServerInterface{
                 $controller->handleStart($conn, $data);
                 break;
             case Protocol::GQL_DATA:
+                if ($conn->remoteAddress != "127.0.0.1")
+                    throw new Exception("Can't accept data from " . $conn->remoteAddress);
                 $controller->handleData($data);
                 break;
             case Protocol::GQL_STOP:
