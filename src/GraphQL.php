@@ -63,9 +63,7 @@ class GraphQL
      */
     public function prepSchema()
     {
-        if ($this->graphqlSchema == null){
-            $this->graphqlSchema = $this->buildSchema();
-        }
+        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema()
     }
 
     /**

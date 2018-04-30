@@ -57,8 +57,6 @@ class WebSocketController{
         $this->resourceServer = $resourceServer;
         $this->tokenRepository = $tokenRepository;
         $this->userProvider = $userProvider;
-
-        graphql()->prepSchema();
     }
 
         /**
@@ -68,6 +66,7 @@ class WebSocketController{
      */
     public function handleConnectionInit(ConnectionInterface $conn, array $data){
         try {
+            graphql()->prepSchema();
             $payload = array_get($data, 'payload');
             $psr = new ServerRequest("ws", "", $payload, null, '1.1', []);
             $auth = null;
