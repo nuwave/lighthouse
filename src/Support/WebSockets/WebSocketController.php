@@ -1,6 +1,8 @@
 <?php
-namespace Nuwave\Lighthouse\Support\WebSockets;
+namespace App\GraphQL\Controllers;
 
+use Ratchet\MessageComponentInterface;
+use Ratchet\WebSocket\WsServerInterface;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Schema;
@@ -12,51 +14,109 @@ use Nuwave\Lighthouse\Schema\Context;
 use Laravel\Passport\TokenRepository;
 use Illuminate\Contracts\Auth\UserProvider;
 
-class WebSocketController{
+class WebSocketController implements MessageComponentInterface, WsServerInterface{
+    
+	/**
+	 * Protocol messages.
+	 *
+	 * @see https://github.com/apollographql/subscriptions-transport-ws/blob/master/src/message-types.ts
+	 */
+	const GQL_CONNECTION_INIT = 'connection_init'; // Client -> Server
+	const GQL_CONNECTION_ACK = 'connection_ack'; // Server -> Client
+	const GQL_CONNECTION_ERROR = 'connection_error'; // Server -> Client
+	const GQL_CONNECTION_KEEP_ALIVE = 'ka'; // Server -> Client
+	const GQL_CONNECTION_TERMINATE = 'connection_terminate'; // Client -> Server
+	const GQL_START = 'start'; // Client -> Server
+	const GQL_DATA = 'data'; // Server -> Client
+	const GQL_ERROR = 'error'; // Server -> Client
+	const GQL_COMPLETE = 'complete'; // Server -> Client
+	const GQL_STOP = 'stop'; // Client -> Server
 
-    /**
-     * The Resource Server instance.
+    /* The Resource Server instance.
      *
      * @var \League\OAuth2\Server\ResourceServer
      */
-    protected $resourceServer;
+    protected $server;
 
-    /**
-     * The Passport Token Repository
+    /* The Passport Token Repository
      *
 	 * @var Laravel\Passport\TokenRepository
 	 */
     protected $tokenRepository;
 
-    /**
-     * The Laravel Auth User Provider
+    /* The Laravel Auth User Provider
      *
      * @var \Illuminate\Contracts\Auth\UserProvider
      */
     protected $userProvider;
 
     /**
-     * Subscription Storage 
-     *
      * @var array
      */
     protected $subscriptions;
 
     /**
-     * Connection Storage
-     *
      * @var \SplObjectStorage
      */
     protected $connStorage;
 
-    public function __construct(ResourceServer $resourceServer, TokenRepository $tokenRepository, UserProvider $userProvider){
+    public function __construct(ResourceServer $server, TokenRepository $tokenRepository){
     	$this->subscriptions = [];
     	$this->connStorage = new \SplObjectStorage();
-    	$this->resourceServer = $resourceServer;
+    	$this->server = $server;
     	$this->tokenRepository = $tokenRepository;
-    	$this->userProvider = $userProvider;
 
+        $auth = app('auth');
+        $driver = $auth->getDefaultDriver();
+        $config = app('config')["auth.guards.{$driver}"];
+        $this->userProvider = app('auth')->createUserProvider($config['provider'] ?: null);
     	graphql()->prepSchema();
+    }
+
+    /**
+     * @return void
+     */
+    public function onOpen(ConnectionInterface $conn){}
+
+    /**
+     * @return void
+     */
+    public function onMessage(ConnectionInterface $conn, $message)
+    {
+    	// \Log::info($message);
+        $data = json_decode($message, true);
+        switch ($data['type']) {
+            case WebSocketController::GQL_CONNECTION_INIT:
+                $this->handleConnectionInit($conn, $data);
+                break;
+            case WebSocketController::GQL_START:
+                $this->handleStart($conn, $data);
+                break;
+            case WebSocketController::GQL_DATA:
+                $this->handleData($data);
+                break;
+            case WebSocketController::GQL_STOP:
+                $this->handleStop($conn, $data);
+                break;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function onClose(ConnectionInterface $conn){}
+
+    /**
+     * @return void
+     */
+    public function onError(ConnectionInterface $conn, \Exception $exception)
+    {
+    	\Log::error($exception);
+    }
+
+    public function getSubProtocols() : array
+    {
+        return ['graphql-ws'];
     }
 
     /**
@@ -129,20 +189,8 @@ class WebSocketController{
             } else {
 
             	$connData = $this->connStorage->offsetExists($conn) ? $this->connStorage->offsetGet($conn) : [];
-            	$psr = new ServerRequest("ws", "", ['authorization' => $connData['auth']], null, '1.1', []);
-
-				if ($psr->hasHeader('authorization')){
-		            $psr = $this->server->validateAuthenticatedRequest($psr);
-		            $auth = $psr->getAttributes();
-
-					$token = $this->tokenRepository->find($auth['oauth_access_token_id']);
-                    $user = $this->userProvider->retrieveById($auth['oauth_user_id'])->withAccessToken($token);
-				}
-
-                if (app('auth')->user() != $user){
-                    if ($user == null) app('auth')->logout();
-                    else app('auth')->setUser($user);
-                }
+            	$user = $this->getUser($connData['auth']);
+                $this->authUser($user);
 
             	$result = graphql()->execute(
 			        $query,
@@ -206,20 +254,8 @@ class WebSocketController{
 
                 $connData = $this->connStorage->offsetExists($conn) ? $this->connStorage->offsetGet($conn) : [];
 
-                $psr = new ServerRequest("ws", "", ['authorization' => $connData['auth']], null, '1.1', []);
-
-				if ($psr->hasHeader('authorization')){
-		            $psr = $this->server->validateAuthenticatedRequest($psr);
-		            $auth = $psr->getAttributes();
-
-					$token = $this->tokenRepository->find($auth['oauth_access_token_id']);
-                    $user = $this->userProvider->retrieveById($auth['oauth_user_id'])->withAccessToken($token);
-				}
-
-                if (app('auth')->user() != $user){
-                    if ($user == null) app('auth')->logout();
-                    else app('auth')->setUser($user);
-                }
+                $user = $this->getUser($connData['auth']);
+                $this->authUser($user);
                 
 				$result = graphql()->execute(
 		            $query,
@@ -260,6 +296,26 @@ class WebSocketController{
         }
     }
 
+    public function getUser($authHeader){
+        $psr = new ServerRequest("ws", "", $authHeader != null ? ['authorization' => $authHeader] : [], null, '1.1', []);
+
+        if ($psr->hasHeader('authorization')){
+            $psr = $this->server->validateAuthenticatedRequest($psr);
+            $auth = $psr->getAttributes();
+
+            $token = $this->tokenRepository->find($auth['oauth_access_token_id']);
+            $user = $this->userProvider->retrieveById($auth['oauth_user_id'])->withAccessToken($token);
+        }
+
+        return $user;
+    }
+
+    public function authUser($user){
+        if (app('auth')->user() != $user){
+            if ($user == null) app('auth')->logout();
+            else app('auth')->setUser($user);
+        }
+    }
 
     /**
      * @param DocumentNode $document
