@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Nuwave\Lighthouse\Support\Console\Commands;
 
 use Illuminate\Console\Command;
 use Ratchet\Server\IoServer;
