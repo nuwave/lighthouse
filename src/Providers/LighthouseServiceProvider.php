@@ -38,7 +38,21 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->commands([
             \Nuwave\Lighthouse\Support\Console\Commands\CacheCommand::class,
+            \Nuwave\Lighthouse\Support\Console\Commands\WebSocketCommand::class,
         ]);
+
+        $this->app->when('Nuwave\Lighthouse\Support\WebSockets\WebSocketController')
+            ->needs('Illuminate\Contracts\Auth\UserProvider')
+            ->give(function ($app) {
+                $auth = $this->app['auth'];
+                $driver = $auth->getDefaultDriver();
+                $config = $this->app['config']["auth.guards.{$driver}"];
+                return $auth->createUserProvider($config['provider'] ?: null);
+            });
+
+        $this->app->bind('Ratchet\WebSocket\WsServerInterface', function($app){
+            return new WebSocketServer($this->app['Nuwave\Lighthouse\Support\WebSockets\WebSocketController']);
+        });
     }
 
     /**
