@@ -12,6 +12,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use Nuwave\Lighthouse\Schema\Context;
 use Illuminate\Contracts\Auth\UserProvider;
 use ReflectionClass;
+use Nuwave\Lighthouse\Support\WebSockets\Protocol;
 
 class WebSocketController{
 
@@ -77,14 +78,14 @@ class WebSocketController{
 			
             $this->connStorage->offsetSet($conn, ['auth' => $auth]);
             $response = [
-                'type'    => WebSocketController::GQL_CONNECTION_ACK,
+                'type'    => Protocol::GQL_CONNECTION_ACK,
                 'payload' => [],
             ];
 
             $conn->send(json_encode($response));
         } catch (\Exception $e) {
             $response = [
-                'type'    => WebSocketController::GQL_CONNECTION_ERROR,
+                'type'    => Protocol::GQL_CONNECTION_ERROR,
                 'payload' => $e->getMessage(),
             ];
             //\Log::info($response);
@@ -140,7 +141,7 @@ class WebSocketController{
 			    );
 
 		        $response = [
-		            'type'    => WebSocketController::GQL_DATA,
+		            'type'    => Protocol::GQL_DATA,
 		            'id'      => $data['id'],
 		            'payload' => "test",
 		        ];
@@ -148,21 +149,21 @@ class WebSocketController{
 		        $conn->send(json_encode($response));
 
                 $response = [
-                    'type' => WebSocketController::GQL_COMPLETE,
+                    'type' => Protocol::GQL_COMPLETE,
                     'id'   => $data['id'],
                 ];
                 $conn->send(json_encode($response));
             }
         } catch (\Exception $e) {
             $response = [
-                'type'    => WebSocketController::GQL_ERROR,
+                'type'    => Protocol::GQL_ERROR,
                 'id'      => $data['id'],
                 'payload' => $e->getMessage(),
             ];
             \Log::error($e);
             $conn->send(json_encode($response));
             $response = [
-                'type' => WebSocketController::GQL_COMPLETE,
+                'type' => Protocol::GQL_COMPLETE,
                 'id'   => $data['id'],
             ];
             // \Log::info($response);
@@ -217,7 +218,7 @@ class WebSocketController{
                 );
 
                 $response = [
-                    'type'    => WebSocketController::GQL_DATA,
+                    'type'    => Protocol::GQL_DATA,
                     'id'      => $subscription['id'],
                     'payload' => $result,
                 ];
@@ -225,7 +226,7 @@ class WebSocketController{
 
             } catch (\Exception $e) {
                 $response = [
-                    'type'    => WebSocketController::GQL_ERROR,
+                    'type'    => Protocol::GQL_ERROR,
                     'id'      => $subscription['id'],
                     'payload' => $e->getMessage(),
                 ];
