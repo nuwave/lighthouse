@@ -157,13 +157,7 @@ class FieldFactory
     protected function subscriptionResolver(FieldValue $value)
     {
         return function ($obj, array $args, $context = null, $info = null) use ($value) {
-            $class = config('lighthouse.namespaces.subscriptions').'\\'.studly_case($value->getFieldName());
-            
-            if (class_exists($class)){
-                return (new $class($obj, $args, $context, $info))->resolve();
-            }
-
-            return $context->event;           
+            return $context->event->resolve($obj, $args, $context, $info)
         };
     }
 

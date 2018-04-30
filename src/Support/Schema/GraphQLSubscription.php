@@ -61,6 +61,6 @@ abstract class GraphQLSubscription implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('graphql');
+        return new Channel('lighthouse.graphql');
     }
 }
