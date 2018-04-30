@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
+use Nuwave\Lighthouse\Support\WebSockets\WebSocketServer;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
