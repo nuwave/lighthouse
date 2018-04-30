@@ -1,10 +1,9 @@
 <?php
 namespace Nuwave\Lighthouse\Support\Broadcaster;
 
-use Ratchet\Client;
-use Ratchet\Client\WebSocket;
 use Nuwave\Lighthouse\Support\WebSockets\Protocol;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
+use WebSocket\Client;
 
 class SubscriptionBroadcaster implements Broadcaster
 {
@@ -29,15 +28,14 @@ class SubscriptionBroadcaster implements Broadcaster
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
-    	Client\connect('ws://' . app('config')['broadcasting.connections.graphql.url'] ?: '127.0.0.1' . ':' . app('config')['broadcasting.connections.graphql.port'], ['graphql-ws'])
-            ->then(function (WebSocket $conn) use ($event, $payload) {
-            $request = [
+        $url = 'ws://' . (app('config')['broadcasting.connections.graphql.url'] ?: '127.0.0.1' . ':' . app('config')['broadcasting.connections.graphql.port']);
+
+        $client = new Client($url);
+        $request = [
                 'type'         => Protocol::GQL_DATA,
                 'subscription' => $event,
                 'payload'      => serialize($payload),
             ];
-            $conn->send(json_encode($request));
-            $conn->close();
-        });
+        $client->send(json_encode($request));
     }
 }

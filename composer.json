@@ -25,7 +25,7 @@
         "illuminate/routing": "^5.4",
         "illuminate/support": "^5.4",
         "opis/closure": "^3.0",
-        "ratchet/pawl": "^0.3.1",
+        "textalk/websocket": "^1.2",
         "webonyx/graphql-php": "^0.11.5"
     },
     "require-dev": {
