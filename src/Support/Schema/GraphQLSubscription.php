@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Schema;
 
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 abstract class GraphQLSubscription implements ShouldBroadcast
 {
@@ -43,7 +44,7 @@ abstract class GraphQLSubscription implements ShouldBroadcast
      * @param ResolveInfo $info
      * @return mixed
      */
-    public function resolve($obj, $args = null, $context = null, $info = null)
+    public function fillAndResolve($obj, $args = null, $context = null, $info = null)
     {
         $this->obj = $obj;
         $this->args = $args;

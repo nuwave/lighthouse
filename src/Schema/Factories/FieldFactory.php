@@ -133,7 +133,7 @@ class FieldFactory
 
     /**
      * Get default query resolver.
-     *
+     *l
      * @param FieldValue $value
      *
      * @return \Closure
@@ -157,7 +157,7 @@ class FieldFactory
     protected function subscriptionResolver(FieldValue $value)
     {
         return function ($obj, array $args, $context = null, $info = null) use ($value) {
-            return $context->event->resolve($obj, $args, $context, $info);
+            return $context->event->fillAndResolve($obj, $args, $context, $info);
         };
     }
 
