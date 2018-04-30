@@ -58,10 +58,6 @@ class WebSocketController{
         $this->tokenRepository = $tokenRepository;
         $this->userProvider = $userProvider;
 
-        \Log::info(json_encode($resourceServer));
-        \Log::info(json_encode($tokenRepository));
-        \Log::info(json_encode($userProvider));
-
         graphql()->prepSchema();
     }
 
