@@ -1,5 +1,5 @@
 <?php
-namespace Nuwave\Lighthouse\Support\WebSockets;
+namespace App\GraphQL\Controllers;
 
 use Ratchet\MessageComponentInterface;
 use Ratchet\WebSocket\WsServerInterface;
@@ -13,69 +13,130 @@ use League\OAuth2\Server\ResourceServer;
 use Nuwave\Lighthouse\Schema\Context;
 use Laravel\Passport\TokenRepository;
 use Illuminate\Contracts\Auth\UserProvider;
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionParameter;
 
-class WebSocketController{
-
+class WebSocketController implements MessageComponentInterface, WsServerInterface{
+    
     /**
-     * The Resource Server instance.
+     * Protocol messages.
+     *
+     * @see https://github.com/apollographql/subscriptions-transport-ws/blob/master/src/message-types.ts
+     */
+    const GQL_CONNECTION_INIT = 'connection_init'; // Client -> Server
+    const GQL_CONNECTION_ACK = 'connection_ack'; // Server -> Client
+    const GQL_CONNECTION_ERROR = 'connection_error'; // Server -> Client
+    const GQL_CONNECTION_KEEP_ALIVE = 'ka'; // Server -> Client
+    const GQL_CONNECTION_TERMINATE = 'connection_terminate'; // Client -> Server
+    const GQL_START = 'start'; // Client -> Server
+    const GQL_DATA = 'data'; // Server -> Client
+    const GQL_ERROR = 'error'; // Server -> Client
+    const GQL_COMPLETE = 'complete'; // Server -> Client
+    const GQL_STOP = 'stop'; // Client -> Server
+
+    /* The Resource Server instance.
      *
      * @var \League\OAuth2\Server\ResourceServer
      */
-    protected $resourceServer;
+    protected $server;
 
-    /**
-     * The Passport Token Repository
+    /* The Passport Token Repository
      *
-	 * @var Laravel\Passport\TokenRepository
-	 */
+     * @var Laravel\Passport\TokenRepository
+     */
     protected $tokenRepository;
 
-    /**
-     * The Laravel Auth User Provider
+    /* The Laravel Auth User Provider
      *
      * @var \Illuminate\Contracts\Auth\UserProvider
      */
     protected $userProvider;
 
     /**
-     * Subscription Storage 
-     *
      * @var array
      */
     protected $subscriptions;
 
     /**
-     * Connection Storage
-     *
      * @var \SplObjectStorage
      */
     protected $connStorage;
 
-    public function __construct(ResourceServer $resourceServer, TokenRepository $tokenRepository, UserProvider $userProvider){
-    	$this->subscriptions = [];
-    	$this->connStorage = new \SplObjectStorage();
-    	$this->resourceServer = $resourceServer;
-    	$this->tokenRepository = $tokenRepository;
-    	$this->userProvider = $userProvider;
+    public function __construct(ResourceServer $server, TokenRepository $tokenRepository){
+        $this->subscriptions = [];
+        $this->connStorage = new \SplObjectStorage();
+        $this->server = $server;
+        $this->tokenRepository = $tokenRepository;
 
-    	graphql()->prepSchema();
+        $auth = app('auth');
+        $driver = $auth->getDefaultDriver();
+        $config = app('config')["auth.guards.{$driver}"];
+        $this->userProvider = app('auth')->createUserProvider($config['provider'] ?: null);
+        graphql()->prepSchema();
     }
 
-        /**
+    /**
+     * @return void
+     */
+    public function onOpen(ConnectionInterface $conn){}
+
+    /**
+     * @return void
+     */
+    public function onMessage(ConnectionInterface $conn, $message)
+    {
+        // \Log::info($message);
+        $data = json_decode($message, true);
+        switch ($data['type']) {
+            case WebSocketController::GQL_CONNECTION_INIT:
+                $this->handleConnectionInit($conn, $data);
+                break;
+            case WebSocketController::GQL_START:
+                $this->handleStart($conn, $data);
+                break;
+            case WebSocketController::GQL_DATA:
+                $this->handleData($data);
+                break;
+            case WebSocketController::GQL_STOP:
+                $this->handleStop($conn, $data);
+                break;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function onClose(ConnectionInterface $conn){}
+
+    /**
+     * @return void
+     */
+    public function onError(ConnectionInterface $conn, \Exception $exception)
+    {
+        \Log::error($exception);
+    }
+
+    public function getSubProtocols() : array
+    {
+        return ['graphql-ws'];
+    }
+
+    /**
      * @param ConnectionInterface $conn
      *
      * @return void
      */
     public function handleConnectionInit(ConnectionInterface $conn, array $data){
         try {
-        	$payload = array_get($data, 'payload');
-  			$psr = new ServerRequest("ws", "", $payload, null, '1.1', []);
+            $payload = array_get($data, 'payload');
+            $psr = new ServerRequest("ws", "", $payload, null, '1.1', []);
 
-			if ($psr->hasHeader('authorization')){
-	            $psr = $this->server->validateAuthenticatedRequest($psr);
-	            $auth = $psr->getHeader('authorization');
-			}
-			
+            if ($psr->hasHeader('authorization')){
+                $psr = $this->server->validateAuthenticatedRequest($psr);
+                $auth = $psr->getHeader('authorization');
+            }
+            
             $this->connStorage->offsetSet($conn, ['auth' => $auth]);
             $response = [
                 'type'    => WebSocketController::GQL_CONNECTION_ACK,
@@ -123,30 +184,30 @@ class WebSocketController{
                 $data['index'] = key($this->subscriptions[$data['name']]);
 
                 $connData = $this->connStorage->offsetExists($conn) ?
-                	$this->connStorage->offsetGet($conn) : [];
+                    $this->connStorage->offsetGet($conn) : [];
 
                 $connData['subscriptions'][$data['id']] = $data;
 
                 $this->connStorage->offsetSet($conn, $connData);
             } else {
 
-            	$connData = $this->connStorage->offsetExists($conn) ? $this->connStorage->offsetGet($conn) : [];
-            	$user = $this->getUser($connData['auth']);
+                $connData = $this->connStorage->offsetExists($conn) ? $this->connStorage->offsetGet($conn) : [];
+                $user = $this->getUser($connData['auth']);
                 $this->authUser($user);
 
-            	$result = graphql()->execute(
-			        $query,
-			        new Context(null, $user),
-			        $variables
-			    );
+                $result = graphql()->execute(
+                    $query,
+                    new Context(null, $user),
+                    $variables
+                );
 
-		        $response = [
-		            'type'    => WebSocketController::GQL_DATA,
-		            'id'      => $data['id'],
-		            'payload' => "test",
-		        ];
+                $response = [
+                    'type'    => WebSocketController::GQL_DATA,
+                    'id'      => $data['id'],
+                    'payload' => "test",
+                ];
 
-		        $conn->send(json_encode($response));
+                $conn->send(json_encode($response));
 
                 $response = [
                     'type' => WebSocketController::GQL_COMPLETE,
@@ -176,19 +237,31 @@ class WebSocketController{
      */
     public function handleData(array $data)
     {
-    	$subscriptionName = 'on' . ucfirst($data['subscription']);
-    	$event = unserialize($data['payload']);
+        $subscriptionName = $data['subscription'];
+        $payload = $data['payload'];
+        $class = $payload['class'];
+        $params = $payload['params'];
 
-    	\Log::info('Event Fired: ' . $subscriptionName);
+        $constructor = (new ReflectionClass($class))->getConstructor();  
+        $parameters = $constructor->getParameters();
+
+        $args = [];
+
+        foreach ($parameters as $parameter) {
+            $args[$parameter->getPosition()] = $params[$parameter->getName()];
+        }
+
+        $event = new $class(...$args);
+        $event->wakeup();
+
+        \Log::info('Event Fired: ' . $subscriptionName);
 
         $subscriptions = array_get($this->subscriptions, $subscriptionName);
         if (is_null($subscriptions)) {
             return;
         }
         foreach ($subscriptions as $subscription) {
-        	try{
-        		$event = unserialize(array_get($data, 'payload'));
-
+            try{
                 $query = array_get($subscription['payload'], 'query');
                 $variables = array_get($subscription['payload'], 'variables');
 
@@ -199,11 +272,11 @@ class WebSocketController{
                 $user = $this->getUser($connData['auth']);
                 $this->authUser($user);
                 
-				$result = graphql()->execute(
-		            $query,
-		            new Context(null, $user, $event),
-		            $variables
-		        );
+                $result = graphql()->execute(
+                    $query,
+                    new Context(null, $user, $event),
+                    $variables
+                );
 
                 $response = [
                     'type'    => WebSocketController::GQL_DATA,
@@ -212,7 +285,7 @@ class WebSocketController{
                 ];
                 $conn->send(json_encode($response));
 
-        	} catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $response = [
                     'type'    => WebSocketController::GQL_ERROR,
                     'id'      => $subscription['id'],

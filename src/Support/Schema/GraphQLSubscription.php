@@ -3,10 +3,16 @@
 namespace Nuwave\Lighthouse\Support\Schema;
 
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Database\ModelIdentifier;
+use ReflectionClass;
+use ReflectionProperty;
 
 abstract class GraphQLSubscription implements ShouldBroadcast
 {
+     use SerializesAndRestoresModelIdentifiers;
+
     /**
      * Root object.
      *
@@ -60,8 +66,60 @@ abstract class GraphQLSubscription implements ShouldBroadcast
      */
     abstract public function resolve();
 
-    public function broadcastOn()
+    /**
+     * Prepare the instance for serialization.
+     *
+     * @return array
+     */
+    public function __sleep()
     {
-        return new Channel('lighthouse.graphql');
+        $properties = (new ReflectionClass($this))->getProperties();
+
+        foreach ($properties as $property) {
+            $property->setValue($this, $this->getSerializedPropertyValue(
+                $this->getPropertyValue($property)
+            ));
+        }
+
+        return array_values(array_filter(array_map(function ($p) {
+            return $p->isStatic() ? null : $p->getName();
+        }, $properties)));
+    }
+
+    /**
+     * Restore the model after serialization.
+     *
+     * @return void
+     */
+    public function wakeup()
+    {
+        foreach ((new ReflectionClass($this))->getProperties() as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $value = $this->getPropertyValue($property);
+
+            if (is_array($value) && array_keys($value) == ["class", "id", "relations", "connection"]){
+                $value = new ModelIdentifier($value['class'], $value['id'], $value['relations'], $value['connection']);
+            }
+
+            $property->setValue($this, $this->getRestoredPropertyValue(
+                $value
+            ));
+        }
+    }
+
+    /**
+     * Get the property value for the given property.
+     *
+     * @param  \ReflectionProperty  $property
+     * @return mixed
+     */
+    protected function getPropertyValue(ReflectionProperty $property)
+    {
+        $property->setAccessible(true);
+
+        return $property->getValue($this);
     }
 }

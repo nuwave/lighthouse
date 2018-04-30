@@ -1,7 +1,7 @@
 <?php
 namespace Nuwave\Lighthouse\Support\WebSockets;
 
-static class Protocol{
+class Protocol{
 	
 	/**
 	 * Protocol messages.

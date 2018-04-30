@@ -37,6 +37,9 @@ class EventDirective implements FieldMiddleware
         return $value->setResolver(function () use ($resolver, $event) {
             $args = func_get_args();
             $value = call_user_func_array($resolver, $args);
+
+            $event = new $event($value);
+
             event(new $event($value));
 
             return $value;
