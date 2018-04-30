@@ -62,7 +62,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->when('Nuwave\Lighthouse\Support\WebSockets\WebSocketController')
             ->needs('$resourceServer')
             ->give(function ($app) {
-                if (array_key_exists($app, 'League\OAuth2\Server\ResourceServer')) return $app['League\OAuth2\Server\ResourceServer'];
+                if (array_key_exists('League\OAuth2\Server\ResourceServer', $app)) return $app['League\OAuth2\Server\ResourceServer'];
                 else return null;
             });
 
