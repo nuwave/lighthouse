@@ -51,7 +51,7 @@ class WebSocketController{
      */
     protected $connStorage;
 
-    public function __construct(ResourceServer $resourceServer, TokenRepository $tokenRepository, UserProvider $userProvider){
+    public function __construct(ResourceServer $resourceServer = null, TokenRepository $tokenRepository, UserProvider $userProvider){
     	$this->subscriptions = [];
     	$this->connStorage = new \SplObjectStorage();
     	$this->resourceServer = $resourceServer;
@@ -71,8 +71,8 @@ class WebSocketController{
         	$payload = array_get($data, 'payload');
   			$psr = new ServerRequest("ws", "", $payload, null, '1.1', []);
 
-			if ($psr->hasHeader('authorization')){
-	            $psr = $this->server->validateAuthenticatedRequest($psr);
+			if ($psr->hasHeader('authorization') && $this->resourceServer != null){
+	            $psr = $this->resourceServer->validateAuthenticatedRequest($psr);
 	            $auth = $psr->getHeader('authorization');
 			}
 			
@@ -253,8 +253,8 @@ class WebSocketController{
     public function getUser($authHeader){
         $psr = new ServerRequest("ws", "", $authHeader != null ? ['authorization' => $authHeader] : [], null, '1.1', []);
 
-        if ($psr->hasHeader('authorization')){
-            $psr = $this->server->validateAuthenticatedRequest($psr);
+        if ($psr->hasHeader('authorization') && $this->resourceServer != null{
+            $psr = $this->resourceServer->validateAuthenticatedRequest($psr);
             $auth = $psr->getAttributes();
 
             $token = $this->tokenRepository->find($auth['oauth_access_token_id']);
