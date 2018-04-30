@@ -253,7 +253,7 @@ class WebSocketController{
     public function getUser($authHeader){
         $psr = new ServerRequest("ws", "", $authHeader != null ? ['authorization' => $authHeader] : [], null, '1.1', []);
 
-        if ($psr->hasHeader('authorization') && $this->resourceServer != null{
+        if ($psr->hasHeader('authorization') && $this->resourceServer != null){
             $psr = $this->resourceServer->validateAuthenticatedRequest($psr);
             $auth = $psr->getAttributes();
 
