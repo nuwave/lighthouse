@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 use Nuwave\Lighthouse\Support\WebSockets\WebSocketServer;
 use Nuwave\Lighthouse\Support\Broadcaster\SubscriptionBroadcaster;
+use Illuminate\Foundation\Application;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
