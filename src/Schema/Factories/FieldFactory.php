@@ -133,7 +133,7 @@ class FieldFactory
 
     /**
      * Get default query resolver.
-     *l
+     *
      * @param FieldValue $value
      *
      * @return \Closure

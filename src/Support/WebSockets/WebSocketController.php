@@ -88,7 +88,7 @@ class WebSocketController{
                 'type'    => WebSocketController::GQL_CONNECTION_ERROR,
                 'payload' => $e->getMessage(),
             ];
-            \Log::info($response);
+            //\Log::info($response);
             $conn->send(json_encode($response));
             $conn->close();
         }
@@ -116,7 +116,7 @@ class WebSocketController{
                 $data['name'] = $this->getSubscriptionName($document);
                 $data['conn'] = $conn;
 
-                \Log::info("New Subscription: " . $data['name'] . "");
+                //\Log::info("New Subscription: " . $data['name'] . "");
 
                 $this->subscriptions[$data['name']][] = $data;
                 end($this->subscriptions[$data['name']]);
@@ -160,13 +160,13 @@ class WebSocketController{
                 'id'      => $data['id'],
                 'payload' => $e->getMessage(),
             ];
-            \Log::info($response);
+            \Log::error($e);
             $conn->send(json_encode($response));
             $response = [
                 'type' => WebSocketController::GQL_COMPLETE,
                 'id'   => $data['id'],
             ];
-            \Log::info($response);
+            // \Log::info($response);
             $conn->send(json_encode($response));
         }
     }
@@ -193,7 +193,7 @@ class WebSocketController{
         $event = new $class(...$args);
         $event->wakeup();
 
-        \Log::info('Event Fired: ' . $subscriptionName);
+        // \Log::info('Event Fired: ' . $subscriptionName);
 
         $subscriptions = array_get($this->subscriptions, $subscriptionName);
         if (is_null($subscriptions)) {
@@ -230,7 +230,7 @@ class WebSocketController{
                     'id'      => $subscription['id'],
                     'payload' => $e->getMessage(),
                 ];
-                \Log::info($response);
+                \Log::error($e);
                 $subscription['conn']->send(json_encode($response));
             }
         }
