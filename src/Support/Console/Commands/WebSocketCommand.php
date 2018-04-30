@@ -49,7 +49,6 @@ class WebSocketCommand extends Command
      */
     public function handle()
     {
-        \Log::info("Start Server");
         $server = IoServer::factory(
              new HttpServer(
                  new WsServer(
