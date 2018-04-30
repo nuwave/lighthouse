@@ -8,7 +8,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\WebSocket\WsServerInterface;
 
-class WebSocketServer extends Command
+class WebSocketCommand extends Command
 {
     /**
      * The name and signature of the console command.
