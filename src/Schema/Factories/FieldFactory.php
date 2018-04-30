@@ -157,7 +157,7 @@ class FieldFactory
     protected function subscriptionResolver(FieldValue $value)
     {
         return function ($obj, array $args, $context = null, $info = null) use ($value) {
-            return $context->event->resolve($obj, $args, $context, $info)
+            return $context->event->resolve($obj, $args, $context, $info);
         };
     }
 
