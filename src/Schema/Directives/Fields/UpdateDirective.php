@@ -64,8 +64,8 @@ class UpdateDirective implements FieldResolver
             $model = $class::find($id);
 
             if ($model) {
-                $attrs = collect($args)->except([$idArg])->toArray();
-                $model->fill($attrs);
+                $attributes = collect($args)->except([$idArg])->toArray();
+                $model->fill($attributes);
                 $model->save();
             }
 

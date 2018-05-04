@@ -18,7 +18,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
 
         if (config('lighthouse.controller')) {
-            require realpath(__DIR__.'/../Support/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
 
         $this->registerSchema();
@@ -49,7 +49,7 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->load(realpath(__DIR__.'/../Schema/Directives/'), 'Nuwave\\Lighthouse\\');
         directives()->load(config('lighthouse.directives', []));
 
-        $schema = app('graphql')->stitcher()->stitch(
+        graphql()->stitcher()->stitch(
             config('lighthouse.global_id_field', '_id'),
             config('lighthouse.schema.register')
         );

@@ -56,8 +56,6 @@ trait HandlesTypes
 
             return false;
         }, false);
-
-        return false;
     }
 
     /**

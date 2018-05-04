@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
+use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 
 class BelongsToLoader extends BatchLoader

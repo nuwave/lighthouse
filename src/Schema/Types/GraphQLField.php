@@ -107,7 +107,7 @@ class GraphQLField
     /**
      * Get the field resolver.
      *
-     * @return \Closure|null
+     * @return array|void
      */
     protected function getResolver()
     {
