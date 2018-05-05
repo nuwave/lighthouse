@@ -1,5 +1,6 @@
 {
     "name": "nuwave/lighthouse",
+    "description": "Lighthouse is a schema first GraphQL package for Laravel applications.",
     "type": "library",
     "keywords": [
         "api",
