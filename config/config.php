@@ -14,6 +14,8 @@ return [
     */
     'route_name' => 'graphql',
 
+    'auth_guard' => 'api',
+
     'route' => [
         'prefix' => '',
         // 'middleware' => ['web','api'],    // [ 'loghttp']

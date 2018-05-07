@@ -57,7 +57,7 @@ class GraphQL
      * @var Schema
      */
     protected $graphqlSchema;
-
+    
     /**
      * Prepare graphql schema.
      */

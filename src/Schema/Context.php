@@ -18,15 +18,25 @@ class Context
      */
     public $user;
 
+
+    /**
+     * Subscription Event
+     * 
+     * @var mixed
+     */
+    public $event;
+
     /**
      * Create new context.
      *
      * @param \Illuminate\Http\Request $request
      * @param mixed                    $user
+     * @param mixed                    $event
      */
-    public function __construct($request, $user)
+    public function __construct($request, $user, $event = null)
     {
         $this->request = $request;
         $this->user = $user;
+        $this->event = $event;
     }
 }
