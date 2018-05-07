@@ -19,12 +19,14 @@
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
+        "cboden/ratchet": "^0.4.1",
         "illuminate/contracts": "^5.4",
         "illuminate/http": "^5.4",
         "illuminate/pagination": "^5.4",
         "illuminate/routing": "^5.4",
         "illuminate/support": "^5.4",
         "opis/closure": "^3.0",
+        "textalk/websocket": "^1.2",
         "webonyx/graphql-php": "^0.11.5"
     },
     "require-dev": {
