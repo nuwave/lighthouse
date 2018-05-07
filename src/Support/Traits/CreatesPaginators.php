@@ -5,8 +5,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+
 
 trait CreatesPaginators
 {

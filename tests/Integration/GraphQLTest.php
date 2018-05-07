@@ -102,4 +102,38 @@ class GraphQLTest extends DBTestCase
 
         $this->assertEquals($expected, $data);
     }
+
+
+    /**
+     * @test
+     */
+    public function itCanResolveQueryThroughController()
+    {
+        $this->be($this->user);
+        $query = '
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+
+        $data = $this->postJson("graphql", ['query' => $query])->json();
+
+        $expected = [
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks->map(function ($task) {
+                        return ['name' => $task->name];
+                    })->toArray(),
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $data);
+    }
 }

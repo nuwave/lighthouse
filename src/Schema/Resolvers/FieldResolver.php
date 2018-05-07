@@ -22,7 +22,7 @@ abstract class FieldResolver
     protected $resolver;
 
     /**
-     * Create a new instace of field resolver.
+     * Create a new instance of field resolver.
      *
      * @param FieldDefinitionNode $field
      * @param Closure|null        $resolver

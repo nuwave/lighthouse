@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
@@ -18,7 +17,7 @@ abstract class AbstractResolver
     protected $value;
 
     /**
-     * Create a new instace of node resolver.
+     * Create a new instance of node resolver.
      *
      * @param NodeValue $value
      */

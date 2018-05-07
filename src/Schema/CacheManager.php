@@ -15,6 +15,7 @@ class CacheManager
      * Store document in cache.
      *
      * @param string $schema
+     * @return DocumentNode
      */
     public function set($schema)
     {

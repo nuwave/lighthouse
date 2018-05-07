@@ -40,7 +40,7 @@ trait HandlesTypes
             return true;
         }
 
-        return collect(array_get($type->config, 'fields'), [])->reduce(function ($packed, $field) {
+        return collect(array_get($type->config, 'fields', []))->reduce(function ($packed, $field) {
             if ($packed) {
                 return true;
             } elseif (is_callable(array_get($field, 'type'))) {
@@ -56,8 +56,6 @@ trait HandlesTypes
 
             return false;
         }, false);
-
-        return false;
     }
 
     /**

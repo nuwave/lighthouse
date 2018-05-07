@@ -22,7 +22,7 @@ class BcryptDirective implements ArgMiddleware
      *
      * @param ArgumentValue $value
      *
-     * @return array
+     * @return ArgumentValue
      */
     public function handleArgument(ArgumentValue $value)
     {

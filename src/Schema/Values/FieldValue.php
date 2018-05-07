@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+
 
 class FieldValue
 {
@@ -98,6 +98,7 @@ class FieldValue
      * Set current resolver.
      *
      * @param Closure|null $resolver
+     * @return FieldValue
      */
     public function setResolver(Closure $resolver = null)
     {

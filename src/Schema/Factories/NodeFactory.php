@@ -17,7 +17,6 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Resolvers\DirectiveResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;

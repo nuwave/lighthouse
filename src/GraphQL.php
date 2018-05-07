@@ -114,7 +114,7 @@ class GraphQL
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
 
-        return GraphQLBase::executeAndReturnResult(
+        return GraphQLBase::executeQuery(
             $schema,
             $query,
             $rootValue,
