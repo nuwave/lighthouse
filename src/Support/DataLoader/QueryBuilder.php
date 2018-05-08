@@ -112,7 +112,7 @@ class QueryBuilder
 
         if ($options['paginated']) {
             foreach ($matched as $model) {
-                $total = $model->getAttribute($options['name'].'_count');
+                $total = $model->getAttribute(snake_case($options['name']).'_count');
                 $paginator = app()->makeWith(LengthAwarePaginator::class, [
                     'items' => $model->getRelation($options['name']),
                     'total' => $total,
