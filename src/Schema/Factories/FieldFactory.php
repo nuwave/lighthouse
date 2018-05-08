@@ -45,6 +45,10 @@ class FieldFactory
             $field['resolve'] = $value->wrap($resolve);
         }
 
+        if ($complexity = $value->getComplexity()) {
+            $field['complexity'] = $complexity;
+        }
+
         return GraphQLField::toArray($field);
     }
 
