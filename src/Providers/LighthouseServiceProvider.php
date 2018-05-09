@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Providers;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
 
@@ -18,11 +19,20 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
 
         if (config('lighthouse.controller')) {
-            require realpath(__DIR__.'/../Support/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
 
         $this->registerSchema();
         $this->registerMacros();
+    }
+
+    protected function loadRoutesFrom($path)
+    {
+        if(Str::contains( $this->app->version(), "Lumen")) {
+           require realpath(__DIR__.'/../Support/Http/routes.php');
+           return;
+        }
+        parent::loadRoutesFrom($path);
     }
 
     /**
