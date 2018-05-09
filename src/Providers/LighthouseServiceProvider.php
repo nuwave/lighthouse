@@ -18,7 +18,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
 
         if (config('lighthouse.controller')) {
-            $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
+            require realpath(__DIR__.'/../Support/Http/routes.php');
         }
 
         $this->registerSchema();
