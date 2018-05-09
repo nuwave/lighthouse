@@ -28,8 +28,8 @@ class LighthouseServiceProvider extends ServiceProvider
 
     protected function loadRoutesFrom($path)
     {
-        if(Str::contains( $this->app->version(), "Lumen")) {
-           require realpath(__DIR__.'/../Support/Http/routes.php');
+        if(Str::contains($this->app->version(), "Lumen")) {
+           require realpath($path);
            return;
         }
         parent::loadRoutesFrom($path);
