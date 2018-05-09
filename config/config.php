@@ -7,12 +7,15 @@ return [
     |--------------------------------------------------------------------------
     |
     | Setup this values as required,
-    | default route endpoints its yourdomain.com/graphql
+    | default route endpoints is yourdomain.com/graphql
+    | get requests default to only being enabled in debug mode
     | setup middleware here for all request,
     | setup more endpoints, ej: pointing to the controller value inside your route file
     |
     */
     'route_name' => 'graphql',
+
+    'route_enable_get' => config('app.debug'),
 
     'route' => [
         'prefix' => '',
