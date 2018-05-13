@@ -16,9 +16,6 @@ class FirstDirectiveTest extends DBTestCase
     public function can_return_single_user()
     {
         $schema = '
-        type Company {
-            name: String!
-        }
         type User {
             id: ID!
             name: String!
@@ -41,9 +38,6 @@ class FirstDirectiveTest extends DBTestCase
     public function can_return_single_user_when_multiple_match()
     {
         $schema = '
-        type Company {
-            name: String!
-        }
         type User {
             id: ID!
             name: String!
@@ -61,6 +55,4 @@ class FirstDirectiveTest extends DBTestCase
         $result = $this->execute($schema, "{ user(name: \"A\") { id } }");
         $this->assertEquals($userA->id, $result->data['user']['id']);
     }
-
-
 }
