@@ -9,10 +9,11 @@ use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class PaginateDirective implements FieldResolver
 {
-    use CreatesPaginators, HandlesGlobalId;
+    use CreatesPaginators, HandlesGlobalId, HandlesQueryFilter;
 
     /**
      * Name of the directive.
@@ -82,9 +83,7 @@ class PaginateDirective implements FieldResolver
         return function ($root, array $args) use ($model, $scopes) {
             $first = data_get($args, 'count', 15);
             $page = data_get($args, 'page', 1);
-            $query = $model::query()->when(isset($args['query.filter']), function ($q) use ($args) {
-                return QueryFilter::build($q, $args);
-            });
+            $query = $query = $this->applyFiltersOnQuery($model::query(), $args);
 
             foreach ($scopes as $scope) {
                 call_user_func_array([$query, $scope], [$args]);
@@ -114,9 +113,7 @@ class PaginateDirective implements FieldResolver
             $first = data_get($args, 'first', 15);
             $after = $this->decodeCursor($args);
             $page = $first && $after ? floor(($first + $after) / $first) : 1;
-            $query = $model::query()->when(isset($args['query.filter']), function ($q) use ($args) {
-                return QueryFilter::build($q, $args);
-            });
+            $query = $query = $this->applyFiltersOnQuery($model::query(), $args);
 
             foreach ($scopes as $scope) {
                 call_user_func_array([$query, $scope], [$args]);
