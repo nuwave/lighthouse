@@ -5,9 +5,10 @@ namespace Nuwave\Lighthouse\Support\Traits;
 
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-trait CanUseModels
+trait HandleQueries
 {
     public abstract function name();
 
@@ -16,7 +17,8 @@ trait CanUseModels
      * @return mixed|string
      * @throws DirectiveException
      */
-    public function getModelClass(FieldValue $value) {
+    public function getModelClass(FieldValue $value)
+    {
         $model = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), $this->name()),
             'model'
@@ -38,5 +40,37 @@ trait CanUseModels
         }
 
         return $model;
+    }
+
+    /**
+     * Get scope(s) to run on connection.
+     *
+     * @param FieldValue $value
+     *
+     * @return array
+     */
+    protected function getScopes(FieldValue $value)
+    {
+        return $this->directiveArgValue(
+            $this->fieldDirective($value->getField(), $this->name()),
+            'scopes',
+            []
+        );
+    }
+
+    public function applyFilters($query, $args)
+    {
+        return $query->when(isset($args['query.filter']), function ($q) use ($args) {
+            return QueryFilter::build($q, $args);
+        });
+    }
+
+    public function applyScopes($query, $args, FieldValue $value)
+    {
+        foreach ($this->getScopes($value) as $scope) {
+            call_user_func_array([$query, $scope], [$args]);
+        }
+
+        return $query;
     }
 }

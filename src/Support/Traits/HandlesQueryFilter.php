@@ -89,11 +89,4 @@ trait HandlesQueryFilter
             return $arg->name->value == $this->name();
         });
     }
-
-    public function applyFiltersOnQuery($query, $args)
-    {
-        return $query->when(isset($args['query.filter']), function ($q) use ($args) {
-            return QueryFilter::build($q, $args);
-        });
-    }
 }
