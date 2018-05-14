@@ -288,7 +288,6 @@ class QueryFilterDirectiveTest extends DBTestCase
 
     /**
      * @test
-     * @group failing
      */
     public function itOnlyProcessesFilledArguments()
     {
