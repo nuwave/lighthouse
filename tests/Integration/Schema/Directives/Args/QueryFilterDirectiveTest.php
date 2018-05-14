@@ -285,4 +285,33 @@ class QueryFilterDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query, true);
         $this->assertCount(2, array_get($result->data, 'users.data'));
     }
+
+    /**
+     * @test
+     * @group failing
+     */
+    public function itOnlyProcessesFilledArguments()
+    {
+        $schema = '
+        type User {
+            id: ID!
+            name: String
+            email: String
+        }
+        type Query {
+            users(id: ID @eq, name: String @where(operator: "like")): [User!]!
+                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+        }';
+
+        $query = '{
+            users(count: 5 name: "'.$this->users->first()->name.'") {
+                data {
+                    id
+                }
+            }
+        }';
+
+        $result = $this->execute($schema, $query, true);
+        $this->assertCount(1, array_get($result->data, 'users.data'));
+    }
 }

@@ -61,6 +61,10 @@ class QueryFilter
     public function filter($query, array $args = [])
     {
         foreach ($this->filters as $key => $filter) {
+            if (! isset($args[$key])) {
+                continue;
+            }
+
             $resolve = $filter['resolve'];
             $resolveArgs = array_merge($args, [
                 'resolveArgs' => array_get($filter, 'resolveArgs', []),
