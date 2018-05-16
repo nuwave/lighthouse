@@ -28,7 +28,9 @@ class Pipeline extends BasePipeline
     {
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
-                $passable = ($this->always)($passable, $pipe);
+                if(!is_null($this->always)) {
+                    $passable = ($this->always)($passable, $pipe);
+                }
                 $slice = parent::carry();
 
                 $callable = $slice($stack, $pipe);
