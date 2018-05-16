@@ -280,7 +280,7 @@ class NodeFactory
     {
         return app(Pipeline::class)
             ->send($value)
-            ->through(directives()->argMiddleware($value->getArg()))
+            ->through(directives()->nodeMiddleware($value->getNode()))
             ->via('handleNode')
             ->then(function(NodeValue $value) {
                 return $value;
