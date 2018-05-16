@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -26,9 +27,10 @@ class GlobalIdDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
+     * @param Closure $next
      * @return FieldValue
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $type = $value->getNodeName();
         $resolver = $value->getResolver();
@@ -38,7 +40,7 @@ class GlobalIdDirective implements FieldMiddleware
             'encode'
         );
 
-        return $value->setResolver(function () use ($resolver, $process, $type) {
+        $value->setResolver(function () use ($resolver, $process, $type) {
             $args = func_get_args();
             $value = call_user_func_array($resolver, $args);
 
@@ -46,5 +48,7 @@ class GlobalIdDirective implements FieldMiddleware
                 ? $this->encodeGlobalId($type, $value)
                 : $this->decodeRelayId($value);
         });
+
+        return $next($value);
     }
 }
