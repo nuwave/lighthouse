@@ -31,9 +31,11 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @param FieldValue $value
      *
+     * @param Closure $next
      * @return FieldValue
+     * @throws DirectiveException
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $validator = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), $this->name()),
@@ -48,7 +50,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
 
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function () use ($validator, $resolver) {
+        $value->setResolver(function () use ($validator, $resolver) {
             $funcArgs = func_get_args();
             $root = array_get($funcArgs, '0');
             $args = array_get($funcArgs, '1');
@@ -59,6 +61,8 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
 
             return call_user_func_array($resolver, $funcArgs);
         });
+
+        return $next($value);
     }
 
     /**
