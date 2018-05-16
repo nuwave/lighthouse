@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -65,9 +66,10 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @param ArgumentValue $value
      *
-     * @return array
+     * @param Closure $next
+     * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value, Closure $next)
     {
         // TODO: Rename "getValue" to something more descriptive like "toArray"
         // and consider using for NodeValue/FieldValue.
@@ -77,7 +79,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
             $this->getRules($value->getDirective())
         );
 
-        return $value->setValue($current);
+        return $next($value->setValue($current));
     }
 
     /**

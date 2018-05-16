@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
@@ -22,12 +23,15 @@ class BcryptDirective implements ArgMiddleware
      *
      * @param ArgumentValue $value
      *
+     * @param Closure $next
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value, Closure $next)
     {
-        return $value->setResolver(function ($password) {
+        $value->setResolver(function ($password) {
             return bcrypt($password);
         });
+        
+        return $next($value);
     }
 }

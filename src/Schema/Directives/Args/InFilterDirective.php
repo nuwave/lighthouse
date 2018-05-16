@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -26,16 +27,19 @@ class InFilterDirective implements ArgMiddleware
      *
      * @param ArgumentValue $argument
      *
-     * @return array
+     * @param Closure $next
+     * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument)
+    public function handleArgument(ArgumentValue $argument, Closure $next)
     {
         $arg = $argument->getArgName();
 
-        return $this->injectFilter($argument, [
+        $this->injectFilter($argument, [
             'resolve' => function ($query, $key, array $args) use ($arg) {
                 return $query->whereIn($key, array_get($args, $arg));
             },
         ]);
+
+        return $next($argument);
     }
 }
