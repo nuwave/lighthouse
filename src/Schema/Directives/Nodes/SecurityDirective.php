@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use Closure;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -30,9 +31,11 @@ class SecurityDirective implements NodeMiddleware
      *
      * @param NodeValue $value
      *
+     * @param Closure $next
      * @return NodeValue
+     * @throws DirectiveException
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value, Closure $next)
     {
         if ('Query' !== $value->getNodeName()) {
             $message = sprintf(
@@ -48,7 +51,7 @@ class SecurityDirective implements NodeMiddleware
         $this->queryComplexity($value);
         $this->queryIntrospection($value);
 
-        return $value;
+        return $next($value);
     }
 
     /**

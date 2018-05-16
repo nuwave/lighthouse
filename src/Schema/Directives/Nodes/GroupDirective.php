@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -26,14 +27,16 @@ class GroupDirective implements NodeMiddleware
      *
      * @param NodeValue $value
      *
+     * @param Closure $next
      * @return NodeValue
+     * @throws DirectiveException
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value, Closure $next)
     {
         $this->setNamespace($value);
         $this->setMiddleware($value);
 
-        return $value;
+        return $next($value);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -25,9 +26,10 @@ class ModelDirective implements NodeMiddleware
      *
      * @param NodeValue $value
      *
+     * @param Closure $next
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value, Closure $next)
     {
         $namespace = $this->getNamespace($value);
 
@@ -37,7 +39,7 @@ class ModelDirective implements NodeMiddleware
 
         $this->registerInterface($value);
 
-        return $value;
+        return $next($value);
     }
 
     /**
