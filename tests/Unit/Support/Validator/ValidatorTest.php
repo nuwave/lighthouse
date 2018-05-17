@@ -6,6 +6,7 @@ use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
+use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Validator\Validator;
 use Tests\TestCase;
 
@@ -36,7 +37,13 @@ class ValidatorTest extends TestCase
             return 'foo';
         });
 
-        (new ValidateDirective())->handleField($field);
+        app(Pipeline::class)
+            ->send($field)
+            ->through([new ValidateDirective()])
+            ->via('handleField')
+            ->then(function($field) {
+                return $field;
+            });
 
         $this->expectException(ValidationError::class);
         $field->getResolver()(null, ['bar' => 'foo', 'baz' => 1]);

@@ -42,8 +42,8 @@ class FieldFactory
             ->through(directives()->fieldMiddleware($value->getField()))
             ->via('handleField')
             ->then(function(FieldValue $value) {
-                return $value->getResolver();
-            });
+                return $value;
+            })->getResolver();
 
         if ($resolve) {
             $field['resolve'] = $value->wrap($resolve);
