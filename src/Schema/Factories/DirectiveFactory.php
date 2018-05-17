@@ -64,7 +64,8 @@ class DirectiveFactory
                 str_after($directive->getPathname(), $path.DIRECTORY_SEPARATOR)
             );
 
-            if (! (new \ReflectionClass($directive))->isAbstract()) {
+            $reflection = (new \ReflectionClass($directive));
+            if (!$reflection->isAbstract() && !$reflection->isTrait()) {
                 $this->register($directive);
             }
         }

@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
+use Nuwave\Lighthouse\Support\Contracts\Errorable;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
@@ -81,7 +82,7 @@ class GraphQL
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
         if (! empty($result->errors)) {
-            foreach ($result->errors as $error) {
+            $result->errors = collect($result->errors)->transform(function ($error) {
                 if ($error instanceof \Exception) {
                     info('GraphQL Error:', [
                         'code' => $error->getCode(),
@@ -89,11 +90,15 @@ class GraphQL
                         'trace' => $error->getTraceAsString(),
                     ]);
                 }
-            }
+                if($error instanceof Errorable) {
+                    $error = $error->toError();
+                }
+                return $this->formatError($error);
+            })->toArray();
 
             return [
                 'data' => $result->data,
-                'errors' => array_map([$this, 'formatError'], $result->errors),
+                'errors' => $result->errors,
             ];
         }
 
