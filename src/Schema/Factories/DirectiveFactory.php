@@ -71,7 +71,7 @@ class DirectiveFactory
     }
 
     /**
-     * Regsiter a new directive handler.
+     * Register a new directive handler.
      *
      * @param string $handler
      */

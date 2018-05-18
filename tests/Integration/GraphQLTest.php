@@ -33,6 +33,7 @@ class GraphQLTest extends DBTestCase
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
+        $app['config']->set('lighthouse.route_enable_get', true);
 
         $path = $this->store('schema.graphql', '
         type User {
@@ -102,4 +103,73 @@ class GraphQLTest extends DBTestCase
 
         $this->assertEquals($expected, $data);
     }
+
+
+    /**
+     * @test
+     */
+    public function itCanResolveQueryThroughController()
+    {
+        $this->be($this->user);
+        $query = '
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+
+        $data = $this->postJson("graphql", ['query' => $query])->json();
+
+        $expected = [
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks->map(function ($task) {
+                        return ['name' => $task->name];
+                    })->toArray(),
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $data);
+    }
+
+  /**
+   * @test
+   */
+  public function itCanResolveQueryThroughControllerViaGetRequest()
+  {
+    $this->be($this->user);
+    $query = '
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+
+    $uri = 'graphql?'.http_build_query(['query' => $query]);
+
+    $data = $this->getJson($uri)->json();
+
+    $expected = [
+      'data' => [
+        'user' => [
+          'email' => $this->user->email,
+          'tasks' => $this->tasks->map(function ($task) {
+            return ['name' => $task->name];
+          })->toArray(),
+        ],
+      ],
+    ];
+
+    $this->assertEquals($expected, $data);
+  }
 }

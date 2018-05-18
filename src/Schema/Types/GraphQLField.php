@@ -64,6 +64,16 @@ class GraphQLField
     }
 
     /**
+     * Get field complexity closure.
+     *
+     * @return \Closure|null
+     */
+    public function complexity()
+    {
+        return array_get($this->attributes, 'complexity');
+    }
+
+    /**
      * Get the attributes of the field.
      *
      * @return array
@@ -74,6 +84,10 @@ class GraphQLField
         $attributes['type'] = $this->type();
         $attributes['resolve'] = $this->getResolver();
         $attributes['description'] = $this->description();
+
+        if ($complexity = $this->complexity()) {
+            $attributes['complexity'] = $complexity;
+        }
 
         return $attributes;
     }
@@ -107,7 +121,7 @@ class GraphQLField
     /**
      * Get the field resolver.
      *
-     * @return \Closure|null
+     * @return array|void
      */
     protected function getResolver()
     {

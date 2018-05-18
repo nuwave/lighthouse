@@ -6,11 +6,11 @@ use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\CanParseResolvers;
 
 class FieldDirective implements FieldResolver
 {
-    use HandlesDirectives;
+    use CanParseResolvers;
 
     /**
      * Field resolver.
@@ -47,7 +47,7 @@ class FieldDirective implements FieldResolver
     {
         $directive = $this->fieldDirective($value->getField(), $this->name());
         $resolver = $this->getResolver($value, $directive);
-        $method = $this->getMethod($directive);
+        $method = $this->getResolverMethod($directive);
         $data = $this->argValue(collect($directive->arguments)->first(function ($arg) {
             return 'args' === data_get($arg, 'name.value');
         }));
@@ -60,74 +60,5 @@ class FieldDirective implements FieldResolver
                 [$root, array_merge($args, ['directive' => $data]), $context, $info]
             );
         });
-    }
-
-    /**
-     * Get resolver namespace.
-     *
-     * @param FieldValue    $value
-     * @param DirectiveNode $directive
-     *
-     * @return string
-     */
-    protected function getResolver(FieldValue $value, DirectiveNode $directive)
-    {
-        if ($resolver = $this->directiveArgValue($directive, 'resolver')) {
-            $className = array_get(explode('@', $resolver), '0');
-
-            return $value->getNode()->getNamespace($className);
-        }
-
-        return $value->getNode()->getNamespace(
-            $this->getClassName($directive)
-        );
-    }
-
-    /**
-     * Get class name for resolver.
-     *
-     * @param DirectiveNode $directive
-     *
-     * @return string
-     */
-    protected function getClassName(DirectiveNode $directive)
-    {
-        $class = $this->directiveArgValue($directive, 'class');
-
-        if (! $class) {
-            throw new DirectiveException(sprintf(
-                'Directive [%s] must have a `class` argument.',
-                $directive->name->value
-            ));
-        }
-
-        return $class;
-    }
-
-    /**
-     * Get method for resolver.
-     *
-     * @param DirectiveNode $directive
-     *
-     * @return string
-     */
-    protected function getMethod(DirectiveNode $directive)
-    {
-        if ($resolver = $this->directiveArgValue($directive, 'resolver')) {
-            if ($method = array_get(explode('@', $resolver), '1')) {
-                return $method;
-            }
-        }
-
-        $method = $this->directiveArgValue($directive, 'method');
-
-        if (! $method) {
-            throw new DirectiveException(sprintf(
-                'Directive [%s] must have a `method` argument.',
-                $directive->name->value
-            ));
-        }
-
-        return $method;
     }
 }

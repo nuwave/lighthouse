@@ -3,16 +3,12 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+
+
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+
 use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Schema\Factories\MutationFactory;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Schema\Factories\QueryFactory;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 trait CanParseTypes

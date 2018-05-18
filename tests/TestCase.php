@@ -4,6 +4,7 @@ namespace Tests;
 
 use GraphQL\Executor\Executor;
 use GraphQL\Language\Parser;
+use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -22,6 +23,7 @@ class TestCase extends BaseTestCase
     {
         return [
             \Nuwave\Lighthouse\Providers\LighthouseServiceProvider::class,
+            ScoutServiceProvider::class,
         ];
     }
 

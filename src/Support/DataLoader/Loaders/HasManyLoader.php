@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
+use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 

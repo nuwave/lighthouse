@@ -36,18 +36,6 @@ if (! function_exists('schema')) {
     }
 }
 
-if (! function_exists('resolve')) {
-    /**
-     * Helper method for Lumen.
-     *
-     * Resolves a class instance out of the container
-     */
-    function resolve($args)
-    {
-        return app()->make($args);
-    }
-}
-
 if (! function_exists('directives')) {
     /**
      * Get instance of directives container.

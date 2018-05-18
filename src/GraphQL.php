@@ -63,7 +63,7 @@ class GraphQL
      */
     public function prepSchema()
     {
-        $this->graphqlSchema = $this->buildSchema();
+        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
     }
 
     /**
@@ -114,7 +114,7 @@ class GraphQL
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
 
-        return GraphQLBase::executeAndReturnResult(
+        return GraphQLBase::executeQuery(
             $schema,
             $query,
             $rootValue,

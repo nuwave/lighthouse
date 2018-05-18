@@ -12,6 +12,7 @@ class ScalarDirective implements NodeResolver
      * Name of the directive.
      *
      * @var string
+     * @return string
      */
     public function name()
     {

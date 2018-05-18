@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode as Field;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 class FieldValue
 {
@@ -43,6 +42,13 @@ class FieldValue
      * @var string
      */
     protected $description;
+
+    /**
+     * Field complexity.
+     *
+     * @var \Closure
+     */
+    protected $complexity;
 
     /**
      * Additional args to inject
@@ -98,6 +104,8 @@ class FieldValue
      * Set current resolver.
      *
      * @param Closure|null $resolver
+     *
+     * @return FieldValue
      */
     public function setResolver(Closure $resolver = null)
     {
@@ -116,6 +124,18 @@ class FieldValue
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Set current complexity.
+     *
+     * @param \Closure $complexity
+     */
+    public function setComplexity($complexity)
+    {
+        $this->complexity = $complexity;
 
         return $this;
     }
@@ -185,6 +205,16 @@ class FieldValue
     public function getDescription()
     {
         return $this->description ?: trim(str_replace("\n", '', $this->getField()->description));
+    }
+
+    /**
+     * Get current complexity.
+     *
+     * @return \Closure|null
+     */
+    public function getComplexity()
+    {
+        return $this->complexity;
     }
 
     /**
