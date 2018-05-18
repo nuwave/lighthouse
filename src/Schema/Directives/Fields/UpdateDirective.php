@@ -60,7 +60,7 @@ class UpdateDirective implements FieldResolver
         }
 
         return $value->setResolver(function ($root, array $args) use ($class, $idArg, $globalId) {
-            $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg)) : array_get($args, $idArg);
+            $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg))[1] : array_get($args, $idArg);
             $model = $class::find($id);
 
             if ($model) {
