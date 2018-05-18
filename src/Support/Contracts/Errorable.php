@@ -4,7 +4,9 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 
-use GraphQL\Error\Error;
+
+
+use Nuwave\Lighthouse\Support\Exceptions\Error;
 
 interface Errorable
 {

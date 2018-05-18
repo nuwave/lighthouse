@@ -6,12 +6,25 @@ use GraphQL\Error\Error;
 
 class ValidationError extends Error
 {
+
+
     /**
      * The validator.
      *
      * @var \Illuminate\Validation\Validator
      */
     protected $validator;
+
+    /**
+     * ValidationError constructor.
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     */
+    public function __construct(\Illuminate\Validation\Validator $validator)
+    {
+        parent::__construct("Validation failed");
+        $this->setValidator($validator);
+    }
 
     /**
      * Set validator instance.

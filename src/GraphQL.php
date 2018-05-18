@@ -10,13 +10,10 @@ use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
-use Nuwave\Lighthouse\Support\Contracts\Errorable;
-use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Support\Exceptions\Handler;
 
 class GraphQL
 {
-    use CanFormatError;
-
     /**
      * Cache manager.
      *
@@ -80,29 +77,7 @@ class GraphQL
     public function execute($query, $context = null, $variables = [], $rootValue = null)
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
-
-        if (! empty($result->errors)) {
-            $result->errors = collect($result->errors)->transform(function ($error) {
-                if ($error instanceof \Exception) {
-                    info('GraphQL Error:', [
-                        'code' => $error->getCode(),
-                        'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
-                    ]);
-                }
-                if($error instanceof Errorable) {
-                    $error = $error->toError();
-                }
-                return $this->formatError($error);
-            })->toArray();
-
-            return [
-                'data' => $result->data,
-                'errors' => $result->errors,
-            ];
-        }
-
-        return ['data' => $result->data];
+        return $result->toArray();
     }
 
     /**
@@ -118,14 +93,13 @@ class GraphQL
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
-
         return GraphQLBase::executeQuery(
             $schema,
             $query,
             $rootValue,
             $context,
             $variables
-        );
+        )->setErrorsHandler([app(config('lighthouse.handlers.error', Handler::class)), 'handler']);
     }
 
     /**

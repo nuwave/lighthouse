@@ -63,4 +63,23 @@ class Collection
             return $this;
         };
     }
+
+    public function toAssoc()
+    {
+        return function () {
+            return $this->reduce(function ($assoc, $keyValuePair) {
+                list($key, $value) = $keyValuePair;
+                $assoc[$key] = $value;
+                return $assoc;
+            }, new static);
+        };
+    }
+
+    public function mapToAssoc()
+    {
+        return function ($callback) {
+            return $this->map($callback)->toAssoc();
+        };
+    }
+
 }

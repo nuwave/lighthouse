@@ -11,10 +11,11 @@ use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class ValidateDirective implements ArgMiddleware, FieldMiddleware
 {
-    use HandlesDirectives;
+    use HandlesDirectives, HandlesQueryFilter;
 
     /**
      * Directive name.
@@ -75,13 +76,21 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      */
     public function handleArgument(ArgumentValue $value, Closure $next)
     {
-        // TODO: Rename "getValue" to something more descriptive like "toArray"
-        // and consider using for NodeValue/FieldValue.
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
-            $this->getRules($value->getDirective())
+        $rules = $this->directiveArgValue(
+            $this->queryFilterDirective($value),
+            'rules',
+            null
         );
+
+        $messages = $this->directiveArgValue(
+            $this->queryFilterDirective($value),
+            'messages',
+            null
+        );
+
+        $current = $value->getValue();
+        $current['rules'] = $rules;
+        $current['messages'] = $messages;
 
         return $next($value->setValue($current));
     }

@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
-use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
-
 class GraphQLField
 {
     /**
@@ -118,6 +116,27 @@ class GraphQLField
         ->toArray();
     }
 
+    public function getValidationMessages()
+    {
+        $arguments = func_get_args();
+        $args = $this->args();
+
+        return collect($args)->map(function ($arg, $name) use ($arguments) {
+            $messages = data_get($arg, 'messages');
+
+            if (! $messages) {
+                return;
+            }
+
+            return $messages;
+            })
+            ->filter()
+            ->flatMap(function ($data) {
+                return $data;
+            })
+            ->toArray();
+    }
+
     /**
      * Get the field resolver.
      *
@@ -145,14 +164,13 @@ class GraphQLField
             $arguments[1] = $this->resolveArgs($arguments[1]);
         }
 
-        $rules = call_user_func_array([$this, 'getRules'], $arguments);
+        $rules = $this->getRules(...$arguments);
+        $messages = $this->getValidationMessages(...$arguments);
 
         if (sizeof($rules)) {
             $input = $this->getInput($arguments);
-            $validator = validator($input, $rules);
-            if ($validator->fails()) {
-                throw with(new ValidationError('validation'))->setValidator($validator);
-            }
+            $validator = validator($input, $rules, $messages);
+            $validator->validate();
         }
 
         return call_user_func_array(

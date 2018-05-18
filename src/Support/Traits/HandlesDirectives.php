@@ -6,6 +6,9 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ObjectFieldNode;
+use GraphQL\Language\AST\ObjectValueNode;
 
 trait HandlesDirectives
 {
@@ -77,6 +80,16 @@ trait HandlesDirectives
             return collect($value->values)->map(function ($node) {
                 return $node->value;
             })->toArray();
+        }
+        if($value instanceof ObjectValueNode) {
+            if($value->fields instanceof NodeList) {
+                $result = collect($value->fields)->mapToAssoc(function ($field) {
+                    if($field instanceof ObjectFieldNode) {
+                        return [$field->name->value, $field->value->value];
+                    }
+                });
+                return $result->toArray();
+            }
         }
 
         return $value->value;
