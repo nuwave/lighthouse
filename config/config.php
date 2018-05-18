@@ -57,7 +57,7 @@ return [
     | Specify which controller (and method) you want to handle GraphQL requests.
     |
     */
-    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
+    'controller' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
 
     /*
     |--------------------------------------------------------------------------

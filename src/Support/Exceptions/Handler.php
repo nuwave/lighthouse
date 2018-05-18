@@ -14,7 +14,6 @@ use Nuwave\Lighthouse\Support\Contracts\Errorable;
 
 class Handler
 {
-
     /**
      * @param array|GraphError[] $errors
      * @return array
