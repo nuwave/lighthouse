@@ -8,10 +8,11 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class UpdateDirective implements FieldResolver
 {
-    use HandlesDirectives;
+    use HandlesDirectives, HandlesGlobalId;
 
     /**
      * Name of the directive.
@@ -60,7 +61,7 @@ class UpdateDirective implements FieldResolver
         }
 
         return $value->setResolver(function ($root, array $args) use ($class, $idArg, $globalId) {
-            $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg)) : array_get($args, $idArg);
+            $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg))[1] : array_get($args, $idArg);
             $model = $class::find($id);
 
             if ($model) {
