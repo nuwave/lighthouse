@@ -3,9 +3,6 @@
 
 namespace Nuwave\Lighthouse\Support\Exceptions;
 
-
-
-
 use Exception;
 use GraphQL\Error\Error as GraphError;
 use GraphQL\Error\FormattedError;

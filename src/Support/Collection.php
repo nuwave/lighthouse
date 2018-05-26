@@ -82,4 +82,39 @@ class Collection
         };
     }
 
+    public function flattenKeepKeys()
+    {
+        return function ($depth = 1, $dotNotation = false) {
+            if ($depth) {
+                $newArray = [];
+                foreach ($this->items as $parentKey => $value) {
+                    if (is_array($value)) {
+                        $valueKeys = array_keys($value);
+                        foreach ($valueKeys as $key) {
+                            $subValue = $value[$key];
+                            $newKey = $key;
+                            if ($dotNotation) {
+                                $newKey = "$parentKey.$key";
+                                if ($dotNotation !== true) {
+                                    $newKey = "$dotNotation.$newKey";
+                                }
+
+                                if (is_array($value[$key])) {
+                                    $subValue = collect($value[$key])->flattenKeepKeys($depth - 1, $newKey)->toArray();
+                                }
+                            }
+                            $newArray[$newKey] = $subValue;
+                        }
+                    } else {
+                        $newArray[$parentKey] = $value;
+                    }
+                }
+
+                $this->items = collect($newArray)->flattenKeepKeys(--$depth, $dotNotation)->toArray();
+            }
+
+            return collect($this->items);
+        };
+    }
+
 }

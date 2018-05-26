@@ -94,7 +94,6 @@ return [
         'register' => base_path('routes/graphql/schema.graphql'),
     ],
 
-
     /*
     |--------------------------------------------------------------------------
     | Handlers
