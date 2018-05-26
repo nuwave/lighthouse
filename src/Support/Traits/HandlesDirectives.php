@@ -81,15 +81,11 @@ trait HandlesDirectives
                 return $node->value;
             })->toArray();
         }
-        if($value instanceof ObjectValueNode) {
-            if($value->fields instanceof NodeList) {
-                $result = collect($value->fields)->mapToAssoc(function ($field) {
-                    if($field instanceof ObjectFieldNode) {
-                        return [$field->name->value, $field->value->value];
-                    }
-                });
-                return $result->toArray();
-            }
+
+        if ($value instanceof ObjectValueNode) {
+            return collect($value->fields)->mapWithKeys(function ($field) {
+                return [$field->name->value => $this->argValue($field)];
+            })->toArray();
         }
 
         return $value->value;

@@ -36,12 +36,12 @@ class BelongsToDirective implements FieldResolver
             $value->getField()->name->value
         );
 
-        return $value->setResolver(function ($root, array $args) use ($relation) {
+        return $value->setResolver(function ($root, array $args, $context = null, $info = null) use ($relation) {
             return graphql()->batch(BelongsToLoader::class, $root->getKey(), [
                 'relation' => $relation,
                 'root' => $root,
                 'args' => $args,
-            ], camel_case($root->getTable().'_'.$relation));
+            ], BelongsToLoader::key($root, $relation, $info));
         });
     }
 }

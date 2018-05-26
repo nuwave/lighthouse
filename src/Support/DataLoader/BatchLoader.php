@@ -21,6 +21,22 @@ abstract class BatchLoader
     protected $hasLoaded = false;
 
     /**
+     * Generate key for field.
+     *
+     * @param \Illuminate\Database\Eloquent\Model  $root
+     * @param \GraphQL\Type\Definition\ResolveInfo $info
+     * @param string                               $relation
+     *
+     * @return string
+     */
+    public static function key($root, $relation, $info = null)
+    {
+        $path = ! empty(data_get($info, 'path')) ? array_last($info->path) : $relation;
+
+        return camel_case($root->getTable().'_'.$path);
+    }
+
+    /**
      * Load object by key.
      *
      * @param mixed $key
