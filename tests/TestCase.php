@@ -119,16 +119,8 @@ class TestCase extends BaseTestCase
      */
     protected function execute($schema, $query, $lighthouse = false, $variables = [])
     {
-        /*
-        if ($lighthouse) {
-            $node = file_get_contents(realpath(__DIR__.'/../assets/node.graphql'));
-            $lighthouse = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
-            $schema = $node."\n".$lighthouse."\n".$schema;
-        }
-        */
         schema()->build($schema);
         return graphql()->queryAndReturnResult($query);
-        //return Executor::execute(schema()->build($schema), $this->parse($query));
     }
 
     /**
