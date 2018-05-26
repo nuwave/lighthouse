@@ -27,7 +27,7 @@ class BelongsToLoader extends BatchLoader
             }]);
 
             $models->each(function ($model) use ($relation) {
-                $this->set($model->id, $model->getRelation($relation));
+                $this->set($model->getKey(), $model->getRelation($relation));
             });
         });
     }
