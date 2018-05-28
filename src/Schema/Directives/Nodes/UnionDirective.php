@@ -47,9 +47,11 @@ class UnionDirective implements NodeResolver
                 })->filter()->toArray();
             },
             'resolveType' => function ($value) use ($namespace, $method) {
-                $instance = app($namespace);
-
-                return call_user_func_array([$instance, $method], [$value]);
+                if ($namespace) {
+                    $instance = app($namespace);
+                    return call_user_func_array([$instance, $method], [$value]);
+                }
+                return schema()->instance(last(explode('\\', get_class($value))));
             },
         ]));
     }
