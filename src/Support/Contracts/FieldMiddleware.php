@@ -4,15 +4,8 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
-interface FieldMiddleware
+interface FieldMiddleware extends Directive
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name();
-
     /**
      * Resolve the field directive.
      *

@@ -4,15 +4,8 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
-interface NodeMiddleware
+interface NodeMiddleware extends Directive
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name();
-
     /**
      * Handle node value.
      *
