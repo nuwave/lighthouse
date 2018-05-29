@@ -4,15 +4,8 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
-interface NodeResolver
+interface NodeResolver extends Directive
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name();
-
     /**
      * Resolve the node directive.
      *
