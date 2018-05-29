@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\DocumentNode;
 
-
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 use GraphQL\Language\Parser;
@@ -23,6 +23,24 @@ trait CanParseTypes
     public function parseSchema($schema)
     {
         return Parser::parse($schema);
+    }
+    
+    /**
+     * Parse schema to definitions.
+     *
+     * @param string $fieldDefinition
+     *
+     * @return FieldDefinitionNode
+     */
+    public function parseFieldDefinition($fieldDefinition)
+    {
+        $schema = 'type Dummy {' . $fieldDefinition . '}';
+        
+        $documentNode = Parser::parse($schema);
+    
+        $firstDefinition = collect($documentNode->definitions)->pop();
+    
+        return collect($firstDefinition->fields)->pop();
     }
 
     /**

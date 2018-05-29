@@ -6,6 +6,8 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\GenerateDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -175,6 +177,20 @@ class DirectiveFactory
         })->reduce(function ($has, $handler) {
             return $handler instanceof FieldResolver ? true : $has;
         }, false);
+    }
+    
+    /**
+     * @param ObjectTypeDefinitionNode $node
+     *
+     * @return GenerateDirective|null
+     */
+    public function getGenerateDirective(ObjectTypeDefinitionNode $node)
+    {
+        return collect($node->directives)->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->first(function ($handler) {
+            return $handler instanceof GenerateDirective;
+        });
     }
 
     /**
