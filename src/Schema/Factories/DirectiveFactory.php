@@ -189,6 +189,7 @@ class DirectiveFactory
         return collect($node->directives)->map(function (DirectiveNode $directive) {
             return $this->handler($directive->name->value);
         })->first(function ($handler) {
+            // TODO filter for first generic generator-like directive, throw if more than one
             return $handler instanceof GenerateDirective;
         });
     }

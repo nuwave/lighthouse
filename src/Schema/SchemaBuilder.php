@@ -170,6 +170,7 @@ class SchemaBuilder
         $originalDocument = $document;
 
         return collect($document->definitions)->filter(function ($node) {
+            // Could generators be useful for other definitions? If so, maybe extend this filter
             return $node instanceof ObjectTypeDefinitionNode;
         })->reduce(function ($document, $definitionNode) use ($originalDocument) {
             $generator = directives()->getGenerateDirective($definitionNode);

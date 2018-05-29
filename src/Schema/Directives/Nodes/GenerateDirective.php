@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
+// Extend or implement a super type that marks this as a schema-changing directive
 class GenerateDirective implements Directive
 {
     use HandlesDirectives, CanParseTypes;
@@ -31,16 +32,36 @@ class GenerateDirective implements Directive
 
         // Get config values and set defaults
         $model = $this->directiveArgValue($directive, 'model');
-        $crud = $this->directiveArgValue($directive, 'crud', false);
-        $read = $this->directiveArgValue($directive, 'read', false);
 
+        $crud = $this->directiveArgValue($directive, 'crud', false);
+        $create = $this->directiveArgValue($directive, 'create', false);
+        // Might have more sophisticated options here to control the generated queries
+        $read = $this->directiveArgValue($directive, 'read', false);
+        $update = $this->directiveArgValue($directive, 'update', false);
+        $delete = $this->directiveArgValue($directive, 'delete', false);
+
+        if($crud || $create) {
+            // TODO add in update mutations
+            // Look at the relations and possibly other type definitions in $originalDocument to figure out nested mutations
+        }
+
+        // TODO modify the type definition in the schema so that hidden fields are excluded
         if ($crud || $read) {
             $query = $this->getRootQueryDefinition($documentNode);
-
+            
             $query = $this->addPaginatedQuery($query, $nodeName, $model);
             $query = $this->addQueryById($query, $nodeName, $model);
-
+            
+            
             $documentNode = $this->setRootQueryDefinition($documentNode, $query);
+        }
+
+        if($crud || $update) {
+            // TODO add in update mutations
+        }
+
+        if($crud || $delete) {
+            // TODO add in delete mutations
         }
         
         return $documentNode;
@@ -76,6 +97,9 @@ class GenerateDirective implements Directive
         return $this->addFieldToRootType($queryMultiple, $query);
     }
     
+    /**
+     * This can be used 
+     */
     protected function addFieldToRootType(FieldDefinitionNode $field, ObjectTypeDefinitionNode $root)
     {
         // webonyx/graphql-php is inconsistent here
@@ -104,6 +128,7 @@ class GenerateDirective implements Directive
      */
     protected function setRootQueryDefinition(DocumentNode $documentNode, ObjectTypeDefinitionNode $query)
     {
+        // TODO pass in type name so this can be used for mutations too
         $documentNode->definitions = collect($documentNode->definitions)->reject(function ($type) {
             return $type->name === 'Query';
         })->push($query)->toArray();
