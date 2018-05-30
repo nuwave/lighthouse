@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
@@ -36,21 +37,17 @@ class SchemaBuilder
     protected $types = [];
 
     /**
-     * Custom (client) directives.
-     *
-     * @var array
-     */
-    protected $directives = [];
-
-    /**
      * Generate a GraphQL Schema.
      *
-     * @param string $schema
+     * @param string|DocumentNode $schema
      *
-     * @return mixed
+     * @return Schema
      */
     public function build($schema)
     {
+        $schema = $this->parseSchemaIfNecessary($schema);
+        $schema = $this->applyGenerateDirective($schema);
+
         $types = $this->register($schema);
         $query = $types->firstWhere('name', 'Query');
         $mutation = $types->firstWhere('name', 'Mutation');
@@ -60,7 +57,7 @@ class SchemaBuilder
             return ! in_array($type->name, ['Query', 'Mutation', 'Subscription']);
         })->toArray();
 
-        $directives = $this->directives;
+        $directives = $this->getCustomClientDirectives($schema);
         $typeLoader = function ($name) {
             return $this->instance($name);
         };
@@ -76,21 +73,19 @@ class SchemaBuilder
     }
 
     /**
-     * Parse schema definitions.
+     * Register the types from the enhanced schema.
      *
-     * @param string $schema
+     * @param DocumentNode $schema
      *
      * @return \Illuminate\Support\Collection
      */
     public function register($schema)
     {
-        $document = $schema instanceof DocumentNode
-            ? $schema
-            : $this->parseSchema($schema);
+        // TODO remove this check after tests are switched to using build()
+        $schema = $this->parseSchemaIfNecessary($schema);
 
-        $this->setTypes($document);
-        $this->extendTypes($document);
-        $this->setDirectives($document);
+        $this->setTypes($schema);
+        $this->extendTypes($schema);
         $this->injectNodeField();
 
         return collect($this->types);
@@ -164,6 +159,27 @@ class SchemaBuilder
     }
 
     /**
+     * Enhance the schema document by applying the GenerateDirective.
+     *
+     * @param DocumentNode $document
+     *
+     * @return DocumentNode
+     */
+    protected function applyGenerateDirective(DocumentNode $document)
+    {
+        $originalDocument = $document;
+
+        return collect($document->definitions)->filter(function ($node) {
+            // Could generators be useful for other definitions? If so, maybe extend this filter
+            return $node instanceof ObjectTypeDefinitionNode;
+        })->reduce(function ($document, $definitionNode) use ($originalDocument) {
+            $generator = directives()->getGenerateDirective($definitionNode);
+
+            return $generator ? $generator->generate($definitionNode, $document, $originalDocument) : $document;
+        }, $document);
+    }
+
+    /**
      * Set schema types.
      *
      * @param DocumentNode $document
@@ -191,9 +207,9 @@ class SchemaBuilder
      *
      * @return array
      */
-    protected function setDirectives(DocumentNode $document)
+    protected function getCustomClientDirectives(DocumentNode $document)
     {
-        $this->directives = collect($document->definitions)->filter(function ($node) {
+        return collect($document->definitions)->filter(function ($node) {
             return $node instanceof DirectiveDefinitionNode;
         })->map(function (Node $node) {
             return app(NodeFactory::class)->handle(new NodeValue($node));
@@ -239,5 +255,17 @@ class SchemaBuilder
                 @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")
         }
         '));
+    }
+
+    /**
+     * @param $schema
+     *
+     * @return DocumentNode
+     */
+    protected function parseSchemaIfNecessary($schema)
+    {
+        return $schema instanceof DocumentNode
+            ? $schema
+            : $this->parseSchema($schema);
     }
 }
