@@ -16,7 +16,7 @@ class NotEqualsFilterDirective implements ArgMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'neq';
     }

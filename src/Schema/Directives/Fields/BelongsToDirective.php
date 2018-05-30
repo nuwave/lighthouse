@@ -16,7 +16,7 @@ class BelongsToDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'belongsTo';
     }
@@ -31,7 +31,7 @@ class BelongsToDirective implements FieldResolver
     public function resolveField(FieldValue $value)
     {
         $relation = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), 'belongsTo'),
+            $this->fieldDirective($value->getField(), self::name()),
             'relation',
             $value->getField()->name->value
         );

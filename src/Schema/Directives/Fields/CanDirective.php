@@ -16,7 +16,7 @@ class CanDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'can';
     }
@@ -31,12 +31,12 @@ class CanDirective implements FieldMiddleware
     public function handleField(FieldValue $value)
     {
         $policies = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), 'can'),
+            $this->fieldDirective($value->getField(), self::name()),
             'if'
         );
 
         $model = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), 'can'),
+            $this->fieldDirective($value->getField(), self::name()),
             'model'
         );
 

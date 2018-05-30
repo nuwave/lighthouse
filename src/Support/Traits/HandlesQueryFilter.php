@@ -86,7 +86,7 @@ trait HandlesQueryFilter
     protected function queryFilterDirective(ArgumentValue $argument)
     {
         return collect($argument->getArg()->directives)->first(function ($arg) {
-            return $arg->name->value == $this->name();
+            return $arg->name->value == $this::name();
         });
     }
 }

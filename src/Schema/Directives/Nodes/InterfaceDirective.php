@@ -17,7 +17,7 @@ class InterfaceDirective implements NodeResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'interface';
     }
@@ -32,7 +32,7 @@ class InterfaceDirective implements NodeResolver
     public function resolveNode(NodeValue $value)
     {
         $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'resolver'
         );
 

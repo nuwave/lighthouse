@@ -16,7 +16,7 @@ class RenameDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'rename';
     }
@@ -31,14 +31,14 @@ class RenameDirective implements FieldResolver
     public function resolveField(FieldValue $value)
     {
         $attribute = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'attribute'
         );
 
         if (! $attribute) {
             throw new DirectiveException(sprintf(
                 'The [%s] directive requires an `attribute` argument.',
-                $this->name()
+                self::name()
             ));
         }
 

@@ -19,7 +19,7 @@ class FirstDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'first';
     }

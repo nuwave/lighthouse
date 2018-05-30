@@ -31,7 +31,7 @@ class FieldDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'field';
     }
@@ -45,7 +45,7 @@ class FieldDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $directive = $this->fieldDirective($value->getField(), $this->name());
+        $directive = $this->fieldDirective($value->getField(), self::name());
         $resolver = $this->getResolver($value, $directive);
         $method = $this->getResolverMethod($directive);
         $data = $this->argValue(collect($directive->arguments)->first(function ($arg) {

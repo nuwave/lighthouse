@@ -15,7 +15,7 @@ class ComplexityDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'complexity';
     }
@@ -29,7 +29,7 @@ class ComplexityDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $value)
     {
-        $directive = $this->fieldDirective($value->getField(), $this->name());
+        $directive = $this->fieldDirective($value->getField(), self::name());
 
         if ($resolver = $this->getResolver($value, $directive, false)) {
             $method = $this->getResolverMethod($directive);

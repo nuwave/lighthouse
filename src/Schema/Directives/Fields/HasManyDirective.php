@@ -20,7 +20,7 @@ class HasManyDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'hasMany';
     }
@@ -71,7 +71,7 @@ class HasManyDirective implements FieldResolver
     protected function getRelationshipName(FieldDefinitionNode $field)
     {
         return $this->directiveArgValue(
-            $this->fieldDirective($field, $this->name()),
+            $this->fieldDirective($field, self::name()),
             'relation',
             $field->name->value
         );
@@ -87,7 +87,7 @@ class HasManyDirective implements FieldResolver
     protected function getResolver(FieldDefinitionNode $field)
     {
         return $this->directiveArgValue(
-            $this->fieldDirective($field, $this->name()),
+            $this->fieldDirective($field, self::name()),
             'type',
             'default'
         );
@@ -165,7 +165,7 @@ class HasManyDirective implements FieldResolver
     protected function getScopes(FieldValue $value)
     {
         return $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'scopes',
             []
         );

@@ -15,7 +15,7 @@ class ModelDirective implements NodeMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'model';
     }
@@ -50,7 +50,7 @@ class ModelDirective implements NodeMiddleware
     protected function getNamespace(NodeValue $value)
     {
         $namespace = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'class'
         );
 

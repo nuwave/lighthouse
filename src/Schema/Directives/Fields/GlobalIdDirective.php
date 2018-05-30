@@ -16,7 +16,7 @@ class GlobalIdDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'globalId';
     }
@@ -33,7 +33,7 @@ class GlobalIdDirective implements FieldMiddleware
         $type = $value->getNodeName();
         $resolver = $value->getResolver();
         $process = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), 'globalId'),
+            $this->fieldDirective($value->getField(), self::name()),
             'process',
             'encode'
         );

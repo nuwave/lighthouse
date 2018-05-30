@@ -16,7 +16,7 @@ class CreateDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'create';
     }
@@ -32,7 +32,7 @@ class CreateDirective implements FieldResolver
     {
         // TODO: create a model registry so we can auto-resolve this.
         $model = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'model'
         );
 

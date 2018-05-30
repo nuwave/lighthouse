@@ -15,7 +15,7 @@ class MiddlewareDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'middleware';
     }
@@ -62,7 +62,7 @@ class MiddlewareDirective implements FieldMiddleware
         }
 
         $checks = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'checks'
         );
 

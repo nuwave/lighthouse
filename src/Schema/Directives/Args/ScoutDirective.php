@@ -18,9 +18,9 @@ class ScoutDirective implements ArgMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
-        return "search";
+        return 'search';
     }
 
     /**

@@ -20,7 +20,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'validate';
     }
@@ -35,7 +35,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
     public function handleField(FieldValue $value)
     {
         $validator = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'validator'
         );
 

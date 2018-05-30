@@ -21,7 +21,7 @@ class PaginateDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'paginate';
     }
@@ -37,7 +37,7 @@ class PaginateDirective implements FieldResolver
     public function resolveField(FieldValue $value)
     {
         $type = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'type',
             'paginator'
         );

@@ -16,7 +16,7 @@ class InjectDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'inject';
     }
@@ -32,18 +32,19 @@ class InjectDirective implements FieldMiddleware
     {
         $resolver = $value->getResolver();
         $attr = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'context'
         );
 
         $name = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'name'
         );
 
         if (! $attr) {
             throw new DirectiveException(sprintf(
-                'The `inject` directive on %s [%s] must have a `context` argument',
+                'The `%s` directive on %s [%s] must have a `context` argument',
+                self::name(),
                 $value->getNodeName(),
                 $value->getFieldName()
             ));
@@ -51,7 +52,8 @@ class InjectDirective implements FieldMiddleware
 
         if (! $name) {
             throw new DirectiveException(sprintf(
-                'The `inject` directive on %s [%s] must have a `name` argument',
+                'The `%s` directive on %s [%s] must have a `name` argument',
+                self::name(),
                 $value->getNodeName(),
                 $value->getFieldName()
             ));
