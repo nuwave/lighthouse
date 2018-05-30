@@ -16,7 +16,7 @@ class DirectiveFactoryTest extends TestCase
      */
     public function itRegistersLighthouseDirectives()
     {
-        $this->assertInstanceOf(ScalarDirective::class, directives()->handler('scalar'));
+        $this->assertInstanceOf(ScalarDirective::class, directives()->handler(ScalarDirective::name()));
     }
 
     /**

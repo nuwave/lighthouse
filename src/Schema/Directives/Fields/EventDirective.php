@@ -17,7 +17,7 @@ class EventDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'event';
     }
@@ -53,10 +53,10 @@ class EventDirective implements FieldMiddleware
     protected function getEvent(FieldDefinitionNode $field)
     {
         return $this->directiveArgValue(
-            $this->fieldDirective($field, 'event'),
+            $this->fieldDirective($field, self::name()),
             'fire',
             $this->directiveArgValue(
-                $this->fieldDirective($field, 'event'),
+                $this->fieldDirective($field, self::name()),
                 'class'
             )
         );

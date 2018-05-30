@@ -16,7 +16,7 @@ class GroupDirective implements NodeMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'group';
     }
@@ -44,7 +44,7 @@ class GroupDirective implements NodeMiddleware
     protected function setNamespace(NodeValue $value)
     {
         $namespace = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'namespace'
         );
 
@@ -69,7 +69,7 @@ class GroupDirective implements NodeMiddleware
         }
 
         $middleware = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'middleware'
         );
 

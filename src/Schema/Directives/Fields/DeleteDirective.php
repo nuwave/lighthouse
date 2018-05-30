@@ -19,7 +19,7 @@ class DeleteDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'delete';
     }
@@ -35,12 +35,12 @@ class DeleteDirective implements FieldResolver
     {
         $idArg = $this->getIDField($value);
         $class = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'model'
         );
 
         $globalId = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'globalId',
             false
         );

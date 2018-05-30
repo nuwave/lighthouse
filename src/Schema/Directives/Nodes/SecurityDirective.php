@@ -20,7 +20,7 @@ class SecurityDirective implements NodeMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'security';
     }
@@ -36,7 +36,8 @@ class SecurityDirective implements NodeMiddleware
     {
         if ('Query' !== $value->getNodeName()) {
             $message = sprintf(
-                'The `security` directive can only be placed on the %s type [%s]',
+                'The `%s` directive can only be placed on the %s type [%s]',
+                self::name(),
                 'Query',
                 $value->getNodeName()
             );
@@ -59,7 +60,7 @@ class SecurityDirective implements NodeMiddleware
     protected function queryComplexity(NodeValue $value)
     {
         $complexity = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'complexity'
         );
 
@@ -78,7 +79,7 @@ class SecurityDirective implements NodeMiddleware
     protected function queryDepth(NodeValue $value)
     {
         $depth = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'depth'
         );
 
@@ -97,7 +98,7 @@ class SecurityDirective implements NodeMiddleware
     protected function queryIntrospection(NodeValue $value)
     {
         $introspection = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'introspection'
         );
 

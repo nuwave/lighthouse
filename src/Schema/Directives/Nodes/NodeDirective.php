@@ -15,7 +15,7 @@ class NodeDirective implements NodeMiddleware
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'node';
     }
@@ -50,7 +50,7 @@ class NodeDirective implements NodeMiddleware
     protected function getResolver(NodeValue $value)
     {
         $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'resolver'
         );
 
@@ -74,7 +74,7 @@ class NodeDirective implements NodeMiddleware
     protected function getResolveType(NodeValue $value)
     {
         $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+            $this->nodeDirective($value->getNode(), self::name()),
             'typeResolver'
         );
 

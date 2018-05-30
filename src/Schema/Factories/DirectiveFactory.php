@@ -79,7 +79,7 @@ class DirectiveFactory
     {
         $directive = app($handler);
 
-        $this->directives->put($directive->name(), $directive);
+        $this->directives->put($directive::name(), $directive);
     }
 
     /**

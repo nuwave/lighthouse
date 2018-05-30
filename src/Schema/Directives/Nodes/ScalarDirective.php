@@ -14,7 +14,7 @@ class ScalarDirective implements NodeResolver
      * @var string
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'scalar';
     }

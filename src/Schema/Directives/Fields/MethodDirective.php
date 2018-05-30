@@ -16,7 +16,7 @@ class MethodDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'method';
     }
@@ -31,7 +31,7 @@ class MethodDirective implements FieldResolver
     public function resolveField(FieldValue $value)
     {
         $method = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), 'method'),
+            $this->fieldDirective($value->getField(), self::name()),
             'name',
             $value->getField()->name->value
         );

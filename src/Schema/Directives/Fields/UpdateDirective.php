@@ -19,7 +19,7 @@ class UpdateDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public static function name()
     {
         return 'update';
     }
@@ -35,19 +35,20 @@ class UpdateDirective implements FieldResolver
     {
         $idArg = $this->getIDField($value);
         $class = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'model'
         );
 
         $globalId = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+            $this->fieldDirective($value->getField(), self::name()),
             'globalId',
             false
         );
 
         if (! $class) {
             throw new DirectiveException(sprintf(
-                'The `update` directive on %s [%s] must have a `model` argument',
+                'The `%s` directive on %s [%s] must have a `model` argument',
+                self::name(),
                 $value->getNodeName(),
                 $value->getFieldName()
             ));
@@ -55,7 +56,8 @@ class UpdateDirective implements FieldResolver
 
         if (! $idArg) {
             new DirectiveException(sprintf(
-                'The `update` requires that you have an `ID` field on %s',
+                'The `%s` requires that you have an `ID` field on %s',
+                self::name(),
                 $value->getNodeName()
             ));
         }
