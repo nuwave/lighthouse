@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
@@ -17,7 +19,7 @@ class HasManyLoader extends BatchLoader
     {
         collect($this->keys)->map(function ($item) {
             return array_merge($item, ['json' => json_encode($item['args'])]);
-        })->groupBy('json')->each(function ($items) {
+        })->groupBy('json')->each(function (Collection $items) {
             $first = $items->first();
             $parents = $items->pluck('parent');
             $scopes = array_get($first, 'scopes', []);
@@ -52,7 +54,7 @@ class HasManyLoader extends BatchLoader
                     break;
             }
 
-            $parents->each(function ($model) use ($relation) {
+            $parents->each(function (Model $model) use ($relation) {
                 $this->set($model->getKey(), $model->getRelation($relation));
             });
         });

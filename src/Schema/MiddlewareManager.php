@@ -4,13 +4,12 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\SelectionNode;
 use GraphQL\Utils\AST;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
+use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 
 class MiddlewareManager
 {
-    use CanParseTypes;
-
     /**
      * Registered query middleware.
      *
@@ -74,8 +73,6 @@ class MiddlewareManager
      *
      * @param string $name
      * @param array  $middleware
-     *
-     * @return array
      */
     public function registerQuery($name, array $middleware)
     {
@@ -87,8 +84,6 @@ class MiddlewareManager
      *
      * @param string $name
      * @param array  $middleware
-     *
-     * @return array
      */
     public function registerMutation($name, array $middleware)
     {
@@ -99,20 +94,20 @@ class MiddlewareManager
      * Get middleware for operation.
      *
      * @param string $operation
-     * @param array  $fields
+     * @param array  $fieldNames
      *
      * @return array
      */
-    public function operation($operation, array $fields)
+    public function operation($operation, array $fieldNames)
     {
         if ('mutation' === $operation) {
-            return array_collapse(array_map(function ($field) {
-                return $this->mutation($field);
-            }, $fields));
+            return array_collapse(array_map(function ($fieldName) {
+                return $this->mutation($fieldName);
+            }, $fieldNames));
         } elseif ('query' === $operation) {
             return array_collapse(array_map(function ($field) {
                 return $this->query($field);
-            }, $fields));
+            }, $fieldNames));
         }
 
         return [];

@@ -4,13 +4,11 @@ namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 
 class CacheManager
 {
-    use CanParseTypes;
-
     /**
      * Store document in cache.
      *
@@ -19,7 +17,7 @@ class CacheManager
      */
     public function set($schema)
     {
-        $document = $this->parseSchema($schema);
+        $document = Parser::parse($schema);
 
         file_put_contents(
             config('lighthouse.cache'),
