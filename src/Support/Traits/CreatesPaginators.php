@@ -2,57 +2,84 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
+use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 
 trait CreatesPaginators
 {
     // TODO: Ugh, get rid of this...
-    use CanParseTypes, HandlesDirectives;
+    use HandlesDirectives;
 
     /**
      * Register connection w/ schema.
      *
-     * @param FieldValue $value
+     * @param FieldDefinitionNode $fieldDefinition
+     * @throws \Exception
      */
-    protected function registerConnection(FieldValue $value)
+    protected function registerConnection(FieldDefinitionNode $fieldDefinition, DocumentAST $current, DocumentAST $original)
     {
-        $schema = sprintf(
-            'type Connection { connection(first: Int! after: String): String }
-            type %s { node: %s cursor: String! }
-            type %s { pageInfo: PageInfo! @field(class: "%s" method: "%s") edges: [%s] @field(class: "%s" method: "%s") }',
-            $this->connectionEdgeName($value),
-            $this->unpackNodeToString($value->getField()),
-            $this->connectionTypeName($value),
-            addslashes(ConnectionField::class),
-            'pageInfoResolver',
-            $this->connectionEdgeName($value),
-            addslashes(ConnectionField::class),
-            'edgeResolver'
+        $connectionTypeName = $this->connectionTypeName($fieldDefinition);
+        $connectionEdgeName = $this->connectionEdgeName($fieldDefinition);
+
+        $connectionFieldName = addslashes(ConnectionField::class);
+        $connectionDefinitionString = sprintf('
+            type %s { pageInfo: PageInfo! @field(class: "%s" method: "pageInfoResolver") edges: [%s] @field(class: "%s" method: "edgeResolver") }',
+            $connectionTypeName,
+            $connectionFieldName,
+            $connectionEdgeName,
+            $connectionFieldName
         );
+        $connectionDefinition = DocumentAST::parseSingleDefinition($connectionDefinitionString);
+        $current->setDefinition($connectionDefinition);
 
-        collect($this->parseSchema($schema)->definitions)
-            ->map(function ($node) use ($value) {
-                if ('Connection' === $node->name->value) {
-                    $connectionField = data_get($node, 'fields.0');
-                    $field = $value->getField();
-                    $field->arguments = $connectionField->arguments->merge($field->arguments);
+        $nodeName = $this->unpackNodeToString($fieldDefinition);
+        $current->setDefinitionFromString("type $connectionEdgeName { node: $nodeName cursor: String! }");
 
-                    return null;
-                }
+        $field = DocumentAST::parseFieldDefinition('users(first: Int! after: String): UserConnection');
+//        $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('first: Int! after: String')->merge($fieldDefinition->arguments);
+//        $fieldDefinition->type = $connectionDefinition;
+//        dd($fieldDefinition);
+        // todo generalize this to all parent types
+        $current->addFieldToQueryType($field);
 
-                return $this->convertNode($node);
-            })
-            ->filter()
-            ->each(function ($type) use ($value) {
-                schema()->type($type);
+        return $current;
+//
+//        DocumentAST::parse($schema)->definitions()
+//            ->map(function ($node) {
+//                return $this->convertNode($node);
+//            })
+//            ->filter()
+//            ->each(function ($type) use ($fieldDefinition) {
+//                schema()->type($type);
+//
+//                if (ends_with($type->name, 'Connection')) {
+//                    $fieldDefinition->setType($type);
+//                }
+//            });
+    }
 
-                if (ends_with($type->name, 'Connection')) {
-                    $value->setType($type);
-                }
-            });
+    /**
+     * Convert node to type.
+     *
+     * @param Node $node
+     *
+     * @return \GraphQL\Type\Definition\Type
+     * @throws \Exception
+     */
+    protected function convertNode(Node $node)
+    {
+        /** @var NodeFactory $nodeFactory */
+        $nodeFactory = app(NodeFactory::class);
+        return $nodeFactory->handle(new NodeValue($node));
     }
 
     /**
@@ -73,7 +100,7 @@ trait CreatesPaginators
             'dataResolver'
         );
 
-        collect($this->parseSchema($schema)->definitions)
+        DocumentAST::parse($schema)->definitions()
             ->map(function ($node) use ($value) {
                 if ('Paginator' === $node->name->value) {
                     $paginatorField = data_get($node, 'fields.0');
@@ -113,30 +140,28 @@ trait CreatesPaginators
     /**
      * Get connection type name.
      *
-     * @param FieldValue $value
+     * @param FieldDefinitionNode $fieldDefinition
      *
      * @return string
      */
-    protected function connectionTypeName(FieldValue $value)
+    protected function connectionTypeName(FieldDefinitionNode $fieldDefinition)
     {
-        $parent = $value->getNodeName();
-        $child = str_singular($value->getField()->name->value);
+        $fieldName = str_singular($fieldDefinition->name->value);
 
-        return studly_case($parent.'_'.$child.'_Connection');
+        return studly_case($fieldName.'_Connection');
     }
 
     /**
      * Get connection edge name.
      *
-     * @param FieldValue $value
+     * @param FieldDefinitionNode $fieldDefinition
      *
      * @return string
      */
-    protected function connectionEdgeName(FieldValue $value)
+    protected function connectionEdgeName(FieldDefinitionNode $fieldDefinition)
     {
-        $parent = $value->getNodeName();
-        $child = str_singular($value->getField()->name->value);
+        $fieldName = str_singular($fieldDefinition->name->value);
 
-        return studly_case($parent.'_'.$child.'_Edge');
+        return studly_case($fieldName.'_Edge');
     }
 }

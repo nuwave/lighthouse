@@ -3,13 +3,12 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\SelectionNode;
 use GraphQL\Utils\AST;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
+use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 
 class MiddlewareManager
 {
-    use CanParseTypes;
-
     /**
      * Registered query middleware.
      *
@@ -33,15 +32,15 @@ class MiddlewareManager
      */
     public function forRequest($request)
     {
-        return collect($this->parseSchema($request)->definitions)
-            ->filter(function ($def) {
-                return $def instanceof OperationDefinitionNode;
-            })->map(function (OperationDefinitionNode $node) {
-                $definition = AST::toArray($node);
-                $operation = array_get($definition, 'operation');
-                $fields = array_pluck(array_get($definition, 'selectionSet.selections', []), 'name.value');
+        return DocumentAST::parse($request)
+            ->operations()
+            ->map(function (OperationDefinitionNode $node) {
+                $operationType = $node->operation;
+                $fieldNames = collect($node->selectionSet->selections)->map(function (SelectionNode $selectionNode){
+                    return $selectionNode->name->value;
+                })->toArray();
 
-                return $this->operation($operation, $fields);
+                return $this->operation($operationType, $fieldNames);
             })
             ->collapse()
             ->unique()
@@ -53,8 +52,6 @@ class MiddlewareManager
      *
      * @param string $name
      * @param array  $middleware
-     *
-     * @return array
      */
     public function registerQuery($name, array $middleware)
     {
@@ -66,8 +63,6 @@ class MiddlewareManager
      *
      * @param string $name
      * @param array  $middleware
-     *
-     * @return array
      */
     public function registerMutation($name, array $middleware)
     {
@@ -78,20 +73,20 @@ class MiddlewareManager
      * Get middleware for operation.
      *
      * @param string $operation
-     * @param array  $fields
+     * @param array  $fieldNames
      *
      * @return array
      */
-    public function operation($operation, array $fields)
+    public function operation($operation, array $fieldNames)
     {
         if ('mutation' === $operation) {
-            return array_collapse(array_map(function ($field) {
-                return $this->mutation($field);
-            }, $fields));
+            return array_collapse(array_map(function ($fieldName) {
+                return $this->mutation($fieldName);
+            }, $fieldNames));
         } elseif ('query' === $operation) {
             return array_collapse(array_map(function ($field) {
                 return $this->query($field);
-            }, $fields));
+            }, $fieldNames));
         }
 
         return [];

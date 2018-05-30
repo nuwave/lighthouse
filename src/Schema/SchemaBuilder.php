@@ -2,20 +2,23 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
+use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class SchemaBuilder
 {
-    use CanParseTypes, HandlesTypes;
+    use HandlesTypes;
 
     /**
      * Definition weights.
@@ -65,6 +68,15 @@ class SchemaBuilder
             return $this->instance($name);
         };
 
+        $schema =new Schema(compact(
+            'query',
+            'mutation',
+            'subscription',
+            'types',
+            'directives',
+            'typeLoader'
+        ));
+        dd($schema->assertValid());
         return new Schema(compact(
             'query',
             'mutation',
@@ -85,15 +97,40 @@ class SchemaBuilder
     public function register($schema)
     {
         $document = $schema instanceof DocumentNode
-            ? $schema
-            : $this->parseSchema($schema);
+            ? new DocumentAST($schema)
+            : DocumentAST::parse($schema);
 
-        $this->setTypes($document);
+        $document = $this->applySchemaGenerators($document);
+
+        $this->registerTypes($document);
         $this->extendTypes($document);
-        $this->setDirectives($document);
+        $this->registerDirectives($document);
         $this->injectNodeField();
 
         return collect($this->types);
+    }
+
+    /**
+     * Enhance the schema document by applying the GenerateDirective.
+     *
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected function applySchemaGenerators(DocumentAST $document)
+    {
+        $originalDocument = $document;
+
+        // todo generalize this to all parent types
+        return collect($document->getQueryTypeDefinition()->fields)
+            // Could generators be useful for other definitions? If so, maybe extend this filter
+        ->reduce(function ($document, $definitionNode) use ($originalDocument) {
+            $generators = directives()->generators($definitionNode);
+
+            return $generators->reduce(function(DocumentAST $document, SchemaGenerator $generator) use ($originalDocument, $definitionNode){
+                return $generator->handleSchemaGeneration($definitionNode, $document, $originalDocument);
+            }, $document);
+        }, $document);
     }
 
     /**
@@ -166,11 +203,11 @@ class SchemaBuilder
     /**
      * Set schema types.
      *
-     * @param DocumentNode $document
+     * @param DocumentAST $document
      */
-    protected function setTypes(DocumentNode $document)
+    protected function registerTypes(DocumentAST $document)
     {
-        $types = collect($document->definitions)->reject(function ($node) {
+        $types = $document->definitions()->reject(function (DefinitionNode $node) {
             return $node instanceof TypeExtensionDefinitionNode
                 || $node instanceof DirectiveDefinitionNode;
         })->sortBy(function ($node) {
@@ -187,15 +224,11 @@ class SchemaBuilder
     /**
      * Set custom client directives.
      *
-     * @param DocumentNode $document
-     *
-     * @return array
+     * @param DocumentAST $document
      */
-    protected function setDirectives(DocumentNode $document)
+    protected function registerDirectives(DocumentAST $document)
     {
-        $this->directives = collect($document->definitions)->filter(function ($node) {
-            return $node instanceof DirectiveDefinitionNode;
-        })->map(function (Node $node) {
+        $this->directives = $document->directives()->map(function (Node $node) {
             return app(NodeFactory::class)->handle(new NodeValue($node));
         })->toArray();
     }
@@ -203,13 +236,11 @@ class SchemaBuilder
     /**
      * Extend registered types.
      *
-     * @param DocumentNode $document
+     * @param DocumentAST $document
      */
-    protected function extendTypes(DocumentNode $document)
+    protected function extendTypes(DocumentAST $document)
     {
-        collect($document->definitions)->filter(function ($def) {
-            return $def instanceof TypeExtensionDefinitionNode;
-        })->each(function (TypeExtensionDefinitionNode $extension) {
+        $document->typeExtensions()->each(function (TypeExtensionDefinitionNode $extension) {
             $name = $extension->definition->name->value;
 
             if ($type = collect($this->types)->firstWhere('name', $name)) {
@@ -233,7 +264,7 @@ class SchemaBuilder
             return;
         }
 
-        $this->extendTypes($this->parseSchema('
+        $this->extendTypes(DocumentAST::parse('
         extend type Query {
             node(id: ID!): Node
                 @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")

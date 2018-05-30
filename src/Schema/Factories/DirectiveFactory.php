@@ -7,10 +7,12 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
+use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Symfony\Component\Finder\Finder;
 
@@ -87,7 +89,7 @@ class DirectiveFactory
      *
      * @param string $name
      *
-     * @return mixed
+     * @return Directive
      */
     public function handler($name)
     {
@@ -143,6 +145,15 @@ class DirectiveFactory
         }
 
         return $resolvers->first();
+    }
+
+    public function generators($node)
+    {
+        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->filter(function(Directive $directive){
+            return $directive instanceof SchemaGenerator;
+        });
     }
 
     /**
