@@ -25,9 +25,9 @@ abstract class BatchLoader
     /**
      * Generate key for field.
      *
-     * @param Model       $root
+     * @param Model $root
      * @param ResolveInfo $info
-     * @param string      $relation
+     * @param string $relation
      *
      * @return string
      */
