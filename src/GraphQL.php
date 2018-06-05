@@ -44,4 +44,9 @@ class GraphQL
     {
         return $this->schema;
     }
+
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
+    }
 }

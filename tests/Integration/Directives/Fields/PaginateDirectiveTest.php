@@ -44,7 +44,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         graphql()->build($schema);
         $result = graphql()->execute($query);
-        dd($result);
+        //dd($result);
         $this->assertEquals(5, array_get($result->data, 'users.paginatorInfo.count'));
         $this->assertEquals(10, array_get($result->data, 'users.paginatorInfo.total'));
         $this->assertEquals(1, array_get($result->data, 'users.paginatorInfo.currentPage'));

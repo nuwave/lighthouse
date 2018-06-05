@@ -80,6 +80,14 @@ class Field
         });
     }
 
+    public function addArgument(Argument $argument)
+    {
+        $arguments = $this->arguments();
+        $this->arguments = function () use ($argument, $arguments){
+            return $arguments->merge([$argument]);
+        };
+    }
+
     public function hasArgument($name)
     {
         return !is_null($this->argument($name));
