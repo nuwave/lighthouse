@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
@@ -33,15 +34,35 @@ class MiddlewareManager
      */
     public function forRequest($request)
     {
+        $definitions = collect($this->parseSchema($request)->definitions);
+        $fragments = $definitions->filter(function ($def) {
+            return $def instanceof FragmentDefinitionNode;
+        });
+
         return collect($this->parseSchema($request)->definitions)
             ->filter(function ($def) {
                 return $def instanceof OperationDefinitionNode;
-            })->map(function (OperationDefinitionNode $node) {
+            })->map(function (OperationDefinitionNode $node) use ($fragments) {
                 $definition = AST::toArray($node);
                 $operation = array_get($definition, 'operation');
-                $fields = array_pluck(array_get($definition, 'selectionSet.selections', []), 'name.value');
+                $fields = array_map(function ($selection) use ($fragments) {
+                    $field = array_get($selection, 'name.value');
 
-                return $this->operation($operation, $fields);
+                    if ('FragmentSpread' == array_get($selection, 'kind')) {
+                        $fragment = $fragments->first(function ($def) use ($field) {
+                            return data_get($def, 'name.value') == $field;
+                        });
+
+                        return array_pluck(
+                            data_get($fragment, 'selectionSet.selections', []),
+                            'name.value'
+                        );
+                    }
+
+                    return [$field];
+                }, array_get($definition, 'selectionSet.selections', []));
+
+                return $this->operation($operation, array_unique(array_flatten($fields)));
             })
             ->collapse()
             ->unique()
