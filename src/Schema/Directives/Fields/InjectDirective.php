@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -26,9 +27,11 @@ class InjectDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
+     * @param Closure $next
      * @return FieldValue
+     * @throws DirectiveException
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $resolver = $value->getResolver();
         $attr = $this->directiveArgValue(
@@ -57,12 +60,14 @@ class InjectDirective implements FieldMiddleware
             ));
         }
 
-        return $value->setResolver(function () use ($attr, $name, $resolver) {
+        $value->setResolver(function () use ($attr, $name, $resolver) {
             $args = func_get_args();
             $context = $args[2];
             $args[1] = array_merge($args[1], [$name => data_get($context, $attr)]);
 
             return call_user_func_array($resolver, $args);
         });
+
+        return $next($value);
     }
 }

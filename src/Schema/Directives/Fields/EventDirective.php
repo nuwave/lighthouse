@@ -27,20 +27,23 @@ class EventDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
-     * @return Closure
+     * @param Closure $next
+     * @return FieldValue
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $event = $this->getEvent($value->getField());
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function () use ($resolver, $event) {
+        $value->setResolver(function () use ($resolver, $event) {
             $args = func_get_args();
             $value = call_user_func_array($resolver, $args);
             event(new $event($value));
 
             return $value;
         });
+
+        return $next($value);
     }
 
     /**

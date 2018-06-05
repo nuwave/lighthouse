@@ -10,12 +10,10 @@ use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
-use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Support\Exceptions\Handler;
 
 class GraphQL
 {
-    use CanFormatError;
-
     /**
      * Cache manager.
      *
@@ -79,25 +77,7 @@ class GraphQL
     public function execute($query, $context = null, $variables = [], $rootValue = null)
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
-
-        if (! empty($result->errors)) {
-            foreach ($result->errors as $error) {
-                if ($error instanceof \Exception) {
-                    info('GraphQL Error:', [
-                        'code' => $error->getCode(),
-                        'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
-                    ]);
-                }
-            }
-
-            return [
-                'data' => $result->data,
-                'errors' => array_map([$this, 'formatError'], $result->errors),
-            ];
-        }
-
-        return ['data' => $result->data];
+        return $result->toArray();
     }
 
     /**
@@ -113,14 +93,13 @@ class GraphQL
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
-
         return GraphQLBase::executeQuery(
             $schema,
             $query,
             $rootValue,
             $context,
             $variables
-        );
+        )->setErrorsHandler([app(config('lighthouse.handlers.error', Handler::class)), 'handler']);
     }
 
     /**

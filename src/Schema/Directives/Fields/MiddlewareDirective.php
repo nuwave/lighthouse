@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -25,9 +26,10 @@ class MiddlewareDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
+     * @param Closure $next
      * @return FieldValue
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $checks = $this->getChecks($value);
 
@@ -45,7 +47,7 @@ class MiddlewareDirective implements FieldMiddleware
             }
         }
 
-        return $value;
+        return $next($value);
     }
 
     /**

@@ -29,7 +29,7 @@ class NodeTest extends DBTestCase
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { name } }', true);
+        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { ... on  User {name } } }', true);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -50,7 +50,7 @@ class NodeTest extends DBTestCase
         type Query {}
         ';
 
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { name } }', true);
+        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { ... on User { name } } }', true);
         $this->assertEquals($user->name, array_get($result->data, 'node.name'));
     }
 

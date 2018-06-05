@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -10,10 +11,11 @@ use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class ValidateDirective implements ArgMiddleware, FieldMiddleware
 {
-    use HandlesDirectives;
+    use HandlesDirectives, HandlesQueryFilter;
 
     /**
      * Directive name.
@@ -30,9 +32,11 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @param FieldValue $value
      *
+     * @param Closure $next
      * @return FieldValue
+     * @throws DirectiveException
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $validator = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), $this->name()),
@@ -47,7 +51,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
 
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function () use ($validator, $resolver) {
+        $value->setResolver(function () use ($validator, $resolver) {
             $funcArgs = func_get_args();
             $root = array_get($funcArgs, '0');
             $args = array_get($funcArgs, '1');
@@ -58,6 +62,8 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
 
             return call_user_func_array($resolver, $funcArgs);
         });
+
+        return $next($value);
     }
 
     /**
@@ -65,19 +71,28 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @param ArgumentValue $value
      *
-     * @return array
+     * @param Closure $next
+     * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value, Closure $next)
     {
-        // TODO: Rename "getValue" to something more descriptive like "toArray"
-        // and consider using for NodeValue/FieldValue.
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
-            $this->getRules($value->getDirective())
+        $rules = $this->directiveArgValue(
+            $this->queryFilterDirective($value),
+            'rules',
+            null
         );
 
-        return $value->setValue($current);
+        $messages = $this->directiveArgValue(
+            $this->queryFilterDirective($value),
+            'messages',
+            null
+        );
+
+        $current = $value->getValue();
+        $current['rules'] = $rules;
+        $current['messages'] = $messages;
+
+        return $next($value->setValue($current));
     }
 
     /**

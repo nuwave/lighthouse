@@ -6,6 +6,8 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
 
 trait HandlesDirectives

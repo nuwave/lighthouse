@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Pipeline;
 
 class ArgumentFactory
 {
@@ -30,11 +32,15 @@ class ArgumentFactory
      */
     protected function applyMiddleware(ArgumentValue $value)
     {
-        return directives()->argMiddleware($value->getArg())
-            ->reduce(function (ArgumentValue $value, $middleware) {
-                return $middleware->handleArgument(
-                    $value->setMiddlewareDirective($middleware->name())
-                );
-            }, $value);
+        return app(Pipeline::class)
+            ->send($value)
+            ->through(directives()->argMiddleware($value->getArg()))
+            ->via('handleArgument')
+            ->always(function (ArgumentValue $value, ArgMiddleware $middleware) {
+               return $value->setMiddlewareDirective($middleware->name());
+            })
+            ->then(function(ArgumentValue $value) {
+                return $value;
+            });
     }
 }

@@ -3,6 +3,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -28,9 +29,10 @@ class ScoutDirective implements ArgMiddleware
      *
      * @param ArgumentValue $argument
      *
+     * @param Closure $next
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument)
+    public function handleArgument(ArgumentValue $argument, Closure $next)
     {
         $arg = $argument->getArgName();
 
@@ -41,7 +43,7 @@ class ScoutDirective implements ArgMiddleware
             null
         );
 
-        return $this->injectFilter(
+        $this->injectFilter(
             $argument, [
                 'resolve' => function (Builder $query, $key, array $args) use ($arg, $within) {
                     $class = get_class($query->getModel());
@@ -56,5 +58,7 @@ class ScoutDirective implements ArgMiddleware
                 },
             ]
         );
+
+        return $next($argument);
     }
 }

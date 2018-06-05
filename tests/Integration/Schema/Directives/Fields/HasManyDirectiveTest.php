@@ -53,6 +53,7 @@ class HasManyDirectiveTest extends DBTestCase
             tasks: [Task!]! @hasMany
         }
         type Task {
+            id: ID
             foo: String
         }
         type Query {

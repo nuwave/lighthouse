@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLField;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Pipeline;
 
 class FieldFactory
 {
@@ -36,10 +37,13 @@ class FieldFactory
             $field['args'] = $args->toArray();
         }
 
-        $resolve = directives()->fieldMiddleware($value->getField())
-            ->reduce(function ($value, $middleware) {
-                return $middleware->handleField($value);
-            }, $value)->getResolver();
+        $resolve = app(Pipeline::class)
+            ->send($value)
+            ->through(directives()->fieldMiddleware($value->getField()))
+            ->via('handleField')
+            ->then(function(FieldValue $value) {
+                return $value;
+            })->getResolver();
 
         if ($resolve) {
             $field['resolve'] = $value->wrap($resolve);

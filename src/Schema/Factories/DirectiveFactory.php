@@ -2,10 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use ArrayAccess;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -64,7 +66,8 @@ class DirectiveFactory
                 str_after($directive->getPathname(), $path.DIRECTORY_SEPARATOR)
             );
 
-            if (! (new \ReflectionClass($directive))->isAbstract()) {
+            $reflection = (new \ReflectionClass($directive));
+            if (!$reflection->isAbstract() && !$reflection->isTrait()) {
                 $this->register($directive);
             }
         }
@@ -109,9 +112,7 @@ class DirectiveFactory
      */
     public function hasNodeResolver(Node $node)
     {
-        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->reduce(function ($has, $handler) {
+        return $this->mapToName(data_get($node, 'directives', []), true)->reduce(function ($has, $handler) {
             return $handler instanceof NodeResolver ? true : $has;
         }, false);
     }
@@ -125,9 +126,8 @@ class DirectiveFactory
      */
     public function forNode(Node $node)
     {
-        $resolvers = collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        $directiveNames = $this->mapToName(data_get($node, 'directives', []), true);
+        $resolvers = $directiveNames->filter(function ($handler) {
             return $handler instanceof NodeResolver;
         });
 
@@ -135,10 +135,8 @@ class DirectiveFactory
             throw new DirectiveException(sprintf(
                 'Nodes can only have 1 assigned directive. %s has %s directives [%s]',
                 data_get($node, 'name.value'),
-                count($directives),
-                collect($directives)->map(function ($directive) {
-                    return $directive->name->value;
-                })->implode(', ')
+                $directiveNames->count(),
+                $directiveNames->implode(', ')
             ));
         }
 
@@ -154,9 +152,7 @@ class DirectiveFactory
      */
     public function nodeMiddleware(Node $node)
     {
-        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        return $this->mapToName(data_get($node, 'directives', []), true)->filter(function ($handler) {
             return $handler instanceof NodeMiddleware;
         });
     }
@@ -170,9 +166,7 @@ class DirectiveFactory
      */
     public function hasResolver($field)
     {
-        return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->reduce(function ($has, $handler) {
+        return $this->mapToName($field)->reduce(function ($has, $handler) {
             return $handler instanceof FieldResolver ? true : $has;
         }, false);
     }
@@ -186,9 +180,8 @@ class DirectiveFactory
      */
     public function fieldResolver($field)
     {
-        $resolvers = collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        $directiveNames = $this->mapToName($field);
+        $resolvers = $directiveNames->filter(function ($handler) {
             return $handler instanceof FieldResolver;
         });
 
@@ -196,10 +189,8 @@ class DirectiveFactory
             throw new DirectiveException(sprintf(
                 'Fields can only have 1 assigned resolver directive. %s has %s resolver directives [%s]',
                 data_get($field, 'name.value'),
-                $resolvers->count(),
-                collect($field->directives)->map(function (DirectiveNode $directive) {
-                    return $directive->name->value;
-                })->implode(', ')
+                $directiveNames->count(),
+                $directiveNames->implode(', ')
             ));
         }
 
@@ -215,9 +206,7 @@ class DirectiveFactory
      */
     public function hasFieldMiddleware($field)
     {
-        return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->reduce(function ($has, $handler) {
+        return $this->mapToName($field)->reduce(function ($has, $handler) {
             return $handler instanceof FieldMiddleware ? true : $has;
         }, false);
     }
@@ -231,9 +220,7 @@ class DirectiveFactory
      */
     public function fieldMiddleware($field)
     {
-        return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        return $this->mapToName($field)->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
         });
     }
@@ -247,10 +234,23 @@ class DirectiveFactory
      */
     public function argMiddleware(InputValueDefinitionNode $arg)
     {
-        return collect($arg->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        return $this->mapToName($arg)->filter(function ($handler) {
             return $handler instanceof ArgMiddleware;
         });
+    }
+
+    /**
+     * Maps a nodes directive to their name.
+     *
+     * @param $node
+     * @param bool $isDirectives if node is directives then just convert them to name
+     * @return \Illuminate\Support\Collection
+     */
+    private function mapToName($node, $isDirectives = false): Collection
+    {
+        return collect($isDirectives ? $node : $node->directives)->map(function (DirectiveNode $directive) {
+                return $this->handler($directive->name->value);
+            }
+        );
     }
 }

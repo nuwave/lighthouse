@@ -20,6 +20,7 @@ use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
@@ -277,9 +278,12 @@ class NodeFactory
      */
     protected function applyMiddleware(NodeValue $value)
     {
-        return directives()->nodeMiddleware($value->getNode())
-            ->reduce(function ($value, $middleware) {
-                return $middleware->handleNode($value);
-            }, $value);
+        return app(Pipeline::class)
+            ->send($value)
+            ->through(directives()->nodeMiddleware($value->getNode()))
+            ->via('handleNode')
+            ->then(function(NodeValue $value) {
+                return $value;
+            });
     }
 }
