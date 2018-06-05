@@ -40,7 +40,6 @@ class MiddlewareDirectiveTest extends TestCase
 
     /**
      * @test
-     * @group new
      */
     public function itCanRegisterMiddlewareWithFragments()
     {
