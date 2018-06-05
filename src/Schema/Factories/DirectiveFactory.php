@@ -6,13 +6,14 @@ use ArrayAccess;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Node;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeNodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
+use Nuwave\Lighthouse\Support\Contracts\Resolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Symfony\Component\Finder\Finder;
 
@@ -80,6 +81,7 @@ class DirectiveFactory
      */
     public function register($handler)
     {
+        /** @var Resolver $directive */
         $directive = app($handler);
 
         $this->directives->put($directive->name(), $directive);
@@ -91,6 +93,7 @@ class DirectiveFactory
      * @param string $name
      *
      * @return mixed
+     * @throws DirectiveException
      */
     public function handler($name)
     {
@@ -112,6 +115,12 @@ class DirectiveFactory
      */
     public function hasNodeResolver(Node $node)
     {
+        $node->directives()->map(function (Node $node) {
+            return $this->handler($node->name());
+        })->reduce(function ($has, $handler){
+            dd($has, $handler);
+        });
+
         return $this->mapToName(data_get($node, 'directives', []), true)->reduce(function ($has, $handler) {
             return $handler instanceof NodeResolver ? true : $has;
         }, false);
@@ -153,7 +162,7 @@ class DirectiveFactory
     public function nodeMiddleware(Node $node)
     {
         return $this->mapToName(data_get($node, 'directives', []), true)->filter(function ($handler) {
-            return $handler instanceof NodeMiddleware;
+            return $handler instanceof NodeNodeMiddleware;
         });
     }
 

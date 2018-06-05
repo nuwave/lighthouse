@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Node;
 
 class NodeResolver
 {
@@ -27,7 +28,7 @@ class NodeResolver
      *
      * @return mixed
      */
-    public function fromNode($node, array $wrappers = [])
+    public function fromNode(Node $node, array $wrappers = [])
     {
         if ('NonNullType' == $node->kind) {
             return $this->fromNode(

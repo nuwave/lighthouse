@@ -14,7 +14,7 @@ use Opis\Closure\SerializableClosure;
 trait HandlesTypes
 {
     /**
-     * Check if schema still has packed types.
+     * Check if schema still has packed Types.
      *
      * @param array $types
      *

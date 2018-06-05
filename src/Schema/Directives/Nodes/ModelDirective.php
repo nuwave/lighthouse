@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeNodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class ModelDirective implements NodeMiddleware
+class ModelDirective implements NodeNodeMiddleware
 {
     use HandlesDirectives;
 
@@ -22,14 +22,13 @@ class ModelDirective implements NodeMiddleware
     }
 
     /**
-     * Handle type construction.
+     * Handle node value.
      *
      * @param NodeValue $value
-     *
      * @param Closure $next
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handle(NodeValue $value, Closure $next): NodeValue
     {
         $namespace = $this->getNamespace($value);
 

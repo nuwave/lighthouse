@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\Node;
-use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Node;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Type;
 
 class NodeValue
 {
@@ -85,7 +85,7 @@ class NodeValue
      *
      * @return self
      */
-    public function setType($type)
+    public function setType(Type $type)
     {
         $this->type = $type;
 
@@ -177,7 +177,7 @@ class NodeValue
      */
     public function getNodeName()
     {
-        return data_get($this->getNode(), 'name.value');
+        return $this->getNode()->name();
     }
 
     /**
@@ -216,7 +216,7 @@ class NodeValue
      */
     public function hasInterface($interface)
     {
-        return collect($this->node->interfaces)
+        return $this->node->interfaces()
             ->reduce(function ($implements, $interfaceNode) use ($interface) {
                 if ($implements) {
                     return true;

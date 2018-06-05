@@ -2,13 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use GraphQL\Type\Definition\InterfaceType;
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Types\InterfaceType;
+use Nuwave\Lighthouse\Support\Contracts\NodeNodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
-class InterfaceDirective implements NodeResolver
+class InterfaceDirective implements NodeNodeMiddleware
 {
     use HandlesDirectives, HandlesTypes;
 
@@ -23,31 +25,31 @@ class InterfaceDirective implements NodeResolver
     }
 
     /**
-     * Resolve the node directive.
+     * Handle node value.
      *
      * @param NodeValue $value
-     *
-     * @return mixed
+     * @param Closure $next
+     * @return NodeValue
      */
-    public function resolveNode(NodeValue $value)
+    public function handle(NodeValue $value, Closure $next): NodeValue
     {
-        $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'resolver'
-        );
+        $resolver = $value->getNode()->directive($this->name())->arg("resolver");
 
         $instance = app(array_get(explode('@', $resolver), '0'));
         $method = array_get(explode('@', $resolver), '1');
 
-        return $value->setType(new InterfaceType([
-            'name' => $value->getNodeName(),
-            'description' => trim(str_replace("\n", '', $value->getNode()->description)),
-            'fields' => function () use ($value) {
-                return $this->getFields($value);
+        $value->setType(graphql()->typeRepository()->create(
+            InterfaceType::class,
+            $value->getNodeName(),
+            function () use ($value) {
+                return $value->getNode()->fields();
             },
-            'resolveType' => function ($value) use ($instance, $method) {
+            function ($value) use ($instance, $method) {
                 return call_user_func_array([$instance, $method], [$value]);
             },
-        ]));
+            $value->getNode()->description()
+        ));
+
+        return $next($value);
     }
 }

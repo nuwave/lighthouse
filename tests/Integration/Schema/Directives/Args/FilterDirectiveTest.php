@@ -4,43 +4,62 @@
 namespace Tests\Integration\Schema\Directives\Args;
 
 
+use GraphQL\Error\Debug;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\User;
 
 class FilterDirectiveTest extends DBTestCase
 {
     use RefreshDatabase;
 
     private $postA, $postB, $postC, $postD, $postE;
+    private $userA, $userB;
     private $schema;
 
     protected function setUp()
     {
         parent::setUp();
 
+        $this->userA = factory(User::class)->create([
+            'name' => "Oliver Nybroe"
+        ]);
+        $this->userB = factory(User::class)->create([
+            'name' => "Christopher Moore"
+        ]);
+
         $this->postA = factory(Post::class)->create([
-            'title' => 'great title'
+            'title' => 'great title',
+            'user_id' => $this->userA->id
         ]);
         $this->postB = factory(Post::class)->create([
-            'title' => 'Really great title'
+            'title' => 'Really great title',
+            'user_id' => $this->userA->id
         ]);
         $this->postC = factory(Post::class)->create([
             'title' => 'bad title is the worse'
         ]);
         $this->postD = factory(Post::class)->create([
-            'title' => 'admin title'
+            'title' => 'admin title',
+            'user_id' => $this->userB->id
         ]);
         $this->postE = factory(Post::class)->create([
             'title' => 'Yet another one'
         ]);
 
-        $this->schema = '     
-        type Post @filter {
+        $this->schema = '    
+        type Post @model @filter {
             id: ID!
             title: String!
+            author: User! @belongsTo(relation: "user")
         }
+        
+        type User @model @filter {
+            id: ID!
+            name: String!
+        } 
   
         type Query {
             posts(filter: PostFilter @filter): [Post!]! @paginate(type: "paginator" model: "Post")
@@ -50,7 +69,7 @@ class FilterDirectiveTest extends DBTestCase
 
     protected function runGraphQl($query)
     {
-        return parent::execute($this->schema, $query, true, null);
+        return parent::execute($this->schema, $query);
     }
 
     /** @test */
@@ -82,6 +101,7 @@ class FilterDirectiveTest extends DBTestCase
             }
         }';
 
+        dd("query ran", $this->runGraphQl($query)->toArray());
         $results = $this->runGraphQl($query)->data;
         $results = Arr::get($results, 'posts.data');
 
@@ -356,5 +376,67 @@ class FilterDirectiveTest extends DBTestCase
         $this->assertEquals($this->postA->title, Arr::get($results, '0.title'));
         $this->assertEquals($this->postB->title, Arr::get($results, '1.title'));
         $this->assertEquals($this->postD->title, Arr::get($results, '2.title'));
+    }
+
+    /** @test */
+    public function can_filter_from_relation_filter()
+    {
+        $query = '{
+            posts(count: 10, filter: {
+                    author: {
+                        name: "Oliver Nybroe"
+                    }
+                }) {
+                data {
+                    author {
+                        name
+                    }
+                }
+            }
+        }';
+
+        $results = $this->runGraphQl($query);
+        dd($results->toArray($debug = Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE));
+        $results = Arr::get($results, 'posts.data');
+
+        $this->assertCount(2, $results);
+        $this->assertEquals($this->userA->name, Arr::get($results, '0.author.name'));
+        $this->assertEquals($this->userA->name, Arr::get($results, '1.author.name'));
+    }
+
+    /** @test */
+    public function can_filter_from_relation_filter_nested()
+    {
+
+    }
+
+    /** @test */
+    public function can_filter_from_to_many_relation_filter()
+    {
+
+    }
+
+    /** @test */
+    public function can_filter_from_to_many_relation_filter_nested()
+    {
+
+    }
+
+    /** @test */
+    public function can_filter_from_to_many_relation_filter_using_every()
+    {
+
+    }
+
+    /** @test */
+    public function can_filter_from_to_many_relation_filter_using_some()
+    {
+
+    }
+
+    /** @test */
+    public function can_filter_from_to_many_relation_filter_using_none()
+    {
+
     }
 }

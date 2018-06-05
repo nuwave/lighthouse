@@ -2,21 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
+
 use GraphQL\Language\AST\EnumValueDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Type;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -37,8 +30,8 @@ class NodeFactory
      */
     public function handle(NodeValue $value)
     {
-        $value = $this->hasResolver($value)
-            ? $this->useResolver($value)
+        $value = $value->getNode()->hasResolver()
+            ? $value->getNode()->resolver()->resolve($value)
             : $this->transform($value);
 
         return $this->applyMiddleware($this->attachInterfaces($value))
@@ -77,26 +70,10 @@ class NodeFactory
      *
      * @return NodeValue
      */
-    protected function transform(NodeValue $value)
+    protected function transform(NodeValue $value) : NodeValue
     {
-        switch (get_class($value->getNode())) {
-            case EnumTypeDefinitionNode::class:
-                return $this->enum($value);
-            case ScalarTypeDefinitionNode::class:
-                return $this->scalar($value);
-            case InterfaceTypeDefinitionNode::class:
-                return $this->interface($value);
-            case ObjectTypeDefinitionNode::class:
-                return $this->objectType($value);
-            case InputObjectTypeDefinitionNode::class:
-                return $this->inputObjectType($value);
-            case DirectiveDefinitionNode::class:
-                return $this->clientDirective($value);
-            case Extension::class:
-                return $this->extend($value);
-            default:
-                throw new \Exception("Unknown node [{$value->getNodeName()}]");
-        }
+        $value->setType($value->getNode()->toType());
+        return $value;
     }
 
     /**
@@ -141,23 +118,6 @@ class NodeFactory
     }
 
     /**
-     * Resolve interface definition to type.
-     *
-     * @param NodeValue $value
-     *
-     * @return NodeValue
-     */
-    public function interface(NodeValue $value)
-    {
-        $interface = new InterfaceType([
-            'name' => $value->getNodeName(),
-            'fields' => $this->getFields($value),
-        ]);
-
-        return $value->setType($interface);
-    }
-
-    /**
      * Resolve object type definition to type.
      *
      * @param NodeValue $value
@@ -166,12 +126,12 @@ class NodeFactory
      */
     public function objectType(NodeValue $value)
     {
-        $objectType = new ObjectType([
+        $objectType = \Nuwave\Lighthouse\Support\Webonyx\Type::toType(new ObjectType([
             'name' => $value->getNodeName(),
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },
-        ]);
+        ]));
 
         return $value->setType($objectType);
     }
@@ -242,10 +202,10 @@ class NodeFactory
         );
 
         $type = $value->getType();
-        $originalFields = value($type->config['fields']);
-        $type->config['fields'] = function () use ($originalFields, $value) {
+        $originalFields = value($type->config()->fields());
+        $type->config()->fields(function () use ($originalFields, $value) {
             return array_merge($originalFields, $this->getFields($value));
-        };
+        });
 
         return $value;
     }
@@ -280,8 +240,8 @@ class NodeFactory
     {
         return app(Pipeline::class)
             ->send($value)
-            ->through(directives()->nodeMiddleware($value->getNode()))
-            ->via('handleNode')
+            ->through($value->getNode()->middlewares())
+            ->via('handle')
             ->then(function(NodeValue $value) {
                 return $value;
             });

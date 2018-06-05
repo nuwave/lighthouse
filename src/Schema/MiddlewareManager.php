@@ -131,6 +131,5 @@ class MiddlewareManager
      */
     protected function byNode(OperationDefinitionNode $node, $operation)
     {
-        dd('here');
     }
 }

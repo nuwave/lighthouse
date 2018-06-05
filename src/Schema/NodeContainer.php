@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use GraphQL\Error\Error;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class NodeContainer
@@ -81,6 +82,11 @@ class NodeContainer
         $resolver = $this->nodes[$type];
 
         return $resolver($this->decodeRelayId($globalId));
+    }
+
+    public function FindModelByType($type)
+    {
+        return array_search($type, $this->models);
     }
 
     /**

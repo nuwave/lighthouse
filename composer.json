@@ -19,6 +19,7 @@
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
+        "digiaonline/graphql": "@dev",
         "illuminate/contracts": "^5.4",
         "illuminate/http": "^5.4",
         "illuminate/pagination": "^5.4",
@@ -37,15 +38,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Nuwave\\Lighthouse\\": "src/"
+            "Nuwave\\Lighthouse\\": "src2/"
         },
         "files": [
-            "src/Support/helpers.php"
+            "src2/helpers.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests2/"
         }
     },
     "scripts": {

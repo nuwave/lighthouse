@@ -40,6 +40,7 @@ class Handler
 
     public function report(Exception $exception)
     {
+        throw $exception;
         info('GraphQL Error:', [
             'code' => $exception->getCode(),
             'message' => $exception->getMessage(),

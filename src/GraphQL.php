@@ -11,8 +11,10 @@ use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Exceptions\Handler;
+use Nuwave\Lighthouse\Support\Webonyx\NodeRepository;
+use Nuwave\Lighthouse\Support\Webonyx\TypeRepository;
 
-class GraphQL
+class GraphQL2
 {
     /**
      * Cache manager.
@@ -56,12 +58,18 @@ class GraphQL
      */
     protected $graphqlSchema;
 
+    protected $typeRepository;
+
+    protected $nodeRepository;
+
     /**
      * Prepare graphql schema.
+     *
+     * @param string|null $schema
      */
-    public function prepSchema()
+    public function prepSchema(string $schema = null)
     {
-        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
+        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema($schema);
     }
 
     /**
@@ -105,17 +113,17 @@ class GraphQL
     /**
      * Build a new schema instance.
      *
+     * @param string|null $schema
      * @return Schema
      */
-    public function buildSchema()
+    public function buildSchema(string $schema = null)
     {
         $schema = $this->cache()->get(function () {
             return $this->stitcher()->stitch(
                 config('lighthouse.global_id_field', '_id'),
                 config('lighthouse.schema.register')
             );
-        });
-
+        }).$schema;
         return $this->schema()->build($schema);
     }
 
@@ -179,6 +187,30 @@ class GraphQL
         }
 
         return $this->middleware;
+    }
+
+    /**
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQl\Repositories\TypeRepository
+     */
+    public function typeRepository()
+    {
+        if(! $this->typeRepository) {
+            $this->typeRepository = app(TypeRepository::class);
+        }
+
+        return $this->typeRepository;
+    }
+
+    /**
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQl\Repositories\NodeRepository
+     */
+    public function nodeRepository()
+    {
+        if(! $this->nodeRepository) {
+            $this->nodeRepository = app(NodeRepository::class);
+        }
+
+        return $this->nodeRepository;
     }
 
     /**

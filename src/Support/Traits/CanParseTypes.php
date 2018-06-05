@@ -10,6 +10,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Webonyx\Node;
 
 trait CanParseTypes
 {
@@ -18,11 +19,11 @@ trait CanParseTypes
      *
      * @param string $schema
      *
-     * @return DocumentNode
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQl\Node
      */
     public function parseSchema($schema)
     {
-        return Parser::parse($schema);
+        return graphql()->nodeRepository()->fromDriver(Parser::parse($schema));
     }
 
     /**
@@ -38,7 +39,7 @@ trait CanParseTypes
     }
 
     /**
-     * Get object types from document.
+     * Get object Types from document.
      *
      * @param DocumentNode $document
      *

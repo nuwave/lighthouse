@@ -13,11 +13,11 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeNodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class FilterDirective implements NodeMiddleware, ArgMiddleware
+class FilterDirective implements NodeNodeMiddleware, ArgMiddleware
 {
     use CreatesPaginators, HandlesQueryFilter;
 
@@ -39,21 +39,22 @@ class FilterDirective implements NodeMiddleware, ArgMiddleware
      * @param Closure $next
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handle(NodeValue $value, Closure $next) : NodeValue
     {
-        $type = $value->getType()->name;
+        $type = $value->getType()->name();
 
-        $fields = collect($value->getNodeFields())->map(function(FieldDefinitionNode $node) {
-            $type = $node->type;
-            while (property_exists($type, 'type')){
-                $type = $type->type;
-            }
+        $fields = function () use ($value, $type) {
+            $originalType = $type;
+            $fields = collect($value->getNodeFields())->map(function(FieldDefinitionNode $node) use ($originalType) {
+                $type = $node->type;
+                while (property_exists($type, 'type')){
+                    $type = $type->type;
+                }
 
-            $type = $type->name->value;
-            return $this->convertType($node->name->value, $type);
-        });
+                $type = $type->name->value;
+                return $this->convertType($node->name->value, $type, $originalType);
+            });
 
-        $fields = function () use ($fields, $type) {
             $fields->push($this->andType($type));
             $fields->push($this->orType($type));
             return $fields->flattenKeepKeys(1)->all();
@@ -82,7 +83,7 @@ class FilterDirective implements NodeMiddleware, ArgMiddleware
         $argument = $this->injectFilter($argument, [
             'resolve' => function ($query, $key, array $args) use ($argument) {
                 //dd($this->resolveArgument($argument, $query, $key, $args)->toSql());
-                return $this->resolveArgument($argument, $query, $key, $args);
+                return $this->resolve($argument, $query, $key, $args);
             },
         ]);
 
@@ -90,16 +91,29 @@ class FilterDirective implements NodeMiddleware, ArgMiddleware
         return $next($argument);
     }
 
-    public function resolveArgument(ArgumentValue $argument, $query, $key, array $args)
+    /**
+     * Manipulates the query based on the argument or type.
+     *
+     * @param ArgumentValue|Type $type
+     * @param Builder$query
+     * @param $key
+     * @param array $args
+     * @return Builder
+     */
+    public function resolve($type, $query, $key, array $args)
     {
+        if($type instanceof ArgumentValue) {
+            $type = $type->getType();
+        }
         $args = array_get($args, $key);
-        collect($argument->getType()->getFields())->each(function(InputObjectField $field) use (&$query, $args, $key, $argument) {
+        collect($type->getFields())->each(function(InputObjectField $field) use (&$query, $args, $key, $type) {
             if(Arr::has($args, $field->name)) {
-                $query = ($field->resolve)($query, Arr::get($args, $field->name), $argument);
+                $query = ($field->resolve)($query, Arr::get($args, $field->name), $type);
             }
         });
         return $query;
     }
+
 
     public function andType(string $type) {
         return $this->nestedType($type, "AND");
@@ -124,10 +138,10 @@ class FilterDirective implements NodeMiddleware, ArgMiddleware
             $boolean => [
                 'type' => Type::listOf(Type::nonNull(schema()->instance("{$type}Filter"))),
                 'description' => "Logical OR on all given filters.",
-                'resolve' => function(Builder $query, $values, $argument) use ($boolean) {
+                'resolve' => function($query, $values, $argument) use ($boolean) {
                     foreach ($values as $value) {
                         $query->where(function ($query) use ($argument, $value){
-                            return $this->resolveArgument($argument, $query, null, $value);
+                            return $this->resolve($argument, $query, null, $value);
                         }, null, null, $boolean);
                     }
                     return $query;
@@ -136,7 +150,7 @@ class FilterDirective implements NodeMiddleware, ArgMiddleware
         ];
     }
 
-    public function convertType(string $name, string $type) {
+    public function convertType(string $name, string $type, string $originalType) {
         switch ($type) {
             case "ID":
                 return [
@@ -195,21 +209,39 @@ class FilterDirective implements NodeMiddleware, ArgMiddleware
                     "{$name}_gt" => self::greaterThan($name, Type::float()),
                     "{$name}_gte" => self::greaterThanEquals($name, Type::float()),
                 ];
-            default:
-                $type = schema()->instance("{$type}Filter");
-                if(!is_null($type)) {
-                    return [
-                        "{$name}" => self::createType(
-                            $type,
-                            ""
-                        )
-                    ];
-                }
+        }
+
+        /** @var InputObjectType $typeObject */
+        $typeObject = schema()->instance("{$type}Filter");
+
+        if(!is_null($typeObject)) {
+            return [
+                "{$name}" => self::createType(
+                    $typeObject,
+                    "",
+                    function ($query, $values, $argument) use ($typeObject, $type, $name, $originalType) {
+                        foreach ($values as $key => $value) {
+                            dd(schema()->instance($originalType)->getField($name));
+
+                            $relation = $this->directiveArgValue(
+                                $this->fieldDirective(schema()->instance($originalType)->getField($name), 'belongsTo'),
+                                'relation',
+                                $value->getField()->name->value
+                            );
+                            dd($relation);
+
+                            dd($relation);
+                            dd(graphql()->nodes()->FindModelByType($type));
+                            dd($this->resolve($typeObject, $query, null, $values)->toSql());
+                        }
+                    }
+                )
+            ];
         }
         return [];
     }
 
-    public static function createType(Type $type, string $description, callable $method = null) {
+    public static function createType(Type $type, string $description, callable $method) {
         return [
             'type' => $type,
             'description' => $description,

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Support;
 
 use Closure;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
+use Illuminate\Support\Collection;
 
 class Pipeline extends BasePipeline
 {
@@ -12,7 +13,7 @@ class Pipeline extends BasePipeline
 
     public function through($pipes)
     {
-        if($pipes instanceof \Illuminate\Support\Collection) {
+        if($pipes instanceof Collection) {
             $pipes = $pipes->toArray();
         }
         return parent::through($pipes);

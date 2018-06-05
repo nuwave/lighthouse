@@ -4,11 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeNodeMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class GroupDirective implements NodeMiddleware
+class GroupDirective implements NodeNodeMiddleware
 {
     use HandlesDirectives;
 
@@ -31,7 +31,7 @@ class GroupDirective implements NodeMiddleware
      * @return NodeValue
      * @throws DirectiveException
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handle(NodeValue $value, Closure $next): NodeValue
     {
         $this->setNamespace($value);
         $this->setMiddleware($value);

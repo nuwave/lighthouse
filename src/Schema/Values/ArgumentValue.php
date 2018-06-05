@@ -6,7 +6,7 @@ use Closure;
 use GraphQL\Language\AST\DirectiveNode as Directive;
 
 use GraphQL\Language\AST\InputValueDefinitionNode as Argument;
-use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Type;
 
 
 class ArgumentValue

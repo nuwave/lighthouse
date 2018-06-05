@@ -8,11 +8,11 @@ use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeNodeMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class SecurityDirective implements NodeMiddleware
+class SecurityDirective implements NodeNodeMiddleware
 {
     use HandlesDirectives;
 
@@ -35,7 +35,7 @@ class SecurityDirective implements NodeMiddleware
      * @return NodeValue
      * @throws DirectiveException
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handle(NodeValue $value, Closure $next) : NodeValue
     {
         if ('Query' !== $value->getNodeName()) {
             $message = sprintf(

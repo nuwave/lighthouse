@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Type as TypeInterface;
+use Nuwave\Lighthouse\Support\Webonyx\Type;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,7 @@ class LighthouseServiceProvider extends ServiceProvider
         if (config('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
+
 
         $this->registerSchema();
         $this->registerMacros();

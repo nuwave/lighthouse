@@ -21,14 +21,7 @@ class UnionDirective implements NodeResolver
         return 'union';
     }
 
-    /**
-     * Resolve the node directive.
-     *
-     * @param NodeValue $value
-     *
-     * @return mixed
-     */
-    public function resolveNode(NodeValue $value)
+    public function resolve($value)
     {
         $resolver = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), $this->name()),
@@ -41,7 +34,7 @@ class UnionDirective implements NodeResolver
         return $value->setType(new UnionType([
             'name' => $value->getNodeName(),
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
-            'types' => function () use ($value) {
+            'Types' => function () use ($value) {
                 return collect($value->getNode()->types)->map(function ($type) {
                     return schema()->instance($type->name->value);
                 })->filter()->toArray();

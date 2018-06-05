@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeNodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class NodeDirective implements NodeMiddleware
+class NodeDirective implements NodeNodeMiddleware
 {
     use HandlesDirectives;
 
@@ -29,7 +29,7 @@ class NodeDirective implements NodeMiddleware
      * @param Closure $next
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handle(NodeValue $value, Closure $next) : NodeValue
     {
         graphql()->nodes()->node(
             $value->getNodeName(),

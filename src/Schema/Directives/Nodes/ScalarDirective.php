@@ -19,14 +19,7 @@ class ScalarDirective implements NodeResolver
         return 'scalar';
     }
 
-    /**
-     * Resolve the node directive.
-     *
-     * @param NodeValue $value
-     *
-     * @return mixed
-     */
-    public function resolveNode(NodeValue $value)
+    public function resolve($value)
     {
         return ScalarResolver::resolve($value);
     }

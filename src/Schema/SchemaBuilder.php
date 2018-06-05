@@ -4,14 +4,20 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
+use GraphQL\Type\SchemaConfig;
+use GraphQL\Utils\BuildSchema;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Kind;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Node;
+use Nuwave\Lighthouse\Support\Contracts\GraphQl\Type as TypeInterface;
 use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
+use Nuwave\Lighthouse\Support\Webonyx\Type;
 
 class SchemaBuilder
 {
@@ -23,17 +29,17 @@ class SchemaBuilder
      * @var array
      */
     protected $weights = [
-        \GraphQL\Language\AST\ScalarTypeDefinitionNode::class => 0,
-        \GraphQL\Language\AST\InterfaceTypeDefinitionNode::class => 1,
-        \GraphQL\Language\AST\UnionTypeDefinitionNode::class => 2,
+        Kind::Scalar => 0,
+        Kind::Interface => 1,
+        Kind::Union => 2,
     ];
 
     /**
-     * Collection of schema types.
+     * Collection of schema Types.
      *
-     * @var array
+     * @var Collection
      */
-    protected $types = [];
+    protected $types;
 
     /**
      * Custom (client) directives.
@@ -41,6 +47,15 @@ class SchemaBuilder
      * @var array
      */
     protected $directives = [];
+
+    /**
+     * SchemaBuilder constructor.
+     */
+    public function __construct()
+    {
+        $this->types = collect();
+    }
+
 
     /**
      * Generate a GraphQL Schema.
@@ -51,19 +66,41 @@ class SchemaBuilder
      */
     public function build($schema)
     {
+        /** @var Collection $types */
         $types = $this->register($schema);
-        $query = $types->firstWhere('name', 'Query');
-        $mutation = $types->firstWhere('name', 'Mutation');
-        $subscription = $types->firstWhere('name', 'Subscription');
+        $query = optional($types->firstWhere('name', 'Query'))->toGraphQlType();
+        $mutation = optional($types->firstWhere('name', 'Mutation'))->toGraphQlType();
+        $subscription = optional($types->firstWhere('name', 'Subscription'))->toGraphQlType();
 
-        $types = $types->filter(function ($type) {
-            return ! in_array($type->name, ['Query', 'Mutation', 'Subscription']);
-        })->toArray();
+        //dd($query->config['fields']);
+        /*
+        $query = new ObjectType([
+            'name' => 'Query',
+            'fields' => [
+                'hello' => [
+                    'type' => \GraphQL\Type\Definition\Type::string(),
+                    'resolve' => function() {
+                        return 'Hello World!';
+                    }
+                ],
+            ]
+        ]);
+        */
 
+        $types = $types->whereNotIn('name', ['Query', 'Mutation', 'Subscription'])->map(function (TypeInterface $type) {
+            return $type->toGraphQlType();
+        })->all();
         $directives = $this->directives;
         $typeLoader = function ($name) {
             return $this->instance($name);
         };
+
+        $schema = new Schema([
+            'query' => $query
+        ]);
+
+        $schema->assertValid();
+
 
         return new Schema(compact(
             'query',
@@ -84,16 +121,14 @@ class SchemaBuilder
      */
     public function register($schema)
     {
-        $document = $schema instanceof DocumentNode
-            ? $schema
-            : $this->parseSchema($schema);
+        $document = $this->parseSchema($schema);
 
         $this->setTypes($document);
         $this->extendTypes($document);
         $this->setDirectives($document);
         $this->injectNodeField();
 
-        return collect($this->types);
+        return $this->types;
     }
 
     /**
@@ -105,14 +140,11 @@ class SchemaBuilder
      */
     public function instance($type)
     {
-        return collect($this->types)
-        ->first(function ($instance) use ($type) {
-            return $instance->name === $type;
-        });
+        return collect($this->types)->firstWhere('name', $type);
     }
 
     /**
-     * Get all registered types.
+     * Get all registered Types.
      *
      * @return array
      */
@@ -124,13 +156,16 @@ class SchemaBuilder
     /**
      * Add type to register.
      *
-     * @param ObjectType|array $type
+     * @param ObjectType|array $types
      */
-    public function type($type)
+    public function type($types)
     {
-        $this->types = is_array($type)
-            ? array_merge($this->types, $type)
-            : array_merge($this->types, [$type]);
+        $types = is_array($types) ? $types : [$types];
+        $types = array_map(function ($type) {
+            return graphql()->typeRepository()->fromDriver($type);
+        }, $types);
+
+        $this->types = $this->types->merge($types);
     }
 
     /**
@@ -164,24 +199,21 @@ class SchemaBuilder
     }
 
     /**
-     * Set schema types.
+     * Set schema Types.
      *
-     * @param DocumentNode $document
+     * @param Node $document
      */
-    protected function setTypes(DocumentNode $document)
+    protected function setTypes(Node $document)
     {
-        $types = collect($document->definitions)->reject(function ($node) {
-            return $node instanceof TypeExtensionDefinitionNode
-                || $node instanceof DirectiveDefinitionNode;
-        })->sortBy(function ($node) {
-            return array_get($this->weights, get_class($node), 9);
-        })->map(function (Node $node) {
-            return app(NodeFactory::class)->handle(new NodeValue($node));
-        })->toArray();
+        $types = $document->definitions()
+            ->whereNotIn('kind', [Kind::Extension, Kind::Directive])
+            ->map(function (Node $node){
+                return app(NodeFactory::class)->handle(new NodeValue($node));
+            });
 
-        // NOTE: We don't assign this above because new types may be
+        // NOTE: We don't assign this above because new Types may be
         // declared by directives.
-        $this->types = array_merge($this->types, $types);
+        $this->types = $this->types->merge($types);
     }
 
     /**
@@ -191,9 +223,9 @@ class SchemaBuilder
      *
      * @return array
      */
-    protected function setDirectives(DocumentNode $document)
+    protected function setDirectives(Node $document)
     {
-        $this->directives = collect($document->definitions)->filter(function ($node) {
+        $this->directives = $document->definitions()->filter(function ($node) {
             return $node instanceof DirectiveDefinitionNode;
         })->map(function (Node $node) {
             return app(NodeFactory::class)->handle(new NodeValue($node));
@@ -201,13 +233,14 @@ class SchemaBuilder
     }
 
     /**
-     * Extend registered types.
+     * Extend registered Types.
      *
      * @param DocumentNode $document
      */
-    protected function extendTypes(DocumentNode $document)
+    protected function extendTypes(Node $document)
     {
-        collect($document->definitions)->filter(function ($def) {
+
+        $document->definitions()->filter(function ($def) {
             return $def instanceof TypeExtensionDefinitionNode;
         })->each(function (TypeExtensionDefinitionNode $extension) {
             $name = $extension->definition->name->value;
