@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\Directives\FieldDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directives\ManipulatorDirective;
 use Nuwave\Lighthouse\Types\Argument;
+use Nuwave\Lighthouse\Types\NonNullType;
 use Nuwave\Lighthouse\Types\Scalar\IntType;
 use Nuwave\Lighthouse\Types\Scalar\StringType;
 
@@ -32,7 +33,7 @@ class PaginateDirective implements FieldDirective, ManipulatorDirective
         $info->field()->addArgument(new Argument(
             "count",
             null,
-            new IntType("Int", "")
+            NonNullType::ofType(IntType::instance())
         ));
         //dd($info->schema()->type('Query')->resolvedField('users')->arguments());
         return $next($info);

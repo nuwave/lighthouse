@@ -24,4 +24,8 @@ class NonNullType extends Type
         return $this->ofType;
     }
 
+    public static function ofType(Type $type)
+    {
+        return new NonNullType($type);
+    }
 }
