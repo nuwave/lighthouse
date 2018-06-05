@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Types;
 
 
 use Closure;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 
 class Argument
@@ -60,7 +61,7 @@ class Argument
         return $this->defaultValue;
     }
 
-    public function directives()
+    public function directives() : Collection
     {
         return($this->directives)();
     }
@@ -76,5 +77,10 @@ class Argument
                     return $value;
                 });
         };
+    }
+
+    public function hasResolver()
+    {
+        return $this->directives()->isNotEmpty();
     }
 }

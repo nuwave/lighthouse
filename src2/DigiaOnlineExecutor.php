@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse;
 
 
 use function Digia\GraphQL\buildSchema;
-use Digia\GraphQL\Execution\ResolveInfo;
+use Digia\GraphQL\Execution\ResolveInfo as DigiaResolveInfo;
 use Digia\GraphQL\Schema\Schema as DigiaSchema;
 use function Digia\GraphQL\Type\Boolean;
 use function Digia\GraphQL\Type\Float;
@@ -53,13 +53,23 @@ class DigiaOnlineExecutor// implements Executor
         );
     }
 
+    /**
+     * Converts a schema to a digia schema
+     *
+     * @param Schema $schema
+     * @return DigiaSchema
+     * @throws \Digia\GraphQL\Error\InvariantException
+     */
     public function toDigiaSchema(Schema $schema) : DigiaSchema
     {
+        // Convert all types to digia types.
         $types = $schema->types()->mapWithKeys(function (Type $type, $key) {
             return [
                 Str::lower($key) => $this->toDigiaType($type)
             ];
         });
+
+        // Convert all digia types into a digia schema type.
         return newSchema($types->all());
     }
 
@@ -88,18 +98,8 @@ class DigiaOnlineExecutor// implements Executor
             'description' => $type->description(),
             'fields' => function () use ($type) {
                 return $type->fields()->map(function (Field $field) {
-                    return [
+                    $data = [
                         'type' => $this->toDigiaType($field->type()),
-
-                        /*
-                        'type' => newList(newObjectType([
-                            'name'   => 'User',
-                            'fields' => [
-                                'name' => ['type' => newNonNull(String())],
-                            ]
-                        ])),
-                        */
-
                         'description' => $field->description(),
                         'args' => $field->arguments()->mapWithKeys(function (Argument $argument) {
                             return [
@@ -111,12 +111,18 @@ class DigiaOnlineExecutor// implements Executor
                                 ]
                             ];
                         })->all(),
-                        'resolve' => function($response, $param1, $param2, ResolveInfo $resolveInfo) use ($field) {
-                            $result = null;
-
-                            return ($field->resolver($result))();
-                        }
                     ];
+
+                    // Add resolver if field has a resolver.
+                    if($field->hasResolver()) {
+                        $data['resolve'] = function($response, $param1, $param2, DigiaResolveInfo $resolveInfo) use ($field) {
+                            return ($field->resolver(
+                                $this->toResolveInfo($resolveInfo, $field)
+                            ))()->toArray();
+                        };
+                    }
+
+                    return $data;
                 })->all();
             }
         ];
@@ -167,5 +173,10 @@ class DigiaOnlineExecutor// implements Executor
                 }
             ]
         );
+    }
+
+    public function toResolveInfo(DigiaResolveInfo $resolveInfo, Field $field) : ResolveInfo
+    {
+        return new ResolveInfo($field);
     }
 }

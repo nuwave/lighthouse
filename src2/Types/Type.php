@@ -9,18 +9,17 @@ use ArrayAccess;
 use Closure;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Directive;
+use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
 
 abstract class Type implements ArrayAccess
 {
-    use HasAttributes;
+    use HasAttributes, HasDirectives;
 
     protected $name;
 
     protected $description;
 
     protected $fields;
-
-    protected $directives;
 
     /**
      * Type constructor.
@@ -46,18 +45,6 @@ abstract class Type implements ArrayAccess
     public function field($name) : ?Field
     {
         return $this->fields()->get($name);
-    }
-
-    public function directives() : Collection
-    {
-        return ($this->directives)();
-    }
-
-    public function directive($name) : ?Directive
-    {
-        return $this->directives()->first(function (Directive $directive) use ($name) {
-            return $directive->name() === $name;
-        });
     }
 
     public function description() : ?string

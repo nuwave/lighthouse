@@ -6,11 +6,12 @@ namespace Nuwave\Lighthouse\Types;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
 use Nuwave\Lighthouse\Support\Pipeline;
 
 class Field
 {
-    use HasAttributes;
+    use HasAttributes, HasDirectives;
 
     public $name;
 
@@ -19,8 +20,6 @@ class Field
     protected $type;
 
     protected $arguments;
-
-    protected $directives;
 
     protected $resolver;
 
@@ -48,7 +47,7 @@ class Field
         $this->type = $type;
         $this->arguments = $arguments ?? function() {return collect();};
         $this->directives = $directives ?? function() {return collect();};
-        $this->resolver = $resolver ?? function($result) {return $result;};
+        $this->resolver = $resolver;
     }
 
     public function description() : ?string
@@ -78,9 +77,21 @@ class Field
         });
     }
 
-    public function directives()
+    public function hasArgument($name)
     {
-        return($this->directives)();
+        return !is_null($this->argument($name));
+    }
+
+    public function hasResolver() : bool
+    {
+        // Checks if arguments has any resolvers, then check if
+        // Directives on the field has any resolver and then
+        // check if the field itself has a resolver.
+        return $this->arguments()->filter(function (Argument $argument) {
+            return $argument->hasResolver();
+        })->isNotEmpty() ||
+            $this->directives()->isNotEmpty() ||
+            !is_null($this->resolver);
     }
 
     public function resolver($result) : Closure
@@ -91,7 +102,9 @@ class Field
             });
 
             // First resolve with supplied resolver
-            $result = ($this->resolver)($result);
+            if(!is_null($this->resolver)) {
+                $result = ($this->resolver)($result);
+            }
 
             // Then resolve with directives.
             $result = app(Pipeline::class)

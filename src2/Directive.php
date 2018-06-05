@@ -38,7 +38,7 @@ class Directive
         return $this->arguments;
     }
 
-    public function argument($name) : Argument
+    public function argument($name) : ?Argument
     {
         return $this->arguments()->first(function (Argument $argument) use ($name) {
             return $argument->name() === $name;

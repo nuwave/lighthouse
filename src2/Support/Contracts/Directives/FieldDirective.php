@@ -5,9 +5,10 @@ namespace Nuwave\Lighthouse\Support\Contracts\Directives;
 
 
 use Closure;
+use Nuwave\Lighthouse\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 interface FieldDirective extends Directive
 {
-    public function handleField($value, Closure $next);
+    public function handleField(ResolveInfo $resolveInfo, Closure $next);
 }
