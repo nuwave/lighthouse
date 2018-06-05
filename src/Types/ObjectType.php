@@ -17,13 +17,14 @@ class ObjectType extends Type
      */
     public function fields(): Collection
     {
+        parent::fields();
         // Sends the collection returned by field closure through the pipeline of node directives.
         return app(Pipeline::class)
-            ->send(parent::fields())
+            ->send($this)
             ->through(graphql()->directives()->getFromDirectives($this->directives()))
             ->via('handleNode')
-            ->then(function($value) {
-                return $value;
+            ->then(function(Type $type) {
+                return $type->resolvedFields();
             });
     }
 

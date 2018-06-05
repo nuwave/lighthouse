@@ -23,6 +23,7 @@ use GraphQL\Type\Definition\StringType as WebonyxStringType;
 use GraphQL\Type\Definition\Type as WebonyxType;
 use GraphQL\Utils\BuildSchema;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\Schema;
 use Nuwave\Lighthouse\Types\Argument;
 use Nuwave\Lighthouse\Types\EnumType;
 use Nuwave\Lighthouse\Types\EnumValueType;

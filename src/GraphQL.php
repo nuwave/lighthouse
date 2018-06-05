@@ -30,6 +30,8 @@ class GraphQL
 
     public function execute(string $query)
     {
+        $this->schema = $this->schema()->runManipulatorDirectives();
+
         return app(Executor::class)->execute($this->schema(), $query);
     }
 

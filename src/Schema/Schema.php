@@ -31,4 +31,9 @@ class Schema
     {
         return $this->types()->firstWhere('name', $name);
     }
+
+    public function runManipulatorDirectives() : Schema
+    {
+        return $this;
+    }
 }

@@ -96,11 +96,13 @@ class DigiaOnlineExecutor// implements Executor
 
     public function convertToDigiaType(Type $type)
     {
+        $fields = $type->fields();
+
         $default = [
             'name' => $type->name(),
             'description' => $type->description(),
-            'fields' => function () use ($type) {
-                return $type->fields()->map(function (Field $field) {
+            'fields' => function () use ($type, $fields) {
+                return $fields->map(function (Field $field) {
                     $data = [
                         'type' => $this->toDigiaType($field->type()),
                         'description' => $field->description(),
@@ -120,10 +122,11 @@ class DigiaOnlineExecutor// implements Executor
                     if($field->hasResolver()) {
                         $data['resolve'] = function($response, $param1, $param2, DigiaResolveInfo $resolveInfo) use ($field) {
 
-                            /** @var ResolveInfo $resolveInfo */
+
                             $resolveInfo = ($field->resolver(
                                 $this->toResolveInfo($resolveInfo, $field)
                             ))();
+                            /** @var ResolveInfo $resolveInfo */
 
                             $result = $resolveInfo->result();
                             if($result instanceof Arrayable) {

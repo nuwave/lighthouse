@@ -31,13 +31,12 @@ class EventDirectiveTest extends TestCase
         $userField = $schema->type('Query')->field('user');
         $resolver = $userField->resolver(new ResolveInfo($userField));
 
+
+
         $resolver();
 
         Event::assertDispatched(FetchedUser::class);
     }
 }
 
-class FetchedUser
-{
-
-}
+class FetchedUser{}

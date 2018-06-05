@@ -8,13 +8,12 @@ use Closure;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
+use Nuwave\Lighthouse\Schema\Traits\HasName;
 use Nuwave\Lighthouse\Support\Pipeline;
 
 class Field
 {
-    use HasAttributes, HasDirectives;
-
-    public $name;
+    use HasAttributes, HasDirectives, HasName;
 
     protected $description;
 
@@ -56,14 +55,17 @@ class Field
         return $this->description;
     }
 
-    public function name() : string
-    {
-        return $this->name;
-    }
-
     public function type() : Type
     {
         return $this->type;
+    }
+
+    /**
+     * @param Type $type
+     */
+    public function setType(Type $type): void
+    {
+        $this->type = $type;
     }
 
     public function arguments() : Collection

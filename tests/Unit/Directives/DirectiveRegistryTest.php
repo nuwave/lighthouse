@@ -16,6 +16,7 @@ use Nuwave\Lighthouse\Support\Contracts\Directives\NodeDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Types\Field;
 use Nuwave\Lighthouse\Types\Scalar\StringType;
+use Nuwave\Lighthouse\Types\Type;
 use Tests\TestCase;
 
 class DirectiveRegistryTest extends TestCase
@@ -277,9 +278,10 @@ class ExampleDirective implements NodeDirective, FieldDirective, ArgumentDirecti
         return "Example";
     }
 
-    public function handleNode(Collection $fields, Closure $next)
+    public function handleNode(Type $type, Closure $next)
     {
-        $fields->put("example", new Field(
+
+        $type->resolvedFields()->put("example", new Field(
            "example",
            "example auto generated field",
            graphql()->schema()->type("String"),
@@ -289,7 +291,7 @@ class ExampleDirective implements NodeDirective, FieldDirective, ArgumentDirecti
                dd("example resolver");
            }
         ));
-        return $next($fields);
+        return $next($type);
     }
 
     public function handleField(ResolveInfo $resolveInfo, Closure $next)
@@ -338,9 +340,9 @@ class OtherDirective implements FieldDirective, NodeDirective
         return $next($resolveInfo);
     }
 
-    public function handleNode(Collection $fields, Closure $next)
+    public function handleNode(Type $type, Closure $next)
     {
-        $fields->put("other", new Field(
+        $type->resolvedFields()->put("other", new Field(
             'other',
             null,
             graphql()->schema()->type("String"),
@@ -351,6 +353,6 @@ class OtherDirective implements FieldDirective, NodeDirective
             }
         ));
 
-        return $next($fields);
+        return $next($type);
     }
 }
