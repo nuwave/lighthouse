@@ -8,21 +8,19 @@ use Closure;
 use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\Directives\FieldDirective;
 
-class EventDirective implements FieldDirective
+class AuthDirective implements FieldDirective
 {
-
     public function name()
     {
-       return 'event';
+        return 'auth';
     }
 
     public function handleField(ResolveInfo $resolveInfo, Closure $next)
     {
-        $event = optional($resolveInfo->field()->directive($this->name())->argument('fire'))->defaultValue();
+        $arg = $resolveInfo->field()->directive($this->name())->argument('guard');
+        $guard = optional($arg)->defaultValue();
 
-        $resolveInfo->addAfter(function ($result) use ($event){
-            event(new $event($result));
-        });
+        $resolveInfo->result(auth($guard)->user());
 
         return $next($resolveInfo);
     }

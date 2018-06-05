@@ -38,15 +38,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Nuwave\\Lighthouse\\": "src2/"
+            "Nuwave\\Lighthouse\\": "src/"
         },
         "files": [
-            "src2/helpers.php"
+            "src/Support/helpers.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests2/"
+            "Tests\\": "tests/"
         }
     },
     "scripts": {

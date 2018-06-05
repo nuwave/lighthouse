@@ -1,30 +1,41 @@
 <?php
 
-
 namespace Tests\Integration;
-
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class GraphQlTest extends DBTestCase
+class GraphQLTest extends DBTestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function itCanResolveQuery()
+    /**
+     * Auth user.
+     *
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * User assigned tasks.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $tasks;
+
+    /**
+     * Define environment setup.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     */
+    protected function getEnvironmentSetUp($app)
     {
-        /** @var User $user */
-        $user = factory(User::class)->create();
-        $tasks = factory(Task::class, 5)->create([
-            'user_id' => $user->getKey(),
-        ]);
+        parent::getEnvironmentSetUp($app);
+        $app['config']->set('lighthouse.route_enable_get', true);
 
-        $this->be($user);
-
-        $schema = '
+        $path = $this->store('schema.graphql', '
         type User {
             id: ID!
             name: String!
@@ -43,8 +54,30 @@ class GraphQlTest extends DBTestCase
         type Query {
             user: User @auth
         }
-        ';
+        ');
 
+        $app['config']->set('lighthouse.schema.register', $path);
+    }
+
+    /**
+     * Setup test environment.
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->user = factory(User::class)->create();
+        $this->tasks = factory(Task::class, 5)->create([
+            'user_id' => $this->user->getKey(),
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveQuery()
+    {
+        $this->be($this->user);
         $query = '
         query UserWithTasks {
             user {
@@ -56,14 +89,12 @@ class GraphQlTest extends DBTestCase
         }
         ';
 
-        graphql()->build($schema);
         $data = graphql()->execute($query);
-        dd($data);
         $expected = [
             'data' => [
                 'user' => [
-                    'email' => $user->email,
-                    'tasks' => $tasks->map(function ($task) {
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks->map(function ($task) {
                         return ['name' => $task->name];
                     })->toArray(),
                 ],
@@ -72,4 +103,73 @@ class GraphQlTest extends DBTestCase
 
         $this->assertEquals($expected, $data);
     }
+
+
+    /**
+     * @test
+     */
+    public function itCanResolveQueryThroughController()
+    {
+        $this->be($this->user);
+        $query = '
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+
+        $data = $this->postJson("graphql", ['query' => $query])->json();
+
+        $expected = [
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks->map(function ($task) {
+                        return ['name' => $task->name];
+                    })->toArray(),
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $data);
+    }
+
+  /**
+   * @test
+   */
+  public function itCanResolveQueryThroughControllerViaGetRequest()
+  {
+    $this->be($this->user);
+    $query = '
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+
+    $uri = 'graphql?'.http_build_query(['query' => $query]);
+
+    $data = $this->getJson($uri)->json();
+
+    $expected = [
+      'data' => [
+        'user' => [
+          'email' => $this->user->email,
+          'tasks' => $this->tasks->map(function ($task) {
+            return ['name' => $task->name];
+          })->toArray(),
+        ],
+      ],
+    ];
+
+    $this->assertEquals($expected, $data);
+  }
 }
