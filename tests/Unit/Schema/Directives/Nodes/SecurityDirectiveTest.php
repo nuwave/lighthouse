@@ -15,12 +15,12 @@ class SecurityDirectiveTest extends TestCase
      */
     public function itCanSetMaxDepth()
     {
-        $schema = '
+        $this->buildSchemaFromString('
         type Query @security(depth: 3) {
             me: String
-        }';
+        }
+        ');
 
-        schema()->register($schema);
         $rule = DocumentValidator::getRule(QueryDepth::class);
         $this->assertEquals(3, $rule->getMaxQueryDepth());
     }
@@ -30,12 +30,12 @@ class SecurityDirectiveTest extends TestCase
      */
     public function itCanSetMaxComplexity()
     {
-        $schema = '
+        $this->buildSchemaFromString('
         type Query @security(complexity: 3) {
             me: String
-        }';
+        }
+        ');
 
-        schema()->register($schema);
         $rule = DocumentValidator::getRule(QueryComplexity::class);
         $this->assertEquals(3, $rule->getMaxQueryComplexity());
     }

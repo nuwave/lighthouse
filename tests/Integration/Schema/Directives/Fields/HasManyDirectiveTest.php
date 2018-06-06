@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
+use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
@@ -134,7 +135,6 @@ class HasManyDirectiveTest extends DBTestCase
         ';
 
         $this->expectException(DirectiveException::class);
-        $type = schema()->register($schema)->first();
-        $type->config['fields']();
+        $this->buildSchemaFromString($schema);
     }
 }

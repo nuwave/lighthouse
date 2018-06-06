@@ -91,8 +91,8 @@ class NodeFactory
                 return $this->inputObjectType($value);
             case DirectiveDefinitionNode::class:
                 return $this->clientDirective($value);
-            case Extension::class:
-                return $this->extend($value);
+//            case Extension::class:
+//                return $this->extend($value);
             default:
                 throw new \Exception("Unknown node [{$value->getNodeName()}]");
         }
@@ -103,7 +103,7 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\EnumType
+     * @return NodeValue
      */
     public function enum(NodeValue $value)
     {
@@ -132,7 +132,7 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\ScalarType
+     * @return NodeValue
      */
     public function scalar(NodeValue $value)
     {
@@ -226,28 +226,28 @@ class NodeFactory
 
         return $value->setType($directive);
     }
-
-    /**
-     * Extend type definition.
-     *
-     * @param NodeValue $value
-     *
-     * @return NodeValue
-     */
-    public function extend(NodeValue $value)
-    {
-        $value->setNode(
-            $value->getNode()->definition
-        );
-
-        $type = $value->getType();
-        $originalFields = value($type->config['fields']);
-        $type->config['fields'] = function () use ($originalFields, $value) {
-            return array_merge($originalFields, $this->getFields($value));
-        };
-
-        return $value;
-    }
+//
+//    /**
+//     * Extend type definition.
+//     *
+//     * @param NodeValue $value
+//     *
+//     * @return NodeValue
+//     */
+//    public function extend(NodeValue $value)
+//    {
+//        $value->setNode(
+//            $value->getNode()->definition
+//        );
+//
+//        $type = $value->getType();
+//        $originalFields = value($type->config['fields']);
+//        $type->config['fields'] = function () use ($originalFields, $value) {
+//            return array_merge($originalFields, $this->getFields($value));
+//        };
+//
+//        return $value;
+//    }
 
     /**
      * Attach interfaces to type.

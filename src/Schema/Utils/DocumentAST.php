@@ -3,8 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Utils;
 
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -12,6 +10,7 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
+use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
 
@@ -39,6 +38,79 @@ class DocumentAST
     }
 
     /**
+     * Parse a single object type.
+     *
+     * @param string $definition
+     *
+     * @return ObjectTypeDefinitionNode
+     * @throws \Exception
+     */
+    public static function parseObjectType($definition)
+    {
+        $objectTypes = self::parse($definition)->objectTypes();
+        if ($objectTypes->count() <> 1) {
+            throw new \Exception('More than one definition was found in the passed in schema.');
+        }
+        return $objectTypes->first();
+    }
+
+    /**
+     * Parse a single field definition.
+     *
+     * @param $fieldDefinition
+     * @return FieldDefinitionNode
+     *
+     * @throws \Exception
+     */
+    public static function parseFieldDefinition($fieldDefinition)
+    {
+        return self::parseObjectType("type Dummy { $fieldDefinition }")
+            ->fields[0];
+    }
+
+    /**
+     * Parse the definition for arguments on a field.
+     *
+     * @param string $argumentDefinitions
+     * @return NodeList
+     *
+     * @throws \Exception
+     */
+    public static function parseArgumentDefinitions($argumentDefinitions)
+    {
+        return self::parseFieldDefinition("field($argumentDefinitions): String")
+            ->arguments;
+    }
+
+    /**
+     * Parse the definition of a type name.
+     *
+     * @param string $typeDefinition
+     *
+     * @return TypeNode
+     * @throws \Exception
+     */
+    public static function parseTypeDefinition($typeDefinition)
+    {
+        return self::parseFieldDefinition("dummy: $typeDefinition")->type;
+    }
+
+    /**
+     * Parse the definition for directives.
+     *
+     * @param string $directiveDefinition
+     *
+     * @return NodeList
+     * @throws \Exception
+     */
+    public static function parseDirectives($directiveDefinition)
+    {
+        return self::parseObjectType("type Dummy $directiveDefinition {}")->directives;
+    }
+
+
+
+    /**
      * Get a collection of the contained definitions.
      *
      * @return Collection
@@ -46,6 +118,46 @@ class DocumentAST
     public function definitions()
     {
         return collect($this->documentNode->definitions);
+    }
+
+    /**
+     * Get all definitions for directives.
+     *
+     * @return Collection
+     */
+    public function directives()
+    {
+        return $this->getDefinitionsByType(DirectiveDefinitionNode::class);
+    }
+
+    /**
+     * Get all definitions for type extensions.
+     *
+     * @return Collection
+     */
+    public function typeExtensions()
+    {
+        return $this->getDefinitionsByType(TypeExtensionDefinitionNode::class);
+    }
+
+    /**
+     * Get all definitions for operations.
+     *
+     * @return Collection
+     */
+    public function operations()
+    {
+        return $this->getDefinitionsByType(OperationDefinitionNode::class);
+    }
+
+    /**
+     * Get all definitions for object types.
+     *
+     * @return Collection
+     */
+    public function objectTypes()
+    {
+        return $this->getDefinitionsByType(ObjectTypeDefinitionNode::class);
     }
 
     /**
@@ -88,24 +200,7 @@ class DocumentAST
     public function getObjectTypeOrDefault($name)
     {
         return $this->getObjectType($name)
-            ?: self::parseSingleDefinition('type ' . $name . '{}');
-    }
-
-    /**
-     * Parse and return a single definition.
-     *
-     * @param string $definition
-     *
-     * @return DefinitionNode
-     * @throws \Exception
-     */
-    public static function parseSingleDefinition($definition)
-    {
-        $definitions = self::parse($definition)->definitions();
-        if ($definitions->count() <> 1) {
-            throw new \Exception('More than one definition was found in the passed in schema.');
-        }
-        return $definitions->first();
+            ?: self::parseObjectType('type ' . $name . '{}');
     }
 
     /**
@@ -115,20 +210,20 @@ class DocumentAST
      */
     public function getObjectType($name)
     {
-        $definition = $this->getDefinitionByName($name);
-
-        return $definition instanceof ObjectTypeDefinitionNode ? $definition : null;
+        return $this->objectTypes()->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
+            return $objectType->name->value === $name;
+        });
     }
 
     /**
-     * @param string $name
+     * @param $name
      *
-     * @return DefinitionNode|null
+     * @return TypeExtensionDefinitionNode|null
      */
-    public function getDefinitionByName($name)
+    public function getTypeExtension($name)
     {
-        return $this->definitions()->first(function ($node) use ($name) {
-            return $node->name->value === $name;
+        return $this->typeExtensions()->first(function (TypeExtensionDefinitionNode $typeExtension) use ($name) {
+            return $typeExtension->definition->name->value === $name;
         });
     }
 
@@ -166,65 +261,48 @@ class DocumentAST
     {
         $query = $this->getQueryTypeDefinition();
         $query = self::addFieldToObjectType($query, $field);
-        $this->setDefinition($query);
-    }
-
-
-    public static function parseFieldDefinition($fieldDefinition)
-    {
-        return self::parseSingleDefinition("type Dummy { $fieldDefinition }")
-            ->fields[0];
+        $this->setObjectType($query);
     }
 
     /**
-     * @param string $argumentDefinitions
-     * @return NodeList
-     */
-    public static function parseArgumentDefinitions($argumentDefinitions)
-    {
-        return self::parseFieldDefinition("field($argumentDefinitions): String }")
-            ->arguments;
-    }
-
-    /**
-     * @param DefinitionNode $definitionNode
+     * @param ObjectTypeDefinitionNode $definitionNode
      *
      * @return DocumentAST
      */
-    public function setDefinition(DefinitionNode $definitionNode)
+    public function setObjectType(ObjectTypeDefinitionNode $definitionNode)
     {
         $name = $definitionNode->name->value;
+        $newDefinitions = $this->definitions()
+            ->reject(function ($node) use ($name) {
+                return $node instanceof ObjectTypeDefinitionNode && $node->name->value === $name;
+            })->push($definitionNode)
+            // Reindex, otherwise offset errors might happen in subsequent runs
+            ->values()
+            ->all();
 
-        $this->documentNode->definitions = $this->definitions()->reject(function (DefinitionNode $type) use ($name) {
-            return $type->name->value === $name;
-        })->push($definitionNode)->toArray();
-
-        return $this;
-    }
-
-    public function setDefinitionFromString($definition)
-    {
-        $definitionNode = self::parseSingleDefinition($definition);
-        $this->setDefinition($definitionNode);
+        // This was a NodeList before, so put it back as it was
+        $this->documentNode->definitions = new NodeList($newDefinitions);
+//        $definitions->merge()
+//
+//        $this->documentNode->definitions = $this->objectTypes()->reject(function (ObjectTypeDefinitionNode $type) use ($name) {
+//            return $type->name->value === $name;
+//        })->push($definitionNode)->toArray();
 
         return $this;
     }
 
     /**
-     * @return Collection
+     * @param string $definition
+     *
+     * @return static
+     *
+     * @throws \Exception
      */
-    public function directives()
+    public function setObjectTypeFromString($definition)
     {
-        return $this->getDefinitionsByType(DirectiveDefinitionNode::class);
-    }
+        $definitionNode = self::parseObjectType($definition);
+        $this->setObjectType($definitionNode);
 
-    public function typeExtensions()
-    {
-        return $this->getDefinitionsByType(TypeExtensionDefinitionNode::class);
-    }
-
-    public function operations()
-    {
-        return $this->getDefinitionsByType(OperationDefinitionNode::class);
+        return $this;
     }
 }

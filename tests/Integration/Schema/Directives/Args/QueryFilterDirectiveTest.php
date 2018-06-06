@@ -2,8 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives\Args;
 
+use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nuwave\Lighthouse\Schema\Directives\Args\EqFilterDirective;
+use Nuwave\Lighthouse\Schema\Utils\ASTBuilder;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 

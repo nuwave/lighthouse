@@ -17,7 +17,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('Foo');
         $fields = $type->config['fields'];
         $resolver = array_get($fields, 'bar.resolve');
         // TODO: Use prophecy to ensure middleware is called

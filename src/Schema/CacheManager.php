@@ -29,11 +29,9 @@ class CacheManager
     }
 
     /**
-     * Load GraphQL schema.
+     * Load GraphQL schema from cache if it exists.
      *
-     * @param Closure $schema
-     *
-     * @return DocumentNode|string
+     * @return DocumentAST|null
      */
     public function get(Closure $schema)
     {
@@ -44,7 +42,7 @@ class CacheManager
         }
 
         return file_exists($cacheFile)
-            ? AST::fromArray(require $cacheFile)
+//            && AST::fromArray(require $cacheFile)
             : $this->set($schema());
     }
 }

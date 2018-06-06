@@ -126,7 +126,8 @@ class PaginateDirectiveTest extends DBTestCase
         $users = factory(User::class, 10)->create();
 
         $schema = '
-        type User {
+        type User implements Node {
+            _id: ID!
             id: ID!
             name: String!
         }

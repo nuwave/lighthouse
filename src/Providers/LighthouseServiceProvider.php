@@ -61,10 +61,10 @@ class LighthouseServiceProvider extends ServiceProvider
         directives()->load(realpath(__DIR__.'/../Schema/Directives/'), 'Nuwave\\Lighthouse\\');
         directives()->load(config('lighthouse.directives', []));
 
-        graphql()->stitcher()->stitch(
-            config('lighthouse.global_id_field', '_id'),
-            config('lighthouse.schema.register')
-        );
+//        graphql()->stitcher()->stitch(
+//            config('lighthouse.global_id_field', '_id'),
+//            config('lighthouse.schema.register')
+//        );
     }
 
     /**

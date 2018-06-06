@@ -4,7 +4,9 @@ namespace Tests;
 
 use GraphQL\Executor\Executor;
 use GraphQL\Language\Parser;
+use GraphQL\Utils\SchemaPrinter;
 use Laravel\Scout\ScoutServiceProvider;
+use Nuwave\Lighthouse\Schema\Utils\ASTBuilder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -112,7 +114,7 @@ class TestCase extends BaseTestCase
      *
      * @param string $schema
      * @param string $query
-     * @param string $lighthouse
+     * @param bool $lighthouse
      * @param array  $variables
      *
      * @return \GraphQL\Executor\ExecutionResult
@@ -124,8 +126,14 @@ class TestCase extends BaseTestCase
             $lighthouse = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
             $schema = $node."\n".$lighthouse."\n".$schema;
         }
+//        dd(SchemaPrinter::doPrint($this->buildSchemaFromString($schema)));
 
-        return Executor::execute(schema()->build($schema), $this->parse($query));
+        return Executor::execute($this->buildSchemaFromString($schema), $this->parse($query));
+    }
+
+    protected function buildSchemaFromString($schema)
+    {
+        return schema()->build(ASTBuilder::generate($schema));
     }
 
     /**

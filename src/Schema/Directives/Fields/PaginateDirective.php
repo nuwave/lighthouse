@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -29,13 +31,15 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
     }
 
     /**
-     * @param $fieldDefinition
+     * @param Node $fieldDefinition
      * @param DocumentAST $current
      * @param DocumentAST $original
+     * @param ObjectTypeDefinitionNode|null $objectType
      *
      * @return DocumentAST
+     * @throws \Exception
      */
-    public function handleSchemaGeneration($fieldDefinition, DocumentAST $current, DocumentAST $original)
+    public function handleSchemaGeneration(Node $fieldDefinition, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
     {
         $paginatorType = $this->directiveArgValue(
             $this->fieldDirective($fieldDefinition, self::name()),
@@ -46,10 +50,10 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
         switch($paginatorType){
             case 'relay':
             case 'connection':
-                return $this->registerConnection($fieldDefinition, $current, $original);
+                return $this->registerConnection($fieldDefinition, $current, $original, $parentType);
             case 'paginator':
             default:
-                return $this->registerPaginator($fieldDefinition, $current, $original);
+                return $this->registerPaginator($fieldDefinition, $current, $original, $parentType);
         }
     }
 

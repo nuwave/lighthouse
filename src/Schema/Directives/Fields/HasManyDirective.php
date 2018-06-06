@@ -3,15 +3,19 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class HasManyDirective implements FieldResolver
+class HasManyDirective implements FieldResolver, SchemaGenerator
 {
     use CreatesPaginators, HandlesGlobalId;
 
@@ -26,6 +30,36 @@ class HasManyDirective implements FieldResolver
     }
 
     /**
+     * @param Node $definitionNode
+     * @param DocumentAST $current
+     * @param DocumentAST $original
+     * @param ObjectTypeDefinitionNode|null $parentType
+     *
+     * @return DocumentAST
+     */
+    public function handleSchemaGeneration(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
+    {
+        $resolver = $this->getResolver($definitionNode);
+
+        if (!in_array($resolver, ['default', 'paginator', 'relay', 'connection'])) {
+            throw new DirectiveException(sprintf(
+                '[%s] is not a valid `type` on `hasMany` directive [`paginator`, `relay`, `default`].',
+                $resolver
+            ));
+        }
+
+        switch ($resolver) {
+            case 'paginator':
+                return $this->registerPaginator($definitionNode, $current, $original, $parentType);
+            case 'connection':
+            case 'relay':
+                return $this->registerConnection($definitionNode, $current, $original, $parentType);
+            default:
+                return $current;
+        }
+    }
+
+    /**
      * Resolve the field directive.
      *
      * @param FieldValue $value
@@ -37,28 +71,14 @@ class HasManyDirective implements FieldResolver
         $relation = $this->getRelationshipName($value->getField());
         $resolver = $this->getResolver($value->getField());
 
-        if (! in_array($resolver, ['default', 'paginator', 'relay', 'connection'])) {
-            throw new DirectiveException(sprintf(
-                '[%s] is not a valid `type` on `hasMany` directive [`paginator`, `relay`, `default`].',
-                $resolver
-            ));
-        }
+        $scopes = $this->getScopes($value);
 
-        switch ($resolver) {
-            case 'paginator':
-                return $value->setResolver(
-                    $this->paginatorTypeResolver($relation, $value)
-                );
-            case 'connection':
-            case 'relay':
-                return $value->setResolver(
-                    $this->connectionTypeResolver($relation, $value)
-                );
-            default:
-                return $value->setResolver(
-                    $this->defaultResolver($relation, $value)
-                );
-        }
+        return $value->setResolver(function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes, $resolver) {
+            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
+                compact('relation', 'parent', 'args', 'scopes'),
+                ['type' => $resolver]
+            ), HasManyLoader::key($parent, $relation, $info));
+        });
     }
 
     /**
@@ -91,68 +111,6 @@ class HasManyDirective implements FieldResolver
             'type',
             'default'
         );
-    }
-
-    /**
-     * Get connection type.
-     *
-     * @param string     $relation
-     * @param FieldValue $value
-     *
-     * @return \Closure
-     */
-    protected function connectionTypeResolver($relation, FieldValue $value)
-    {
-        $this->registerConnection($value);
-        $scopes = $this->getScopes($value);
-
-        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
-            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
-                compact('relation', 'parent', 'args', 'scopes'),
-                ['type' => 'relay']
-            ), HasManyLoader::key($parent, $relation, $info));
-        };
-    }
-
-    /**
-     * Get paginator type resolver.
-     *
-     * @param string     $relation
-     * @param FieldValue $value
-     *
-     * @return \Closure
-     */
-    protected function paginatorTypeResolver($relation, FieldValue $value)
-    {
-        $this->registerPaginator($value);
-        $scopes = $this->getScopes($value);
-
-        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
-            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
-                compact('relation', 'parent', 'args', 'scopes'),
-                ['type' => 'paginator']
-            ), HasManyLoader::key($parent, $relation, $info));
-        };
-    }
-
-    /**
-     * Use default resolver for field.
-     *
-     * @param FieldValue $value
-     * @param string     $relation
-     *
-     * @return \Closure
-     */
-    protected function defaultResolver($relation, FieldValue $value)
-    {
-        $scopes = $this->getScopes($value);
-
-        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes) {
-            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
-                compact('relation', 'parent', 'args', 'scopes'),
-                ['type' => 'default']
-            ), HasManyLoader::key($parent, $relation, $info));
-        };
     }
 
     /**

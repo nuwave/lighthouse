@@ -24,7 +24,7 @@ class MethodDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('Foo');
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'bar.resolve');
         $this->assertEquals('baz', $resolver($root, []));
@@ -48,7 +48,7 @@ class MethodDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('Foo');
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'bar.resolve');
         $this->assertEquals('foo', $resolver($root, ['baz' => 'foo']));

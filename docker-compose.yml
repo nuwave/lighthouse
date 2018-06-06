@@ -2,7 +2,7 @@ version: '2'
 
 services:
   php:
-    image: #todo add in some fitting php image
+    image: spawnia/php7.1-fpm:dev
     volumes:
       - ./:/var/www
     environment:

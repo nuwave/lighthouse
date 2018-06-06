@@ -2,12 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode;
+use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class GroupDirective implements NodeMiddleware
+class GroupDirective implements NodeMiddleware, SchemaGenerator
 {
     use HandlesDirectives;
 
@@ -86,4 +93,47 @@ class GroupDirective implements NodeMiddleware
                 : $container->registerMutation($field->name->value, $middleware);
         }
     }
+
+    /**
+     * @param Node $definitionNode
+     * @param DocumentAST $current
+     * @param DocumentAST $original
+     * @param ObjectTypeDefinitionNode|null $parentType
+     *
+     * @return DocumentAST
+     */
+    public function handleSchemaGeneration(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
+    {
+        $nodeName = $definitionNode->name->value;
+
+        if (! in_array($nodeName, ['Query', 'Mutation'])) {
+            $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
+
+            throw new DirectiveException($message);
+        }
+
+        dd($definitionNode->directives);
+
+        $middlewareDirectives = $this->middlewareFieldDirective();
+
+        dd($definitionNode->fields);
+        collect($definitionNode->fields)->transform(function(FieldDefinitionNode $fieldDefinition) use ($middlewareDirectives){
+//            $fieldDefinition->directives->merge()
+        });
+
+    }
+//
+//    /**
+//     * @return NodeList
+//     */
+//    protected function middlewareFieldDirective()
+//    {
+//        $middleware = $this->directiveArgValue(
+//            $this->nodeDirective($definitionNode, self::name()),
+//            'middleware'
+//        );
+////        dd(implode)
+//
+//        $middlewareDirectives = DocumentAST::parseDirectives("@middleware(checks: ")
+//    }
 }

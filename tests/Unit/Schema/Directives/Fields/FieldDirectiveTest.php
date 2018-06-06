@@ -18,7 +18,7 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('Foo');
         $fields = $type->config['fields']();
         $resolve = array_get($fields, 'bar.resolve');
 
@@ -36,7 +36,7 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('Foo');
         $fields = $type->config['fields']();
         $resolve = array_get($fields, 'bar.resolve');
 
@@ -55,7 +55,7 @@ class FieldDirectiveTest extends TestCase
         ';
 
         $this->expectException(DirectiveException::class);
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('Foo');
         $type->config['fields']();
     }
 
@@ -71,7 +71,7 @@ class FieldDirectiveTest extends TestCase
         ';
 
         $this->expectException(DirectiveException::class);
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('Foo');
         $type->config['fields']();
     }
 }

@@ -111,11 +111,7 @@ class DirectiveFactory
      */
     public function hasNodeResolver(Node $node)
     {
-        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->reduce(function ($has, $handler) {
-            return $handler instanceof NodeResolver ? true : $has;
-        }, false);
+        return $this->forNode($node) instanceof NodeResolver;
     }
 
     /**
@@ -127,9 +123,7 @@ class DirectiveFactory
      */
     public function forNode(Node $node)
     {
-        $resolvers = collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        $resolvers = $this->handlers($node)->filter(function ($handler) {
             return $handler instanceof NodeResolver;
         });
 
@@ -147,11 +141,13 @@ class DirectiveFactory
         return $resolvers->first();
     }
 
+    /**
+     * @param $node
+     * @return \Illuminate\Support\Collection
+     */
     public function generators($node)
     {
-        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function(Directive $directive){
+        return $this->handlers($node)->filter(function(Directive $directive){
             return $directive instanceof SchemaGenerator;
         });
     }
@@ -165,10 +161,22 @@ class DirectiveFactory
      */
     public function nodeMiddleware(Node $node)
     {
+        return $this->handlers($node)->filter(function ($handler) {
+            return $handler instanceof NodeMiddleware;
+        });
+    }
+
+    /**
+     * Get all handlers associated with the node's directives.
+     *
+     * @param Node $node
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function handlers(Node $node)
+    {
         return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
             return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
-            return $handler instanceof NodeMiddleware;
         });
     }
 
@@ -181,11 +189,7 @@ class DirectiveFactory
      */
     public function hasResolver($field)
     {
-        return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->reduce(function ($has, $handler) {
-            return $handler instanceof FieldResolver ? true : $has;
-        }, false);
+        return $this->fieldResolver($field) instanceof FieldResolver;
     }
 
     /**
@@ -197,9 +201,7 @@ class DirectiveFactory
      */
     public function fieldResolver($field)
     {
-        $resolvers = collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        $resolvers = $this->handlers($field)->filter(function ($handler) {
             return $handler instanceof FieldResolver;
         });
 
@@ -218,22 +220,6 @@ class DirectiveFactory
     }
 
     /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldDefinitionNode $field
-     *
-     * @return bool
-     */
-    public function hasFieldMiddleware($field)
-    {
-        return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->reduce(function ($has, $handler) {
-            return $handler instanceof FieldMiddleware ? true : $has;
-        }, false);
-    }
-
-    /**
      * Get middleware for field.
      *
      * @param FieldDefinitionNode $field
@@ -242,11 +228,21 @@ class DirectiveFactory
      */
     public function fieldMiddleware($field)
     {
-        return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        return $this->handlers($field)->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
         });
+    }
+
+    /**
+     * Check if field has a resolver directive.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return bool
+     */
+    public function hasFieldMiddleware($field)
+    {
+        return $this->fieldMiddleware($field)->count() > 0;
     }
 
     /**
@@ -258,9 +254,7 @@ class DirectiveFactory
      */
     public function argMiddleware(InputValueDefinitionNode $arg)
     {
-        return collect($arg->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function ($handler) {
+        return $this->handlers($arg)->filter(function ($handler) {
             return $handler instanceof ArgMiddleware;
         });
     }

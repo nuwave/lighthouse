@@ -20,7 +20,7 @@ class ComplexityDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('User');
         $fields = $type->config['fields']();
         $complexity = $fields['posts']['complexity'];
 
@@ -45,7 +45,7 @@ class ComplexityDirectiveTest extends TestCase
         }
         ';
 
-        $type = schema()->register($schema)->first();
+        $type = $this->buildSchemaFromString($schema)->getType('User');
         $fields = $type->config['fields']();
         $complexity = $fields['posts']['complexity'];
         $this->assertEquals(100, $complexity(10, ['foo' => 10]));

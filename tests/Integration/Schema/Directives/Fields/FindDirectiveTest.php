@@ -39,7 +39,8 @@ class FindDirectiveTest extends DBTestCase
     /** @test */
     public function can_fail_if_no_model_supplied()
     {
-        $schema = '
+        $this->expectException(DirectiveException::class);
+        $schema = $this->buildSchemaFromString('
         type User {
             id: ID!
             name: String!
@@ -47,15 +48,8 @@ class FindDirectiveTest extends DBTestCase
         type Query {
             user(id: ID @eq): User @find
         }
-        ';
-
-        $userA = factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'B']);
-        $userC = factory(User::class)->create(['name' => 'C']);
-
-
-        $this->expectException(DirectiveException::class);
-        $result = $this->execute($schema, "{ user(id:{$userA->id}) { name } }");
+        ');
+        $schema->getQueryType()->getField('user')->resolveFn();
     }
 
     /** @test */

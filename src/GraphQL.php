@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\Utils\ASTBuilder;
 use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
@@ -130,12 +131,19 @@ class GraphQL
      */
     public function buildSchema()
     {
-        $schema = $this->cache()->get(function () {
-            return $this->stitcher()->stitch(
+        // todo get from cache and save back
+//
+//        $schema = $this->cache()->get();
+//        if (!$schema){
+//            $this->cache()->set($schema);
+//        }
+            $schemaString = $this->stitcher()->stitch(
                 config('lighthouse.global_id_field', '_id'),
                 config('lighthouse.schema.register')
             );
-        });
+
+            $schema = ASTBuilder::generate($schemaString);
+            // todo save into cache
 
         return $this->schema()->build($schema);
     }
