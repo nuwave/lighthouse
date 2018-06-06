@@ -24,6 +24,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Schema;
+use Nuwave\Lighthouse\Support\Contracts\Executor;
 use Nuwave\Lighthouse\Types\Argument;
 use Nuwave\Lighthouse\Types\Field;
 use Nuwave\Lighthouse\Types\InputObjectType;
@@ -38,7 +39,7 @@ use Nuwave\Lighthouse\Types\Scalar\ScalarType;
 use Nuwave\Lighthouse\Types\Scalar\StringType;
 use Nuwave\Lighthouse\Types\Type;
 
-class DigiaOnlineExecutor// implements Executor
+class DigiaOnlineExecutor implements Executor
 {
     public $digiaTypes;
 

@@ -39,6 +39,7 @@ use GraphQL\Type\Definition\ListOfType as DigiaListOfType;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\Directive;
 use Nuwave\Lighthouse\Schema\Schema;
+use Nuwave\Lighthouse\Support\Contracts\SchemaBuilder;
 use Nuwave\Lighthouse\Types\Argument;
 use Nuwave\Lighthouse\Types\EnumType;
 use Nuwave\Lighthouse\Types\EnumValueType;
@@ -55,7 +56,7 @@ use Nuwave\Lighthouse\Types\Scalar\IntType;
 use Nuwave\Lighthouse\Types\Scalar\ScalarType;
 use Nuwave\Lighthouse\Types\Scalar\StringType;
 
-class DigiaOnlineSchemaBuilder // implements SchemaBuilder
+class DigiaOnlineSchemaBuilder implements SchemaBuilder
 {
 
     public function buildFromTypeLanguage(string $schemaDefinition): Schema

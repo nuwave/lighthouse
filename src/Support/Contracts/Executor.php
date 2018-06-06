@@ -1,8 +1,10 @@
 <?php
 
 
-namespace Nuwave\Lighthouse;
+namespace Nuwave\Lighthouse\Support\Contracts;
 
+
+use Nuwave\Lighthouse\Schema\Schema;
 
 interface Executor
 {
