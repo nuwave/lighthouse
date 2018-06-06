@@ -58,8 +58,8 @@ class WebonyxSchemaBuilder implements SchemaBuilder
             })
         );
     }
-
-    public function toType(WebonyxType $type) : Type
+    
+    public function toType(WebonyxType $type): Type
     {
         $fields = function () {
             return collect();
