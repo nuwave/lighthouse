@@ -13,8 +13,7 @@ use Tests\TestCase;
 
 class NodeDirectiveTest extends TestCase
 {
-    /** @test */
-    public function node_directive_can_add_field()
+    public function testNodeDirectiveCanAddField()
     {
         $schema = '
             type User @AddField {
@@ -56,8 +55,7 @@ class NodeDirectiveTest extends TestCase
         ], $fields[1]);
     }
 
-    /** @test */
-    public function node_directive_can_edit_field()
+    public function testNodeDirectiveCanEditField()
     {
         $schema = '
             type User @EditField {

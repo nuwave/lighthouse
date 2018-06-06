@@ -10,8 +10,7 @@ use Tests\TestCase;
 
 class AuthDirectiveTest extends TestCase
 {
-    /** @test */
-    public function can_resolve_auth_directive()
+    public function testCanResolveAuthDirective()
     {
         $user = new class() extends Authenticatable {
             public $foo = 'bar';
@@ -39,8 +38,7 @@ class AuthDirectiveTest extends TestCase
         $this->assertEquals('bar', $resolver()->result()->foo);
     }
 
-    /** @test */
-    public function can_resolve_with_custom_guard()
+    public function testCanResolveWithCustomGuard()
     {
         $this->app['config']["auth.guards.customGuard"] = [
             'driver' => 'customGuard'

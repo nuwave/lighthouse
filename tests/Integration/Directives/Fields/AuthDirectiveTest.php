@@ -16,8 +16,7 @@ class AuthDirectiveTest extends DBTestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function can_resolve_auth_directive()
+    public function testCanResolveAuthDirective()
     {
         /** @var User $user */
         $user = factory(User::class)->create([
@@ -60,8 +59,7 @@ class AuthDirectiveTest extends DBTestCase
         $this->assertEquals($expected, $data);
     }
 
-    /** @test */
-    public function can_resolve_with_custom_guard()
+    public function testCanResolveWithCustomGuard()
     {
         $this->app['config']["auth.guards.customGuard"] = [
             'driver' => 'customGuard'

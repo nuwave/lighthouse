@@ -10,8 +10,7 @@ use Tests\TestCase;
 
 class EventDirectiveTest extends TestCase
 {
-    /** @test */
-    public function can_fire_event()
+    public function testCanFireEvent()
     {
         Event::fake();
 

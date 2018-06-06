@@ -10,10 +10,7 @@ use Tests\TestCase;
 
 class FieldDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function can_resolve_with_resolver_arg()
+    public function testCanResolveWithResolverArg()
     {
         $schema = '
         type Foo {
@@ -29,10 +26,7 @@ class FieldDirectiveTest extends TestCase
         $this->assertEquals('foo', $resolver()->result()['bar']);
     }
 
-    /**
-     * @test
-     */
-    public function can_resolve_with_class_method_args()
+    public function testCanResolveWithClassMethodArgs()
     {
         $schema = '
         type Foo {
@@ -48,10 +42,7 @@ class FieldDirectiveTest extends TestCase
         $this->assertEquals('foo', $resolver()->result()['bar']);
     }
 
-    /**
-     * @test
-     */
-    public function can_resolve_with_args_argument()
+    public function testCanResolveWithArgsArgument()
     {
         $schema = '
         type Foo {
@@ -67,8 +58,7 @@ class FieldDirectiveTest extends TestCase
         //TODO: make assertions
     }
 
-    /** @test */
-    public function can_throw_error_if_no_class_is_defined()
+    public function testCanThrowErrorIfNoClassIsDefined()
     {
         $schema = '
         type Foo {
@@ -85,10 +75,7 @@ class FieldDirectiveTest extends TestCase
         $resolver()->result();
     }
 
-    /**
-     * @test
-     */
-    public function can_throw_error_if_no_method_is_defined()
+    public function testCanThrowErrorIfNoMethodIsDefined()
     {
         $schema = '
         type Foo {
@@ -105,8 +92,7 @@ class FieldDirectiveTest extends TestCase
         $resolver()->result();
     }
 
-    /** @test */
-    public function can_throw_error_if_no_class_is_defined_using_resolver_arg()
+    public function testCanThrowErrorIfNoClassIsDefinedUsingResolverArg()
     {
         $schema = '
         type Foo {
@@ -123,8 +109,7 @@ class FieldDirectiveTest extends TestCase
         $resolver()->result();
     }
 
-    /** @test */
-    public function can_throw_error_if_no_class_is_defined_using_resolver_arg_with_at_sign()
+    public function testCanThrowErrorIfNoClassIsDefinedUsingResolverArgWithAtSign()
     {
         $schema = '
         type Foo {
@@ -141,10 +126,7 @@ class FieldDirectiveTest extends TestCase
         $resolver()->result();
     }
 
-    /**
-     * @test
-     */
-    public function can_throw_error_if_no_method_is_defined_using_resolver_arg()
+    public function testCanThrowErrorIfNoMethodIsDefinedUsingResolverArg()
     {
         $schema = '
         type Foo {
@@ -161,10 +143,7 @@ class FieldDirectiveTest extends TestCase
         $resolver()->result();
     }
 
-    /**
-     * @test
-     */
-    public function can_throw_error_if_no_method_is_defined_using_resolver_arg_with_at_sign()
+    public function testCanThrowErrorIfNoMethodIsDefinedUsingResolverArgWithAtSign()
     {
         $schema = '
         type Foo {

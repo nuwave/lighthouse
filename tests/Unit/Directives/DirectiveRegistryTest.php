@@ -21,8 +21,7 @@ use Tests\TestCase;
 
 class DirectiveRegistryTest extends TestCase
 {
-    /** @test */
-    public function can_register_a_directive()
+    public function testCanRegisterADirective()
     {
         $directiveRegistry = new DirectiveRegistry();
         $directiveRegistry->add(ExampleDirective::class);
@@ -30,8 +29,7 @@ class DirectiveRegistryTest extends TestCase
         $this->assertTrue($directiveRegistry->has("Example"));
     }
 
-    /** @test */
-    public function can_get_a_directive_from_name()
+    public function testCanGetADirectiveFromName()
     {
         $directiveRegistry = new DirectiveRegistry();
         $directiveRegistry->add(ExampleDirective::class);
@@ -43,8 +41,7 @@ class DirectiveRegistryTest extends TestCase
         $this->assertEquals("Example", $directives->first()->name());
     }
 
-    /** @test */
-    public function can_resolve_a_field_directive()
+    public function testCanResolveAFieldDirective()
     {
         $schema = '
             type Query {
@@ -66,8 +63,7 @@ class DirectiveRegistryTest extends TestCase
         $this->assertEquals("Handler ran", $result['example']);
     }
 
-    /** @test */
-    public function can_resolve_a_field_directive_with_multiple_resolvers()
+    public function testCanResolveAFieldDirectiveWithMultipleResolvers()
     {
         $schema = '
             type Query {
@@ -90,8 +86,7 @@ class DirectiveRegistryTest extends TestCase
         $this->assertEquals("Handler ran and append this.", $result['example']);
     }
 
-    /** @test */
-    public function can_resolve_multiple_field_directives()
+    public function testCanResolveMultipleFieldDirectives()
     {
         $schema = '
             type Query {
@@ -114,8 +109,7 @@ class DirectiveRegistryTest extends TestCase
         $this->assertEquals("Handler ran and other appending this.", $result['example']);
     }
 
-    /** @test */
-    public function can_resolve_multiple_field_directives_reverse_order()
+    public function testCanResolveMultipleFieldDirectivesReverseOrder()
     {
         $schema = '
             type Query {
@@ -138,8 +132,7 @@ class DirectiveRegistryTest extends TestCase
         $this->assertEquals(" and other appending this.Handler ran", $result['example']);
     }
 
-    /** @test */
-    public function can_resolve_a_node_directive()
+    public function testCanResolveANodeDirective()
     {
         $schema = '
             type User @Example {
@@ -181,8 +174,7 @@ class DirectiveRegistryTest extends TestCase
         ], $fields[1]);
     }
 
-    /** @test */
-    public function can_resolve_multiple_node_directives()
+    public function testCanResolveMultipleNodeDirectives()
     {
         $schema = '
             type User @Example @Other {
@@ -231,8 +223,7 @@ class DirectiveRegistryTest extends TestCase
         ], $fields[2]);
     }
 
-    /** @test */
-    public function can_resolve_arg_directive()
+    public function testCanResolveArgDirective()
     {
         $schema = '
             type User {
@@ -262,8 +253,7 @@ class DirectiveRegistryTest extends TestCase
         $this->assertEquals(['name' => 'new user'], $users[0]);
     }
 
-    /** @test */
-    public function can_resolve_multiple_arg_directives()
+    public function testCanResolveMultipleArgDirectives()
     {
 
     }

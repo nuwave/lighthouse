@@ -13,8 +13,7 @@ class PaginateDirectiveTest extends DBTestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function itCanCreateQueryPaginators()
+    public function testCanCreateQueryPaginators()
     {
         $users = factory(User::class, 10)->create();
 

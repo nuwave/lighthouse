@@ -19,8 +19,7 @@ use Tests\TestCase;
 
 class SchemaBuilderTest extends TestCase
 {
-    /** @test */
-    public function can_resolve_string_type()
+    public function testCanResolveStringType()
     {
         $schema = '   
         type Query {
@@ -41,8 +40,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $appName->type());
     }
 
-    /** @test */
-    public function can_resolve_non_null_string_type()
+    public function testCanResolveNonNullStringType()
     {
         $schema = '   
         type Query {
@@ -64,8 +62,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $appNameField->type()->getWrappedType());
     }
 
-    /** @test */
-    public function can_resolve_int_type()
+    public function testCanResolveIntType()
     {
         $schema = '   
         type Query {
@@ -86,8 +83,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(IntType::class, $appVersionField->type());
     }
 
-    /** @test */
-    public function can_resolve_id_type()
+    public function testCanResolveIdType()
     {
         $schema = '   
         type Query {
@@ -108,8 +104,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(IDType::class, $appVersionField->type());
     }
 
-    /** @test */
-    public function can_resolve_float_type()
+    public function testCanResolveFloatType()
     {
         $schema = '   
         type Query {
@@ -130,8 +125,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(FloatType::class, $appVersionField->type());
     }
 
-    /** @test */
-    public function can_resolve_list_of_strings_type()
+    public function testCanResolveListOfStringsType()
     {
         $schema = '   
         type Query {
@@ -153,8 +147,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $appVersionField->type()->getWrappedType());
     }
 
-    /** @test */
-    public function can_resolve_boolean_type()
+    public function testCanResolveBooleanType()
     {
         $schema = '   
         type Query {
@@ -175,8 +168,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(BooleanType::class, $appVersionField->type());
     }
 
-    /** @test */
-    public function can_resolve_enum_type()
+    public function testCanResolveEnumType()
     {
         $schema = '   
         "A enum of Roles a user can have in the system"
@@ -208,8 +200,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertEquals("Company employee.", $employee->description());
     }
 
-    /** @test */
-    public function can_resolve_object_type()
+    public function testCanResolveObjectType()
     {
         $schema = '
         "Defines the Foo type."
@@ -236,8 +227,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $barField->type()->getWrappedType());
     }
 
-    /** @test */
-    public function can_resolve_object_type_recursively()
+    public function testCanResolveObjectTypeRecursively()
     {
         $schema = '
         "Defines the Foo type."
@@ -263,8 +253,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(ObjectType::class, $barField->type());
     }
 
-    /** @test */
-    public function can_resolve_interface_types()
+    public function testCanResolveInterfaceTypes()
     {
         $schema = '
         "Defines the Foo interface."
@@ -299,8 +288,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(InterfaceType::class, $barField->type());
     }
 
-    /** @test */
-    public function can_resolve_scalar_type()
+    public function testCanResolveScalarType()
     {
         $schema = '
         "Defines our scala DataTime"
@@ -316,8 +304,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertCount(0, $dateTime->fields());
     }
 
-    /** @test */
-    public function can_resolve_input_object_type()
+    public function testCanResolveInputObjectType()
     {
         $schema = '
         "Defines our input for creating a Foo object"
@@ -348,8 +335,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(IntType::class, $fooField->type());
     }
 
-    /** @test */
-    public function can_resolve_simple_mutation()
+    public function testCanResolveSimpleMutation()
     {
         $schema = '
         "A comment about our mutation"
@@ -388,8 +374,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $bazArg->type());
     }
 
-    /** @test */
-    public function can_resolve_query()
+    public function testCanResolveQuery()
     {
         $schema = '
         "A comment on query."
@@ -423,8 +408,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $bazArg->type());
     }
 
-    /** @test */
-    public function can_resolve_extend_object_type()
+    public function testCanResolveExtendObjectType()
     {
         $schema = '
         type Foo {
@@ -452,8 +436,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $bazField->type()->getWrappedType());
     }
 
-    /** @test */
-    public function can_resolve_extend_query()
+    public function testCanResolveExtendQuery()
     {
         $schema = '
         type Query {
@@ -480,8 +463,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $bazField->type()->getWrappedType());
     }
 
-    /** @test */
-    public function can_resolve_extend_mutation()
+    public function testCanResolveExtendMutation()
     {
         $schema = '
         type Mutation {
@@ -508,8 +490,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $bazField->type()->getWrappedType());
     }
 
-    /** @test */
-    public function can_resolve_query_and_mutation()
+    public function testCanResolveQueryAndMutation()
     {
         $schema = '
         type Query {
@@ -540,8 +521,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(StringType::class, $bazField->type()->getWrappedType());
     }
 
-    /** @test */
-    public function can_get_node_directive_from_scalar_type_with_string_arg()
+    public function testCanGetNodeDirectiveFromScalarTypeWithStringArg()
     {
         $schema = '
             scalar Email @scalar(class: "Email")

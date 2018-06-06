@@ -13,8 +13,7 @@ class GraphQlTest extends DBTestCase
 {
     use RefreshDatabase;
 
-    /** @test2 */
-    public function itCanResolveQuery()
+    public function testCanResolveQuery()
     {
         /** @var User $user */
         $user = factory(User::class)->create();
@@ -58,7 +57,7 @@ class GraphQlTest extends DBTestCase
 
         graphql()->build($schema);
         $data = graphql()->execute($query);
-        dd($data);
+//        dd($data);
         $expected = [
             'data' => [
                 'user' => [
