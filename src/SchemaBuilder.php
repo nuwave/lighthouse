@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Contracts;
+namespace Nuwave\Lighthouse;
 
 use Nuwave\Lighthouse\Schema\Schema;
 

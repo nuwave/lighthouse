@@ -10,21 +10,21 @@ class DBTestCase extends TestCase
     protected function setUp()
     {
         parent::setUp();
-
+        
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->withFactories(__DIR__ . '/database/factories');
         $this->artisan('migrate', ['--database' => env('DB_DATABASE', 'lighthouse')]);
     }
-
+    
     /**
-     * Define environment setup.
-     *
      * @param \Illuminate\Foundation\Application $app
+     *
+     * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function resolveApplicationConfiguration($app)
     {
-        parent::getEnvironmentSetUp($app);
-
+        parent::resolveApplicationConfiguration($app);
+        
         $connection = [
             'driver' => 'mysql',
             'database' => env('DB_DATABASE', 'lighthouse'),
@@ -34,8 +34,8 @@ class DBTestCase extends TestCase
             'username' => env('DB_USERNAME', 'testing'),
             'password' => env('DB_PASSWORD', ''),
         ];
-
+        
         $app['config']->set('database.default', env('DB_DATABASE', 'lighthouse'));
-        $app['config']->set('database.connections.'.env('DB_DATABASE', 'lighthouse'), $connection);
+        $app['config']->set('database.connections.' . env('DB_DATABASE', 'lighthouse'), $connection);
     }
 }

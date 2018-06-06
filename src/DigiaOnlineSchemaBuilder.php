@@ -39,7 +39,6 @@ use GraphQL\Type\Definition\ListOfType as DigiaListOfType;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\Directive;
 use Nuwave\Lighthouse\Schema\Schema;
-use Nuwave\Lighthouse\Support\Contracts\SchemaBuilder;
 use Nuwave\Lighthouse\Types\Argument;
 use Nuwave\Lighthouse\Types\EnumType;
 use Nuwave\Lighthouse\Types\EnumValueType;

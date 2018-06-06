@@ -109,4 +109,27 @@ return [
     'handlers' => [
         'error' => \Nuwave\Lighthouse\Support\Exceptions\Handler::class
     ],
+    
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Schema Builder
+    |--------------------------------------------------------------------------
+    |
+    | This class builds a Schema from the schema definition string.
+    | It must implement the SchemaBuilder interface.
+    |
+    */
+    'schema_builder' => \Nuwave\Lighthouse\DigiaOnlineSchemaBuilder::class,
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Executor
+    |--------------------------------------------------------------------------
+    |
+    | This class executes a query on the internal schema and returns a result.
+    | It must implement the Executor interface.
+    |
+    */
+    'executor' => \Nuwave\Lighthouse\DigiaOnlineExecutor::class,
 ];
