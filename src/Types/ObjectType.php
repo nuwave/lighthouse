@@ -27,6 +27,4 @@ class ObjectType extends Type
                 return $type->resolvedFields();
             });
     }
-
-
 }

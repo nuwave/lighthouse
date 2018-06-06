@@ -116,5 +116,4 @@ class Collection
             return collect($this->items);
         };
     }
-
 }

@@ -15,7 +15,7 @@ class PaginateDirectiveTest extends DBTestCase
 
     public function testCanCreateQueryPaginators()
     {
-        $users = factory(User::class, 10)->create();
+        factory(User::class, 10)->create();
 
         $schema = '
         type User {
@@ -39,7 +39,8 @@ class PaginateDirectiveTest extends DBTestCase
                     name
                 }
             }
-        }';
+        }
+        ';
 
         graphql()->build($schema);
         $result = graphql()->execute($query);

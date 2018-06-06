@@ -44,6 +44,4 @@ class Directive
             return $argument->name() === $name;
         });
     }
-
-
 }

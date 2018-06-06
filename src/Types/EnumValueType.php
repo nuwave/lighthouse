@@ -28,7 +28,4 @@ class EnumValueType extends Type
     {
         return $this->value;
     }
-
-
-
 }

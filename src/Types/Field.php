@@ -136,6 +136,4 @@ class Field
             return $resolveInfo;
         };
     }
-
-
 }

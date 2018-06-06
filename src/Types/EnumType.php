@@ -35,7 +35,4 @@ class EnumType extends Type
     {
         return $this->values()->firstWhere('name', $name);
     }
-
-
-
 }

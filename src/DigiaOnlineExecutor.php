@@ -47,7 +47,6 @@ class DigiaOnlineExecutor implements Executor
         $this->digiaTypes = collect();
     }
 
-
     public function execute(Schema $schema, string $query)
     {
         return execute(
