@@ -4,9 +4,12 @@
 namespace Nuwave\Lighthouse\Types;
 
 
-class ListType extends Type
+use Nuwave\Lighthouse\Schema\Contracts\TypeWrapper;
+use Nuwave\Lighthouse\Schema\Traits\HasWrappedType;
+
+class ListType extends Type implements TypeWrapper
 {
-    protected $ofType;
+    use HasWrappedType;
 
     /**
      * NonNullType constructor.
@@ -15,12 +18,12 @@ class ListType extends Type
      */
     public function __construct($ofType)
     {
-        parent::__construct("", "");
+        parent::__construct(null, null);
         $this->ofType = $ofType;
     }
 
-    public function getWrappedType() : Type
+    public static function ofType(Type $type)
     {
-        return $this->ofType;
+        return new ListType($type);
     }
 }

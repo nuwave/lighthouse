@@ -9,12 +9,11 @@ use ArrayAccess;
 use Closure;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
+use Nuwave\Lighthouse\Schema\Traits\HasName;
 
 abstract class Type implements ArrayAccess
 {
-    use HasAttributes, HasDirectives;
-
-    protected $name;
+    use HasAttributes, HasDirectives, HasName;
 
     protected $description;
 
@@ -30,7 +29,7 @@ abstract class Type implements ArrayAccess
      * @param Closure $fields
      * @param Closure|null $directives
      */
-    public function __construct(string $name, ?string $description, Closure $fields = null, Closure $directives = null)
+    public function __construct(?string $name, ?string $description, Closure $fields = null, Closure $directives = null)
     {
         $this->name = $name;
         $this->description = $description;
@@ -62,10 +61,5 @@ abstract class Type implements ArrayAccess
     public function description() : ?string
     {
         return $this->description;
-    }
-
-    public function name() : string
-    {
-        return $this->name;
     }
 }

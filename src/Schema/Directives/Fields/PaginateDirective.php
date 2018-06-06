@@ -24,12 +24,13 @@ class PaginateDirective implements FieldDirective, ManipulatorDirective
 
     public function handleField(ResolveInfo $resolveInfo, Closure $next)
     {
-        dd("here");
-        dd($resolveInfo->field()->directive($this->name()));
+
     }
 
     public function handleManipulator(ManipulatorInfo $info, Closure $next)
     {
+       //dd($info->field()->type()->getUnderlyingName());
+
         $info->field()->addArgument(new Argument(
             "count",
             null,
