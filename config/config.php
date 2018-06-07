@@ -66,10 +66,13 @@ return [
     | Schema Cache
     |--------------------------------------------------------------------------
     |
-    | Specify where the GraphQL schema should be cached.
+    | A large part of the Schema generation is parsing into an AST.
+    | This operation is cached by default when APP_ENV is set to 'production'
     |
     */
-    'cache' => null,
+    'cache' => [
+        'enable' => true,
+    ],
 
     /*
     |--------------------------------------------------------------------------

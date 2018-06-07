@@ -4,10 +4,11 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\CacheManager;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
@@ -17,13 +18,6 @@ use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 class GraphQL
 {
     use CanFormatError;
-
-    /**
-     * Cache manager.
-     *
-     * @var CacheManager
-     */
-    protected $cache;
 
     /**
      * Schema builder.
@@ -132,15 +126,32 @@ class GraphQL
      */
     public function buildSchema()
     {
-        $documentAST = Cache::rememberForever(self::AST_CACHE_KEY, function () {
-            $schemaString = $this->stitcher()->stitch(
-                config('lighthouse.schema.register')
-            );
-
-            return ASTBuilder::generate($schemaString);
-        });
+        $documentAST = $this->shouldCacheAST() ?
+            Cache::rememberForever(self::AST_CACHE_KEY, function () {
+                return $this->buildAST();
+            })
+            : $this->buildAST();
 
         return $this->schema()->build($documentAST);
+    }
+
+    protected function shouldCacheAST()
+    {
+        return App::environment('production') && config('cache.enable');
+    }
+
+    /**
+     * Get the stitched schema and build an AST out of it.
+     *
+     * @return DocumentAST
+     */
+    protected function buildAST()
+    {
+        $schemaString = $this->stitcher()->stitch(
+            config('lighthouse.schema.register')
+        );
+
+        return ASTBuilder::generate($schemaString);
     }
 
     /**
