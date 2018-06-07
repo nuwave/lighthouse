@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
+use Nuwave\Lighthouse\Schema\Directives\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class HasManyDirective implements FieldResolver, FieldManipulator

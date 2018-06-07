@@ -1,16 +1,14 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Traits;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 trait CreatesPaginators
 {
@@ -20,10 +18,10 @@ trait CreatesPaginators
     /**
      * Register connection w/ schema.
      *
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param DocumentAST              $current
-     * @param DocumentAST              $original
+     * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
+     * @param DocumentAST $current
+     * @param DocumentAST $original
      *
      * @throws \Exception
      *
@@ -35,13 +33,12 @@ trait CreatesPaginators
         $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
         $connectionFieldName = addslashes(ConnectionField::class);
 
-        $connectionDefinition = DocumentAST::parseObjectType("
+        $current->setObjectTypeFromString("
             type $connectionTypeName {
                 pageInfo: PageInfo! @field(class: \"$connectionFieldName\" method: \"pageInfoResolver\")
                 edges: [$connectionEdgeName] @field(class: \"$connectionFieldName\" method: \"edgeResolver\")
             }
         ");
-        $current->setObjectType($connectionDefinition);
 
         $nodeName = $this->unpackNodeToString($fieldDefinition);
         $current->setObjectTypeFromString("
@@ -61,10 +58,10 @@ trait CreatesPaginators
     /**
      * Register paginator w/ schema.
      *
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param DocumentAST              $current
-     * @param DocumentAST              $original
-     * @param ObjectTypeDefinitionNode $objectType
+     * @param FieldDefinitionNode $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parentType
+     * @param DocumentAST $current
+     * @param DocumentAST $original
      *
      * @throws \Exception
      *
@@ -76,13 +73,12 @@ trait CreatesPaginators
         $paginatorFieldClassName = addslashes(PaginatorField::class);
         $fieldTypeName = $this->unpackNodeToString($fieldDefinition);
 
-        $paginatorDefinition = DocumentAST::parseObjectType("
+        $current->setObjectTypeFromString("
             type $paginatorTypeName {
                 paginatorInfo: PaginatorInfo! @field(class: \"$paginatorFieldClassName\" method: \"paginatorInfoResolver\")
                 data: [$fieldTypeName!]! @field(class: \"$paginatorFieldClassName\" method: \"dataResolver\")
             }        
         ");
-        $current->setObjectType($paginatorDefinition);
 
         $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('count: Int! page: Int')->merge($fieldDefinition->arguments);
         $fieldDefinition->type = Parser::parseType($paginatorTypeName);
@@ -102,8 +98,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            .$this->singularFieldName($fieldDefinition)
-            .'_Paginator');
+            . $this->singularFieldName($fieldDefinition)
+            . '_Paginator');
     }
 
     /**
@@ -117,8 +113,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            .$this->singularFieldName($fieldDefinition)
-            .'_Connection');
+            . $this->singularFieldName($fieldDefinition)
+            . '_Connection');
     }
 
     /**
@@ -132,8 +128,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            .$this->singularFieldName($fieldDefinition)
-            .'_Edge');
+            . $this->singularFieldName($fieldDefinition)
+            . '_Edge');
     }
 
     /**
@@ -150,6 +146,6 @@ trait CreatesPaginators
     {
         $name = $objectType->name->value;
 
-        return 'Query' === $name ? '' : $name.'_';
+        return 'Query' === $name ? '' : $name . '_';
     }
 }

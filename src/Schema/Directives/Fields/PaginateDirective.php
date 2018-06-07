@@ -5,10 +5,10 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Pagination\Paginator;
+use Nuwave\Lighthouse\Schema\Directives\CreatesPaginators;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
@@ -28,10 +28,10 @@ class PaginateDirective implements FieldResolver, FieldManipulator
     }
 
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
+     * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
-     * @param DocumentAST              $original
+     * @param DocumentAST $current
+     * @param DocumentAST $original
      *
      * @throws \Exception
      *
@@ -90,7 +90,7 @@ class PaginateDirective implements FieldResolver, FieldManipulator
      * Create a paginator resolver.
      *
      * @param FieldValue $value
-     * @param string     $model
+     * @param string $model
      *
      * @return \Closure
      */
@@ -115,7 +115,7 @@ class PaginateDirective implements FieldResolver, FieldManipulator
      * Create a connection resolver.
      *
      * @param FieldValue $value
-     * @param string     $model
+     * @param string $model
      *
      * @return \Closure
      */
