@@ -8,6 +8,7 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\Directives\Args\ArgMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Directive;
+use Nuwave\Lighthouse\Schema\Directives\Args\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
@@ -163,6 +164,18 @@ class DirectiveFactory
     {
         return $this->handlers($node)->filter(function (Directive $directive) {
             return $directive instanceof FieldManipulator;
+        });
+    }
+
+    /**
+     * @param $node
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function argManipulators($node)
+    {
+        return $this->handlers($node)->filter(function (Directive $directive) {
+            return $directive instanceof ArgManipulator;
         });
     }
 
