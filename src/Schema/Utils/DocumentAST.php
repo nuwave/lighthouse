@@ -87,20 +87,6 @@ class DocumentAST
     }
 
     /**
-     * Parse the definition of a type name.
-     *
-     * @param string $typeDefinition
-     *
-     * @throws \Exception
-     *
-     * @return TypeNode
-     */
-    public static function parseTypeDefinition($typeDefinition)
-    {
-        return self::parseFieldDefinition("dummy: $typeDefinition")->type;
-    }
-
-    /**
      * Parse the definition for directives.
      *
      * @param string $directiveDefinition
