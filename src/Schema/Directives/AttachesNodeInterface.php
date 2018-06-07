@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Traits;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;

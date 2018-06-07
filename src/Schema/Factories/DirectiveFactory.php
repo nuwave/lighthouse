@@ -6,9 +6,9 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Schema\Directives\Args\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Args\ArgMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Directive;
-use Nuwave\Lighthouse\Schema\Directives\Args\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
@@ -41,11 +41,11 @@ class DirectiveFactory
      * https://github.com/laravel/framework/blob/5.5/src/Illuminate/Foundation/Console/Kernel.php#L190-L224
      *
      * @param array|string $paths
-     * @param string|null  $namespace
+     * @param string|null $namespace
      */
     public function load($paths, $namespace = null)
     {
-        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
+        $paths = array_unique(is_array($paths) ? $paths : (array)$paths);
         $paths = array_map(function ($path) {
             return realpath($path);
         }, array_filter($paths, function ($path) {
@@ -58,17 +58,18 @@ class DirectiveFactory
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-            ? realpath(__DIR__.'/../../')
+            ? realpath(__DIR__ . '/../../')
             : app_path();
 
         foreach ((new Finder())->in($paths)->files() as $directive) {
-            $directive = $namespace.str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                str_after($directive->getPathname(), $path.DIRECTORY_SEPARATOR)
-            );
+            $directive = $namespace . str_replace(
+                    ['/', '.php'],
+                    ['\\', ''],
+                    str_after($directive->getPathname(), $path . DIRECTORY_SEPARATOR)
+                );
 
-            if (! (new \ReflectionClass($directive))->isAbstract()) {
+            $reflection = new \ReflectionClass($directive);
+            if ($reflection->implementsInterface(Directive::class) && $reflection->isInstantiable()) {
                 $this->register($directive);
             }
         }
@@ -97,7 +98,7 @@ class DirectiveFactory
     {
         $handler = $this->directives->get($name);
 
-        if (! $handler) {
+        if (!$handler) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
