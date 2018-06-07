@@ -43,12 +43,12 @@ class CanDirective implements FieldMiddleware
         $resolver = $value->getResolver();
 
         return $value->setResolver(
-            function () use ($policies, $resolver, $model) {
+            function ($root, array $args, $context = null) use ($policies, $resolver, $model) {
                 $args = func_get_args();
                 $model = $model ?: get_class($args[0]);
 
-                $can = collect($policies)->reduce(function ($allowed, $policy) use ($model) {
-                    if (! app('auth')->user()->can($policy, $model)) {
+                $can = ($context->user == null) ? false : collect($policies)->reduce(function ($allowed, $policy) use ($model, $context) {
+                    if (! $context->user->can($policy, $model)) {
                         return false;
                     }
 
