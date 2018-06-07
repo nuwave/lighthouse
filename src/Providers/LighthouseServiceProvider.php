@@ -21,6 +21,8 @@ class LighthouseServiceProvider extends ServiceProvider
         if (config('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
+
+        $this->registerMacros();
     }
 
     protected function loadRoutesFrom($path)
