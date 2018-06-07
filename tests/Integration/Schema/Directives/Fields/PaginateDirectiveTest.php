@@ -57,10 +57,10 @@ class PaginateDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 10)->create();
         $posts = factory(Post::class, 10)->create([
-            'user_id' => $users->first()->id
+            'user_id' => $users->first()->id,
         ]);
         $comments = factory(Comment::class, 10)->create([
-            'post_id' => $posts->first()->id
+            'post_id' => $posts->first()->id,
         ]);
 
         $schema = '

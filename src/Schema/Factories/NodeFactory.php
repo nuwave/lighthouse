@@ -226,6 +226,7 @@ class NodeFactory
 
         return $value->setType($directive);
     }
+
 //
 //    /**
 //     * Extend type definition.

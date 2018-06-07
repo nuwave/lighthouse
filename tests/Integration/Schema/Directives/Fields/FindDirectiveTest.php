@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Integration\Schema\Directives\Fields;
-
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -30,7 +28,6 @@ class FindDirectiveTest extends DBTestCase
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
-
 
         $result = $this->execute($schema, "{ user(id:{$userB->id}) { name } }");
         $this->assertEquals('B', $result->data['user']['name']);
@@ -69,8 +66,7 @@ class FindDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'A']);
         $userC = factory(User::class)->create(['name' => 'B']);
 
-
-        $result = $this->execute($schema, "{ user(name: \"A\") { name } }");
+        $result = $this->execute($schema, '{ user(name: "A") { name } }');
         $this->assertCount(1, $result->errors);
     }
 
@@ -96,8 +92,7 @@ class FindDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
         $userC = factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
 
-
-        $result = $this->execute($schema, "{ user(name: \"A\" company: \"CompanyA\") { id, name } }");
+        $result = $this->execute($schema, '{ user(name: "A" company: "CompanyA") { id, name } }');
         $this->assertEquals($userA->id, $result->data['user']['id']);
         $this->assertEquals('A', $result->data['user']['name']);
     }

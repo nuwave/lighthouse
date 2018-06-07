@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class ModelDirective implements NodeMiddleware

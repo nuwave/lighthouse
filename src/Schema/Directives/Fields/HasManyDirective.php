@@ -3,19 +3,16 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class HasManyDirective implements FieldResolver, SchemaManipulator
+class HasManyDirective implements FieldResolver, FieldManipulator
 {
     use CreatesPaginators, HandlesGlobalId;
 
@@ -30,18 +27,20 @@ class HasManyDirective implements FieldResolver, SchemaManipulator
     }
 
     /**
-     * @param Node $definitionNode
-     * @param DocumentAST $current
-     * @param DocumentAST $original
-     * @param ObjectTypeDefinitionNode|null $parentType
+     * @param FieldDefinitionNode      $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parentType
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
+     *
+     * @throws DirectiveException
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
+    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
-        $resolver = $this->getResolver($definitionNode);
+        $resolver = $this->getResolver($fieldDefinition);
 
-        if (!in_array($resolver, ['default', 'paginator', 'relay', 'connection'])) {
+        if (! in_array($resolver, ['default', 'paginator', 'relay', 'connection'])) {
             throw new DirectiveException(sprintf(
                 '[%s] is not a valid `type` on `hasMany` directive [`paginator`, `relay`, `default`].',
                 $resolver
@@ -50,10 +49,10 @@ class HasManyDirective implements FieldResolver, SchemaManipulator
 
         switch ($resolver) {
             case 'paginator':
-                return $this->registerPaginator($definitionNode, $current, $original, $parentType);
+                return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
             case 'connection':
             case 'relay':
-                return $this->registerConnection($definitionNode, $current, $original, $parentType);
+                return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
             default:
                 return $current;
         }

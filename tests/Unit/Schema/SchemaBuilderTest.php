@@ -36,11 +36,13 @@ class SchemaBuilderTest extends TestCase
 
     /**
      * @param $schema
+     *
      * @return Collection
      */
     protected function getTypesFromString($schema)
     {
         $ast = ASTBuilder::generate($schema);
+
         return schema()->convertTypes($ast);
     }
 

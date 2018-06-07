@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Utils;
 
-
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
-use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeManipulator;
 
 class ASTBuilder
 {
@@ -48,7 +48,6 @@ class ASTBuilder
         return $document;
     }
 
-
     /**
      * Inject node field into Query.
      *
@@ -74,22 +73,23 @@ class ASTBuilder
 
     /**
      * @param DocumentAST $document
+     *
      * @return DocumentAST
      */
     protected static function applyObjectTypeGenerators(DocumentAST $document)
     {
         $originalDocument = $document;
 
-        $extendedTypes = $document->typeExtensions()->map(function(TypeExtensionDefinitionNode $typeExtension){
+        $extendedTypes = $document->typeExtensions()->map(function (TypeExtensionDefinitionNode $typeExtension) {
             return $typeExtension->definition;
         });
 
         $objectTypes = $document->objectTypes()->concat($extendedTypes);
 
         return $objectTypes->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($originalDocument) {
-            $generators = directives()->generators($objectType);
+            $generators = directives()->nodeManipulators($objectType);
 
-            return $generators->reduce(function (DocumentAST $document, SchemaManipulator $generator) use ($originalDocument, $objectType) {
+            return $generators->reduce(function (DocumentAST $document, NodeManipulator $generator) use ($originalDocument, $objectType) {
                 return $generator->manipulateSchema($objectType, $document, $originalDocument);
             }, $document);
         }, $document);
@@ -97,6 +97,7 @@ class ASTBuilder
 
     /**
      * @param DocumentAST $document
+     *
      * @return DocumentAST
      */
     protected static function applyFieldGenerators(DocumentAST $document)
@@ -105,10 +106,10 @@ class ASTBuilder
 
         return $document->objectTypes()->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($originalDocument) {
             return collect($objectType->fields)->reduce(function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType, $originalDocument) {
-                $generators = directives()->generators($fieldDefinition);
+                $generators = directives()->fieldManipulators($fieldDefinition);
 
-                return $generators->reduce(function (DocumentAST $document, SchemaManipulator $generator) use ($fieldDefinition, $objectType, $originalDocument) {
-                    return $generator->manipulateSchema($fieldDefinition, $document, $originalDocument, $objectType);
+                return $generators->reduce(function (DocumentAST $document, FieldManipulator $generator) use ($fieldDefinition, $objectType, $originalDocument) {
+                    return $generator->manipulateSchema($fieldDefinition, $objectType, $document, $originalDocument);
                 }, $document);
             }, $document);
         }, $document);

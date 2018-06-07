@@ -11,7 +11,6 @@ use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
-
 trait CreatesPaginators
 {
     // TODO: Ugh, get rid of this...
@@ -20,16 +19,16 @@ trait CreatesPaginators
     /**
      * Register connection w/ schema.
      *
-     * @param FieldDefinitionNode $fieldDefinition
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param FieldDefinitionNode      $fieldDefinition
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
      * @param ObjectTypeDefinitionNode $parentType
      *
-     * @return DocumentAST
-     *
      * @throws \Exception
+     *
+     * @return DocumentAST
      */
-    protected function registerConnection(FieldDefinitionNode $fieldDefinition, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType)
+    public function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
         $connectionTypeName = $this->connectionTypeName($fieldDefinition, $parentType);
         $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
@@ -61,16 +60,16 @@ trait CreatesPaginators
     /**
      * Register paginator w/ schema.
      *
-     * @param FieldDefinitionNode $fieldDefinition
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param FieldDefinitionNode      $fieldDefinition
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
      * @param ObjectTypeDefinitionNode $objectType
      *
-     * @return DocumentAST
-     *
      * @throws \Exception
+     *
+     * @return DocumentAST
      */
-    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType)
+    public function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
         $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType);
         $paginatorFieldClassName = addslashes(PaginatorField::class);
@@ -102,8 +101,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Paginator');
+            .$this->singularFieldName($fieldDefinition)
+            .'_Paginator');
     }
 
     /**
@@ -117,8 +116,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Connection');
+            .$this->singularFieldName($fieldDefinition)
+            .'_Connection');
     }
 
     /**
@@ -132,8 +131,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Edge');
+            .$this->singularFieldName($fieldDefinition)
+            .'_Edge');
     }
 
     /**
@@ -150,6 +149,6 @@ trait CreatesPaginators
     {
         $name = $objectType->name->value;
 
-        return $name === 'Query' ? '' : $name . '_';
+        return 'Query' === $name ? '' : $name.'_';
     }
 }

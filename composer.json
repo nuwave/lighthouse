@@ -50,7 +50,8 @@
     },
     "scripts": {
         "test" : "vendor/bin/phpunit --colors=always",
-        "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml"
+        "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml",
+        "style": "vendor/bin/php-cs-fixer fix"
     },
     "extra": {
       "laravel": {

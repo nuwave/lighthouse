@@ -50,6 +50,7 @@ class NodeValue
      * Create new instance of node value.
      *
      * @param Node $node
+     *
      * @return NodeValue
      */
     public static function init(Node $node)

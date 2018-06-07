@@ -137,13 +137,13 @@ class GraphQL
 //        if (!$schema){
 //            $this->cache()->set($schema);
 //        }
-            $schemaString = $this->stitcher()->stitch(
+        $schemaString = $this->stitcher()->stitch(
                 config('lighthouse.global_id_field', '_id'),
                 config('lighthouse.schema.register')
             );
 
-            $schema = ASTBuilder::generate($schemaString);
-            // todo save into cache
+        $schema = ASTBuilder::generate($schemaString);
+        // todo save into cache
 
         return $this->schema()->build($schema);
     }

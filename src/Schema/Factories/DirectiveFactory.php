@@ -6,13 +6,14 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
-use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
+use Nuwave\Lighthouse\Schema\Directives\Args\ArgMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\Directive;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeManipulator;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Symfony\Component\Finder\Finder;
 
@@ -143,12 +144,25 @@ class DirectiveFactory
 
     /**
      * @param $node
+     *
      * @return \Illuminate\Support\Collection
      */
-    public function generators($node)
+    public function nodeManipulators($node)
     {
-        return $this->handlers($node)->filter(function(Directive $directive){
-            return $directive instanceof SchemaManipulator;
+        return $this->handlers($node)->filter(function (Directive $directive) {
+            return $directive instanceof NodeManipulator;
+        });
+    }
+
+    /**
+     * @param $node
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function fieldManipulators($node)
+    {
+        return $this->handlers($node)->filter(function (Directive $directive) {
+            return $directive instanceof FieldManipulator;
         });
     }
 

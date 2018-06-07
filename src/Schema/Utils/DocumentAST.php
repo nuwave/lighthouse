@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Utils;
 
-
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -17,7 +16,7 @@ use Illuminate\Support\Collection;
 class DocumentAST
 {
     /**
-     * @var DocumentNode $documentNode
+     * @var DocumentNode
      */
     protected $documentNode;
 
@@ -30,6 +29,7 @@ class DocumentAST
      * Create a new instance from a schema.
      *
      * @param $schema
+     *
      * @return DocumentAST
      */
     public static function parse($schema)
@@ -42,15 +42,17 @@ class DocumentAST
      *
      * @param string $definition
      *
-     * @return ObjectTypeDefinitionNode
      * @throws \Exception
+     *
+     * @return ObjectTypeDefinitionNode
      */
     public static function parseObjectType($definition)
     {
         $objectTypes = self::parse($definition)->objectTypes();
-        if ($objectTypes->count() <> 1) {
+        if (1 != $objectTypes->count()) {
             throw new \Exception('More than one definition was found in the passed in schema.');
         }
+
         return $objectTypes->first();
     }
 
@@ -58,9 +60,10 @@ class DocumentAST
      * Parse a single field definition.
      *
      * @param $fieldDefinition
-     * @return FieldDefinitionNode
      *
      * @throws \Exception
+     *
+     * @return FieldDefinitionNode
      */
     public static function parseFieldDefinition($fieldDefinition)
     {
@@ -72,9 +75,10 @@ class DocumentAST
      * Parse the definition for arguments on a field.
      *
      * @param string $argumentDefinitions
-     * @return NodeList
      *
      * @throws \Exception
+     *
+     * @return NodeList
      */
     public static function parseArgumentDefinitions($argumentDefinitions)
     {
@@ -87,8 +91,9 @@ class DocumentAST
      *
      * @param string $typeDefinition
      *
-     * @return TypeNode
      * @throws \Exception
+     *
+     * @return TypeNode
      */
     public static function parseTypeDefinition($typeDefinition)
     {
@@ -100,15 +105,14 @@ class DocumentAST
      *
      * @param string $directiveDefinition
      *
-     * @return NodeList
      * @throws \Exception
+     *
+     * @return NodeList
      */
     public static function parseDirectives($directiveDefinition)
     {
         return self::parseObjectType("type Dummy $directiveDefinition {}")->directives;
     }
-
-
 
     /**
      * Get a collection of the contained definitions.
@@ -200,7 +204,7 @@ class DocumentAST
     public function getObjectTypeOrDefault($name)
     {
         return $this->getObjectType($name)
-            ?: self::parseObjectType('type ' . $name . '{}');
+            ?: self::parseObjectType('type '.$name.'{}');
     }
 
     /**
@@ -241,7 +245,7 @@ class DocumentAST
 
     /**
      * @param ObjectTypeDefinitionNode $objectType
-     * @param FieldDefinitionNode $field
+     * @param FieldDefinitionNode      $field
      *
      * @return ObjectTypeDefinitionNode
      */
@@ -294,9 +298,9 @@ class DocumentAST
     /**
      * @param string $definition
      *
-     * @return static
-     *
      * @throws \Exception
+     *
+     * @return static
      */
     public function setObjectTypeFromString($definition)
     {

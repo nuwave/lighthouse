@@ -3,18 +3,13 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class GroupDirective implements SchemaManipulator
+class GroupDirective implements NodeManipulator
 {
     use HandlesDirectives;
 
@@ -29,17 +24,17 @@ class GroupDirective implements SchemaManipulator
     }
 
     /**
-     * @param Node $definitionNode
-     * @param DocumentAST $current
-     * @param DocumentAST $original
-     * @param ObjectTypeDefinitionNode|null $parentType
+     * @param ObjectTypeDefinitionNode $objectType
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
+     *
+     * @throws DirectiveException
      *
      * @return DocumentAST
-     * @throws DirectiveException
      */
-    public function manipulateSchema(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
+    public function manipulateSchema(ObjectTypeDefinitionNode $objectType, DocumentAST $current, DocumentAST $original)
     {
-        $nodeName = $definitionNode->name->value;
+        $nodeName = $objectType->name->value;
 
         if (! in_array($nodeName, ['Query', 'Mutation'])) {
             $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
@@ -47,69 +42,74 @@ class GroupDirective implements SchemaManipulator
             throw new DirectiveException($message);
         }
 
-        $definitionNode = $this->setMiddlewareDirectiveOnFields($definitionNode);
-        $definitionNode = $this->setNamespaceDirectiveOnFields($definitionNode);
+        $objectType = $this->setMiddlewareDirectiveOnFields($objectType);
+        $objectType = $this->setNamespaceDirectiveOnFields($objectType);
 
-        $current->setObjectType($definitionNode);
+        $current->setObjectType($objectType);
 
         return $current;
     }
 
     /**
-     * @param $definitionNode
-     * @return mixed
+     * @param ObjectTypeDefinitionNode $objectType
      *
      * @throws \Exception
+     *
+     * @return ObjectTypeDefinitionNode
      */
-    protected function setMiddlewareDirectiveOnFields($definitionNode)
+    protected function setMiddlewareDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
     {
         $middlewareValues = $this->directiveArgValue(
-            $this->nodeDirective($definitionNode, self::name()),
+            $this->nodeDirective($objectType, self::name()),
             'middleware'
         );
 
-        if(! $middlewareValues){
-            return $definitionNode;
+        if (! $middlewareValues) {
+            return $objectType;
         }
 
-        $middlewareValues = '["' . implode('", "', $middlewareValues) . '"]';
+        $middlewareValues = '["'.implode('", "', $middlewareValues).'"]';
         $middlewareDirective = DocumentAST::parseDirectives("@middleware(checks: $middlewareValues)");
 
-        $definitionNode->fields = new NodeList(collect($definitionNode->fields)->map(function(FieldDefinitionNode $fieldDefinition) use ($middlewareDirective){
+        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
             $fieldDefinition->directives = $fieldDefinition->directives->merge($middlewareDirective);
+
             return $fieldDefinition;
         })->toArray());
 
-        return $definitionNode;
+        return $objectType;
     }
 
     /**
-     * @param $definitionNode
-     * @return mixed
-     * @throws DirectiveException
+     * @param ObjectTypeDefinitionNode $objectType
+     *
+     * @throws \Exception
+     *
+     * @return ObjectTypeDefinitionNode
      */
-    protected function setNamespaceDirectiveOnFields($definitionNode)
+    protected function setNamespaceDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
     {
         $namespaceValue = $this->directiveArgValue(
-            $this->nodeDirective($definitionNode, self::name()),
+            $this->nodeDirective($objectType, self::name()),
             'namespace'
         );
 
-        if(!$namespaceValue){
-            return $definitionNode;
+        if (! $namespaceValue) {
+            return $objectType;
         }
 
-        if(! is_string($namespaceValue)){
+        if (! is_string($namespaceValue)) {
             throw new DirectiveException('The value of the namespace directive on has to be a string');
         }
 
-        $namespaceDirective = DocumentAST::parseDirectives('@namespace(value: "' . addslashes($namespaceValue) . '")');
+        $namespaceDirective = DocumentAST::parseDirectives('@namespace(value: "'.addslashes($namespaceValue).'")');
 
-        $definitionNode->fields = new NodeList(collect($definitionNode->fields)->map(function(FieldDefinitionNode $fieldDefinition) use ($namespaceDirective){
+        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceDirective) {
             $fieldDefinition->directives = $fieldDefinition->directives->merge($namespaceDirective);
+
             return $fieldDefinition;
         })->toArray());
 
-        return $definitionNode;
+        return $objectType;
     }
 }

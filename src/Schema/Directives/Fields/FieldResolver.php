@@ -1,7 +1,8 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Contracts;
+namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Schema\Directives\Directive;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 interface FieldResolver extends Directive

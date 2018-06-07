@@ -114,7 +114,7 @@ class TestCase extends BaseTestCase
      *
      * @param string $schema
      * @param string $query
-     * @param bool $lighthouse
+     * @param bool   $lighthouse
      * @param array  $variables
      *
      * @return \GraphQL\Executor\ExecutionResult

@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class NamespaceDirective implements FieldMiddleware
@@ -34,7 +33,7 @@ class NamespaceDirective implements FieldMiddleware
             'value'
         );
 
-        if(is_string($namespace)){
+        if (is_string($namespace)) {
             $value->setNamespace($namespace);
         }
 

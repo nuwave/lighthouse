@@ -1,15 +1,8 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-
-use GraphQL\Error\Error;
-use GraphQL\Language\AST\DefinitionNode;
-use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -34,8 +27,9 @@ class ByIdDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
      * @throws DirectiveException
+     *
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {

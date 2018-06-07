@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class UnionDirective implements NodeResolver
@@ -49,8 +48,10 @@ class UnionDirective implements NodeResolver
             'resolveType' => function ($value) use ($namespace, $method) {
                 if ($namespace) {
                     $instance = app($namespace);
+
                     return call_user_func_array([$instance, $method], [$value]);
                 }
+
                 return schema()->instance(last(explode('\\', get_class($value))));
             },
         ]));

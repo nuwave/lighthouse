@@ -60,7 +60,7 @@ class SchemaBuilder
         $subscription = $this->types->firstWhere('name', 'Subscription');
 
         $types = $this->types->filter(function ($type) {
-            return !in_array($type->name, ['Query', 'Mutation', 'Subscription']);
+            return ! in_array($type->name, ['Query', 'Mutation', 'Subscription']);
         })->toArray();
 
         $directives = $this->convertDirectives($schema)->toArray();
@@ -154,6 +154,7 @@ class SchemaBuilder
      * Convert definitions to types.
      *
      * @param DocumentAST $document
+     *
      * @return Collection
      */
     public function convertTypes(DocumentAST $document)

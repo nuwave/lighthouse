@@ -4,10 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
@@ -29,6 +28,8 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
+     *
+     * @throws DirectiveException
      *
      * @return FieldValue
      */
@@ -61,11 +62,11 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
     }
 
     /**
-     * Resolve the field directive.
+     * Resolve the argument directive.
      *
      * @param ArgumentValue $value
      *
-     * @return array
+     * @return ArgumentValue
      */
     public function handleArgument(ArgumentValue $value)
     {
