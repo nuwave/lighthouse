@@ -41,11 +41,11 @@ class DirectiveFactory
      * https://github.com/laravel/framework/blob/5.5/src/Illuminate/Foundation/Console/Kernel.php#L190-L224
      *
      * @param array|string $paths
-     * @param string|null $namespace
+     * @param string|null  $namespace
      */
     public function load($paths, $namespace = null)
     {
-        $paths = array_unique(is_array($paths) ? $paths : (array)$paths);
+        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
         $paths = array_map(function ($path) {
             return realpath($path);
         }, array_filter($paths, function ($path) {
@@ -58,14 +58,14 @@ class DirectiveFactory
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-            ? realpath(__DIR__ . '/../../')
+            ? realpath(__DIR__.'/../../')
             : app_path();
 
         foreach ((new Finder())->in($paths)->files() as $directive) {
-            $directive = $namespace . str_replace(
+            $directive = $namespace.str_replace(
                     ['/', '.php'],
                     ['\\', ''],
-                    str_after($directive->getPathname(), $path . DIRECTORY_SEPARATOR)
+                    str_after($directive->getPathname(), $path.DIRECTORY_SEPARATOR)
                 );
 
             $reflection = new \ReflectionClass($directive);
@@ -98,7 +98,7 @@ class DirectiveFactory
     {
         $handler = $this->directives->get($name);
 
-        if (!$handler) {
+        if (! $handler) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 

@@ -10,9 +10,11 @@ trait AttachesNodeInterface
 {
     /**
      * @param ObjectTypeDefinitionNode $objectType
-     * @param DocumentAST $documentAST
-     * @return DocumentAST
+     * @param DocumentAST              $documentAST
+     *
      * @throws \Exception
+     *
+     * @return DocumentAST
      */
     protected function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
     {

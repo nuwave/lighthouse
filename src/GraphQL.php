@@ -74,9 +74,9 @@ class GraphQL
      * Execute GraphQL query.
      *
      * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
      *
      * @return array
      */
@@ -84,7 +84,7 @@ class GraphQL
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
-        if (!empty($result->errors)) {
+        if (! empty($result->errors)) {
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
                     info('GraphQL Error:', [
@@ -108,9 +108,9 @@ class GraphQL
      * Execute GraphQL query.
      *
      * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
@@ -137,6 +137,7 @@ class GraphQL
                 config('lighthouse.global_id_field', '_id'),
                 config('lighthouse.schema.register')
             );
+
             return ASTBuilder::generate($schemaString);
         });
 
@@ -147,8 +148,8 @@ class GraphQL
      * Batch field resolver.
      *
      * @param string $abstract
-     * @param mixed $key
-     * @param array $data
+     * @param mixed  $key
+     * @param array  $data
      * @param string $name
      *
      * @return \GraphQL\Deferred
@@ -170,7 +171,7 @@ class GraphQL
      */
     public function schema()
     {
-        if (!$this->schema) {
+        if (! $this->schema) {
             $this->schema = app(SchemaBuilder::class);
         }
 
@@ -184,7 +185,7 @@ class GraphQL
      */
     public function directives()
     {
-        if (!$this->directives) {
+        if (! $this->directives) {
             $this->directives = app(DirectiveFactory::class);
         }
 
@@ -198,7 +199,7 @@ class GraphQL
      */
     public function middleware()
     {
-        if (!$this->middleware) {
+        if (! $this->middleware) {
             $this->middleware = app(MiddlewareManager::class);
         }
 
@@ -212,7 +213,7 @@ class GraphQL
      */
     public function stitcher()
     {
-        if (!$this->stitcher) {
+        if (! $this->stitcher) {
             $this->stitcher = app(SchemaStitcher::class);
         }
 
@@ -226,7 +227,7 @@ class GraphQL
      */
     public function nodes()
     {
-        if (!app()->has(NodeContainer::class)) {
+        if (! app()->has(NodeContainer::class)) {
             return app()->instance(
                 NodeContainer::class,
                 resolve(NodeContainer::class)

@@ -5,17 +5,17 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Directives\Directive;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\Directive;
 
 interface ArgManipulator extends Directive
 {
     /**
      * @param InputValueDefinitionNode $argDefinition
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
      *
      * @return DocumentAST
      */

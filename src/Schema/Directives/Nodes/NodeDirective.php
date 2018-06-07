@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Directives\AttachesNodeInterface;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class NodeDirective implements NodeMiddleware, NodeManipulator
@@ -68,8 +68,8 @@ class NodeDirective implements NodeMiddleware, NodeManipulator
 
     /**
      * @param ObjectTypeDefinitionNode $objectType
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
      *
      * @return DocumentAST
      */

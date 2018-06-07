@@ -6,10 +6,10 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\CreatesPaginators;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class HasManyDirective implements FieldResolver, FieldManipulator

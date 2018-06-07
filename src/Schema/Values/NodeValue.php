@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Collection;
 

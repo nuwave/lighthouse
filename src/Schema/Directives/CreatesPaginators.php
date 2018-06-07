@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 trait CreatesPaginators
@@ -18,10 +18,10 @@ trait CreatesPaginators
     /**
      * Register connection w/ schema.
      *
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
      *
      * @throws \Exception
      *
@@ -58,10 +58,10 @@ trait CreatesPaginators
     /**
      * Register paginator w/ schema.
      *
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
      *
      * @throws \Exception
      *
@@ -98,8 +98,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Paginator');
+            .$this->singularFieldName($fieldDefinition)
+            .'_Paginator');
     }
 
     /**
@@ -113,8 +113,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Connection');
+            .$this->singularFieldName($fieldDefinition)
+            .'_Connection');
     }
 
     /**
@@ -128,8 +128,8 @@ trait CreatesPaginators
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Edge');
+            .$this->singularFieldName($fieldDefinition)
+            .'_Edge');
     }
 
     /**
@@ -146,6 +146,6 @@ trait CreatesPaginators
     {
         $name = $objectType->name->value;
 
-        return 'Query' === $name ? '' : $name . '_';
+        return 'Query' === $name ? '' : $name.'_';
     }
 }

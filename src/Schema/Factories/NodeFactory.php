@@ -110,7 +110,7 @@ class NodeFactory
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     $directive = $this->fieldDirective($field, 'enum');
 
-                    if (!$directive) {
+                    if (! $directive) {
                         return [];
                     }
 
@@ -171,7 +171,7 @@ class NodeFactory
                 return $value->getInterfaceNames()->map(function ($interfaceName) {
                     return schema()->instance($interfaceName);
                 })->toArray();
-            }
+            },
         ]);
 
         return $value->setType($objectType);
