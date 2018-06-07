@@ -2,12 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Support\Traits\AttachesNodeInterface;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class NodeDirective implements NodeMiddleware
+class NodeDirective implements NodeMiddleware, NodeManipulator
 {
     use HandlesDirectives;
+    use AttachesNodeInterface;
 
     /**
      * Directive name.
@@ -28,13 +32,13 @@ class NodeDirective implements NodeMiddleware
      */
     public function handleNode(NodeValue $value)
     {
-        graphql()->nodes()->node(
+        graphql()->nodes()->registerNode(
             $value->getNodeName(),
-            $this->getResolver($value),
-            $this->getResolveType($value)
+            // Resolver for the node itself
+            $this->getResolver($value, 'resolver'),
+            // Interface type resolver
+            $this->getResolver($value, 'typeResolver')
         );
-
-        $this->registerInterface($value);
 
         return $value;
     }
@@ -46,15 +50,14 @@ class NodeDirective implements NodeMiddleware
      *
      * @return \Closure
      */
-    protected function getResolver(NodeValue $value)
+    protected function getResolver(NodeValue $value, string $argKey)
     {
         $resolver = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), self::name()),
-            'resolver'
+            $argKey
         );
 
-        $namespace = array_get(explode('@', $resolver), '0');
-        $method = array_get(explode('@', $resolver), '1');
+        list($namespace, $method) = explode('@', $resolver);
 
         return function ($id) use ($namespace, $method) {
             $instance = app($namespace);
@@ -64,40 +67,14 @@ class NodeDirective implements NodeMiddleware
     }
 
     /**
-     * Get interface type resolver.
+     * @param ObjectTypeDefinitionNode $objectType
+     * @param DocumentAST $current
+     * @param DocumentAST $original
      *
-     * @param NodeValue $value
-     *
-     * @return \Closure
+     * @return DocumentAST
      */
-    protected function getResolveType(NodeValue $value)
+    public function manipulateSchema(ObjectTypeDefinitionNode $objectType, DocumentAST $current, DocumentAST $original)
     {
-        $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
-            'typeResolver'
-        );
-
-        $namespace = array_get(explode('@', $resolver), '0');
-        $method = array_get(explode('@', $resolver), '1');
-
-        return function ($value) use ($namespace, $method) {
-            $instance = app($namespace);
-
-            return call_user_func_array([$instance, $method], [$value]);
-        };
-    }
-
-    /**
-     * Register Node interface.
-     *
-     * @param NodeValue $value
-     */
-    protected function registerInterface(NodeValue $value)
-    {
-        if (! $value->hasInterface('Node')
-            && ! is_null(config('lighthouse.global_id_field'))
-        ) {
-            $value->attachInterface('Node');
-        }
+        return $this->attachNodeInterfaceToObjectType($objectType, $current);
     }
 }

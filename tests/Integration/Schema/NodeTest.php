@@ -22,7 +22,6 @@ class NodeTest extends DBTestCase
             resolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNode"
             typeResolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNodeType"
         ) {
-            _id: ID!
             name: String!
         }
         type Query {}
@@ -44,7 +43,6 @@ class NodeTest extends DBTestCase
 
         $schema = '
         type User @model {
-            _id: ID!
             name: String!
         }
         type Query {}

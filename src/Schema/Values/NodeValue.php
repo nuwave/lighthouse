@@ -3,8 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Collection;
 
 class NodeValue
 {
@@ -28,13 +30,6 @@ class NodeValue
      * @var DirectiveNode
      */
     protected $directive;
-
-    /**
-     * Registered interfaces.
-     *
-     * @var array
-     */
-    protected $interfaces = [];
 
     /**
      * Create new instance of node value.
@@ -97,22 +92,6 @@ class NodeValue
     }
 
     /**
-     * Attach interface(s) to node.
-     *
-     * @param array|string $interface
-     *
-     * @return self
-     */
-    public function attachInterface($interface)
-    {
-        $interfaces = is_string($interface) ? [$interface] : $interface;
-
-        $this->interfaces = array_merge($this->interfaces, $interfaces);
-
-        return $this;
-    }
-
-    /**
      * Get current node.
      *
      * @return Node
@@ -163,38 +142,15 @@ class NodeValue
     }
 
     /**
-     * Get list of interfaces for node.
+     * Get a collection of the names of all interfaces the node has.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
-    public function getInterfaces()
+    public function getInterfaceNames()
     {
         return collect($this->node->interfaces)
-            ->map(function ($interface) {
+            ->map(function (NamedTypeNode $interface) {
                 return $interface->name->value;
-            })
-            ->merge($this->interfaces)
-            ->unique()
-            ->values()
-            ->toArray();
-    }
-
-    /**
-     * Check if node implements a interface.
-     *
-     * @param string $interface
-     *
-     * @return bool
-     */
-    public function hasInterface($interface)
-    {
-        return collect($this->node->interfaces)
-            ->reduce(function ($implements, $interfaceNode) use ($interface) {
-                if ($implements) {
-                    return true;
-                }
-
-                return data_get($interfaceNode, 'name.value') == $interface;
-            }, false);
+            });
     }
 }

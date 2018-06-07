@@ -9,11 +9,11 @@ use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 interface NodeManipulator extends Directive
 {
     /**
-     * @param ObjectTypeDefinitionNode $definitionNode
+     * @param ObjectTypeDefinitionNode $objectType
      * @param DocumentAST              $current
      * @param DocumentAST              $original
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(ObjectTypeDefinitionNode $definitionNode, DocumentAST $current, DocumentAST $original);
+    public function manipulateSchema(ObjectTypeDefinitionNode $objectType, DocumentAST $current, DocumentAST $original);
 }

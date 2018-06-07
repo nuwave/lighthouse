@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
@@ -51,7 +52,8 @@ trait CreatesPaginators
         ");
 
         $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('first: Int! after: String')->merge($fieldDefinition->arguments);
-        $fieldDefinition->type = DocumentAST::parseTypeDefinition($connectionTypeName);
+        $fieldDefinition->type = Parser::parseType($connectionTypeName);
+//        $fieldDefinition->type = DocumentAST::parseTypeDefinition($connectionTypeName);
         $current->setObjectType(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
 
         return $current;
@@ -84,7 +86,8 @@ trait CreatesPaginators
         $current->setObjectType($paginatorDefinition);
 
         $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('count: Int! page: Int')->merge($fieldDefinition->arguments);
-        $fieldDefinition->type = DocumentAST::parseTypeDefinition($paginatorTypeName);
+//        $fieldDefinition->type = DocumentAST::parseTypeDefinition($paginatorTypeName);
+        $fieldDefinition->type = Parser::parseType($paginatorTypeName);
         $current->setObjectType(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
 
         return $current;

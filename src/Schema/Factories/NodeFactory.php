@@ -9,7 +9,6 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\FieldArgument;
@@ -17,6 +16,7 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeMiddleware;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -40,8 +40,7 @@ class NodeFactory
             ? $this->useResolver($value)
             : $this->transform($value);
 
-        return $this->applyMiddleware($this->attachInterfaces($value))
-            ->getType();
+        return $this->applyMiddleware($value)->getType();
     }
 
     /**
@@ -91,8 +90,6 @@ class NodeFactory
                 return $this->inputObjectType($value);
             case DirectiveDefinitionNode::class:
                 return $this->clientDirective($value);
-//            case Extension::class:
-//                return $this->extend($value);
             default:
                 throw new \Exception("Unknown node [{$value->getNodeName()}]");
         }
@@ -113,7 +110,7 @@ class NodeFactory
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     $directive = $this->fieldDirective($field, 'enum');
 
-                    if (! $directive) {
+                    if (!$directive) {
                         return [];
                     }
 
@@ -170,6 +167,11 @@ class NodeFactory
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },
+            'interfaces' => function () use ($value) {
+                return $value->getInterfaceNames()->map(function ($interfaceName) {
+                    return schema()->instance($interfaceName);
+                })->toArray();
+            }
         ]);
 
         return $value->setType($objectType);
@@ -227,48 +229,6 @@ class NodeFactory
         return $value->setType($directive);
     }
 
-//
-//    /**
-//     * Extend type definition.
-//     *
-//     * @param NodeValue $value
-//     *
-//     * @return NodeValue
-//     */
-//    public function extend(NodeValue $value)
-//    {
-//        $value->setNode(
-//            $value->getNode()->definition
-//        );
-//
-//        $type = $value->getType();
-//        $originalFields = value($type->config['fields']);
-//        $type->config['fields'] = function () use ($originalFields, $value) {
-//            return array_merge($originalFields, $this->getFields($value));
-//        };
-//
-//        return $value;
-//    }
-
-    /**
-     * Attach interfaces to type.
-     *
-     * @param NodeValue $value
-     *
-     * @return NodeValue
-     */
-    protected function attachInterfaces(NodeValue $value)
-    {
-        $type = $value->getType();
-        $type->config['interfaces'] = function () use ($value) {
-            return collect($value->getInterfaces())->map(function ($interface) {
-                return schema()->instance($interface);
-            })->filter()->toArray();
-        };
-
-        return $value;
-    }
-
     /**
      * Apply node middleware.
      *
@@ -279,7 +239,7 @@ class NodeFactory
     protected function applyMiddleware(NodeValue $value)
     {
         return directives()->nodeMiddleware($value->getNode())
-            ->reduce(function ($value, $middleware) {
+            ->reduce(function (NodeValue $value, NodeMiddleware $middleware) {
                 return $middleware->handleNode($value);
             }, $value);
     }

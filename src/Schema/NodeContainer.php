@@ -22,44 +22,42 @@ class NodeContainer
      *
      * @var array
      */
-    protected $models = [];
+    protected $modelToTypeMap = [];
 
     /**
      * Value to type map.
      *
      * @var array
      */
-    protected $types = [];
+    protected $valueToTypeMap = [];
 
     /**
      * Store resolver for node.
      *
-     * @param string  $type
+     * @param string  $typeName
      * @param Closure $resolver
      * @param Closure $resolveType
      *
      * @return mixed
      */
-    public function node($type, Closure $resolver, Closure $resolveType)
+    public function registerNode($typeName, Closure $resolver, Closure $resolveType)
     {
-        $this->types[$type] = $resolveType;
-        $this->nodes[$type] = $resolver;
+        $this->valueToTypeMap[$typeName] = $resolveType;
+        $this->nodes[$typeName] = $resolver;
     }
 
     /**
      * Register model node.
      *
-     * @param string $type
-     * @param string $model
-     *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param string $typeName
+     * @param string $modelClassName
      */
-    public function model($type, $model)
+    public function registerModel($typeName, $modelClassName)
     {
-        $this->models[$model] = $type;
+        $this->modelToTypeMap[$modelClassName] = $typeName;
 
-        $this->nodes[$type] = function ($id) use ($model) {
-            return $model::find($id);
+        $this->nodes[$typeName] = function ($id) use ($modelClassName) {
+            return $modelClassName::find($id);
         };
     }
 
@@ -92,11 +90,11 @@ class NodeContainer
      */
     public function resolveType($value)
     {
-        if (is_object($value) && isset($this->models[get_class($value)])) {
-            return schema()->instance($this->models[get_class($value)]);
+        if (is_object($value) && isset($this->modelToTypeMap[get_class($value)])) {
+            return schema()->instance($this->modelToTypeMap[get_class($value)]);
         }
 
-        return collect($this->types)
+        return collect($this->valueToTypeMap)
             ->map(function ($value, $key) {
                 return ['resolver' => $value, 'type' => $key];
             })
