@@ -6,6 +6,7 @@ use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -151,6 +152,16 @@ class DocumentAST
     public function operations()
     {
         return $this->getDefinitionsByType(OperationDefinitionNode::class);
+    }
+
+    /**
+     * Get all fragment definitions.
+     *
+     * @return Collection
+     */
+    public function fragments()
+    {
+        return $this->getDefinitionsByType(FragmentDefinitionNode::class);
     }
 
     /**
