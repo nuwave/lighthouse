@@ -4,9 +4,8 @@ namespace Tests;
 
 use GraphQL\Executor\Executor;
 use GraphQL\Language\Parser;
-use GraphQL\Utils\SchemaPrinter;
 use Laravel\Scout\ScoutServiceProvider;
-use Nuwave\Lighthouse\Schema\Utils\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;

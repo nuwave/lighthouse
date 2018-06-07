@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Schema\Utils;
 
-use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use PHPUnit\Framework\TestCase;
 
 class SchemaStitcherTest extends TestCase

@@ -2,10 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;

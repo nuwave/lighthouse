@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Utils;
+namespace Nuwave\Lighthouse\Schema\AST;
 
 class SchemaStitcher
 {

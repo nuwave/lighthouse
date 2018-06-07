@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
-use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 trait AttachesNodeInterface
 {

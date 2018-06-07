@@ -11,7 +11,7 @@ use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 

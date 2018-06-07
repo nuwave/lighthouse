@@ -4,13 +4,14 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Facades\Cache;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\CacheManager;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\Utils\ASTBuilder;
-use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
@@ -62,18 +63,20 @@ class GraphQL
     /**
      * Prepare graphql schema.
      */
-    public function prepSchema()
+    const AST_CACHE_KEY = 'lighthouse-schema';
+
+    public function retrieveSchema(): Schema
     {
-        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
+        return $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
     }
 
     /**
      * Execute GraphQL query.
      *
      * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
      *
      * @return array
      */
@@ -81,7 +84,7 @@ class GraphQL
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
-        if (! empty($result->errors)) {
+        if (!empty($result->errors)) {
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
                     info('GraphQL Error:', [
@@ -105,18 +108,16 @@ class GraphQL
      * Execute GraphQL query.
      *
      * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
-        $schema = $this->graphqlSchema ?: $this->buildSchema();
-
         return GraphQLBase::executeQuery(
-            $schema,
+            $this->retrieveSchema(),
             $query,
             $rootValue,
             $context,
@@ -131,29 +132,23 @@ class GraphQL
      */
     public function buildSchema()
     {
-        // todo get from cache and save back
-//
-//        $schema = $this->cache()->get();
-//        if (!$schema){
-//            $this->cache()->set($schema);
-//        }
-        $schemaString = $this->stitcher()->stitch(
+        $documentAST = Cache::rememberForever(self::AST_CACHE_KEY, function () {
+            $schemaString = $this->stitcher()->stitch(
                 config('lighthouse.global_id_field', '_id'),
                 config('lighthouse.schema.register')
             );
+            return ASTBuilder::generate($schemaString);
+        });
 
-        $schema = ASTBuilder::generate($schemaString);
-        // todo save into cache
-
-        return $this->schema()->build($schema);
+        return $this->schema()->build($documentAST);
     }
 
     /**
      * Batch field resolver.
      *
      * @param string $abstract
-     * @param mixed  $key
-     * @param array  $data
+     * @param mixed $key
+     * @param array $data
      * @param string $name
      *
      * @return \GraphQL\Deferred
@@ -175,7 +170,7 @@ class GraphQL
      */
     public function schema()
     {
-        if (! $this->schema) {
+        if (!$this->schema) {
             $this->schema = app(SchemaBuilder::class);
         }
 
@@ -189,7 +184,7 @@ class GraphQL
      */
     public function directives()
     {
-        if (! $this->directives) {
+        if (!$this->directives) {
             $this->directives = app(DirectiveFactory::class);
         }
 
@@ -203,25 +198,11 @@ class GraphQL
      */
     public function middleware()
     {
-        if (! $this->middleware) {
+        if (!$this->middleware) {
             $this->middleware = app(MiddlewareManager::class);
         }
 
         return $this->middleware;
-    }
-
-    /**
-     * Get instance of cache manager.
-     *
-     * @return CacheManager
-     */
-    public function cache()
-    {
-        if (! $this->cache) {
-            $this->cache = app(CacheManager::class);
-        }
-
-        return $this->cache;
     }
 
     /**
@@ -231,7 +212,7 @@ class GraphQL
      */
     public function stitcher()
     {
-        if (! $this->stitcher) {
+        if (!$this->stitcher) {
             $this->stitcher = app(SchemaStitcher::class);
         }
 
@@ -245,7 +226,7 @@ class GraphQL
      */
     public function nodes()
     {
-        if (! app()->has(NodeContainer::class)) {
+        if (!app()->has(NodeContainer::class)) {
             return app()->instance(
                 NodeContainer::class,
                 resolve(NodeContainer::class)

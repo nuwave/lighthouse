@@ -49,7 +49,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Nuwave\Lighthouse\Support\Console\Commands\CacheCommand::class,
+                \Nuwave\Lighthouse\Support\Console\Commands\ClearCacheCommand::class,
             ]);
         }
     }

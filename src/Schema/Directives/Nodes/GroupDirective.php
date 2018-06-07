@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 

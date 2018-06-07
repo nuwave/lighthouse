@@ -9,7 +9,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Schema;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\Utils\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Tests\TestCase;
 
 class SchemaBuilderTest extends TestCase

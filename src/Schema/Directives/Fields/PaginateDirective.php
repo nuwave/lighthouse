@@ -6,7 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\Directives\CreatesPaginators;
-use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandleQueries;

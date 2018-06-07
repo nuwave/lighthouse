@@ -2,10 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives\Args;
 
-use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nuwave\Lighthouse\Schema\Directives\Args\EqFilterDirective;
-use Nuwave\Lighthouse\Schema\Utils\ASTBuilder;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -41,7 +39,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         }';
 
         $query = '{
-            users(count: 5 id: '.$this->users->first()->getKey().') {
+            users(count: 5 id: ' . $this->users->first()->getKey() . ') {
                 data {
                     id
                 }
@@ -68,7 +66,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         }';
 
         $query = '{
-            users(count: 5 id: '.$this->users->first()->getKey().') {
+            users(count: 5 id: ' . $this->users->first()->getKey() . ') {
                 data {
                     id
                 }
@@ -98,7 +96,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
         $query = '{
-            users(count: 5 include: ['.$user1.', '.$user2.']) {
+            users(count: 5 include: [' . $user1 . ', ' . $user2 . ']) {
                 data {
                     id
                 }
@@ -128,7 +126,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
         $query = '{
-            users(count: 5 exclude: ['.$user1.', '.$user2.']) {
+            users(count: 5 exclude: [' . $user1 . ', ' . $user2 . ']) {
                 data {
                     id
                 }
@@ -157,7 +155,7 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $user1 = $this->users->first()->getKey();
         $query = '{
-            users(count: 5 id: '.$user1.') {
+            users(count: 5 id: ' . $user1 . ') {
                 data {
                     id
                 }
@@ -198,7 +196,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
         $query = '{
-            users(count: 5 start: "'.$start.'" end: "'.$end.'") {
+            users(count: 5 start: "' . $start . '" end: "' . $end . '") {
                 data {
                     id
                 }
@@ -239,7 +237,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
         $query = '{
-            users(count: 5 start: "'.$start.'" end: "'.$end.'") {
+            users(count: 5 start: "' . $start . '" end: "' . $end . '") {
                 data {
                     id
                 }
@@ -277,7 +275,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         $year = now()->subYear()->format('Y');
 
         $query = '{
-            users(count: 5 created_at: "'.$year.'") {
+            users(count: 5 created_at: "' . $year . '") {
                 data {
                     id
                 }
@@ -305,7 +303,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         }';
 
         $query = '{
-            users(count: 5 name: "'.$this->users->first()->name.'") {
+            users(count: 5 name: "' . $this->users->first()->name . '") {
                 data {
                     id
                 }

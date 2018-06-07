@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\Directive;
-use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 interface FieldManipulator extends Directive
 {
