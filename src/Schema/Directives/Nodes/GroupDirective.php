@@ -45,7 +45,7 @@ class GroupDirective implements NodeManipulator
         $objectType = $this->setMiddlewareDirectiveOnFields($objectType);
         $objectType = $this->setNamespaceDirectiveOnFields($objectType);
 
-        $current->setObjectType($objectType);
+        $current->setDefinition($objectType);
 
         return $current;
     }

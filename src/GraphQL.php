@@ -134,7 +134,6 @@ class GraphQL
     {
         $documentAST = Cache::rememberForever(self::AST_CACHE_KEY, function () {
             $schemaString = $this->stitcher()->stitch(
-                config('lighthouse.global_id_field', '_id'),
                 config('lighthouse.schema.register')
             );
 

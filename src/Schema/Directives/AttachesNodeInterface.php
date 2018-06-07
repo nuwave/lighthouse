@@ -22,6 +22,6 @@ trait AttachesNodeInterface
 
         $objectType = DocumentAST::addFieldToObjectType($objectType, DocumentAST::parseFieldDefinition('_id: ID!'));
 
-        return $documentAST->setObjectType($objectType);
+        return $documentAST->setDefinition($objectType);
     }
 }

@@ -50,7 +50,7 @@ trait CreatesPaginators
 
         $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('first: Int! after: String')->merge($fieldDefinition->arguments);
         $fieldDefinition->type = Parser::parseType($connectionTypeName);
-        $current->setObjectType(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
+        $current->setDefinition(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
 
         return $current;
     }
@@ -82,7 +82,7 @@ trait CreatesPaginators
 
         $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('count: Int! page: Int')->merge($fieldDefinition->arguments);
         $fieldDefinition->type = Parser::parseType($paginatorTypeName);
-        $current->setObjectType(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
+        $current->setDefinition(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
 
         return $current;
     }

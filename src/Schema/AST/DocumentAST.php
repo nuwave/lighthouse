@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
@@ -101,6 +103,18 @@ class DocumentAST
     }
 
     /**
+     * Parse the definition for a single interface.
+     *
+     * @param $interfaceDefinition
+     *
+     * @return InterfaceTypeDefinitionNode
+     */
+    public static function parseInterfaceDefinition($interfaceDefinition)
+    {
+        return self::parse($interfaceDefinition)->interfaces()->first();
+    }
+
+    /**
      * Get a collection of the contained definitions.
      *
      * @return Collection
@@ -148,6 +162,16 @@ class DocumentAST
     public function objectTypes()
     {
         return $this->getDefinitionsByType(ObjectTypeDefinitionNode::class);
+    }
+
+    /**
+     * Get all interface definitions.
+     *
+     * @return Collection
+     */
+    public function interfaces()
+    {
+        return $this->getDefinitionsByType(InterfaceTypeDefinitionNode::class);
     }
 
     /**
@@ -251,32 +275,28 @@ class DocumentAST
     {
         $query = $this->getQueryTypeDefinition();
         $query = self::addFieldToObjectType($query, $field);
-        $this->setObjectType($query);
+        $this->setDefinition($query);
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $definitionNode
+     * @param ObjectTypeDefinitionNode $objectType
      *
      * @return DocumentAST
      */
-    public function setObjectType(ObjectTypeDefinitionNode $definitionNode)
+    public function setDefinition(DefinitionNode $objectType)
     {
-        $name = $definitionNode->name->value;
+        $name = $objectType->name->value;
         $newDefinitions = $this->definitions()
             ->reject(function ($node) use ($name) {
-                return $node instanceof ObjectTypeDefinitionNode && $node->name->value === $name;
-            })->push($definitionNode)
+                // We can safely kick this by name because names must be unique
+                return $node->name->value === $name;
+            })->push($objectType)
             // Reindex, otherwise offset errors might happen in subsequent runs
             ->values()
             ->all();
 
         // This was a NodeList before, so put it back as it was
         $this->documentNode->definitions = new NodeList($newDefinitions);
-//        $definitions->merge()
-//
-//        $this->documentNode->definitions = $this->objectTypes()->reject(function (ObjectTypeDefinitionNode $type) use ($name) {
-//            return $type->name->value === $name;
-//        })->push($definitionNode)->toArray();
 
         return $this;
     }
@@ -291,7 +311,7 @@ class DocumentAST
     public function setObjectTypeFromString($definition)
     {
         $definitionNode = self::parseObjectType($definition);
-        $this->setObjectType($definitionNode);
+        $this->setDefinition($definitionNode);
 
         return $this;
     }

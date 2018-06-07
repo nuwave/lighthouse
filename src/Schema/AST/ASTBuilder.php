@@ -4,6 +4,8 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
@@ -30,7 +32,7 @@ class ASTBuilder
         $document = self::applyFieldManipulators($document);
         $document = self::applyArgManipulators($document);
 
-        $document = self::injectNodeField($document);
+        $document = self::addNodeSupport($document);
 
         return $document;
     }
@@ -45,7 +47,7 @@ class ASTBuilder
                 $fields = $objectType->fields;
                 $objectType->fields = $fields->merge($typeExtension->definition->fields);
                 // Modify the original document by overwriting the definition with the merged one
-                $document->setObjectType($objectType);
+                $document->setDefinition($objectType);
             }
         });
 
@@ -53,21 +55,36 @@ class ASTBuilder
     }
 
     /**
-     * Inject node field into Query.
+     * Inject the node type and a node field into Query.
      *
      * @param DocumentAST $document
      *
      * @return DocumentAST
      */
-    protected static function injectNodeField(DocumentAST $document)
+    protected static function addNodeSupport(DocumentAST $document)
     {
-        if (is_null(config('lighthouse.global_id_field'))) {
+        $hasTypeImplementingNode = $document->objectTypes()->contains(function(ObjectTypeDefinitionNode $objectType){
+            return collect($objectType->interfaces)->contains(function(NamedTypeNode $interface){
+                return $interface->name->value === 'Node';
+            });
+        });
+
+        // Only add the node type and node field if a type actually implements them
+        // Otherwise, a validation error is thrown
+        if(!$hasTypeImplementingNode){
             return $document;
         }
-//
-//        if (! $query = $this->instance('Query')) {
-//            return;
-//        }
+
+        $globalId = config('lighthouse.global_id_field', '_id');
+
+        $interface = DocumentAST::parseInterfaceDefinition("
+            # Node global interface
+            interface Node @interface(resolver: \"Nuwave\\Lighthouse\\Support\\Http\\GraphQL\\Interfaces\\NodeInterface@resolve\") {
+              # Global identifier that can be used to resolve any Node implementation.
+              $globalId: ID!
+            }
+        ");
+        $document->setDefinition($interface);
 
         $nodeQuery = DocumentAST::parseFieldDefinition('node(id: ID!): Node @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")');
         $document->addFieldToQueryType($nodeQuery);

@@ -7,37 +7,17 @@ class SchemaStitcher
     /**
      * Stitch together schema documents.
      *
-     * @param string      $globalId
      * @param string|null $path
      *
      * @return string
      */
-    public function stitch($globalId, $path = null)
+    public function stitch($path = null)
     {
-        $lighthouse = $this->lighthouseSchema($globalId);
+        $lighthouse = file_get_contents(realpath(__DIR__.'/../../../assets/schema.graphql'));
+
         $app = $path ? $this->appSchema($path) : '';
 
-        return $lighthouse.$app;
-    }
-
-    /**
-     * Get Lighthouse schema.
-     *
-     * @param string $globalId
-     *
-     * @return string
-     */
-    public function lighthouseSchema($globalId = '_id')
-    {
-        $schema = file_get_contents(realpath(__DIR__.'/../../../assets/schema.graphql'));
-
-        if ($globalId) {
-            $node = file_get_contents(realpath(__DIR__.'/../../../assets/node.graphql'));
-
-            return str_replace('_id', $globalId, $node).$schema;
-        }
-
-        return $schema;
+        return $lighthouse . $app;
     }
 
     /**

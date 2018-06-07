@@ -6,6 +6,7 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Directives\Args\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Args\ArgMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Directive;
@@ -32,7 +33,9 @@ class DirectiveFactory
      */
     public function __construct()
     {
-        $this->directives = collect();
+        $this->directives = new Collection();
+        $this->load(realpath(__DIR__.'/../Directives/'), 'Nuwave\\Lighthouse\\');
+        $this->load(config('lighthouse.directives', []));
     }
 
     /**
@@ -69,7 +72,7 @@ class DirectiveFactory
                 );
 
             $reflection = new \ReflectionClass($directive);
-            if ($reflection->implementsInterface(Directive::class) && $reflection->isInstantiable()) {
+            if ($reflection->isInstantiable()) {
                 $this->register($directive);
             }
         }

@@ -21,9 +21,6 @@ class LighthouseServiceProvider extends ServiceProvider
         if (config('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
-
-        $this->registerSchema();
-        $this->registerMacros();
     }
 
     protected function loadRoutesFrom($path)
@@ -50,22 +47,9 @@ class LighthouseServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Nuwave\Lighthouse\Support\Console\Commands\ClearCacheCommand::class,
+                \Nuwave\Lighthouse\Support\Console\Commands\ValidateSchemaCommand::class,
             ]);
         }
-    }
-
-    /**
-     * Register GraphQL schema.
-     */
-    public function registerSchema()
-    {
-        directives()->load(realpath(__DIR__.'/../Schema/Directives/'), 'Nuwave\\Lighthouse\\');
-        directives()->load(config('lighthouse.directives', []));
-
-//        graphql()->stitcher()->stitch(
-//            config('lighthouse.global_id_field', '_id'),
-//            config('lighthouse.schema.register')
-//        );
     }
 
     /**
