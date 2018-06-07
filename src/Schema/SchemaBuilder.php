@@ -68,7 +68,7 @@ class SchemaBuilder
             return $this->instance($name);
         };
 
-        $schema = new Schema(compact(
+        return new Schema(compact(
             'query',
             'mutation',
             'subscription',
@@ -76,11 +76,6 @@ class SchemaBuilder
             'directives',
             'typeLoader'
         ));
-
-//        dd(SchemaPrinter::doPrint($schema));
-//        $schema->assertValid();
-
-        return $schema;
     }
 
     /**

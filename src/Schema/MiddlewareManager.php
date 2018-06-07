@@ -4,8 +4,9 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Language\Parser;
+use GraphQL\Language\AST\SelectionNode;
 use GraphQL\Utils\AST;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class MiddlewareManager
 {
@@ -32,15 +33,11 @@ class MiddlewareManager
      */
     public function forRequest($request)
     {
-        $definitions = collect(Parser::parse($request)->definitions);
-        $fragments = $definitions->filter(function ($def) {
-            return $def instanceof FragmentDefinitionNode;
-        });
+        $document = DocumentAST::parse($request);
+        $fragments = $document->fragments();
 
-        return collect(Parser::parse($request)->definitions)
-            ->filter(function ($def) {
-                return $def instanceof OperationDefinitionNode;
-            })->map(function (OperationDefinitionNode $node) use ($fragments) {
+        return $document->operations()
+            ->map(function (OperationDefinitionNode $node) use ($fragments) {
                 $definition = AST::toArray($node);
                 $operation = array_get($definition, 'operation');
                 $fields = array_map(function ($selection) use ($fragments) {
