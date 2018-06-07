@@ -21,6 +21,8 @@ class FieldFactory
     {
         $value->setType(NodeResolver::resolve($value->getField()->type));
 
+        $value = $this->applyMiddleware($value);
+
         $this->hasResolver($value)
             ? $this->useResolver($value)
             : $value->setResolver($this->resolver($value));
@@ -36,12 +38,7 @@ class FieldFactory
             $field['args'] = $args->toArray();
         }
 
-        $resolve = directives()->fieldMiddleware($value->getField())
-            ->reduce(function ($value, $middleware) {
-                return $middleware->handleField($value);
-            }, $value)->getResolver();
-
-        if ($resolve) {
+        if ($resolve = $value->getResolver()) {
             $field['resolve'] = $value->wrap($resolve);
         }
 
@@ -107,7 +104,7 @@ class FieldFactory
     {
         if (! directives()->hasFieldMiddleware($value->getField())) {
             // Use graphql-php default resolver
-            return;
+            return null;
         }
 
         $name = $value->getFieldName();
@@ -176,5 +173,13 @@ class FieldFactory
     protected function argFactory()
     {
         return app(ArgumentFactory::class);
+    }
+
+    protected function applyMiddleware($value)
+    {
+        return directives()->fieldMiddleware($value->getField())
+            ->reduce(function ($value, $middleware) {
+                return $middleware->handleField($value);
+            }, $value);
     }
 }

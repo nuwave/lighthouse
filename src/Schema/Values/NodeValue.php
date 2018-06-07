@@ -30,13 +30,6 @@ class NodeValue
     protected $directive;
 
     /**
-     * Current namespace.
-     *
-     * @var string
-     */
-    protected $namespace;
-
-    /**
      * Registered interfaces.
      *
      * @var array
@@ -103,16 +96,6 @@ class NodeValue
     }
 
     /**
-     * Set the current namespace.
-     *
-     * @param string $namespace
-     */
-    public function setNamespace($namespace)
-    {
-        $this->namespace = $namespace;
-    }
-
-    /**
      * Attach interface(s) to node.
      *
      * @param array|string $interface
@@ -156,18 +139,6 @@ class NodeValue
     public function getType()
     {
         return $this->type;
-    }
-
-    /**
-     * Get current namespace.
-     *
-     * @param string $class
-     *
-     * @return string
-     */
-    public function getNamespace($class = null)
-    {
-        return $class ? $this->namespace.'\\'.$class : $this->namespace;
     }
 
     /**

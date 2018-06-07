@@ -37,6 +37,13 @@ class FieldValue
     protected $resolver;
 
     /**
+     * Current namespace.
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
      * Current description.
      *
      * @var string
@@ -112,6 +119,16 @@ class FieldValue
         $this->resolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Set the current namespace.
+     *
+     * @param string $namespace
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
     }
 
     /**
@@ -195,6 +212,18 @@ class FieldValue
     public function getResolver()
     {
         return $this->resolver;
+    }
+
+    /**
+     * Get current namespace.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    public function getNamespace($class = null)
+    {
+        return $class ? $this->namespace.'\\'.$class : $this->namespace;
     }
 
     /**

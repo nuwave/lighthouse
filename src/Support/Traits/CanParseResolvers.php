@@ -25,10 +25,10 @@ trait CanParseResolvers
         if ($resolver = $this->directiveArgValue($directive, 'resolver')) {
             $className = array_get(explode('@', $resolver), '0');
 
-            return $value->getNode()->getNamespace($className);
+            return $value->getNamespace($className);
         }
 
-        return $value->getNode()->getNamespace(
+        return $value->getNamespace(
             $this->getResolverClassName($directive, $throw)
         );
     }

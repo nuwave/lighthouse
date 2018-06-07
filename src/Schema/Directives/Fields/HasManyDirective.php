@@ -9,13 +9,13 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
+use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class HasManyDirective implements FieldResolver, SchemaGenerator
+class HasManyDirective implements FieldResolver, SchemaManipulator
 {
     use CreatesPaginators, HandlesGlobalId;
 
@@ -37,7 +37,7 @@ class HasManyDirective implements FieldResolver, SchemaGenerator
      *
      * @return DocumentAST
      */
-    public function handleSchemaGeneration(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
+    public function manipulateSchema(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
     {
         $resolver = $this->getResolver($definitionNode);
 

@@ -7,7 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
-use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
+use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
 
 class ASTBuilder
 {
@@ -89,8 +89,8 @@ class ASTBuilder
         return $objectTypes->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($originalDocument) {
             $generators = directives()->generators($objectType);
 
-            return $generators->reduce(function (DocumentAST $document, SchemaGenerator $generator) use ($originalDocument, $objectType) {
-                return $generator->handleSchemaGeneration($objectType, $document, $originalDocument);
+            return $generators->reduce(function (DocumentAST $document, SchemaManipulator $generator) use ($originalDocument, $objectType) {
+                return $generator->manipulateSchema($objectType, $document, $originalDocument);
             }, $document);
         }, $document);
     }
@@ -107,8 +107,8 @@ class ASTBuilder
             return collect($objectType->fields)->reduce(function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType, $originalDocument) {
                 $generators = directives()->generators($fieldDefinition);
 
-                return $generators->reduce(function (DocumentAST $document, SchemaGenerator $generator) use ($fieldDefinition, $objectType, $originalDocument) {
-                    return $generator->handleSchemaGeneration($fieldDefinition, $document, $originalDocument, $objectType);
+                return $generators->reduce(function (DocumentAST $document, SchemaManipulator $generator) use ($fieldDefinition, $objectType, $originalDocument) {
+                    return $generator->manipulateSchema($fieldDefinition, $document, $originalDocument, $objectType);
                 }, $document);
             }, $document);
         }, $document);

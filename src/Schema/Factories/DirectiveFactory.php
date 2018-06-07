@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
-use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
+use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Symfony\Component\Finder\Finder;
 
@@ -148,7 +148,7 @@ class DirectiveFactory
     public function generators($node)
     {
         return $this->handlers($node)->filter(function(Directive $directive){
-            return $directive instanceof SchemaGenerator;
+            return $directive instanceof SchemaManipulator;
         });
     }
 

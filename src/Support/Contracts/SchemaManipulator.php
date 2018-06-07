@@ -7,7 +7,7 @@ use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 
-interface SchemaGenerator extends Directive
+interface SchemaManipulator extends Directive
 {
 
     /**
@@ -18,5 +18,5 @@ interface SchemaGenerator extends Directive
      *
      * @return DocumentAST
      */
-    public function handleSchemaGeneration(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null);
+    public function manipulateSchema(Node $definitionNode, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null);
 }

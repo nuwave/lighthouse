@@ -9,14 +9,14 @@ use Illuminate\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
+use Nuwave\Lighthouse\Support\Contracts\SchemaManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class PaginateDirective implements FieldResolver, SchemaGenerator
+class PaginateDirective implements FieldResolver, SchemaManipulator
 {
     use CreatesPaginators, HandlesGlobalId, HandlesQueryFilter, HandleQueries;
 
@@ -39,7 +39,7 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
      * @return DocumentAST
      * @throws \Exception
      */
-    public function handleSchemaGeneration(Node $fieldDefinition, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
+    public function manipulateSchema(Node $fieldDefinition, DocumentAST $current, DocumentAST $original, ObjectTypeDefinitionNode $parentType = null)
     {
         $paginatorType = $this->directiveArgValue(
             $this->fieldDirective($fieldDefinition, self::name()),
