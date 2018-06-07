@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Collection;
 
@@ -20,47 +20,28 @@ class NodeValue
     /**
      * Current definition node.
      *
-     * @var Node
+     * @var DefinitionNode
      */
     protected $node;
 
     /**
-     * Node directive.
-     *
-     * @var DirectiveNode
-     */
-    protected $directive;
-
-    /**
      * Create new instance of node value.
      *
-     * @param Node $node
+     * @param DefinitionNode $node
      */
-    public function __construct(Node $node)
+    public function __construct(DefinitionNode $node)
     {
         $this->node = $node;
     }
 
     /**
-     * Create new instance of node value.
-     *
-     * @param Node $node
-     *
-     * @return NodeValue
-     */
-    public static function init(Node $node)
-    {
-        return new static($node);
-    }
-
-    /**
      * Set current node instance.
      *
-     * @param Node $node
+     * @param DefinitionNode $node
      *
      * @return self
      */
-    public function setNode(Node $node)
+    public function setNode(DefinitionNode $node)
     {
         $this->node = $node;
 
@@ -82,33 +63,13 @@ class NodeValue
     }
 
     /**
-     * Set the current directive.
-     *
-     * @param DirectiveNode $directive
-     */
-    public function setDirective(DirectiveNode $directive)
-    {
-        $this->directive = $directive;
-    }
-
-    /**
      * Get current node.
      *
-     * @return Node
+     * @return DefinitionNode
      */
     public function getNode()
     {
         return $this->node;
-    }
-
-    /**
-     * Get current directive.
-     *
-     * @return DirectiveNode|null
-     */
-    public function getDirective()
-    {
-        return $this->directive;
     }
 
     /**

@@ -162,9 +162,9 @@ class SchemaBuilder
         return $document->definitions()->reject(function (DefinitionNode $node) {
             return $node instanceof TypeExtensionDefinitionNode
                 || $node instanceof DirectiveDefinitionNode;
-        })->sortBy(function ($node) {
+        })->sortBy(function (DefinitionNode $node) {
             return array_get($this->weights, get_class($node), 9);
-        })->map(function (Node $node) {
+        })->map(function (DefinitionNode $node) {
             return app(NodeFactory::class)->handle(new NodeValue($node));
         });
     }
