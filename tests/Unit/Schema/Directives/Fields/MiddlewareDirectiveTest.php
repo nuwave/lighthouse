@@ -43,7 +43,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itCanRegisterMiddlewareWithFragments()
     {
-        schema()->register('
+        $this->buildSchemaFromString('
             type Query {
                 foo: String! @middleware(checks: ["auth:web", "auth:admin"])
                 bar: String!

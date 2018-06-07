@@ -141,15 +141,6 @@ class DirectiveFactory
         return $resolvers->first();
     }
 
-    public function generators($node)
-    {
-        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
-        })->filter(function(Directive $directive){
-            return $directive instanceof SchemaGenerator;
-        });
-    }
-
     /**
      * @param $node
      * @return \Illuminate\Support\Collection
