@@ -29,6 +29,6 @@ class ClearCacheCommand extends Command
     {
         Cache::forget(GraphQL::AST_CACHE_KEY);
 
-        $this->info('GraphQL AST successfully cached.');
+        $this->info('GraphQL AST schema cache deleted.');
     }
 }

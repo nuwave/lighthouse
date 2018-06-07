@@ -17,7 +17,7 @@ class SchemaStitcher
 
         $app = $path ? $this->appSchema($path) : '';
 
-        return $lighthouse . $app;
+        return $lighthouse.$app;
     }
 
     /**

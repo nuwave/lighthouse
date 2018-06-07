@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -63,23 +62,24 @@ class ASTBuilder
      */
     protected static function addNodeSupport(DocumentAST $document)
     {
-        $hasTypeImplementingNode = $document->objectTypes()->contains(function(ObjectTypeDefinitionNode $objectType){
-            return collect($objectType->interfaces)->contains(function(NamedTypeNode $interface){
-                return $interface->name->value === 'Node';
+        $hasTypeImplementingNode = $document->objectTypes()->contains(function (ObjectTypeDefinitionNode $objectType) {
+            return collect($objectType->interfaces)->contains(function (NamedTypeNode $interface) {
+                return 'Node' === $interface->name->value;
             });
         });
 
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if(!$hasTypeImplementingNode){
+        if (! $hasTypeImplementingNode) {
             return $document;
         }
 
         $globalId = config('lighthouse.global_id_field', '_id');
 
+        // Double slashes to escape the slashes in the namespace.
         $interface = DocumentAST::parseInterfaceDefinition("
             # Node global interface
-            interface Node @interface(resolver: \"Nuwave\\Lighthouse\\Support\\Http\\GraphQL\\Interfaces\\NodeInterface@resolve\") {
+            interface Node @interface(resolver: \"Nuwave\\\\Lighthouse\\\\Support\\\\Http\\\\GraphQL\\\\Interfaces\\\\NodeInterface@resolve\") {
               # Global identifier that can be used to resolve any Node implementation.
               $globalId: ID!
             }

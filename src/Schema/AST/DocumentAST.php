@@ -11,7 +11,6 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
-use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
 
@@ -271,26 +270,37 @@ class DocumentAST
         return $objectType;
     }
 
+    /**
+     * Add a single field to the query type.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return $this
+     */
     public function addFieldToQueryType(FieldDefinitionNode $field)
     {
         $query = $this->getQueryTypeDefinition();
         $query = self::addFieldToObjectType($query, $field);
         $this->setDefinition($query);
+
+        return $this;
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $objectType
+     * @param DefinitionNode $definition
      *
      * @return DocumentAST
      */
-    public function setDefinition(DefinitionNode $objectType)
+    public function setDefinition(DefinitionNode $definition)
     {
-        $name = $objectType->name->value;
+        $newName = $definition->name->value;
         $newDefinitions = $this->definitions()
-            ->reject(function ($node) use ($name) {
+            ->reject(function (DefinitionNode $node) use ($newName) {
+                $nodeName = data_get($node, 'name.value');
+                // We only consider replacing nodes that have a name
                 // We can safely kick this by name because names must be unique
-                return $node->name->value === $name;
-            })->push($objectType)
+                return $nodeName && $nodeName === $newName;
+            })->push($definition)
             // Reindex, otherwise offset errors might happen in subsequent runs
             ->values()
             ->all();
@@ -310,8 +320,8 @@ class DocumentAST
      */
     public function setObjectTypeFromString($definition)
     {
-        $definitionNode = self::parseObjectType($definition);
-        $this->setDefinition($definitionNode);
+        $objectType = self::parseObjectType($definition);
+        $this->setDefinition($objectType);
 
         return $this;
     }

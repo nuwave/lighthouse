@@ -121,17 +121,22 @@ class TestCase extends BaseTestCase
     protected function execute($schema, $query, $lighthouse = false, $variables = [])
     {
         if ($lighthouse) {
-            $node = file_get_contents(realpath(__DIR__.'/../assets/node.graphql'));
             $lighthouse = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
-            $schema = $node."\n".$lighthouse."\n".$schema;
+            $schema = $lighthouse."\n".$schema;
         }
-//        dd(SchemaPrinter::doPrint($this->buildSchemaFromString($schema)));
 
         return Executor::execute($this->buildSchemaFromString($schema), $this->parse($query));
     }
 
     protected function buildSchemaFromString($schema)
     {
+        // Add default empty Query if not provided
+        $schema .= '
+            type Query {
+                dummy: String
+            }
+        ';
+
         return schema()->build(ASTBuilder::generate($schema));
     }
 

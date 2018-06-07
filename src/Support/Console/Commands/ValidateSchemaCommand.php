@@ -27,6 +27,9 @@ class ValidateSchemaCommand extends Command
      */
     public function handle()
     {
+        // Clear the cache so this always validates the current schema
+        Cache::forget(GraphQL::AST_CACHE_KEY);
+
         graphql()->retrieveSchema()->assertValid();
 
         $this->info('The defined schema is valid.');
