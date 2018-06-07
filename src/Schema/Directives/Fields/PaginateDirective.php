@@ -3,18 +3,17 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Pagination\Paginator;
-use Nuwave\Lighthouse\Schema\Utils\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Directives\CreatesPaginators;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\SchemaGenerator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
 use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class PaginateDirective implements FieldResolver, SchemaGenerator
+class PaginateDirective implements FieldResolver, FieldManipulator
 {
     use CreatesPaginators, HandlesGlobalId, HandlesQueryFilter, HandleQueries;
 
@@ -29,13 +28,16 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
     }
 
     /**
-     * @param $fieldDefinition
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param FieldDefinitionNode      $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parentType
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
+     *
+     * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function handleSchemaGeneration($fieldDefinition, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
         $paginatorType = $this->directiveArgValue(
             $this->fieldDirective($fieldDefinition, self::name()),
@@ -43,13 +45,13 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
             'paginator'
         );
 
-        switch($paginatorType){
+        switch ($paginatorType) {
             case 'relay':
             case 'connection':
-                return $this->registerConnection($fieldDefinition, $current, $original);
+                return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
             case 'paginator':
             default:
-                return $this->registerPaginator($fieldDefinition, $current, $original);
+                return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
         }
     }
 
@@ -67,8 +69,9 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
      * @throws DirectiveException
+     *
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
@@ -87,7 +90,7 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
      * Create a paginator resolver.
      *
      * @param FieldValue $value
-     * @param string $model
+     * @param string     $model
      *
      * @return \Closure
      */
@@ -103,6 +106,7 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
             Paginator::currentPageResolver(function () use ($page) {
                 return $page;
             });
+
             return $query->paginate($first);
         };
     }
@@ -111,7 +115,7 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
      * Create a connection resolver.
      *
      * @param FieldValue $value
-     * @param string $model
+     * @param string     $model
      *
      * @return \Closure
      */
@@ -128,6 +132,7 @@ class PaginateDirective implements FieldResolver, SchemaGenerator
             Paginator::currentPageResolver(function () use ($page) {
                 return $page;
             });
+
             return $query->paginate($first);
         };
     }
