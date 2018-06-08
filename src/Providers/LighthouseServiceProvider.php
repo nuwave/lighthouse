@@ -60,6 +60,7 @@ class LighthouseServiceProvider extends ServiceProvider
             $this->commands([
                 \Nuwave\Lighthouse\Support\Console\Commands\ClearCacheCommand::class,
                 \Nuwave\Lighthouse\Support\Console\Commands\ValidateSchemaCommand::class,
+                \Nuwave\Lighthouse\Support\Console\Commands\PrintSchemaCommand::class,
             ]);
         }
     }
