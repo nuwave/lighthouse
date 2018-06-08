@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
@@ -28,7 +28,7 @@ class GraphQL
     /**
      * Middleware manager.
      *
-     * @var MiddlewareManager
+     * @var MiddlewareRegistry
      */
     protected $middleware;
 
@@ -183,12 +183,12 @@ class GraphQL
     /**
      * Get instance of middle manager.
      *
-     * @return MiddlewareManager
+     * @return MiddlewareRegistry
      */
     public function middleware()
     {
         if (! $this->middleware) {
-            $this->middleware = app(MiddlewareManager::class);
+            $this->middleware = app(MiddlewareRegistry::class);
         }
 
         return $this->middleware;

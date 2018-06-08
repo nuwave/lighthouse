@@ -8,7 +8,7 @@ use GraphQL\Language\AST\SelectionNode;
 use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-class MiddlewareManager
+class MiddlewareRegistry
 {
     /**
      * Registered query middleware.
