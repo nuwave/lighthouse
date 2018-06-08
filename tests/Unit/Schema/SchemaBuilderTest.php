@@ -10,6 +10,7 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Schema;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Tests\TestCase;
 
 class SchemaBuilderTest extends TestCase
@@ -43,7 +44,7 @@ class SchemaBuilderTest extends TestCase
     {
         $ast = ASTBuilder::generate($schema);
 
-        return schema()->convertTypes($ast);
+        return (new SchemaBuilder())->convertTypes($ast);
     }
 
     /**
@@ -239,17 +240,19 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itCanGenerateGraphQLSchema()
+    public function itCanGenerateValidGraphQLSchema()
     {
-        $schema = '
+        $schema = $this->buildSchemaFromString('
         type Query {
             foo: String!
         }
         type Mutation {
             foo: String!
         }
-        ';
+        ');
 
-        $this->assertInstanceOf(Schema::class, schema()->build(ASTBuilder::generate($schema)));
+        $this->assertInstanceOf(Schema::class, $schema);
+        // This would throw if the schema were invalid
+        $schema->assertValid();
     }
 }

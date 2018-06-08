@@ -19,13 +19,6 @@ class GraphQL
     use CanFormatError;
 
     /**
-     * Schema builder.
-     *
-     * @var SchemaBuilder
-     */
-    protected $schema;
-
-    /**
      * Middleware manager.
      *
      * @var MiddlewareRegistry
@@ -124,7 +117,7 @@ class GraphQL
             })
             : $this->buildAST();
 
-        return $this->schema()->build($documentAST);
+        return (new SchemaBuilder())->build($documentAST);
     }
 
     protected function shouldCacheAST()
@@ -164,20 +157,6 @@ class GraphQL
             : app()->instance($name, resolve($abstract));
 
         return $instance->load($key, $data);
-    }
-
-    /**
-     * Get an instance of the schema builder.
-     *
-     * @return SchemaBuilder
-     */
-    public function schema()
-    {
-        if (! $this->schema) {
-            $this->schema = app(SchemaBuilder::class);
-        }
-
-        return $this->schema;
     }
 
     /**

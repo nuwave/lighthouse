@@ -6,6 +6,7 @@ use GraphQL\Executor\Executor;
 use GraphQL\Language\Parser;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
@@ -130,14 +131,17 @@ class TestCase extends BaseTestCase
 
     protected function buildSchemaFromString($schema)
     {
-        // Add default empty Query if not provided
-        $schema .= '
+        return (new SchemaBuilder())->build(ASTBuilder::generate($schema));
+    }
+
+    protected function buildSchemaWithDefaultQuery($schema)
+    {
+        // Add default empty Query, schema is invalid without it
+        return $this->buildSchemaFromString($schema.'
             type Query {
                 dummy: String
             }
-        ';
-
-        return schema()->build(ASTBuilder::generate($schema));
+        ');
     }
 
     /**

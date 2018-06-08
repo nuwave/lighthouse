@@ -91,7 +91,7 @@ class NodeRegistry
     public function resolveType($value)
     {
         if (is_object($value) && isset($this->modelToTypeMap[get_class($value)])) {
-            return schema()->instance($this->modelToTypeMap[get_class($value)]);
+            return types()->get($this->modelToTypeMap[get_class($value)]);
         }
 
         return collect($this->valueToTypeMap)
@@ -106,7 +106,7 @@ class NodeRegistry
                 $resolver = $item['resolver'];
                 $type = $item['type'];
 
-                return $resolver($value) ? schema()->instance($type) : $instance;
+                return $resolver($value) ? types()->get($type) : $instance;
             });
     }
 }

@@ -65,6 +65,6 @@ class UnionTest extends TestCase
     {
         $type = isset($value['id']) ? 'User' : 'Employee';
 
-        return schema()->instance($type);
+        return types()->get($type);
     }
 }

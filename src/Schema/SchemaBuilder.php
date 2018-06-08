@@ -2,22 +2,20 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
+use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\Factories\TypeFactory;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
-use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class SchemaBuilder
 {
-    use HandlesTypes;
-
     /**
      * Definition weights.
      *
@@ -30,20 +28,6 @@ class SchemaBuilder
     ];
 
     /**
-     * Collection of schema types.
-     *
-     * @var array
-     */
-    protected $types = [];
-
-    /**
-     * Custom (client) directives.
-     *
-     * @var array
-     */
-    protected $directives = [];
-
-    /**
      * Build an executable schema from AST.
      *
      * @param DocumentAST $documentAST
@@ -52,96 +36,56 @@ class SchemaBuilder
      */
     public function build($documentAST)
     {
-        $this->types = $this->convertTypes($documentAST);
+        $types = $this->convertTypes($documentAST);
+        $this->loadRootOperationFields($types);
 
-        $query = $this->types->firstWhere('name', 'Query');
-        $mutation = $this->types->firstWhere('name', 'Mutation');
-        $subscription = $this->types->firstWhere('name', 'Subscription');
+        $config = SchemaConfig::create()
+            ->setQuery($types->firstWhere('name', 'Query'))
+            ->setTypes($types->reject($this->isOperationType())->toArray())
+            ->setDirectives($this->convertDirectives($documentAST)->toArray())
+            ->setTypeLoader(function ($name) {
+                return types()->get($name);
+            });
 
-        $types = $this->types->filter(function ($type) {
-            return ! in_array($type->name, ['Query', 'Mutation', 'Subscription']);
-        })->toArray();
+        if ($mutation = $types->firstWhere('name', 'Mutation')) {
+            $config->setMutation($mutation);
+        }
 
-        $directives = $this->convertDirectives($documentAST)->toArray();
-        $typeLoader = function ($name) {
-            return $this->instance($name);
-        };
+        if ($subscription = $types->firstWhere('name', 'Subscription')) {
+            $config->setSubscription($subscription);
+        }
 
-        return new Schema(compact(
-            'query',
-            'mutation',
-            'subscription',
-            'types',
-            'directives',
-            'typeLoader'
-        ));
+        return new Schema($config);
     }
 
     /**
-     * Resolve instance by name.
+     * The fields for the root operations have to be loaded in advance.
      *
-     * @param string $type
+     * This is because they might have to register middleware.
+     * Other fields can be lazy-loaded to improve performance.
      *
-     * @return mixed
+     * @param Collection $types
      */
-    public function instance($type)
+    protected function loadRootOperationFields(Collection $types)
     {
-        return collect($this->types)
-            ->first(function ($instance) use ($type) {
-                return $instance->name === $type;
+        $types->filter($this->isOperationType())
+            ->each(function (ObjectType $type) {
+                // This resolves the fields which causes the fields MiddlewareDirective to run
+                // and thus register the (Laravel)-Middleware for the fields.
+                $type->getFields();
             });
     }
 
     /**
-     * Get all registered types.
+     * Callback to determine whether a type is one of the three root operation types.
      *
-     * @return array
+     * @return \Closure
      */
-    public function types()
+    protected function isOperationType()
     {
-        return $this->types;
-    }
-
-    /**
-     * Add type to register.
-     *
-     * @param ObjectType|array $type
-     */
-    public function type($type)
-    {
-        $this->types = is_array($type)
-            ? array_merge($this->types, $type)
-            : array_merge($this->types, [$type]);
-    }
-
-    /**
-     * Serialize AST.
-     *
-     * @return string
-     */
-    public function serialize()
-    {
-        $schema = collect($this->types)->map(function ($type) {
-            return $this->serializeableType($type);
-        })->toArray();
-
-        return serialize($schema);
-    }
-
-    /**
-     * Unserialize AST.
-     *
-     * @param string $schema
-     *
-     * @return Collection
-     */
-    public function unserialize($schema)
-    {
-        $this->types = collect(unserialize($schema))->map(function ($type) {
-            return $this->unpackType($type);
-        });
-
-        return collect($this->types);
+        return function (Type $type) {
+            return in_array($type->name, ['Query', 'Mutation', 'Subscription']);
+        };
     }
 
     /**
@@ -158,6 +102,9 @@ class SchemaBuilder
                 return array_get($this->weights, get_class($typeDefinition), 9);
             })->map(function (TypeDefinitionNode $typeDefinition) {
                 return app(TypeFactory::class)->toType(new TypeValue($typeDefinition));
+            })->each(function (Type $type) {
+                // Register in global type registry
+                types()->register($type);
             });
     }
 

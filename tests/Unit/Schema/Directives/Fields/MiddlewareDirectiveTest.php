@@ -22,18 +22,21 @@ class MiddlewareDirectiveTest extends TestCase
             }
         ');
 
-        collect(schema()->types())->each(function ($type) {
-            $type->config['fields']();
-        });
+        $middleware = graphql()->middleware()->forRequest('
+            query FooQuery {
+                foo
+            }
+        ');
 
-        $query = 'query FooQuery { foo }';
-        $middleware = graphql()->middleware()->forRequest($query);
         $this->assertCount(2, $middleware);
         $this->assertContains('auth:web', $middleware);
         $this->assertContains('auth:admin', $middleware);
 
-        $query = 'mutation CreateFoo { foo(bar:"baz") }';
-        $middleware = graphql()->middleware()->forRequest($query);
+        $middleware = graphql()->middleware()->forRequest('
+            mutation CreateFoo {
+                foo(bar:"baz")
+            }
+        ');
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }
@@ -54,18 +57,24 @@ class MiddlewareDirectiveTest extends TestCase
             }
         ');
 
-        collect(schema()->types())->each(function ($type) {
-            $type->config['fields']();
-        });
-
-        $query = 'query FooQuery { ...Foo_Fragment } fragment Foo_Fragment on Query { foo }';
-        $middleware = graphql()->middleware()->forRequest($query);
+        $middleware = graphql()->middleware()->forRequest('
+            query FooQuery {
+                ...Foo_Fragment
+            }
+            
+            fragment Foo_Fragment on Query {
+                foo
+            }
+        ');
         $this->assertCount(2, $middleware);
         $this->assertContains('auth:web', $middleware);
         $this->assertContains('auth:admin', $middleware);
 
-        $query = 'mutation CreateFoo { foo(bar:"baz") }';
-        $middleware = graphql()->middleware()->forRequest($query);
+        $middleware = graphql()->middleware()->forRequest('
+            mutation CreateFoo {
+                foo(bar:"baz")
+            }
+        ');
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }

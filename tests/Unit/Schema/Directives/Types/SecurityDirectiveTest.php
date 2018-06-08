@@ -15,9 +15,9 @@ class SecurityDirectiveTest extends TestCase
     public function itCanSetMaxDepth()
     {
         $this->buildSchemaFromString('
-        type Query @security(depth: 3) {
-            me: String
-        }
+            type Query @security(depth: 3) {
+                me: String
+            }
         ');
 
         $rule = DocumentValidator::getRule(QueryDepth::class);

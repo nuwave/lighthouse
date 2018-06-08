@@ -18,12 +18,12 @@ class AuthDirectiveTest extends TestCase
 
         $this->be($user);
         $schema = '
-        type User {
-            foo: String!
-        }
-        type Query {
-            user: User! @auth
-        }
+            type User {
+                foo: String!
+            }
+            type Query {
+                user: User! @auth
+            }
         ';
 
         $query = $this->buildSchemaFromString($schema)->getQueryType();

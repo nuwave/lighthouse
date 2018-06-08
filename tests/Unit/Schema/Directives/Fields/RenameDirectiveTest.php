@@ -12,10 +12,10 @@ class RenameDirectiveTest extends TestCase
      */
     public function itCanRenameAField()
     {
-        $schema = $this->buildSchemaFromString('
-        type Foo {
-            fooBar: String! @rename(attribute: "foo_bar")
-        }
+        $schema = $this->buildSchemaWithDefaultQuery('
+            type Foo {
+                fooBar: String! @rename(attribute: "foo_bar")
+            }
         ');
 
         $type = $schema->getType('Foo');
@@ -31,10 +31,10 @@ class RenameDirectiveTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $schema = $this->buildSchemaFromString('
-        type Foo {
-            fooBar: String! @rename
-        }
+        $schema = $this->buildSchemaWithDefaultQuery('
+            type Foo {
+                fooBar: String! @rename
+            }
         ');
 
         $type = $schema->getType('Foo');

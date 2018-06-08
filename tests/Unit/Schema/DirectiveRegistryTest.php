@@ -39,12 +39,10 @@ class DirectiveRegistryTest extends TestCase
     public function itThrowsErrorIfMultipleDirectivesAssignedToNode()
     {
         $this->expectException(DirectiveException::class);
-        echo 'fix me';
-//
-//        $document = $this->buildSchemaFromString('
-//            scalar DateTime @scalar @foo
-//        ');
-//        $handler = directives()->typeResolverForNode($document->);
+
+        $this->buildSchemaWithDefaultQuery('
+            scalar DateTime @scalar @foo
+        ');
     }
 
     /**

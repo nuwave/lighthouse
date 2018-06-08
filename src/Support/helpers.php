@@ -24,15 +24,15 @@ if (! function_exists('auth')) {
     }
 }
 
-if (! function_exists('schema')) {
+if (! function_exists('types')) {
     /**
      * Get instance of schema container.
      *
-     * @return \Nuwave\Lighthouse\Schema\SchemaBuilder
+     * @return \Nuwave\Lighthouse\Schema\TypeRegistry
      */
-    function schema()
+    function types()
     {
-        return graphql()->schema();
+        return app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);
     }
 }
 

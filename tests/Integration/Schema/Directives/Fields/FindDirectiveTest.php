@@ -38,13 +38,13 @@ class FindDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
         $schema = $this->buildSchemaFromString('
-        type User {
-            id: ID!
-            name: String!
-        }
-        type Query {
-            user(id: ID @eq): User @find
-        }
+            type User {
+                id: ID!
+                name: String!
+            }
+            type Query {
+                user(id: ID @eq): User @find
+            }
         ');
         $schema->getQueryType()->getField('user')->resolveFn();
     }

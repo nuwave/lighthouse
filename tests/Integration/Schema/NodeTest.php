@@ -62,7 +62,7 @@ class NodeTest extends DBTestCase
     public function resolveNodeType($value)
     {
         if (is_array($value) && isset($value['name'])) {
-            return schema()->instance('User');
+            return types()->get('User');
         }
     }
 }

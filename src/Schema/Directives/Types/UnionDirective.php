@@ -44,7 +44,7 @@ class UnionDirective implements TypeResolver
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
             'types' => function () use ($value) {
                 return collect($value->getNode()->types)->map(function ($type) {
-                    return schema()->instance($type->name->value);
+                    return types()->get($type->name->value);
                 })->filter()->toArray();
             },
             'resolveType' => function ($value) use ($namespace, $method) {
@@ -54,7 +54,7 @@ class UnionDirective implements TypeResolver
                     return call_user_func_array([$instance, $method], [$value]);
                 }
 
-                return schema()->instance(last(explode('\\', get_class($value))));
+                return types()->get(last(explode('\\', get_class($value))));
             },
         ]);
     }

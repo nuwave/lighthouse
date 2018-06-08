@@ -170,7 +170,7 @@ class TypeFactory
             },
             'interfaces' => function () use ($value) {
                 return $value->getInterfaceNames()->map(function ($interfaceName) {
-                    return schema()->instance($interfaceName);
+                    return types()->get($interfaceName);
                 })->toArray();
             },
         ]);

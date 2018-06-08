@@ -13,12 +13,12 @@ class FieldDirectiveTest extends TestCase
     public function itCanResolveFieldWithAssignedClass()
     {
         $schema = '
-        type Foo {
-            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
-        }
+            type Foo {
+                bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
+            }
         ';
 
-        $type = $this->buildSchemaFromString($schema)->getType('Foo');
+        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
         $fields = $type->config['fields']();
         $resolve = array_get($fields, 'bar.resolve');
 
@@ -31,12 +31,12 @@ class FieldDirectiveTest extends TestCase
     public function itCanResolveFieldWithMergedArgs()
     {
         $schema = '
-        type Foo {
-            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
-        }
+            type Foo {
+                bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
+            }
         ';
 
-        $type = $this->buildSchemaFromString($schema)->getType('Foo');
+        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
         $fields = $type->config['fields']();
         $resolve = array_get($fields, 'bar.resolve');
 
@@ -49,13 +49,13 @@ class FieldDirectiveTest extends TestCase
     public function itThrowsAnErrorIfNoClassIsDefined()
     {
         $schema = '
-        type Foo {
-            bar: String! @field(method: "bar")
-        }
+            type Foo {
+                bar: String! @field(method: "bar")
+            }
         ';
 
         $this->expectException(DirectiveException::class);
-        $type = $this->buildSchemaFromString($schema)->getType('Foo');
+        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
         $type->config['fields']();
     }
 
@@ -65,13 +65,13 @@ class FieldDirectiveTest extends TestCase
     public function itThrowsAnErrorIfNoMethodIsDefined()
     {
         $schema = '
-        type Foo {
-            bar: String! @field(class: "Foo\\\Bar")
-        }
+            type Foo {
+                bar: String! @field(class: "Foo\\\Bar")
+            }
         ';
 
         $this->expectException(DirectiveException::class);
-        $type = $this->buildSchemaFromString($schema)->getType('Foo');
+        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
         $type->config['fields']();
     }
 }

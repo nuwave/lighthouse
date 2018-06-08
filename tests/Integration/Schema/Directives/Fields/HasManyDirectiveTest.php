@@ -123,15 +123,15 @@ class HasManyDirectiveTest extends DBTestCase
     public function itThrowsErrorWithUnknownTypeArg()
     {
         $schema = '
-        type User {
-            tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
-        }
-        type Task {
-            foo: String
-        }
+            type User {
+                tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
+            }
+            type Task {
+                foo: String
+            }
         ';
 
         $this->expectException(DirectiveException::class);
-        $this->buildSchemaFromString($schema);
+        $this->buildSchemaWithDefaultQuery($schema);
     }
 }
