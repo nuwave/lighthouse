@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Utils;
+namespace Tests\Unit\Schema\AST;
 
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use PHPUnit\Framework\TestCase;
@@ -26,23 +26,23 @@ class SchemaStitcherTest extends TestCase
         }
 
         file_put_contents(__DIR__.'/foo.graphql', '
-        #import ./schema/bar.graphql
-        type Foo {
-            foo: String!
-        }
+            #import ./schema/bar.graphql
+            type Foo {
+                foo: String!
+            }
         ');
 
         file_put_contents(__DIR__.'/schema/bar.graphql', '
-        #import ./baz.graphql
-        type Bar {
-            bar: String!
-        }
+            #import ./baz.graphql
+            type Bar {
+                bar: String!
+            }
         ');
 
         file_put_contents(__DIR__.'/schema/baz.graphql', '
-        type Baz {
-            baz: String!
-        }
+            type Baz {
+                baz: String!
+            }
         ');
     }
 
