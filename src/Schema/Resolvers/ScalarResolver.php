@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Type\Definition\ScalarType;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
+use Nuwave\Lighthouse\Schema\Directives\Types\ScalarDirective;
 
 class ScalarResolver extends AbstractResolver
 {

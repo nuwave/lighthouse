@@ -4,8 +4,8 @@ namespace Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ScalarType;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Directives\Types\ScalarDirective;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\TestCase;
 
@@ -28,7 +28,7 @@ class DirectiveRegistryTest extends TestCase
         $document = Parser::parse($schema);
         $definition = $document->definitions[0];
         $scalar = directives()->typeResolverForNode($definition)
-            ->resolveType(new NodeValue($definition));
+            ->resolveType(new TypeValue($definition));
 
         $this->assertInstanceOf(ScalarType::class, $scalar);
     }
@@ -39,10 +39,12 @@ class DirectiveRegistryTest extends TestCase
     public function itThrowsErrorIfMultipleDirectivesAssignedToNode()
     {
         $this->expectException(DirectiveException::class);
-
-        $schema = 'scalar DateTime @scalar @foo';
-        $document = Parser::parse($schema);
-        $handler = directives()->typeResolverForNode($document->definitions[0]);
+        echo 'fix me';
+//
+//        $document = $this->buildSchemaFromString('
+//            scalar DateTime @scalar @foo
+//        ');
+//        $handler = directives()->typeResolverForNode($document->);
     }
 
     /**

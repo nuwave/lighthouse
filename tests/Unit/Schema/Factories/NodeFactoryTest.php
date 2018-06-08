@@ -7,8 +7,8 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
-use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Factories\TypeFactory;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
 
 class NodeFactoryTest extends TestCase
@@ -16,7 +16,7 @@ class NodeFactoryTest extends TestCase
     /**
      * Node factory.
      *
-     * @var NodeFactory
+     * @var TypeFactory
      */
     protected $factory;
 
@@ -27,7 +27,7 @@ class NodeFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = new NodeFactory();
+        $this->factory = new TypeFactory();
     }
 
     /**
@@ -58,7 +58,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $enumNode = $this->parse($schema)->definitions[0];
-        $type = $this->factory->toType(new NodeValue($enumNode));
+        $type = $this->factory->toType(new TypeValue($enumNode));
 
         $this->assertInstanceOf(EnumType::class, $type);
         $this->assertEquals('Role', $type->name);
@@ -74,7 +74,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $scalarNode = $this->parse($schema)->definitions[0];
-        $type = $this->factory->toType(new NodeValue($scalarNode));
+        $type = $this->factory->toType(new TypeValue($scalarNode));
 
         $this->assertInstanceOf(ScalarType::class, $type);
         $this->assertEquals('DateTime', $type->name);
@@ -92,7 +92,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->toType(new NodeValue($interface));
+        $type = $this->factory->toType(new TypeValue($interface));
 
         $this->assertInstanceOf(InterfaceType::class, $type);
         $this->assertEquals('Node', $type->name);
@@ -111,7 +111,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->toType(new NodeValue($interface));
+        $type = $this->factory->toType(new TypeValue($interface));
 
         $this->assertInstanceOf(ObjectType::class, $type);
         $this->assertEquals('User', $type->name);
@@ -130,7 +130,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->toType(new NodeValue($interface));
+        $type = $this->factory->toType(new TypeValue($interface));
 
         $this->assertInstanceOf(InputObjectType::class, $type);
         $this->assertEquals('UserInput', $type->name);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
+namespace Nuwave\Lighthouse\Schema\Directives\Types;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NodeList;
@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class GroupDirective implements NodeManipulator
+class GroupDirective implements TypeManipulator
 {
     use HandlesDirectives;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
+namespace Nuwave\Lighthouse\Schema\Directives\Types;
 
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
@@ -25,11 +25,11 @@ class InterfaceDirective implements TypeResolver
     /**
      * Resolve the node directive.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return Type
      */
-    public function resolveType(NodeValue $value)
+    public function resolveType(TypeValue $value)
     {
         $resolver = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), self::name()),

@@ -25,7 +25,7 @@ class FieldValue
     /**
      * Current node (type).
      *
-     * @var NodeValue
+     * @var TypeValue
      */
     protected $node;
 
@@ -68,11 +68,11 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param NodeValue $node
+     * @param TypeValue $node
      * @param Field     $field
      * @param string    $description
      */
-    public function __construct(NodeValue $node, $field, $description = '')
+    public function __construct(TypeValue $node, $field, $description = '')
     {
         $this->node = $node;
         $this->field = $field;
@@ -82,13 +82,13 @@ class FieldValue
     /**
      * Initialize new field value.
      *
-     * @param NodeValue $node
+     * @param TypeValue $node
      * @param Field     $field
      * @param string    $description
      *
      * @return self
      */
-    public static function init(NodeValue $node, Field $field, $description = '')
+    public static function init(TypeValue $node, Field $field, $description = '')
     {
         return new static($node, $field, $description);
     }
@@ -187,7 +187,7 @@ class FieldValue
     /**
      * Get current node.
      *
-     * @return NodeValue
+     * @return TypeValue
      */
     public function getNode()
     {

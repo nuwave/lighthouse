@@ -8,7 +8,7 @@ use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -173,7 +173,7 @@ class TestCase extends BaseTestCase
     protected function getNodeField($schema, $index = 0, $field = null)
     {
         $document = $this->parse($schema);
-        $node = new NodeValue($document->definitions[$index]);
+        $node = new TypeValue($document->definitions[$index]);
 
         if (is_null($field)) {
             return new FieldValue($node, array_get($node->getNodeFields(), '0'));

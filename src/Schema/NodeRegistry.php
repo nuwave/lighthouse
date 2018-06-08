@@ -6,7 +6,7 @@ use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class NodeContainer
+class NodeRegistry
 {
     use HandlesGlobalId;
 

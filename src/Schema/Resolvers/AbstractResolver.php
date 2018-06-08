@@ -5,23 +5,23 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 
 abstract class AbstractResolver
 {
     /**
      * Instance of node to resolve.
      *
-     * @var NodeValue
+     * @var TypeValue
      */
     protected $value;
 
     /**
      * Create a new instance of node resolver.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      */
-    public function __construct(NodeValue $value)
+    public function __construct(TypeValue $value)
     {
         $this->value = $value;
     }
@@ -29,11 +29,11 @@ abstract class AbstractResolver
     /**
      * Resolve node type from node.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return Type
      */
-    public static function resolveType(NodeValue $value)
+    public static function resolveType(TypeValue $value)
     {
         $instance = new static($value);
 

@@ -10,7 +10,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\Args\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeManipulator;
+use Nuwave\Lighthouse\Schema\Directives\Types\TypeManipulator;
 
 class ASTBuilder
 {
@@ -110,7 +110,7 @@ class ASTBuilder
         return $objectTypes->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($originalDocument) {
             $nodeManipulators = directives()->nodeManipulators($objectType);
 
-            return $nodeManipulators->reduce(function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($originalDocument, $objectType) {
+            return $nodeManipulators->reduce(function (DocumentAST $document, TypeManipulator $nodeManipulator) use ($originalDocument, $objectType) {
                 return $nodeManipulator->manipulateSchema($objectType, $document, $originalDocument);
             }, $document);
         }, $document);

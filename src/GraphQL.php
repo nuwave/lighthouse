@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Schema\NodeContainer;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
@@ -211,17 +211,17 @@ class GraphQL
     /**
      * Instance of Node container.
      *
-     * @return NodeContainer
+     * @return NodeRegistry
      */
     public function nodes()
     {
-        if (! app()->has(NodeContainer::class)) {
+        if (! app()->has(NodeRegistry::class)) {
             return app()->instance(
-                NodeContainer::class,
-                resolve(NodeContainer::class)
+                NodeRegistry::class,
+                resolve(NodeRegistry::class)
             );
         }
 
-        return resolve(NodeContainer::class);
+        return resolve(NodeRegistry::class);
     }
 }

@@ -1,14 +1,14 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
+namespace Nuwave\Lighthouse\Schema\Directives\Types;
 
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\AttachesNodeInterface;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class NodeDirective implements NodeMiddleware, NodeManipulator
+class TypeDirective implements TypeMiddleware, TypeManipulator
 {
     use HandlesDirectives;
     use AttachesNodeInterface;
@@ -26,11 +26,11 @@ class NodeDirective implements NodeMiddleware, NodeManipulator
     /**
      * Handle type construction.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
-     * @return NodeValue
+     * @return TypeValue
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(TypeValue $value)
     {
         graphql()->nodes()->registerNode(
             $value->getNodeName(),
@@ -46,11 +46,11 @@ class NodeDirective implements NodeMiddleware, NodeManipulator
     /**
      * Get node resolver.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return \Closure
      */
-    protected function getResolver(NodeValue $value, string $argKey)
+    protected function getResolver(TypeValue $value, string $argKey)
     {
         $resolver = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), self::name()),

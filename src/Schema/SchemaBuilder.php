@@ -4,15 +4,14 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
-use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\Factories\TypeFactory;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class SchemaBuilder
@@ -47,23 +46,23 @@ class SchemaBuilder
     /**
      * Build an executable schema from AST.
      *
-     * @param DocumentAST $schema
+     * @param DocumentAST $documentAST
      *
      * @return Schema
      */
-    public function build($schema)
+    public function build($documentAST)
     {
-        $this->types = $this->convertTypes($schema);
+        $this->types = $this->convertTypes($documentAST);
 
         $query = $this->types->firstWhere('name', 'Query');
         $mutation = $this->types->firstWhere('name', 'Mutation');
         $subscription = $this->types->firstWhere('name', 'Subscription');
 
         $types = $this->types->filter(function ($type) {
-            return ! in_array($type->name, ['Query', 'Mutation', 'Subscription']);
+            return !in_array($type->name, ['Query', 'Mutation', 'Subscription']);
         })->toArray();
 
-        $directives = $this->convertDirectives($schema)->toArray();
+        $directives = $this->convertDirectives($documentAST)->toArray();
         $typeLoader = function ($name) {
             return $this->instance($name);
         };
@@ -154,14 +153,12 @@ class SchemaBuilder
      */
     public function convertTypes(DocumentAST $document)
     {
-        return $document->definitions()->reject(function (DefinitionNode $node) {
-            return $node instanceof TypeExtensionDefinitionNode
-                || $node instanceof DirectiveDefinitionNode;
-        })->sortBy(function (DefinitionNode $node) {
-            return array_get($this->weights, get_class($node), 9);
-        })->map(function (DefinitionNode $node) {
-            return app(NodeFactory::class)->toType(new NodeValue($node));
-        });
+        return $document->typeDefinitions()
+            ->sortBy(function (TypeDefinitionNode $typeDefinition) {
+                return array_get($this->weights, get_class($typeDefinition), 9);
+            })->map(function (TypeDefinitionNode $typeDefinition) {
+                return app(TypeFactory::class)->toType(new TypeValue($typeDefinition));
+            });
     }
 
     /**
@@ -173,8 +170,8 @@ class SchemaBuilder
      */
     protected function convertDirectives(DocumentAST $document)
     {
-        return $document->directives()->map(function (Node $node) {
-            return app(NodeFactory::class)->toType(new NodeValue($node));
+        return $document->directives()->map(function (DirectiveDefinitionNode $directive) {
+            return app(DirectiveFactory::class)->toDirective($directive);
         });
     }
 }

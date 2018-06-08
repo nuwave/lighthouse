@@ -13,9 +13,9 @@ use Nuwave\Lighthouse\Schema\Directives\Directive;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeManipulator;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeMiddleware;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\TypeResolver;
+use Nuwave\Lighthouse\Schema\Directives\Types\TypeManipulator;
+use Nuwave\Lighthouse\Schema\Directives\Types\TypeMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\Types\TypeResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -158,7 +158,7 @@ class DirectiveRegistry
     public function nodeManipulators($node)
     {
         return $this->handlers($node)->filter(function (Directive $directive) {
-            return $directive instanceof NodeManipulator;
+            return $directive instanceof TypeManipulator;
         });
     }
 
@@ -196,7 +196,7 @@ class DirectiveRegistry
     public function nodeMiddleware(Node $node)
     {
         return $this->handlers($node)->filter(function ($handler) {
-            return $handler instanceof NodeMiddleware;
+            return $handler instanceof TypeMiddleware;
         });
     }
 

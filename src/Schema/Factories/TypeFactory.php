@@ -17,25 +17,25 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\Types\TypeMiddleware;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
-class NodeFactory
+class TypeFactory
 {
     use HandlesDirectives, HandlesTypes;
 
     /**
      * Transform node to type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return Type
      */
-    public function toType(NodeValue $value)
+    public function toType(TypeValue $value)
     {
         $value->setType(
             $this->hasTypeResolver($value)
@@ -49,11 +49,11 @@ class NodeFactory
     /**
      * Check if node has a type resolver directive.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return bool
      */
-    protected function hasTypeResolver(NodeValue $value)
+    protected function hasTypeResolver(TypeValue $value)
     {
         return directives()->hasTypeResolver($value->getNode());
     }
@@ -61,11 +61,11 @@ class NodeFactory
     /**
      * Use directive resolver to transform type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return Type
      */
-    protected function resolveTypeViaDirective(NodeValue $value)
+    protected function resolveTypeViaDirective(TypeValue $value)
     {
         return directives()
             ->typeResolverForNode($value->getNode())
@@ -75,11 +75,11 @@ class NodeFactory
     /**
      * Transform value to type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return Type
      */
-    protected function resolveType(NodeValue $value)
+    protected function resolveType(TypeValue $value)
     {
         // We do not have to consider TypeExtensionNode since they
         // are merged before we get here
@@ -94,8 +94,7 @@ class NodeFactory
                 return $this->objectType($value);
             case InputObjectTypeDefinitionNode::class:
                 return $this->inputObjectType($value);
-            case DirectiveDefinitionNode::class:
-                return $this->clientDirective($value);
+            // todo deal with UnionTypes
             default:
                 throw new \Exception("Unknown type for Node [{$value->getNodeName()}]");
         }
@@ -104,11 +103,11 @@ class NodeFactory
     /**
      * Resolve enum definition to type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return EnumType
      */
-    public function enum(NodeValue $value)
+    public function enum(TypeValue $value)
     {
         return new EnumType([
             'name' => $value->getNodeName(),
@@ -131,11 +130,11 @@ class NodeFactory
     /**
      * Resolve scalar definition to type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return ScalarType
      */
-    public function scalar(NodeValue $value)
+    public function scalar(TypeValue $value)
     {
         return ScalarResolver::resolveType($value);
     }
@@ -143,11 +142,11 @@ class NodeFactory
     /**
      * Resolve interface definition to type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return InterfaceType
      */
-    public function interface(NodeValue $value)
+    public function interface(TypeValue $value)
     {
         return new InterfaceType([
             'name' => $value->getNodeName(),
@@ -158,11 +157,11 @@ class NodeFactory
     /**
      * Resolve object type definition to type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return ObjectType
      */
-    public function objectType(NodeValue $value)
+    public function objectType(TypeValue $value)
     {
         return new ObjectType([
             'name' => $value->getNodeName(),
@@ -180,11 +179,11 @@ class NodeFactory
     /**
      * Resolve input type definition to type.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return InputObjectType
      */
-    public function inputObjectType(NodeValue $value)
+    public function inputObjectType(TypeValue $value)
     {
         return new InputObjectType([
             'name' => $value->getNodeName(),
@@ -195,47 +194,16 @@ class NodeFactory
     }
 
     /**
-     * Resolve client directive.
-     *
-     * @param NodeValue $value
-     *
-     * @return Directive
-     */
-    public function clientDirective(NodeValue $value)
-    {
-        $node = $value->getNode();
-        $args = $node->arguments
-            ? collect($node->arguments)->map(function ($input) {
-                return new FieldArgument([
-                    'name' => data_get($input, 'name.value'),
-                    'defaultValue' => data_get($input, 'defaultValue.value'),
-                    'description' => data_get($input, 'description'),
-                    'type' => NodeResolver::resolve(data_get($input, 'type')),
-                ]);
-            })->toArray()
-            : null;
-
-        return new Directive([
-            'name' => $node->name->value,
-            'locations' => collect($node->locations)->map(function ($location) {
-                return $location->value;
-            })->toArray(),
-            'args' => $args,
-            'astNode' => $node,
-        ]);
-    }
-
-    /**
      * Apply node middleware.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
-     * @return NodeValue
+     * @return TypeValue
      */
-    protected function applyMiddleware(NodeValue $value)
+    protected function applyMiddleware(TypeValue $value)
     {
         return directives()->nodeMiddleware($value->getNode())
-            ->reduce(function (NodeValue $value, NodeMiddleware $middleware) {
+            ->reduce(function (TypeValue $value, TypeMiddleware $middleware) {
                 return $middleware->handleNode($value);
             }, $value);
     }

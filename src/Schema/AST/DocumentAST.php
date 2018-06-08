@@ -5,13 +5,17 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
 
@@ -122,6 +126,23 @@ class DocumentAST
     public function definitions()
     {
         return collect($this->documentNode->definitions);
+    }
+
+    /**
+     * Get all type definitions from the document.
+     *
+     * @return Collection
+     */
+    public function typeDefinitions()
+    {
+        return $this->definitions()->filter(function (DefinitionNode $node) {
+            return $node instanceof ScalarTypeDefinitionNode
+                || $node instanceof ObjectTypeDefinitionNode
+                || $node instanceof InterfaceTypeDefinitionNode
+                || $node instanceof UnionTypeDefinitionNode
+                || $node instanceof EnumTypeDefinitionNode
+                || $node instanceof InputObjectTypeDefinitionNode;
+        });
     }
 
     /**

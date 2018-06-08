@@ -8,7 +8,7 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Collection;
 
-class NodeValue
+class TypeValue
 {
     /**
      * Current GraphQL type.

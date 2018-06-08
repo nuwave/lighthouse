@@ -1,16 +1,16 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
+namespace Nuwave\Lighthouse\Schema\Directives\Types;
 
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class SecurityDirective implements NodeMiddleware
+class SecurityDirective implements TypeMiddleware
 {
     use HandlesDirectives;
 
@@ -27,11 +27,11 @@ class SecurityDirective implements NodeMiddleware
     /**
      * Handle node value.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
-     * @return NodeValue
+     * @return TypeValue
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(TypeValue $value)
     {
         if ('Query' !== $value->getNodeName()) {
             $message = sprintf(
@@ -54,9 +54,9 @@ class SecurityDirective implements NodeMiddleware
     /**
      * Set the max query complexity.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      */
-    protected function queryComplexity(NodeValue $value)
+    protected function queryComplexity(TypeValue $value)
     {
         $complexity = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), self::name()),
@@ -73,9 +73,9 @@ class SecurityDirective implements NodeMiddleware
     /**
      * Set max query depth.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      */
-    protected function queryDepth(NodeValue $value)
+    protected function queryDepth(TypeValue $value)
     {
         $depth = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), self::name()),
@@ -92,9 +92,9 @@ class SecurityDirective implements NodeMiddleware
     /**
      * Set introspection rule.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      */
-    protected function queryIntrospection(NodeValue $value)
+    protected function queryIntrospection(TypeValue $value)
     {
         $introspection = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), self::name()),

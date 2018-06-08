@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
+namespace Nuwave\Lighthouse\Schema\Directives\Types;
 
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\Directive;
 
-interface NodeManipulator extends Directive
+interface TypeManipulator extends Directive
 {
     /**
      * @param ObjectTypeDefinitionNode $objectType
