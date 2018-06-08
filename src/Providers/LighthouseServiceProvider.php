@@ -45,7 +45,7 @@ class LighthouseServiceProvider extends ServiceProvider
             return new GraphQL();
         });
 
-        $this->app->singleton(DirectiveRegistry::class, function ($app){
+        $this->app->singleton(DirectiveRegistry::class, function ($app) {
             return new DirectiveRegistry();
         });
 

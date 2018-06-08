@@ -115,7 +115,7 @@ class TypeFactory
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     $directive = $this->fieldDirective($field, 'enum');
 
-                    if (!$directive) {
+                    if (! $directive) {
                         return [];
                     }
 

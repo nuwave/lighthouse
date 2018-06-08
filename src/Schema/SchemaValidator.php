@@ -6,6 +6,5 @@ class SchemaValidator
 {
     public function validate()
     {
-
     }
 }

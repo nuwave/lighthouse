@@ -37,7 +37,7 @@ class DirectiveRegistry
         $this->directives = new Collection();
 
         // Load built-in directives from the default directory
-        $this->load(realpath(__DIR__ . '/Directives/'), 'Nuwave\\Lighthouse\\');
+        $this->load(realpath(__DIR__.'/Directives/'), 'Nuwave\\Lighthouse\\');
 
         // Load custom directives
         $this->load(config('lighthouse.directives', []));
@@ -49,7 +49,7 @@ class DirectiveRegistry
      * Works similar to https://github.com/laravel/framework/blob/5.6/src/Illuminate/Foundation/Console/Kernel.php#L191-L225
      *
      * @param array|string $paths
-     * @param null $namespace
+     * @param null         $namespace
      */
     public function load($paths, $namespace = null)
     {
@@ -67,15 +67,15 @@ class DirectiveRegistry
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-            ? realpath(__DIR__ . '/../../src/')
+            ? realpath(__DIR__.'/../../src/')
             : app_path();
 
         /** @var SplFileInfo $file */
         foreach ((new Finder())->in($paths)->files() as $file) {
-            $className = $namespace . str_replace(
+            $className = $namespace.str_replace(
                     ['/', '.php'],
                     ['\\', ''],
-                    str_after($file->getPathname(), $path . DIRECTORY_SEPARATOR)
+                    str_after($file->getPathname(), $path.DIRECTORY_SEPARATOR)
             );
 
             $this->register($className);
@@ -86,6 +86,7 @@ class DirectiveRegistry
      * Register a directive class.
      *
      * @param string $className
+     *
      * @throws \ReflectionException
      */
     protected function register($className)
@@ -103,14 +104,15 @@ class DirectiveRegistry
      *
      * @param string $name
      *
-     * @return Directive
      * @throws DirectiveException
+     *
+     * @return Directive
      */
     public function handler($name)
     {
         $handler = $this->directives->get($name);
 
-        if (!$handler) {
+        if (! $handler) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
