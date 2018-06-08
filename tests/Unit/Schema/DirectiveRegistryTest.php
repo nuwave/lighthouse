@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\TestCase;
 
-class DirectiveFactoryTest extends TestCase
+class DirectiveRegistryTest extends TestCase
 {
     /**
      * @test
@@ -27,9 +27,8 @@ class DirectiveFactoryTest extends TestCase
         $schema = 'scalar Email @scalar(class: "Email")';
         $document = Parser::parse($schema);
         $definition = $document->definitions[0];
-        $scalar = directives()->forNode($definition)
-            ->resolveNode(new NodeValue($definition))
-            ->getType();
+        $scalar = directives()->typeResolverForNode($definition)
+            ->resolveType(new NodeValue($definition));
 
         $this->assertInstanceOf(ScalarType::class, $scalar);
     }
@@ -43,7 +42,7 @@ class DirectiveFactoryTest extends TestCase
 
         $schema = 'scalar DateTime @scalar @foo';
         $document = Parser::parse($schema);
-        $handler = directives()->forNode($document->definitions[0]);
+        $handler = directives()->typeResolverForNode($document->definitions[0]);
     }
 
     /**

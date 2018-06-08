@@ -27,9 +27,9 @@ return [
     | Directive registry
     |--------------------------------------------------------------------------
     |
-    | This package allows you to create your own server-side directives. Change
-    | these values to register the directory that will hold all of your
-    | custom directives.
+    | This package allows you to create your own server-side directives.
+    | List directories that will be scanned for custom directives.
+    | Hint: Directives must implement \Nuwave\Lighthouse\Schema\Directives\Directive
     |
     */
     'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],

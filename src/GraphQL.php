@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -25,13 +24,6 @@ class GraphQL
      * @var SchemaBuilder
      */
     protected $schema;
-
-    /**
-     * Directive container.
-     *
-     * @var DirectiveFactory
-     */
-    protected $directives;
 
     /**
      * Middleware manager.
@@ -186,20 +178,6 @@ class GraphQL
         }
 
         return $this->schema;
-    }
-
-    /**
-     * Get an instance of the directive container.
-     *
-     * @return DirectiveFactory
-     */
-    public function directives()
-    {
-        if (! $this->directives) {
-            $this->directives = app(DirectiveFactory::class);
-        }
-
-        return $this->directives;
     }
 
     /**

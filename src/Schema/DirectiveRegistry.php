@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Factories;
+namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -15,11 +15,12 @@ use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeMiddleware;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeResolver;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\TypeResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
-class DirectiveFactory
+class DirectiveRegistry
 {
     /**
      * Collection of registered directives.
@@ -29,31 +30,36 @@ class DirectiveFactory
     protected $directives;
 
     /**
-     * Create new instance of directive container.
+     * Create new instance of the directive container.
      */
     public function __construct()
     {
         $this->directives = new Collection();
-        $this->load(realpath(__DIR__.'/../Directives/'), 'Nuwave\\Lighthouse\\');
+
+        // Load built-in directives from the default directory
+        $this->load(realpath(__DIR__ . '/Directives/'), 'Nuwave\\Lighthouse\\');
+
+        // Load custom directives
         $this->load(config('lighthouse.directives', []));
     }
 
     /**
-     * Register all of the commands in the given directory.
+     * Gather all directives from a given directory and register them.
      *
-     * https://github.com/laravel/framework/blob/5.5/src/Illuminate/Foundation/Console/Kernel.php#L190-L224
+     * Works similar to https://github.com/laravel/framework/blob/5.6/src/Illuminate/Foundation/Console/Kernel.php#L191-L225
      *
      * @param array|string $paths
-     * @param string|null  $namespace
+     * @param null $namespace
      */
     public function load($paths, $namespace = null)
     {
-        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
-        $paths = array_map(function ($path) {
-            return realpath($path);
-        }, array_filter($paths, function ($path) {
-            return is_dir($path);
-        }));
+        $paths = collect($paths)
+            ->unique()
+            ->filter(function ($path) {
+                return is_dir($path);
+            })->map(function ($path) {
+                return realpath($path);
+            })->all();
 
         if (empty($paths)) {
             return;
@@ -61,33 +67,35 @@ class DirectiveFactory
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-            ? realpath(__DIR__.'/../../')
+            ? realpath(__DIR__ . '/../../src/')
             : app_path();
 
-        foreach ((new Finder())->in($paths)->files() as $directive) {
-            $directive = $namespace.str_replace(
+        /** @var SplFileInfo $file */
+        foreach ((new Finder())->in($paths)->files() as $file) {
+            $className = $namespace . str_replace(
                     ['/', '.php'],
                     ['\\', ''],
-                    str_after($directive->getPathname(), $path.DIRECTORY_SEPARATOR)
-                );
+                    str_after($file->getPathname(), $path . DIRECTORY_SEPARATOR)
+            );
 
-            $reflection = new \ReflectionClass($directive);
-            if ($reflection->isInstantiable()) {
-                $this->register($directive);
-            }
+            $this->register($className);
         }
     }
 
     /**
-     * Register a new directive handler.
+     * Register a directive class.
      *
-     * @param string $handler
+     * @param string $className
+     * @throws \ReflectionException
      */
-    public function register($handler)
+    protected function register($className)
     {
-        $directive = app($handler);
+        $reflection = new \ReflectionClass($className);
 
-        $this->directives->put($directive::name(), $directive);
+        if ($reflection->isInstantiable() && $reflection->isSubclassOf(Directive::class)) {
+            $directive = $reflection->newInstance();
+            $this->directives->put($directive::name(), $directive);
+        }
     }
 
     /**
@@ -96,12 +104,13 @@ class DirectiveFactory
      * @param string $name
      *
      * @return Directive
+     * @throws DirectiveException
      */
     public function handler($name)
     {
         $handler = $this->directives->get($name);
 
-        if (! $handler) {
+        if (!$handler) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
@@ -109,39 +118,33 @@ class DirectiveFactory
     }
 
     /**
-     * Check if field has a resolver directive.
+     * Check if the given node has a type resolver directive handler assigned to it.
      *
      * @param Node $node
      *
      * @return bool
      */
-    public function hasNodeResolver(Node $node)
+    public function hasTypeResolver(Node $node)
     {
-        return $this->forNode($node) instanceof NodeResolver;
+        return $this->typeResolverForNode($node) instanceof TypeResolver;
     }
 
     /**
-     * Get handler for node.
+     * Get the type resolver directive handler for the given node.
      *
      * @param Node $node
      *
-     * @return mixed
+     * @return TypeResolver
      */
-    public function forNode(Node $node)
+    public function typeResolverForNode(Node $node)
     {
         $resolvers = $this->handlers($node)->filter(function ($handler) {
-            return $handler instanceof NodeResolver;
+            return $handler instanceof TypeResolver;
         });
 
         if ($resolvers->count() > 1) {
-            throw new DirectiveException(sprintf(
-                'Nodes can only have 1 assigned directive. %s has %s directives [%s]',
-                data_get($node, 'name.value'),
-                count($directives),
-                collect($directives)->map(function ($directive) {
-                    return $directive->name->value;
-                })->implode(', ')
-            ));
+            $nodeName = data_get($node, 'name.value');
+            throw new DirectiveException("Node $nodeName can only have one TypeResolver directive. Check your schema definition");
         }
 
         return $resolvers->first();
