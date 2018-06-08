@@ -36,21 +36,126 @@ class ASTBuilder
         return $document;
     }
 
+    /**
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected static function applyNodeManipulators(DocumentAST $document)
+    {
+        $originalDocument = $document;
+
+        return $document->typeExtensions()
+            // Unwrap extended types so they can be treated same as other types
+            ->map(function (TypeExtensionDefinitionNode $typeExtension) {
+                return $typeExtension->definition;
+            })
+            // This is just temporarily merged together
+            ->concat($document->objectTypes())
+            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use (
+                $originalDocument
+            ) {
+                $nodeManipulators = directives()->nodeManipulators($objectType);
+
+                return $nodeManipulators->reduce(function (DocumentAST $document, TypeManipulator $nodeManipulator) use (
+                    $originalDocument,
+                    $objectType
+                ) {
+                    return $nodeManipulator->manipulateSchema($objectType, $document, $originalDocument);
+                }, $document);
+            }, $document);
+    }
+
     protected static function mergeTypeExtensions(DocumentAST $document)
     {
         $document->objectTypes()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
             $name = $objectType->name->value;
 
-            if ($typeExtension = $document->getTypeExtension($name)) {
+            $document->typeExtensions($name)->reduce(function (
+                ObjectTypeDefinitionNode $relatedObjectType,
+                TypeExtensionDefinitionNode $typeExtension
+            ) {
                 /** @var NodeList $fields */
-                $fields = $objectType->fields;
-                $objectType->fields = $fields->merge($typeExtension->definition->fields);
-                // Modify the original document by overwriting the definition with the merged one
-                $document->setDefinition($objectType);
-            }
+                $fields = $relatedObjectType->fields;
+                $relatedObjectType->fields = $fields->merge($typeExtension->definition->fields);
+
+                return $relatedObjectType;
+            }, $objectType);
+
+            // Modify the original document by overwriting the definition with the merged one
+            $document->setDefinition($objectType);
         });
 
         return $document;
+    }
+
+    /**
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected static function applyFieldManipulators(DocumentAST $document)
+    {
+        $originalDocument = $document;
+
+        return $document->objectTypes()->reduce(function (
+            DocumentAST $document,
+            ObjectTypeDefinitionNode $objectType
+        ) use ($originalDocument) {
+            return collect($objectType->fields)->reduce(function (
+                DocumentAST $document,
+                FieldDefinitionNode $fieldDefinition
+            ) use ($objectType, $originalDocument) {
+                $fieldManipulators = directives()->fieldManipulators($fieldDefinition);
+
+                return $fieldManipulators->reduce(function (
+                    DocumentAST $document,
+                    FieldManipulator $fieldManipulator
+                ) use ($fieldDefinition, $objectType, $originalDocument) {
+                    return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document,
+                        $originalDocument);
+                }, $document);
+            }, $document);
+        }, $document);
+    }
+
+    /**
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected static function applyArgManipulators(DocumentAST $document)
+    {
+        $originalDocument = $document;
+
+        return $document->objectTypes()->reduce(
+            function (DocumentAST $document, ObjectTypeDefinitionNode $parentType) use ($originalDocument) {
+                return collect($parentType->fields)->reduce(
+                    function (DocumentAST $document, FieldDefinitionNode $parentField) use (
+                        $parentType,
+                        $originalDocument
+                    ) {
+                        return collect($parentField->arguments)->reduce(
+                            function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use (
+                                $parentType,
+                                $parentField,
+                                $originalDocument
+                            ) {
+                                $argManipulators = directives()->argManipulators($argDefinition);
+
+                                return $argManipulators->reduce(
+                                    function (DocumentAST $document, ArgManipulator $argManipulator) use (
+                                        $argDefinition,
+                                        $parentField,
+                                        $parentType,
+                                        $originalDocument
+                                    ) {
+                                        return $argManipulator->manipulateSchema($argDefinition, $parentField,
+                                            $parentType, $document, $originalDocument);
+                                    }, $document);
+                            }, $document);
+                    }, $document);
+            }, $document);
     }
 
     /**
@@ -90,75 +195,5 @@ class ASTBuilder
         $document->addFieldToQueryType($nodeQuery);
 
         return $document;
-    }
-
-    /**
-     * @param DocumentAST $document
-     *
-     * @return DocumentAST
-     */
-    protected static function applyNodeManipulators(DocumentAST $document)
-    {
-        $originalDocument = $document;
-
-        // Unwrap extended types so they can be treated same as other types
-        $extendedTypes = $document->typeExtensions()->map(function (TypeExtensionDefinitionNode $typeExtension) {
-            return $typeExtension->definition;
-        });
-        $objectTypes = $document->objectTypes()->concat($extendedTypes);
-
-        return $objectTypes->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($originalDocument) {
-            $nodeManipulators = directives()->nodeManipulators($objectType);
-
-            return $nodeManipulators->reduce(function (DocumentAST $document, TypeManipulator $nodeManipulator) use ($originalDocument, $objectType) {
-                return $nodeManipulator->manipulateSchema($objectType, $document, $originalDocument);
-            }, $document);
-        }, $document);
-    }
-
-    /**
-     * @param DocumentAST $document
-     *
-     * @return DocumentAST
-     */
-    protected static function applyFieldManipulators(DocumentAST $document)
-    {
-        $originalDocument = $document;
-
-        return $document->objectTypes()->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($originalDocument) {
-            return collect($objectType->fields)->reduce(function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType, $originalDocument) {
-                $fieldManipulators = directives()->fieldManipulators($fieldDefinition);
-
-                return $fieldManipulators->reduce(function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType, $originalDocument) {
-                    return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document, $originalDocument);
-                }, $document);
-            }, $document);
-        }, $document);
-    }
-
-    /**
-     * @param DocumentAST $document
-     *
-     * @return DocumentAST
-     */
-    protected static function applyArgManipulators(DocumentAST $document)
-    {
-        $originalDocument = $document;
-
-        return $document->objectTypes()->reduce(
-            function (DocumentAST $document, ObjectTypeDefinitionNode $parentType) use ($originalDocument) {
-                return collect($parentType->fields)->reduce(
-                    function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType, $originalDocument) {
-                        return collect($parentField->arguments)->reduce(
-                            function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField, $originalDocument) {
-                                $argManipulators = directives()->argManipulators($argDefinition);
-
-                                return $argManipulators->reduce(
-                                    function (DocumentAST $document, ArgManipulator $argManipulator) use ($argDefinition, $parentField, $parentType, $originalDocument) {
-                                        return $argManipulator->manipulateSchema($argDefinition, $parentField, $parentType, $document, $originalDocument);
-                                    }, $document);
-                            }, $document);
-                    }, $document);
-            }, $document);
     }
 }

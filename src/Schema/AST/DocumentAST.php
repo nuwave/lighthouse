@@ -158,11 +158,20 @@ class DocumentAST
     /**
      * Get all definitions for type extensions.
      *
+     * Without a name, it simply return all TypeExtensions.
+     * If a name is given, it may return multiple type extensions
+     * that apply to a named type.
+     *
+     * @param string|null $extendedTypeName
+     *
      * @return Collection
      */
-    public function typeExtensions()
+    public function typeExtensions($extendedTypeName = null)
     {
-        return $this->getDefinitionsByType(TypeExtensionDefinitionNode::class);
+        return $this->getDefinitionsByType(TypeExtensionDefinitionNode::class)
+            ->filter(function (TypeExtensionDefinitionNode $typeExtension) use ($extendedTypeName) {
+                return is_null($extendedTypeName) || $extendedTypeName === $typeExtension->definition->name->value;
+            });
     }
 
     /**
@@ -212,7 +221,7 @@ class DocumentAST
      */
     public function getQueryTypeDefinition()
     {
-        return $this->getObjectTypeOrDefault('Query');
+        return $this->objectTypeOrDefault('Query');
     }
 
     /**
@@ -222,7 +231,7 @@ class DocumentAST
      */
     public function getMutationTypeDefinition()
     {
-        return $this->getObjectTypeOrDefault('Mutation');
+        return $this->objectTypeOrDefault('Mutation');
     }
 
     /**
@@ -232,7 +241,7 @@ class DocumentAST
      */
     public function getSubscriptionTypeDefinition()
     {
-        return $this->getObjectTypeOrDefault('Subscription');
+        return $this->objectTypeOrDefault('Subscription');
     }
 
     /**
@@ -242,9 +251,9 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    public function getObjectTypeOrDefault($name)
+    protected function objectTypeOrDefault($name)
     {
-        return $this->getObjectType($name)
+        return $this->objectType($name)
             ?: self::parseObjectType('type '.$name.'{}');
     }
 
@@ -253,22 +262,10 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode|null
      */
-    public function getObjectType($name)
+    public function objectType($name)
     {
         return $this->objectTypes()->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
             return $objectType->name->value === $name;
-        });
-    }
-
-    /**
-     * @param $name
-     *
-     * @return TypeExtensionDefinitionNode|null
-     */
-    public function getTypeExtension($name)
-    {
-        return $this->typeExtensions()->first(function (TypeExtensionDefinitionNode $typeExtension) use ($name) {
-            return $typeExtension->definition->name->value === $name;
         });
     }
 
@@ -277,7 +274,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function getDefinitionsByType($type)
+    protected function getDefinitionsByType($type)
     {
         return $this->definitions()->filter(function ($node) use ($type) {
             return $node instanceof $type;
