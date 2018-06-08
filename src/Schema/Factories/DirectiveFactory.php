@@ -10,6 +10,13 @@ use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 
 class DirectiveFactory
 {
+    /**
+     * Transform a directive definition into a directive.
+     *
+     * @param DirectiveDefinitionNode $directive
+     *
+     * @return Directive
+     */
     public function toDirective(DirectiveDefinitionNode $directive)
     {
         return new Directive([

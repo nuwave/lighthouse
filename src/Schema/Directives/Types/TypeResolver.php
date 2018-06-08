@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\Values\TypeValue;
 interface TypeResolver extends Directive
 {
     /**
-     * Resolve the Node type and set it on the NodeValue.
+     * Resolve the Node type and set it on the TypeValue.
      *
      * @param TypeValue $value
      *

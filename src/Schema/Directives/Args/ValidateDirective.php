@@ -71,7 +71,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
     public function handleArgument(ArgumentValue $value)
     {
         // TODO: Rename "getValue" to something more descriptive like "toArray"
-        // and consider using for NodeValue/FieldValue.
+        // and consider using for TypeValue/FieldValue.
         $current = $value->getValue();
         $current['rules'] = array_merge(
             array_get($value->getArg(), 'rules', []),
