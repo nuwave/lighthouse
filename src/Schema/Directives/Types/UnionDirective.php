@@ -35,8 +35,9 @@ class UnionDirective implements TypeResolver
             'resolver'
         );
 
-        $namespace = array_get(explode('@', $resolver), '0');
-        $method = array_get(explode('@', $resolver), '1', strtolower($value->getNodeName()));
+        $resolverPieces = explode('@', $resolver);
+        $namespace = array_get($resolverPieces, '0');
+        $method = array_get($resolverPieces, '1', strtolower($value->getNodeName()));
 
         return new UnionType([
             'name' => $value->getNodeName(),

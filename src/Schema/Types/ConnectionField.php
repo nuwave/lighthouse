@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection ALL */
-
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use GraphQL\Type\Definition\ResolveInfo;
