@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives\Nodes;
+namespace Tests\Unit\Schema\Directives\Types;
 
 use Tests\TestCase;
 
@@ -36,7 +36,6 @@ class GroupDirectiveTest extends TestCase
         $result = $this->execute($schema, '{ me }');
         $this->assertEquals('foo.bar', $result->data['me']);
     }
-
 
     /**
      * @test

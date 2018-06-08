@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives\Nodes;
+namespace Tests\Unit\Schema\Directives\Types;
 
 use GraphQL\Validator\DocumentValidator;
-use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use Tests\TestCase;

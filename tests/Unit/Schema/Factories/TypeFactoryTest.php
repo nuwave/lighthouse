@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\Factories\TypeFactory;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
 
-class NodeFactoryTest extends TestCase
+class TypeFactoryTest extends TestCase
 {
     /**
      * Node factory.
