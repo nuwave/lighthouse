@@ -25,7 +25,7 @@ class FieldValue
     /**
      * Current node (type).
      *
-     * @var NodeValue
+     * @var TypeValue
      */
     protected $node;
 
@@ -35,6 +35,13 @@ class FieldValue
      * @var \Closure
      */
     protected $resolver;
+
+    /**
+     * Current namespace.
+     *
+     * @var string
+     */
+    protected $namespace;
 
     /**
      * Current description.
@@ -61,11 +68,11 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param NodeValue $node
+     * @param TypeValue $node
      * @param Field     $field
      * @param string    $description
      */
-    public function __construct(NodeValue $node, $field, $description = '')
+    public function __construct(TypeValue $node, $field, $description = '')
     {
         $this->node = $node;
         $this->field = $field;
@@ -75,13 +82,13 @@ class FieldValue
     /**
      * Initialize new field value.
      *
-     * @param NodeValue $node
+     * @param TypeValue $node
      * @param Field     $field
      * @param string    $description
      *
      * @return self
      */
-    public static function init(NodeValue $node, Field $field, $description = '')
+    public static function init(TypeValue $node, Field $field, $description = '')
     {
         return new static($node, $field, $description);
     }
@@ -112,6 +119,16 @@ class FieldValue
         $this->resolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Set the current namespace.
+     *
+     * @param string $namespace
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
     }
 
     /**
@@ -170,7 +187,7 @@ class FieldValue
     /**
      * Get current node.
      *
-     * @return NodeValue
+     * @return TypeValue
      */
     public function getNode()
     {
@@ -195,6 +212,18 @@ class FieldValue
     public function getResolver()
     {
         return $this->resolver;
+    }
+
+    /**
+     * Get current namespace.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    public function getNamespace($class = null)
+    {
+        return $class ? $this->namespace.'\\'.$class : $this->namespace;
     }
 
     /**

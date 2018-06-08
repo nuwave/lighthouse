@@ -4,7 +4,7 @@ namespace Tests\Unit\Support\Validator;
 
 use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 use Nuwave\Lighthouse\Support\Validator\Validator;
 use Tests\TestCase;

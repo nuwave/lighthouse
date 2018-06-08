@@ -1,11 +1,8 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
@@ -29,8 +26,9 @@ class FirstDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
      * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     *
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
@@ -39,6 +37,7 @@ class FirstDirective implements FieldResolver
         return $value->setResolver(function ($root, $args) use ($model, $value) {
             $query = $this->applyFilters($model::query(), $args);
             $query = $this->applyScopes($query, $args, $value);
+
             return $query->first();
         });
     }

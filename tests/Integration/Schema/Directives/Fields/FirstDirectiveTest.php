@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Integration\Schema\Directives\Fields;
-
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
@@ -29,7 +27,6 @@ class FirstDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
 
-
         $result = $this->execute($schema, "{ user(id:{$userB->id}) { name } }");
         $this->assertEquals('B', $result->data['user']['name']);
     }
@@ -51,8 +48,7 @@ class FirstDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'A']);
         $userC = factory(User::class)->create(['name' => 'B']);
 
-
-        $result = $this->execute($schema, "{ user(name: \"A\") { id } }");
+        $result = $this->execute($schema, '{ user(name: "A") { id } }');
         $this->assertEquals($userA->id, $result->data['user']['id']);
     }
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Support\Traits;
-
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
@@ -12,8 +10,10 @@ trait HandleQueries
 {
     /**
      * @param FieldValue $value
-     * @return mixed|string
+     *
      * @throws DirectiveException
+     *
+     * @return mixed|string
      */
     public function getModelClass(FieldValue $value)
     {

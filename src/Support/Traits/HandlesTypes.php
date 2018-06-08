@@ -8,7 +8,7 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Opis\Closure\SerializableClosure;
 
 trait HandlesTypes
@@ -167,11 +167,11 @@ trait HandlesTypes
     /**
      * Get fields for node.
      *
-     * @param NodeValue $value
+     * @param TypeValue $value
      *
      * @return array
      */
-    protected function getFields(NodeValue $value)
+    protected function getFields(TypeValue $value)
     {
         $factory = $this->fieldFactory();
 

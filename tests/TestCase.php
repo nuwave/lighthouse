@@ -5,9 +5,11 @@ namespace Tests;
 use GraphQL\Executor\Executor;
 use GraphQL\Language\Parser;
 use Laravel\Scout\ScoutServiceProvider;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -112,7 +114,7 @@ class TestCase extends BaseTestCase
      *
      * @param string $schema
      * @param string $query
-     * @param string $lighthouse
+     * @param bool   $lighthouse
      * @param array  $variables
      *
      * @return \GraphQL\Executor\ExecutionResult
@@ -120,12 +122,26 @@ class TestCase extends BaseTestCase
     protected function execute($schema, $query, $lighthouse = false, $variables = [])
     {
         if ($lighthouse) {
-            $node = file_get_contents(realpath(__DIR__.'/../assets/node.graphql'));
             $lighthouse = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
-            $schema = $node."\n".$lighthouse."\n".$schema;
+            $schema = $lighthouse."\n".$schema;
         }
 
-        return Executor::execute(schema()->build($schema), $this->parse($query));
+        return Executor::execute($this->buildSchemaFromString($schema), $this->parse($query));
+    }
+
+    protected function buildSchemaFromString($schema)
+    {
+        return (new SchemaBuilder())->build(ASTBuilder::generate($schema));
+    }
+
+    protected function buildSchemaWithDefaultQuery($schema)
+    {
+        // Add default empty Query, schema is invalid without it
+        return $this->buildSchemaFromString($schema.'
+            type Query {
+                dummy: String
+            }
+        ');
     }
 
     /**
@@ -161,7 +177,7 @@ class TestCase extends BaseTestCase
     protected function getNodeField($schema, $index = 0, $field = null)
     {
         $document = $this->parse($schema);
-        $node = new NodeValue($document->definitions[$index]);
+        $node = new TypeValue($document->definitions[$index]);
 
         if (is_null($field)) {
             return new FieldValue($node, array_get($node->getNodeFields(), '0'));

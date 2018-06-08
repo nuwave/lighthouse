@@ -32,13 +32,13 @@ class User extends Authenticatable
     /**
      * @param $query User
      * @param $args
+     *
      * @return mixed
      */
     public function scopeCompanyName($query, $args)
     {
-        return $query->whereHas("company", function($q) use ($args){
-            $q->where("name", $args['company']);
+        return $query->whereHas('company', function ($q) use ($args) {
+            $q->where('name', $args['company']);
         });
-
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Schema\Utils;
 
-use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use PHPUnit\Framework\TestCase;
 
 class SchemaStitcherTest extends TestCase
@@ -29,18 +29,21 @@ class SchemaStitcherTest extends TestCase
         #import ./schema/bar.graphql
         type Foo {
             foo: String!
-        }');
+        }
+        ');
 
         file_put_contents(__DIR__.'/schema/bar.graphql', '
         #import ./baz.graphql
         type Bar {
             bar: String!
-        }');
+        }
+        ');
 
         file_put_contents(__DIR__.'/schema/baz.graphql', '
         type Baz {
             baz: String!
-        }');
+        }
+        ');
     }
 
     /**
@@ -60,25 +63,10 @@ class SchemaStitcherTest extends TestCase
     /**
      * @test
      */
-    public function itStitchesLighthouseSchema()
-    {
-        $schema = $this->stitcher->stitch('_id');
-        $hasNode = false !== strpos($schema, 'interface Node');
-
-        $this->assertTrue($hasNode);
-    }
-
-    /**
-     * @test
-     */
     public function itConcatsSchemas()
     {
-        $schema = $this->stitcher->stitch('_id', __DIR__.'/schema/baz.graphql');
-        $hasNode = false !== strpos($schema, 'interface Node');
-        $hasBaz = false !== strpos($schema, 'type Baz');
-
-        $this->assertTrue($hasNode);
-        $this->assertTrue($hasBaz);
+        $schema = $this->stitcher->stitch(__DIR__.'/schema/baz.graphql');
+        $this->assertContains('type Baz', $schema);
     }
 
     /**
@@ -86,15 +74,9 @@ class SchemaStitcherTest extends TestCase
      */
     public function itCanImportSchemas()
     {
-        $schema = $this->stitcher->stitch('_id', __DIR__.'/foo.graphql');
-        $hasNode = false !== strpos($schema, 'interface Node');
-        $hasFoo = false !== strpos($schema, 'type Foo');
-        $hasBar = false !== strpos($schema, 'type Bar');
-        $hasBaz = false !== strpos($schema, 'type Baz');
-
-        $this->assertTrue($hasNode, 'Schema does not include type Node');
-        $this->assertTrue($hasFoo, 'Schema does not include type Foo');
-        $this->assertTrue($hasBar, 'Schema does not include type Bar');
-        $this->assertTrue($hasBaz, 'Schema does not include type Baz');
+        $schema = $this->stitcher->stitch(__DIR__.'/foo.graphql');
+        $this->assertContains('type Foo', $schema);
+        $this->assertContains('type Bar', $schema);
+        $this->assertContains('type Baz', $schema);
     }
 }

@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class EventDirective implements FieldMiddleware

@@ -18,15 +18,15 @@ class AuthDirectiveTest extends TestCase
 
         $this->be($user);
         $schema = '
-        type User {
-            foo: String!
-        }
-        type Query {
-            user: User! @auth
-        }
+            type User {
+                foo: String!
+            }
+            type Query {
+                user: User! @auth
+            }
         ';
 
-        $query = schema()->register($schema)->firstWhere('name', 'Query');
+        $query = $this->buildSchemaFromString($schema)->getQueryType();
         $resolver = array_get($query->config['fields'](), 'user.resolve');
         $this->assertEquals('bar', data_get($resolver(), 'foo'));
     }

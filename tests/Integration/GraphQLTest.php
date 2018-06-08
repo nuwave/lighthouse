@@ -104,7 +104,6 @@ class GraphQLTest extends DBTestCase
         $this->assertEquals($expected, $data);
     }
 
-
     /**
      * @test
      */
@@ -122,7 +121,7 @@ class GraphQLTest extends DBTestCase
         }
         ';
 
-        $data = $this->postJson("graphql", ['query' => $query])->json();
+        $data = $this->postJson('graphql', ['query' => $query])->json();
 
         $expected = [
             'data' => [
@@ -138,13 +137,13 @@ class GraphQLTest extends DBTestCase
         $this->assertEquals($expected, $data);
     }
 
-  /**
-   * @test
-   */
-  public function itCanResolveQueryThroughControllerViaGetRequest()
-  {
-    $this->be($this->user);
-    $query = '
+    /**
+     * @test
+     */
+    public function itCanResolveQueryThroughControllerViaGetRequest()
+    {
+        $this->be($this->user);
+        $query = '
         query UserWithTasks {
             user {
                 email
@@ -155,21 +154,21 @@ class GraphQLTest extends DBTestCase
         }
         ';
 
-    $uri = 'graphql?'.http_build_query(['query' => $query]);
+        $uri = 'graphql?'.http_build_query(['query' => $query]);
 
-    $data = $this->getJson($uri)->json();
+        $data = $this->getJson($uri)->json();
 
-    $expected = [
+        $expected = [
       'data' => [
         'user' => [
           'email' => $this->user->email,
           'tasks' => $this->tasks->map(function ($task) {
-            return ['name' => $task->name];
+              return ['name' => $task->name];
           })->toArray(),
         ],
       ],
     ];
 
-    $this->assertEquals($expected, $data);
-  }
+        $this->assertEquals($expected, $data);
+    }
 }

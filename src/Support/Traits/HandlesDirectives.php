@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListValueNode;
@@ -51,7 +52,7 @@ trait HandlesDirectives
      */
     protected function directiveArgValue(DirectiveNode $directive, $name, $default = null)
     {
-        $arg = collect($directive->arguments)->first(function ($arg) use ($name) {
+        $arg = collect($directive->arguments)->first(function (ArgumentNode $arg) use ($name) {
             return $arg->name->value === $name;
         });
 

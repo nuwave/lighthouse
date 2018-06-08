@@ -12,13 +12,13 @@ class RenameDirectiveTest extends TestCase
      */
     public function itCanRenameAField()
     {
-        $schema = '
-        type Foo {
-            fooBar: String! @rename(attribute: "foo_bar")
-        }
-        ';
+        $schema = $this->buildSchemaWithDefaultQuery('
+            type Foo {
+                fooBar: String! @rename(attribute: "foo_bar")
+            }
+        ');
 
-        $type = schema()->register($schema)->first();
+        $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'fooBar.resolve');
         $this->assertEquals('bar', $resolver(['foo_bar' => 'bar', 'fooBar' => 'baz'], []));
@@ -29,14 +29,15 @@ class RenameDirectiveTest extends TestCase
      */
     public function itThrowsAnExceptionIfNoAttributeDefined()
     {
-        $schema = '
-        type Foo {
-            fooBar: String! @rename
-        }
-        ';
-
         $this->expectException(DirectiveException::class);
-        $type = schema()->register($schema)->first();
+
+        $schema = $this->buildSchemaWithDefaultQuery('
+            type Foo {
+                fooBar: String! @rename
+            }
+        ');
+
+        $type = $schema->getType('Foo');
         $type->config['fields']();
     }
 }

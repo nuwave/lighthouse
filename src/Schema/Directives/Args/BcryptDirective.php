@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
 class BcryptDirective implements ArgMiddleware
 {
