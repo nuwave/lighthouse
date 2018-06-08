@@ -2,17 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Directives\Directive;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
-interface NodeResolver extends Directive
+interface TypeResolver extends Directive
 {
     /**
-     * Resolve the node directive.
+     * Resolve the Node type and set it on the NodeValue.
      *
      * @param NodeValue $value
      *
-     * @return mixed
+     * @return Type
      */
-    public function resolveNode(NodeValue $value);
+    public function resolveType(NodeValue $value);
 }

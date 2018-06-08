@@ -31,19 +31,19 @@ abstract class AbstractResolver
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return Type
      */
-    public static function resolve(NodeValue $value)
+    public static function resolveType(NodeValue $value)
     {
         $instance = new static($value);
 
-        return $value->setType($instance->generate());
+        return $instance->generate();
     }
 
     /**
      * Generate a GraphQL type from a node.
      *
-     * @var Type
+     * @return Type
      */
     abstract public function generate();
 

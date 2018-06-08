@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class UnionDirective implements NodeResolver
+class UnionDirective implements TypeResolver
 {
     use HandlesDirectives;
 
@@ -25,9 +26,9 @@ class UnionDirective implements NodeResolver
      *
      * @param NodeValue $value
      *
-     * @return mixed
+     * @return UnionType
      */
-    public function resolveNode(NodeValue $value)
+    public function resolveType(NodeValue $value)
     {
         $resolver = $this->directiveArgValue(
             $this->nodeDirective($value->getNode(), self::name()),
@@ -37,7 +38,7 @@ class UnionDirective implements NodeResolver
         $namespace = array_get(explode('@', $resolver), '0');
         $method = array_get(explode('@', $resolver), '1', strtolower($value->getNodeName()));
 
-        return $value->setType(new UnionType([
+        return new UnionType([
             'name' => $value->getNodeName(),
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
             'types' => function () use ($value) {
@@ -54,6 +55,6 @@ class UnionDirective implements NodeResolver
 
                 return schema()->instance(last(explode('\\', get_class($value))));
             },
-        ]));
+        ]);
     }
 }

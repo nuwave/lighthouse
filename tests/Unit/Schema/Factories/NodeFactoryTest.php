@@ -58,7 +58,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $enumNode = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($enumNode));
+        $type = $this->factory->toType(new NodeValue($enumNode));
 
         $this->assertInstanceOf(EnumType::class, $type);
         $this->assertEquals('Role', $type->name);
@@ -74,7 +74,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $scalarNode = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($scalarNode));
+        $type = $this->factory->toType(new NodeValue($scalarNode));
 
         $this->assertInstanceOf(ScalarType::class, $type);
         $this->assertEquals('DateTime', $type->name);
@@ -92,7 +92,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($interface));
+        $type = $this->factory->toType(new NodeValue($interface));
 
         $this->assertInstanceOf(InterfaceType::class, $type);
         $this->assertEquals('Node', $type->name);
@@ -111,7 +111,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($interface));
+        $type = $this->factory->toType(new NodeValue($interface));
 
         $this->assertInstanceOf(ObjectType::class, $type);
         $this->assertEquals('User', $type->name);
@@ -130,7 +130,7 @@ class NodeFactoryTest extends TestCase
         ';
 
         $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($interface));
+        $type = $this->factory->toType(new NodeValue($interface));
 
         $this->assertInstanceOf(InputObjectType::class, $type);
         $this->assertEquals('UserInput', $type->name);

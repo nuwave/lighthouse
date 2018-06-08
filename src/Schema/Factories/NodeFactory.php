@@ -15,6 +15,7 @@ use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\NodeMiddleware;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
@@ -34,25 +35,27 @@ class NodeFactory
      *
      * @return Type
      */
-    public function handle(NodeValue $value)
+    public function toType(NodeValue $value)
     {
-        $value = $this->hasResolver($value)
-            ? $this->useResolver($value)
-            : $this->transform($value);
+        $value->setType(
+            $this->hasTypeResolver($value)
+                ? $this->resolveTypeViaDirective($value)
+                : $this->resolveType($value)
+        );
 
         return $this->applyMiddleware($value)->getType();
     }
 
     /**
-     * Check if node has a resolver directive.
+     * Check if node has a type resolver directive.
      *
      * @param NodeValue $value
      *
      * @return bool
      */
-    protected function hasResolver(NodeValue $value)
+    protected function hasTypeResolver(NodeValue $value)
     {
-        return directives()->hasNodeResolver($value->getNode());
+        return directives()->hasTypeResolver($value->getNode());
     }
 
     /**
@@ -60,12 +63,13 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return Type
      */
-    protected function useResolver(NodeValue $value)
+    protected function resolveTypeViaDirective(NodeValue $value)
     {
-        return directives()->forNode($value->getNode())
-            ->resolveNode($value);
+        return directives()
+            ->typeResolverForNode($value->getNode())
+            ->resolveType($value);
     }
 
     /**
@@ -73,10 +77,12 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return Type
      */
-    protected function transform(NodeValue $value)
+    protected function resolveType(NodeValue $value)
     {
+        // We do not have to consider TypeExtensionNode since they
+        // are merged before we get here
         switch (get_class($value->getNode())) {
             case EnumTypeDefinitionNode::class:
                 return $this->enum($value);
@@ -91,7 +97,7 @@ class NodeFactory
             case DirectiveDefinitionNode::class:
                 return $this->clientDirective($value);
             default:
-                throw new \Exception("Unknown node [{$value->getNodeName()}]");
+                throw new \Exception("Unknown type for Node [{$value->getNodeName()}]");
         }
     }
 
@@ -100,17 +106,17 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return EnumType
      */
     public function enum(NodeValue $value)
     {
-        $enum = new EnumType([
+        return new EnumType([
             'name' => $value->getNodeName(),
             'values' => collect($value->getNode()->values)
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     $directive = $this->fieldDirective($field, 'enum');
 
-                    if (! $directive) {
+                    if (!$directive) {
                         return [];
                     }
 
@@ -120,8 +126,6 @@ class NodeFactory
                     ]];
                 })->toArray(),
         ]);
-
-        return $value->setType($enum);
     }
 
     /**
@@ -129,11 +133,11 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return ScalarType
      */
     public function scalar(NodeValue $value)
     {
-        return ScalarResolver::resolve($value);
+        return ScalarResolver::resolveType($value);
     }
 
     /**
@@ -141,16 +145,14 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return InterfaceType
      */
     public function interface(NodeValue $value)
     {
-        $interface = new InterfaceType([
+        return new InterfaceType([
             'name' => $value->getNodeName(),
             'fields' => $this->getFields($value),
         ]);
-
-        return $value->setType($interface);
     }
 
     /**
@@ -158,11 +160,11 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return ObjectType
      */
     public function objectType(NodeValue $value)
     {
-        $objectType = new ObjectType([
+        return new ObjectType([
             'name' => $value->getNodeName(),
             'fields' => function () use ($value) {
                 return $this->getFields($value);
@@ -173,8 +175,6 @@ class NodeFactory
                 })->toArray();
             },
         ]);
-
-        return $value->setType($objectType);
     }
 
     /**
@@ -182,18 +182,16 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return InputObjectType
      */
     public function inputObjectType(NodeValue $value)
     {
-        $inputType = new InputObjectType([
+        return new InputObjectType([
             'name' => $value->getNodeName(),
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },
         ]);
-
-        return $value->setType($inputType);
     }
 
     /**
@@ -201,7 +199,7 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return NodeValue
+     * @return Directive
      */
     public function clientDirective(NodeValue $value)
     {
@@ -217,7 +215,7 @@ class NodeFactory
             })->toArray()
             : null;
 
-        $directive = new Directive([
+        return new Directive([
             'name' => $node->name->value,
             'locations' => collect($node->locations)->map(function ($location) {
                 return $location->value;
@@ -225,8 +223,6 @@ class NodeFactory
             'args' => $args,
             'astNode' => $node,
         ]);
-
-        return $value->setType($directive);
     }
 
     /**

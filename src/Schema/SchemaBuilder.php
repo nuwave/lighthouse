@@ -160,7 +160,7 @@ class SchemaBuilder
         })->sortBy(function (DefinitionNode $node) {
             return array_get($this->weights, get_class($node), 9);
         })->map(function (DefinitionNode $node) {
-            return app(NodeFactory::class)->handle(new NodeValue($node));
+            return app(NodeFactory::class)->toType(new NodeValue($node));
         });
     }
 
@@ -174,7 +174,7 @@ class SchemaBuilder
     protected function convertDirectives(DocumentAST $document)
     {
         return $document->directives()->map(function (Node $node) {
-            return app(NodeFactory::class)->handle(new NodeValue($node));
+            return app(NodeFactory::class)->toType(new NodeValue($node));
         });
     }
 }

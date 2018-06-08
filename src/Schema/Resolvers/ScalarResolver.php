@@ -25,9 +25,9 @@ class ScalarResolver extends AbstractResolver
     {
         $directive = $this->getDirective($this->value->getNode(), ScalarDirective::name());
         $className = $directive ? $this->getClassName($directive) : ucfirst($this->value->getNodeName());
-        $namespace = config('lighthouse.namespaces.scalars').'\\'.$className;
+        $namespacedClassName = config('lighthouse.namespaces.scalars').'\\'.$className;
 
-        return app($namespace);
+        return app($namespacedClassName);
     }
 
     /**
