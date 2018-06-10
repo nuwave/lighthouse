@@ -6,6 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -33,24 +34,33 @@ trait CreatesPaginators
         $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
         $connectionFieldName = addslashes(ConnectionField::class);
 
-        $current->setObjectTypeFromString("
+        $connectionType = PartialParser::objectType("
             type $connectionTypeName {
                 pageInfo: PageInfo! @field(class: \"$connectionFieldName\" method: \"pageInfoResolver\")
                 edges: [$connectionEdgeName] @field(class: \"$connectionFieldName\" method: \"edgeResolver\")
             }
         ");
+        $current->setDefinition($connectionType);
 
         $nodeName = $this->unpackNodeToString($fieldDefinition);
-        $current->setObjectTypeFromString("
+        $connectionEdge = PartialParser::objectType("
             type $connectionEdgeName {
                 node: $nodeName
                 cursor: String!
             }
         ");
+        $current->setDefinition($connectionEdge);
 
-        $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('first: Int! after: String')->merge($fieldDefinition->arguments);
+        $connectionArguments = PartialParser::arguments([
+            'first: Int!',
+            'after: String'
+        ]);
+        $fieldDefinition->arguments = array_merge($fieldDefinition->arguments, $connectionArguments);
+        
         $fieldDefinition->type = Parser::parseType($connectionTypeName);
-        $current->setDefinition(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
+        
+        $parentType->fields->merge([$fieldDefinition]);
+        $current->setDefinition($parentType);
 
         return $current;
     }
@@ -72,18 +82,26 @@ trait CreatesPaginators
         $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType);
         $paginatorFieldClassName = addslashes(PaginatorField::class);
         $fieldTypeName = $this->unpackNodeToString($fieldDefinition);
-
-        $current->setObjectTypeFromString("
+        
+        $paginatorType = PartialParser::objectType("
             type $paginatorTypeName {
                 paginatorInfo: PaginatorInfo! @field(class: \"$paginatorFieldClassName\" method: \"paginatorInfoResolver\")
                 data: [$fieldTypeName!]! @field(class: \"$paginatorFieldClassName\" method: \"dataResolver\")
-            }        
+            }
         ");
+        $current->setDefinition($paginatorType);
 
-        $fieldDefinition->arguments = DocumentAST::parseArgumentDefinitions('count: Int! page: Int')->merge($fieldDefinition->arguments);
+        $paginationArguments = PartialParser::arguments([
+            'count: Int!',
+            'page: Int'
+        ]);
+        $fieldDefinition->arguments = array_merge($fieldDefinition->arguments, $paginationArguments);
+    
         $fieldDefinition->type = Parser::parseType($paginatorTypeName);
-        $current->setDefinition(DocumentAST::addFieldToObjectType($parentType, $fieldDefinition));
-
+    
+        $parentType->fields->merge([$fieldDefinition]);
+        $current->setDefinition($parentType);
+        
         return $current;
     }
 

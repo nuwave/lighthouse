@@ -25,7 +25,12 @@ class DocumentAST
      * @var DocumentNode
      */
     protected $documentNode;
-
+    
+    /**
+     * DocumentAST constructor.
+     *
+     * @param DocumentNode $documentNode
+     */
     public function __construct(DocumentNode $documentNode)
     {
         $this->documentNode = $documentNode;
@@ -38,84 +43,9 @@ class DocumentAST
      *
      * @return DocumentAST
      */
-    public static function parse($schema)
+    public static function fromSource($schema)
     {
         return new static(Parser::parse($schema));
-    }
-
-    /**
-     * Parse a single object type.
-     *
-     * @param string $definition
-     *
-     * @throws \Exception
-     *
-     * @return ObjectTypeDefinitionNode
-     */
-    public static function parseObjectType($definition)
-    {
-        $objectTypes = self::parse($definition)->objectTypes();
-        if (1 != $objectTypes->count()) {
-            throw new \Exception('More than one definition was found in the passed in schema.');
-        }
-
-        return $objectTypes->first();
-    }
-
-    /**
-     * Parse a single field definition.
-     *
-     * @param $fieldDefinition
-     *
-     * @throws \Exception
-     *
-     * @return FieldDefinitionNode
-     */
-    public static function parseFieldDefinition($fieldDefinition)
-    {
-        return self::parseObjectType("type Dummy { $fieldDefinition }")
-            ->fields[0];
-    }
-
-    /**
-     * Parse the definition for arguments on a field.
-     *
-     * @param string $argumentDefinitions
-     *
-     * @throws \Exception
-     *
-     * @return NodeList
-     */
-    public static function parseArgumentDefinitions($argumentDefinitions)
-    {
-        return self::parseFieldDefinition("field($argumentDefinitions): String")
-            ->arguments;
-    }
-
-    /**
-     * Parse the definition for directives.
-     *
-     * @param string $directiveDefinition
-     *
-     * @throws \Exception
-     *
-     * @return NodeList
-     */
-    public static function parseDirectives($directiveDefinition)
-    {
-        return self::parseObjectType("type Dummy $directiveDefinition {}")->directives;
-    }
-
-    /**
-     * Parse the definition for a single interface.
-     *
-     * @param $interfaceDefinition
-     *
-     * @return InterfaceTypeDefinitionNode
-     */
-    public static function parseInterfaceDefinition($interfaceDefinition)
-    {
-        return self::parse($interfaceDefinition)->interfaces()->first();
     }
 
     /**
@@ -152,7 +82,7 @@ class DocumentAST
      */
     public function directives()
     {
-        return $this->getDefinitionsByType(DirectiveDefinitionNode::class);
+        return $this->definitionsByType(DirectiveDefinitionNode::class);
     }
 
     /**
@@ -168,7 +98,7 @@ class DocumentAST
      */
     public function typeExtensions($extendedTypeName = null)
     {
-        return $this->getDefinitionsByType(TypeExtensionDefinitionNode::class)
+        return $this->definitionsByType(TypeExtensionDefinitionNode::class)
             ->filter(function (TypeExtensionDefinitionNode $typeExtension) use ($extendedTypeName) {
                 return is_null($extendedTypeName) || $extendedTypeName === $typeExtension->definition->name->value;
             });
@@ -181,7 +111,7 @@ class DocumentAST
      */
     public function operations()
     {
-        return $this->getDefinitionsByType(OperationDefinitionNode::class);
+        return $this->definitionsByType(OperationDefinitionNode::class);
     }
 
     /**
@@ -191,7 +121,7 @@ class DocumentAST
      */
     public function fragments()
     {
-        return $this->getDefinitionsByType(FragmentDefinitionNode::class);
+        return $this->definitionsByType(FragmentDefinitionNode::class);
     }
 
     /**
@@ -201,7 +131,7 @@ class DocumentAST
      */
     public function objectTypes()
     {
-        return $this->getDefinitionsByType(ObjectTypeDefinitionNode::class);
+        return $this->definitionsByType(ObjectTypeDefinitionNode::class);
     }
 
     /**
@@ -211,7 +141,7 @@ class DocumentAST
      */
     public function interfaces()
     {
-        return $this->getDefinitionsByType(InterfaceTypeDefinitionNode::class);
+        return $this->definitionsByType(InterfaceTypeDefinitionNode::class);
     }
 
     /**
@@ -219,7 +149,7 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    public function getQueryTypeDefinition()
+    public function queryType()
     {
         return $this->objectTypeOrDefault('Query');
     }
@@ -229,7 +159,7 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    public function getMutationTypeDefinition()
+    public function mutationType()
     {
         return $this->objectTypeOrDefault('Mutation');
     }
@@ -239,7 +169,7 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    public function getSubscriptionTypeDefinition()
+    public function subscriptionType()
     {
         return $this->objectTypeOrDefault('Subscription');
     }
@@ -254,7 +184,7 @@ class DocumentAST
     protected function objectTypeOrDefault($name)
     {
         return $this->objectType($name)
-            ?: self::parseObjectType('type '.$name.'{}');
+            ?: PartialParser::objectType('type '.$name.'{}');
     }
 
     /**
@@ -274,29 +204,11 @@ class DocumentAST
      *
      * @return Collection
      */
-    protected function getDefinitionsByType($type)
+    protected function definitionsByType($type)
     {
         return $this->definitions()->filter(function ($node) use ($type) {
             return $node instanceof $type;
         });
-    }
-
-    /**
-     * @param ObjectTypeDefinitionNode $objectType
-     * @param FieldDefinitionNode      $field
-     *
-     * @return ObjectTypeDefinitionNode
-     */
-    public static function addFieldToObjectType(ObjectTypeDefinitionNode $objectType, FieldDefinitionNode $field)
-    {
-        // webonyx/graphql-php is inconsistent here
-        // This should be FieldDefinitionNode[] but comes back as NodeList
-        /** @var NodeList $nodeList */
-        $nodeList = $objectType->fields;
-
-        $objectType->fields = $nodeList->merge([$field]);
-
-        return $objectType;
     }
 
     /**
@@ -308,8 +220,8 @@ class DocumentAST
      */
     public function addFieldToQueryType(FieldDefinitionNode $field)
     {
-        $query = $this->getQueryTypeDefinition();
-        $query = self::addFieldToObjectType($query, $field);
+        $query = $this->queryType();
+        $query->fields = $query->fields->merge([$field]);
         $this->setDefinition($query);
 
         return $this;

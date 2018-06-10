@@ -21,7 +21,7 @@ class ASTBuilder
      */
     public static function generate($schema)
     {
-        $document = DocumentAST::parse($schema);
+        $document = DocumentAST::fromSource($schema);
 
         // Node manipulators may be defined on type extensions
         $document = self::applyNodeManipulators($document);
@@ -182,7 +182,7 @@ class ASTBuilder
         $globalId = config('lighthouse.global_id_field', '_id');
 
         // Double slashes to escape the slashes in the namespace.
-        $interface = DocumentAST::parseInterfaceDefinition("
+        $interface = PartialParser::interfaceType("
             # Node global interface
             interface Node @interface(resolver: \"Nuwave\\\\Lighthouse\\\\Support\\\\Http\\\\GraphQL\\\\Interfaces\\\\NodeInterface@resolve\") {
               # Global identifier that can be used to resolve any Node implementation.
@@ -191,7 +191,7 @@ class ASTBuilder
         ");
         $document->setDefinition($interface);
 
-        $nodeQuery = DocumentAST::parseFieldDefinition('node(id: ID!): Node @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")');
+        $nodeQuery = PartialParser::fieldDefinition('node(id: ID!): Node @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")');
         $document->addFieldToQueryType($nodeQuery);
 
         return $document;

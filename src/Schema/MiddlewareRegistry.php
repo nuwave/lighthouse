@@ -33,7 +33,7 @@ class MiddlewareRegistry
      */
     public function forRequest($request)
     {
-        $document = DocumentAST::parse($request);
+        $document = DocumentAST::fromSource($request);
 
         $fragments = $document->fragments();
 

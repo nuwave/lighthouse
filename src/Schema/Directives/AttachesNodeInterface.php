@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 trait AttachesNodeInterface
 {
@@ -19,8 +20,11 @@ trait AttachesNodeInterface
     protected function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
     {
         $objectType->interfaces = array_merge($objectType->interfaces, [Parser::parseType('Node')]);
-
-        $objectType = DocumentAST::addFieldToObjectType($objectType, DocumentAST::parseFieldDefinition('_id: ID!'));
+        
+        $globalIdFieldName = config('lighthouse.global_id_field', '_id');
+        
+        $globalIdFieldDefinition =  PartialParser::fieldDefinition($globalIdFieldName . ': ID!');
+        $objectType->fields->merge([$globalIdFieldDefinition]);
 
         return $documentAST->setDefinition($objectType);
     }

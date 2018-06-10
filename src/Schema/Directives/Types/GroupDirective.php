@@ -6,6 +6,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
@@ -69,10 +70,10 @@ class GroupDirective implements TypeManipulator
         }
 
         $middlewareValues = '["'.implode('", "', $middlewareValues).'"]';
-        $middlewareDirective = DocumentAST::parseDirectives("@middleware(checks: $middlewareValues)");
+        $middlewareDirective = PartialParser::directive("@middleware(checks: $middlewareValues)");
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
-            $fieldDefinition->directives = $fieldDefinition->directives->merge($middlewareDirective);
+            $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
 
             return $fieldDefinition;
         })->toArray());
@@ -102,10 +103,10 @@ class GroupDirective implements TypeManipulator
             throw new DirectiveException('The value of the namespace directive on has to be a string');
         }
 
-        $namespaceDirective = DocumentAST::parseDirectives('@namespace(value: "'.addslashes($namespaceValue).'")');
+        $namespaceDirective = PartialParser::directive('@namespace(value: "'.addslashes($namespaceValue).'")');
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceDirective) {
-            $fieldDefinition->directives = $fieldDefinition->directives->merge($namespaceDirective);
+            $fieldDefinition->directives = $fieldDefinition->directives->merge([$namespaceDirective]);
 
             return $fieldDefinition;
         })->toArray());
