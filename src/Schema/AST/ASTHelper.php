@@ -13,6 +13,9 @@ class ASTHelper
      * when the list is empty, then it is []. This function corrects that inconsistency
      * and allows the rest of our code to not worry about it until it is fixed.
      *
+     * This issue is brought up here https://github.com/webonyx/graphql-php/issues/285
+     * Remove this method (and possibly the entire class) once it is resolved.
+     *
      * @param NodeList|array $original
      * @param array          $addition
      *
