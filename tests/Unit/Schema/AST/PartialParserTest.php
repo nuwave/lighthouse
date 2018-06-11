@@ -20,7 +20,7 @@ class PartialParserTest extends TestCase
                 }
         '));
     }
-    
+
     public function testThrowsForInvalidDefinition()
     {
         $this->expectException(SyntaxError::class);
@@ -28,7 +28,7 @@ class PartialParserTest extends TestCase
             INVALID
         ');
     }
-    
+
     public function testThrowsIfMultipleDefinitionsAreGiven()
     {
         $this->expectException(ParseException::class);
@@ -42,7 +42,7 @@ class PartialParserTest extends TestCase
             }
         ');
     }
-    
+
     public function testThrowsIfDefinitionIsUnexpectedType()
     {
         $this->expectException(ParseException::class);
@@ -52,7 +52,7 @@ class PartialParserTest extends TestCase
             }
         ');
     }
-    
+
     public function testParsesObjectTypesArray()
     {
         $objectTypes = PartialParser::objectTypes(['
@@ -64,12 +64,12 @@ class PartialParserTest extends TestCase
                 bar: Int
             }
         ']);
-        
+
         $this->assertCount(2, $objectTypes);
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $objectTypes[0]);
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $objectTypes[1]);
     }
-    
+
     public function testThrowsOnInvalidTypeInObjectTypesArray()
     {
         $this->expectException(ParseException::class);
@@ -83,7 +83,7 @@ class PartialParserTest extends TestCase
             }
         ']);
     }
-    
+
     public function testThrowsOnMultipleDefinitionsInArrayItem()
     {
         $this->expectException(ParseException::class);

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
@@ -53,13 +54,13 @@ trait CreatesPaginators
 
         $connectionArguments = PartialParser::arguments([
             'first: Int!',
-            'after: String'
+            'after: String',
         ]);
-        $fieldDefinition->arguments = array_merge($fieldDefinition->arguments, $connectionArguments);
-        
+        $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
+
         $fieldDefinition->type = Parser::parseType($connectionTypeName);
-        
-        $parentType->fields->merge([$fieldDefinition]);
+
+        $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
         $current->setDefinition($parentType);
 
         return $current;
@@ -82,7 +83,7 @@ trait CreatesPaginators
         $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType);
         $paginatorFieldClassName = addslashes(PaginatorField::class);
         $fieldTypeName = $this->unpackNodeToString($fieldDefinition);
-        
+
         $paginatorType = PartialParser::objectType("
             type $paginatorTypeName {
                 paginatorInfo: PaginatorInfo! @field(class: \"$paginatorFieldClassName\" method: \"paginatorInfoResolver\")
@@ -93,15 +94,15 @@ trait CreatesPaginators
 
         $paginationArguments = PartialParser::arguments([
             'count: Int!',
-            'page: Int'
+            'page: Int',
         ]);
-        $fieldDefinition->arguments = array_merge($fieldDefinition->arguments, $paginationArguments);
-    
+        $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $paginationArguments);
+
         $fieldDefinition->type = Parser::parseType($paginatorTypeName);
-    
-        $parentType->fields->merge([$fieldDefinition]);
+
+        $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
         $current->setDefinition($parentType);
-        
+
         return $current;
     }
 

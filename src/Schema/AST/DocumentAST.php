@@ -25,7 +25,7 @@ class DocumentAST
      * @var DocumentNode
      */
     protected $documentNode;
-    
+
     /**
      * DocumentAST constructor.
      *

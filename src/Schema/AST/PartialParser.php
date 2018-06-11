@@ -25,7 +25,7 @@ class PartialParser
             return self::objectType($objectType);
         }, $objectTypes);
     }
-    
+
     /**
      * Parse a single object type.
      *
@@ -42,30 +42,30 @@ class PartialParser
             ObjectTypeDefinitionNode::class
         );
     }
-    
+
     /**
      * @param NodeList $list
-     * @param string $expectedType
-     *
-     * @return mixed
+     * @param string   $expectedType
      *
      * @throws ParseException
+     *
+     * @return mixed
      */
     protected static function getFirstAndValidateType(NodeList $list, $expectedType)
     {
         if (1 !== $list->count()) {
             throw new ParseException('  More than one definition was found in the passed in schema.');
         }
-        
+
         $node = $list[0];
-        
-        if (!$node instanceof $expectedType) {
+
+        if (! $node instanceof $expectedType) {
             throw new ParseException("The given definition was not of type: $expectedType");
         }
-        
+
         return $node;
     }
-    
+
     /**
      * Parse the definition for arguments on a field.
      *
@@ -82,7 +82,7 @@ class PartialParser
             InputValueDefinitionNode::class
         );
     }
-    
+
     /**
      * @param string[] $argumentDefinitions
      *
@@ -94,7 +94,7 @@ class PartialParser
             return self::argument($argumentDefinition);
         }, $argumentDefinitions);
     }
-    
+
     /**
      * Parse a single field definition.
      *
@@ -111,7 +111,7 @@ class PartialParser
             FieldDefinitionNode::class
         );
     }
-    
+
     /**
      * Parses a directive node attached to a type.
      *
@@ -128,7 +128,7 @@ class PartialParser
             DirectiveNode::class
         );
     }
-    
+
     /**
      * @param string[] $directives
      *
@@ -140,7 +140,7 @@ class PartialParser
             return self::argument($directive);
         }, $directivea);
     }
-    
+
     /**
      * Parse the definition for directives.
      *
@@ -157,7 +157,7 @@ class PartialParser
             DirectiveDefinitionNode::class
         );
     }
-    
+
     /**
      * @param string[] $directiveDefinitions
      *
@@ -169,7 +169,7 @@ class PartialParser
             return self::argument($directiveDefinition);
         }, $directiveDefinitions);
     }
-    
+
     /**
      * Parse the definition for a single interface.
      *
