@@ -6,6 +6,7 @@ namespace Nuwave\Lighthouse;
 
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Schema;
+use Nuwave\Lighthouse\Support\Contracts\SchemaBuilder;
 
 class GraphQL
 {
@@ -25,13 +26,13 @@ class GraphQL
 
     public function build(string $schema) : Schema
     {
-        return $this->schema = app(SchemaBuilder::class)->buildFromTypeLanguage($schema);
+        return $this->schema = app(SchemaBuilder::class, [
+            'directiveRegistry' => $this->directives()
+        ])->buildFromTypeLanguage($schema);
     }
 
     public function execute(string $query)
     {
-        $this->schema = $this->schema()->runManipulatorDirectives();
-
         return app(Executor::class)->execute($this->schema(), $query);
     }
 

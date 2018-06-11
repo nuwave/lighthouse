@@ -2,7 +2,13 @@
 
 namespace Tests;
 
-class DBTestCase extends TestCase
+
+
+use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
+
+use Orchestra\Testbench\TestCase as BaseTestCase;
+
+class DBTestCase extends BaseTestCase
 {
     /**
      * Setup the test environment.
@@ -15,6 +21,12 @@ class DBTestCase extends TestCase
         $this->withFactories(__DIR__ . '/database/factories');
         $this->artisan('migrate', ['--database' => env('DB_DATABASE', 'lighthouse')]);
     }
+
+
+    protected function getPackageProviders($app)
+    {
+        return [LighthouseServiceProvider::class];
+    }
     
     /**
      * @param \Illuminate\Foundation\Application $app
@@ -24,6 +36,8 @@ class DBTestCase extends TestCase
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
+
+        $app['config']->set('lighthouse', require __DIR__. '/../config/config.php');
         
         $connection = [
             'driver' => 'mysql',

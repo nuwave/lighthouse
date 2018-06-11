@@ -24,9 +24,19 @@ class DirectiveRegistry
     }
 
 
-    public function add(string $class) : DirectiveRegistry
+    /**
+     *
+     *
+     * @param $class
+     * @return DirectiveRegistry
+     */
+    public function add($class) : DirectiveRegistry
     {
-        $this->directives->push(app($class));
+        if(is_string($class)) {
+            $class = app($class);
+        }
+
+        $this->directives->push($class);
 
         return $this;
     }

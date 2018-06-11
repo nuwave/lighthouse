@@ -20,6 +20,7 @@ use GraphQL\Type\Definition\Type as WebonyxType;
 use GraphQL\Utils\BuildSchema;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\Schema;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Types\Argument;
 use Nuwave\Lighthouse\Types\EnumType;
 use Nuwave\Lighthouse\Types\EnumValueType;
@@ -37,14 +38,14 @@ use Nuwave\Lighthouse\Types\Scalar\ScalarType;
 use Nuwave\Lighthouse\Types\Scalar\StringType;
 use Nuwave\Lighthouse\Types\Type;
 
-class WebonyxSchemaBuilder implements SchemaBuilder
+class WebonyxSchemaBuilder extends SchemaBuilder
 {
-    public function buildFromTypeLanguage(string $schema): Schema
+    public function buildFromTypeLanguage(string $typeLanguage): Schema
     {
-        $schema = BuildSchema::build($schema);
+        $typeLanguage = BuildSchema::build($typeLanguage);
         
         return new Schema(
-            collect($schema->getTypeMap())->filter(function (WebonyxType $type) {
+            collect($typeLanguage->getTypeMap())->filter(function (WebonyxType $type) {
                 return !Str::startsWith($type->name, "__");
             })->map(function (WebonyxType $type) {
                 return $this->toType($type);

@@ -4,6 +4,7 @@
 namespace Tests\Unit\Directives\Fields;
 
 
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective;
 use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Nuwave\Lighthouse\Support\Exceptions\InvalidArgsException;
 use Tests\TestCase;
@@ -18,7 +19,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -34,7 +36,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -50,7 +53,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -66,7 +70,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -83,7 +88,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -100,7 +106,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -117,7 +124,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -134,7 +142,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));
@@ -151,7 +160,8 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(FieldDirective::class);
+        $schema = $this->graphql->build($schema);
 
         $fieldBar = $schema->type('Foo')->field('bar');
         $resolver = $fieldBar->resolver(new ResolveInfo($fieldBar));

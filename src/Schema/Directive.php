@@ -5,14 +5,14 @@ namespace Nuwave\Lighthouse\Schema;
 
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\Traits\CanManipulate;
+use Nuwave\Lighthouse\Schema\Traits\HasName;
 use Nuwave\Lighthouse\Types\Argument;
 use Nuwave\Lighthouse\Types\HasAttributes;
 
 class Directive
 {
-    use HasAttributes;
-
-    protected $name;
+    use HasAttributes, HasName, CanManipulate;
 
     protected $arguments;
 
@@ -28,10 +28,6 @@ class Directive
         $this->arguments = $arguments;
     }
 
-    public function name() : string
-    {
-        return $this->name;
-    }
 
     public function arguments() : Collection
     {

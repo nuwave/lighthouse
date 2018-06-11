@@ -28,7 +28,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
 
@@ -49,7 +49,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
 
@@ -71,7 +71,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
 
@@ -92,7 +92,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
 
@@ -113,7 +113,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
 
@@ -134,7 +134,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
 
@@ -156,7 +156,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
 
@@ -181,7 +181,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         /** @var EnumType $role */
         $role = $schema->type('Role');
@@ -210,7 +210,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $foo = $schema->type('Foo');
 
@@ -237,7 +237,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $foo = $schema->type('Foo');
 
@@ -266,7 +266,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $foo = $schema->type('Foo');
 
@@ -295,7 +295,7 @@ class SchemaBuilderTest extends TestCase
         scalar DateTime
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $dateTime = $schema->type('DateTime');
 
@@ -315,7 +315,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $createFoo = $schema->type('CreateFoo');
 
@@ -349,7 +349,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $mutation = $schema->type('Mutation');
         $this->assertEquals("Mutation", $mutation->name());
@@ -383,7 +383,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $mutation = $schema->type('Query');
         $this->assertEquals("Query", $mutation->name());
@@ -420,10 +420,11 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $foo = $schema->type('Foo');
         $this->assertEquals("Foo", $foo->name());
+        $this->assertCount(2, $foo->fields());
 
         $barField = $foo->field("bar");
         $this->assertEquals("bar", $barField->name());
@@ -447,7 +448,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
         $this->assertEquals("Query", $query->name());
@@ -474,7 +475,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $mutation = $schema->type('Mutation');
         $this->assertEquals("Mutation", $mutation->name());
@@ -501,7 +502,7 @@ class SchemaBuilderTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $query = $schema->type('Query');
         $this->assertEquals("Query", $query->name());
@@ -527,7 +528,7 @@ class SchemaBuilderTest extends TestCase
             scalar Email @scalar(class: "Email")
         ';
 
-        $schema = graphql()->build($schema);
+        $schema = $this->graphql->build($schema);
 
         $directive = $schema->type('Email')->directive('scalar');
         $this->assertEquals("scalar", $directive->name());

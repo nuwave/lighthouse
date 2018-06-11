@@ -6,6 +6,7 @@ namespace Nuwave\Lighthouse\Types;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Support\Pipeline;
 
 class Argument
@@ -22,22 +23,26 @@ class Argument
 
     protected $directives;
 
+    protected $directiveRegistry;
+
     /**
      * Argument constructor.
      *
+     * @param DirectiveRegistry $directiveRegistry
      * @param string $name
      * @param null|string $description
      * @param Type $type
      * @param string|null $defaultValue
      * @param Closure|null $directives
      */
-    public function __construct(string $name, ?string $description, Type $type, string $defaultValue = null, Closure $directives = null)
+    public function __construct(DirectiveRegistry $directiveRegistry, string $name, ?string $description, Type $type, string $defaultValue = null, Closure $directives = null)
     {
         $this->name = $name;
         $this->description = $description;
         $this->type = $type;
         $this->defaultValue = $defaultValue;
         $this->directives = $directives ?? function() {return collect();};
+        $this->directiveRegistry = $directiveRegistry;
     }
 
 
@@ -71,7 +76,7 @@ class Argument
         return function () use ($data) {
             return app(Pipeline::class)
                 ->send($data)
-                ->through(graphql()->directives()->getFromDirectives($this->directives()))
+                ->through($this->directiveRegistry->getFromDirectives($this->directives()))
                 ->via('handleArgument')
                 ->then(function($value) {
                     return $value;

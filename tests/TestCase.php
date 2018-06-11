@@ -4,26 +4,30 @@
 namespace Tests;
 
 
+use Illuminate\Container\Container;
+use Nuwave\Lighthouse\DigiaOnlineExecutor;
+use Nuwave\Lighthouse\DigiaOnlineSchemaBuilder;
+use Nuwave\Lighthouse\Executor;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Nuwave\Lighthouse\Support\Contracts\SchemaBuilder;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    /**
-     * @param \Illuminate\Foundation\Application $app
-     *
-     * @return void
-     */
-    protected function resolveApplicationConfiguration($app)
+    /** @var GraphQL */
+    protected $graphql;
+
+    protected $app;
+
+    protected function setUp()
     {
-        parent::resolveApplicationConfiguration($app);
-        
-        // Load default config
-        $app['config']->set('lighthouse', require __DIR__. '/../config/config.php');
-    }
-    
-    protected function getPackageProviders($app)
-    {
-        return [LighthouseServiceProvider::class];
+        parent::setUp();
+        $this->graphql = new GraphQL();
+        $container = Container::getInstance();
+        $this->app = $container;
+
+        $container->bind(SchemaBuilder::class, DigiaOnlineSchemaBuilder::class);
+        $container->bind(Executor::class, DigiaOnlineExecutor::class);
     }
 }

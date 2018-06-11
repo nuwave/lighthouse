@@ -5,8 +5,12 @@ namespace Tests\Unit\Directives\Fields;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use Mockery;
+use Mockery\Mock;
+use Nuwave\Lighthouse\Schema\Directives\Fields\AuthDirective;
 use Nuwave\Lighthouse\Schema\ResolveInfo;
 use Tests\TestCase;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 
 class AuthDirectiveTest extends TestCase
 {
@@ -27,9 +31,24 @@ class AuthDirectiveTest extends TestCase
         }
         ';
 
+        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory->expects('guard')->andReturn(
+            new class($user) {
+                protected $user;
 
-        $this->be($user);
-        $schema = graphql()->build($schema);
+                public function __construct($user)
+                {
+                    $this->user = $user;
+                }
+
+                public function user()
+                {
+                    return $this->user;
+                }
+            });
+
+        $this->graphql->directives()->add(new AuthDirective($authFactory));
+        $schema = $this->graphql->build($schema);
 
         $me = $schema->type('Query')->field('me');
         $resolver = $me->resolver(new ResolveInfo($me));
@@ -40,20 +59,16 @@ class AuthDirectiveTest extends TestCase
 
     public function testCanResolveWithCustomGuard()
     {
-        $this->app['config']["auth.guards.customGuard"] = [
-            'driver' => 'customGuard'
-        ];
-
-        Auth::extend('customGuard', function () {
-            return new class {
+        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory->expects('guard')->with('customGuard')->andReturn(
+            new class {
                 public function user()
                 {
                     return new class() extends Authenticatable {
                         public $someData = "from custom guard";
                     };
                 }
-            };
-        });
+            });
 
         $schema = '
         type User {
@@ -66,7 +81,8 @@ class AuthDirectiveTest extends TestCase
         }
         ';
 
-        $schema = graphql()->build($schema);
+        $this->graphql->directives()->add(new AuthDirective($authFactory));
+        $schema = $this->graphql->build($schema);
 
         $me = $schema->type('Query')->field('me');
         $resolver = $me->resolver(new ResolveInfo($me));

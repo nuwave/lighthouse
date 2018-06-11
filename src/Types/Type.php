@@ -7,18 +7,22 @@ namespace Nuwave\Lighthouse\Types;
 
 use ArrayAccess;
 use Closure;
+use Exception;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\Traits\CanManipulate;
+use Nuwave\Lighthouse\Schema\Traits\HasDescription;
 use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
 use Nuwave\Lighthouse\Schema\Traits\HasName;
+use Nuwave\Lighthouse\Types\Scalar\IntType;
+use Nuwave\Lighthouse\Types\Scalar\StringType;
 
 abstract class Type implements ArrayAccess
 {
-    use HasAttributes, HasDirectives, HasName;
-
-    protected $description;
+    use HasAttributes, HasDirectives, HasName, CanManipulate, HasDescription;
 
     protected $fields;
 
+    /** @var null|Collection */
     protected $resolvedFields;
 
     /**
@@ -35,15 +39,18 @@ abstract class Type implements ArrayAccess
         $this->description = $description;
         $this->fields = $fields ?? function() {return collect();};
         $this->directives = $directives ?? function() {return collect();};
-        $this->resolvedFields = collect();
+        $this->resolvedFields = null;
     }
 
     public function fields() : Collection
     {
-        return $this->resolvedFields = ($this->fields)();
+        if(is_null($this->resolvedFields)) {
+            $this->resolvedFields = ($this->fields)();
+        }
+        return $this->resolvedFields;
     }
 
-    public function resolvedFields() : Collection
+    public function resolvedFields() : ?Collection
     {
         return $this->resolvedFields;
     }
@@ -55,11 +62,27 @@ abstract class Type implements ArrayAccess
 
     public function field($name) : ?Field
     {
-        return $this->fields()->get($name);
+        return $this->fields()->firstWhere('name', $name);
     }
 
-    public function description() : ?string
+    public function addField(Field $field)
     {
-        return $this->description;
+        $this->manipulatable();
+
+        if($this->fields()->pluck('name')->contains($field->name())) {
+            throw new Exception("Cannot add Field which already exist.");
+        }
+
+        $this->resolvedFields->push($field);
+    }
+
+    public static function string() : StringType
+    {
+        return StringType::instance();
+    }
+
+    public static function integer() : IntType
+    {
+        return IntType::instance();
     }
 }

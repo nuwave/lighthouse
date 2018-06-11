@@ -6,16 +6,17 @@ namespace Nuwave\Lighthouse\Types;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Traits\CanManipulate;
+use Nuwave\Lighthouse\Schema\Traits\HasDescription;
 use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
 use Nuwave\Lighthouse\Schema\Traits\HasName;
 use Nuwave\Lighthouse\Support\Pipeline;
 
 class Field
 {
-    use HasAttributes, HasDirectives, HasName;
-
-    protected $description;
+    use HasAttributes, HasDirectives, HasName, CanManipulate, HasDescription;
 
     protected $type;
 
@@ -23,9 +24,13 @@ class Field
 
     protected $resolver;
 
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+
     /**
      * Field constructor.
      *
+     * @param DirectiveRegistry $directiveRegistry
      * @param string $name
      * @param string $description
      * @param Type $type
@@ -34,6 +39,7 @@ class Field
      * @param Closure|null $resolver
      */
     public function __construct(
+        DirectiveRegistry $directiveRegistry,
         string $name,
         ?string $description,
         Type $type,
@@ -42,17 +48,13 @@ class Field
         Closure $resolver = null
     )
     {
+        $this->directiveRegistry = $directiveRegistry;
         $this->name = $name;
         $this->description = $description;
         $this->type = $type;
         $this->arguments = $arguments ?? function() {return collect();};
         $this->directives = $directives ?? function() {return collect();};
         $this->resolver = $resolver;
-    }
-
-    public function description() : ?string
-    {
-        return $this->description;
     }
 
     public function type() : Type
@@ -120,7 +122,7 @@ class Field
             // Then resolve with directives.
             $resolveInfo = app(Pipeline::class)
                 ->send($resolveInfo)
-                ->through(graphql()->directives()->getFromDirectives($this->directives()))
+                ->through($this->directiveRegistry->getFromDirectives($this->directives()))
                 ->via('handleField')
                 ->then(function($value) {
                     return $value;

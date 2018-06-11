@@ -57,7 +57,7 @@ class GraphQlTest extends DBTestCase
 
         graphql()->build($schema);
         $data = graphql()->execute($query);
-//        dd($data);
+        //dd($data);
         $expected = [
             'data' => [
                 'user' => [

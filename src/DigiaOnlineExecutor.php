@@ -95,7 +95,7 @@ class DigiaOnlineExecutor implements Executor
 
     public function convertToDigiaType(Type $type)
     {
-        $fields = $type->resolvedFields();
+        $fields = $type->fields();
 
         $default = [
             'name' => $type->name(),

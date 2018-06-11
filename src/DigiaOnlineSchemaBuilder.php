@@ -15,9 +15,15 @@ use Digia\GraphQL\Language\Node\DefinitionNodeInterface as DigiaDefinitionNode;
 use Digia\GraphQL\Language\Node\DirectiveNode as DigiaDirectiveNode;
 use Digia\GraphQL\Language\Node\DirectivesAwareInterface as DigiaDirectiveAware;
 use Digia\GraphQL\Language\Node\DocumentNode as DigiaDocumentNode;
+use Digia\GraphQL\Language\Node\InterfaceTypeExtensionNode as DigiaInterfaceTypeExtensionNode;
 use Digia\GraphQL\Language\Node\NodeInterface as DigiaNode;
+use Digia\GraphQL\Language\Node\ObjectTypeDefinitionNode;
+use Digia\GraphQL\Language\Node\ObjectTypeExtensionNode as DigiaObjectTypeExtensionNode;
+use Digia\GraphQL\Language\Node\ObjectTypeExtensionNode;
 use function Digia\GraphQL\parse;
 use Digia\GraphQL\Schema\Building\SchemaBuilderInterface as DigiaSchemaBuilder;
+use Digia\GraphQL\Schema\DefinitionBuilder;
+use Digia\GraphQL\Schema\DefinitionBuilderInterface;
 use Digia\GraphQL\Schema\Extension\SchemaExtenderInterface as DigiaSchemaExtender;
 use Digia\GraphQL\Schema\Resolver\ResolverRegistry as DigiaResolverRegistry;
 use Digia\GraphQL\Schema\Schema as DigiaSchema;
@@ -35,10 +41,15 @@ use Digia\GraphQL\Type\Definition\NonNullType as DigiaNonNullType;
 use Digia\GraphQL\Type\Definition\ObjectType as DigiaObjectType;
 use Digia\GraphQL\Type\Definition\ScalarType as DigiaScalarType;
 use Digia\GraphQL\Type\Definition\TypeInterface as DigiaType;
+use function Digia\GraphQL\Type\newObjectType;
+use Exception;
 use GraphQL\Type\Definition\ListOfType as DigiaListOfType;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\Directive;
 use Nuwave\Lighthouse\Schema\Schema;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Types\Argument;
 use Nuwave\Lighthouse\Types\EnumType;
 use Nuwave\Lighthouse\Types\EnumValueType;
@@ -54,14 +65,22 @@ use Nuwave\Lighthouse\Types\Scalar\IDType;
 use Nuwave\Lighthouse\Types\Scalar\IntType;
 use Nuwave\Lighthouse\Types\Scalar\ScalarType;
 use Nuwave\Lighthouse\Types\Scalar\StringType;
+use Nuwave\Lighthouse\Types\Type;
 
-class DigiaOnlineSchemaBuilder implements SchemaBuilder
+class DigiaOnlineSchemaBuilder extends SchemaBuilder
 {
+    protected $digiaSchema;
 
-    public function buildFromTypeLanguage(string $schemaDefinition): Schema
+    /**
+     * Should only return the normal types.
+     * It should ignore extension types totally.
+     *
+     * @param DigiaDocumentNode $documentNode
+     * @return Collection
+     */
+    public function getTypesFromDocumentNode($documentNode): Collection
     {
-        $documentNode = parse($schemaDefinition);
-
+        // Creates a digia schema object from the document node
         /** @var DigiaSchema $schema */
         $schema = DigiaGraphQL::make(DigiaSchemaBuilder::class)->build(
             $documentNode,
@@ -69,28 +88,69 @@ class DigiaOnlineSchemaBuilder implements SchemaBuilder
             []
         );
 
-        $extension = collect($documentNode->getDefinitions())->filter(function (DigiaNode $node) {
-            return $node->getKind() === "ObjectTypeExtension";
-        });
-        if($extension->isNotEmpty()) {
-            $schema = DigiaGraphQL::make(DigiaSchemaExtender::class)->extend(
-                $schema,
-                new DigiaDocumentNode(
-                    $extension->all(),
-                    null
-                ),
-                new DigiaResolverRegistry([]),
-                []
-            );
-        }
+        // We need the schema later when resolving extension types.
+        $this->digiaSchema = $schema;
 
-        return new Schema(
-            collect($schema->getTypeMap())->filter(function (DigiaNamedType $type) {
-                return !Str::startsWith($type->getName(), "__");
-            })->map(function (DigiaNamedType $type) {
-                return $this->toType($type);
-            })
+        // Get all types which are not build in types and convert them to lighthouse type objects.
+        return collect($schema->getTypeMap())->filter(function (DigiaNamedType $type) {
+            return !Str::startsWith($type->getName(), "__");
+        })->map(function (DigiaNamedType $type) {
+            return $this->toType($type);
+        });
+    }
+
+    /**
+     * Should return extension types.
+     * It should not merge the extension types together if they are the same type.
+     *
+     * @param DigiaDocumentNode $documentNode
+     * @return Collection
+     */
+    public function getExtensionTypesFromDocumentNode($documentNode): Collection
+    {
+        $extensions = collect($documentNode->getDefinitions())->filter(function (DigiaNode $node) {
+            return $node->getKind() === "ObjectTypeExtension";
+        })->map(function (ObjectTypeExtensionNode $node) {
+            return new ObjectTypeDefinitionNode(
+                null,
+                $node->getName(),
+                $node->getInterfaces(),
+                $node->getDirectives(),
+                $node->getFields(),
+                $node->getLocation()
+            );
+        });
+
+        /** @var DigiaSchema $schema */
+        $schema = DigiaGraphQL::make(DigiaSchemaBuilder::class)->build(
+            new DigiaDocumentNode(
+                $extensions->all(),
+                null
+            ),
+            new DigiaResolverRegistry([]),
+            []
         );
+
+        // Get all types which are not build in types and convert them to lighthouse type objects.
+        return collect($schema->getTypeMap())->filter(function (DigiaNamedType $type) {
+            return !Str::startsWith($type->getName(), "__") &&
+                !in_array($type->getName(), [
+                    'String', 'Boolean', 'Int', 'Float', 'ID']
+                );
+        })->map(function (DigiaNamedType $type) {
+            return $this->toType($type);
+        });
+    }
+
+    /**
+     * Converts a type language into a document node.
+     *
+     * @param string $typeLanguage
+     * @return DigiaDocumentNode
+     */
+    public function parseToDocumentNode(string $typeLanguage)
+    {
+        return parse($typeLanguage);
     }
 
     private function toType(DigiaType $type)
@@ -163,12 +223,13 @@ class DigiaOnlineSchemaBuilder implements SchemaBuilder
             );
         }
 
-        dd("unknown type, class: ". get_class($type), $type);
+        throw new Exception("unknown type, class: ". get_class($type));
     }
 
     private function toField(DigiaField $field)
     {
         return new Field(
+            $this->directiveRegistry,
             $field->getName(),
             $field->getDescription(),
             $this->toType($field->getType()),
@@ -184,6 +245,7 @@ class DigiaOnlineSchemaBuilder implements SchemaBuilder
     public function toArgument(DigiaArgument $argument) : Argument
     {
         return new Argument(
+            $this->directiveRegistry,
             $argument->getName(),
             $argument->getDescription(),
             $this->toType($argument->getType()),
@@ -212,17 +274,9 @@ class DigiaOnlineSchemaBuilder implements SchemaBuilder
     {
         switch ($type->getName()) {
             case "String":
-                return new StringType(
-                    $name,
-                    $type->getDescription(),
-                    $fields
-                );
+                return Type::string();
             case "Int":
-                return new IntType(
-                    $name,
-                    $type->getDescription(),
-                    $fields
-                );
+                return Type::integer();
             case "Float":
                 return new FloatType(
                     $name,
@@ -266,9 +320,10 @@ class DigiaOnlineSchemaBuilder implements SchemaBuilder
                             $node->getNameValue(),
                             collect($node->getArguments())->map(function (DigiaArgumentNode $node) {
                                     return new Argument(
+                                        $this->directiveRegistry,
                                         $node->getNameValue(),
                                         null,
-                                        graphql()->schema()->type("String"),
+                                        Type::string(), //TODO: make support for other arg types then string.
                                         $node->getValue()->getValue()
                                     );
                                 }

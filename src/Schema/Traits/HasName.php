@@ -11,6 +11,8 @@ trait HasName
 {
     public $name;
 
+    public abstract function manipulatable();
+
     public function name() : ?string
     {
         return $this->name;
@@ -20,8 +22,9 @@ trait HasName
      * @param string $name
      * @return self|Type
      */
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
+        $this->manipulatable();
         $this->name = $name;
         return $this;
     }

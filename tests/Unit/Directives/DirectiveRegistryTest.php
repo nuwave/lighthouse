@@ -13,7 +13,6 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\Directives\ArgumentDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directives\FieldDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directives\NodeDirective;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Types\Field;
 use Nuwave\Lighthouse\Types\Scalar\StringType;
 use Nuwave\Lighthouse\Types\Type;
@@ -55,10 +54,10 @@ class DirectiveRegistryTest extends TestCase
             }
         ';
 
-        graphql()->directives()->add(ExampleDirective::class);
-        graphql()->build($schema);
+        $this->graphql->directives()->add(ExampleDirective::class);
+        $this->graphql->build($schema);
 
-        $result = graphql()->execute($query)['data'];
+        $result = $this->graphql->execute($query)['data'];
         $this->assertCount(1, $result);
         $this->assertEquals("Handler ran", $result['example']);
     }
@@ -77,11 +76,11 @@ class DirectiveRegistryTest extends TestCase
             }
         ';
 
-        graphql()->directives()->add(AfterExampleDirective::class);
-        graphql()->directives()->add(ExampleDirective::class);
-        graphql()->build($schema);
+        $this->graphql->directives()->add(AfterExampleDirective::class);
+        $this->graphql->directives()->add(ExampleDirective::class);
+        $this->graphql->build($schema);
 
-        $result = graphql()->execute($query)['data'];
+        $result = $this->graphql->execute($query)['data'];
         $this->assertCount(1, $result);
         $this->assertEquals("Handler ran and append this.", $result['example']);
     }
@@ -100,11 +99,11 @@ class DirectiveRegistryTest extends TestCase
             }
         ';
 
-        graphql()->directives()->add(OtherDirective::class);
-        graphql()->directives()->add(ExampleDirective::class);
-        graphql()->build($schema);
+        $this->graphql->directives()->add(OtherDirective::class);
+        $this->graphql->directives()->add(ExampleDirective::class);
+        $this->graphql->build($schema);
 
-        $result = graphql()->execute($query)['data'];
+        $result = $this->graphql->execute($query)['data'];
         $this->assertCount(1, $result);
         $this->assertEquals("Handler ran and other appending this.", $result['example']);
     }
@@ -123,104 +122,22 @@ class DirectiveRegistryTest extends TestCase
             }
         ';
 
-        graphql()->directives()->add(OtherDirective::class);
-        graphql()->directives()->add(ExampleDirective::class);
-        graphql()->build($schema);
+        $this->graphql->directives()->add(OtherDirective::class);
+        $this->graphql->directives()->add(ExampleDirective::class);
+        $this->graphql->build($schema);
 
-        $result = graphql()->execute($query)['data'];
+        $result = $this->graphql->execute($query)['data'];
         $this->assertCount(1, $result);
         $this->assertEquals(" and other appending this.Handler ran", $result['example']);
     }
 
     public function testCanResolveANodeDirective()
     {
-        $schema = '
-            type User @Example {
-                name: String!
-            }
-            
-            type Query {
-                me: User
-            }
-        ';
-
-        $query = '
-            { __type(name:"User") {
-                fields {
-                  name
-                  description
-                  }  
-                }
-            }
-        ';
-
-        graphql()->directives()->add(ExampleDirective::class);
-        graphql()->build($schema);
-
-        $result = graphql()->execute($query)['data'];
-        $fields = data_get($result, '__type.fields');
-        $this->assertCount(2, $fields);
-
-        // Check if the already defined field exist.
-        $this->assertEquals([
-            'name' => 'name',
-            'description' => null
-        ], $fields[0]);
-
-        // Check if the field added by node directive exist.
-        $this->assertEquals([
-            'name' => 'example',
-            'description' => "example auto generated field"
-        ], $fields[1]);
     }
 
     public function testCanResolveMultipleNodeDirectives()
     {
-        $schema = '
-            type User @Example @Other {
-                name: String!
-            }
-            
-            type Query {
-                me: User
-            }
-        ';
 
-        $query = '
-            { __type(name:"User") {
-                fields {
-                  name
-                  description
-                  }  
-                }
-            }
-        ';
-
-        graphql()->directives()->add(ExampleDirective::class);
-        graphql()->directives()->add(OtherDirective::class);
-        graphql()->build($schema);
-
-        $result = graphql()->execute($query)['data'];
-        $fields = data_get($result, '__type.fields');
-        $this->assertCount(3, $fields);
-
-        // Check if the already defined field exist.
-        $this->assertEquals([
-            'name' => 'name',
-            'description' => null
-        ], $fields[0]);
-
-        // Check if the field added by example node directive exist.
-        $this->assertEquals([
-            'name' => 'example',
-            'description' => "example auto generated field"
-        ], $fields[1]);
-
-        // Check if the field added by other node directive exist.
-        $this->assertEquals([
-            'name' => 'other',
-            'description' => null
-        ], $fields[2]);
     }
 
     public function testCanResolveArgDirective()
@@ -243,10 +160,10 @@ class DirectiveRegistryTest extends TestCase
             }
         ';
 
-        graphql()->directives()->add(ExampleDirective::class);
-        graphql()->build($schema);
+        $this->graphql->directives()->add(ExampleDirective::class);
+        $this->graphql->build($schema);
 
-        $result = graphql()->execute($query)['data'];
+        $result = $this->graphql->execute($query)['data'];
         $users = $result['users'];
 
         $this->assertCount(1, $users);
@@ -261,28 +178,13 @@ class DirectiveRegistryTest extends TestCase
 
 }
 
-class ExampleDirective implements NodeDirective, FieldDirective, ArgumentDirective
+class ExampleDirective implements FieldDirective, ArgumentDirective
 {
     public function name(): string
     {
         return "Example";
     }
 
-    public function handleNode(Type $type, Closure $next)
-    {
-
-        $type->resolvedFields()->put("example", new Field(
-           "example",
-           "example auto generated field",
-           graphql()->schema()->type("String"),
-           null,
-           null,
-           function ($data) {
-               dd("example resolver");
-           }
-        ));
-        return $next($type);
-    }
 
     public function handleField(ResolveInfo $resolveInfo, Closure $next)
     {
@@ -316,7 +218,7 @@ class AfterExampleDirective implements FieldDirective
     }
 }
 
-class OtherDirective implements FieldDirective, NodeDirective
+class OtherDirective implements FieldDirective
 {
     public function name(): string
     {
@@ -328,21 +230,5 @@ class OtherDirective implements FieldDirective, NodeDirective
         $resolveInfo->result($resolveInfo->result()." and other appending this.");
 
         return $next($resolveInfo);
-    }
-
-    public function handleNode(Type $type, Closure $next)
-    {
-        $type->resolvedFields()->put("other", new Field(
-            'other',
-            null,
-            graphql()->schema()->type("String"),
-            null,
-            null,
-            function ($data) {
-                dd("other resolver");
-            }
-        ));
-
-        return $next($type);
     }
 }

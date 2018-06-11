@@ -9,6 +9,6 @@ if (! function_exists('graphql')) {
      */
     function graphql()
     {
-        return app('graphql');
+        return app(\Nuwave\Lighthouse\GraphQL::class);
     }
 }
