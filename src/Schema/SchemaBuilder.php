@@ -118,7 +118,7 @@ class SchemaBuilder
     protected function convertDirectives(DocumentAST $document)
     {
         return $document->directives()->map(function (DirectiveDefinitionNode $directive) {
-            return app(DirectiveFactory::class)->toDirective($directive);
+            return DirectiveFactory::toDirective($directive);
         });
     }
 }

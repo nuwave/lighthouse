@@ -17,7 +17,7 @@ class DirectiveFactory
      *
      * @return Directive
      */
-    public function toDirective(DirectiveDefinitionNode $directive)
+    public static function toDirective(DirectiveDefinitionNode $directive)
     {
         return new Directive([
             'name' => $directive->name->value,
@@ -27,7 +27,7 @@ class DirectiveFactory
             'args' => collect($directive->arguments)->map(function (InputValueDefinitionNode $argument) {
                 return new FieldArgument([
                     'name' => $argument->name->value,
-                    'defaultValue' => $argument->defaultValue->value,
+                    'defaultValue' => data_get($argument, 'defaultValue.value', null),
                     'description' => $argument->description,
                     'type' => NodeResolver::resolve($argument->type),
                 ]);
