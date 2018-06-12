@@ -27,7 +27,7 @@ class ClearCacheCommand extends Command
      */
     public function handle()
     {
-        Cache::forget(GraphQL::AST_CACHE_KEY);
+        Cache::forget(config('lighthouse.cache.key'));
 
         $this->info('GraphQL AST schema cache deleted.');
     }

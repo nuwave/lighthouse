@@ -111,8 +111,8 @@ class GraphQL
      */
     public function buildSchema()
     {
-        $documentAST = $this->shouldCacheAST() ?
-            Cache::rememberForever(self::AST_CACHE_KEY, function () {
+        $documentAST = $this->shouldCacheAST()
+            ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
                 return $this->buildAST();
             })
             : $this->buildAST();

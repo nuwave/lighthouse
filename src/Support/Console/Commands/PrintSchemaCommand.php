@@ -33,7 +33,7 @@ class PrintSchemaCommand extends Command
     public function handle()
     {
         // Clear the cache so this always gets the current schema
-        Cache::forget(GraphQL::AST_CACHE_KEY);
+        Cache::forget(config('lighthouse.cache.key'));
 
         $schema = SchemaPrinter::doPrint(
             graphql()->retrieveSchema()

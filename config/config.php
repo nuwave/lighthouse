@@ -72,6 +72,7 @@ return [
     */
     'cache' => [
         'enable' => true,
+        'key' => 'lighthouse-schema'
     ],
 
     /*
