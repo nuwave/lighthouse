@@ -9,6 +9,7 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Traits\CanManipulate;
 use Nuwave\Lighthouse\Schema\Traits\HasDescription;
 use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
@@ -25,21 +26,26 @@ abstract class Type implements ArrayAccess
     /** @var null|Collection */
     protected $resolvedFields;
 
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+
     /**
      * Type constructor.
      *
+     * @param DirectiveRegistry $directiveRegistry
      * @param string $name
      * @param null|string $description
      * @param Closure $fields
      * @param Closure|null $directives
      */
-    public function __construct(?string $name, ?string $description, Closure $fields = null, Closure $directives = null)
+    public function __construct(DirectiveRegistry $directiveRegistry, ?string $name, ?string $description, Closure $fields = null, Closure $directives = null)
     {
         $this->name = $name;
         $this->description = $description;
         $this->fields = $fields ?? function() {return collect();};
         $this->directives = $directives ?? function() {return collect();};
         $this->resolvedFields = null;
+        $this->directiveRegistry = $directiveRegistry;
     }
 
     public function fields() : Collection

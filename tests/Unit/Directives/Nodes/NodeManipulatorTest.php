@@ -100,6 +100,7 @@ class AddNewType implements NodeManipulator
     public function manipulateNode(ManipulatorInfo $info, Closure $next)
     {
         $info->addType(new ObjectType(
+            $this->directiveRegistry,
             "Example",
             null,
             function () {

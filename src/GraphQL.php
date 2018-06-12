@@ -16,24 +16,32 @@ class GraphQL
     /** @var Schema */
     public $schema;
 
+    public $schemaBuilder;
+
+    public $executor;
+
     /**
      * GraphQL constructor.
+     *
+     * @param SchemaBuilder $schemaBuilder
+     * @param Executor $executor
+     * @param DirectiveRegistry $directiveRegistry
      */
-    public function __construct()
+    public function __construct(SchemaBuilder $schemaBuilder, Executor $executor, DirectiveRegistry $directiveRegistry)
     {
-        $this->directiveRegistry = app(DirectiveRegistry::class);
+        $this->schemaBuilder = $schemaBuilder;
+        $this->executor = $executor;
+        $this->directiveRegistry = $directiveRegistry;
     }
 
     public function build(string $schema) : Schema
     {
-        return $this->schema = app(SchemaBuilder::class, [
-            'directiveRegistry' => $this->directives()
-        ])->buildFromTypeLanguage($schema);
+        return $this->schema = $this->schemaBuilder->buildFromTypeLanguage($schema);
     }
 
     public function execute(string $query)
     {
-        return app(Executor::class)->execute($this->schema(), $query);
+        return $this->executor->execute($this->schema(), $query);
     }
 
     public function directives() : DirectiveRegistry

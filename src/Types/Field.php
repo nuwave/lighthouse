@@ -110,11 +110,12 @@ class Field
     public function resolver(ResolveInfo $resolveInfo) : Closure
     {
         return function () use ($resolveInfo) {
+            // Resolve arguments first
             $this->arguments()->each(function (Argument $argument) use (&$resolveInfo) {
                 $resolveInfo = ($argument->resolver($resolveInfo))();
             });
 
-            // First resolve with supplied resolver
+            // Then resolve with supplied resolver
             if(!is_null($this->resolver)) {
                 $resolveInfo = ($this->resolver)($resolveInfo);
             }

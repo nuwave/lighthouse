@@ -23,6 +23,10 @@ class DirectiveRegistry
         $this->directives = collect();
     }
 
+    public function all() : Collection
+    {
+        return $this->directives;
+    }
 
     /**
      *
@@ -61,9 +65,10 @@ class DirectiveRegistry
      * returned in the order the directives are supplied.
      *
      * @param Collection $directives
+     * @param null|string $type
      * @return Collection
      */
-    public function getFromDirectives(Collection $directives) : Collection
+    public function getFromDirectives(Collection $directives, ?string $type = null) : Collection
     {
         return $this->directives->filter(function (Directive $directive) use ($directives) {
             return $directives->first(function ($directiveType) use ($directive) {
@@ -73,6 +78,8 @@ class DirectiveRegistry
             return $directives->filter(function ($directiveType) use ($directive) {
                 return $directiveType->name() === $directive->name();
             })->keys()->first();
+        })->filter(function (Directive $directive) use ($type) {
+            return is_null($type) ? true : $directive instanceof $type;
         });
     }
 

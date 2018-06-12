@@ -176,6 +176,7 @@ class DigiaOnlineSchemaBuilder extends SchemaBuilder
 
         if($type instanceof DigiaObjectType) {
             return new ObjectType(
+                $this->directiveRegistry,
                 $name,
                 $type->getDescription(),
                 $fields,
@@ -187,16 +188,19 @@ class DigiaOnlineSchemaBuilder extends SchemaBuilder
         }
         elseif ($type instanceof DigiaNonNullType) {
             return new NonNullType(
+                $this->directiveRegistry,
                 $this->toType($type->getOfType())
             );
         }
         elseif ($type instanceof DigiaListType) {
             return new ListType(
+                $this->directiveRegistry,
                 $this->toType($type->getOfType())
             );
         }
         elseif ($type instanceof DigiaEnumType) {
             return new EnumType(
+                $this->directiveRegistry,
                 $name,
                 $type->getDescription(),
                 collect($type->getValues())->map(function (DigiaEnumValue $value) {
@@ -206,6 +210,7 @@ class DigiaOnlineSchemaBuilder extends SchemaBuilder
         }
         elseif ($type instanceof DigiaInterfaceType) {
             return new InterfaceType(
+                $this->directiveRegistry,
                 $name,
                 $type->getDescription(),
                 $fields
@@ -213,6 +218,7 @@ class DigiaOnlineSchemaBuilder extends SchemaBuilder
         }
         elseif ($type instanceof DigiaInputObjectType) {
             return new InputObjectType(
+                $this->directiveRegistry,
                 $name,
                 $type->getDescription(),
                 function () use ($type) {
@@ -257,6 +263,7 @@ class DigiaOnlineSchemaBuilder extends SchemaBuilder
     private function toEnumValue(DigiaEnumValue $value)
     {
         return new EnumValueType(
+            $this->directiveRegistry,
             $value->getName(),
             $value->getDescription(),
             $value->getValue()
@@ -279,24 +286,28 @@ class DigiaOnlineSchemaBuilder extends SchemaBuilder
                 return Type::integer();
             case "Float":
                 return new FloatType(
+                    $this->directiveRegistry,
                     $name,
                     $type->getDescription(),
                     $fields
                 );
             case "ID":
                 return new IDType(
+                    $this->directiveRegistry,
                     $name,
                     $type->getDescription(),
                     $fields
                 );
             case "Boolean":
                 return new BooleanType(
+                    $this->directiveRegistry,
                     $name,
                     $type->getDescription(),
                     $fields
                 );
         }
         return new ScalarType(
+            $this->directiveRegistry,
             $name,
             $type->getDescription(),
             $fields,

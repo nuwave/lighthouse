@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Types;
 
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 
 class EnumType extends Type
 {
@@ -13,13 +14,14 @@ class EnumType extends Type
     /**
      * EnumType constructor.
      *
+     * @param DirectiveRegistry $directiveRegistry
      * @param string $name
      * @param string $description
      * @param Collection $values
      */
-    public function __construct(string $name, string $description, Collection $values)
+    public function __construct(DirectiveRegistry $directiveRegistry, string $name, string $description, Collection $values)
     {
-        parent::__construct($name, $description);
+        parent::__construct($directiveRegistry, $name, $description);
         $this->values = $values;
     }
 

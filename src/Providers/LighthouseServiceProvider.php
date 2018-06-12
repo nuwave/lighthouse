@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Executor;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Support\Contracts\SchemaBuilder;
 
 class LighthouseServiceProvider extends ServiceProvider
@@ -17,10 +18,6 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(GraphQL::class, function () {
-            return new GraphQL();
-        });
-        
         $this->app->bind(
             SchemaBuilder::class,
             config('lighthouse.schema_builder')
@@ -30,6 +27,14 @@ class LighthouseServiceProvider extends ServiceProvider
             Executor::class,
             config('lighthouse.executor')
         );
+
+        $this->app->singleton(GraphQL::class, function () {
+            return new GraphQL(
+                app(SchemaBuilder::class),
+                app(Executor::class),
+                app(DirectiveRegistry::class)
+            );
+        });
 
         Collection::mixin(new \Nuwave\Lighthouse\Support\Collection());
 
