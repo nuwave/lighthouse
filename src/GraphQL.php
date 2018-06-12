@@ -9,42 +9,84 @@ use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
 {
     use CanFormatError;
 
-    /**
-     * Middleware manager.
-     *
-     * @var MiddlewareRegistry
-     */
-    protected $middleware;
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
 
     /**
-     * Schema Stitcher.
-     *
-     * @var SchemaStitcher
+     * @return DirectiveRegistry
      */
-    protected $stitcher;
+    public function directives()
+    {
+        return $this->directiveRegistry;
+    }
+
+    /** @var MiddlewareRegistry */
+    protected $middlewareRegistry;
 
     /**
-     * GraphQL Schema.
-     *
-     * @var Schema
+     * @return MiddlewareRegistry
      */
+    public function middleware()
+    {
+        return $this->middlewareRegistry;
+    }
+
+    /** @var NodeRegistry */
+    protected $nodeRegistry;
+
+    /**
+     * @return NodeRegistry
+     */
+    public function nodes()
+    {
+        return $this->nodeRegistry;
+    }
+
+    /** @var TypeRegistry */
+    protected $typeRegistry;
+
+    /**
+     * @return TypeRegistry
+     */
+    public function types()
+    {
+        return $this->typeRegistry;
+    }
+
+    /**
+     * GraphQL constructor.
+     *
+     * @param DirectiveRegistry  $directiveRegistry
+     * @param MiddlewareRegistry $middlewareRegistry
+     * @param NodeRegistry       $nodeRegistry
+     * @param TypeRegistry       $typeRegistry
+     */
+    public function __construct(DirectiveRegistry $directiveRegistry, MiddlewareRegistry $middlewareRegistry, NodeRegistry $nodeRegistry, TypeRegistry $typeRegistry)
+    {
+        $this->directiveRegistry = $directiveRegistry;
+        $this->middlewareRegistry = $middlewareRegistry;
+        $this->nodeRegistry = $nodeRegistry;
+        $this->typeRegistry = $typeRegistry;
+    }
+
+    /** @var Schema */
     protected $graphqlSchema;
 
     /**
-     * Prepare graphql schema.
+     * @return Schema
      */
-    const AST_CACHE_KEY = 'lighthouse-schema';
-
-    public function retrieveSchema(): Schema
+    public function prepSchema(): Schema
     {
         return $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
     }
@@ -96,7 +138,7 @@ class GraphQL
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
         return GraphQLBase::executeQuery(
-            $this->retrieveSchema(),
+            $this->prepSchema(),
             $query,
             $rootValue,
             $context,
@@ -105,7 +147,7 @@ class GraphQL
     }
 
     /**
-     * Build a new schema instance.
+     * Build a new executable schema.
      *
      * @return Schema
      */
@@ -120,6 +162,11 @@ class GraphQL
         return (new SchemaBuilder())->build($documentAST);
     }
 
+    /**
+     * Determine if the AST should be cached.
+     *
+     * @return bool
+     */
     protected function shouldCacheAST()
     {
         return App::environment('production') && config('cache.enable');
@@ -132,7 +179,7 @@ class GraphQL
      */
     protected function buildAST()
     {
-        $schemaString = $this->stitcher()->stitch(
+        $schemaString = SchemaStitcher::stitch(
             config('lighthouse.schema.register')
         );
 
@@ -157,50 +204,5 @@ class GraphQL
             : app()->instance($name, resolve($abstract));
 
         return $instance->load($key, $data);
-    }
-
-    /**
-     * Get instance of middle manager.
-     *
-     * @return MiddlewareRegistry
-     */
-    public function middleware()
-    {
-        if (! $this->middleware) {
-            $this->middleware = app(MiddlewareRegistry::class);
-        }
-
-        return $this->middleware;
-    }
-
-    /**
-     * Get instance of schema stitcher.
-     *
-     * @return SchemaStitcher
-     */
-    public function stitcher()
-    {
-        if (! $this->stitcher) {
-            $this->stitcher = app(SchemaStitcher::class);
-        }
-
-        return $this->stitcher;
-    }
-
-    /**
-     * Instance of Node container.
-     *
-     * @return NodeRegistry
-     */
-    public function nodes()
-    {
-        if (! app()->has(NodeRegistry::class)) {
-            return app()->instance(
-                NodeRegistry::class,
-                resolve(NodeRegistry::class)
-            );
-        }
-
-        return resolve(NodeRegistry::class);
     }
 }

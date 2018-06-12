@@ -15,7 +15,8 @@ class GraphQLController extends Controller
      */
     public function __construct(Request $request)
     {
-        graphql()->retrieveSchema();
+        // This builds and caches the AST and registers all the types, schema ...
+        graphql()->prepSchema();
 
         $this->middleware(graphql()->middleware()->forRequest(
             $request->input('query', '{ empty }')

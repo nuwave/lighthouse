@@ -24,15 +24,17 @@ if (! function_exists('auth')) {
     }
 }
 
-if (! function_exists('types')) {
+if (! function_exists('schema')) {
     /**
-     * Get instance of schema container.
+     * Get instance of type registry.
      *
      * @return \Nuwave\Lighthouse\Schema\TypeRegistry
+     *
+     * @deprecated Will be removed in the next major version
      */
-    function types()
+    function schema()
     {
-        return app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);
+        return graphql()->types();
     }
 }
 
@@ -41,10 +43,12 @@ if (! function_exists('directives')) {
      * Get instance of directives container.
      *
      * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
+     *
+     * @deprecated Will be removed in the next major version
      */
     function directives()
     {
-        return app(\Nuwave\Lighthouse\Schema\DirectiveRegistry::class);
+        return graphql()->directives();
     }
 }
 

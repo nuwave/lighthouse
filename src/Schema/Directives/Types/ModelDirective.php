@@ -35,7 +35,7 @@ class ModelDirective implements TypeMiddleware, TypeManipulator
         $modelClassName = $this->getModelClassName($value);
 
         graphql()->nodes()->registerModel(
-            $value->getNodeName(), $modelClassName
+            $value->getName(), $modelClassName
         );
 
         return $value;
@@ -51,11 +51,11 @@ class ModelDirective implements TypeMiddleware, TypeManipulator
     protected function getModelClassName(TypeValue $value)
     {
         $className = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
+            $this->nodeDirective($value->getDefinition(), self::name()),
             'class'
         );
 
-        return $className ?? $this->inferModelClassName($value->getNodeName());
+        return $className ?? $this->inferModelClassName($value->getName());
     }
 
     /**

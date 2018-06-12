@@ -14,9 +14,26 @@ class TypeRegistry
      */
     protected $types;
 
+    /**
+     * TypeRegistry constructor.
+     */
     public function __construct()
     {
         $this->types = new Collection();
+    }
+
+    /**
+     * Resolve type instance by name.
+     *
+     * @param string $typeName
+     *
+     * @return Type
+     *
+     * @deprecated Will be removed in the next major release
+     */
+    public function instance($typeName)
+    {
+        return $this->get($typeName);
     }
 
     /**

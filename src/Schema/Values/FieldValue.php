@@ -263,7 +263,7 @@ class FieldValue
      */
     public function getNodeName()
     {
-        return $this->getNode()->getNodeName();
+        return $this->getNode()->getName();
     }
 
     /**

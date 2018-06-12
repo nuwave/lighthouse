@@ -180,10 +180,10 @@ class TestCase extends BaseTestCase
         $node = new TypeValue($document->definitions[$index]);
 
         if (is_null($field)) {
-            return new FieldValue($node, array_get($node->getNodeFields(), '0'));
+            return new FieldValue($node, array_get($node->getFields(), '0'));
         }
 
-        return collect($node->getNodeFields())->filter(function ($nodeField) use ($field) {
+        return collect($node->getFields())->filter(function ($nodeField) use ($field) {
             return $nodeField->name->value === $field;
         })->map(function ($field) use ($node) {
             return new FieldValue($node, $field);

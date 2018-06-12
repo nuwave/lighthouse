@@ -16,7 +16,7 @@ class DirectiveRegistryTest extends TestCase
      */
     public function itRegistersLighthouseDirectives()
     {
-        $this->assertInstanceOf(ScalarDirective::class, directives()->handler(ScalarDirective::name()));
+        $this->assertInstanceOf(ScalarDirective::class, graphql()->directives()->get(ScalarDirective::name()));
     }
 
     /**
@@ -27,7 +27,7 @@ class DirectiveRegistryTest extends TestCase
         $schema = 'scalar Email @scalar(class: "Email")';
         $document = Parser::parse($schema);
         $definition = $document->definitions[0];
-        $scalar = directives()->typeResolverForNode($definition)
+        $scalar = graphql()->directives()->typeResolver($definition)
             ->resolveType(new TypeValue($definition));
 
         $this->assertInstanceOf(ScalarType::class, $scalar);
@@ -57,7 +57,7 @@ class DirectiveRegistryTest extends TestCase
         ';
 
         $document = Parser::parse($schema);
-        $hasResolver = directives()->hasResolver($document->definitions[0]->fields[0]);
+        $hasResolver = graphql()->directives()->hasFieldResolver($document->definitions[0]->fields[0]);
         $this->assertTrue($hasResolver);
     }
 
@@ -75,7 +75,7 @@ class DirectiveRegistryTest extends TestCase
         ';
 
         $document = Parser::parse($schema);
-        directives()->fieldResolver($document->definitions[0]->fields[0]);
+        graphql()->directives()->fieldResolver($document->definitions[0]->fields[0]);
     }
 
     /**
@@ -90,7 +90,7 @@ class DirectiveRegistryTest extends TestCase
         ';
 
         $document = Parser::parse($schema);
-        $middleware = directives()->fieldMiddleware($document->definitions[0]->fields[0]);
+        $middleware = graphql()->directives()->fieldMiddleware($document->definitions[0]->fields[0]);
         $this->assertCount(2, $middleware);
     }
 }

@@ -8,19 +8,10 @@ use PHPUnit\Framework\TestCase;
 class SchemaStitcherTest extends TestCase
 {
     /**
-     * Schema stitcher.
-     *
-     * @var SchemaStitcher
-     */
-    protected $stitcher;
-
-    /**
      * Set up test case.
      */
     protected function setUp()
     {
-        $this->stitcher = new SchemaStitcher();
-
         if (! is_dir(__DIR__.'/schema')) {
             mkdir(__DIR__.'/schema');
         }
@@ -65,7 +56,7 @@ class SchemaStitcherTest extends TestCase
      */
     public function itConcatsSchemas()
     {
-        $schema = $this->stitcher->stitch(__DIR__.'/schema/baz.graphql');
+        $schema = SchemaStitcher::stitch(__DIR__.'/schema/baz.graphql');
         $this->assertContains('type Baz', $schema);
     }
 
@@ -74,7 +65,7 @@ class SchemaStitcherTest extends TestCase
      */
     public function itCanImportSchemas()
     {
-        $schema = $this->stitcher->stitch(__DIR__.'/foo.graphql');
+        $schema = SchemaStitcher::stitch(__DIR__.'/foo.graphql');
         $this->assertContains('type Foo', $schema);
         $this->assertContains('type Bar', $schema);
         $this->assertContains('type Baz', $schema);

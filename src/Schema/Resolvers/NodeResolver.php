@@ -89,7 +89,7 @@ class NodeResolver
             case 'String':
                 return Type::string();
             default:
-                return types()->get($node->name->value);
+                return graphql()->types()->get($node->name->value);
         }
     }
 }

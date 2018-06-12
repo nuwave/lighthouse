@@ -33,12 +33,12 @@ class SecurityDirective implements TypeMiddleware
      */
     public function handleNode(TypeValue $value)
     {
-        if ('Query' !== $value->getNodeName()) {
+        if ('Query' !== $value->getName()) {
             $message = sprintf(
                 'The `%s` directive can only be placed on the %s type [%s]',
                 self::name(),
                 'Query',
-                $value->getNodeName()
+                $value->getName()
             );
 
             throw new DirectiveException($message);
@@ -59,7 +59,7 @@ class SecurityDirective implements TypeMiddleware
     protected function queryComplexity(TypeValue $value)
     {
         $complexity = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
+            $this->nodeDirective($value->getDefinition(), self::name()),
             'complexity'
         );
 
@@ -78,7 +78,7 @@ class SecurityDirective implements TypeMiddleware
     protected function queryDepth(TypeValue $value)
     {
         $depth = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
+            $this->nodeDirective($value->getDefinition(), self::name()),
             'depth'
         );
 
@@ -97,7 +97,7 @@ class SecurityDirective implements TypeMiddleware
     protected function queryIntrospection(TypeValue $value)
     {
         $introspection = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
+            $this->nodeDirective($value->getDefinition(), self::name()),
             'introspection'
         );
 

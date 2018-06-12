@@ -55,7 +55,7 @@ class ASTBuilder
             ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use (
                 $originalDocument
             ) {
-                $nodeManipulators = directives()->nodeManipulators($objectType);
+                $nodeManipulators = graphql()->directives()->typeManipulators($objectType);
 
                 return $nodeManipulators->reduce(function (DocumentAST $document, TypeManipulator $nodeManipulator) use (
                     $originalDocument,
@@ -106,7 +106,7 @@ class ASTBuilder
                 DocumentAST $document,
                 FieldDefinitionNode $fieldDefinition
             ) use ($objectType, $originalDocument) {
-                $fieldManipulators = directives()->fieldManipulators($fieldDefinition);
+                $fieldManipulators = graphql()->directives()->fieldManipulators($fieldDefinition);
 
                 return $fieldManipulators->reduce(function (
                     DocumentAST $document,
@@ -141,7 +141,7 @@ class ASTBuilder
                                 $parentField,
                                 $originalDocument
                             ) {
-                                $argManipulators = directives()->argManipulators($argDefinition);
+                                $argManipulators = graphql()->directives()->argManipulators($argDefinition);
 
                                 return $argManipulators->reduce(
                                     function (DocumentAST $document, ArgManipulator $argManipulator) use (

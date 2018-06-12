@@ -31,20 +31,20 @@ class UnionDirective implements TypeResolver
     public function resolveType(TypeValue $value)
     {
         $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
+            $this->nodeDirective($value->getDefinition(), self::name()),
             'resolver'
         );
 
         $resolverPieces = explode('@', $resolver);
         $namespace = array_get($resolverPieces, '0');
-        $method = array_get($resolverPieces, '1', strtolower($value->getNodeName()));
+        $method = array_get($resolverPieces, '1', strtolower($value->getName()));
 
         return new UnionType([
-            'name' => $value->getNodeName(),
-            'description' => trim(str_replace("\n", '', $value->getNode()->description)),
+            'name' => $value->getName(),
+            'description' => trim(str_replace("\n", '', $value->getDefinition()->description)),
             'types' => function () use ($value) {
-                return collect($value->getNode()->types)->map(function ($type) {
-                    return types()->get($type->name->value);
+                return collect($value->getDefinition()->types)->map(function ($type) {
+                    return graphql()->types()->get($type->name->value);
                 })->filter()->toArray();
             },
             'resolveType' => function ($value) use ($namespace, $method) {
@@ -54,7 +54,7 @@ class UnionDirective implements TypeResolver
                     return call_user_func_array([$instance, $method], [$value]);
                 }
 
-                return types()->get(last(explode('\\', get_class($value))));
+                return graphql()->types()->get(last(explode('\\', get_class($value))));
             },
         ]);
     }

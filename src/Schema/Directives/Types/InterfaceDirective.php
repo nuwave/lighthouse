@@ -32,7 +32,7 @@ class InterfaceDirective implements TypeResolver
     public function resolveType(TypeValue $value)
     {
         $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
+            $this->nodeDirective($value->getDefinition(), self::name()),
             'resolver'
         );
 
@@ -40,8 +40,8 @@ class InterfaceDirective implements TypeResolver
         $method = array_get(explode('@', $resolver), '1');
 
         return new InterfaceType([
-            'name' => $value->getNodeName(),
-            'description' => trim(str_replace("\n", '', $value->getNode()->description)),
+            'name' => $value->getName(),
+            'description' => trim(str_replace("\n", '', $value->getDefinition()->description)),
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },

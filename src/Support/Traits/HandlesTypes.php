@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use Closure;
+use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
@@ -173,25 +174,13 @@ trait HandlesTypes
      */
     protected function getFields(TypeValue $value)
     {
-        $factory = $this->fieldFactory();
-
-        return collect($value->getNodeFields())
-            ->mapWithKeys(function ($field) use ($factory, $value) {
+        return collect($value->getFields())
+            ->mapWithKeys(function (Node $field) use ($value) {
                 $fieldValue = new FieldValue($value, $field);
 
                 return [
-                    $fieldValue->getFieldName() => $factory->handle($fieldValue),
+                    $fieldValue->getFieldName() => app(FieldFactory::class)->handle($fieldValue),
                 ];
             })->toArray();
-    }
-
-    /**
-     * Get instance of field factory.
-     *
-     * @return FieldFactory
-     */
-    protected function fieldFactory()
-    {
-        return app(FieldFactory::class);
     }
 }

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeList;
@@ -182,6 +183,21 @@ class PartialParser
         return self::getFirstAndValidateType(
             Parser::parse($interfaceDefinition)->definitions,
             InterfaceTypeDefinitionNode::class
+        );
+    }
+
+    /**
+     * @param string $inputTypeDefinition
+     *
+     * @throws ParseException
+     *
+     * @return InputObjectTypeDefinitionNode
+     */
+    public static function inputObjectType($inputTypeDefinition)
+    {
+        return self::getFirstAndValidateType(
+            Parser::parse($inputTypeDefinition)->definitions,
+            InputObjectTypeDefinitionNode::class
         );
     }
 }

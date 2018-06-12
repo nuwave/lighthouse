@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Factories\TypeFactory;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Tests\TestCase;
@@ -48,13 +49,13 @@ class TypeFactoryTest extends TestCase
     public function itCanTransformEnums()
     {
         $schema = '
-        enum Role {
-            # Company administrator.
-            ADMIN @enum(value:"admin")
-
-            # Company employee.
-            EMPLOYEE @enum(value:"employee")
-        }
+            enum Role {
+                # Company administrator.
+                ADMIN @enum(value:"admin")
+    
+                # Company employee.
+                EMPLOYEE @enum(value:"employee")
+            }
         ';
 
         $enumNode = $this->parse($schema)->definitions[0];
@@ -70,7 +71,7 @@ class TypeFactoryTest extends TestCase
     public function itCanTransformScalars()
     {
         $schema = '
-        scalar DateTime @scalar(class:"DateTime")
+            scalar DateTime @scalar(class:"DateTime")
         ';
 
         $scalarNode = $this->parse($schema)->definitions[0];
@@ -86,9 +87,9 @@ class TypeFactoryTest extends TestCase
     public function itCanTransformInterfaces()
     {
         $schema = '
-        interface Node {
-            _id: ID!
-        }
+            interface Node {
+                _id: ID!
+            }
         ';
 
         $interface = $this->parse($schema)->definitions[0];
@@ -105,9 +106,9 @@ class TypeFactoryTest extends TestCase
     public function itCanTransformObjectTypes()
     {
         $schema = '
-        type User {
-            foo(bar: String! @bcrypt): String!
-        }
+            type User {
+                foo(bar: String! @bcrypt): String!
+            }
         ';
 
         $interface = $this->parse($schema)->definitions[0];
@@ -123,14 +124,12 @@ class TypeFactoryTest extends TestCase
      */
     public function itCanTransformInputObjectTypes()
     {
-        $schema = '
-        input UserInput {
-            foo: String!
-        }
-        ';
-
-        $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->toType(new TypeValue($interface));
+        $input = PartialParser::inputObjectType('
+            input UserInput {
+                foo: String!
+            }
+        ');
+        $type = $this->factory->toType(new TypeValue($input));
 
         $this->assertInstanceOf(InputObjectType::class, $type);
         $this->assertEquals('UserInput', $type->name);

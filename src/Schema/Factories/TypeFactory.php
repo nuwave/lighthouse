@@ -2,23 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Directives\Types\TypeMiddleware;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
@@ -55,7 +51,7 @@ class TypeFactory
      */
     protected function hasTypeResolver(TypeValue $value)
     {
-        return directives()->hasTypeResolver($value->getNode());
+        return graphql()->directives()->hasTypeResolver($value->getDefinition());
     }
 
     /**
@@ -67,8 +63,8 @@ class TypeFactory
      */
     protected function resolveTypeViaDirective(TypeValue $value)
     {
-        return directives()
-            ->typeResolverForNode($value->getNode())
+        return graphql()->directives()
+            ->typeResolver($value->getDefinition())
             ->resolveType($value);
     }
 
@@ -83,7 +79,7 @@ class TypeFactory
     {
         // We do not have to consider TypeExtensionNode since they
         // are merged before we get here
-        switch (get_class($value->getNode())) {
+        switch (get_class($value->getDefinition())) {
             case EnumTypeDefinitionNode::class:
                 return $this->enum($value);
             case ScalarTypeDefinitionNode::class:
@@ -96,7 +92,7 @@ class TypeFactory
                 return $this->inputObjectType($value);
             // todo deal with UnionTypes
             default:
-                throw new \Exception("Unknown type for Node [{$value->getNodeName()}]");
+                throw new \Exception("Unknown type for Node [{$value->getName()}]");
         }
     }
 
@@ -110,8 +106,8 @@ class TypeFactory
     public function enum(TypeValue $value)
     {
         return new EnumType([
-            'name' => $value->getNodeName(),
-            'values' => collect($value->getNode()->values)
+            'name' => $value->getName(),
+            'values' => collect($value->getDefinition()->values)
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     $directive = $this->fieldDirective($field, 'enum');
 
@@ -149,7 +145,7 @@ class TypeFactory
     public function interface(TypeValue $value)
     {
         return new InterfaceType([
-            'name' => $value->getNodeName(),
+            'name' => $value->getName(),
             'fields' => $this->getFields($value),
         ]);
     }
@@ -164,13 +160,13 @@ class TypeFactory
     public function objectType(TypeValue $value)
     {
         return new ObjectType([
-            'name' => $value->getNodeName(),
+            'name' => $value->getName(),
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },
             'interfaces' => function () use ($value) {
                 return $value->getInterfaceNames()->map(function ($interfaceName) {
-                    return types()->get($interfaceName);
+                    return graphql()->types()->get($interfaceName);
                 })->toArray();
             },
         ]);
@@ -186,7 +182,7 @@ class TypeFactory
     public function inputObjectType(TypeValue $value)
     {
         return new InputObjectType([
-            'name' => $value->getNodeName(),
+            'name' => $value->getName(),
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },
@@ -202,7 +198,7 @@ class TypeFactory
      */
     protected function applyMiddleware(TypeValue $value)
     {
-        return directives()->nodeMiddleware($value->getNode())
+        return graphql()->directives()->typeMiddlewares($value->getDefinition())
             ->reduce(function (TypeValue $value, TypeMiddleware $middleware) {
                 return $middleware->handleNode($value);
             }, $value);

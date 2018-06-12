@@ -33,7 +33,7 @@ class TypeDirective implements TypeMiddleware, TypeManipulator
     public function handleNode(TypeValue $value)
     {
         graphql()->nodes()->registerNode(
-            $value->getNodeName(),
+            $value->getName(),
             // Resolver for the node itself
             $this->getResolver($value, 'resolver'),
             // Interface type resolver
@@ -53,7 +53,7 @@ class TypeDirective implements TypeMiddleware, TypeManipulator
     protected function getResolver(TypeValue $value, string $argKey)
     {
         $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
+            $this->nodeDirective($value->getDefinition(), self::name()),
             $argKey
         );
 

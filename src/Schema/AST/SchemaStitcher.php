@@ -11,11 +11,11 @@ class SchemaStitcher
      *
      * @return string
      */
-    public function stitch($path = null)
+    public static function stitch($path = null)
     {
         $lighthouse = file_get_contents(realpath(__DIR__.'/../../../assets/schema.graphql'));
 
-        $app = $path ? $this->appSchema($path) : '';
+        $app = $path ? self::appSchema($path) : '';
 
         return $lighthouse.$app;
     }
@@ -27,7 +27,7 @@ class SchemaStitcher
      *
      * @return string
      */
-    protected function appSchema($path)
+    protected static function appSchema($path)
     {
         try {
             $schema = file_get_contents($path);
@@ -41,7 +41,7 @@ class SchemaStitcher
         })->map(function ($import) {
             return trim(str_replace('#import', '', $import));
         })->map(function ($file) use ($path) {
-            return $this->appSchema(realpath(dirname($path).'/'.$file));
+            return self::appSchema(realpath(dirname($path).'/'.$file));
         })->implode("\n");
 
         return $imports."\n".$schema;

@@ -6,8 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
 
 class LighthouseServiceProvider extends ServiceProvider
@@ -42,19 +40,8 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('graphql', function () {
-            return new GraphQL();
-        });
-
-        $this->app->singleton(DirectiveRegistry::class, function ($app) {
-            return new DirectiveRegistry();
-        });
-
-        $this->app->singleton(TypeRegistry::class, function ($app) {
-            return new TypeRegistry();
-        });
-
-        $this->app->alias('graphql', GraphQL::class);
+        $this->app->singleton(GraphQL::class);
+        $this->app->alias(GraphQL::class, 'graphql');
 
         if ($this->app->runningInConsole()) {
             $this->commands([

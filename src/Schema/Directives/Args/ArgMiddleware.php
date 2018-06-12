@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 interface ArgMiddleware extends Directive
 {
     /**
-     * Resolve the field directive.
+     * Apply transformations on the ArgumentValue.
      *
      * @param ArgumentValue $argument
      *

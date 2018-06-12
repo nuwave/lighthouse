@@ -65,6 +65,6 @@ class UnionTest extends TestCase
     {
         $type = isset($value['id']) ? 'User' : 'Employee';
 
-        return types()->get($type);
+        return graphql()->types()->get($type);
     }
 }

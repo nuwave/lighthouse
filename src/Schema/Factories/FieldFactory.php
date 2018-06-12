@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLField;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -34,7 +35,7 @@ class FieldFactory
 
         $args = $this->getArgs($value);
 
-        if (! $args->isEmpty()) {
+        if ($args->isNotEmpty()) {
             $field['args'] = $args->toArray();
         }
 
@@ -58,7 +59,7 @@ class FieldFactory
      */
     protected function hasResolver(FieldValue $value)
     {
-        return directives()->hasResolver($value->getField());
+        return graphql()->directives()->hasFieldResolver($value->getField());
     }
 
     /**
@@ -70,7 +71,7 @@ class FieldFactory
      */
     protected function useResolver(FieldValue $value)
     {
-        return directives()->fieldResolver($value->getField())
+        return graphql()->directives()->fieldResolver($value->getField())
             ->resolveField($value);
     }
 
@@ -102,7 +103,7 @@ class FieldFactory
      */
     protected function defaultResolver(FieldValue $value)
     {
-        if (! directives()->hasFieldMiddleware($value->getField())) {
+        if (! graphql()->directives()->hasFieldMiddleware($value->getField())) {
             // Use graphql-php default resolver
             return null;
         }
@@ -155,30 +156,23 @@ class FieldFactory
      */
     protected function getArgs(FieldValue $value)
     {
-        $factory = $this->argFactory();
-
         return collect(data_get($value->getField(), 'arguments', []))
-            ->mapWithKeys(function (InputValueDefinitionNode $arg) use ($factory, $value) {
+            ->mapWithKeys(function (InputValueDefinitionNode $arg) use ($value) {
                 $argValue = new ArgumentValue($value, $arg);
 
-                return [$argValue->getArgName() => $factory->handle($argValue)];
+                return [$argValue->getArgName() => app(ArgumentFactory::class)->handle($argValue)];
             });
     }
 
     /**
-     * Get instance of argument factory.
+     * @param FieldValue $value
      *
-     * @return ArgumentFactory
+     * @return FieldValue
      */
-    protected function argFactory()
+    protected function applyMiddleware(FieldValue $value)
     {
-        return app(ArgumentFactory::class);
-    }
-
-    protected function applyMiddleware($value)
-    {
-        return directives()->fieldMiddleware($value->getField())
-            ->reduce(function ($value, $middleware) {
+        return graphql()->directives()->fieldMiddleware($value->getField())
+            ->reduce(function (FieldValue $value, FieldMiddleware $middleware) {
                 return $middleware->handleField($value);
             }, $value);
     }

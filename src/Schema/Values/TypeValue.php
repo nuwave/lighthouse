@@ -3,10 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Language\AST\DefinitionNode;
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Collection;
 
 class TypeValue
 {
@@ -22,28 +20,28 @@ class TypeValue
      *
      * @var DefinitionNode
      */
-    protected $node;
+    protected $definition;
 
     /**
      * Create new instance of node value.
      *
-     * @param DefinitionNode $node
+     * @param DefinitionNode $definition
      */
-    public function __construct(DefinitionNode $node)
+    public function __construct(DefinitionNode $definition)
     {
-        $this->node = $node;
+        $this->definition = $definition;
     }
 
     /**
      * Set current node instance.
      *
-     * @param DefinitionNode $node
+     * @param DefinitionNode $definition
      *
      * @return self
      */
-    public function setNode(DefinitionNode $node)
+    public function setDefinition(DefinitionNode $definition)
     {
-        $this->node = $node;
+        $this->definition = $definition;
 
         return $this;
     }
@@ -67,9 +65,9 @@ class TypeValue
      *
      * @return DefinitionNode
      */
-    public function getNode()
+    public function getDefinition()
     {
-        return $this->node;
+        return $this->definition;
     }
 
     /**
@@ -87,9 +85,9 @@ class TypeValue
      *
      * @return string
      */
-    public function getNodeName()
+    public function getName()
     {
-        return data_get($this->getNode(), 'name.value');
+        return data_get($this->getDefinition(), 'name.value');
     }
 
     /**
@@ -97,9 +95,9 @@ class TypeValue
      *
      * @return array
      */
-    public function getNodeFields()
+    public function getFields()
     {
-        return data_get($this->getNode(), 'fields', []);
+        return data_get($this->getDefinition(), 'fields', []);
     }
 
     /**
@@ -109,7 +107,7 @@ class TypeValue
      */
     public function getInterfaceNames()
     {
-        return collect($this->node->interfaces)
+        return collect($this->definition->interfaces)
             ->map(function (NamedTypeNode $interface) {
                 return $interface->name->value;
             });

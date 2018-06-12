@@ -36,15 +36,14 @@ class PrintSchemaCommand extends Command
         Cache::forget(config('lighthouse.cache.key'));
 
         $schema = SchemaPrinter::doPrint(
-            graphql()->retrieveSchema()
+            graphql()->prepSchema()
         );
 
-        if($this->option('write')){
+        if ($this->option('write')) {
             $this->info('Wrote schema to the default file storage (usually storage/app)');
             Storage::put('lighthouse-schema.graphqls', $schema);
         } else {
             $this->info($schema);
         }
-
     }
 }

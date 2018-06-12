@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Nuwave\Lighthouse\Schema\Directives\Args\ArgMiddleware;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class ArgumentFactory
 {
     /**
-     * Convert field definition to type.
+     * Convert argument definition to type.
      *
      * @param ArgumentValue $value
      *
@@ -30,8 +31,8 @@ class ArgumentFactory
      */
     protected function applyMiddleware(ArgumentValue $value)
     {
-        return directives()->argMiddleware($value->getArg())
-            ->reduce(function (ArgumentValue $value, $middleware) {
+        return graphql()->directives()->argMiddleware($value->getArg())
+            ->reduce(function (ArgumentValue $value, ArgMiddleware $middleware) {
                 return $middleware->handleArgument(
                     $value->setMiddlewareDirective($middleware::name())
                 );

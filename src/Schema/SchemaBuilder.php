@@ -40,17 +40,18 @@ class SchemaBuilder
         $this->loadRootOperationFields($types);
 
         $config = SchemaConfig::create()
+            // Always set Query since it is required
             ->setQuery($types->firstWhere('name', 'Query'))
             ->setTypes($types->reject($this->isOperationType())->toArray())
             ->setDirectives($this->convertDirectives($documentAST)->toArray())
             ->setTypeLoader(function ($name) {
-                return types()->get($name);
+                return graphql()->types()->get($name);
             });
 
+        // Those are optional so only add them if they are present in the schema
         if ($mutation = $types->firstWhere('name', 'Mutation')) {
             $config->setMutation($mutation);
         }
-
         if ($subscription = $types->firstWhere('name', 'Subscription')) {
             $config->setSubscription($subscription);
         }
@@ -104,7 +105,7 @@ class SchemaBuilder
                 return app(TypeFactory::class)->toType(new TypeValue($typeDefinition));
             })->each(function (Type $type) {
                 // Register in global type registry
-                types()->register($type);
+                graphql()->types()->register($type);
             });
     }
 
