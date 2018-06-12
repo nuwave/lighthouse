@@ -12,10 +12,39 @@ use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-trait CreatesPaginators
+abstract class PaginatorCreatingDirective implements Directive
 {
-    // TODO: Ugh, get rid of this...
     use HandlesDirectives;
+
+    const PAGINATION_TYPE_PAGINATOR = 'paginator';
+    const PAGINATION_TYPE_CONNECTION = 'connection';
+
+    const PAGINATION_ALIAS_RELAY = 'relay';
+
+    /**
+     * @param string $paginationType
+     *
+     * @return bool
+     */
+    protected function isValidPaginationType($paginationType)
+    {
+        return self::PAGINATION_TYPE_PAGINATOR === $paginationType ||
+            self::PAGINATION_TYPE_CONNECTION === $paginationType;
+    }
+
+    /**
+     * @param string $paginationType
+     *
+     * @return string
+     */
+    protected function convertAliasToPaginationType($paginationType)
+    {
+        if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
+            return self::PAGINATION_TYPE_CONNECTION;
+        }
+
+        return $paginationType;
+    }
 
     /**
      * Register connection w/ schema.
@@ -29,7 +58,7 @@ trait CreatesPaginators
      *
      * @return DocumentAST
      */
-    public function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
         $connectionTypeName = $this->connectionTypeName($fieldDefinition, $parentType);
         $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
@@ -78,7 +107,7 @@ trait CreatesPaginators
      *
      * @return DocumentAST
      */
-    public function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
         $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType);
         $paginatorFieldClassName = addslashes(PaginatorField::class);

@@ -6,16 +6,16 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Directives\CreatesPaginators;
+use Nuwave\Lighthouse\Schema\Directives\PaginatorCreatingDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class PaginateDirective implements FieldResolver, FieldManipulator
+class PaginateDirective extends PaginatorCreatingDirective implements FieldResolver, FieldManipulator
 {
-    use CreatesPaginators, HandlesGlobalId, HandlesQueryFilter, HandleQueries;
+    use HandlesGlobalId, HandlesQueryFilter, HandleQueries;
 
     /**
      * Name of the directive.
@@ -39,29 +39,12 @@ class PaginateDirective implements FieldResolver, FieldManipulator
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
-        $paginatorType = $this->directiveArgValue(
-            $this->fieldDirective($fieldDefinition, self::name()),
-            'type',
-            'paginator'
-        );
-
-        switch ($paginatorType) {
-            case 'relay':
-            case 'connection':
+        switch ($this->getPaginationType($fieldDefinition)) {
+            case self::PAGINATION_TYPE_CONNECTION:
                 return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
-            case 'paginator':
-            default:
+            case self::PAGINATION_TYPE_PAGINATOR:
                 return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
         }
-    }
-
-    protected function getPaginatorType(FieldDefinitionNode $field)
-    {
-        return $this->directiveArgValue(
-            $this->fieldDirective($field, self::name()),
-            'type',
-            'paginator'
-        );
     }
 
     /**
@@ -75,15 +58,45 @@ class PaginateDirective implements FieldResolver, FieldManipulator
      */
     public function resolveField(FieldValue $value)
     {
-        $type = $this->getPaginatorType($value->getField());
+        $paginationType = $this->getPaginationType($value->getField());
 
         $model = $this->getModelClass($value);
 
-        $resolver = in_array($type, ['relay', 'connection'])
-            ? $this->connectionTypeResolver($value, $model)
-            : $this->paginatorTypeResolver($value, $model);
+        switch ($paginationType) {
+            case self::PAGINATION_TYPE_CONNECTION:
+                $resolver = $this->connectionTypeResolver($value, $model);
+                break;
+            case self::PAGINATION_TYPE_PAGINATOR:
+                $resolver = $this->paginatorTypeResolver($value, $model);
+                break;
+        }
 
         return $value->setResolver($resolver);
+    }
+
+    /**
+     * @param FieldDefinitionNode $field
+     *
+     * @throws DirectiveException
+     *
+     * @return string
+     */
+    protected function getPaginationType(FieldDefinitionNode $field)
+    {
+        $paginationType = $this->directiveArgValue(
+            $this->fieldDirective($field, self::name()),
+            'type',
+            self::PAGINATION_TYPE_PAGINATOR
+        );
+
+        $paginationType = $this->convertAliasToPaginationType($paginationType);
+        if (! $this->isValidPaginationType($paginationType)) {
+            $fieldName = $field->name->value;
+            $directiveName = self::name();
+            throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
+        }
+
+        return $paginationType;
     }
 
     /**

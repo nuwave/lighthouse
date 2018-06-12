@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\Directives\PaginatorCreatingDirective;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
@@ -24,30 +25,30 @@ class HasManyLoader extends BatchLoader
             $parents = $items->pluck('parent');
             $scopes = array_get($first, 'scopes', []);
             $relation = $first['relation'];
-            $type = $first['type'];
+            $resolverType = $first['type'];
             $args = $first['args'];
 
-            $constraints = [$relation => function ($q) use ($scopes, $args) {
+            $constraints = [$relation => function ($query) use ($scopes, $args) {
                 foreach ($scopes as $scope) {
-                    call_user_func_array([$q, $scope], [$args]);
+                    call_user_func_array([$query, $scope], [$args]);
                 }
 
-                $q->when(isset($args['query.filter']), function ($q) use ($args) {
+                $query->when(isset($args['query.filter']), function ($q) use ($args) {
                     return QueryFilter::build($q, $args);
                 });
             }];
 
-            switch ($type) {
-                case 'relay':
+            switch ($resolverType) {
+                case PaginatorCreatingDirective::PAGINATION_TYPE_PAGINATOR:
+                    $first = data_get($args, 'count', 15);
+                    $page = data_get($args, 'page', 1);
+                    $parents->fetchForPage($first, $page, $constraints);
+                    break;
+                case PaginatorCreatingDirective::PAGINATION_TYPE_CONNECTION:
                     $first = data_get($args, 'first', 15);
                     $after = $this->decodeCursor($args);
                     $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
                     $parents->fetchForPage($first, $currentPage, $constraints);
-                    break;
-                case 'paginator':
-                    $first = data_get($args, 'count', 15);
-                    $page = data_get($args, 'page', 1);
-                    $parents->fetchForPage($first, $page, $constraints);
                     break;
                 default:
                     $parents->fetch($constraints);
