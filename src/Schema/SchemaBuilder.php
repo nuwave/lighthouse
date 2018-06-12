@@ -1,243 +1,185 @@
 <?php
 
+
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
-use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
-class SchemaBuilder
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Contracts\Directives\ManipulatorDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directives\NodeManipulator;
+use Nuwave\Lighthouse\Support\Contracts\SchemaBuilder as SchemaBuilderInterface;
+use Nuwave\Lighthouse\Support\Pipeline;
+use Nuwave\Lighthouse\Types\Field;
+use Nuwave\Lighthouse\Types\Type;
+
+abstract class SchemaBuilder implements SchemaBuilderInterface
 {
-    use CanParseTypes, HandlesTypes;
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+
+    /** @var Collection */
+    protected $types;
+
+    /** @var Schema */
+    protected $schema;
 
     /**
-     * Definition weights.
+     * SchemaBuilder constructor.
      *
-     * @var array
+     * @param DirectiveRegistry $directiveRegistry
      */
-    protected $weights = [
-        \GraphQL\Language\AST\ScalarTypeDefinitionNode::class => 0,
-        \GraphQL\Language\AST\InterfaceTypeDefinitionNode::class => 1,
-        \GraphQL\Language\AST\UnionTypeDefinitionNode::class => 2,
-    ];
+    public function __construct(DirectiveRegistry $directiveRegistry)
+    {
+        $this->directiveRegistry = $directiveRegistry;
+        $this->types = collect();
+    }
+
 
     /**
-     * Collection of schema types.
+     * Generates the schema from type system language.
      *
-     * @var array
+     * It should generate the schema with extension types and run our
+     * manipulators on the types.
+     *
+     * @param string $typeLanguage
+     * @return Schema
      */
-    protected $types = [];
+    public function buildFromTypeLanguage(string $typeLanguage): Schema
+    {
+        // First parse the type language to a document node
+        $documentNode = $this->parseToDocumentNode($typeLanguage);
+
+        // Then get all the types.
+        $types = $this->getTypesFromDocumentNode($documentNode)->values();
+
+        // Then get all the types from extension types.
+        $types = $types->merge(
+            $this->getExtensionTypesFromDocumentNode($documentNode)->values()
+        );
+
+        // Then we run the manipulator on each type.
+        $types = $this->manipulate($types);
+
+        // Afterwards we merge the types which are the same together.
+        $types = $this->mergeTypes($types);
+
+        // At last we create the schema object from the types.
+        $schema = $this->createSchema($types);
+
+        $this->schema = $schema;
+
+        return $schema;
+    }
+
+    public function addType(Type $type): SchemaBuilderInterface
+    {
+        $this->types->push($type);
+        return $this;
+    }
+
 
     /**
-     * Custom (client) directives.
+     * Converts a type language into a document node.
      *
-     * @var array
-     */
-    protected $directives = [];
-
-    /**
-     * Generate a GraphQL Schema.
-     *
-     * @param string $schema
-     *
+     * @param string $typeLanguage
      * @return mixed
      */
-    public function build($schema)
-    {
-        $types = $this->register($schema);
-        $query = $types->firstWhere('name', 'Query');
-        $mutation = $types->firstWhere('name', 'Mutation');
-        $subscription = $types->firstWhere('name', 'Subscription');
-
-        $types = $types->filter(function ($type) {
-            return ! in_array($type->name, ['Query', 'Mutation', 'Subscription']);
-        })->toArray();
-
-        $directives = $this->directives;
-        $typeLoader = function ($name) {
-            return $this->instance($name);
-        };
-
-        return new Schema(compact(
-            'query',
-            'mutation',
-            'subscription',
-            'types',
-            'directives',
-            'typeLoader'
-        ));
-    }
+    public abstract function parseToDocumentNode(string $typeLanguage);
 
     /**
-     * Parse schema definitions.
+     * Should only return the normal types.
+     * It should ignore extension types totally.
      *
-     * @param string $schema
-     *
-     * @return \Illuminate\Support\Collection
+     * @param $documentNode
+     * @return Collection
      */
-    public function register($schema)
-    {
-        $document = $schema instanceof DocumentNode
-            ? $schema
-            : $this->parseSchema($schema);
+    public abstract function getTypesFromDocumentNode($documentNode) : Collection;
 
-        $this->setTypes($document);
-        $this->extendTypes($document);
-        $this->setDirectives($document);
-        $this->injectNodeField();
-
-        return collect($this->types);
-    }
 
     /**
-     * Resolve instance by name.
+     * Should return extension types.
+     * It should not merge the extension types together if they are the same type.
      *
-     * @param string $type
-     *
-     * @return mixed
+     * @param $documentNode
+     * @return Collection
      */
-    public function instance($type)
-    {
-        return collect($this->types)
-        ->first(function ($instance) use ($type) {
-            return $instance->name === $type;
-        });
-    }
+    public abstract function getExtensionTypesFromDocumentNode($documentNode) : Collection;
 
     /**
-     * Get all registered types.
+     * Merges types with the same name together.
      *
-     * @return array
+     * @param Collection $types
+     * @return Collection
      */
-    public function types()
+    public function mergeTypes(Collection $types) : Collection
     {
-        return $this->types;
-    }
-
-    /**
-     * Add type to register.
-     *
-     * @param ObjectType|array $type
-     */
-    public function type($type)
-    {
-        $this->types = is_array($type)
-            ? array_merge($this->types, $type)
-            : array_merge($this->types, [$type]);
-    }
-
-    /**
-     * Serialize AST.
-     *
-     * @return string
-     */
-    public function serialize()
-    {
-        $schema = collect($this->types)->map(function ($type) {
-            return $this->serializeableType($type);
-        })->toArray();
-
-        return serialize($schema);
-    }
-
-    /**
-     * Unserialize AST.
-     *
-     * @param string $schema
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function unserialize($schema)
-    {
-        $this->types = collect(unserialize($schema))->map(function ($type) {
-            return $this->unpackType($type);
-        });
-
-        return collect($this->types);
-    }
-
-    /**
-     * Set schema types.
-     *
-     * @param DocumentNode $document
-     */
-    protected function setTypes(DocumentNode $document)
-    {
-        $types = collect($document->definitions)->reject(function ($node) {
-            return $node instanceof TypeExtensionDefinitionNode
-                || $node instanceof DirectiveDefinitionNode;
-        })->sortBy(function ($node) {
-            return array_get($this->weights, get_class($node), 9);
-        })->map(function (Node $node) {
-            return app(NodeFactory::class)->handle(new NodeValue($node));
-        })->toArray();
-
-        // NOTE: We don't assign this above because new types may be
-        // declared by directives.
-        $this->types = array_merge($this->types, $types);
-    }
-
-    /**
-     * Set custom client directives.
-     *
-     * @param DocumentNode $document
-     *
-     * @return array
-     */
-    protected function setDirectives(DocumentNode $document)
-    {
-        $this->directives = collect($document->definitions)->filter(function ($node) {
-            return $node instanceof DirectiveDefinitionNode;
-        })->map(function (Node $node) {
-            return app(NodeFactory::class)->handle(new NodeValue($node));
-        })->toArray();
-    }
-
-    /**
-     * Extend registered types.
-     *
-     * @param DocumentNode $document
-     */
-    protected function extendTypes(DocumentNode $document)
-    {
-        collect($document->definitions)->filter(function ($def) {
-            return $def instanceof TypeExtensionDefinitionNode;
-        })->each(function (TypeExtensionDefinitionNode $extension) {
-            $name = $extension->definition->name->value;
-
-            if ($type = collect($this->types)->firstWhere('name', $name)) {
-                $value = new NodeValue($extension);
-
-                app(NodeFactory::class)->handle($value->setType($type));
+        // Map all types which has the same name to one name.
+        $types = $types->groupBy('name')->map(function (Collection $types) {
+            // If there only is one type in the group
+            // then return that type.
+            if($types->count() == 1) {
+                return $types->first();
             }
+
+            // Merge all the fields of the same type to one type.
+            $mergedType = $types->reduce(function ($carry, Type $item) {
+                if(is_null($carry)) {
+                    return $item;
+                }
+                // Add all the fields to the item.
+                $item->fields()->each(function (Field $field) use ($carry) {
+                    $carry->addField($field);
+                });
+                return $carry;
+            });
+
+            return $mergedType;
         });
+
+        return $types;
     }
 
     /**
-     * Inject node field into Query.
+     * Create a schema from a collection of types.
+     *
+     * @param Collection $types
+     * @return Schema
      */
-    protected function injectNodeField()
+    public function createSchema(Collection $types) : Schema
     {
-        if (is_null(config('lighthouse.global_id_field'))) {
-            return;
-        }
+        return new Schema($types);
+    }
 
-        if (! $query = $this->instance('Query')) {
-            return;
-        }
+    /**
+     * Run the manipulator on each type.
+     *
+     * @param Collection $types
+     * @return Collection
+     */
+    public function manipulate(Collection $types) : Collection
+    {
+        // Resolve the manipulators
+        $types = $types->each(function (Type $type) use (&$types){
+            // Get all directives which are node manipulators
+            $manipulators = $this->directiveRegistry->getFromDirectives($type->directives())
+                ->filter(function (Directive $directive) {
+                    return $directive instanceof NodeManipulator;
+            });
 
-        $this->extendTypes($this->parseSchema('
-        extend type Query {
-            node(id: ID!): Node
-                @field(resolver: "Nuwave\\\Lighthouse\\\Support\\\Http\\\GraphQL\\\Queries\\\NodeQuery@resolve")
-        }
-        '));
+            // Resolve the manipulators on the node.
+            /** @var ManipulatorInfo $manipulatorInfo */
+            $manipulatorInfo = app(Pipeline::class)
+                ->send(new ManipulatorInfo($types, $type))
+                ->through($manipulators)
+                ->via('manipulateNode')
+                ->then(function($value) {
+                    return $value;
+                });
+
+            $types = $manipulatorInfo->getTypes();
+
+        });
+        return $types;
     }
 }

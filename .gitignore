@@ -6,3 +6,5 @@ vendor
 .idea
 .php_cs.cache
 phpunit.xml
+/src2/
+/tests2/

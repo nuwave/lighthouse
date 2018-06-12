@@ -2,16 +2,21 @@
 
 namespace Tests\Utils\Resolvers;
 
-use GraphQL\Type\Definition\ResolveInfo;
+
+use Nuwave\Lighthouse\Schema\ResolveInfo;
 
 class Foo
 {
-    public function bar($root, array $args, $context = null, ResolveInfo $info = null)
+    public function bar(ResolveInfo $resolveInfo)
     {
-        return 'foo.bar';
+
+        $resolveInfo->result([
+            $resolveInfo->field()->name() => "foo"
+        ]);
+        return $resolveInfo;
     }
 
-    public function baz($root, array $args, $context = null, ResolveInfo $info = null)
+    public function baz()
     {
         return array_get($args, 'directive.0');
     }

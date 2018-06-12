@@ -7,8 +7,6 @@ use Nuwave\Lighthouse\Support\Traits\IsRelayConnection;
 
 class User extends Authenticatable
 {
-    use IsRelayConnection;
-
     public function company()
     {
         return $this->belongsTo(Company::class);

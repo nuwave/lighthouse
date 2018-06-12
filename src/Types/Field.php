@@ -1,0 +1,142 @@
+<?php
+
+
+namespace Nuwave\Lighthouse\Types;
+
+
+use Closure;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Traits\CanManipulate;
+use Nuwave\Lighthouse\Schema\Traits\HasDescription;
+use Nuwave\Lighthouse\Schema\Traits\HasDirectives;
+use Nuwave\Lighthouse\Schema\Traits\HasName;
+use Nuwave\Lighthouse\Support\Pipeline;
+
+class Field
+{
+    use HasAttributes, HasDirectives, HasName, CanManipulate, HasDescription;
+
+    protected $type;
+
+    protected $arguments;
+
+    protected $resolver;
+
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+
+    /**
+     * Field constructor.
+     *
+     * @param DirectiveRegistry $directiveRegistry
+     * @param string $name
+     * @param string $description
+     * @param Type $type
+     * @param Closure $arguments
+     * @param Closure|null $directives
+     * @param Closure|null $resolver
+     */
+    public function __construct(
+        DirectiveRegistry $directiveRegistry,
+        string $name,
+        ?string $description,
+        Type $type,
+        Closure $arguments = null,
+        Closure $directives = null,
+        Closure $resolver = null
+    )
+    {
+        $this->directiveRegistry = $directiveRegistry;
+        $this->name = $name;
+        $this->description = $description;
+        $this->type = $type;
+        $this->arguments = $arguments ?? function() {return collect();};
+        $this->directives = $directives ?? function() {return collect();};
+        $this->resolver = $resolver;
+    }
+
+    public function type() : Type
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param Type $type
+     */
+    public function setType(Type $type): void
+    {
+        $this->type = $type;
+    }
+
+    public function arguments() : Collection
+    {
+        return($this->arguments)();
+    }
+
+    public function argument($name) : ?Argument
+    {
+        return $this->arguments()->first(function (Argument $argument) use ($name) {
+            return $argument->name() == $name;
+        });
+    }
+
+    public function addArgument(Argument $argument)
+    {
+        $arguments = $this->arguments();
+        $this->arguments = function () use ($argument, $arguments){
+            return $arguments->merge([$argument]);
+        };
+    }
+
+    public function hasArgument($name)
+    {
+        return !is_null($this->argument($name));
+    }
+
+    public function hasResolver() : bool
+    {
+        // Checks if arguments has any resolvers, then check if
+        // Directives on the field has any resolver and then
+        // check if the field itself has a resolver.
+        return $this->arguments()->filter(function (Argument $argument) {
+            return $argument->hasResolver();
+        })->isNotEmpty() ||
+            $this->directives()->isNotEmpty() ||
+            !is_null($this->resolver);
+    }
+
+    public function resolver(ResolveInfo $resolveInfo) : Closure
+    {
+        return function () use ($resolveInfo) {
+            // Resolve arguments first
+            $this->arguments()->each(function (Argument $argument) use (&$resolveInfo) {
+                $resolveInfo = ($argument->resolver($resolveInfo))();
+            });
+
+            // Then resolve with supplied resolver
+            if(!is_null($this->resolver)) {
+                $resolveInfo = ($this->resolver)($resolveInfo);
+            }
+
+            // Then resolve with directives.
+            $resolveInfo = app(Pipeline::class)
+                ->send($resolveInfo)
+                ->through($this->directiveRegistry->getFromDirectives($this->directives()))
+                ->via('handleField')
+                ->then(function($value) {
+                    return $value;
+                });
+
+            // Then resolve all resolvers from the arguments.
+            $this->arguments()->each(function (Argument $argument) use (&$resolveInfo) {
+                $resolveInfo = ($argument->resolver($resolveInfo))();
+            });
+
+            $resolveInfo->runAfters();
+
+            return $resolveInfo;
+        };
+    }
+}

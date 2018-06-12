@@ -1,41 +1,40 @@
 <?php
 
+
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class AuthDirective implements FieldResolver
+use Closure;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\Directives\FieldDirective;
+
+class AuthDirective implements FieldDirective
 {
-    use HandlesDirectives;
+    protected $authFactory;
 
     /**
-     * Name of the directive.
+     * AuthDirective constructor.
      *
-     * @return string
+     * @param $authFactory
      */
+    public function __construct(AuthFactory $authFactory)
+    {
+        $this->authFactory = $authFactory;
+    }
+
     public function name()
     {
         return 'auth';
     }
 
-    /**
-     * Resolve the field directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
-     */
-    public function resolveField(FieldValue $value)
+    public function handleField(ResolveInfo $resolveInfo, Closure $next)
     {
-        $guard = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'guard'
-        );
+        $arg = $resolveInfo->field()->directive($this->name())->argument('guard');
+        $guard = optional($arg)->defaultValue();
 
-        return $value->setResolver(function () use ($guard) {
-            return auth($guard)->user();
-        });
+        $resolveInfo->result($this->authFactory->guard($guard)->user());
+
+        return $next($resolveInfo);
     }
 }

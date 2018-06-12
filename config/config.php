@@ -52,15 +52,15 @@ return [
         'scalars' => 'App\\Http\\GraphQL\\Scalars',
     ],
 
-     /*
-     |--------------------------------------------------------------------------
-     | GraphQL Controller
-     |--------------------------------------------------------------------------
-     |
-     | Specify which controller (and method) you want to handle GraphQL requests.
-     |
-     */
-    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
+    /*
+    |--------------------------------------------------------------------------
+    | GraphQL Controller
+    |--------------------------------------------------------------------------
+    |
+    | Specify which controller (and method) you want to handle GraphQL requests.
+    |
+    */
+    'controller' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -77,8 +77,8 @@ return [
     | Global ID
     |--------------------------------------------------------------------------
     |
-    | When creating a GraphQL type that is Relay compliant, provide a named field
-    | for the Node identifier.
+    | When creating a GraphQL type that is Relay compliant, provide a named
+    | field for the Node identifier.
     |
     */
     'global_id_field' => '_id',
@@ -96,4 +96,40 @@ return [
     'schema' => [
         'register' => base_path('routes/graphql/schema.graphql'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Handlers
+    |--------------------------------------------------------------------------
+    |
+    | This defines the paths for the handlers used in the program. You can
+    | extend them or replace them for customization.
+    |
+    */
+    'handlers' => [
+        'error' => \Nuwave\Lighthouse\Support\Exceptions\Handler::class
+    ],
+    
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Schema Builder
+    |--------------------------------------------------------------------------
+    |
+    | This class builds a Schema from the schema definition string.
+    | It must implement the SchemaBuilder interface.
+    |
+    */
+    'schema_builder' => \Nuwave\Lighthouse\DigiaOnlineSchemaBuilder::class,
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Executor
+    |--------------------------------------------------------------------------
+    |
+    | This class executes a query on the internal schema and returns a result.
+    | It must implement the Executor interface.
+    |
+    */
+    'executor' => \Nuwave\Lighthouse\DigiaOnlineExecutor::class,
 ];

@@ -1,106 +1,42 @@
 <?php
 
+
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Illuminate\Pagination\Paginator;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Database\QueryFilter;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandleQueries;
-use Nuwave\Lighthouse\Support\Traits\CreatesPaginators;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
-use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class PaginateDirective implements FieldResolver
+use Closure;
+use Nuwave\Lighthouse\Schema\ManipulatorInfo;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\Directives\FieldDirective;
+use Nuwave\Lighthouse\Support\Contracts\Directives\ManipulatorDirective;
+use Nuwave\Lighthouse\Types\Argument;
+use Nuwave\Lighthouse\Types\NonNullType;
+use Nuwave\Lighthouse\Types\Scalar\IntType;
+use Nuwave\Lighthouse\Types\Scalar\StringType;
+
+class PaginateDirective implements FieldDirective, ManipulatorDirective
 {
-    use CreatesPaginators, HandlesGlobalId, HandlesQueryFilter, HandleQueries;
 
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
     public function name()
     {
         return 'paginate';
     }
 
-    /**
-     * Resolve the field directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
-     * @throws DirectiveException
-     */
-    public function resolveField(FieldValue $value)
+    public function handleField(ResolveInfo $resolveInfo, Closure $next)
     {
-        $type = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'type',
-            'paginator'
-        );
 
-        $model = $this->getModelClass($value);
-
-        $resolver = in_array($type, ['relay', 'connection'])
-            ? $this->connectionTypeResolver($value, $model)
-            : $this->paginatorTypeResolver($value, $model);
-
-        return $value->setResolver($resolver);
     }
 
-    /**
-     * Create a paginator resolver.
-     *
-     * @param FieldValue $value
-     * @param string     $model
-     *
-     * @return \Closure
-     */
-    protected function paginatorTypeResolver(FieldValue $value, $model)
+    public function handleManipulator(ManipulatorInfo $info, Closure $next)
     {
-        $this->registerPaginator($value);
+       //dd($info->field()->type()->getUnderlyingName());
 
-        return function ($root, array $args) use ($model, $value) {
-            $first = data_get($args, 'count', 15);
-            $page = data_get($args, 'page', 1);
-
-            $query = $this->applyFilters($model::query(), $args);
-            $query = $this->applyScopes($query, $args, $value);
-
-            Paginator::currentPageResolver(function() use ($page) {
-                return $page;
-            });
-            return $query->paginate($first);
-        };
-    }
-
-    /**
-     * Create a connection resolver.
-     *
-     * @param FieldValue $value
-     * @param string     $model
-     *
-     * @return \Closure
-     */
-    protected function connectionTypeResolver(FieldValue $value, $model)
-    {
-        $this->registerConnection($value);
-
-        return function ($root, array $args) use ($model, $value) {
-            $first = data_get($args, 'first', 15);
-            $after = $this->decodeCursor($args);
-            $page = $first && $after ? floor(($first + $after) / $first) : 1;
-
-            $query = $this->applyFilters($model::query(), $args);
-            $query = $this->applyScopes($query, $args, $value);
-
-            Paginator::currentPageResolver(function() use ($page) {
-                return $page;
-            });
-            return $query->paginate($first);
-        };
+        $info->field()->addArgument(new Argument(
+            "count",
+            null,
+            NonNullType::ofType(IntType::instance())
+        ));
+        //dd($info->schema()->type('Query')->resolvedField('users')->arguments());
+        return $next($info);
     }
 }

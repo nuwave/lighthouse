@@ -1,64 +1,42 @@
 <?php
 
+
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\DirectiveNode;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\CanParseResolvers;
 
-class FieldDirective implements FieldResolver
+use Closure;
+use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Schema\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\Directives\FieldDirective as FieldDirectiveInterface;
+use Nuwave\Lighthouse\Support\Exceptions\InvalidArgsException;
+
+class FieldDirective implements FieldDirectiveInterface
 {
-    use CanParseResolvers;
 
-    /**
-     * Field resolver.
-     *
-     * @var string
-     */
-    protected $resolver;
-
-    /**
-     * Field resolver method.
-     *
-     * @var string
-     */
-    protected $method;
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
     public function name()
     {
-        return 'field';
+        return "field";
     }
 
-    /**
-     * Resolve the field directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
-     */
-    public function resolveField(FieldValue $value)
+    public function handleField(ResolveInfo $resolveInfo, Closure $next)
     {
-        $directive = $this->fieldDirective($value->getField(), $this->name());
-        $resolver = $this->getResolver($value, $directive);
-        $method = $this->getResolverMethod($directive);
-        $data = $this->argValue(collect($directive->arguments)->first(function ($arg) {
-            return 'args' === data_get($arg, 'name.value');
-        }));
+        $resolver = optional($resolveInfo->field()->directive($this->name())->argument('resolver'))->defaultValue();
 
-        return $value->setResolver(function ($root, array $args, $context = null, $info = null) use ($resolver, $method, $data) {
-            $instance = app($resolver);
+        if(!is_null($resolver)) {
+            $resolver = Str::parseCallback($resolver);
+        } else {
+            $resolver[0] = optional($resolveInfo->field()->directive($this->name())->argument('class'))->defaultValue();
+            $resolver[1] = optional($resolveInfo->field()->directive($this->name())->argument('method'))->defaultValue();
+        }
 
-            return call_user_func_array(
-                [$instance, $method],
-                [$root, array_merge($args, ['directive' => $data]), $context, $info]
-            );
-        });
+        // Check if method and class for the resolver is set.
+        if(sizeof($resolver) != 2 || empty($resolver[0]) || empty($resolver[1]))
+        {
+            throw new InvalidArgsException("Directive [{$this->name()}] has invalid args.");
+        }
+
+        $resolver[0] = app($resolver[0]);
+
+        return $next(call_user_func_array($resolver, [$resolveInfo]));
     }
 }
