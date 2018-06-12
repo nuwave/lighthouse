@@ -28,6 +28,8 @@ class LighthouseServiceProvider extends ServiceProvider
             config('lighthouse.executor')
         );
 
+        $this->app->singleton(DirectiveRegistry::class, DirectiveRegistry::class);
+
         $this->app->singleton(GraphQL::class, function () {
             return new GraphQL(
                 app(SchemaBuilder::class),
