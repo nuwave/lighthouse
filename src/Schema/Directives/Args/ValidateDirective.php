@@ -36,14 +36,14 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
     public function handleField(FieldValue $value)
     {
         $validator = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
+            $this->fieldDirective($value->getFieldDefinition(), self::name()),
             'validator'
         );
 
         if (! $validator) {
-            $message = 'A `validator` argument must be supplied on the @validate field directive';
-
-            throw new DirectiveException($message);
+            $fieldName = $value->getFieldName();
+            $directiveName = self::name();
+            throw new DirectiveException("A `validator` argument must be supplied for the @$directiveName directive on field $fieldName");
         }
 
         $resolver = $value->getResolver();

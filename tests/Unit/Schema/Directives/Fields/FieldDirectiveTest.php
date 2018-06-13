@@ -30,13 +30,13 @@ class FieldDirectiveTest extends TestCase
      */
     public function itCanResolveFieldWithMergedArgs()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
             type Foo {
                 bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
             }
-        ';
+        ');
 
-        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
+        $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
         $resolve = array_get($fields, 'bar.resolve');
 

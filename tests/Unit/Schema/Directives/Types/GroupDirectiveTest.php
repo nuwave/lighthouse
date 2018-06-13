@@ -12,9 +12,9 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetNamespaceThroughType()
     {
         $this->assertCanSetNamespace('
-        type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
-            me: String @field(resolver: "Foo@bar")
-        }
+            type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
+                me: String @field(resolver: "Foo@bar")
+            }
         ');
     }
 
@@ -24,10 +24,10 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetNamespaceThroughTypeExtension()
     {
         $this->assertCanSetNamespace('
-        type Query {}
-        extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
-            me: String @field(resolver: "Foo@bar")
-        }
+            type Query {}
+            extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
+                me: String @field(resolver: "Foo@bar")
+            }
         ');
     }
 
@@ -43,9 +43,9 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetMiddlewareThroughType()
     {
         $this->assertSetMiddleware('
-        type Query @group(middleware: ["foo", "bar"]) {
-            me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
-        }
+            type Query @group(middleware: ["foo", "bar"]) {
+                me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
+            }
         ');
     }
 
@@ -56,9 +56,9 @@ class GroupDirectiveTest extends TestCase
     {
         $this->assertSetMiddleware('
         type Query {}
-        extend type Query @group(middleware: ["foo", "bar"]) {
-            me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
-        }
+            extend type Query @group(middleware: ["foo", "bar"]) {
+                me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
+            }
         ');
     }
 

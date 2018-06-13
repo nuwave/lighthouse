@@ -8,7 +8,7 @@ use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 
-class BelongsToTest extends DBTestCase
+class BelongsToDirectiveTest extends DBTestCase
 {
     use RefreshDatabase;
 

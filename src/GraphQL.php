@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
@@ -94,16 +95,22 @@ class GraphQL
     /**
      * Execute GraphQL query.
      *
-     * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
+     * @param string       $query
+     * @param Context|null $context
+     * @param array        $variables
+     * @param mixed        $rootValue
      *
      * @return array
      */
     public function execute($query, $context = null, $variables = [], $rootValue = null)
     {
-        $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
+        $result = GraphQLBase::executeQuery(
+            $this->prepSchema(),
+            $query,
+            $rootValue,
+            $context,
+            $variables
+        );
 
         if (! empty($result->errors)) {
             foreach ($result->errors as $error) {
@@ -123,27 +130,6 @@ class GraphQL
         }
 
         return ['data' => $result->data];
-    }
-
-    /**
-     * Execute GraphQL query.
-     *
-     * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
-     *
-     * @return \GraphQL\Executor\ExecutionResult
-     */
-    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
-    {
-        return GraphQLBase::executeQuery(
-            $this->prepSchema(),
-            $query,
-            $rootValue,
-            $context,
-            $variables
-        );
     }
 
     /**

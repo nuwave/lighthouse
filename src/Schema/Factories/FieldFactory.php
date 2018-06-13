@@ -3,76 +3,56 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLField;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 
 class FieldFactory
 {
     /**
      * Convert field definition to type.
      *
-     * @param FieldValue $value
+     * @param Node      $fieldDefinition
+     * @param TypeValue $parentType
      *
      * @return array
      */
-    public function handle(FieldValue $value)
+    public static function handle(Node $fieldDefinition, TypeValue $parentType)
     {
-        $value->setType(NodeResolver::resolve($value->getField()->type));
+        $fieldValue = new FieldValue($fieldDefinition, $parentType);
 
-        $value = $this->applyMiddleware($value);
+        $resolverDirective = $fieldValue->resolverDirective();
+        $fieldValue->setResolver($resolverDirective instanceof FieldResolver
+            ? $resolverDirective->resolveField($fieldValue)
+            : self::defaultResolver($fieldValue)
+        );
 
-        $this->hasResolver($value)
-            ? $this->useResolver($value)
-            : $value->setResolver($this->resolver($value));
+        $fieldValue->setResolver(self::applyMiddleware($fieldValue));
 
-        $field = [
-            'type' => $value->getType(),
-            'description' => $value->getDescription(),
+        $attributes = [
+            'type' => $fieldValue->getReturnTypeInstance(),
+            'description' => $fieldValue->getDescription(),
         ];
 
-        $args = $this->getArgs($value);
+        $args = self::getArgs($fieldValue);
 
         if ($args->isNotEmpty()) {
-            $field['args'] = $args->toArray();
+            $attributes['args'] = $args->toArray();
         }
 
-        if ($resolve = $value->getResolver()) {
-            $field['resolve'] = $value->wrap($resolve);
+        if ($resolve = $fieldValue->getResolver()) {
+            $attributes['resolve'] = $fieldValue->wrap($resolve);
         }
 
-        if ($complexity = $value->getComplexity()) {
-            $field['complexity'] = $complexity;
+        if ($complexity = $fieldValue->getComplexity()) {
+            $attributes['complexity'] = $complexity;
         }
 
-        return GraphQLField::toArray($field);
-    }
-
-    /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return bool
-     */
-    protected function hasResolver(FieldValue $value)
-    {
-        return graphql()->directives()->hasFieldResolver($value->getField());
-    }
-
-    /**
-     * Use directive resolver to transform field.
-     *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
-     */
-    protected function useResolver(FieldValue $value)
-    {
-        return graphql()->directives()->fieldResolver($value->getField())
-            ->resolveField($value);
+        return GraphQLField::toArray($attributes);
     }
 
     /**
@@ -82,37 +62,17 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function resolver(FieldValue $value)
+    protected static function defaultResolver(FieldValue $value)
     {
-        switch ($value->getNodeName()) {
+        switch ($value->getParentTypeName()) {
             case 'Mutation':
-                return $this->mutationResolver($value);
+                return self::mutationResolver($value);
             case 'Query':
-                return $this->queryResolver($value);
+                return self::queryResolver($value);
             default:
-                return $this->defaultResolver($value);
+                // Use graphql-php default resolver
+                return \Closure::fromCallable([\GraphQL\Executor\Executor::class, 'defaultFieldResolver']);
         }
-    }
-
-    /**
-     * Default field resolver.
-     *
-     * @param FieldValue $value
-     *
-     * @return \Closure|null
-     */
-    protected function defaultResolver(FieldValue $value)
-    {
-        if (! graphql()->directives()->hasFieldMiddleware($value->getField())) {
-            // Use graphql-php default resolver
-            return null;
-        }
-
-        $name = $value->getFieldName();
-
-        return function ($parent, array $args) use ($name) {
-            return data_get($parent, $name);
-        };
     }
 
     /**
@@ -122,7 +82,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function mutationResolver(FieldValue $value)
+    protected static function mutationResolver(FieldValue $value)
     {
         return function ($obj, array $args, $context = null, $info = null) use ($value) {
             $class = config('lighthouse.namespaces.mutations').'\\'.studly_case($value->getFieldName());
@@ -138,7 +98,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function queryResolver(FieldValue $value)
+    protected static function queryResolver(FieldValue $value)
     {
         return function ($obj, array $args, $context = null, $info = null) use ($value) {
             $class = config('lighthouse.namespaces.queries').'\\'.studly_case($value->getFieldName());
@@ -154,9 +114,9 @@ class FieldFactory
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function getArgs(FieldValue $value)
+    protected static function getArgs(FieldValue $value)
     {
-        return collect(data_get($value->getField(), 'arguments', []))
+        return collect(data_get($value->getFieldDefinition(), 'arguments', []))
             ->mapWithKeys(function (InputValueDefinitionNode $arg) use ($value) {
                 $argValue = new ArgumentValue($value, $arg);
 
@@ -167,13 +127,14 @@ class FieldFactory
     /**
      * @param FieldValue $value
      *
-     * @return FieldValue
+     * @return \Closure
      */
-    protected function applyMiddleware(FieldValue $value)
+    protected static function applyMiddleware(FieldValue $value)
     {
-        return graphql()->directives()->fieldMiddleware($value->getField())
+        return $value->middlewareDirectives()
             ->reduce(function (FieldValue $value, FieldMiddleware $middleware) {
                 return $middleware->handleField($value);
-            }, $value);
+            }, $value)
+            ->getResolver();
     }
 }

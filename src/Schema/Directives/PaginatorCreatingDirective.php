@@ -8,11 +8,12 @@ use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\Fields\AbstractFieldDirective;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-abstract class PaginatorCreatingDirective implements Directive
+abstract class PaginatorCreatingDirective extends AbstractFieldDirective
 {
     use HandlesDirectives;
 
@@ -81,7 +82,7 @@ abstract class PaginatorCreatingDirective implements Directive
         ");
         $current->setDefinition($connectionEdge);
 
-        $connectionArguments = PartialParser::arguments([
+        $connectionArguments = PartialParser::inputValues([
             'first: Int!',
             'after: String',
         ]);
@@ -121,7 +122,7 @@ abstract class PaginatorCreatingDirective implements Directive
         ");
         $current->setDefinition($paginatorType);
 
-        $paginationArguments = PartialParser::arguments([
+        $paginationArguments = PartialParser::inputValues([
             'count: Int!',
             'page: Int',
         ]);
@@ -190,6 +191,11 @@ abstract class PaginatorCreatingDirective implements Directive
         return str_singular($fieldDefinition->name->value);
     }
 
+    /**
+     * @param ObjectTypeDefinitionNode $objectType
+     *
+     * @return string
+     */
     protected function parentTypeName(ObjectTypeDefinitionNode $objectType)
     {
         $name = $objectType->name->value;

@@ -54,7 +54,7 @@ class NodeTest extends DBTestCase
 
     public function resolveNode($id)
     {
-        if ($this->node['id'] == $id) {
+        if ($this->node['id'] === $id) {
             return $this->node;
         }
     }

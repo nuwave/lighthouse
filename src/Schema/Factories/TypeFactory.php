@@ -8,6 +8,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -90,7 +91,8 @@ class TypeFactory
                 return $this->objectType($value);
             case InputObjectTypeDefinitionNode::class:
                 return $this->inputObjectType($value);
-            // todo deal with UnionTypes
+            case UnionTypeDefinitionNode::class:
+                throw new \Exception('Union types need to have the @union directive defined to resolve them.');
             default:
                 throw new \Exception("Unknown type for Node [{$value->getName()}]");
         }

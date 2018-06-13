@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\AST;
 
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\SyntaxError;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Exceptions\ParseException;
@@ -96,5 +97,15 @@ class PartialParserTest extends TestCase
                 bar: Int
             }
         ']);
+    }
+
+    public function testParseOperationDefinition()
+    {
+        $this->assertInstanceOf(OperationDefinitionNode::class,
+            PartialParser::operationDefinition('
+            {
+                foo: Foo
+            }
+        '));
     }
 }

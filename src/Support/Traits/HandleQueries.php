@@ -18,7 +18,7 @@ trait HandleQueries
     public function getModelClass(FieldValue $value)
     {
         $model = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
+            $this->fieldDirective($value->getFieldDefinition(), self::name()),
             'model'
         );
 
@@ -26,7 +26,7 @@ trait HandleQueries
             $message = sprintf(
                 'A `model` argument must be assigned to the %s directive on the %s field [%s]',
                 self::name(),
-                $value->getNodeName(),
+                $value->getParentTypeName(),
                 $value->getFieldName()
             );
 
@@ -50,7 +50,7 @@ trait HandleQueries
     protected function getScopes(FieldValue $value)
     {
         return $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
+            $this->fieldDirective($value->getFieldDefinition(), self::name()),
             'scopes',
             []
         );

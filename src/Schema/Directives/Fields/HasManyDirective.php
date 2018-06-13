@@ -38,7 +38,7 @@ class HasManyDirective extends PaginatorCreatingDirective implements FieldResolv
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
-        $paginationType = $this->getResolverType($fieldDefinition);
+        $paginationType = $this->getResolverType();
 
         switch ($paginationType) {
             case self::PAGINATION_TYPE_PAGINATOR:
@@ -56,37 +56,31 @@ class HasManyDirective extends PaginatorCreatingDirective implements FieldResolv
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
+     * @return \Closure
      */
     public function resolveField(FieldValue $value)
     {
-        $relation = $this->getRelationshipName($value->getField());
-        $type = $this->getResolverType($value->getField());
+        $relation = $this->associatedArgValue('relation', $this->fieldDefinition->name->value);
+        $type = $this->getResolverType();
 
-        $scopes = $this->getScopes($value);
+        $scopes = $this->associatedArgValue('scopes', []);
 
-        return $value->setResolver(function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes, $type) {
+        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes, $type) {
             return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
                 compact('relation', 'parent', 'args', 'scopes'),
                 ['type' => $type]
             ), HasManyLoader::key($parent, $relation, $info));
-        });
+        };
     }
 
     /**
-     * @param FieldDefinitionNode $field
-     *
      * @throws DirectiveException
      *
      * @return string
      */
-    protected function getResolverType(FieldDefinitionNode $field)
+    protected function getResolverType()
     {
-        $paginationType = $this->directiveArgValue(
-            $this->fieldDirective($field, self::name()),
-            'type',
-            'default'
-        );
+        $paginationType = $this->associatedArgValue('type', 'default');
 
         if ('default' === $paginationType) {
             return $paginationType;
@@ -94,43 +88,11 @@ class HasManyDirective extends PaginatorCreatingDirective implements FieldResolv
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
         if (! $this->isValidPaginationType($paginationType)) {
-            $fieldName = $field->name->value;
+            $fieldName = $this->fieldDefinition->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
         }
 
         return $paginationType;
-    }
-
-    /**
-     * Get has many relationship name.
-     *
-     * @param FieldDefinitionNode $field
-     *
-     * @return string
-     */
-    protected function getRelationshipName(FieldDefinitionNode $field)
-    {
-        return $this->directiveArgValue(
-            $this->fieldDirective($field, self::name()),
-            'relation',
-            $field->name->value
-        );
-    }
-
-    /**
-     * Get scope(s) to run on connection.
-     *
-     * @param FieldValue $value
-     *
-     * @return array
-     */
-    protected function getScopes(FieldValue $value)
-    {
-        return $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
-            'scopes',
-            []
-        );
     }
 }

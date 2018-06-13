@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class RenameDirective implements FieldResolver
+class RenameDirective extends AbstractFieldDirective implements FieldResolver
 {
     use HandlesDirectives;
 
@@ -29,10 +29,7 @@ class RenameDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $attribute = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
-            'attribute'
-        );
+        $attribute = $this->associatedArgValue('attribute');
 
         if (! $attribute) {
             throw new DirectiveException(sprintf(
@@ -41,8 +38,8 @@ class RenameDirective implements FieldResolver
             ));
         }
 
-        return $value->setResolver(function ($parent, array $args) use ($attribute) {
+        return function ($parent, array $args) use ($attribute) {
             return data_get($parent, $attribute);
-        });
+        };
     }
 }

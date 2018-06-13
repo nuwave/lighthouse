@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class FindDirective implements FieldResolver
+class FindDirective extends AbstractFieldDirective implements FieldResolver
 {
     use HandleQueries, HandlesDirectives, HandlesQueryFilter;
 
@@ -31,13 +31,13 @@ class FindDirective implements FieldResolver
      *
      * @throws DirectiveException
      *
-     * @return FieldValue
+     * @return \Closure
      */
     public function resolveField(FieldValue $value)
     {
         $model = $this->getModelClass($value);
 
-        return $value->setResolver(function ($root, $args) use ($model, $value) {
+        return function ($root, $args) use ($model, $value) {
             /** @var Builder $query */
             $query = $this->applyFilters($model::query(), $args);
             $query = $this->applyScopes($query, $args, $value);
@@ -47,6 +47,6 @@ class FindDirective implements FieldResolver
             }
 
             return $query->first();
-        });
+        };
     }
 }

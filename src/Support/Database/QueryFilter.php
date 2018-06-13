@@ -24,7 +24,7 @@ class QueryFilter
     {
         $handler = sprintf(
             'query.filter.%s.%s',
-            strtolower($value->getField()->getNodeName()),
+            strtolower($value->getField()->getParentTypeName()),
             strtolower($value->getField()->getFieldName())
         );
 

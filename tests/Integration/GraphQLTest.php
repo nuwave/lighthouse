@@ -79,14 +79,14 @@ class GraphQLTest extends DBTestCase
     {
         $this->be($this->user);
         $query = '
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
+            query UserWithTasks {
+                user {
+                    email
+                    tasks {
+                        name
+                    }
                 }
             }
-        }
         ';
 
         $data = graphql()->execute($query);

@@ -17,7 +17,7 @@ trait HandlesDirectives
      * @param Node   $node
      * @param string $name
      *
-     * @return DirectiveNode
+     * @return DirectiveNode|null
      */
     protected function nodeDirective(Node $node, $name)
     {
@@ -32,7 +32,7 @@ trait HandlesDirectives
      * @param FieldDefinitionNode $field
      * @param string              $name
      *
-     * @return DirectiveNode
+     * @return DirectiveNode|null
      */
     protected function fieldDirective($field, $name)
     {

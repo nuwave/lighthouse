@@ -3,26 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Traits\CanParseResolvers;
+use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-class FieldDirective implements FieldResolver
+class FieldDirective extends AbstractFieldDirective implements FieldResolver
 {
-    use CanParseResolvers;
-
-    /**
-     * Field resolver.
-     *
-     * @var string
-     */
-    protected $resolver;
-
-    /**
-     * Field resolver method.
-     *
-     * @var string
-     */
-    protected $method;
-
     /**
      * Name of the directive.
      *
@@ -38,24 +22,32 @@ class FieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
+     * @return \Closure
      */
     public function resolveField(FieldValue $value)
     {
-        $directive = $this->fieldDirective($value->getField(), self::name());
-        $resolver = $this->getResolver($value, $directive);
-        $method = $this->getResolverMethod($directive);
-        $data = $this->argValue(collect($directive->arguments)->first(function ($arg) {
-            return 'args' === data_get($arg, 'name.value');
-        }));
+        $baseClassname = $this->associatedArgValue('class')
+            ?? str_before($this->associatedArgValue('resolver'), '@');
+        if (empty($baseClassname)) {
+            $directiveName = self::name();
+            throw new DirectiveException("Directive '$directiveName' must have a `class` argument.");
+        }
+        $resolverClass = $this->namespaceClassName($baseClassname);
 
-        return $value->setResolver(function ($root, array $args, $context = null, $info = null) use ($resolver, $method, $data) {
-            $instance = app($resolver);
+        $resolverMethod = $this->associatedArgValue('method')
+            ?? str_after($this->associatedArgValue('resolver'), '@');
 
+        if (! method_exists($resolverClass, $resolverMethod)) {
+            throw new DirectiveException("Method '$resolverMethod' does not exist on class '$resolverClass'");
+        }
+
+        $additionalData = $this->associatedArgValue('args');
+
+        return function ($root, array $args, $context = null, $info = null) use ($resolverClass, $resolverMethod, $additionalData) {
             return call_user_func_array(
-                [$instance, $method],
-                [$root, array_merge($args, ['directive' => $data]), $context, $info]
+                [app($resolverClass), $resolverMethod],
+                [$root, array_merge($args, ['directive' => $additionalData]), $context, $info]
             );
-        });
+        };
     }
 }

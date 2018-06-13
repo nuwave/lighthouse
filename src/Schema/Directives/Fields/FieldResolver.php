@@ -12,7 +12,7 @@ interface FieldResolver extends Directive
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
+     * @return \Closure
      */
     public function resolveField(FieldValue $value);
 }

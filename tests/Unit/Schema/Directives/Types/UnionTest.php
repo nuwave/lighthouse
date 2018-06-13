@@ -56,7 +56,7 @@ class UnionTest extends TestCase
 
     public function resolve($root, array $args)
     {
-        return 'user' == $args['type']
+        return 'user' === $args['type']
             ? ['id' => 'user.id']
             : ['employeeId' => 'employee.id'];
     }

@@ -2,13 +2,23 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Schema\Directives\Directive;
 
-class NamespaceDirective implements FieldMiddleware
+/**
+ * Class NamespaceDirective.
+ *
+ * This directive class is just used for allowing this directive
+ * to exist and to get it from the directive registry. Its purpose
+ * is to provide namespaces for other directives. On its own, it does
+ * not do anything.
+ *
+ * The args for this directive are map from directive names to namespaces.
+ * For example: (field: "App\\GraphQL")
+ *
+ * The namespaces are used to complete class references in other field directives.
+ */
+class NamespaceDirective extends AbstractFieldDirective implements Directive
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -17,26 +27,5 @@ class NamespaceDirective implements FieldMiddleware
     public static function name()
     {
         return 'namespace';
-    }
-
-    /**
-     * Resolve the field directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
-     */
-    public function handleField(FieldValue $value)
-    {
-        $namespace = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
-            'value'
-        );
-
-        if (is_string($namespace)) {
-            $value->setNamespace($namespace);
-        }
-
-        return $value;
     }
 }

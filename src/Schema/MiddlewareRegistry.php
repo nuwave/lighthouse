@@ -44,9 +44,9 @@ class MiddlewareRegistry
                 $fields = array_map(function ($selection) use ($fragments) {
                     $field = array_get($selection, 'name.value');
 
-                    if ('FragmentSpread' == array_get($selection, 'kind')) {
+                    if ('FragmentSpread' === array_get($selection, 'kind')) {
                         $fragment = $fragments->first(function ($def) use ($field) {
-                            return data_get($def, 'name.value') == $field;
+                            return data_get($def, 'name.value') === $field;
                         });
 
                         return array_pluck(

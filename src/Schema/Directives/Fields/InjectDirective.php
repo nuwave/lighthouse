@@ -4,12 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class InjectDirective implements FieldMiddleware
+class InjectDirective extends AbstractFieldDirective implements FieldMiddleware
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -25,26 +22,22 @@ class InjectDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
+     * @throws DirectiveException
+     *
+     * @return \Closure
      */
     public function handleField(FieldValue $value)
     {
         $resolver = $value->getResolver();
-        $attr = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
-            'context'
-        );
+        $attr = $this->associatedArgValue('context');
 
-        $name = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), self::name()),
-            'name'
-        );
+        $name = $this->associatedArgValue('name');
 
         if (! $attr) {
             throw new DirectiveException(sprintf(
                 'The `%s` directive on %s [%s] must have a `context` argument',
                 self::name(),
-                $value->getNodeName(),
+                $value->getParentTypeName(),
                 $value->getFieldName()
             ));
         }
@@ -53,17 +46,17 @@ class InjectDirective implements FieldMiddleware
             throw new DirectiveException(sprintf(
                 'The `%s` directive on %s [%s] must have a `name` argument',
                 self::name(),
-                $value->getNodeName(),
+                $value->getParentTypeName(),
                 $value->getFieldName()
             ));
         }
 
-        return $value->setResolver(function () use ($attr, $name, $resolver) {
+        return function () use ($attr, $name, $resolver) {
             $args = func_get_args();
             $context = $args[2];
             $args[1] = array_merge($args[1], [$name => data_get($context, $attr)]);
 
             return call_user_func_array($resolver, $args);
-        });
+        };
     }
 }

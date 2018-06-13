@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\Values\TypeValue;
 interface TypeResolver extends Directive
 {
     /**
-     * Resolve the Node type and set it on the TypeValue.
+     * Resolve the TypeValue to a GraphQL Type.
      *
      * @param TypeValue $value
      *

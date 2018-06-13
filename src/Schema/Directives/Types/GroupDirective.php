@@ -2,14 +2,24 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Types;
 
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
+/**
+ * Class GroupDirective.
+ *
+ * This directive is kept for compatibility reasons but is superseded by
+ * NamespaceDirective and MiddlewareDirective.
+ *
+ * @deprecated Will be removed in next major version
+ */
 class GroupDirective implements TypeManipulator
 {
     use HandlesDirectives;
@@ -103,14 +113,37 @@ class GroupDirective implements TypeManipulator
             throw new DirectiveException('The value of the namespace directive on has to be a string');
         }
 
-        $namespaceDirective = PartialParser::directive('@namespace(value: "'.addslashes($namespaceValue).'")');
+        $namespaceValue = addslashes($namespaceValue);
 
-        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceDirective) {
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$namespaceDirective]);
+        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
+            $previousNamespaces = $this->fieldDirective($fieldDefinition, NamespaceDirective::name());
+
+            $previousNamespaces = $previousNamespaces
+                ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)
+                : PartialParser::directive("@namespace(field: \"$namespaceValue\", complexity: \"$namespaceValue\")");
+            $fieldDefinition->directives = $fieldDefinition->directives->merge([$previousNamespaces]);
 
             return $fieldDefinition;
         })->toArray());
 
         return $objectType;
+    }
+
+    /**
+     * @param string        $namespaceValue
+     * @param DirectiveNode $directive
+     *
+     * @return DirectiveNode
+     */
+    protected function mergeNamespaceOnExistingDirective($namespaceValue, DirectiveNode $directive)
+    {
+        $namespaces = PartialParser::arguments([
+            "field: \"$namespaceValue\"",
+            "complexity: \"$namespaceValue\"",
+        ]);
+
+        $directive->arguments = $directive->arguments->merge($namespaces);
+
+        return $directive;
     }
 }

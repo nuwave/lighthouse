@@ -155,9 +155,9 @@ trait HandlesTypes
         $unpackedType = is_callable($type) ? $type() : $type;
 
         return collect($wrappers)->reduce(function ($innerType, $type) {
-            if (ListOfType::class == $type) {
+            if (ListOfType::class === $type) {
                 return Type::listOf($innerType);
-            } elseif (NonNull::class == $type) {
+            } elseif (NonNull::class === $type) {
                 return Type::nonNull($innerType);
             } else {
                 throw new \Exception("Unknown Type [{$type}]");
@@ -168,18 +168,16 @@ trait HandlesTypes
     /**
      * Get fields for node.
      *
-     * @param TypeValue $value
+     * @param TypeValue $parentType
      *
-     * @return array
+     * @return array[]
      */
-    protected function getFields(TypeValue $value)
+    protected function getFields(TypeValue $parentType)
     {
-        return collect($value->getFields())
-            ->mapWithKeys(function (Node $field) use ($value) {
-                $fieldValue = new FieldValue($value, $field);
-
+        return collect($parentType->getFields())
+            ->mapWithKeys(function (Node $fieldDefinition) use ($parentType) {
                 return [
-                    $fieldValue->getFieldName() => app(FieldFactory::class)->handle($fieldValue),
+                    $fieldDefinition->name->value => FieldFactory::handle($fieldDefinition, $parentType),
                 ];
             })->toArray();
     }

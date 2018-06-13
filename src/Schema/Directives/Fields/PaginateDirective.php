@@ -39,7 +39,7 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
-        switch ($this->getPaginationType($fieldDefinition)) {
+        switch ($this->getPaginationType()) {
             case self::PAGINATION_TYPE_CONNECTION:
                 return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
             case self::PAGINATION_TYPE_PAGINATOR:
@@ -54,24 +54,20 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
      *
      * @throws DirectiveException
      *
-     * @return FieldValue
+     * @return \Closure
      */
     public function resolveField(FieldValue $value)
     {
-        $paginationType = $this->getPaginationType($value->getField());
+        $paginationType = $this->getPaginationType();
 
         $model = $this->getModelClass($value);
 
         switch ($paginationType) {
             case self::PAGINATION_TYPE_CONNECTION:
-                $resolver = $this->connectionTypeResolver($value, $model);
-                break;
+                return $this->connectionTypeResolver($value, $model);
             case self::PAGINATION_TYPE_PAGINATOR:
-                $resolver = $this->paginatorTypeResolver($value, $model);
-                break;
+                return $this->paginatorTypeResolver($value, $model);
         }
-
-        return $value->setResolver($resolver);
     }
 
     /**
@@ -81,17 +77,13 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
      *
      * @return string
      */
-    protected function getPaginationType(FieldDefinitionNode $field)
+    protected function getPaginationType()
     {
-        $paginationType = $this->directiveArgValue(
-            $this->fieldDirective($field, self::name()),
-            'type',
-            self::PAGINATION_TYPE_PAGINATOR
-        );
+        $paginationType = $this->associatedArgValue('type', self::PAGINATION_TYPE_PAGINATOR);
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
         if (! $this->isValidPaginationType($paginationType)) {
-            $fieldName = $field->name->value;
+            $fieldName = $this->fieldDefinition->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
         }

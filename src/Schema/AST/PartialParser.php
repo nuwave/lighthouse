@@ -2,14 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Support\Exceptions\ParseException;
 
@@ -70,7 +73,36 @@ class PartialParser
     /**
      * Parse the definition for arguments on a field.
      *
-     * @param string $argumentDefinitions
+     * @param string $inputValueDefinition
+     *
+     * @throws \Exception
+     *
+     * @return NodeList
+     */
+    public static function inputValue($inputValueDefinition)
+    {
+        return self::getFirstAndValidateType(
+            self::fieldDefinition("field($inputValueDefinition): String")->arguments,
+            InputValueDefinitionNode::class
+        );
+    }
+
+    /**
+     * @param string[] $inputValueDefinitions
+     *
+     * @return InputValueDefinitionNode[]
+     */
+    public static function inputValues($inputValueDefinitions)
+    {
+        return array_map(function ($inputValueDefinition) {
+            return self::inputValue($inputValueDefinition);
+        }, $inputValueDefinitions);
+    }
+
+    /**
+     * Parse the definition for arguments on a field.
+     *
+     * @param string $argumentDefinition
      *
      * @throws \Exception
      *
@@ -79,8 +111,8 @@ class PartialParser
     public static function argument($argumentDefinition)
     {
         return self::getFirstAndValidateType(
-            self::fieldDefinition("field($argumentDefinition): String")->arguments,
-            InputValueDefinitionNode::class
+            self::field("field($argumentDefinition): String")->arguments,
+            ArgumentNode::class
         );
     }
 
@@ -94,6 +126,36 @@ class PartialParser
         return array_map(function ($argumentDefinition) {
             return self::argument($argumentDefinition);
         }, $argumentDefinitions);
+    }
+
+    /**
+     * @param string $field
+     *
+     * @throws ParseException
+     *
+     * @return FieldNode
+     */
+    public static function field($field)
+    {
+        return self::getFirstAndValidateType(
+            self::operationDefinition("{ $field }")->selectionSet->selections,
+            FieldNode::class
+        );
+    }
+
+    /**
+     * @param string $operation
+     *
+     * @throws ParseException
+     *
+     * @return OperationDefinitionNode
+     */
+    public static function operationDefinition($operation)
+    {
+        return self::getFirstAndValidateType(
+            Parser::parse($operation)->definitions,
+            OperationDefinitionNode::class
+        );
     }
 
     /**
@@ -138,7 +200,7 @@ class PartialParser
     public static function directives($directivea)
     {
         return array_map(function ($directive) {
-            return self::argument($directive);
+            return self::inputValue($directive);
         }, $directivea);
     }
 
@@ -167,7 +229,7 @@ class PartialParser
     public static function directiveDefinitions($directiveDefinitions)
     {
         return array_map(function ($directiveDefinition) {
-            return self::argument($directiveDefinition);
+            return self::inputValue($directiveDefinition);
         }, $directiveDefinitions);
     }
 

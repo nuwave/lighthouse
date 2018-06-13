@@ -166,31 +166,6 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * Get a node's field.
-     *
-     * @param string      $schema
-     * @param int         $index
-     * @param string|null $name
-     *
-     * @return FieldValue
-     */
-    protected function getNodeField($schema, $index = 0, $field = null)
-    {
-        $document = $this->parse($schema);
-        $node = new TypeValue($document->definitions[$index]);
-
-        if (is_null($field)) {
-            return new FieldValue($node, array_get($node->getFields(), '0'));
-        }
-
-        return collect($node->getFields())->filter(function ($nodeField) use ($field) {
-            return $nodeField->name->value === $field;
-        })->map(function ($field) use ($node) {
-            return new FieldValue($node, $field);
-        })->first();
-    }
-
-    /**
      * Get field argument value.
      *
      * @param string     $name
@@ -200,7 +175,7 @@ class TestCase extends BaseTestCase
      */
     protected function getFieldArg($name, FieldValue $field)
     {
-        return collect(data_get($field->getField(), 'arguments', []))
+        return collect(data_get($field->getFieldDefinition(), 'arguments', []))
             ->filter(function ($arg) use ($name) {
                 return $arg->name->value === $name;
             })->map(function ($arg) use ($field) {

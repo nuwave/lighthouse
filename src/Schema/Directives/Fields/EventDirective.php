@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Closure;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class EventDirective implements FieldMiddleware
+class EventDirective extends AbstractFieldDirective implements FieldMiddleware
 {
     use HandlesDirectives;
 
@@ -26,38 +26,26 @@ class EventDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
+     * @throws DirectiveException
+     *
      * @return Closure
      */
     public function handleField(FieldValue $value)
     {
-        $event = $this->getEvent($value->getField());
+        $eventBaseName = $this->associatedArgValue('fire')
+            // Default to reading this from class
+            ?? $this->associatedArgValue('class');
+
+        $eventClassName = $this->namespaceClassName($eventBaseName);
+
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function () use ($resolver, $event) {
+        return function () use ($resolver, $eventClassName) {
             $args = func_get_args();
             $value = call_user_func_array($resolver, $args);
-            event(new $event($value));
+            event(new $eventClassName($value));
 
             return $value;
-        });
-    }
-
-    /**
-     * Get the event name.
-     *
-     * @param FieldDefinitionNode $field
-     *
-     * @return mixed
-     */
-    protected function getEvent(FieldDefinitionNode $field)
-    {
-        return $this->directiveArgValue(
-            $this->fieldDirective($field, self::name()),
-            'fire',
-            $this->directiveArgValue(
-                $this->fieldDirective($field, self::name()),
-                'class'
-            )
-        );
+        };
     }
 }

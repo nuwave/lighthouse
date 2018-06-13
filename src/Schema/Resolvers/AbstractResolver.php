@@ -59,7 +59,7 @@ abstract class AbstractResolver
     {
         return collect($node->directives)
             ->reduce(function ($match, DirectiveNode $directive) use ($name) {
-                return $match ?: $directive->name->value == $name ? true : false;
+                return $match ?: $directive->name->value === $name ? true : false;
             }, false);
     }
 
@@ -106,7 +106,7 @@ abstract class AbstractResolver
     {
         return collect($node->directives)
             ->first(function (DirectiveNode $directive) use ($name) {
-                return $directive->name->value == $name;
+                return $directive->name->value === $name;
             }, $default);
     }
 
@@ -123,7 +123,7 @@ abstract class AbstractResolver
     {
         $argument = collect($node->arguments)
             ->first(function (ArgumentNode $arg) use ($key) {
-                return $arg->name->value == $key;
+                return $arg->name->value === $key;
             });
 
         return $argument ? $argument->value->value : $default;

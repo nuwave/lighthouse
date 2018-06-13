@@ -4,6 +4,8 @@ namespace Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ScalarType;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
 use Nuwave\Lighthouse\Schema\Directives\Types\ScalarDirective;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -48,17 +50,14 @@ class DirectiveRegistryTest extends TestCase
     /**
      * @test
      */
-    public function itCanCheckIfFieldHasAResolverDirective()
+    public function itCanGetFieldResolverDirective()
     {
-        $schema = '
-        type Foo {
-            bar: [Bar!]! @hasMany
-        }
-        ';
+        $fieldDefinition = PartialParser::fieldDefinition('
+            foo: [Foo!]! @hasMany
+        ');
 
-        $document = Parser::parse($schema);
-        $hasResolver = graphql()->directives()->hasFieldResolver($document->definitions[0]->fields[0]);
-        $this->assertTrue($hasResolver);
+        $resolver = graphql()->directives()->fieldResolver($fieldDefinition);
+        $this->assertInstanceOf(FieldResolver::class, $resolver);
     }
 
     /**

@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Directives\Args\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Args\ArgMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Directive;
+use Nuwave\Lighthouse\Schema\Directives\Fields\AbstractFieldDirective;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
@@ -172,7 +173,7 @@ class DirectiveRegistry
     }
 
     /**
-     * @param $fieldDefinition
+     * @param FieldDefinitionNode $fieldDefinition
      *
      * @return \Illuminate\Support\Collection
      */
@@ -180,6 +181,8 @@ class DirectiveRegistry
     {
         return $this->directives($fieldDefinition)->filter(function (Directive $directive) {
             return $directive instanceof FieldManipulator;
+        })->map(function (AbstractFieldDirective $directive) use ($fieldDefinition) {
+            return $directive->hydrate($fieldDefinition);
         });
     }
 
@@ -233,7 +236,9 @@ class DirectiveRegistry
      *
      * @param FieldDefinitionNode $field
      *
-     * @return mixed
+     * @throws DirectiveException
+     *
+     * @return AbstractFieldDirective|null
      */
     public function fieldResolver($field)
     {
@@ -252,19 +257,9 @@ class DirectiveRegistry
             ));
         }
 
-        return $resolvers->first();
-    }
+        $resolver = $resolvers->first();
 
-    /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldDefinitionNode $field
-     *
-     * @return bool
-     */
-    public function hasFieldResolver($field)
-    {
-        return $this->fieldResolver($field) instanceof FieldResolver;
+        return ($resolver instanceof AbstractFieldDirective) ? $resolver->hydrate($field) : null;
     }
 
     /**
@@ -292,6 +287,8 @@ class DirectiveRegistry
     {
         return $this->directives($field)->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
+        })->map(function (AbstractFieldDirective $fieldDirective) use ($field) {
+            return $fieldDirective->hydrate($field);
         });
     }
 

@@ -2,32 +2,33 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
-use GraphQL\Language\AST\FieldDefinitionNode as Field;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 
 class FieldValue
 {
     /**
      * Current type.
      *
-     * @var Closure
+     * @var \Closure
      */
     protected $type;
 
     /**
-     * Current field.
+     * The underlying Field Definition.
      *
-     * @var Field
+     * @var FieldDefinitionNode
      */
-    protected $field;
+    protected $fieldDefinition;
 
     /**
-     * Current node (type).
+     * The parent type in which the field is contained.
      *
      * @var TypeValue
      */
-    protected $node;
+    protected $parentType;
 
     /**
      * Field resolver closure.
@@ -35,13 +36,6 @@ class FieldValue
      * @var \Closure
      */
     protected $resolver;
-
-    /**
-     * Current namespace.
-     *
-     * @var string
-     */
-    protected $namespace;
 
     /**
      * Current description.
@@ -66,69 +60,47 @@ class FieldValue
     protected $args = [];
 
     /**
-     * Create new field value instance.
-     *
-     * @param TypeValue $node
-     * @param Field     $field
-     * @param string    $description
+     * @param TypeValue           $parentType
+     * @param FieldDefinitionNode $fieldDefinition
      */
-    public function __construct(TypeValue $node, $field, $description = '')
+    public function __construct($fieldDefinition, TypeValue $parentType)
     {
-        $this->node = $node;
-        $this->field = $field;
-        $this->description = $description;
+        $this->parentType = $parentType;
+        $this->fieldDefinition = $fieldDefinition;
     }
 
     /**
-     * Initialize new field value.
+     * Get the field resolver directive if it exists.
      *
-     * @param TypeValue $node
-     * @param Field     $field
-     * @param string    $description
-     *
-     * @return self
+     * @return FieldResolver|null
      */
-    public static function init(TypeValue $node, Field $field, $description = '')
+    public function resolverDirective()
     {
-        return new static($node, $field, $description);
+        return graphql()->directives()->fieldResolver($this->fieldDefinition);
     }
 
     /**
-     * Set current description.
+     * Get a collection of field middleware directives.
      *
-     * @param Closure|Type $type
-     *
-     * @return self
+     * @return \Illuminate\Support\Collection
      */
-    public function setType($type)
+    public function middlewareDirectives()
     {
-        $this->type = $type;
-
-        return $this;
+        return graphql()->directives()->fieldMiddleware($this->fieldDefinition);
     }
 
     /**
      * Set current resolver.
      *
-     * @param Closure|null $resolver
+     * @param \Closure|null $resolver
      *
      * @return FieldValue
      */
-    public function setResolver(Closure $resolver = null)
+    public function setResolver(\Closure $resolver = null)
     {
         $this->resolver = $resolver;
 
         return $this;
-    }
-
-    /**
-     * Set the current namespace.
-     *
-     * @param string $namespace
-     */
-    public function setNamespace($namespace)
-    {
-        $this->namespace = $namespace;
     }
 
     /**
@@ -149,6 +121,8 @@ class FieldValue
      * Set current complexity.
      *
      * @param \Closure $complexity
+     *
+     * @return self
      */
     public function setComplexity($complexity)
     {
@@ -175,55 +149,41 @@ class FieldValue
     }
 
     /**
-     * Get current type.
+     * Get an instance of the return type of the field.
      *
-     * @return Closure|Type
+     * @return \Closure|Type
      */
-    public function getType()
+    public function getReturnTypeInstance()
     {
-        return $this->type;
+        return NodeResolver::resolve($this->fieldDefinition->type);
     }
 
     /**
-     * Get current node.
-     *
      * @return TypeValue
      */
-    public function getNode()
+    public function getParentType()
     {
-        return $this->node;
+        return $this->parentType;
     }
 
     /**
      * Get current field.
      *
-     * @return Field
+     * @return FieldDefinitionNode
      */
-    public function getField()
+    public function getFieldDefinition()
     {
-        return $this->field;
+        return $this->fieldDefinition;
     }
 
     /**
      * Get field resolver.
      *
-     * @return Closure
+     * @return \Closure
      */
     public function getResolver()
     {
         return $this->resolver;
-    }
-
-    /**
-     * Get current namespace.
-     *
-     * @param string $class
-     *
-     * @return string
-     */
-    public function getNamespace($class = null)
-    {
-        return $class ? $this->namespace.'\\'.$class : $this->namespace;
     }
 
     /**
@@ -233,7 +193,7 @@ class FieldValue
      */
     public function getDescription()
     {
-        return $this->description ?: trim(str_replace("\n", '', $this->getField()->description));
+        return $this->description ?: trim(str_replace("\n", '', $this->fieldDefinition->description));
     }
 
     /**
@@ -253,7 +213,7 @@ class FieldValue
      */
     public function getFieldName()
     {
-        return $this->getField()->name->value;
+        return $this->fieldDefinition->name->value;
     }
 
     /**
@@ -261,19 +221,19 @@ class FieldValue
      *
      * @return string
      */
-    public function getNodeName()
+    public function getParentTypeName()
     {
-        return $this->getNode()->getName();
+        return $this->getParentType()->getName();
     }
 
     /**
      * Wrap resolver.
      *
-     * @param Closure $resolver
+     * @param \Closure $resolver
      *
-     * @return Closure
+     * @return \Closure
      */
-    public function wrap(Closure $resolver)
+    public function wrap(\Closure $resolver)
     {
         if (empty($this->args)) {
             return $resolver;
