@@ -49,10 +49,10 @@
         }
     },
     "scripts": {
-        "test" : "phpunit",
-        "test:unit" : "phpunit --testsuite Unit",
-        "test:integration" : "phpunit --testsuite Integration",
-        "test:ci": "phpunit --verbose --coverage-text --coverage-clover=coverage.xml",
+        "test" : "phpunit --colors=always",
+        "test:unit" : "phpunit --colors=always --testsuite Unit",
+        "test:integration" : "phpunit --colors=always --testsuite Integration",
+        "test:ci": "phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml",
         "style": "php-cs-fixer fix"
     },
     "extra": {
