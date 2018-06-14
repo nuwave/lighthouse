@@ -6,13 +6,13 @@ use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class FindDirective extends AbstractFieldDirective implements FieldResolver
 {
-    use HandleQueries, HandlesDirectives, HandlesQueryFilter;
+    use HandlesQueries, HandlesDirectives, HandlesQueryFilter;
 
     /**
      * Name of the directive.

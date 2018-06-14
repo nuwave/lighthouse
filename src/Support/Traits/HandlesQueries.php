@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-trait HandleQueries
+trait HandlesQueries
 {
     /**
      * @param FieldValue $value

@@ -9,13 +9,13 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Directives\PaginatorCreatingDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class PaginateDirective extends PaginatorCreatingDirective implements FieldResolver, FieldManipulator
 {
-    use HandlesGlobalId, HandlesQueryFilter, HandleQueries;
+    use HandlesGlobalId, HandlesQueryFilter, HandlesQueries;
 
     /**
      * Name of the directive.
