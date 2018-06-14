@@ -182,7 +182,7 @@ class ASTBuilder
         $globalId = config('lighthouse.global_id_field', '_id');
 
         // Double slashes to escape the slashes in the namespace.
-        $interface = PartialParser::interfaceType("
+        $interface = PartialParser::interfaceTypeDefinition("
             # Node global interface
             interface Node @interface(resolver: \"Nuwave\\\\Lighthouse\\\\Support\\\\Http\\\\GraphQL\\\\Interfaces\\\\NodeInterface@resolve\") {
               # Global identifier that can be used to resolve any Node implementation.

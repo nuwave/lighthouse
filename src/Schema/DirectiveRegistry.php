@@ -77,7 +77,7 @@ class DirectiveRegistry
                     ['/', '.php'],
                     ['\\', ''],
                     str_after($file->getPathname(), $path.DIRECTORY_SEPARATOR)
-            );
+                );
 
             $this->tryRegisterClassName($className);
         }
@@ -181,8 +181,8 @@ class DirectiveRegistry
     {
         return $this->directives($fieldDefinition)->filter(function (Directive $directive) {
             return $directive instanceof FieldManipulator;
-        })->map(function (AbstractFieldDirective $directive) use ($fieldDefinition) {
-            return $directive->hydrate($fieldDefinition);
+        })->map(function (FieldManipulator $directive) use ($fieldDefinition) {
+            return $this->hydrateIfAbstractFieldDirective($directive, $fieldDefinition);
         });
     }
 
@@ -238,12 +238,12 @@ class DirectiveRegistry
      *
      * @throws DirectiveException
      *
-     * @return AbstractFieldDirective|null
+     * @return FieldResolver|null
      */
     public function fieldResolver($field)
     {
-        $resolvers = $this->directives($field)->filter(function ($handler) {
-            return $handler instanceof FieldResolver;
+        $resolvers = $this->directives($field)->filter(function ($directive) {
+            return $directive instanceof FieldResolver;
         });
 
         if ($resolvers->count() > 1) {
@@ -259,7 +259,7 @@ class DirectiveRegistry
 
         $resolver = $resolvers->first();
 
-        return ($resolver instanceof AbstractFieldDirective) ? $resolver->hydrate($field) : null;
+        return $resolver ? $this->hydrateIfAbstractFieldDirective($resolver, $field) : null;
     }
 
     /**
@@ -279,29 +279,17 @@ class DirectiveRegistry
     /**
      * Get middleware for field.
      *
-     * @param FieldDefinitionNode $field
+     * @param FieldDefinitionNode $fieldDefinition
      *
      * @return \Illuminate\Support\Collection
      */
-    public function fieldMiddleware($field)
+    public function fieldMiddleware($fieldDefinition)
     {
-        return $this->directives($field)->filter(function ($handler) {
+        return $this->directives($fieldDefinition)->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
-        })->map(function (AbstractFieldDirective $fieldDirective) use ($field) {
-            return $fieldDirective->hydrate($field);
+        })->map(function (FieldMiddleware $fieldDirective) use ($fieldDefinition) {
+            return $this->hydrateIfAbstractFieldDirective($fieldDirective, $fieldDefinition);
         });
-    }
-
-    /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldDefinitionNode $field
-     *
-     * @return bool
-     */
-    public function hasFieldMiddleware($field)
-    {
-        return $this->fieldMiddleware($field)->count() > 0;
     }
 
     /**
@@ -313,8 +301,21 @@ class DirectiveRegistry
      */
     public function argMiddleware(InputValueDefinitionNode $arg)
     {
-        return $this->directives($arg)->filter(function ($handler) {
-            return $handler instanceof ArgMiddleware;
+        return $this->directives($arg)->filter(function (Directive $directive) {
+            return $directive instanceof ArgMiddleware;
         });
+    }
+
+    /**
+     * @param Directive           $directive
+     * @param FieldDefinitionNode $fieldDefinition
+     *
+     * @return Directive
+     */
+    protected function hydrateIfAbstractFieldDirective(Directive $directive, FieldDefinitionNode $fieldDefinition)
+    {
+        return $directive instanceof AbstractFieldDirective
+            ? $directive->hydrate($fieldDefinition)
+            : $directive;
     }
 }

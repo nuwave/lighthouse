@@ -82,7 +82,7 @@ abstract class PaginatorCreatingDirective extends AbstractFieldDirective
         ");
         $current->setDefinition($connectionEdge);
 
-        $connectionArguments = PartialParser::inputValues([
+        $connectionArguments = PartialParser::inputValueDefinitions([
             'first: Int!',
             'after: String',
         ]);
@@ -122,7 +122,7 @@ abstract class PaginatorCreatingDirective extends AbstractFieldDirective
         ");
         $current->setDefinition($paginatorType);
 
-        $paginationArguments = PartialParser::inputValues([
+        $paginationArguments = PartialParser::inputValueDefinitions([
             'count: Int!',
             'page: Int',
         ]);

@@ -124,7 +124,7 @@ class TypeFactoryTest extends TestCase
      */
     public function itCanTransformInputObjectTypes()
     {
-        $input = PartialParser::inputObjectType('
+        $input = PartialParser::inputObjectTypeDefinition('
             input UserInput {
                 foo: String!
             }

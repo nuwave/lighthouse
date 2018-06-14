@@ -13,6 +13,7 @@ use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Support\Exceptions\ParseException;
 
@@ -31,8 +32,6 @@ class PartialParser
     }
 
     /**
-     * Parse a single object type.
-     *
      * @param string $definition
      *
      * @throws ParseException
@@ -48,38 +47,13 @@ class PartialParser
     }
 
     /**
-     * @param NodeList $list
-     * @param string   $expectedType
+     * @param string $inputValueDefinition
      *
      * @throws ParseException
      *
-     * @return mixed
+     * @return InputValueDefinitionNode
      */
-    protected static function getFirstAndValidateType(NodeList $list, $expectedType)
-    {
-        if (1 !== $list->count()) {
-            throw new ParseException('  More than one definition was found in the passed in schema.');
-        }
-
-        $node = $list[0];
-
-        if (! $node instanceof $expectedType) {
-            throw new ParseException("The given definition was not of type: $expectedType");
-        }
-
-        return $node;
-    }
-
-    /**
-     * Parse the definition for arguments on a field.
-     *
-     * @param string $inputValueDefinition
-     *
-     * @throws \Exception
-     *
-     * @return NodeList
-     */
-    public static function inputValue($inputValueDefinition)
+    public static function inputValueDefinition($inputValueDefinition)
     {
         return self::getFirstAndValidateType(
             self::fieldDefinition("field($inputValueDefinition): String")->arguments,
@@ -92,19 +66,17 @@ class PartialParser
      *
      * @return InputValueDefinitionNode[]
      */
-    public static function inputValues($inputValueDefinitions)
+    public static function inputValueDefinitions($inputValueDefinitions)
     {
         return array_map(function ($inputValueDefinition) {
-            return self::inputValue($inputValueDefinition);
+            return self::inputValueDefinition($inputValueDefinition);
         }, $inputValueDefinitions);
     }
 
     /**
-     * Parse the definition for arguments on a field.
-     *
      * @param string $argumentDefinition
      *
-     * @throws \Exception
+     * @throws ParseException
      *
      * @return NodeList
      */
@@ -159,9 +131,7 @@ class PartialParser
     }
 
     /**
-     * Parse a single field definition.
-     *
-     * @param $fieldDefinition
+     * @param string $fieldDefinition
      *
      * @throws ParseException
      *
@@ -176,11 +146,9 @@ class PartialParser
     }
 
     /**
-     * Parses a directive node attached to a type.
-     *
      * @param string $directive
      *
-     * @throws \Exception
+     * @throws ParseException
      *
      * @return DirectiveNode
      */
@@ -197,19 +165,17 @@ class PartialParser
      *
      * @return DirectiveNode[]
      */
-    public static function directives($directivea)
+    public static function directives($directives)
     {
         return array_map(function ($directive) {
-            return self::inputValue($directive);
-        }, $directivea);
+            return self::inputValueDefinition($directive);
+        }, $directives);
     }
 
     /**
-     * Parse the definition for directives.
-     *
      * @param string $directiveDefinition
      *
-     * @throws \Exception
+     * @throws ParseException
      *
      * @return DirectiveDefinitionNode
      */
@@ -229,18 +195,18 @@ class PartialParser
     public static function directiveDefinitions($directiveDefinitions)
     {
         return array_map(function ($directiveDefinition) {
-            return self::inputValue($directiveDefinition);
+            return self::inputValueDefinition($directiveDefinition);
         }, $directiveDefinitions);
     }
 
     /**
-     * Parse the definition for a single interface.
-     *
      * @param $interfaceDefinition
+     *
+     * @throws ParseException
      *
      * @return InterfaceTypeDefinitionNode
      */
-    public static function interfaceType($interfaceDefinition)
+    public static function interfaceTypeDefinition($interfaceDefinition)
     {
         return self::getFirstAndValidateType(
             Parser::parse($interfaceDefinition)->definitions,
@@ -255,11 +221,51 @@ class PartialParser
      *
      * @return InputObjectTypeDefinitionNode
      */
-    public static function inputObjectType($inputTypeDefinition)
+    public static function inputObjectTypeDefinition($inputTypeDefinition)
     {
         return self::getFirstAndValidateType(
             Parser::parse($inputTypeDefinition)->definitions,
             InputObjectTypeDefinitionNode::class
         );
+    }
+
+    /**
+     * @param string $scalarDefinition
+     *
+     * @throws ParseException
+     *
+     * @return ScalarTypeDefinitionNode
+     */
+    public static function scalarTypeDefinition($scalarDefinition)
+    {
+        return self::getFirstAndValidateType(
+            Parser::parse($scalarDefinition)->definitions,
+            ScalarTypeDefinitionNode::class
+        );
+    }
+
+    /**
+     * Get the first Node from a given NodeList and validate it.
+     *
+     * @param NodeList $list
+     * @param string   $expectedType
+     *
+     * @throws ParseException
+     *
+     * @return mixed
+     */
+    protected static function getFirstAndValidateType(NodeList $list, $expectedType)
+    {
+        if (1 !== $list->count()) {
+            throw new ParseException('  More than one definition was found in the passed in schema.');
+        }
+
+        $node = $list[0];
+
+        if (! $node instanceof $expectedType) {
+            throw new ParseException("The given definition was not of type: $expectedType");
+        }
+
+        return $node;
     }
 }
