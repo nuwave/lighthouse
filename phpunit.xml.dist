@@ -11,8 +11,11 @@
          verbose="true"
 >
     <testsuites>
-        <testsuite name="Package Test Suite">
-            <directory>./tests/</directory>
+        <testsuite name="Unit">
+            <directory>./tests/Unit/</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>./tests/Integration/</directory>
         </testsuite>
     </testsuites>
     <filter>
