@@ -36,24 +36,24 @@ class GraphQLTest extends DBTestCase
         $app['config']->set('lighthouse.route_enable_get', true);
 
         $path = $this->store('schema.graphql', '
-        type User {
-            id: ID!
-            name: String!
-            email: String!
-            created_at: String!
-            updated_at: String!
-            tasks: [Task!]! @hasMany
-        }
-        type Task {
-            id: ID!
-            name: String!
-            created_at: String!
-            updated_at: String!
-            user: User! @belongsTo
-        }
-        type Query {
-            user: User @auth
-        }
+            type User {
+                id: ID!
+                name: String!
+                email: String!
+                created_at: String!
+                updated_at: String!
+                tasks: [Task!]! @hasMany
+            }
+            type Task {
+                id: ID!
+                name: String!
+                created_at: String!
+                updated_at: String!
+                user: User! @belongsTo
+            }
+            type Query {
+                user: User @auth
+            }
         ');
 
         $app['config']->set('lighthouse.schema.register', $path);
@@ -78,7 +78,8 @@ class GraphQLTest extends DBTestCase
     public function itCanResolveQuery()
     {
         $this->be($this->user);
-        $query = '
+
+        $actual = graphql()->execute('
             query UserWithTasks {
                 user {
                     email
@@ -87,9 +88,8 @@ class GraphQLTest extends DBTestCase
                     }
                 }
             }
-        ';
+        ');
 
-        $data = graphql()->execute($query);
         $expected = [
             'data' => [
                 'user' => [
@@ -101,7 +101,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertEquals($expected, $actual);
     }
 
     /**

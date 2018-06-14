@@ -16,20 +16,28 @@ class FindDirectiveTest extends DBTestCase
     public function can_return_single_user()
     {
         $schema = '
-        type User {
-            id: ID!
-            name: String!
-        }
-        type Query {
-            user(id: ID @eq): User @find(model: "User")
-        }
+            type User {
+                id: ID!
+                name: String!
+            }
+            
+            type Query {
+                user(id: ID @eq): User @find(model: "User")
+            }
         ';
 
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
 
-        $result = $this->execute($schema, "{ user(id:{$userB->id}) { name } }");
+        $query = "
+            {
+                user(id:{$userB->id}) {
+                    name
+                }
+            }
+        ";
+        $result = $this->execute($schema, $query);
         $this->assertEquals('B', $result->data['user']['name']);
     }
 
@@ -37,6 +45,7 @@ class FindDirectiveTest extends DBTestCase
     public function can_fail_if_no_model_supplied()
     {
         $this->expectException(DirectiveException::class);
+
         $schema = $this->buildSchemaFromString('
             type User {
                 id: ID!
@@ -46,6 +55,7 @@ class FindDirectiveTest extends DBTestCase
                 user(id: ID @eq): User @find
             }
         ');
+
         $schema->getQueryType()->getField('user')->resolveFn();
     }
 
@@ -53,20 +63,28 @@ class FindDirectiveTest extends DBTestCase
     public function cannot_fetch_if_multiple_models_match()
     {
         $schema = '
-        type User {
-            id: ID!
-            name: String!
-        }
-        type Query {
-            user(name: String @eq): User @find(model: "User")
-        }
+            type User {
+                id: ID!
+                name: String!
+            }
+            
+            type Query {
+                user(name: String @eq): User @find(model: "User")
+            }
         ';
 
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'A']);
         $userC = factory(User::class)->create(['name' => 'B']);
 
-        $result = $this->execute($schema, '{ user(name: "A") { name } }');
+        $query = '
+            {
+                user(name: "A") {
+                    name
+                }
+            }
+        ';
+        $result = $this->execute($schema, $query);
         $this->assertCount(1, $result->errors);
     }
 
@@ -74,16 +92,18 @@ class FindDirectiveTest extends DBTestCase
     public function can_use_scopes()
     {
         $schema = '
-        type Company {
-            name: String!
-        }
-        type User {
-            id: ID!
-            name: String!
-        }
-        type Query {
-            user(name: String @eq, company: String!): User @find(model: "User" scopes: [companyName])
-        }
+            type Company {
+                name: String!
+            }
+            
+            type User {
+                id: ID!
+                name: String!
+            }
+            
+            type Query {
+                user(name: String @eq, company: String!): User @find(model: "User" scopes: [companyName])
+            }
         ';
 
         $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
@@ -92,7 +112,16 @@ class FindDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
         $userC = factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
 
-        $result = $this->execute($schema, '{ user(name: "A" company: "CompanyA") { id, name } }');
+        $query = '
+            {
+                user(name: "A" company: "CompanyA") {
+                    id
+                    name
+                }
+            }
+        ';
+
+        $result = $this->execute($schema, $query);
         $this->assertEquals($userA->id, $result->data['user']['id']);
         $this->assertEquals('A', $result->data['user']['name']);
     }

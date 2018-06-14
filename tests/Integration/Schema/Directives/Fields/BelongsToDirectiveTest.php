@@ -46,6 +46,8 @@ class BelongsToDirectiveTest extends DBTestCase
             'company_id' => $this->company->getKey(),
             'team_id' => $this->team->getKey(),
         ]);
+
+        $this->be($this->user);
     }
 
     /**
@@ -54,20 +56,30 @@ class BelongsToDirectiveTest extends DBTestCase
     public function itCanResolveBelongsToRelationship()
     {
         $schema = '
-        type Company {
-            name: String!
-        }
-        type User {
-            company: Company @belongsTo
-        }
-        type Query {
-            user: User @auth
-        }
+            type Company {
+                name: String!
+            }
+            
+            type User {
+                company: Company @belongsTo
+            }
+            
+            type Query {
+                user: User @auth
+            }
         ';
 
-        $this->be($this->user);
+        $query = '
+            {
+                user {
+                    company {
+                        name
+                    }
+                }
+            }
+        ';
 
-        $result = $this->execute($schema, '{ user { company { name } } }');
+        $result = $this->execute($schema, $query);
         $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
     }
 
@@ -77,19 +89,30 @@ class BelongsToDirectiveTest extends DBTestCase
     public function itCanResolveBelongsToWithCustomName()
     {
         $schema = '
-        type Company {
-            name: String!
-        }
-        type User {
-            account: Company @belongsTo(relation: "company")
-        }
-        type Query {
-            user: User @auth
-        }
+            type Company {
+                name: String!
+            }
+            
+            type User {
+                account: Company @belongsTo(relation: "company")
+            }
+            
+            type Query {
+                user: User @auth
+            }
         ';
 
-        $this->be($this->user);
-        $result = $this->execute($schema, '{ user { account { name } } }');
+        $query = '
+            {
+                user {
+                    account {
+                        name
+                    }
+                }
+            }
+        ';
+
+        $result = $this->execute($schema, $query);
         $this->assertEquals($this->company->name, array_get($result->data, 'user.account.name'));
     }
 
@@ -99,24 +122,37 @@ class BelongsToDirectiveTest extends DBTestCase
     public function itCanResolveBelongsToRelationshipWithTwoRelation()
     {
         $schema = '
-        type Company {
-            name: String!
-        }
-        type Team {
-            name: String!
-        }
-        type User {
-            company: Company @belongsTo
-            team: Team @belongsTo
-        }
-        type Query {
-            user: User @auth
-        }
+            type Company {
+                name: String!
+            }
+            
+            type Team {
+                name: String!
+            }
+            
+            type User {
+                company: Company @belongsTo
+                team: Team @belongsTo
+            }
+            
+            type Query {
+                user: User @auth
+            }
         ';
 
-        $this->be($this->user);
-
-        $result = $this->execute($schema, '{ user { company { name } team { name } } }');
+        $query = '
+            {
+                user {
+                    company {
+                        name
+                    }
+                    team {
+                        name
+                    }
+                }
+            }
+        ';
+        $result = $this->execute($schema, $query);
         $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
         $this->assertEquals($this->team->name, array_get($result->data, 'user.team.name'));
     }

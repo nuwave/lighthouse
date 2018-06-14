@@ -12,13 +12,13 @@ class FieldDirectiveTest extends TestCase
      */
     public function itCanResolveFieldWithAssignedClass()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
             type Foo {
                 bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
             }
-        ';
+        ');
 
-        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
+        $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
         $resolve = array_get($fields, 'bar.resolve');
 
@@ -48,14 +48,14 @@ class FieldDirectiveTest extends TestCase
      */
     public function itThrowsAnErrorIfNoClassIsDefined()
     {
-        $schema = '
+        $this->expectException(DirectiveException::class);
+
+        $schema = $this->buildSchemaWithDefaultQuery('
             type Foo {
                 bar: String! @field(method: "bar")
             }
-        ';
-
-        $this->expectException(DirectiveException::class);
-        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
+        ');
+        $type = $schema->getType('Foo');
         $type->config['fields']();
     }
 
@@ -64,14 +64,14 @@ class FieldDirectiveTest extends TestCase
      */
     public function itThrowsAnErrorIfNoMethodIsDefined()
     {
-        $schema = '
+        $this->expectException(DirectiveException::class);
+
+        $schema = $this->buildSchemaWithDefaultQuery('
             type Foo {
                 bar: String! @field(class: "Foo\\\Bar")
             }
-        ';
-
-        $this->expectException(DirectiveException::class);
-        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('Foo');
+        ');
+        $type = $schema->getType('Foo');
         $type->config['fields']();
     }
 }

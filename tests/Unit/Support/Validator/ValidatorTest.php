@@ -29,7 +29,7 @@ class ValidatorTest extends TestCase
             };
         });
 
-        $typeDefinition = PartialParser::objectType('
+        $typeDefinition = PartialParser::objectTypeDefinition('
             type Mutation {
                 foo(bar: String baz: Int): String @validate(validator: "foo.validator")
             }

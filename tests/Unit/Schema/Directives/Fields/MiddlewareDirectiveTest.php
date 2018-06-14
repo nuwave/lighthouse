@@ -37,6 +37,7 @@ class MiddlewareDirectiveTest extends TestCase
                 foo(bar:"baz")
             }
         ');
+
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }
@@ -75,6 +76,7 @@ class MiddlewareDirectiveTest extends TestCase
                 foo(bar:"baz")
             }
         ');
+
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }

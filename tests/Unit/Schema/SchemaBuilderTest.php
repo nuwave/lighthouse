@@ -53,13 +53,13 @@ class SchemaBuilderTest extends TestCase
     public function itCanResolveEnumTypes()
     {
         $schema = '
-        enum Role {
-            # Company administrator.
-            admin @enum(value:"admin")
-
-            # Company employee.
-            employee @enum(value:"employee")
-        }
+            enum Role {
+                # Company administrator.
+                admin @enum(value:"admin")
+    
+                # Company employee.
+                employee @enum(value:"employee")
+            }
         ';
 
         $types = $this->getTypesFromString($schema);
@@ -72,10 +72,10 @@ class SchemaBuilderTest extends TestCase
     public function itCanResolveInterfaceTypes()
     {
         $schema = '
-        interface Foo {
-            # bar is baz
-            bar: String!
-        }
+            interface Foo {
+                # bar is baz
+                bar: String!
+            }
         ';
 
         $types = $this->getTypesFromString($schema);
@@ -88,7 +88,7 @@ class SchemaBuilderTest extends TestCase
     public function itCanResolveScalarTypes()
     {
         $schema = '
-        scalar DateTime @scalar(class:"DateTime")
+            scalar DateTime @scalar(class:"DateTime")
         ';
 
         $this->app['config']->set('lighthouse.namespaces.scalars', 'Nuwave\Lighthouse\Schema\Types\Scalars');
@@ -102,10 +102,10 @@ class SchemaBuilderTest extends TestCase
     public function itCanResolveObjectTypes()
     {
         $schema = '
-        type Foo {
-            # bar attribute of Foo
-            bar: String!
-        }
+            type Foo {
+                # bar attribute of Foo
+                bar: String!
+            }
         ';
 
         $types = $this->getTypesFromString($schema);
@@ -122,10 +122,10 @@ class SchemaBuilderTest extends TestCase
     public function itCanResolveInputObjectTypes()
     {
         $schema = '
-        input CreateFoo {
-            foo: String!
-            bar: Int
-        }
+            input CreateFoo {
+                foo: String!
+                bar: Int
+            }
         ';
 
         $types = $this->getTypesFromString($schema);
@@ -144,9 +144,9 @@ class SchemaBuilderTest extends TestCase
     public function itCanResolveMutations()
     {
         $schema = '
-        type Mutation {
-            foo(bar: String! baz: String): String
-        }
+            type Mutation {
+                foo(bar: String! baz: String): String
+            }
         ';
 
         $type = $this->getTypesFromString($schema)->firstWhere('name', 'Mutation');
@@ -165,9 +165,9 @@ class SchemaBuilderTest extends TestCase
     public function itCanResolveQueries()
     {
         $schema = '
-        type Query {
-            foo(bar: String! baz: String): String
-        }
+            type Query {
+                foo(bar: String! baz: String): String
+            }
         ';
 
         $type = $this->getTypesFromString($schema)->firstWhere('name', 'Query');
@@ -186,12 +186,13 @@ class SchemaBuilderTest extends TestCase
     public function itCanExtendObjectTypes()
     {
         $schema = '
-        type Foo {
-            bar: String!
-        }
-        extend type Foo {
-            baz: String!
-        }
+            type Foo {
+                bar: String!
+            }
+            
+            extend type Foo {
+                baz: String!
+            }
         ';
 
         $type = $this->getTypesFromString($schema)->first();
@@ -205,12 +206,13 @@ class SchemaBuilderTest extends TestCase
     public function itCanExtendQuery()
     {
         $schema = '
-        type Query {
-            foo: String!
-        }
-        extend type Query {
-            bar: String!
-        }
+            type Query {
+                foo: String!
+            }
+            
+            extend type Query {
+                bar: String!
+            }
         ';
 
         $type = $this->getTypesFromString($schema)->firstWhere('name', 'Query');
@@ -224,12 +226,13 @@ class SchemaBuilderTest extends TestCase
     public function itCanExtendMutation()
     {
         $schema = '
-        type Mutation {
-            foo: String!
-        }
-        extend type Mutation {
-            bar: String!
-        }
+            type Mutation {
+                foo: String!
+            }
+            
+            extend type Mutation {
+                bar: String!
+            }
         ';
 
         $type = $this->getTypesFromString($schema)->firstWhere('name', 'Mutation');
@@ -243,12 +246,13 @@ class SchemaBuilderTest extends TestCase
     public function itCanGenerateValidGraphQLSchema()
     {
         $schema = $this->buildSchemaFromString('
-        type Query {
-            foo: String!
-        }
-        type Mutation {
-            foo: String!
-        }
+            type Query {
+                foo: String!
+            }
+            
+            type Mutation {
+                foo: String!
+            }
         ');
 
         $this->assertInstanceOf(Schema::class, $schema);

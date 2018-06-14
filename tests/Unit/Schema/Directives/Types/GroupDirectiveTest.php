@@ -25,6 +25,7 @@ class GroupDirectiveTest extends TestCase
     {
         $this->assertCanSetNamespace('
             type Query {}
+            
             extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
                 me: String @field(resolver: "Foo@bar")
             }
@@ -34,6 +35,7 @@ class GroupDirectiveTest extends TestCase
     protected function assertCanSetNamespace($schema)
     {
         $result = $this->execute($schema, '{ me }');
+
         $this->assertEquals('foo.bar', $result->data['me']);
     }
 
@@ -55,7 +57,8 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetMiddlewareThroughTypeExtension()
     {
         $this->assertSetMiddleware('
-        type Query {}
+            type Query {}
+            
             extend type Query @group(middleware: ["foo", "bar"]) {
                 me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
             }
@@ -66,6 +69,7 @@ class GroupDirectiveTest extends TestCase
     {
         $this->execute($schema, '{ me }');
         $middleware = graphql()->middleware()->query('me');
+
         $this->assertCount(2, $middleware);
         $this->assertEquals('foo', $middleware[0]);
         $this->assertEquals('bar', $middleware[1]);
