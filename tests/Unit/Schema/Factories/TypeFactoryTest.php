@@ -48,7 +48,7 @@ class TypeFactoryTest extends TestCase
      */
     public function itCanTransformEnums()
     {
-        $schema = '
+        $enumNode = PartialParser::enumTypeDefinition('
             enum Role {
                 # Company administrator.
                 ADMIN @enum(value:"admin")
@@ -56,9 +56,8 @@ class TypeFactoryTest extends TestCase
                 # Company employee.
                 EMPLOYEE @enum(value:"employee")
             }
-        ';
+        ');
 
-        $enumNode = $this->parse($schema)->definitions[0];
         $type = $this->factory->toType(new TypeValue($enumNode));
 
         $this->assertInstanceOf(EnumType::class, $type);
@@ -70,11 +69,10 @@ class TypeFactoryTest extends TestCase
      */
     public function itCanTransformScalars()
     {
-        $schema = '
+        $scalarNode = PartialParser::scalarTypeDefinition('
             scalar DateTime @scalar(class:"DateTime")
-        ';
+        ');
 
-        $scalarNode = $this->parse($schema)->definitions[0];
         $type = $this->factory->toType(new TypeValue($scalarNode));
 
         $this->assertInstanceOf(ScalarType::class, $type);
@@ -86,13 +84,12 @@ class TypeFactoryTest extends TestCase
      */
     public function itCanTransformInterfaces()
     {
-        $schema = '
+        $interface = PartialParser::interfaceTypeDefinition('
             interface Node {
                 _id: ID!
             }
-        ';
+        ');
 
-        $interface = $this->parse($schema)->definitions[0];
         $type = $this->factory->toType(new TypeValue($interface));
 
         $this->assertInstanceOf(InterfaceType::class, $type);
@@ -105,14 +102,13 @@ class TypeFactoryTest extends TestCase
      */
     public function itCanTransformObjectTypes()
     {
-        $schema = '
+        $objectTypeDefinition = PartialParser::objectTypeDefinition('
             type User {
                 foo(bar: String! @bcrypt): String!
             }
-        ';
+        ');
 
-        $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->toType(new TypeValue($interface));
+        $type = $this->factory->toType(new TypeValue($objectTypeDefinition));
 
         $this->assertInstanceOf(ObjectType::class, $type);
         $this->assertEquals('User', $type->name);
@@ -129,6 +125,7 @@ class TypeFactoryTest extends TestCase
                 foo: String!
             }
         ');
+
         $type = $this->factory->toType(new TypeValue($input));
 
         $this->assertInstanceOf(InputObjectType::class, $type);

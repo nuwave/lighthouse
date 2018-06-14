@@ -15,7 +15,7 @@ class PartialParserTest extends TestCase
     {
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            PartialParser::objectType('
+            PartialParser::objectTypeDefinition('
                 type Foo {
                     foo: String
                 }
@@ -25,7 +25,7 @@ class PartialParserTest extends TestCase
     public function testThrowsForInvalidDefinition()
     {
         $this->expectException(SyntaxError::class);
-        PartialParser::objectType('
+        PartialParser::objectTypeDefinition('
             INVALID
         ');
     }
@@ -33,7 +33,7 @@ class PartialParserTest extends TestCase
     public function testThrowsIfMultipleDefinitionsAreGiven()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectType('
+        PartialParser::objectTypeDefinition('
             type Foo {
                 foo: String
             }
@@ -47,7 +47,7 @@ class PartialParserTest extends TestCase
     public function testThrowsIfDefinitionIsUnexpectedType()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectType('
+        PartialParser::objectTypeDefinition('
             interface Foo {
                 foo: String
             }
@@ -56,7 +56,7 @@ class PartialParserTest extends TestCase
 
     public function testParsesObjectTypesArray()
     {
-        $objectTypes = PartialParser::objectTypes(['
+        $objectTypes = PartialParser::objectTypeDefinitions(['
             type Foo {
                 foo: String
             }
@@ -74,7 +74,7 @@ class PartialParserTest extends TestCase
     public function testThrowsOnInvalidTypeInObjectTypesArray()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectTypes(['
+        PartialParser::objectTypeDefinitions(['
             type Foo {
                 foo: String
             }
@@ -88,7 +88,7 @@ class PartialParserTest extends TestCase
     public function testThrowsOnMultipleDefinitionsInArrayItem()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectTypes(['
+        PartialParser::objectTypeDefinitions(['
             type Foo {
                 foo: String
             }
