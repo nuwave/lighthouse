@@ -10,9 +10,9 @@ interface TypeMiddleware extends Directive
     /**
      * Handle node value.
      *
-     * @param TypeValue $value
+     * @param TypeValue $typeValue
      *
      * @return TypeValue
      */
-    public function handleNode(TypeValue $value);
+    public function handleNode(TypeValue $typeValue);
 }

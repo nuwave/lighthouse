@@ -27,28 +27,30 @@ class SecurityDirective implements TypeMiddleware
     /**
      * Handle node value.
      *
-     * @param TypeValue $value
+     * @param TypeValue $typeValue
+     *
+     * @throws DirectiveException
      *
      * @return TypeValue
      */
-    public function handleNode(TypeValue $value)
+    public function handleNode(TypeValue $typeValue)
     {
-        if ('Query' !== $value->getName()) {
+        if ('Query' !== $typeValue->getName()) {
             $message = sprintf(
                 'The `%s` directive can only be placed on the %s type [%s]',
                 self::name(),
                 'Query',
-                $value->getName()
+                $typeValue->getName()
             );
 
             throw new DirectiveException($message);
         }
 
-        $this->queryDepth($value);
-        $this->queryComplexity($value);
-        $this->queryIntrospection($value);
+        $this->queryDepth($typeValue);
+        $this->queryComplexity($typeValue);
+        $this->queryIntrospection($typeValue);
 
-        return $value;
+        return $typeValue;
     }
 
     /**

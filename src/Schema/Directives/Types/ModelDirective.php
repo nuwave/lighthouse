@@ -26,19 +26,19 @@ class ModelDirective implements TypeMiddleware, TypeManipulator
     /**
      * Handle type construction.
      *
-     * @param TypeValue $value
+     * @param TypeValue $typeValue
      *
      * @return TypeValue
      */
-    public function handleNode(TypeValue $value)
+    public function handleNode(TypeValue $typeValue)
     {
-        $modelClassName = $this->getModelClassName($value);
+        $modelClassName = $this->getModelClassName($typeValue);
 
         graphql()->nodes()->registerModel(
-            $value->getName(), $modelClassName
+            $typeValue->getName(), $modelClassName
         );
 
-        return $value;
+        return $typeValue;
     }
 
     /**

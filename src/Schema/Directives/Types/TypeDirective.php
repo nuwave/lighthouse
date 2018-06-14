@@ -26,21 +26,21 @@ class TypeDirective implements TypeMiddleware, TypeManipulator
     /**
      * Handle type construction.
      *
-     * @param TypeValue $value
+     * @param TypeValue $typeValue
      *
      * @return TypeValue
      */
-    public function handleNode(TypeValue $value)
+    public function handleNode(TypeValue $typeValue)
     {
         graphql()->nodes()->registerNode(
-            $value->getName(),
+            $typeValue->getName(),
             // Resolver for the node itself
-            $this->getResolver($value, 'resolver'),
+            $this->getResolver($typeValue, 'resolver'),
             // Interface type resolver
-            $this->getResolver($value, 'typeResolver')
+            $this->getResolver($typeValue, 'typeResolver')
         );
 
-        return $value;
+        return $typeValue;
     }
 
     /**
