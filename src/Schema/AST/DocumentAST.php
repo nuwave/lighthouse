@@ -184,7 +184,7 @@ class DocumentAST
     protected function objectTypeOrDefault($name)
     {
         return $this->objectType($name)
-            ?: PartialParser::objectType('type '.$name.'{}');
+            ?: PartialParser::objectTypeDefinition('type '.$name.'{}');
     }
 
     /**

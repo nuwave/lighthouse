@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -24,10 +25,10 @@ class PartialParser
      *
      * @return ObjectTypeDefinitionNode[]
      */
-    public static function objectTypes($objectTypes)
+    public static function objectTypeDefinitions($objectTypes)
     {
         return array_map(function ($objectType) {
-            return self::objectType($objectType);
+            return self::objectTypeDefinition($objectType);
         }, $objectTypes);
     }
 
@@ -38,7 +39,7 @@ class PartialParser
      *
      * @return ObjectTypeDefinitionNode
      */
-    public static function objectType($definition)
+    public static function objectTypeDefinition($definition)
     {
         return self::getFirstAndValidateType(
             Parser::parse($definition)->definitions,
@@ -140,7 +141,7 @@ class PartialParser
     public static function fieldDefinition($fieldDefinition)
     {
         return self::getFirstAndValidateType(
-            self::objectType("type Dummy { $fieldDefinition }")->fields,
+            self::objectTypeDefinition("type Dummy { $fieldDefinition }")->fields,
             FieldDefinitionNode::class
         );
     }
@@ -155,7 +156,7 @@ class PartialParser
     public static function directive($directive)
     {
         return self::getFirstAndValidateType(
-            self::objectType("type Dummy $directive {}")->directives,
+            self::objectTypeDefinition("type Dummy $directive {}")->directives,
             DirectiveNode::class
         );
     }
@@ -241,6 +242,21 @@ class PartialParser
         return self::getFirstAndValidateType(
             Parser::parse($scalarDefinition)->definitions,
             ScalarTypeDefinitionNode::class
+        );
+    }
+
+    /**
+     * @param $enumDefinition
+     *
+     * @throws ParseException
+     *
+     * @return mixed
+     */
+    public static function enumTypeDefinition($enumDefinition)
+    {
+        return self::getFirstAndValidateType(
+            Parser::parse($enumDefinition)->definitions,
+            EnumTypeDefinitionNode::class
         );
     }
 

@@ -65,7 +65,7 @@ abstract class PaginatorCreatingDirective extends AbstractFieldDirective
         $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
         $connectionFieldName = addslashes(ConnectionField::class);
 
-        $connectionType = PartialParser::objectType("
+        $connectionType = PartialParser::objectTypeDefinition("
             type $connectionTypeName {
                 pageInfo: PageInfo! @field(class: \"$connectionFieldName\" method: \"pageInfoResolver\")
                 edges: [$connectionEdgeName] @field(class: \"$connectionFieldName\" method: \"edgeResolver\")
@@ -74,7 +74,7 @@ abstract class PaginatorCreatingDirective extends AbstractFieldDirective
         $current->setDefinition($connectionType);
 
         $nodeName = $this->unpackNodeToString($fieldDefinition);
-        $connectionEdge = PartialParser::objectType("
+        $connectionEdge = PartialParser::objectTypeDefinition("
             type $connectionEdgeName {
                 node: $nodeName
                 cursor: String!
@@ -114,7 +114,7 @@ abstract class PaginatorCreatingDirective extends AbstractFieldDirective
         $paginatorFieldClassName = addslashes(PaginatorField::class);
         $fieldTypeName = $this->unpackNodeToString($fieldDefinition);
 
-        $paginatorType = PartialParser::objectType("
+        $paginatorType = PartialParser::objectTypeDefinition("
             type $paginatorTypeName {
                 paginatorInfo: PaginatorInfo! @field(class: \"$paginatorFieldClassName\" method: \"paginatorInfoResolver\")
                 data: [$fieldTypeName!]! @field(class: \"$paginatorFieldClassName\" method: \"dataResolver\")
