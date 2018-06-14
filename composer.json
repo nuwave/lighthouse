@@ -49,9 +49,9 @@
         }
     },
     "scripts": {
-        "test" : "vendor/bin/phpunit --colors=always",
-        "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml",
-        "style": "vendor/bin/php-cs-fixer fix"
+        "test" : "phpunit",
+        "test:ci": "phpunit --verbose --coverage-text --coverage-clover=coverage.xml",
+        "style": "php-cs-fixer fix"
     },
     "extra": {
       "laravel": {
