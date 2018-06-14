@@ -47,20 +47,30 @@ class HasManyDirectiveTest extends DBTestCase
     public function itCanQueryHasManyRelationship()
     {
         $schema = '
-        type User {
-            tasks: [Task!]! @hasMany
-        }
-        type Task {
-            foo: String
-        }
-        type Query {
-            user: User @auth
-        }
+            type User {
+                tasks: [Task!]! @hasMany
+            }
+            
+            type Task {
+                id: ID
+            }
+            
+            type Query {
+                user: User @auth
+            }
         ';
 
-        $this->be($this->user);
+        $query = '
+            {
+                user {
+                    tasks {
+                        id
+                     }
+                 }
+             }
+         ';
 
-        $result = $this->execute($schema, '{ user { tasks { id } } }');
+        $result = $this->execute($schema, $query);
 
         $this->assertCount(3, array_get($result->data, 'user.tasks'));
     }
@@ -71,20 +81,36 @@ class HasManyDirectiveTest extends DBTestCase
     public function itCanQueryHasManyPaginator()
     {
         $schema = '
-        type User {
-            tasks: [Task!]! @hasMany(type:"paginator")
-        }
-        type Task {
-            id: Int!
-        }
-        type Query {
-            user: User @auth
-        }
+            type User {
+                tasks: [Task!]! @hasMany(type:"paginator")
+            }
+            
+            type Task {
+                id: Int!
+            }
+            
+            type Query {
+                user: User @auth
+            }
         ';
 
-        $result = $this->execute($schema, '
-        { user { tasks(count: 2) { paginatorInfo { total count hasMorePages } data { id } } } }
-        ', true);
+        $query = '
+            {
+                user {
+                    tasks(count: 2) {
+                        paginatorInfo {
+                            total
+                            count
+                            hasMorePages
+                        }
+                        data {
+                            id
+                        }
+                    }
+                }
+            }
+        ';
+        $result = $this->execute($schema, $query, true);
 
         $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
         $this->assertEquals(3, array_get($result->data, 'user.tasks.paginatorInfo.total'));
@@ -98,19 +124,34 @@ class HasManyDirectiveTest extends DBTestCase
     public function itCanQueryHasManyRelayConnection()
     {
         $schema = '
-        type User {
-            tasks: [Task!]! @hasMany(type:"relay")
-        }
-        type Task {
-            id: Int!
-        }
-        type Query {
-            user: User @auth
-        }
+            type User {
+                tasks: [Task!]! @hasMany(type:"relay")
+            }
+            
+            type Task {
+                id: Int!
+            }
+            
+            type Query {
+                user: User @auth
+            }
         ';
 
         $result = $this->execute($schema, '
-        { user { tasks(first: 2) { pageInfo { hasNextPage } edges { node { id } } } } }
+            {
+                user {
+                    tasks(first: 2) {
+                        pageInfo {
+                            hasNextPage
+                        }
+                        edges {
+                            node {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
         ', true);
 
         $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
@@ -122,16 +163,16 @@ class HasManyDirectiveTest extends DBTestCase
      */
     public function itThrowsErrorWithUnknownTypeArg()
     {
-        $schema = '
+        $this->expectException(DirectiveException::class);
+
+        $this->buildSchemaWithDefaultQuery('
             type User {
                 tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
             }
+            
             type Task {
                 foo: String
             }
-        ';
-
-        $this->expectException(DirectiveException::class);
-        $this->buildSchemaWithDefaultQuery($schema);
+        ');
     }
 }

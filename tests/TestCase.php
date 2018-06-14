@@ -114,19 +114,18 @@ class TestCase extends BaseTestCase
      *
      * @param string $schema
      * @param string $query
-     * @param bool   $lighthouse
-     * @param array  $variables
+     * @param bool   $addDefaultSchema
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function execute($schema, $query, $lighthouse = false, $variables = [])
+    protected function execute($schema, $query, $addDefaultSchema = false)
     {
-        if ($lighthouse) {
-            $lighthouse = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
-            $schema = $lighthouse."\n".$schema;
+        if ($addDefaultSchema) {
+            $addDefaultSchema = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
+            $schema = $addDefaultSchema."\n".$schema;
         }
 
-        return Executor::execute($this->buildSchemaFromString($schema), $this->parse($query));
+        return GraphQL::executeQuery($this->buildSchemaFromString($schema), $query);
     }
 
     protected function buildSchemaFromString($schema)

@@ -18,40 +18,38 @@ class NodeTest extends DBTestCase
     public function itCanResolveNodes()
     {
         $schema = '
-        type User @node(
-            resolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNode"
-            typeResolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNodeType"
-        ) {
-            name: String!
-        }
-        type Query {}
+            type User @node(
+                resolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNode"
+                typeResolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNodeType"
+            ) {
+                name: String!
+            }
+            
+            type Query {}
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { name } }', true);
+        $query = '
+            {
+                node(id: "'.$globalId.'") {
+                    ... on User {
+                        name
+                    }
+                }
+            }
+        ';
+        $result = $this->execute($schema, $query, true);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
 
     /**
-     * @test
+     * This is used as a helper for the test above.
+     *
+     * @param $id
+     *
+     * @return array
      */
-    public function itCanResolveModelsNodes()
-    {
-        $user = factory(User::class)->create();
-        $globalId = $this->encodeGlobalId('User', $user->getKey());
-
-        $schema = '
-        type User @model {
-            name: String!
-        }
-        type Query {}
-        ';
-
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { name } }', true);
-        $this->assertEquals($user->name, array_get($result->data, 'node.name'));
-    }
-
     public function resolveNode($id)
     {
         if ($this->node['id'] === $id) {
@@ -59,10 +57,47 @@ class NodeTest extends DBTestCase
         }
     }
 
+    /**
+     * Helper for the test above.
+     *
+     * @param $value
+     *
+     * @return \GraphQL\Type\Definition\Type
+     */
     public function resolveNodeType($value)
     {
         if (is_array($value) && isset($value['name'])) {
             return graphql()->types()->get('User');
         }
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveModelsNodes()
+    {
+        $schema = '
+            type User @model {
+                name: String!
+            }
+            
+            type Query {}
+        ';
+
+        $user = factory(User::class)->create();
+        $globalId = $this->encodeGlobalId('User', $user->getKey());
+
+        $query = '
+            {
+                node(id: "'.$globalId.'") {
+                    ... on User {
+                        name
+                    }
+                }
+            }
+        ';
+
+        $result = $this->execute($schema, $query, true);
+        $this->assertEquals($user->name, array_get($result->data, 'node.name'));
     }
 }
