@@ -4,14 +4,14 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\CacheManager;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
@@ -83,7 +83,7 @@ class GraphQL
      */
     public function prepSchema()
     {
-        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
+        return $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
     }
 
     /**
@@ -100,7 +100,7 @@ class GraphQL
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
-        if (! empty($result->errors)) {
+        if (!empty($result->errors)) {
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
                     info('GraphQL Error:', [
@@ -151,10 +151,10 @@ class GraphQL
     public function buildSchema()
     {
         $documentAST = $this->shouldCacheAST()
-            ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
-                return $this->buildAST();
-            })
-            : $this->buildAST();
+        ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+            return $this->buildAST();
+        })
+        : $this->buildAST();
 
         return (new SchemaBuilder())->build($documentAST);
     }
@@ -197,8 +197,8 @@ class GraphQL
     {
         $name = $name ?: $abstract;
         $instance = app()->has($name)
-            ? resolve($name)
-            : app()->instance($name, resolve($abstract));
+        ? resolve($name)
+        : app()->instance($name, resolve($abstract));
 
         return $instance->load($key, $data);
     }
@@ -206,15 +206,11 @@ class GraphQL
     /**
      * Get an instance of the schema builder.
      *
-     * @return SchemaBuilder
+     * @return TypeRegistry
      */
     public function schema()
     {
-        if (! $this->schema) {
-            $this->schema = app(SchemaBuilder::class);
-        }
-
-        return $this->schema;
+        return $this->types();
     }
 
     /**
@@ -244,39 +240,11 @@ class GraphQL
      */
     public function middleware()
     {
-        if (! $this->middleware) {
+        if (!$this->middleware) {
             $this->middleware = app(MiddlewareManager::class);
         }
 
         return $this->middleware;
-    }
-
-    /**
-     * Get instance of cache manager.
-     *
-     * @return CacheManager
-     */
-    public function cache()
-    {
-        if (! $this->cache) {
-            $this->cache = app(CacheManager::class);
-        }
-
-        return $this->cache;
-    }
-
-    /**
-     * Get instance of schema stitcher.
-     *
-     * @return SchemaStitcher
-     */
-    public function stitcher()
-    {
-        if (! $this->stitcher) {
-            $this->stitcher = app(SchemaStitcher::class);
-        }
-
-        return $this->stitcher;
     }
 
     /**
@@ -286,7 +254,7 @@ class GraphQL
      */
     public function nodes()
     {
-        if (! app()->has(NodeContainer::class)) {
+        if (!app()->has(NodeContainer::class)) {
             return app()->instance(
                 NodeContainer::class,
                 resolve(NodeContainer::class)

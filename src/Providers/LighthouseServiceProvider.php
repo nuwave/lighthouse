@@ -32,9 +32,10 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     protected function loadRoutesFrom($path)
     {
-        if(Str::contains($this->app->version(), "Lumen")) {
-           require realpath($path);
-           return;
+        if (Str::contains($this->app->version(), 'Lumen')) {
+            require realpath($path);
+
+            return;
         }
 
         parent::loadRoutesFrom($path);
@@ -49,9 +50,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->alias(GraphQL::class, 'graphql');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([
-                \Nuwave\Lighthouse\Support\Console\Commands\CacheCommand::class,
-            ]);
+            $this->commands([]);
         }
     }
 
