@@ -3,11 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Closure;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class EventDirective extends AbstractFieldDirective implements FieldMiddleware
+class EventDirective implements FieldMiddleware
 {
     use HandlesDirectives;
 
@@ -16,7 +17,7 @@ class EventDirective extends AbstractFieldDirective implements FieldMiddleware
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'event';
     }
@@ -26,26 +27,38 @@ class EventDirective extends AbstractFieldDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
-     * @throws DirectiveException
-     *
      * @return Closure
      */
     public function handleField(FieldValue $value)
     {
-        $eventBaseName = $this->associatedArgValue('fire')
-            // Default to reading this from class
-            ?? $this->associatedArgValue('class');
-
-        $eventClassName = $this->namespaceClassName($eventBaseName);
-
+        $event = $this->getEvent($value->getField());
         $resolver = $value->getResolver();
 
-        return function () use ($resolver, $eventClassName) {
+        return $value->setResolver(function () use ($resolver, $event) {
             $args = func_get_args();
             $value = call_user_func_array($resolver, $args);
-            event(new $eventClassName($value));
+            event(new $event($value));
 
             return $value;
-        };
+        });
+    }
+
+    /**
+     * Get the event name.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return mixed
+     */
+    protected function getEvent(FieldDefinitionNode $field)
+    {
+        return $this->directiveArgValue(
+            $this->fieldDirective($field, 'event'),
+            'fire',
+            $this->directiveArgValue(
+                $this->fieldDirective($field, 'event'),
+                'class'
+            )
+        );
     }
 }

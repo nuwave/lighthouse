@@ -2,7 +2,9 @@
 
 namespace Tests;
 
+use GraphQL\Executor\Executor;
 use GraphQL\GraphQL;
+use GraphQL\Language\Parser;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -70,48 +72,65 @@ class TestCase extends BaseTestCase
     }
 
     /**
+     * Load schema from directory.
+     *
+     * @param string $schema
+     *
+     * @return string
+     */
+    protected function loadSchema($schema = 'schema.graphql')
+    {
+        return file_get_contents(__DIR__."/Utils/Schemas/{$schema}");
+    }
+
+    /**
+     * Get parsed schema.
+     *
+     * @param string $schema
+     *
+     * @return \GraphQL\Language\AST\DocumentNode
+     */
+    protected function parseSchema($schema = 'schema.graphql')
+    {
+        return Parser::parse($this->loadSchema($schema));
+    }
+
+    /**
+     * Parse raw schema.
+     *
+     * @param string $schema
+     *
+     * @return \GraphQL\Language\AST\DocumentNode
+     */
+    protected function parse(string $schema)
+    {
+        return Parser::parse($schema);
+    }
+
+    /**
      * Execute query/mutation.
      *
      * @param string $schema
      * @param string $query
-     * @param bool   $addDefaultSchema
+     * @param string $lighthouse
+     * @param array  $variables
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function execute($schema, $query, $addDefaultSchema = false)
+    protected function execute($schema, $query, $lighthouse = false, $variables = [])
     {
-        if ($addDefaultSchema) {
+        if ($lighthouse) {
             $addDefaultSchema = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
             $schema = $addDefaultSchema."\n".$schema;
         }
 
-        return GraphQL::executeQuery($this->buildSchemaFromString($schema), $query);
-    }
-
-    /**
-     * @param string $schema
-     *
-     * @return \GraphQL\Type\Schema
-     */
-    protected function buildSchemaFromString($schema)
-    {
-        return (new SchemaBuilder())->build(ASTBuilder::generate($schema));
-    }
-
-    /**
-     * Convenience method to add a default Query, sometimes needed because the Schema is invalid without it.
-     *
-     * @param string $schema
-     *
-     * @return \GraphQL\Type\Schema
-     */
-    protected function buildSchemaWithDefaultQuery($schema)
-    {
-        return $this->buildSchemaFromString($schema.'
-            type Query {
-                dummy: String
-            }
-        ');
+        return GraphQL::executeQuery(
+            $this->buildSchemaFromString($schema),
+            $query,
+            null,
+            null,
+            $variables
+        );
     }
 
     /**
@@ -133,5 +152,32 @@ class TestCase extends BaseTestCase
         file_put_contents($path, $contents);
 
         return $path;
+    }
+
+    /**
+     * @param string $schema
+     *
+     * @return \GraphQL\Type\Schema
+     */
+    protected function buildSchemaFromString($schema)
+    {
+        return (new SchemaBuilder())->build(ASTBuilder::generate($schema));
+    }
+
+    /**
+     * Convenience method to add a default Query, sometimes needed
+     * because the Schema is invalid without it.
+     *
+     * @param string $schema
+     *
+     * @return \GraphQL\Type\Schema
+     */
+    protected function buildSchemaWithDefaultQuery($schema)
+    {
+        return $this->buildSchemaFromString($schema.'
+            type Query {
+                dummy: String
+            }
+        ');
     }
 }

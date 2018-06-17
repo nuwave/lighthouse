@@ -5,7 +5,7 @@ namespace Tests\Unit\Support\Validator;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 use Nuwave\Lighthouse\Support\Validator\Validator;
 use Tests\TestCase;
@@ -34,9 +34,8 @@ class ValidatorTest extends TestCase
                 foo(bar: String baz: Int): String @validate(validator: "foo.validator")
             }
         ');
-        $typeValue = new TypeValue($typeDefinition);
-        $fieldValue = new FieldValue($typeDefinition->fields[0], $typeValue);
 
+        $fieldValue = new FieldValue(new NodeValue($typeDefinition), $typeDefinition->fields[0]);
         $fieldValue->setResolver(function () {
             return 'foo';
         });

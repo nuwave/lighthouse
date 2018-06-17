@@ -6,14 +6,15 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Pagination\Paginator;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Directives\PaginatorCreatingDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class PaginateDirective extends PaginatorCreatingDirective implements FieldResolver, FieldManipulator
+class PaginateDirective extends PaginationManipulator implements FieldResolver, FieldManipulator
 {
     use HandlesGlobalId, HandlesQueryFilter, HandlesQueries;
 
@@ -22,7 +23,7 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'paginate';
     }
@@ -54,7 +55,7 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
      *
      * @throws DirectiveException
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
@@ -82,7 +83,7 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
         $paginationType = $this->associatedArgValue('type', self::PAGINATION_TYPE_PAGINATOR);
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
-        if (! $this->isValidPaginationType($paginationType)) {
+        if (!$this->isValidPaginationType($paginationType)) {
             $fieldName = $this->fieldDefinition->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
@@ -101,7 +102,7 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
      */
     protected function paginatorTypeResolver(FieldValue $value, $model)
     {
-        return function ($root, array $args) use ($model, $value) {
+        return $value->setResolver(function ($root, array $args) use ($model, $value) {
             $first = data_get($args, 'count', 15);
             $page = data_get($args, 'page', 1);
 
@@ -113,7 +114,7 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
             });
 
             return $query->paginate($first);
-        };
+        });
     }
 
     /**
@@ -122,11 +123,11 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
      * @param FieldValue $value
      * @param string     $model
      *
-     * @return \Closure
+     * @return FieldValue
      */
     protected function connectionTypeResolver(FieldValue $value, $model)
     {
-        return function ($root, array $args) use ($model, $value) {
+        return $value->setResolver(function ($root, array $args) use ($model, $value) {
             $first = data_get($args, 'first', 15);
             $after = $this->decodeCursor($args);
             $page = $first && $after ? floor(($first + $after) / $first) : 1;
@@ -139,6 +140,6 @@ class PaginateDirective extends PaginatorCreatingDirective implements FieldResol
             });
 
             return $query->paginate($first);
-        };
+        });
     }
 }

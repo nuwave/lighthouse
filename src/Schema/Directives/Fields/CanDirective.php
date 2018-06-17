@@ -4,15 +4,19 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class CanDirective extends AbstractFieldDirective implements FieldMiddleware
+class CanDirective implements FieldMiddleware
 {
+    use HandlesDirectives;
+
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'can';
     }
@@ -26,8 +30,15 @@ class CanDirective extends AbstractFieldDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $value)
     {
-        $policies = $this->associatedArgValue('if');
-        $model = $this->associatedArgValue('model');
+        $policies = $this->directiveArgValue(
+            $this->fieldDirective($value->getField(), 'can'),
+            'if'
+        );
+
+        $model = $this->directiveArgValue(
+            $this->fieldDirective($value->getField(), 'can'),
+            'model'
+        );
 
         $resolver = $value->getResolver();
 

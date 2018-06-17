@@ -17,7 +17,6 @@ class ValidationError extends Error
      * Set validator instance.
      *
      * @param mixed $validator
-     *
      * @return ValidationError
      */
     public function setValidator($validator)

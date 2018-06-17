@@ -19,15 +19,14 @@ class MethodDirectiveTest extends TestCase
         };
 
         $schema = $this->buildSchemaWithDefaultQuery('
-            type Foo {
-                bar: String! @method(name: "foobar")
-            }
+        type Foo {
+            bar: String! @method(name: "foobar")
+        }
         ');
 
         $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'bar.resolve');
-
         $this->assertEquals('baz', $resolver($root, []));
     }
 
@@ -44,15 +43,14 @@ class MethodDirectiveTest extends TestCase
         };
 
         $schema = $this->buildSchemaWithDefaultQuery('
-            type Foo {
-                bar(baz: String!): String! @method(name: "bar")
-            }
+        type Foo {
+            bar(baz: String!): String! @method(name: "bar")
+        }
         ');
 
         $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'bar.resolve');
-
         $this->assertEquals('foo', $resolver($root, ['baz' => 'foo']));
     }
 }

@@ -6,17 +6,16 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\Directives\Args\ArgManipulator;
-use Nuwave\Lighthouse\Schema\Directives\Args\ArgMiddleware;
-use Nuwave\Lighthouse\Schema\Directives\Directive;
-use Nuwave\Lighthouse\Schema\Directives\Fields\AbstractFieldDirective;
-use Nuwave\Lighthouse\Schema\Directives\Fields\FieldManipulator;
-use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
-use Nuwave\Lighthouse\Schema\Directives\Fields\FieldResolver;
-use Nuwave\Lighthouse\Schema\Directives\Types\TypeManipulator;
-use Nuwave\Lighthouse\Schema\Directives\Types\TypeMiddleware;
-use Nuwave\Lighthouse\Schema\Directives\Types\TypeResolver;
+use Nuwave\Lighthouse\Schema\Directives\Fields\BaseFieldDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -35,10 +34,10 @@ class DirectiveRegistry
      */
     public function __construct()
     {
-        $this->directives = new Collection();
+        $this->directives = collect();
 
         // Load built-in directives from the default directory
-        $this->load(realpath(__DIR__.'/Directives/'), 'Nuwave\\Lighthouse\\');
+        $this->load(realpath(__DIR__ . '/Directives/'), 'Nuwave\\Lighthouse\\');
 
         // Load custom directives
         $this->load(config('lighthouse.directives', []));
@@ -59,8 +58,8 @@ class DirectiveRegistry
             ->filter(function ($path) {
                 return is_dir($path);
             })->map(function ($path) {
-                return realpath($path);
-            })->all();
+            return realpath($path);
+        })->all();
 
         if (empty($paths)) {
             return;
@@ -68,16 +67,16 @@ class DirectiveRegistry
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-            ? realpath(__DIR__.'/../../src/')
-            : app_path();
+        ? realpath(__DIR__ . '/../../src/')
+        : app_path();
 
         /** @var SplFileInfo $file */
         foreach ((new Finder())->in($paths)->files() as $file) {
-            $className = $namespace.str_replace(
-                    ['/', '.php'],
-                    ['\\', ''],
-                    str_after($file->getPathname(), $path.DIRECTORY_SEPARATOR)
-                );
+            $className = $namespace . str_replace(
+                ['/', '.php'],
+                ['\\', ''],
+                str_after($file->getPathname(), $path . DIRECTORY_SEPARATOR)
+            );
 
             $this->tryRegisterClassName($className);
         }
@@ -107,7 +106,7 @@ class DirectiveRegistry
      */
     public function register(Directive $directive)
     {
-        $this->directives->put($directive::name(), $directive);
+        $this->directives->put($directive->name(), $directive);
     }
 
     /**
@@ -123,7 +122,7 @@ class DirectiveRegistry
     {
         $handler = $this->directives->get($name);
 
-        if (! $handler) {
+        if (!$handler) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
@@ -165,10 +164,10 @@ class DirectiveRegistry
      *
      * @return \Illuminate\Support\Collection
      */
-    public function typeManipulators(Node $node)
+    public function nodeManipulators(Node $node)
     {
         return $this->directives($node)->filter(function (Directive $directive) {
-            return $directive instanceof TypeManipulator;
+            return $directive instanceof NodeManipulator;
         });
     }
 
@@ -182,7 +181,7 @@ class DirectiveRegistry
         return $this->directives($fieldDefinition)->filter(function (Directive $directive) {
             return $directive instanceof FieldManipulator;
         })->map(function (FieldManipulator $directive) use ($fieldDefinition) {
-            return $this->hydrateIfAbstractFieldDirective($directive, $fieldDefinition);
+            return $this->hydrate($directive, $fieldDefinition);
         });
     }
 
@@ -199,21 +198,33 @@ class DirectiveRegistry
     }
 
     /**
-     * Get the type resolver directive for the given type definition.
+     * Get the node resolver directive for the given type definition.
      *
-     * @param Node $typeDefinition
+     * @param Node $node
      *
-     * @return TypeResolver
+     * @return NodeResolver
      */
-    public function typeResolver(Node $typeDefinition)
+    public function forNode(Node $node)
     {
-        $resolvers = $this->directives($typeDefinition)->filter(function (Directive $directive) {
-            return $directive instanceof TypeResolver;
+        return $this->nodeResolver($node);
+    }
+
+    /**
+     * Get the node resolver directive for the given type definition.
+     *
+     * @param Node $node
+     *
+     * @return NodeResolver
+     */
+    public function nodeResolver(Node $node)
+    {
+        $resolvers = $this->directives($node)->filter(function (Directive $directive) {
+            return $directive instanceof NodeResolver;
         });
 
         if ($resolvers->count() > 1) {
-            $nodeName = data_get($typeDefinition, 'name.value');
-            throw new DirectiveException("Node $nodeName can only have one TypeResolver directive. Check your schema definition");
+            $nodeName = data_get($node, 'name.value');
+            throw new DirectiveException("Node $nodeName can only have one NodeResolver directive. Check your schema definition");
         }
 
         return $resolvers->first();
@@ -226,9 +237,47 @@ class DirectiveRegistry
      *
      * @return bool
      */
-    public function hasTypeResolver(Node $typeDefinition)
+    public function hasNodeResolver(Node $typeDefinition)
     {
-        return $this->typeResolver($typeDefinition) instanceof TypeResolver;
+        return $this->nodeResolver($typeDefinition) instanceof NodeResolver;
+    }
+
+    /**
+     * @param FieldDefinitionNode $fieldDefinition
+     *
+     * @return bool
+     */
+    public function hasResolver($fieldDefinition)
+    {
+        return $this->hasFieldResolver($fieldDefinition);
+    }
+
+    /**
+     * Check if the given field has a field resolver directive handler assigned to it.
+     *
+     * @param FieldDefinitionNode $fieldDefinition
+     *
+     * @return bool
+     */
+    public function hasFieldResolver($fieldDefinition)
+    {
+        return $this->fieldResolver($fieldDefinition) instanceof FieldResolver;
+    }
+
+    /**
+     * Check if field has a resolver directive.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return bool
+     */
+    public function hasFieldMiddleware($field)
+    {
+        return collect($field->directives)->map(function (DirectiveNode $directive) {
+            return $this->handler($directive->name->value);
+        })->reduce(function ($has, $handler) {
+            return $handler instanceof FieldMiddleware ? true : $has;
+        }, false);
     }
 
     /**
@@ -259,7 +308,7 @@ class DirectiveRegistry
 
         $resolver = $resolvers->first();
 
-        return $resolver ? $this->hydrateIfAbstractFieldDirective($resolver, $field) : null;
+        return $resolver ? $this->hydrate($resolver, $field) : null;
     }
 
     /**
@@ -269,10 +318,10 @@ class DirectiveRegistry
      *
      * @return \Illuminate\Support\Collection
      */
-    public function typeMiddlewares(Node $typeDefinition)
+    public function nodeMiddleware(Node $typeDefinition)
     {
         return $this->directives($typeDefinition)->filter(function (Directive $directive) {
-            return $directive instanceof TypeMiddleware;
+            return $directive instanceof NodeMiddleware;
         });
     }
 
@@ -288,7 +337,7 @@ class DirectiveRegistry
         return $this->directives($fieldDefinition)->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
         })->map(function (FieldMiddleware $fieldDirective) use ($fieldDefinition) {
-            return $this->hydrateIfAbstractFieldDirective($fieldDirective, $fieldDefinition);
+            return $this->hydrate($fieldDirective, $fieldDefinition);
         });
     }
 
@@ -312,10 +361,10 @@ class DirectiveRegistry
      *
      * @return Directive
      */
-    protected function hydrateIfAbstractFieldDirective(Directive $directive, FieldDefinitionNode $fieldDefinition)
+    protected function hydrate(Directive $directive, FieldDefinitionNode $fieldDefinition)
     {
-        return $directive instanceof AbstractFieldDirective
-            ? $directive->hydrate($fieldDefinition)
-            : $directive;
+        return $directive instanceof BaseFieldDirective
+        ? $directive->hydrate($fieldDefinition)
+        : $directive;
     }
 }

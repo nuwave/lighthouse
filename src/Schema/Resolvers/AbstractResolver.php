@@ -5,23 +5,23 @@ namespace Nuwave\Lighthouse\Schema\Resolvers;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 abstract class AbstractResolver
 {
     /**
      * Instance of node to resolve.
      *
-     * @var TypeValue
+     * @var NodeValue
      */
     protected $value;
 
     /**
      * Create a new instance of node resolver.
      *
-     * @param TypeValue $value
+     * @param NodeValue $value
      */
-    public function __construct(TypeValue $value)
+    public function __construct(NodeValue $value)
     {
         $this->value = $value;
     }
@@ -29,21 +29,21 @@ abstract class AbstractResolver
     /**
      * Resolve node type from node.
      *
-     * @param TypeValue $value
+     * @param NodeValue $value
      *
-     * @return Type
+     * @return NodeValue
      */
-    public static function resolveType(TypeValue $value)
+    public static function resolve(NodeValue $value)
     {
         $instance = new static($value);
 
-        return $instance->generate();
+        return $value->setType($instance->generate());
     }
 
     /**
      * Generate a GraphQL type from a node.
      *
-     * @return Type
+     * @var Type
      */
     abstract public function generate();
 
@@ -59,7 +59,7 @@ abstract class AbstractResolver
     {
         return collect($node->directives)
             ->reduce(function ($match, DirectiveNode $directive) use ($name) {
-                return $match ?: $directive->name->value === $name ? true : false;
+                return $match ?: $directive->name->value == $name ? true : false;
             }, false);
     }
 
@@ -106,7 +106,7 @@ abstract class AbstractResolver
     {
         return collect($node->directives)
             ->first(function (DirectiveNode $directive) use ($name) {
-                return $directive->name->value === $name;
+                return $directive->name->value == $name;
             }, $default);
     }
 
@@ -123,7 +123,7 @@ abstract class AbstractResolver
     {
         $argument = collect($node->arguments)
             ->first(function (ArgumentNode $arg) use ($key) {
-                return $arg->name->value === $key;
+                return $arg->name->value == $key;
             });
 
         return $argument ? $argument->value->value : $default;

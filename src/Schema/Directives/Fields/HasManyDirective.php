@@ -6,22 +6,20 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Directives\PaginatorCreatingDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class HasManyDirective extends PaginatorCreatingDirective implements FieldResolver, FieldManipulator
+class HasManyDirective extends PaginationManipulator implements FieldResolver, FieldManipulator
 {
-    use HandlesGlobalId;
-
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'hasMany';
     }
@@ -56,21 +54,20 @@ class HasManyDirective extends PaginatorCreatingDirective implements FieldResolv
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
-        $relation = $this->associatedArgValue('relation', $this->fieldDefinition->name->value);
+        $relation = $this->associatedArgValue('relation', $value->getFieldName());
         $type = $this->getResolverType();
-
         $scopes = $this->associatedArgValue('scopes', []);
 
-        return function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes, $type) {
+        return $value->setResolver(function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes, $type) {
             return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
                 compact('relation', 'parent', 'args', 'scopes'),
                 ['type' => $type]
             ), HasManyLoader::key($parent, $relation, $info));
-        };
+        });
     }
 
     /**
@@ -87,7 +84,8 @@ class HasManyDirective extends PaginatorCreatingDirective implements FieldResolv
         }
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
-        if (! $this->isValidPaginationType($paginationType)) {
+
+        if (!$this->isValidPaginationType($paginationType)) {
             $fieldName = $this->fieldDefinition->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");

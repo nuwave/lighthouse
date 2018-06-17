@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+
+
 trait IsRelayConnection
 {
     use HandlesGlobalId;

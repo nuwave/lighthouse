@@ -25,13 +25,18 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->registerMacros();
     }
 
+    /**
+     * Load routes from provided path.
+     *
+     * @param string $path
+     */
     protected function loadRoutesFrom($path)
     {
-        if (Str::contains($this->app->version(), 'Lumen')) {
-            require realpath($path);
-
-            return;
+        if(Str::contains($this->app->version(), "Lumen")) {
+           require realpath($path);
+           return;
         }
+
         parent::loadRoutesFrom($path);
     }
 
@@ -45,9 +50,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Nuwave\Lighthouse\Support\Console\Commands\ClearCacheCommand::class,
-                \Nuwave\Lighthouse\Support\Console\Commands\ValidateSchemaCommand::class,
-                \Nuwave\Lighthouse\Support\Console\Commands\PrintSchemaCommand::class,
+                \Nuwave\Lighthouse\Support\Console\Commands\CacheCommand::class,
             ]);
         }
     }

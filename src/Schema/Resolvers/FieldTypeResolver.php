@@ -21,7 +21,7 @@ class FieldTypeResolver
     public static function resolve(FieldValue $value)
     {
         return $value->setType(
-            (new static())->resolveNodeType($value->getFieldDefinition())
+            (new static())->resolveNodeType($value->getField())
         );
     }
 
@@ -59,12 +59,12 @@ class FieldTypeResolver
      */
     public function resolveNodeType($node, array $wrappers = [])
     {
-        if ('NonNullType' === $node->kind) {
+        if ('NonNullType' == $node->kind) {
             return $this->resolveNodeType(
                 $node->type,
                 array_merge($wrappers, ['NonNullType'])
             );
-        } elseif ('ListType' === $node->kind) {
+        } elseif ('ListType' == $node->kind) {
             return $this->resolveNodeType(
                 $node->type,
                 array_merge($wrappers, ['ListType'])
@@ -74,9 +74,9 @@ class FieldTypeResolver
         return collect($wrappers)
             ->reverse()
             ->reduce(function ($type, $kind) {
-                if ('NonNullType' === $kind) {
+                if ('NonNullType' == $kind) {
                     return Type::nonNull($type);
-                } elseif ('ListType' === $kind) {
+                } elseif ('ListType' == $kind) {
                     return Type::listOf($type);
                 }
 
@@ -160,7 +160,7 @@ class FieldTypeResolver
     protected function convertCustomType($name)
     {
         return function () use ($name) {
-            return graphql()->types()->get($name);
+            return schema()->instance($name);
         };
     }
 }

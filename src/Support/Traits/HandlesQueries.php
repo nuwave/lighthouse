@@ -8,33 +8,33 @@ use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 trait HandlesQueries
 {
+    abstract public function name();
+
     /**
      * @param FieldValue $value
-     *
-     * @throws DirectiveException
-     *
      * @return mixed|string
+     * @throws DirectiveException
      */
     public function getModelClass(FieldValue $value)
     {
         $model = $this->directiveArgValue(
-            $this->fieldDirective($value->getFieldDefinition(), self::name()),
+            $this->fieldDirective($value->getField(), $this->name()),
             'model'
         );
 
-        if (! $model) {
+        if (!$model) {
             $message = sprintf(
                 'A `model` argument must be assigned to the %s directive on the %s field [%s]',
-                self::name(),
-                $value->getParentTypeName(),
+                $this->name(),
+                $value->getNodeName(),
                 $value->getFieldName()
             );
 
             throw new DirectiveException($message);
         }
 
-        if (! class_exists($model)) {
-            $model = config('lighthouse.namespaces.models').'\\'.$model;
+        if (!class_exists($model)) {
+            $model = config('lighthouse.namespaces.models') . '\\' . $model;
         }
 
         return $model;
@@ -50,7 +50,7 @@ trait HandlesQueries
     protected function getScopes(FieldValue $value)
     {
         return $this->directiveArgValue(
-            $this->fieldDirective($value->getFieldDefinition(), self::name()),
+            $this->fieldDirective($value->getField(), $this->name()),
             'scopes',
             []
         );

@@ -10,9 +10,9 @@ use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Schema\Factories\TypeFactory;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
 
 class SchemaBuilder
 {
@@ -102,7 +102,7 @@ class SchemaBuilder
             ->sortBy(function (TypeDefinitionNode $typeDefinition) {
                 return array_get($this->weights, get_class($typeDefinition), 9);
             })->map(function (TypeDefinitionNode $typeDefinition) {
-                return app(TypeFactory::class)->toType(new TypeValue($typeDefinition));
+                return app(NodeFactory::class)->handle(new NodeValue($typeDefinition));
             })->each(function (Type $type) {
                 // Register in global type registry
                 graphql()->types()->register($type);
@@ -119,7 +119,7 @@ class SchemaBuilder
     protected function convertDirectives(DocumentAST $document)
     {
         return $document->directives()->map(function (DirectiveDefinitionNode $directive) {
-            return DirectiveFactory::toDirective($directive);
+            return app(NodeFactory::class)->handle(new NodeValue($directive));
         });
     }
 }

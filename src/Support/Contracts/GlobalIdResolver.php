@@ -2,8 +2,15 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-interface GlobalIdResolver extends Directive
+interface GlobalIdResolver
 {
+    /**
+     * Directive name.
+     *
+     * @return string
+     */
+    public function name();
+
     /**
      * Resolve node by global id.
      *

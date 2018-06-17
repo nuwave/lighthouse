@@ -23,7 +23,7 @@ class EnumResolver extends AbstractResolver
     public function generate()
     {
         $config = [
-            'name' => $this->getName(),
+            'name'   => $this->getName(),
             'values' => $this->getValues(),
         ];
 
@@ -74,14 +74,14 @@ class EnumResolver extends AbstractResolver
      */
     protected function parseEnumNode(EnumValueDefinitionNode $node)
     {
-        $directive = $this->getDirective($node, 'enum');
+        $directive = $this->getDirective($node, "enum");
 
         if (! $directive) {
             return [];
         }
 
         return [
-            'value' => $this->directiveArgValue($directive, 'value'),
+            'value'       => $this->directiveArgValue($directive, 'value'),
             'description' => $this->safeDescription($node->description),
         ];
     }

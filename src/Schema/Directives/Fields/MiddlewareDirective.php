@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class MiddlewareDirective extends AbstractFieldDirective implements FieldMiddleware
+class MiddlewareDirective implements FieldMiddleware
 {
     use HandlesDirectives;
 
@@ -14,7 +15,7 @@ class MiddlewareDirective extends AbstractFieldDirective implements FieldMiddlew
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'middleware';
     }
@@ -31,12 +32,12 @@ class MiddlewareDirective extends AbstractFieldDirective implements FieldMiddlew
         $checks = $this->getChecks($value);
 
         if ($checks) {
-            if ('Query' === $value->getParentTypeName()) {
+            if ('Query' === $value->getNodeName()) {
                 graphql()->middleware()->registerQuery(
                     $value->getFieldName(),
                     $checks
                 );
-            } elseif ('Mutation' === $value->getParentTypeName()) {
+            } elseif ('Mutation' === $value->getNodeName()) {
                 graphql()->middleware()->registerMutation(
                     $value->getFieldName(),
                     $checks
@@ -56,11 +57,14 @@ class MiddlewareDirective extends AbstractFieldDirective implements FieldMiddlew
      */
     protected function getChecks(FieldValue $value)
     {
-        if (! in_array($value->getParentTypeName(), ['Mutation', 'Query'])) {
+        if (! in_array($value->getNodeName(), ['Mutation', 'Query'])) {
             return null;
         }
 
-        $checks = $this->associatedArgValue('checks');
+        $checks = $this->directiveArgValue(
+            $this->fieldDirective($value->getField(), $this->name()),
+            'checks'
+        );
 
         if (! $checks) {
             return null;

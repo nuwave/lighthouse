@@ -3,16 +3,19 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Traits\CanParseResolvers;
 
-class ComplexityDirective extends AbstractFieldDirective implements FieldMiddleware
+class ComplexityDirective implements FieldMiddleware
 {
+    use CanParseResolvers;
+
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'complexity';
     }
@@ -26,29 +29,20 @@ class ComplexityDirective extends AbstractFieldDirective implements FieldMiddlew
      */
     public function handleField(FieldValue $value)
     {
-        $baseClassname = $this->associatedArgValue('class')
-            ?? str_before($this->associatedArgValue('resolver'), '@');
+        $directive = $this->fieldDirective($value->getField(), $this->name());
 
-        // No class is set so we apply a default function
-        if (empty($baseClassname)) {
-            return $value->setComplexity(function ($childrenComplexity, $args) {
-                $complexity = array_get($args, 'first', array_get($args, 'count', 1));
+        if ($resolver = $this->getResolver($value, $directive, false)) {
+            $method = $this->getResolverMethod($directive);
 
-                return $childrenComplexity * $complexity;
+            return $value->setComplexity(function () use ($resolver, $method) {
+                return call_user_func_array([app($resolver), $method], func_get_args());
             });
         }
 
-        $resolverClass = $this->namespaceClassName($baseClassname);
+        return $value->setComplexity(function ($childrenComplexity, $args) {
+            $complexity = array_get($args, 'first', array_get($args, 'count', 1));
 
-        $resolverMethod = $this->associatedArgValue('method')
-            ?? str_after($this->associatedArgValue('resolver'), '@');
-
-        if (! method_exists($resolverClass, $resolverMethod)) {
-            throw new DirectiveException("Method '$resolverMethod' does not exist on class '$resolverClass'");
-        }
-
-        return $value->setComplexity(function () use ($resolverClass, $resolverMethod) {
-            return call_user_func_array([app($resolverClass), $resolverMethod], func_get_args());
+            return $childrenComplexity * $complexity;
         });
     }
 }

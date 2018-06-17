@@ -3,15 +3,13 @@
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
 use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Model;
 
 abstract class BatchLoader
 {
     /**
      * Keys to resolve.
      *
-     * @var array
+     * @var \Illuminate\Support\Collection
      */
     protected $keys = [];
 
@@ -25,13 +23,13 @@ abstract class BatchLoader
     /**
      * Generate key for field.
      *
-     * @param Model       $root
-     * @param ResolveInfo $info
-     * @param string      $relation
+     * @param \Illuminate\Database\Eloquent\Model  $root
+     * @param \GraphQL\Type\Definition\ResolveInfo $info
+     * @param string                               $relation
      *
      * @return string
      */
-    public static function key(Model $root, $relation, ResolveInfo $info = null)
+    public static function key($root, $relation, $info = null)
     {
         $path = ! empty(data_get($info, 'path')) ? array_last($info->path) : $relation;
 

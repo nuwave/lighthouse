@@ -4,113 +4,101 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\Context;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\CacheManager;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\NodeContainer;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
 {
     use CanFormatError;
 
-    /** @var DirectiveRegistry */
-    protected $directiveRegistry;
-
     /**
-     * @return DirectiveRegistry
-     */
-    public function directives()
-    {
-        return $this->directiveRegistry;
-    }
-
-    /** @var MiddlewareRegistry */
-    protected $middlewareRegistry;
-
-    /**
-     * @return MiddlewareRegistry
-     */
-    public function middleware()
-    {
-        return $this->middlewareRegistry;
-    }
-
-    /** @var NodeRegistry */
-    protected $nodeRegistry;
-
-    /**
-     * @return NodeRegistry
-     */
-    public function nodes()
-    {
-        return $this->nodeRegistry;
-    }
-
-    /** @var TypeRegistry */
-    protected $typeRegistry;
-
-    /**
-     * @return TypeRegistry
-     */
-    public function types()
-    {
-        return $this->typeRegistry;
-    }
-
-    /**
-     * GraphQL constructor.
+     * Cache manager.
      *
-     * @param DirectiveRegistry  $directiveRegistry
-     * @param MiddlewareRegistry $middlewareRegistry
-     * @param NodeRegistry       $nodeRegistry
-     * @param TypeRegistry       $typeRegistry
+     * @var CacheManager
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, MiddlewareRegistry $middlewareRegistry, NodeRegistry $nodeRegistry, TypeRegistry $typeRegistry)
-    {
-        $this->directiveRegistry = $directiveRegistry;
-        $this->middlewareRegistry = $middlewareRegistry;
-        $this->nodeRegistry = $nodeRegistry;
-        $this->typeRegistry = $typeRegistry;
-    }
+    protected $cache;
 
-    /** @var Schema */
+    /**
+     * Schema builder.
+     *
+     * @var SchemaBuilder
+     */
+    protected $schema;
+
+    /**
+     * Directive registry container.
+     *
+     * @var DirectiveRegistry
+     */
+    protected $directives;
+
+    /**
+     * Type registry container.
+     *
+     * @var TypeRegistry
+     */
+    protected $types;
+
+    /**
+     * Middleware manager.
+     *
+     * @var MiddlewareManager
+     */
+    protected $middleware;
+
+    /**
+     * Schema Stitcher.
+     *
+     * @var SchemaStitcher
+     */
+    protected $stitcher;
+
+    /**
+     * GraphQL Schema.
+     *
+     * @var Schema
+     */
     protected $graphqlSchema;
 
     /**
-     * @return Schema
+     * Create instance of graphql container.
+     *
+     * @param DirectiveRegistry $directives
      */
-    public function prepSchema(): Schema
+    public function __construct(DirectiveRegistry $directives, TypeRegistry $types)
     {
-        return $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
+        $this->directives = $directives;
+        $this->types = $types;
+    }
+
+    /**
+     * Prepare graphql schema.
+     */
+    public function prepSchema()
+    {
+        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
     }
 
     /**
      * Execute GraphQL query.
      *
-     * @param string       $query
-     * @param Context|null $context
-     * @param array        $variables
-     * @param mixed        $rootValue
+     * @param string $query
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
      *
      * @return array
      */
     public function execute($query, $context = null, $variables = [], $rootValue = null)
     {
-        $result = GraphQLBase::executeQuery(
-            $this->prepSchema(),
-            $query,
-            $rootValue,
-            $context,
-            $variables
-        );
+        $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
         if (! empty($result->errors)) {
             foreach ($result->errors as $error) {
@@ -130,6 +118,29 @@ class GraphQL
         }
 
         return ['data' => $result->data];
+    }
+
+    /**
+     * Execute GraphQL query.
+     *
+     * @param string $query
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     */
+    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
+    {
+        $schema = $this->graphqlSchema ?: $this->buildSchema();
+
+        return GraphQLBase::executeQuery(
+            $schema,
+            $query,
+            $rootValue,
+            $context,
+            $variables
+        );
     }
 
     /**
@@ -155,7 +166,7 @@ class GraphQL
      */
     protected function shouldCacheAST()
     {
-        return App::environment('production') && config('cache.enable');
+        return app()->environment('production') && config('cache.enable');
     }
 
     /**
@@ -190,5 +201,98 @@ class GraphQL
             : app()->instance($name, resolve($abstract));
 
         return $instance->load($key, $data);
+    }
+
+    /**
+     * Get an instance of the schema builder.
+     *
+     * @return SchemaBuilder
+     */
+    public function schema()
+    {
+        if (! $this->schema) {
+            $this->schema = app(SchemaBuilder::class);
+        }
+
+        return $this->schema;
+    }
+
+    /**
+     * Get an instance of the directive container.
+     *
+     * @return DirectiveRegistry
+     */
+    public function directives()
+    {
+        return $this->directives;
+    }
+
+    /**
+     * Get instsance of type container.
+     *
+     * @return TypeRegistry
+     */
+    public function types()
+    {
+        return $this->types;
+    }
+
+    /**
+     * Get instance of middle manager.
+     *
+     * @return MiddlewareManager
+     */
+    public function middleware()
+    {
+        if (! $this->middleware) {
+            $this->middleware = app(MiddlewareManager::class);
+        }
+
+        return $this->middleware;
+    }
+
+    /**
+     * Get instance of cache manager.
+     *
+     * @return CacheManager
+     */
+    public function cache()
+    {
+        if (! $this->cache) {
+            $this->cache = app(CacheManager::class);
+        }
+
+        return $this->cache;
+    }
+
+    /**
+     * Get instance of schema stitcher.
+     *
+     * @return SchemaStitcher
+     */
+    public function stitcher()
+    {
+        if (! $this->stitcher) {
+            $this->stitcher = app(SchemaStitcher::class);
+        }
+
+        return $this->stitcher;
+    }
+
+    /**
+     * Instance of Node container.
+     *
+     * @return NodeContainer
+     */
+    public function nodes()
+    {
+        if (! app()->has(NodeContainer::class)) {
+            return app()->instance(
+                NodeContainer::class,
+                resolve(NodeContainer::class)
+            );
+        }
+
+        return resolve(NodeContainer::class);
     }
 }

@@ -4,9 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use Nuwave\Lighthouse\Schema\Directives\Fields\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
@@ -19,7 +20,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'validate';
     }
@@ -29,21 +30,19 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @param FieldValue $value
      *
-     * @throws DirectiveException
-     *
      * @return FieldValue
      */
     public function handleField(FieldValue $value)
     {
         $validator = $this->directiveArgValue(
-            $this->fieldDirective($value->getFieldDefinition(), self::name()),
+            $this->fieldDirective($value->getField(), $this->name()),
             'validator'
         );
 
         if (! $validator) {
-            $fieldName = $value->getFieldName();
-            $directiveName = self::name();
-            throw new DirectiveException("A `validator` argument must be supplied for the @$directiveName directive on field $fieldName");
+            $message = 'A `validator` argument must be supplied on the @validate field directive';
+
+            throw new DirectiveException($message);
         }
 
         $resolver = $value->getResolver();
@@ -62,16 +61,16 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
     }
 
     /**
-     * Resolve the argument directive.
+     * Resolve the field directive.
      *
      * @param ArgumentValue $value
      *
-     * @return ArgumentValue
+     * @return array
      */
     public function handleArgument(ArgumentValue $value)
     {
         // TODO: Rename "getValue" to something more descriptive like "toArray"
-        // and consider using for TypeValue/FieldValue.
+        // and consider using for NodeValue/FieldValue.
         $current = $value->getValue();
         $current['rules'] = array_merge(
             array_get($value->getArg(), 'rules', []),

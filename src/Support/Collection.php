@@ -1,14 +1,15 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support;
 
+namespace Nuwave\Lighthouse\Support;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 
+
 /**
- * Class Collection.
+ * Class Collection
  *
+ * @package Nuwave\Lighthouse\Support
  * @mixin \Illuminate\Support\Collection
- *
  * @property array items
  */
 class Collection
@@ -27,6 +28,7 @@ class Collection
             return $this;
         };
     }
+
 
     public function fetchCount()
     {
