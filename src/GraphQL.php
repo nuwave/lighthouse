@@ -100,7 +100,7 @@ class GraphQL
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
-        if (!empty($result->errors)) {
+        if (! empty($result->errors)) {
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
                     info('GraphQL Error:', [
@@ -240,7 +240,7 @@ class GraphQL
      */
     public function middleware()
     {
-        if (!$this->middleware) {
+        if (! $this->middleware) {
             $this->middleware = app(MiddlewareManager::class);
         }
 
@@ -254,7 +254,7 @@ class GraphQL
      */
     public function nodes()
     {
-        if (!app()->has(NodeContainer::class)) {
+        if (! app()->has(NodeContainer::class)) {
             return app()->instance(
                 NodeContainer::class,
                 resolve(NodeContainer::class)

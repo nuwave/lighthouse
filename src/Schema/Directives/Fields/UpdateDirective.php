@@ -7,12 +7,11 @@ use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class UpdateDirective implements FieldResolver
+class UpdateDirective extends BaseFieldDirective implements FieldResolver
 {
-    use HandlesDirectives, HandlesGlobalId;
+    use HandlesGlobalId;
 
     /**
      * Name of the directive.
@@ -34,18 +33,10 @@ class UpdateDirective implements FieldResolver
     public function resolveField(FieldValue $value)
     {
         $idArg = $this->getIDField($value);
-        $class = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'model'
-        );
+        $class = $this->associatedArgValue('model');
+        $globalId = $this->associatedArgValue('globalId', false);
 
-        $globalId = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'globalId',
-            false
-        );
-
-        if (! $class) {
+        if (!$class) {
             throw new DirectiveException(sprintf(
                 'The `update` directive on %s [%s] must have a `model` argument',
                 $value->getNodeName(),
@@ -53,7 +44,7 @@ class UpdateDirective implements FieldResolver
             ));
         }
 
-        if (! $idArg) {
+        if (!$idArg) {
             new DirectiveException(sprintf(
                 'The `update` requires that you have an `ID` field on %s',
                 $value->getNodeName()

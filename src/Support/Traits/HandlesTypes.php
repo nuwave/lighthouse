@@ -67,7 +67,7 @@ trait HandlesTypes
      */
     protected function unpackType($type)
     {
-        if (! isset($type->config['fields'])) {
+        if (!isset($type->config['fields'])) {
             return $type;
         }
 
@@ -118,8 +118,8 @@ trait HandlesTypes
         if (array_has($config, 'fields')) {
             $config['fields'] = collect($config['fields'])->mapWithKeys(function ($field, $key) {
                 $field['type'] = $field['type'] instanceof Closure
-                    ? new SerializableClosure($field['type'])
-                    : $field['type'];
+                ? new SerializableClosure($field['type'])
+                : $field['type'];
 
                 if (array_has($field, 'resolve') && $field['resolve'] instanceof Closure) {
                     $field['resolve'] = new SerializableClosure($field['resolve']);
@@ -154,9 +154,9 @@ trait HandlesTypes
         $unpackedType = is_callable($type) ? $type() : $type;
 
         return collect($wrappers)->reduce(function ($innerType, $type) {
-            if (ListOfType::class == $type) {
+            if (ListOfType::class === $type) {
                 return Type::listOf($innerType);
-            } elseif (NonNull::class == $type) {
+            } elseif (NonNull::class === $type) {
                 return Type::nonNull($innerType);
             } else {
                 throw new \Exception("Unknown Type [{$type}]");

@@ -40,7 +40,8 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
         );
 
         if (! $validator) {
-            $message = 'A `validator` argument must be supplied on the @validate field directive';
+            $fieldName = $value->getFieldName();
+            $message = "A `validator` argument must be supplied on the @validate directive on field {$fieldName}";
 
             throw new DirectiveException($message);
         }
@@ -65,7 +66,7 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      *
      * @param ArgumentValue $value
      *
-     * @return array
+     * @return ArgumentValue
      */
     public function handleArgument(ArgumentValue $value)
     {

@@ -8,12 +8,12 @@ use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 trait HandlesQueries
 {
-    abstract public function name();
-
     /**
      * @param FieldValue $value
-     * @return mixed|string
+     *
      * @throws DirectiveException
+     *
+     * @return mixed|string
      */
     public function getModelClass(FieldValue $value)
     {
@@ -22,7 +22,7 @@ trait HandlesQueries
             'model'
         );
 
-        if (!$model) {
+        if (! $model) {
             $message = sprintf(
                 'A `model` argument must be assigned to the %s directive on the %s field [%s]',
                 $this->name(),
@@ -33,8 +33,8 @@ trait HandlesQueries
             throw new DirectiveException($message);
         }
 
-        if (!class_exists($model)) {
-            $model = config('lighthouse.namespaces.models') . '\\' . $model;
+        if (! class_exists($model)) {
+            $model = config('lighthouse.namespaces.models').'\\'.$model;
         }
 
         return $model;

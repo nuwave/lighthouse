@@ -8,6 +8,9 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
+/**
+ * @deprecated This trait will be removed in a future version of Lighthouse.
+ */
 trait CanParseResolvers
 {
     use HandlesDirectives;
@@ -50,10 +53,10 @@ trait CanParseResolvers
         );
 
         return $namespaceDirective
-            // Look if a namespace for the current field is set, if not default to an empty string
-            ? $this->directiveArgValue($namespaceDirective, $this->name(), '')
-            // Default to an empty namespace if the namespace directive does not exist
-            : '';
+        // Look if a namespace for the current field is set, if not default to an empty string
+         ? $this->directiveArgValue($namespaceDirective, $this->name(), '')
+        // Default to an empty namespace if the namespace directive does not exist
+         : '';
     }
 
     /**
@@ -68,7 +71,7 @@ trait CanParseResolvers
     {
         $class = $this->directiveArgValue($directive, 'class');
 
-        if (! $class && $throw) {
+        if (!$class && $throw) {
             throw new DirectiveException(sprintf(
                 'Directive [%s] must have a `class` argument.',
                 $directive->name->value
@@ -95,7 +98,7 @@ trait CanParseResolvers
 
         $method = $this->directiveArgValue($directive, 'method');
 
-        if (! $method) {
+        if (!$method) {
             throw new DirectiveException(sprintf(
                 'Directive [%s] must have a `method` argument.',
                 $directive->name->value

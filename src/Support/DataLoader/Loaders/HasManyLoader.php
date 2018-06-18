@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
+use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
@@ -36,14 +37,14 @@ class HasManyLoader extends BatchLoader
             }];
 
             switch ($type) {
-                case 'connection':
-                case 'relay':
+                case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
+                case PaginationManipulator::PAGINATION_ALIAS_RELAY:
                     $first = data_get($args, 'first', 15);
                     $after = $this->decodeCursor($args);
                     $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
                     $parents->fetchForPage($first, $currentPage, $constraints);
                     break;
-                case 'paginator':
+                case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                     $first = data_get($args, 'count', 15);
                     $page = data_get($args, 'page', 1);
                     $parents->fetchForPage($first, $page, $constraints);

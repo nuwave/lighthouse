@@ -5,12 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class InjectDirective implements FieldMiddleware
+class InjectDirective extends BaseFieldDirective implements FieldMiddleware
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -31,17 +28,10 @@ class InjectDirective implements FieldMiddleware
     public function handleField(FieldValue $value)
     {
         $resolver = $value->getResolver();
-        $attr = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'context'
-        );
+        $attr = $this->associatedArgValue('context');
+        $name = $this->associatedArgValue('name');
 
-        $name = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'name'
-        );
-
-        if (! $attr) {
+        if (!$attr) {
             throw new DirectiveException(sprintf(
                 'The `inject` directive on %s [%s] must have a `context` argument',
                 $value->getNodeName(),
@@ -49,7 +39,7 @@ class InjectDirective implements FieldMiddleware
             ));
         }
 
-        if (! $name) {
+        if (!$name) {
             throw new DirectiveException(sprintf(
                 'The `inject` directive on %s [%s] must have a `name` argument',
                 $value->getNodeName(),

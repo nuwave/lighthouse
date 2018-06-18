@@ -18,4 +18,5 @@ return PhpCsFixer\Config::create()
         'no_unused_imports' => false,
         'ordered_imports' => true,
         'phpdoc_order' => true,
+        'not_operator_with_successor_space' => true
     ])->setFinder($finder);

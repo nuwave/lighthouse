@@ -3,14 +3,14 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\DocumentNode;
-
-
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
+/**
+ * @deprecated this trait will be removed in a future version of Lighthouse
+ */
 trait CanParseTypes
 {
     /**
