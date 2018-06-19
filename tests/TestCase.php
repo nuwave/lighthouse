@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use GraphQL\Executor\Executor;
 use GraphQL\GraphQL;
 use GraphQL\Language\Parser;
 use Laravel\Scout\ScoutServiceProvider;
@@ -102,18 +101,18 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Language\AST\DocumentNode
      */
-    protected function parse(string $schema)
+    protected function parse($schema)
     {
         return Parser::parse($schema);
     }
-
+    
     /**
      * Execute query/mutation.
      *
      * @param string $schema
      * @param string $query
-     * @param string $lighthouse
-     * @param array  $variables
+     * @param bool $lighthouse
+     * @param array $variables
      *
      * @return \GraphQL\Executor\ExecutionResult
      */

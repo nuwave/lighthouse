@@ -3,8 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Client;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Utils\BuildSchema;
-use Nuwave\Lighthouse\Schema\Resolvers\DirectiveResolver;
 use Tests\TestCase;
 
 class ClientDirectiveTest extends TestCase
