@@ -13,7 +13,7 @@ class DBTestCase extends TestCase
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
         $this->withFactories(__DIR__.'/database/factories');
-        $this->artisan('migrate', ['--database' => env('DB_DATABASE', 'lighthouse')]);
+        $this->loadLaravelMigrations(['--database' => env('DB_DATABASE', 'lighthouse')]);
     }
 
     /**
