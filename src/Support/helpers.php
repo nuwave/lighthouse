@@ -40,7 +40,7 @@ if (! function_exists('directives')) {
     /**
      * Get instance of directives container.
      *
-     * @return \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
      */
     function directives()
     {
