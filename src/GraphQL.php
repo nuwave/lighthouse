@@ -47,6 +47,13 @@ class GraphQL
     protected $types;
 
     /**
+     * Instance of node container.
+     *
+     * @var NodeContainer
+     */
+    protected $nodes;
+
+    /**
      * Middleware manager.
      *
      * @var MiddlewareManager
@@ -72,10 +79,16 @@ class GraphQL
      *
      * @param DirectiveRegistry $directives
      */
-    public function __construct(DirectiveRegistry $directives, TypeRegistry $types)
-    {
+    public function __construct(
+        DirectiveRegistry $directives,
+        TypeRegistry $types,
+        MiddlewareManager $middleware,
+        NodeContainer $nodes
+    ) {
         $this->directives = $directives;
         $this->types = $types;
+        $this->middleware = $middleware;
+        $this->nodes = $nodes;
     }
 
     /**
@@ -197,8 +210,8 @@ class GraphQL
     {
         $name = $name ?: $abstract;
         $instance = app()->has($name)
-        ? resolve($name)
-        : app()->instance($name, resolve($abstract));
+            ? resolve($name)
+            : app()->instance($name, resolve($abstract));
 
         return $instance->load($key, $data);
     }
@@ -224,7 +237,7 @@ class GraphQL
     }
 
     /**
-     * Get instsance of type container.
+     * Get instance of type container.
      *
      * @return TypeRegistry
      */
@@ -240,10 +253,6 @@ class GraphQL
      */
     public function middleware()
     {
-        if (! $this->middleware) {
-            $this->middleware = app(MiddlewareManager::class);
-        }
-
         return $this->middleware;
     }
 
@@ -254,13 +263,6 @@ class GraphQL
      */
     public function nodes()
     {
-        if (! app()->has(NodeContainer::class)) {
-            return app()->instance(
-                NodeContainer::class,
-                resolve(NodeContainer::class)
-            );
-        }
-
-        return resolve(NodeContainer::class);
+        return $this->nodes;
     }
 }
