@@ -33,6 +33,6 @@ class ValidationError extends Error
      */
     public function getValidatorMessages()
     {
-        return $this->validator ? $this->validator->messages() : [];
+        return $this->validator ? $this->validator->messages()->all() : [];
     }
 }
