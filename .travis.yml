@@ -16,16 +16,17 @@ php:
 
 env:
   matrix:
-    - COVERAGE=0 LARAVEL='^5.4' ORCHESTRA='^3.4'
-    - COVERAGE=0 LARAVEL='^5.5' ORCHESTRA='^3.5'
-    - COVERAGE=1 LARAVEL='^5.6' ORCHESTRA='^3.6'
+    - COVERAGE=0 LARAVEL='^5.4' ORCHESTRA='^3.4' PHPUNIT='~5.7'
+    - COVERAGE=0 LARAVEL='^5.5' ORCHESTRA='^3.5' PHPUNIT='~6.0'
+    - COVERAGE=1 LARAVEL='^5.6' ORCHESTRA='^3.6' PHPUNIT='^7.0'
   global:
     - DB_DATABASE="lighthouse" DB_USERNAME="root"
 
 matrix:
   exclude:
+    # This is removed because Laravel 5.6 needs PHP 7.1
     - php: 7.0
-      env: COVERAGE=1 LARAVEL='^5.6'' ORCHESTRA='^3.6''
+      env: COVERAGE=1 LARAVEL='^5.6' ORCHESTRA='^3.6' PHPUNIT='^7.0'
 
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS lighthouse;'
@@ -33,6 +34,7 @@ before_install:
   - travis_retry composer self-update
   - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
   - travis_retry composer require "orchestra/testbench:${ORCHESTRA}" --dev --no-interaction --no-update
+  - travis_retry composer require "phpunit/phpunit:${PHPUNIT}" --dev --no-interaction --no-update
 
 install:
   - travis_retry composer install --prefer-dist --no-interaction --no-suggest
