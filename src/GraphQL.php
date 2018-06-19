@@ -6,7 +6,6 @@ use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\CacheManager;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
@@ -17,13 +16,6 @@ use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 class GraphQL
 {
     use CanFormatError;
-
-    /**
-     * Cache manager.
-     *
-     * @var CacheManager
-     */
-    protected $cache;
 
     /**
      * Schema builder.
