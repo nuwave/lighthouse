@@ -34,7 +34,7 @@ before_install:
   - composer global require hirak/prestissimo --update-no-dev
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
   - composer require "orchestra/testbench:${ORCHESTRA}" --dev --no-interaction --no-update
-  - if [[ $ORCHESTRA = "^3.4" || $ORCHESTRA = "^3.5" ]]; composer require "orchestra/database:${ORCHESTRA}" --dev --no-interaction --no-update
+  - if [[ $ORCHESTRA = "^3.4" || $ORCHESTRA = "^3.5" ]]; then composer require "orchestra/database:${ORCHESTRA}" --dev --no-interaction --no-update; fi
   - composer require "phpunit/phpunit:${PHPUNIT}" --dev --no-interaction --no-update
 
 install:
