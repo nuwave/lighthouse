@@ -60,6 +60,6 @@ trait CanParseTypes
      */
     protected function convertNode($node)
     {
-        return app(NodeFactory::class)->handle(new NodeValue($node));
+        return (new NodeFactory)->handle(new NodeValue($node));
     }
 }
