@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
