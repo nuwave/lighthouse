@@ -50,10 +50,11 @@ class TypeRegistry
      * Register type with registry.
      *
      * @param Type $type
+     * @deprecated in favour of register
      */
     public function type(Type $type)
     {
-        return $this->register($type);
+        $this->register($type);
     }
 
     /**

@@ -66,9 +66,9 @@ class MiddlewareManager
      * Register query middleware.
      *
      * @param string $name
-     * @param array  $middleware
+     * @param array $middleware
      *
-     * @return array
+     * @return void
      */
     public function registerQuery($name, array $middleware)
     {
@@ -79,9 +79,9 @@ class MiddlewareManager
      * Register mutation middleware.
      *
      * @param string $name
-     * @param array  $middleware
+     * @param array $middleware
      *
-     * @return array
+     * @return void
      */
     public function registerMutation($name, array $middleware)
     {
@@ -141,7 +141,7 @@ class MiddlewareManager
      * @param OperationDefinitionNode $node
      * @param  string
      *
-     * @return array
+     * @return void
      */
     protected function byNode(OperationDefinitionNode $node, $operation)
     {

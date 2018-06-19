@@ -135,6 +135,7 @@ abstract class PaginationManipulator extends BaseFieldDirective
      * Get paginator type name.
      *
      * @param FieldDefinitionNode $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parent
      *
      * @return string
      */
@@ -151,6 +152,7 @@ abstract class PaginationManipulator extends BaseFieldDirective
      * Get connection type name.
      *
      * @param FieldDefinitionNode $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parent
      *
      * @return string
      */
@@ -167,6 +169,7 @@ abstract class PaginationManipulator extends BaseFieldDirective
      * Get connection edge name.
      *
      * @param FieldDefinitionNode $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parent
      *
      * @return string
      */

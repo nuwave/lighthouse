@@ -23,7 +23,8 @@ class EventDirective extends BaseFieldDirective implements FieldMiddleware
      *
      * @param FieldValue $value
      *
-     * @return Closure
+     * @return FieldValue
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      */
     public function handleField(FieldValue $value)
     {

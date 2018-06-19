@@ -10,9 +10,9 @@ trait IsRelayConnection
      * Paginate connection w/ query args.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array                                 $args
+     * @param array $args
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function scopeRelayConnection($query, array $args)
     {
@@ -28,9 +28,9 @@ trait IsRelayConnection
      * Paginate connection w/ query args.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array                                 $args
+     * @param array $args
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function scopePaginatorConnection($query, array $args)
     {

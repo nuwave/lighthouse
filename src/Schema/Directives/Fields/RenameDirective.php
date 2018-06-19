@@ -23,7 +23,8 @@ class RenameDirective extends BaseFieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
+     * @throws DirectiveException
      */
     public function resolveField(FieldValue $value)
     {

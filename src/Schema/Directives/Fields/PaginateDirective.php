@@ -72,11 +72,8 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
     }
 
     /**
-     * @param FieldDefinitionNode $field
-     *
-     * @throws DirectiveException
-     *
      * @return string
+     * @throws DirectiveException
      */
     protected function getPaginationType()
     {
@@ -96,9 +93,9 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      * Create a paginator resolver.
      *
      * @param FieldValue $value
-     * @param string     $model
+     * @param string $model
      *
-     * @return \Closure
+     * @return FieldValue
      */
     protected function paginatorTypeResolver(FieldValue $value, $model)
     {

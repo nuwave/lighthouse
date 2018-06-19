@@ -26,7 +26,7 @@ class NotEqualsFilterDirective implements ArgMiddleware
      *
      * @param ArgumentValue $argument
      *
-     * @return array
+     * @return ArgumentValue
      */
     public function handleArgument(ArgumentValue $argument)
     {

@@ -164,6 +164,7 @@ class ASTBuilder
      * @param DocumentAST $document
      *
      * @return DocumentAST
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
      */
     protected static function addNodeSupport(DocumentAST $document)
     {

@@ -132,6 +132,8 @@ class FieldValue
      * Set current complexity.
      *
      * @param \Closure $complexity
+     *
+     * @return FieldValue
      */
     public function setComplexity($complexity)
     {
