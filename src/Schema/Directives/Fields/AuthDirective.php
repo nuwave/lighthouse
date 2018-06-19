@@ -3,15 +3,16 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class AuthDirective extends AbstractFieldDirective implements FieldResolver
+class AuthDirective extends BaseFieldDirective implements FieldResolver
 {
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'auth';
     }
@@ -21,14 +22,14 @@ class AuthDirective extends AbstractFieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
         $guard = $this->associatedArgValue('name');
 
-        return function () use ($guard) {
+        return $value->setResolver(function () use ($guard) {
             return auth($guard)->user();
-        };
+        });
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Directives\Directive;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 /**
  * Class NamespaceDirective.
@@ -17,14 +17,14 @@ use Nuwave\Lighthouse\Schema\Directives\Directive;
  *
  * The namespaces are used to complete class references in other field directives.
  */
-class NamespaceDirective extends AbstractFieldDirective implements Directive
+class NamespaceDirective implements Directive
 {
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'namespace';
     }

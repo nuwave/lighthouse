@@ -17,14 +17,14 @@ class GraphQLTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $path = $this->store('schema.graphql', '
-            type User {
-                id: ID!
-                created_at: String!
-                updated_at: String!
-            }
-            type Query {
-                user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
-            }
+        type User {
+            id: ID!
+            created_at: String!
+            updated_at: String!
+        }
+        type Query {
+            user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
+        }
         ');
 
         $app['config']->set('lighthouse.schema.register', $path);
@@ -46,13 +46,13 @@ class GraphQLTest extends TestCase
     public function itCanExecuteQuery()
     {
         $query = '
-            query User {
-                user {
-                    id
-                    created_at
-                    updated_at
-                }
+        query User {
+            user {
+                id
+                created_at
+                updated_at
             }
+        }
         ';
 
         $expected = ['data' => [

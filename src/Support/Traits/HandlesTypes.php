@@ -3,13 +3,12 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use Closure;
-use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Opis\Closure\SerializableClosure;
 
 trait HandlesTypes
@@ -68,7 +67,7 @@ trait HandlesTypes
      */
     protected function unpackType($type)
     {
-        if (! isset($type->config['fields'])) {
+        if (!isset($type->config['fields'])) {
             return $type;
         }
 
@@ -119,8 +118,8 @@ trait HandlesTypes
         if (array_has($config, 'fields')) {
             $config['fields'] = collect($config['fields'])->mapWithKeys(function ($field, $key) {
                 $field['type'] = $field['type'] instanceof Closure
-                    ? new SerializableClosure($field['type'])
-                    : $field['type'];
+                ? new SerializableClosure($field['type'])
+                : $field['type'];
 
                 if (array_has($field, 'resolve') && $field['resolve'] instanceof Closure) {
                     $field['resolve'] = new SerializableClosure($field['resolve']);
@@ -168,17 +167,31 @@ trait HandlesTypes
     /**
      * Get fields for node.
      *
-     * @param TypeValue $parentType
+     * @param NodeValue $value
      *
-     * @return array[]
+     * @return array
      */
-    protected function getFields(TypeValue $parentType)
+    protected function getFields(NodeValue $value)
     {
-        return collect($parentType->getFields())
-            ->mapWithKeys(function (Node $fieldDefinition) use ($parentType) {
+        $factory = $this->fieldFactory();
+
+        return collect($value->getNodeFields())
+            ->mapWithKeys(function ($field) use ($factory, $value) {
+                $fieldValue = new FieldValue($value, $field);
+
                 return [
-                    $fieldDefinition->name->value => FieldFactory::handle($fieldDefinition, $parentType),
+                    $fieldValue->getFieldName() => $factory->handle($fieldValue),
                 ];
             })->toArray();
+    }
+
+    /**
+     * Get instance of field factory.
+     *
+     * @return FieldFactory
+     */
+    protected function fieldFactory()
+    {
+        return app(FieldFactory::class);
     }
 }

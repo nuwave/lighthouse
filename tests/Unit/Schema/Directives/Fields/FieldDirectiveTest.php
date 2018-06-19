@@ -13,10 +13,9 @@ class FieldDirectiveTest extends TestCase
     public function itCanResolveFieldWithAssignedClass()
     {
         $schema = $this->buildSchemaWithDefaultQuery('
-            type Foo {
-                bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
-            }
-        ');
+        type Foo {
+            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
+        }');
 
         $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
@@ -31,9 +30,9 @@ class FieldDirectiveTest extends TestCase
     public function itCanResolveFieldWithMergedArgs()
     {
         $schema = $this->buildSchemaWithDefaultQuery('
-            type Foo {
-                bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
-            }
+        type Foo {
+            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
+        }
         ');
 
         $type = $schema->getType('Foo');
@@ -48,13 +47,13 @@ class FieldDirectiveTest extends TestCase
      */
     public function itThrowsAnErrorIfNoClassIsDefined()
     {
-        $this->expectException(DirectiveException::class);
-
         $schema = $this->buildSchemaWithDefaultQuery('
-            type Foo {
-                bar: String! @field(method: "bar")
-            }
+        type Foo {
+            bar: String! @field(method: "bar")
+        }
         ');
+
+        $this->expectException(DirectiveException::class);
         $type = $schema->getType('Foo');
         $type->config['fields']();
     }
@@ -64,13 +63,13 @@ class FieldDirectiveTest extends TestCase
      */
     public function itThrowsAnErrorIfNoMethodIsDefined()
     {
-        $this->expectException(DirectiveException::class);
-
         $schema = $this->buildSchemaWithDefaultQuery('
-            type Foo {
-                bar: String! @field(class: "Foo\\\Bar")
-            }
+        type Foo {
+            bar: String! @field(class: "Foo\\\Bar")
+        }
         ');
+
+        $this->expectException(DirectiveException::class);
         $type = $schema->getType('Foo');
         $type->config['fields']();
     }

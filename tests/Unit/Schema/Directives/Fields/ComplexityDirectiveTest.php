@@ -12,14 +12,12 @@ class ComplexityDirectiveTest extends TestCase
     public function itCanSetDefaultComplexityOnField()
     {
         $schema = $this->buildSchemaWithDefaultQuery('
-            type User {
-                posts: [Post!]! @complexity @hasMany
-            }
-            
-            type Post {
-                title: String
-            }
-        ');
+        type User {
+            posts: [Post!]! @complexity @hasMany
+        }
+        type Post {
+            title: String
+        }');
 
         $type = $schema->getType('User');
         $fields = $type->config['fields']();
@@ -35,31 +33,22 @@ class ComplexityDirectiveTest extends TestCase
     public function itCanSetCustomComplexityResolver()
     {
         $resolver = addslashes(self::class);
-        $schema = '
-            type User {
-                posts: [Post!]!
-                    @complexity(resolver: "'.$resolver.'@complexity")
-                    @hasMany
-            }
-            type Post {
-                title: String
-            }
-        ';
 
-        $type = $this->buildSchemaWithDefaultQuery($schema)->getType('User');
+        $schema = $this->buildSchemaWithDefaultQuery('
+        type User {
+            posts: [Post!]!
+                @complexity(resolver: "'.$resolver.'@complexity")
+                @hasMany
+        }
+        type Post {
+            title: String
+        }');
+        $type = $schema->getType('User');
         $fields = $type->config['fields']();
         $complexity = $fields['posts']['complexity'];
         $this->assertEquals(100, $complexity(10, ['foo' => 10]));
     }
 
-    /**
-     * Helper function that is used in test above.
-     *
-     * @param int   $children
-     * @param array $args
-     *
-     * @return int
-     */
     public function complexity($children, array $args)
     {
         return $children * array_get($args, 'foo', 0);

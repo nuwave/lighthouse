@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
 class BcryptDirective implements ArgMiddleware
 {
@@ -11,7 +12,7 @@ class BcryptDirective implements ArgMiddleware
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'bcrypt';
     }

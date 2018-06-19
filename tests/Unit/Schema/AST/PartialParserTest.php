@@ -19,7 +19,8 @@ class PartialParserTest extends TestCase
                 type Foo {
                     foo: String
                 }
-        '));
+        ')
+        );
     }
 
     public function testThrowsForInvalidDefinition()
@@ -101,11 +102,13 @@ class PartialParserTest extends TestCase
 
     public function testParseOperationDefinition()
     {
-        $this->assertInstanceOf(OperationDefinitionNode::class,
+        $this->assertInstanceOf(
+            OperationDefinitionNode::class,
             PartialParser::operationDefinition('
             {
                 foo: Foo
             }
-        '));
+        ')
+        );
     }
 }

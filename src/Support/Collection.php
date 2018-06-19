@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Support;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 
 /**
- * Class Collection.
+ * Class Collection
  *
  * @mixin \Illuminate\Support\Collection
  *

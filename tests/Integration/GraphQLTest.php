@@ -36,24 +36,24 @@ class GraphQLTest extends DBTestCase
         $app['config']->set('lighthouse.route_enable_get', true);
 
         $path = $this->store('schema.graphql', '
-            type User {
-                id: ID!
-                name: String!
-                email: String!
-                created_at: String!
-                updated_at: String!
-                tasks: [Task!]! @hasMany
-            }
-            type Task {
-                id: ID!
-                name: String!
-                created_at: String!
-                updated_at: String!
-                user: User! @belongsTo
-            }
-            type Query {
-                user: User @auth
-            }
+        type User {
+            id: ID!
+            name: String!
+            email: String!
+            created_at: String!
+            updated_at: String!
+            tasks: [Task!]! @hasMany
+        }
+        type Task {
+            id: ID!
+            name: String!
+            created_at: String!
+            updated_at: String!
+            user: User! @belongsTo
+        }
+        type Query {
+            user: User @auth
+        }
         ');
 
         $app['config']->set('lighthouse.schema.register', $path);
@@ -78,18 +78,18 @@ class GraphQLTest extends DBTestCase
     public function itCanResolveQuery()
     {
         $this->be($this->user);
-
-        $actual = graphql()->execute('
-            query UserWithTasks {
-                user {
-                    email
-                    tasks {
-                        name
-                    }
+        $query = '
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
                 }
             }
-        ');
+        }
+        ';
 
+        $data = graphql()->execute($query);
         $expected = [
             'data' => [
                 'user' => [
@@ -101,7 +101,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $data);
     }
 
     /**
@@ -154,20 +154,20 @@ class GraphQLTest extends DBTestCase
         }
         ';
 
-        $uri = 'graphql?'.http_build_query(['query' => $query]);
+        $uri = 'graphql?' . http_build_query(['query' => $query]);
 
         $data = $this->getJson($uri)->json();
 
         $expected = [
-      'data' => [
-        'user' => [
-          'email' => $this->user->email,
-          'tasks' => $this->tasks->map(function ($task) {
-              return ['name' => $task->name];
-          })->toArray(),
-        ],
-      ],
-    ];
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks->map(function ($task) {
+                        return ['name' => $task->name];
+                    })->toArray(),
+                ],
+            ],
+        ];
 
         $this->assertEquals($expected, $data);
     }

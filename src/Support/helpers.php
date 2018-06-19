@@ -26,11 +26,9 @@ if (! function_exists('auth')) {
 
 if (! function_exists('schema')) {
     /**
-     * Get instance of type registry.
+     * Get instance of schema container.
      *
      * @return \Nuwave\Lighthouse\Schema\TypeRegistry
-     *
-     * @deprecated Will be removed in the next major version
      */
     function schema()
     {
@@ -42,9 +40,7 @@ if (! function_exists('directives')) {
     /**
      * Get instance of directives container.
      *
-     * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
-     *
-     * @deprecated Will be removed in the next major version
+     * @return \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
     function directives()
     {

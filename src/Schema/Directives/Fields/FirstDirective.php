@@ -3,11 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class FirstDirective extends AbstractFieldDirective implements FieldResolver
+class FirstDirective implements FieldResolver
 {
     use HandlesQueries, HandlesDirectives, HandlesQueryFilter;
 
@@ -16,7 +17,7 @@ class FirstDirective extends AbstractFieldDirective implements FieldResolver
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'first';
     }
@@ -26,19 +27,17 @@ class FirstDirective extends AbstractFieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
+     * @return FieldValue
      * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
-     *
-     * @return \Closure
      */
     public function resolveField(FieldValue $value)
     {
         $model = $this->getModelClass($value);
 
-        return function ($root, $args) use ($model, $value) {
+        return $value->setResolver(function ($root, $args) use ($model, $value) {
             $query = $this->applyFilters($model::query(), $args);
             $query = $this->applyScopes($query, $args, $value);
-
             return $query->first();
-        };
+        });
     }
 }

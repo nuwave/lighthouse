@@ -4,15 +4,16 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class CanDirective extends AbstractFieldDirective implements FieldMiddleware
+class CanDirective extends BaseFieldDirective implements FieldMiddleware
 {
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'can';
     }
@@ -28,7 +29,6 @@ class CanDirective extends AbstractFieldDirective implements FieldMiddleware
     {
         $policies = $this->associatedArgValue('if');
         $model = $this->associatedArgValue('model');
-
         $resolver = $value->getResolver();
 
         return $value->setResolver(
@@ -37,14 +37,14 @@ class CanDirective extends AbstractFieldDirective implements FieldMiddleware
                 $model = $model ?: get_class($args[0]);
 
                 $can = collect($policies)->reduce(function ($allowed, $policy) use ($model) {
-                    if (! app('auth')->user()->can($policy, $model)) {
+                    if (!app('auth')->user()->can($policy, $model)) {
                         return false;
                     }
 
                     return $allowed;
                 }, true);
 
-                if (! $can) {
+                if (!$can) {
                     throw new Error('Not authorized to access resource');
                 }
 

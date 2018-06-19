@@ -18,15 +18,15 @@ trait HandlesQueries
     public function getModelClass(FieldValue $value)
     {
         $model = $this->directiveArgValue(
-            $this->fieldDirective($value->getFieldDefinition(), self::name()),
+            $this->fieldDirective($value->getField(), $this->name()),
             'model'
         );
 
         if (! $model) {
             $message = sprintf(
                 'A `model` argument must be assigned to the %s directive on the %s field [%s]',
-                self::name(),
-                $value->getParentTypeName(),
+                $this->name(),
+                $value->getNodeName(),
                 $value->getFieldName()
             );
 
@@ -50,7 +50,7 @@ trait HandlesQueries
     protected function getScopes(FieldValue $value)
     {
         return $this->directiveArgValue(
-            $this->fieldDirective($value->getFieldDefinition(), self::name()),
+            $this->fieldDirective($value->getField(), $this->name()),
             'scopes',
             []
         );

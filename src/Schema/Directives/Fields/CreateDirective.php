@@ -3,16 +3,17 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-class CreateDirective extends AbstractFieldDirective implements FieldResolver
+class CreateDirective extends BaseFieldDirective implements FieldResolver
 {
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'create';
     }
@@ -22,23 +23,23 @@ class CreateDirective extends AbstractFieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @return \Closure
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
         // TODO: create a model registry so we can auto-resolve this.
         $model = $this->associatedArgValue('model');
 
-        if (! $model) {
+        if (!$model) {
             throw new DirectiveException(sprintf(
                 'The `create` directive on %s [%s] must have a `model` argument',
-                $value->getParentTypeName(),
+                $value->getNodeName(),
                 $value->getFieldName()
             ));
         }
 
-        return function ($root, array $args) use ($model) {
+        return $value->setResolver(function ($root, array $args) use ($model) {
             return $model::create($args);
-        };
+        });
     }
 }

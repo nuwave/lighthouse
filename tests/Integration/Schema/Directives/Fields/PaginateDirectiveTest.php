@@ -20,31 +20,28 @@ class PaginateDirectiveTest extends DBTestCase
         $users = factory(User::class, 10)->create();
 
         $schema = '
-            type User {
-                id: ID!
-                name: String!
-            }
-            
-            type Query {
-                users: [User!]! @paginate(type: "paginator" model: "User")
-            }
+        type User {
+            id: ID!
+            name: String!
+        }
+        type Query {
+            users: [User!]! @paginate(type: "paginator" model: "User")
+        }
         ';
 
-        $query = '
-            {
-                users(count: 5) {
-                    paginatorInfo {
-                        count
-                        total
-                        currentPage
-                    }
-                    data {
-                        id
-                        name
-                    }
+        $query = '{
+            users(count: 5) {
+                paginatorInfo {
+                    count
+                    total
+                    currentPage
+                }
+                data {
+                    id
+                    name
                 }
             }
-        ';
+        }';
 
         $result = $this->execute($schema, $query, true);
         $this->assertEquals(5, array_get($result->data, 'users.paginatorInfo.count'));
@@ -67,55 +64,53 @@ class PaginateDirectiveTest extends DBTestCase
         ]);
 
         $schema = '
-            type User {
-                id: ID!
-                name: String!
-                posts: [Post!]! @paginate(type: "paginator" model: "Post")
-            }
-            
-            type Post {
-                id: ID!
-                comments: [Comment!]! @paginate(type: "paginator" model: "Comment")
-            }
-            
-            type Comment {
-                id: ID!
-            }
-            
-            type Query {
-                users: [User!]! @paginate(type: "paginator" model: "User")
-            }
+        type User {
+            id: ID!
+            name: String!
+            posts: [Post!]! @paginate(type: "paginator" model: "Post")
+        }
+
+        type Post {
+            id: ID!
+            comments: [Comment!]! @paginate(type: "paginator" model: "Comment")
+        }
+
+        type Comment {
+            id: ID!
+        }
+
+        type Query {
+            users: [User!]! @paginate(type: "paginator" model: "User")
+        }
         ';
 
-        $query = '
-            {
-                users(count:3 page: 1) {
-                    paginatorInfo {
-                        count
-                        total
-                        currentPage
-                    }
-                    data {
-                        posts(count:2 page: 2) {
-                            paginatorInfo {
-                                count
-                                total
-                                currentPage
-                            }
-                            data {
-                                comments(count:1 page: 3) {
-                                    paginatorInfo {
-                                        count
-                                        total
-                                        currentPage
-                                    }
+        $query = '{
+            users(count:3 page: 1) {
+                paginatorInfo {
+                    count
+                    total
+                    currentPage
+                }
+                data {
+                    posts(count:2 page: 2) {
+                        paginatorInfo {
+                            count
+                            total
+                            currentPage
+                        }
+                        data {
+                            comments(count:1 page: 3) {
+                                paginatorInfo {
+                                    count
+                                    total
+                                    currentPage
                                 }
                             }
                         }
                     }
                 }
             }
-        ';
+        }';
 
         $result = $this->execute($schema, $query, true);
         $this->assertEquals(1, array_get($result->data, 'users.paginatorInfo.currentPage'));
@@ -131,30 +126,28 @@ class PaginateDirectiveTest extends DBTestCase
         $users = factory(User::class, 10)->create();
 
         $schema = '
-            type User {
-                id: ID!
-                name: String!
-            }
-            type Query {
-                users: [User!]! @paginate(type: "connection" model: "User")
-            }
+        type User {
+            id: ID!
+            name: String!
+        }
+        type Query {
+            users: [User!]! @paginate(type: "relay" model: "User")
+        }
         ';
 
-        $query = '
-            {
-                users(first: 5) {
-                    pageInfo {
-                        hasNextPage
-                    }
-                    edges {
-                        node {
-                            id
-                            name
-                        }
+        $query = '{
+            users(first: 5) {
+                pageInfo {
+                    hasNextPage
+                }
+                edges {
+                    node {
+                        id
+                        name
                     }
                 }
             }
-        ';
+        }';
 
         $result = $this->execute($schema, $query, true);
         $this->assertTrue(array_get($result->data, 'users.pageInfo.hasNextPage'));

@@ -21,7 +21,7 @@ class FieldTypeResolver
     public static function resolve(FieldValue $value)
     {
         return $value->setType(
-            (new static())->resolveNodeType($value->getFieldDefinition())
+            (new static())->resolveNodeType($value->getField())
         );
     }
 
@@ -106,8 +106,8 @@ class FieldTypeResolver
             ->reverse()
             ->reduce(function ($innerType, $wrapper) {
                 return 'ListOfType' === $wrapper
-                    ? Type::listOf($innerType)
-                    : Type::nonNull($innerType);
+                ? Type::listOf($innerType)
+                : Type::nonNull($innerType);
             }, $type);
     }
 
@@ -160,7 +160,7 @@ class FieldTypeResolver
     protected function convertCustomType($name)
     {
         return function () use ($name) {
-            return graphql()->types()->get($name);
+            return schema()->instance($name);
         };
     }
 }

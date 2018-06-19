@@ -11,7 +11,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itCanRegisterMiddleware()
     {
-        $this->buildSchemaFromString('
+        $schema = $this->buildSchemaFromString('
             type Query {
                 foo: String! @middleware(checks: ["auth:web", "auth:admin"])
                 bar: String!
@@ -22,22 +22,14 @@ class MiddlewareDirectiveTest extends TestCase
             }
         ');
 
-        $middleware = graphql()->middleware()->forRequest('
-            query FooQuery {
-                foo
-            }
-        ');
-
+        $query = 'query FooQuery { foo }';
+        $middleware = graphql()->middleware()->forRequest($query);
         $this->assertCount(2, $middleware);
         $this->assertContains('auth:web', $middleware);
         $this->assertContains('auth:admin', $middleware);
 
-        $middleware = graphql()->middleware()->forRequest('
-            mutation CreateFoo {
-                foo(bar:"baz")
-            }
-        ');
-
+        $query = 'mutation CreateFoo { foo(bar:"baz") }';
+        $middleware = graphql()->middleware()->forRequest($query);
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }
@@ -47,7 +39,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itCanRegisterMiddlewareWithFragments()
     {
-        $this->buildSchemaFromString('
+        $schema = $this->buildSchemaFromString('
             type Query {
                 foo: String! @middleware(checks: ["auth:web", "auth:admin"])
                 bar: String!
@@ -58,25 +50,14 @@ class MiddlewareDirectiveTest extends TestCase
             }
         ');
 
-        $middleware = graphql()->middleware()->forRequest('
-            query FooQuery {
-                ...Foo_Fragment
-            }
-            
-            fragment Foo_Fragment on Query {
-                foo
-            }
-        ');
+        $query = 'query FooQuery { ...Foo_Fragment } fragment Foo_Fragment on Query { foo }';
+        $middleware = graphql()->middleware()->forRequest($query);
         $this->assertCount(2, $middleware);
         $this->assertContains('auth:web', $middleware);
         $this->assertContains('auth:admin', $middleware);
 
-        $middleware = graphql()->middleware()->forRequest('
-            mutation CreateFoo {
-                foo(bar:"baz")
-            }
-        ');
-
+        $query = 'mutation CreateFoo { foo(bar:"baz") }';
+        $middleware = graphql()->middleware()->forRequest($query);
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }

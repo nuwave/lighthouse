@@ -19,7 +19,7 @@ class TypeRegistry
      */
     public function __construct()
     {
-        $this->types = new Collection();
+        $this->types = collect();
     }
 
     /**
@@ -28,8 +28,6 @@ class TypeRegistry
      * @param string $typeName
      *
      * @return Type
-     *
-     * @deprecated Will be removed in the next major release
      */
     public function instance($typeName)
     {
@@ -49,6 +47,18 @@ class TypeRegistry
     }
 
     /**
+     * Register type with registry.
+     *
+     * @param Type $type
+     */
+    public function type(Type $type)
+    {
+        return $this->register($type);
+    }
+
+    /**
+     * Register type with registry.
+     *
      * @param Type $type
      */
     public function register(Type $type)

@@ -2,24 +2,23 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\IDType;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class UpdateDirective extends AbstractFieldDirective implements FieldResolver
+class UpdateDirective extends BaseFieldDirective implements FieldResolver
 {
-    use HandlesDirectives, HandlesGlobalId;
+    use HandlesGlobalId;
 
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public static function name()
+    public function name()
     {
         return 'update';
     }
@@ -29,35 +28,30 @@ class UpdateDirective extends AbstractFieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
-     * @throws DirectiveException
-     *
-     * @return \Closure
+     * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
-        $idArg = $this->getIDField();
+        $idArg = $this->getIDField($value);
         $class = $this->associatedArgValue('model');
-
         $globalId = $this->associatedArgValue('globalId', false);
 
-        if (! $class) {
+        if (!$class) {
             throw new DirectiveException(sprintf(
-                'The `%s` directive on %s [%s] must have a `model` argument',
-                self::name(),
-                $value->getParentTypeName(),
+                'The `update` directive on %s [%s] must have a `model` argument',
+                $value->getNodeName(),
                 $value->getFieldName()
             ));
         }
 
-        if (! $idArg) {
+        if (!$idArg) {
             new DirectiveException(sprintf(
-                'The `%s` requires that you have an `ID` field on %s',
-                self::name(),
-                $value->getParentTypeName()
+                'The `update` requires that you have an `ID` field on %s',
+                $value->getNodeName()
             ));
         }
 
-        return function ($root, array $args) use ($class, $idArg, $globalId) {
+        return $value->setResolver(function ($root, array $args) use ($class, $idArg, $globalId) {
             $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg))[1] : array_get($args, $idArg);
             $model = $class::find($id);
 
@@ -68,17 +62,19 @@ class UpdateDirective extends AbstractFieldDirective implements FieldResolver
             }
 
             return $model;
-        };
+        });
     }
 
     /**
      * Check if field has an ID argument.
      *
+     * @param FieldValue $value
+     *
      * @return bool
      */
-    protected function getIDField()
+    protected function getIDField(FieldValue $value)
     {
-        return collect($this->fieldDefinition->arguments)->filter(function (InputValueDefinitionNode $arg) {
+        return collect($value->getField()->arguments)->filter(function ($arg) {
             $type = NodeResolver::resolve($arg->type);
             $type = method_exists($type, 'getWrappedType') ? $type->getWrappedType() : $type;
 
