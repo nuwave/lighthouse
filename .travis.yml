@@ -22,9 +22,6 @@ env:
   global:
     - DB_DATABASE="lighthouse" DB_USERNAME="root"
 
-matrix:
-  fast_finish: true
-
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS lighthouse;'
   - if [[ $COVERAGE = 0 ]]; then phpenv config-rm xdebug.ini; fi
