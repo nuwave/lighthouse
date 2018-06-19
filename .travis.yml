@@ -34,7 +34,7 @@ before_install:
   - travis_retry composer self-update
   - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
   - travis_retry composer require "orchestra/testbench:${ORCHESTRA}" --dev --no-interaction --no-update
-  - if [[ $ORCHESTRA = "^3.4" ] || [ $ORCHESTRA = "^3.5" ]] composer require "orchestra/database:${ORCHESTRA}" --dev --no-interaction --no-update
+  - if [[ $ORCHESTRA = "^3.4" || $ORCHESTRA = "^3.5" ]] composer require "orchestra/database:${ORCHESTRA}" --dev --no-interaction --no-update
   - travis_retry composer require "phpunit/phpunit:${PHPUNIT}" --dev --no-interaction --no-update
 
 install:
