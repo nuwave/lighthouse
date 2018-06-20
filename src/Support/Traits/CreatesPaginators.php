@@ -50,7 +50,7 @@ trait CreatesPaginators
             })
             ->filter()
             ->each(function ($type) use ($value) {
-                schema()->type($type);
+                graphql()->types()->type($type);
 
                 if (ends_with($type->name, 'Connection')) {
                     $value->setType($type);
@@ -90,7 +90,7 @@ trait CreatesPaginators
             })
             ->filter()
             ->each(function ($type) use ($value) {
-                schema()->type($type);
+                graphql()->types()->type($type);
 
                 if (ends_with($type->name, 'Paginator')) {
                     $value->setType($type);

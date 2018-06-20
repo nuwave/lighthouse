@@ -160,7 +160,7 @@ class FieldTypeResolver
     protected function convertCustomType($name)
     {
         return function () use ($name) {
-            return schema()->instance($name);
+            return graphql()->types()->instance($name);
         };
     }
 }

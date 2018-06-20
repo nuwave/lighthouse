@@ -36,7 +36,7 @@ class FieldFactory
             $field['args'] = $args->toArray();
         }
 
-        $resolve = directives()->fieldMiddleware($value->getField())
+        $resolve = graphql()->directives()->fieldMiddleware($value->getField())
             ->reduce(function ($value, $middleware) {
                 return $middleware->handleField($value);
             }, $value)->getResolver();
@@ -61,7 +61,7 @@ class FieldFactory
      */
     protected function hasResolver(FieldValue $value)
     {
-        return directives()->hasResolver($value->getField());
+        return graphql()->directives()->hasResolver($value->getField());
     }
 
     /**
@@ -73,7 +73,7 @@ class FieldFactory
      */
     protected function useResolver(FieldValue $value)
     {
-        return directives()->fieldResolver($value->getField())
+        return graphql()->directives()->fieldResolver($value->getField())
             ->resolveField($value);
     }
 
@@ -105,7 +105,7 @@ class FieldFactory
      */
     protected function defaultResolver(FieldValue $value)
     {
-        if (! directives()->hasFieldMiddleware($value->getField())) {
+        if (! graphql()->directives()->hasFieldMiddleware($value->getField())) {
             // Use graphql-php default resolver
             return;
         }

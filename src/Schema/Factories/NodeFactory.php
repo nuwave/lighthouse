@@ -53,7 +53,7 @@ class NodeFactory
      */
     protected function hasResolver(NodeValue $value)
     {
-        return directives()->hasNodeResolver($value->getNode());
+        return graphql()->directives()->hasNodeResolver($value->getNode());
     }
 
     /**
@@ -65,7 +65,7 @@ class NodeFactory
      */
     protected function useResolver(NodeValue $value)
     {
-        return directives()->forNode($value->getNode())
+        return graphql()->directives()->forNode($value->getNode())
             ->resolveNode($value);
     }
 
@@ -261,7 +261,7 @@ class NodeFactory
         $type = $value->getType();
         $type->config['interfaces'] = function () use ($value) {
             return collect($value->getInterfaces())->map(function ($interface) {
-                return schema()->instance($interface);
+                return graphql()->types()->instance($interface);
             })->filter()->toArray();
         };
 
@@ -277,7 +277,7 @@ class NodeFactory
      */
     protected function applyMiddleware(NodeValue $value)
     {
-        return directives()->nodeMiddleware($value->getNode())
+        return graphql()->directives()->nodeMiddleware($value->getNode())
             ->reduce(function ($value, $middleware) {
                 return $middleware->handleNode($value);
             }, $value);

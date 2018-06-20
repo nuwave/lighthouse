@@ -19,13 +19,6 @@ class GraphQL
     use CanFormatError;
 
     /**
-     * Schema builder.
-     *
-     * @var SchemaBuilder
-     */
-    protected $schema;
-
-    /**
      * Directive registry container.
      *
      * @var DirectiveRegistry
@@ -52,13 +45,6 @@ class GraphQL
      * @var MiddlewareManager
      */
     protected $middleware;
-
-    /**
-     * Schema Stitcher.
-     *
-     * @var SchemaStitcher
-     */
-    protected $stitcher;
 
     /**
      * GraphQL Schema.
@@ -213,17 +199,7 @@ class GraphQL
     }
 
     /**
-     * Get an instance of the schema builder.
-     *
-     * @return TypeRegistry
-     */
-    public function schema()
-    {
-        return $this->types();
-    }
-
-    /**
-     * Get an instance of the directive container.
+     * Get the directive registry instance.
      *
      * @return DirectiveRegistry
      */
@@ -233,7 +209,7 @@ class GraphQL
     }
 
     /**
-     * Get instance of type container.
+     * Get the type registry instance.
      *
      * @return TypeRegistry
      */
@@ -243,7 +219,18 @@ class GraphQL
     }
 
     /**
-     * Get instance of middle manager.
+     * * Get the type registry instance.
+     *
+     * @return TypeRegistry
+     * @deprecated in favour of types()
+     */
+    public function schema()
+    {
+        return $this->types();
+    }
+
+    /**
+     * Get the middleware manager instance.
      *
      * @return MiddlewareManager
      */
@@ -253,7 +240,7 @@ class GraphQL
     }
 
     /**
-     * Instance of Node container.
+     * Get the instance of the node container.
      *
      * @return NodeContainer
      */

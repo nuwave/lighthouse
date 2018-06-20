@@ -17,7 +17,7 @@ class DirectiveFactoryTest extends TestCase
      */
     public function itRegistersLighthouseDirectives()
     {
-        $this->assertInstanceOf(ScalarDirective::class, directives()->handler('scalar'));
+        $this->assertInstanceOf(ScalarDirective::class, graphql()->directives()->handler('scalar'));
     }
 
     /**
@@ -28,7 +28,7 @@ class DirectiveFactoryTest extends TestCase
         $schema = 'scalar Email @scalar(class: "Email")';
         $document = Parser::parse($schema);
         $definition = $document->definitions[0];
-        $scalar = directives()->forNode($definition)
+        $scalar = graphql()->directives()->forNode($definition)
             ->resolveNode(new NodeValue($definition))
             ->getType();
 
@@ -44,7 +44,7 @@ class DirectiveFactoryTest extends TestCase
 
         $schema = 'scalar DateTime @scalar @foo';
         $document = Parser::parse($schema);
-        $handler = directives()->forNode($document->definitions[0]);
+        $handler = graphql()->directives()->forNode($document->definitions[0]);
     }
 
     /**
@@ -57,7 +57,7 @@ class DirectiveFactoryTest extends TestCase
             bar: [Bar!]! @hasMany
         }');
 
-        $hasResolver = directives()->hasResolver($type->fields[0]);
+        $hasResolver = graphql()->directives()->hasResolver($type->fields[0]);
         $this->assertTrue($hasResolver);
     }
 
@@ -75,7 +75,7 @@ class DirectiveFactoryTest extends TestCase
         ';
 
         $document = Parser::parse($schema);
-        directives()->fieldResolver($document->definitions[0]->fields[0]);
+        graphql()->directives()->fieldResolver($document->definitions[0]->fields[0]);
     }
 
     /**
@@ -90,7 +90,7 @@ class DirectiveFactoryTest extends TestCase
         ';
 
         $document = Parser::parse($schema);
-        $middleware = directives()->fieldMiddleware($document->definitions[0]->fields[0]);
+        $middleware = graphql()->directives()->fieldMiddleware($document->definitions[0]->fields[0]);
         $this->assertCount(2, $middleware);
     }
 }
