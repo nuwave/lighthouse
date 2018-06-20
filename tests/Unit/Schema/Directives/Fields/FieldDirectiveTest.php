@@ -15,7 +15,26 @@ class FieldDirectiveTest extends TestCase
         $schema = $this->buildSchemaWithDefaultQuery('
         type Foo {
             bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
-        }');
+        }
+        ');
+
+        $type = $schema->getType('Foo');
+        $fields = $type->config['fields']();
+        $resolve = array_get($fields, 'bar.resolve');
+
+        $this->assertEquals('foo.bar', $resolve(null, []));
+    }
+
+    /**
+     * @test
+     */
+    public function itAssignsResolverFromCombinedDefinition()
+    {
+        $schema = $this->buildSchemaWithDefaultQuery('
+        type Foo {
+            bar: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo@bar")
+        }
+        ');
 
         $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
