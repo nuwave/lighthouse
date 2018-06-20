@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Args;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Nuwave\Lighthouse\Schema\Directives\Args\EqFilterDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 

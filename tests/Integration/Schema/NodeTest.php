@@ -18,7 +18,7 @@ class NodeTest extends DBTestCase
     public function itCanResolveNodes()
     {
         $schema = '
-        type User @node(
+        type User implements Node @node(
             resolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNode"
             typeResolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNodeType"
         ) {
@@ -29,7 +29,7 @@ class NodeTest extends DBTestCase
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { name } }', true);
+        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { ...on User { name } } }', true);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -43,14 +43,14 @@ class NodeTest extends DBTestCase
         $globalId = $this->encodeGlobalId('User', $user->getKey());
 
         $schema = '
-        type User @model {
+        type User implements Node @model {
             _id: ID!
             name: String!
         }
         type Query {}
         ';
 
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { name } }', true);
+        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { ...on User { name } } }', true);
         $this->assertEquals($user->name, array_get($result->data, 'node.name'));
     }
 

@@ -2,15 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Utils\AST;
-use Nuwave\Lighthouse\Support\Traits\CanParseTypes;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class MiddlewareManager
 {
-    use CanParseTypes;
-
     /**
      * Registered query middleware.
      *
@@ -34,23 +31,19 @@ class MiddlewareManager
      */
     public function forRequest($request)
     {
-        $definitions = collect($this->parseSchema($request)->definitions);
-        $fragments = $definitions->filter(function ($def) {
-            return $def instanceof FragmentDefinitionNode;
-        });
+        $document = DocumentAST::fromSource($request);
+        $fragments = $document->fragments();
 
-        return collect($this->parseSchema($request)->definitions)
-            ->filter(function ($def) {
-                return $def instanceof OperationDefinitionNode;
-            })->map(function (OperationDefinitionNode $node) use ($fragments) {
+        return $document->operations()
+            ->map(function (OperationDefinitionNode $node) use ($fragments) {
                 $definition = AST::toArray($node);
                 $operation = array_get($definition, 'operation');
                 $fields = array_map(function ($selection) use ($fragments) {
                     $field = array_get($selection, 'name.value');
 
-                    if ('FragmentSpread' == array_get($selection, 'kind')) {
+                    if ('FragmentSpread' === array_get($selection, 'kind')) {
                         $fragment = $fragments->first(function ($def) use ($field) {
-                            return data_get($def, 'name.value') == $field;
+                            return data_get($def, 'name.value') === $field;
                         });
 
                         return array_pluck(
@@ -73,9 +66,9 @@ class MiddlewareManager
      * Register query middleware.
      *
      * @param string $name
-     * @param array  $middleware
+     * @param array $middleware
      *
-     * @return array
+     * @return void
      */
     public function registerQuery($name, array $middleware)
     {
@@ -86,9 +79,9 @@ class MiddlewareManager
      * Register mutation middleware.
      *
      * @param string $name
-     * @param array  $middleware
+     * @param array $middleware
      *
-     * @return array
+     * @return void
      */
     public function registerMutation($name, array $middleware)
     {
@@ -148,7 +141,7 @@ class MiddlewareManager
      * @param OperationDefinitionNode $node
      * @param  string
      *
-     * @return array
+     * @return void
      */
     protected function byNode(OperationDefinitionNode $node, $operation)
     {

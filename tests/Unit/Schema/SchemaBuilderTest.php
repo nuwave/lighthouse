@@ -37,7 +37,7 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveEnumTypes()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         enum Role {
             # Company administrator.
             admin @enum(value:"admin")
@@ -45,11 +45,9 @@ class SchemaBuilderTest extends TestCase
             # Company employee.
             employee @enum(value:"employee")
         }
-        ';
+        ');
 
-        $types = schema()->register($schema);
-
-        $this->assertInstanceOf(EnumType::class, $types->firstWhere('name', 'Role'));
+        $this->assertInstanceOf(EnumType::class, $schema->getType('Role'));
     }
 
     /**
@@ -57,15 +55,14 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveInterfaceTypes()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         interface Foo {
             # bar is baz
             bar: String!
         }
-        ';
+        ');
 
-        $types = schema()->register($schema);
-        $this->assertInstanceOf(InterfaceType::class, $types->firstWhere('name', 'Foo'));
+        $this->assertInstanceOf(InterfaceType::class, $schema->getType('Foo'));
     }
 
     /**
@@ -73,13 +70,16 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveScalarTypes()
     {
-        $schema = '
-        scalar DateTime @scalar(class:"DateTime")
-        ';
+        $this->app['config']->set(
+            'lighthouse.namespaces.scalars',
+            'Nuwave\Lighthouse\Schema\Types\Scalars'
+        );
 
-        $this->app['config']->set('lighthouse.namespaces.scalars', 'Nuwave\Lighthouse\Schema\Types\Scalars');
-        $types = schema()->register($schema);
-        $this->assertInstanceOf(ScalarType::class, $types->firstWhere('name', 'DateTime'));
+        $schema = $this->buildSchemaWithDefaultQuery('
+        scalar DateTime @scalar(class:"DateTime")
+        ');
+
+        $this->assertInstanceOf(ScalarType::class, $schema->getType('DateTime'));
     }
 
     /**
@@ -87,17 +87,17 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveObjectTypes()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         type Foo {
             # bar attribute of Foo
             bar: String!
         }
-        ';
+        ');
 
-        $types = schema()->register($schema);
-        $this->assertInstanceOf(ObjectType::class, $types->firstWhere('name', 'Foo'));
+        $foo = $schema->getType('Foo');
+        $this->assertInstanceOf(ObjectType::class, $foo);
 
-        $config = $types->firstWhere('name', 'Foo')->config;
+        $config = $foo->config;
         $this->assertEquals('Foo', data_get($config, 'name'));
         $this->assertEquals('bar attribute of Foo', array_get($config['fields'](), 'bar.description'));
     }
@@ -107,17 +107,17 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveInputObjectTypes()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         input CreateFoo {
             foo: String!
             bar: Int
         }
-        ';
+        ');
 
-        $types = schema()->register($schema);
-        $this->assertInstanceOf(InputType::class, $types->firstWhere('name', 'CreateFoo'));
+        $createFoo = $schema->getType('CreateFoo');
+        $this->assertInstanceOf(InputType::class, $createFoo);
 
-        $config = $types->firstWhere('name', 'CreateFoo')->config;
+        $config = $createFoo->config;
         $fields = $config['fields']();
         $this->assertEquals('CreateFoo', data_get($config, 'name'));
         $this->assertArrayHasKey('foo', $fields);
@@ -129,13 +129,13 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveMutations()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         type Mutation {
             foo(bar: String! baz: String): String
         }
-        ';
+        ');
 
-        $type = schema()->register($schema)->firstWhere('name', 'Mutation');
+        $type = $schema->getType('Mutation');
         $mutation = $type->config['fields']()['foo'];
 
         $this->assertArrayHasKey('args', $mutation);
@@ -150,13 +150,13 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveQueries()
     {
-        $schema = '
+        $schema = $this->buildSchemaFromString('
         type Query {
             foo(bar: String! baz: String): String
         }
-        ';
+        ');
 
-        $type = schema()->register($schema)->firstWhere('name', 'Query');
+        $type = $schema->getType('Query');
         $query = $type->config['fields']()['foo'];
 
         $this->assertArrayHasKey('args', $query);
@@ -171,16 +171,16 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendObjectTypes()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         type Foo {
             bar: String!
         }
         extend type Foo {
             baz: String!
         }
-        ';
+        ');
 
-        $type = schema()->register($schema)->first();
+        $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
         $this->assertArrayHasKey('baz', $fields);
     }
@@ -190,16 +190,16 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendQuery()
     {
-        $schema = '
+        $schema = $this->buildSchemaFromString('
         type Query {
             foo: String!
         }
         extend type Query {
             bar: String!
         }
-        ';
+        ');
 
-        $type = schema()->register($schema)->firstWhere('name', 'Query');
+        $type = $schema->getType('Query');
         $fields = $type->config['fields']();
         $this->assertArrayHasKey('bar', $fields);
     }
@@ -209,16 +209,16 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendMutation()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         type Mutation {
             foo: String!
         }
         extend type Mutation {
             bar: String!
         }
-        ';
+        ');
 
-        $type = schema()->register($schema)->firstWhere('name', 'Mutation');
+        $type = $schema->getType('Mutation');
         $fields = $type->config['fields']();
         $this->assertArrayHasKey('bar', $fields);
     }
@@ -228,15 +228,18 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanGenerateGraphQLSchema()
     {
-        $schema = '
-        type Query {
-            foo: String!
-        }
-        type Mutation {
-            foo: String!
-        }
-        ';
+        $schema = $this->buildSchemaFromString('
+            type Query {
+                foo: String!
+            }
 
-        $this->assertInstanceOf(Schema::class, schema()->build($schema));
+            type Mutation {
+                foo: String!
+            }
+        ');
+
+        $this->assertInstanceOf(Schema::class, $schema);
+        // This would throw if the schema were invalid
+        $schema->assertValid();
     }
 }

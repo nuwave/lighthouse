@@ -4,24 +4,19 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\Schema\CacheManager;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
 {
     use CanFormatError;
-
-    /**
-     * Cache manager.
-     *
-     * @var CacheManager
-     */
-    protected $cache;
 
     /**
      * Schema builder.
@@ -31,11 +26,25 @@ class GraphQL
     protected $schema;
 
     /**
-     * Directive container.
+     * Directive registry container.
      *
-     * @var DirectiveFactory
+     * @var DirectiveRegistry
      */
     protected $directives;
+
+    /**
+     * Type registry container.
+     *
+     * @var TypeRegistry
+     */
+    protected $types;
+
+    /**
+     * Instance of node container.
+     *
+     * @var NodeContainer
+     */
+    protected $nodes;
 
     /**
      * Middleware manager.
@@ -59,11 +68,31 @@ class GraphQL
     protected $graphqlSchema;
 
     /**
+     * Create instance of graphql container.
+     *
+     * @param DirectiveRegistry $directives
+     * @param TypeRegistry $types
+     * @param MiddlewareManager $middleware
+     * @param NodeContainer $nodes
+     */
+    public function __construct(
+        DirectiveRegistry $directives,
+        TypeRegistry $types,
+        MiddlewareManager $middleware,
+        NodeContainer $nodes
+    ) {
+        $this->directives = $directives;
+        $this->types = $types;
+        $this->middleware = $middleware;
+        $this->nodes = $nodes;
+    }
+
+    /**
      * Prepare graphql schema.
      */
     public function prepSchema()
     {
-        $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
+        return $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
     }
 
     /**
@@ -124,20 +153,43 @@ class GraphQL
     }
 
     /**
-     * Build a new schema instance.
+     * Build a new executable schema.
      *
      * @return Schema
      */
     public function buildSchema()
     {
-        $schema = $this->cache()->get(function () {
-            return $this->stitcher()->stitch(
-                config('lighthouse.global_id_field', '_id'),
-                config('lighthouse.schema.register')
-            );
-        });
+        $documentAST = $this->shouldCacheAST()
+        ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+            return $this->buildAST();
+        })
+        : $this->buildAST();
 
-        return $this->schema()->build($schema);
+        return (new SchemaBuilder())->build($documentAST);
+    }
+
+    /**
+     * Determine if the AST should be cached.
+     *
+     * @return bool
+     */
+    protected function shouldCacheAST()
+    {
+        return app()->environment('production') && config('cache.enable');
+    }
+
+    /**
+     * Get the stitched schema and build an AST out of it.
+     *
+     * @return DocumentAST
+     */
+    protected function buildAST()
+    {
+        $schemaString = SchemaStitcher::stitch(
+            config('lighthouse.schema.register')
+        );
+
+        return ASTBuilder::generate($schemaString);
     }
 
     /**
@@ -163,29 +215,31 @@ class GraphQL
     /**
      * Get an instance of the schema builder.
      *
-     * @return SchemaBuilder
+     * @return TypeRegistry
      */
     public function schema()
     {
-        if (! $this->schema) {
-            $this->schema = app(SchemaBuilder::class);
-        }
-
-        return $this->schema;
+        return $this->types();
     }
 
     /**
      * Get an instance of the directive container.
      *
-     * @return DirectiveFactory
+     * @return DirectiveRegistry
      */
     public function directives()
     {
-        if (! $this->directives) {
-            $this->directives = app(DirectiveFactory::class);
-        }
-
         return $this->directives;
+    }
+
+    /**
+     * Get instance of type container.
+     *
+     * @return TypeRegistry
+     */
+    public function types()
+    {
+        return $this->types;
     }
 
     /**
@@ -195,39 +249,7 @@ class GraphQL
      */
     public function middleware()
     {
-        if (! $this->middleware) {
-            $this->middleware = app(MiddlewareManager::class);
-        }
-
         return $this->middleware;
-    }
-
-    /**
-     * Get instance of cache manager.
-     *
-     * @return CacheManager
-     */
-    public function cache()
-    {
-        if (! $this->cache) {
-            $this->cache = app(CacheManager::class);
-        }
-
-        return $this->cache;
-    }
-
-    /**
-     * Get instance of schema stitcher.
-     *
-     * @return SchemaStitcher
-     */
-    public function stitcher()
-    {
-        if (! $this->stitcher) {
-            $this->stitcher = app(SchemaStitcher::class);
-        }
-
-        return $this->stitcher;
     }
 
     /**
@@ -237,13 +259,6 @@ class GraphQL
      */
     public function nodes()
     {
-        if (! app()->has(NodeContainer::class)) {
-            return app()->instance(
-                NodeContainer::class,
-                resolve(NodeContainer::class)
-            );
-        }
-
-        return resolve(NodeContainer::class);
+        return $this->nodes;
     }
 }

@@ -1,21 +1,19 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
-
 
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class FindDirective implements FieldResolver
 {
-    use HandleQueries, HandlesDirectives, HandlesQueryFilter;
+    use HandlesQueries, HandlesDirectives, HandlesQueryFilter;
 
     /**
      * Name of the directive.
@@ -44,7 +42,7 @@ class FindDirective implements FieldResolver
             $query = $this->applyFilters($model::query(), $args);
             $query = $this->applyScopes($query, $args, $value);
             $total = $query->count();
-            if($total > 1) {
+            if ($total > 1) {
                 throw new Error('Query returned more than one result.');
             }
             return $query->first();

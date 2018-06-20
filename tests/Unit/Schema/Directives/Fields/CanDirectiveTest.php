@@ -11,13 +11,11 @@ class CanDirectiveTest extends TestCase
      */
     public function itCanAttachPoliciesToField()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         type Foo {
             bar: String! @can(if: ["viewBar"])
-        }
-        ';
-
-        $type = schema()->register($schema)->first();
+        }');
+        $type = $schema->getType('Foo');
         $fields = $type->config['fields'];
         $resolver = array_get($fields, 'bar.resolve');
         // TODO: Use prophecy to ensure middleware is called

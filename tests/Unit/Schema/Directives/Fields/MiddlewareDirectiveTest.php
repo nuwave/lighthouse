@@ -11,7 +11,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itCanRegisterMiddleware()
     {
-        schema()->register('
+        $schema = $this->buildSchemaFromString('
             type Query {
                 foo: String! @middleware(checks: ["auth:web", "auth:admin"])
                 bar: String!
@@ -21,10 +21,6 @@ class MiddlewareDirectiveTest extends TestCase
                 bar(baz: String!): String!
             }
         ');
-
-        collect(schema()->types())->each(function ($type) {
-            $type->config['fields']();
-        });
 
         $query = 'query FooQuery { foo }';
         $middleware = graphql()->middleware()->forRequest($query);
@@ -43,7 +39,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itCanRegisterMiddlewareWithFragments()
     {
-        schema()->register('
+        $schema = $this->buildSchemaFromString('
             type Query {
                 foo: String! @middleware(checks: ["auth:web", "auth:admin"])
                 bar: String!
@@ -53,10 +49,6 @@ class MiddlewareDirectiveTest extends TestCase
                 bar(baz: String!): String!
             }
         ');
-
-        collect(schema()->types())->each(function ($type) {
-            $type->config['fields']();
-        });
 
         $query = 'query FooQuery { ...Foo_Fragment } fragment Foo_Fragment on Query { foo }';
         $middleware = graphql()->middleware()->forRequest($query);

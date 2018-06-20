@@ -4,17 +4,10 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
-interface ArgMiddleware
+interface ArgMiddleware extends Directive
 {
     /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name();
-
-    /**
-     * Resolve the field directive.
+     * Apply transformations on the ArgumentValue.
      *
      * @param ArgumentValue $argument
      *

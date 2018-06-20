@@ -103,7 +103,7 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\EnumType
+     * @return NodeValue
      */
     public function enum(NodeValue $value)
     {
@@ -132,7 +132,7 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\ScalarType
+     * @return NodeValue
      */
     public function scalar(NodeValue $value)
     {

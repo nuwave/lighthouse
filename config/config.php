@@ -22,15 +22,14 @@ return [
         // 'middleware' => ['web','api'],    // [ 'loghttp']
     ],
 
-
     /*
     |--------------------------------------------------------------------------
     | Directive registry
     |--------------------------------------------------------------------------
     |
-    | This package allows you to create your own server-side directives. Change
-    | these values to register the directory that will hold all of your
-    | custom directives.
+    | This package allows you to create your own server-side directives.
+    | List directories that will be scanned for custom directives.
+    | Hint: Directives must implement \Nuwave\Lighthouse\Schema\Directives\Directive
     |
     */
     'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
@@ -67,10 +66,14 @@ return [
     | Schema Cache
     |--------------------------------------------------------------------------
     |
-    | Specify where the GraphQL schema should be cached.
+    | A large part of the Schema generation is parsing into an AST.
+    | This operation is cached by default when APP_ENV is set to 'production'
     |
     */
-    'cache' => null,
+    'cache' => [
+        'enable' => true,
+        'key' => 'lighthouse-schema',
+    ],
 
     /*
     |--------------------------------------------------------------------------

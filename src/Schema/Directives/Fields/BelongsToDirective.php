@@ -5,12 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\BelongsToLoader;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class BelongsToDirective implements FieldResolver
+class BelongsToDirective extends BaseFieldDirective implements FieldResolver
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -30,11 +27,7 @@ class BelongsToDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $relation = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), 'belongsTo'),
-            'relation',
-            $value->getField()->name->value
-        );
+        $relation = $this->associatedArgValue('relation', $value->getFieldName());
 
         return $value->setResolver(function ($root, array $args, $context = null, $info = null) use ($relation) {
             return graphql()->batch(BelongsToLoader::class, $root->getKey(), [

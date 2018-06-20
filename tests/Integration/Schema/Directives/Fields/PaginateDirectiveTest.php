@@ -57,10 +57,10 @@ class PaginateDirectiveTest extends DBTestCase
     {
         $users = factory(User::class, 10)->create();
         $posts = factory(Post::class, 10)->create([
-            'user_id' => $users->first()->id
+            'user_id' => $users->first()->id,
         ]);
         $comments = factory(Comment::class, 10)->create([
-            'post_id' => $posts->first()->id
+            'post_id' => $posts->first()->id,
         ]);
 
         $schema = '
@@ -69,16 +69,16 @@ class PaginateDirectiveTest extends DBTestCase
             name: String!
             posts: [Post!]! @paginate(type: "paginator" model: "Post")
         }
-        
+
         type Post {
             id: ID!
             comments: [Comment!]! @paginate(type: "paginator" model: "Comment")
         }
-        
+
         type Comment {
             id: ID!
         }
-        
+
         type Query {
             users: [User!]! @paginate(type: "paginator" model: "User")
         }

@@ -1,18 +1,16 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
-
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Traits\HandleQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
+use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class FirstDirective implements FieldResolver
 {
-    use HandleQueries, HandlesDirectives, HandlesQueryFilter;
+    use HandlesQueries, HandlesDirectives, HandlesQueryFilter;
 
     /**
      * Name of the directive.

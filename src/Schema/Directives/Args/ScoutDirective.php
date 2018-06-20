@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -20,7 +19,7 @@ class ScoutDirective implements ArgMiddleware
      */
     public function name()
     {
-        return "search";
+        return 'search';
     }
 
     /**
@@ -48,7 +47,7 @@ class ScoutDirective implements ArgMiddleware
                     /** @var \Laravel\Scout\Builder $query */
                     $query = $class::search(array_get($args, $arg));
 
-                    if(!is_null($within)) {
+                    if (! is_null($within)) {
                         $query->within($within);
                     }
 

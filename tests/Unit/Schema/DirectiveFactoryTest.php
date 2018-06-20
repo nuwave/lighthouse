@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema;
 
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\ScalarType;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -51,14 +52,12 @@ class DirectiveFactoryTest extends TestCase
      */
     public function itCanCheckIfFieldHasAResolverDirective()
     {
-        $schema = '
+        $type = PartialParser::objectTypeDefinition('
         type Foo {
             bar: [Bar!]! @hasMany
-        }
-        ';
+        }');
 
-        $document = Parser::parse($schema);
-        $hasResolver = directives()->hasResolver($document->definitions[0]->fields[0]);
+        $hasResolver = directives()->hasResolver($type->fields[0]);
         $this->assertTrue($hasResolver);
     }
 

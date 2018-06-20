@@ -22,16 +22,22 @@ class LighthouseServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
 
-        $this->registerSchema();
         $this->registerMacros();
     }
 
+    /**
+     * Load routes from provided path.
+     *
+     * @param string $path
+     */
     protected function loadRoutesFrom($path)
     {
-        if(Str::contains($this->app->version(), "Lumen")) {
-           require realpath($path);
-           return;
+        if (Str::contains($this->app->version(), 'Lumen')) {
+            require realpath($path);
+
+            return;
         }
+
         parent::loadRoutesFrom($path);
     }
 
@@ -40,31 +46,12 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('graphql', function () {
-            return new GraphQL();
-        });
-
-        $this->app->alias('graphql', GraphQL::class);
+        $this->app->singleton(GraphQL::class);
+        $this->app->alias(GraphQL::class, 'graphql');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([
-                \Nuwave\Lighthouse\Support\Console\Commands\CacheCommand::class,
-            ]);
+            $this->commands([]);
         }
-    }
-
-    /**
-     * Register GraphQL schema.
-     */
-    public function registerSchema()
-    {
-        directives()->load(realpath(__DIR__.'/../Schema/Directives/'), 'Nuwave\\Lighthouse\\');
-        directives()->load(config('lighthouse.directives', []));
-
-        graphql()->stitcher()->stitch(
-            config('lighthouse.global_id_field', '_id'),
-            config('lighthouse.schema.register')
-        );
     }
 
     /**

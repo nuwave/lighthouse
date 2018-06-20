@@ -3,8 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Schema\Utils\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
@@ -53,6 +51,7 @@ class HasManyDirectiveTest extends DBTestCase
             tasks: [Task!]! @hasMany
         }
         type Task {
+            id: Int
             foo: String
         }
         type Query {
@@ -124,17 +123,15 @@ class HasManyDirectiveTest extends DBTestCase
      */
     public function itThrowsErrorWithUnknownTypeArg()
     {
-        $schema = '
+        $this->expectException(DirectiveException::class);
+        $schema = $this->buildSchemaWithDefaultQuery('
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
         }
         type Task {
             foo: String
-        }
-        ';
-
-        $this->expectException(DirectiveException::class);
-        $type = schema()->register($schema)->first();
+        }');
+        $type = $schema->getType('User');
         $type->config['fields']();
     }
 }

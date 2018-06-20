@@ -28,11 +28,11 @@ if (! function_exists('schema')) {
     /**
      * Get instance of schema container.
      *
-     * @return \Nuwave\Lighthouse\Schema\SchemaBuilder
+     * @return \Nuwave\Lighthouse\Schema\TypeRegistry
      */
     function schema()
     {
-        return graphql()->schema();
+        return graphql()->types();
     }
 }
 
@@ -40,7 +40,7 @@ if (! function_exists('directives')) {
     /**
      * Get instance of directives container.
      *
-     * @return \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
      */
     function directives()
     {

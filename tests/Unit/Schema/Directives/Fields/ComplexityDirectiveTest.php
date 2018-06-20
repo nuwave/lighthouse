@@ -11,16 +11,15 @@ class ComplexityDirectiveTest extends TestCase
      */
     public function itCanSetDefaultComplexityOnField()
     {
-        $schema = '
+        $schema = $this->buildSchemaWithDefaultQuery('
         type User {
             posts: [Post!]! @complexity @hasMany
         }
         type Post {
             title: String
-        }
-        ';
+        }');
 
-        $type = schema()->register($schema)->first();
+        $type = $schema->getType('User');
         $fields = $type->config['fields']();
         $complexity = $fields['posts']['complexity'];
 
@@ -34,7 +33,8 @@ class ComplexityDirectiveTest extends TestCase
     public function itCanSetCustomComplexityResolver()
     {
         $resolver = addslashes(self::class);
-        $schema = '
+
+        $schema = $this->buildSchemaWithDefaultQuery('
         type User {
             posts: [Post!]!
                 @complexity(resolver: "'.$resolver.'@complexity")
@@ -42,10 +42,8 @@ class ComplexityDirectiveTest extends TestCase
         }
         type Post {
             title: String
-        }
-        ';
-
-        $type = schema()->register($schema)->first();
+        }');
+        $type = $schema->getType('User');
         $fields = $type->config['fields']();
         $complexity = $fields['posts']['complexity'];
         $this->assertEquals(100, $complexity(10, ['foo' => 10]));

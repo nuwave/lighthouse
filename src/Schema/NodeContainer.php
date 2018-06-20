@@ -52,7 +52,7 @@ class NodeContainer
      * @param string $type
      * @param string $model
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return void
      */
     public function model($type, $model)
     {

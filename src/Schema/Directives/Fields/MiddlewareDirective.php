@@ -4,12 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class MiddlewareDirective implements FieldMiddleware
+class MiddlewareDirective extends BaseFieldDirective implements FieldMiddleware
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -57,16 +54,13 @@ class MiddlewareDirective implements FieldMiddleware
      */
     protected function getChecks(FieldValue $value)
     {
-        if (! in_array($value->getNodeName(), ['Mutation', 'Query'])) {
+        if (!in_array($value->getNodeName(), ['Mutation', 'Query'])) {
             return null;
         }
 
-        $checks = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'checks'
-        );
+        $checks = $this->associatedArgValue('checks');
 
-        if (! $checks) {
+        if (!$checks) {
             return null;
         }
 

@@ -2,12 +2,26 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
+use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class GroupDirective implements NodeMiddleware
+/**
+ * Class GroupDirective.
+ *
+ * This directive is kept for compatibility reasons but is superseded by
+ * NamespaceDirective and MiddlewareDirective.
+ *
+ * @deprecated Will be removed in next major version
+ */
+class GroupDirective implements NodeManipulator
 {
     use HandlesDirectives;
 
@@ -22,68 +36,115 @@ class GroupDirective implements NodeMiddleware
     }
 
     /**
-     * Handle node value.
+     * @param ObjectTypeDefinitionNode $objectType
+     * @param DocumentAST              $current
+     * @param DocumentAST              $original
      *
-     * @param NodeValue $value
+     * @throws DirectiveException
      *
-     * @return NodeValue
+     * @return DocumentAST
      */
-    public function handleNode(NodeValue $value)
+    public function manipulateSchema(ObjectTypeDefinitionNode $objectType, DocumentAST $current, DocumentAST $original)
     {
-        $this->setNamespace($value);
-        $this->setMiddleware($value);
+        $nodeName = $objectType->name->value;
 
-        return $value;
-    }
-
-    /**
-     * Set namespace on node.
-     *
-     * @param NodeValue $value [description]
-     */
-    protected function setNamespace(NodeValue $value)
-    {
-        $namespace = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'namespace'
-        );
-
-        if ($namespace) {
-            $value->setNamespace($namespace);
-        }
-    }
-
-    /**
-     * Set middleware for field.
-     *
-     * @param NodeValue $value
-     */
-    protected function setMiddleware(NodeValue $value)
-    {
-        $node = $value->getNodeName();
-
-        if (! in_array($node, ['Query', 'Mutation'])) {
-            $message = 'Middleware can only be placed on a Query or Mutation ['.$node.']';
+        if (! in_array($nodeName, ['Query', 'Mutation'])) {
+            $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
 
             throw new DirectiveException($message);
         }
 
-        $middleware = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
+        $objectType = $this->setMiddlewareDirectiveOnFields($objectType);
+        $objectType = $this->setNamespaceDirectiveOnFields($objectType);
+
+        $current->setDefinition($objectType);
+
+        return $current;
+    }
+
+    /**
+     * @param ObjectTypeDefinitionNode $objectType
+     *
+     * @throws \Exception
+     *
+     * @return ObjectTypeDefinitionNode
+     */
+    protected function setMiddlewareDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
+    {
+        $middlewareValues = $this->directiveArgValue(
+            $this->nodeDirective($objectType, self::name()),
             'middleware'
         );
 
-        $container = graphql()->middleware();
-        $middleware = is_string($middleware) ? [$middleware] : $middleware;
-
-        if (empty($middleware)) {
-            return;
+        if (! $middlewareValues) {
+            return $objectType;
         }
 
-        foreach ($value->getNodeFields() as $field) {
-            'Query' == $node
-                ? $container->registerQuery($field->name->value, $middleware)
-                : $container->registerMutation($field->name->value, $middleware);
+        $middlewareValues = '["'.implode('", "', $middlewareValues).'"]';
+        $middlewareDirective = PartialParser::directive("@middleware(checks: $middlewareValues)");
+
+        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
+            $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
+
+            return $fieldDefinition;
+        })->toArray());
+
+        return $objectType;
+    }
+
+    /**
+     * @param ObjectTypeDefinitionNode $objectType
+     *
+     * @throws \Exception
+     *
+     * @return ObjectTypeDefinitionNode
+     */
+    protected function setNamespaceDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
+    {
+        $namespaceValue = $this->directiveArgValue(
+            $this->nodeDirective($objectType, self::name()),
+            'namespace'
+        );
+
+        if (! $namespaceValue) {
+            return $objectType;
         }
+
+        if (! is_string($namespaceValue)) {
+            throw new DirectiveException('The value of the namespace directive on has to be a string');
+        }
+
+        $namespaceValue = addslashes($namespaceValue);
+
+        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
+            $previousNamespaces = $this->fieldDirective($fieldDefinition, (new NamespaceDirective)->name());
+
+            $previousNamespaces = $previousNamespaces
+                ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)
+                : PartialParser::directive("@namespace(field: \"$namespaceValue\", complexity: \"$namespaceValue\")");
+            $fieldDefinition->directives = $fieldDefinition->directives->merge([$previousNamespaces]);
+
+            return $fieldDefinition;
+        })->toArray());
+
+        return $objectType;
+    }
+
+    /**
+     * @param string        $namespaceValue
+     * @param DirectiveNode $directive
+     *
+     * @return DirectiveNode
+     */
+    protected function mergeNamespaceOnExistingDirective($namespaceValue, DirectiveNode $directive)
+    {
+        $namespaces = PartialParser::arguments([
+            "field: \"$namespaceValue\"",
+            "complexity: \"$namespaceValue\"",
+        ]);
+
+        $directive->arguments = $directive->arguments->merge($namespaces);
+
+        return $directive;
     }
 }

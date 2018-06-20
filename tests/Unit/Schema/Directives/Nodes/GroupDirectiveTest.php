@@ -8,6 +8,7 @@ class GroupDirectiveTest extends TestCase
 {
     /**
      * @test
+     * @group fixing
      */
     public function itCanSetNamespaces()
     {
@@ -15,8 +16,7 @@ class GroupDirectiveTest extends TestCase
         type Query {}
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             me: String @field(resolver: "Foo@bar")
-        }
-        ';
+        }';
 
         $result = $this->execute($schema, '{ me }');
         $this->assertEquals('foo.bar', $result->data['me']);

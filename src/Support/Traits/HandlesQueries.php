@@ -1,21 +1,19 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Support\Traits;
-
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-trait HandleQueries
+trait HandlesQueries
 {
-    public abstract function name();
-
     /**
      * @param FieldValue $value
-     * @return mixed|string
+     *
      * @throws DirectiveException
+     *
+     * @return mixed|string
      */
     public function getModelClass(FieldValue $value)
     {

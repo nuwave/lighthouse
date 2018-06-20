@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Support\Validator;
 
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -28,17 +29,23 @@ class ValidatorTest extends TestCase
             };
         });
 
-        $field = $this->getNodeField('
+        $typeDefinition = PartialParser::objectTypeDefinition('
             type Mutation {
                 foo(bar: String baz: Int): String @validate(validator: "foo.validator")
             }
-            ')->setResolver(function () {
+        ');
+
+        $fieldValue = new FieldValue(new NodeValue($typeDefinition), $typeDefinition->fields[0]);
+        $fieldValue->setResolver(function () {
             return 'foo';
         });
 
-        (new ValidateDirective())->handleField($field);
+        (new ValidateDirective())->handleField($fieldValue);
 
         $this->expectException(ValidationError::class);
-        $field->getResolver()(null, ['bar' => 'foo', 'baz' => 1]);
+        $fieldValue->getResolver()(
+            null,
+            ['bar' => 'foo', 'baz' => 1]
+        );
     }
 }

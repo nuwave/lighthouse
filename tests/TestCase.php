@@ -2,12 +2,11 @@
 
 namespace Tests;
 
-use GraphQL\Executor\Executor;
+use GraphQL\GraphQL;
 use GraphQL\Language\Parser;
 use Laravel\Scout\ScoutServiceProvider;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -102,30 +101,35 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Language\AST\DocumentNode
      */
-    protected function parse(string $schema)
+    protected function parse($schema)
     {
         return Parser::parse($schema);
     }
-
+    
     /**
      * Execute query/mutation.
      *
      * @param string $schema
      * @param string $query
-     * @param string $lighthouse
-     * @param array  $variables
+     * @param bool $lighthouse
+     * @param array $variables
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
     protected function execute($schema, $query, $lighthouse = false, $variables = [])
     {
         if ($lighthouse) {
-            $node = file_get_contents(realpath(__DIR__.'/../assets/node.graphql'));
-            $lighthouse = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
-            $schema = $node."\n".$lighthouse."\n".$schema;
+            $addDefaultSchema = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
+            $schema = $addDefaultSchema."\n".$schema;
         }
 
-        return Executor::execute(schema()->build($schema), $this->parse($query));
+        return GraphQL::executeQuery(
+            $this->buildSchemaFromString($schema),
+            $query,
+            null,
+            null,
+            $variables
+        );
     }
 
     /**
@@ -150,45 +154,29 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * Get a node's field.
+     * @param string $schema
      *
-     * @param string      $schema
-     * @param int         $index
-     * @param string|null $name
-     *
-     * @return FieldValue
+     * @return \GraphQL\Type\Schema
      */
-    protected function getNodeField($schema, $index = 0, $field = null)
+    protected function buildSchemaFromString($schema)
     {
-        $document = $this->parse($schema);
-        $node = new NodeValue($document->definitions[$index]);
-
-        if (is_null($field)) {
-            return new FieldValue($node, array_get($node->getNodeFields(), '0'));
-        }
-
-        return collect($node->getNodeFields())->filter(function ($nodeField) use ($field) {
-            return $nodeField->name->value === $field;
-        })->map(function ($field) use ($node) {
-            return new FieldValue($node, $field);
-        })->first();
+        return (new SchemaBuilder())->build(ASTBuilder::generate($schema));
     }
 
     /**
-     * Get field argument value.
+     * Convenience method to add a default Query, sometimes needed
+     * because the Schema is invalid without it.
      *
-     * @param string     $name
-     * @param FieldValue $field
+     * @param string $schema
      *
-     * @return ArgumentValue
+     * @return \GraphQL\Type\Schema
      */
-    protected function getFieldArg($name, FieldValue $field)
+    protected function buildSchemaWithDefaultQuery($schema)
     {
-        return collect(data_get($field->getField(), 'arguments', []))
-            ->filter(function ($arg) use ($name) {
-                return $arg->name->value === $name;
-            })->map(function ($arg) use ($field) {
-                return new ArgumentValue($field, $arg);
-            })->first();
+        return $this->buildSchemaFromString($schema.'
+            type Query {
+                dummy: String
+            }
+        ');
     }
 }
