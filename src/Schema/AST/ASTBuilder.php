@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
@@ -51,17 +52,17 @@ class ASTBuilder
                 return $typeExtension->definition;
             })
         // This is just temporarily merged together
-            ->concat($document->objectTypes())
-            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use (
+            ->concat($document->typeDefinitions())
+            ->reduce(function (DocumentAST $document, Node $node) use (
                 $originalDocument
             ) {
-                $nodeManipulators = graphql()->directives()->nodeManipulators($objectType);
+                $nodeManipulators = graphql()->directives()->nodeManipulators($node);
 
                 return $nodeManipulators->reduce(function (DocumentAST $document, NodeManipulator $nodeManipulator) use (
                     $originalDocument,
-                    $objectType
+                    $node
                 ) {
-                    return $nodeManipulator->manipulateSchema($objectType, $document, $originalDocument);
+                    return $nodeManipulator->manipulateSchema($node, $document, $originalDocument);
                 }, $document);
             }, $document);
     }
@@ -163,8 +164,9 @@ class ASTBuilder
      *
      * @param DocumentAST $document
      *
-     * @return DocumentAST
      * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     *
+     * @return DocumentAST
      */
     protected static function addNodeSupport(DocumentAST $document)
     {
@@ -176,7 +178,7 @@ class ASTBuilder
 
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if (!$hasTypeImplementingNode) {
+        if (! $hasTypeImplementingNode) {
             return $document;
         }
 
