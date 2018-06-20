@@ -118,7 +118,21 @@ class SchemaBuilder
     protected function convertDirectives(DocumentAST $document)
     {
         return $document->directives()->map(function (DirectiveDefinitionNode $directive) {
-            return app(NodeFactory::class)->handle(new NodeValue($directive));
+            return new Directive([
+                'name' => $directive->name->value,
+                'locations' => collect($directive->locations)->map(function ($location) {
+                    return $location->value;
+                })->toArray(),
+                'args' => collect($directive->arguments)->map(function (InputValueDefinitionNode $argument) {
+                    return new FieldArgument([
+                        'name' => $argument->name->value,
+                        'defaultValue' => data_get($argument, 'defaultValue.value', null),
+                        'description' => $argument->description,
+                        'type' => NodeResolver::resolve($argument->type),
+                    ]);
+                })->toArray(),
+                'astNode' => $directive,
+            ]);
         });
     }
 }
