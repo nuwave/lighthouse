@@ -3,7 +3,10 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
@@ -11,6 +14,7 @@ use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 class SchemaBuilder
@@ -39,7 +43,7 @@ class SchemaBuilder
         $this->loadRootOperationFields($types);
 
         $config = SchemaConfig::create()
-        // Always set Query since it is required
+            // Always set Query since it is required
             ->setQuery($types->firstWhere('name', 'Query'))
             ->setTypes($types->reject($this->isOperationType())->toArray())
             ->setDirectives($this->convertDirectives($documentAST)->toArray())
@@ -101,11 +105,11 @@ class SchemaBuilder
             ->sortBy(function (TypeDefinitionNode $typeDefinition) {
                 return array_get($this->weights, get_class($typeDefinition), 9);
             })->map(function (TypeDefinitionNode $typeDefinition) {
-            return app(NodeFactory::class)->handle(new NodeValue($typeDefinition));
-        })->each(function (Type $type) {
-            // Register in global type registry
-            graphql()->types()->register($type);
-        });
+                return (new NodeFactory())->handle(new NodeValue($typeDefinition));
+            })->each(function (Type $type) {
+                // Register in global type registry
+                graphql()->types()->register($type);
+            });
     }
 
     /**
