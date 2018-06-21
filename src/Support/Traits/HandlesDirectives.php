@@ -8,6 +8,11 @@ use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectValueNode;
 
+/**
+ * Trait HandlesDirectives
+ * @package Nuwave\Lighthouse\Support\Traits
+ * @deprecated Use the BaseDirective class instead
+ */
 trait HandlesDirectives
 {
     /**

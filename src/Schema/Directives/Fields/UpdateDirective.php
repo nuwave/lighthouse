@@ -3,13 +3,14 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Type\Definition\IDType;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class UpdateDirective extends BaseFieldDirective implements FieldResolver
+class UpdateDirective extends BaseDirective implements FieldResolver
 {
     use HandlesGlobalId;
 
@@ -29,12 +30,13 @@ class UpdateDirective extends BaseFieldDirective implements FieldResolver
      * @param FieldValue $value
      *
      * @return FieldValue
+     * @throws DirectiveException
      */
     public function resolveField(FieldValue $value)
     {
         $idArg = $this->getIDField($value);
-        $class = $this->associatedArgValue('model');
-        $globalId = $this->associatedArgValue('globalId', false);
+        $class = $this->directiveArgValue('model');
+        $globalId = $this->directiveArgValue('globalId', false);
 
         if (!$class) {
             throw new DirectiveException(sprintf(

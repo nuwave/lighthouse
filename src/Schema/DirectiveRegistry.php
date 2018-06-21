@@ -6,7 +6,8 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
-use Nuwave\Lighthouse\Schema\Directives\Fields\BaseFieldDirective;
+use GraphQL\Language\AST\TypeSystemDefinitionNode;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -156,6 +157,8 @@ class DirectiveRegistry
     {
         return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
             return $this->get($directive->name->value);
+        })->map(function (Directive $directive) use ($node){
+            return $this->hydrate($directive, $node);
         });
     }
 
@@ -180,8 +183,6 @@ class DirectiveRegistry
     {
         return $this->directives($fieldDefinition)->filter(function (Directive $directive) {
             return $directive instanceof FieldManipulator;
-        })->map(function (FieldManipulator $directive) use ($fieldDefinition) {
-            return $this->hydrate($directive, $fieldDefinition);
         });
     }
 
@@ -274,7 +275,7 @@ class DirectiveRegistry
     public function hasFieldMiddleware($field)
     {
         return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->handler($directive->name->value);
+            return $this->get($directive->name->value);
         })->reduce(function ($has, $handler) {
             return $handler instanceof FieldMiddleware ? true : $has;
         }, false);
@@ -306,9 +307,7 @@ class DirectiveRegistry
             ));
         }
 
-        $resolver = $resolvers->first();
-
-        return $resolver ? $this->hydrate($resolver, $field) : null;
+        return $resolvers->first();
     }
 
     /**
@@ -336,8 +335,6 @@ class DirectiveRegistry
     {
         return $this->directives($fieldDefinition)->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
-        })->map(function (FieldMiddleware $fieldDirective) use ($fieldDefinition) {
-            return $this->hydrate($fieldDirective, $fieldDefinition);
         });
     }
 
@@ -356,15 +353,15 @@ class DirectiveRegistry
     }
 
     /**
-     * @param Directive           $directive
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param Directive $directive
+     * @param TypeSystemDefinitionNode $definitionNode
      *
      * @return Directive
      */
-    protected function hydrate(Directive $directive, FieldDefinitionNode $fieldDefinition)
+    protected function hydrate(Directive $directive, $definitionNode)
     {
-        return $directive instanceof BaseFieldDirective
-        ? $directive->hydrate($fieldDefinition)
-        : $directive;
+        return $directive instanceof BaseDirective
+            ? $directive->hydrate($definitionNode)
+            : $directive;
     }
 }

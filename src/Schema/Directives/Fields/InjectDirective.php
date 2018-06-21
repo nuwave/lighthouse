@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-class InjectDirective extends BaseFieldDirective implements FieldMiddleware
+class InjectDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * Name of the directive.
@@ -28,8 +29,8 @@ class InjectDirective extends BaseFieldDirective implements FieldMiddleware
     public function handleField(FieldValue $value)
     {
         $resolver = $value->getResolver();
-        $attr = $this->associatedArgValue('context');
-        $name = $this->associatedArgValue('name');
+        $attr = $this->directiveArgValue('context');
+        $name = $this->directiveArgValue('name');
 
         if (!$attr) {
             throw new DirectiveException(sprintf(

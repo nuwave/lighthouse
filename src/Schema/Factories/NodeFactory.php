@@ -4,28 +4,26 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\EnumDirective;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 
 class NodeFactory
 {
-    use HandlesDirectives, HandlesTypes;
+    use HandlesTypes;
 
     /**
      * Transform node to type.
@@ -33,6 +31,7 @@ class NodeFactory
      * @param NodeValue $value
      *
      * @return Type
+     * @throws \Exception
      */
     public function handle(NodeValue $value)
     {
@@ -75,6 +74,7 @@ class NodeFactory
      * @param NodeValue $value
      *
      * @return NodeValue
+     * @throws \Exception
      */
     protected function transform(NodeValue $value)
     {
@@ -101,30 +101,17 @@ class NodeFactory
     /**
      * Resolve enum definition to type.
      *
-     * @param NodeValue $value
+     * @param NodeValue $enumNodeValue
      *
      * @return NodeValue
      */
-    public function enum(NodeValue $value)
+    public function enum(NodeValue $enumNodeValue)
     {
-        $enum = new EnumType([
-            'name' => $value->getNodeName(),
-            'values' => collect($value->getNode()->values)
-                ->mapWithKeys(function (EnumValueDefinitionNode $field) {
-                    $directive = $this->fieldDirective($field, 'enum');
+        $enumDirective = (new EnumDirective())->hydrate($enumNodeValue->getNode());
 
-                    if (! $directive) {
-                        return [];
-                    }
+        $enumType = $enumDirective->resolveNode($enumNodeValue);
 
-                    return [$field->name->value => [
-                        'value' => $this->directiveArgValue($directive, 'value'),
-                        'description' => $this->safeDescription($field->description),
-                    ]];
-                })->toArray(),
-        ]);
-
-        return $value->setType($enum);
+        return $enumNodeValue->setType($enumType);
     }
 
     /**

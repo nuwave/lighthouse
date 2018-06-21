@@ -4,17 +4,15 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class ValidateDirective implements ArgMiddleware, FieldMiddleware
+class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMiddleware
 {
-    use HandlesDirectives;
-
     /**
      * Directive name.
      *
@@ -31,13 +29,11 @@ class ValidateDirective implements ArgMiddleware, FieldMiddleware
      * @param FieldValue $value
      *
      * @return FieldValue
+     * @throws DirectiveException
      */
     public function handleField(FieldValue $value)
     {
-        $validator = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
-            'validator'
-        );
+        $validator = $this->directiveArgValue('validator');
 
         if (! $validator) {
             $fieldName = $value->getFieldName();

@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class NotEqualsFilterDirective implements ArgMiddleware
+class NotEqualsFilterDirective extends BaseDirective implements ArgMiddleware
 {
-    use HandlesDirectives, HandlesQueryFilter;
+    use HandlesQueryFilter;
 
     /**
      * Name of the directive.

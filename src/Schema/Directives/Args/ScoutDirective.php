@@ -3,14 +3,14 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Illuminate\Database\Eloquent\Builder;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class ScoutDirective implements ArgMiddleware
+class ScoutDirective extends BaseDirective implements ArgMiddleware
 {
-    use HandlesDirectives, HandlesQueryFilter;
+    use HandlesQueryFilter;
 
     /**
      * Name of the directive.
@@ -34,11 +34,7 @@ class ScoutDirective implements ArgMiddleware
         $arg = $argument->getArgName();
 
         // Adds within method to specify custom index.
-        $within = $this->directiveArgValue(
-            $this->queryFilterDirective($argument),
-            'within',
-            null
-        );
+        $within = $this->directiveArgValue('within');
 
         return $this->injectFilter(
             $argument, [

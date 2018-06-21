@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
-class BcryptDirective implements ArgMiddleware
+class BcryptDirective extends BaseDirective implements ArgMiddleware
 {
     /**
      * Directive name.

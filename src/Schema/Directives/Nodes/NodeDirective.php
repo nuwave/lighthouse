@@ -2,14 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class NodeDirective implements NodeMiddleware
+class NodeDirective extends BaseDirective implements NodeMiddleware
 {
-    use HandlesDirectives;
-
     /**
      * Directive name.
      *
@@ -49,10 +47,7 @@ class NodeDirective implements NodeMiddleware
      */
     protected function getResolver(NodeValue $value)
     {
-        $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'resolver'
-        );
+        $resolver = $this->directiveArgValue('resolver');
 
         $namespace = array_get(explode('@', $resolver), '0');
         $method = array_get(explode('@', $resolver), '1');
@@ -73,10 +68,7 @@ class NodeDirective implements NodeMiddleware
      */
     protected function getResolveType(NodeValue $value)
     {
-        $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'typeResolver'
-        );
+        $resolver = $this->directiveArgValue('typeResolver');
 
         $namespace = array_get(explode('@', $resolver), '0');
         $method = array_get(explode('@', $resolver), '1');

@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class WhereFilterDirective implements ArgMiddleware
+class WhereFilterDirective extends BaseDirective implements ArgMiddleware
 {
-    use HandlesDirectives, HandlesQueryFilter;
+    use HandlesQueryFilter;
 
     /**
      * Name of the directive.
@@ -32,16 +32,8 @@ class WhereFilterDirective implements ArgMiddleware
     {
         $arg = $argument->getArgName();
 
-        $operator = $this->directiveArgValue(
-            $this->queryFilterDirective($argument),
-            'operator',
-            '='
-        );
-
-        $clause = $this->directiveArgValue(
-            $this->queryFilterDirective($argument),
-            'clause'
-        );
+        $operator = $this->directiveArgValue('operator', '=');
+        $clause = $this->directiveArgValue('clause');
 
         return $this->injectFilter($argument, [
             'resolve' => function ($query, $key, array $args) use ($arg, $operator, $clause) {

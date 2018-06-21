@@ -2,14 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class ModelDirective implements NodeMiddleware
+class ModelDirective extends BaseDirective implements NodeMiddleware
 {
-    use HandlesDirectives;
-
     /**
      * Directive name.
      *
@@ -49,10 +47,7 @@ class ModelDirective implements NodeMiddleware
      */
     protected function getNamespace(NodeValue $value)
     {
-        $namespace = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'class'
-        );
+        $namespace = $this->directiveArgValue('class');
 
         if ($namespace) {
             return $namespace;

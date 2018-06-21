@@ -70,7 +70,6 @@ trait HandlesQueryFilter
     protected function queryFilterKey(ArgumentValue $argument)
     {
         return $this->directiveArgValue(
-            $this->queryFilterDirective($argument),
             'key',
             $argument->getArgName()
         );
@@ -82,6 +81,7 @@ trait HandlesQueryFilter
      * @param ArgumentValue $argument
      *
      * @return mixed
+     * @deprecated
      */
     protected function queryFilterDirective(ArgumentValue $argument)
     {
