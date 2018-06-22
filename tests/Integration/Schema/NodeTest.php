@@ -18,18 +18,27 @@ class NodeTest extends DBTestCase
     public function itCanResolveNodes()
     {
         $schema = '
-        type User implements Node @node(
+        type User @node(
             resolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNode"
             typeResolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNodeType"
         ) {
-            _id: ID!
             name: String!
         }
+        
         type Query {}
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { ...on User { name } } }', true);
+        $query = '
+        {
+            node(id: "' . $globalId . '") {
+                ...on User {
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query, true);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -39,18 +48,27 @@ class NodeTest extends DBTestCase
      */
     public function itCanResolveModelsNodes()
     {
-        $user = factory(User::class)->create();
-        $globalId = $this->encodeGlobalId('User', $user->getKey());
-
         $schema = '
-        type User implements Node @model {
-            _id: ID!
+        type User @model {
             name: String!
         }
+        
         type Query {}
         ';
 
-        $result = $this->execute($schema, '{ node(id: "'.$globalId.'") { ...on User { name } } }', true);
+        $user = factory(User::class)->create();
+        $globalId = $this->encodeGlobalId('User', $user->getKey());
+        $query = '
+        {
+            node(id: "' . $globalId . '") {
+                ...on User {
+                    name
+                }
+            }
+        }
+        ';
+
+        $result = $this->execute($schema, $query, true);
         $this->assertEquals($user->name, array_get($result->data, 'node.name'));
     }
 
