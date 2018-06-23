@@ -135,6 +135,16 @@ class DocumentAST
     }
 
     /**
+     * Get all definitions for input types.
+     *
+     * @return Collection
+     */
+    public function inputTypes()
+    {
+        return $this->definitionsByType(InputObjectTypeDefinitionNode::class);
+    }
+
+    /**
      * Get all interface definitions.
      *
      * @return Collection
