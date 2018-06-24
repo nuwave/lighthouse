@@ -6,8 +6,9 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -22,24 +23,28 @@ class RuleFactory
      * Build rules for field.
      *
      * @param DirectiveNode                 $directive
-     * @param InputValueDefinitionNode      $input
-     * @param InputObjectTypeDefinitionNode $input
+     * @param InputValueDefinitionNode      $arg
+     * @param InputObjectTypeDefinitionNode $inputType
      * @param DocumentAST                   $document
      *
      * @return DocumentAST
      */
     public static function build(
         DirectiveNode $directive,
-        InputValueDefinitionNode $field,
-        InputObjectTypeDefinitionNode $input,
+        InputValueDefinitionNode $arg,
+        InputObjectTypeDefinitionNode $inputType,
         DocumentAST $documentAST
     ) {
         $instance = new static();
         $directiveClone = ASTHelper::cloneDefinition($directive);
-        $directiveClone = $instance->appendPath($directiveClone, $field);
+        $directiveClone = $instance->appendPath(
+            $directiveClone,
+            $arg,
+            $instance->includesList($arg)
+        );
 
-        $documentAST = $instance->applyToMutation($directiveClone, $input, $documentAST);
-        $documentAST = $instance->applyToInputTypes($directiveClone, $input, $documentAST);
+        $documentAST = $instance->applyToMutation($directiveClone, $inputType, $documentAST);
+        $documentAST = $instance->applyToInputTypes($directiveClone, $inputType, $documentAST);
 
         return $documentAST;
     }
@@ -61,10 +66,10 @@ class RuleFactory
         $documentAST->inputTypes()
             ->each(function (InputObjectTypeDefinitionNode $inputType) use ($directive, $input, $documentAST) {
                 collect($inputType->fields)->filter(function (InputValueDefinitionNode $field) use ($input) {
-                    return $field->type->name->value === $input->name->value;
+                    return $this->unwrapArgType($field->type)->name->value === $input->name->value;
                 })->each(function ($field) use ($directive, $inputType, $documentAST) {
                     $directiveClone = ASTHelper::cloneDefinition($directive);
-                    $directiveClone = $this->appendPath($directiveClone, $field);
+                    $directiveClone = $this->appendPath($directiveClone, $field, $this->includesList($field));
 
                     $documentAST = $this->applyToMutation($directiveClone, $inputType, $documentAST);
                     $documentAST = $this->applyToInputTypes($directiveClone, $inputType, $documentAST);
@@ -98,12 +103,14 @@ class RuleFactory
             ->map(function (FieldDefinitionNode $field) use ($directive, $input) {
                 $arguments = collect($field->arguments)
                     ->map(function (InputValueDefinitionNode $arg) use ($directive, $input) {
-                        if ($arg->type->name->value !== $input->name->value) {
+                        $argType = $this->unwrapArgType($arg->type);
+
+                        if ($argType->name->value !== $input->name->value) {
                             return $arg;
                         }
 
                         $directiveClone = ASTHelper::cloneDefinition($directive);
-                        $this->appendPath($directiveClone, $arg);
+                        $this->appendPath($directiveClone, $arg, $this->includesList($arg));
 
                         $arg->directives = ASTHelper::mergeNodeList(
                             $arg->directives, NodeList::create([$directiveClone])
@@ -131,13 +138,18 @@ class RuleFactory
      *
      * @param DirectiveNode            $directive
      * @param InputValueDefinitionNode $arg
+     * @param bool                     $list
      *
      * @return DirectiveNode
      */
-    protected function appendPath(DirectiveNode $directive, InputValueDefinitionNode $arg)
+    protected function appendPath(DirectiveNode $directive, InputValueDefinitionNode $arg, $list)
     {
         $currentPath = $this->directiveArgValue($directive, 'path', '');
         $fullPath = $arg->name->value;
+
+        if ($list) {
+            $currentPath = "*.{$currentPath}";
+        }
 
         if (! empty($currentPath)) {
             $fullPath = "{$fullPath}.{$currentPath}";
@@ -157,5 +169,43 @@ class RuleFactory
         );
 
         return $directive;
+    }
+
+    /**
+     * Unwrap input argument type.
+     *
+     * @param Node $arg
+     *
+     * @return Node
+     */
+    protected function unwrapArgType(Node $arg)
+    {
+        if (! data_get($arg, 'type')) {
+            return $arg;
+        } elseif (! data_get($arg, 'type.name')) {
+            return $this->unwrapArgType($arg->type);
+        }
+
+        return $arg->type;
+    }
+
+    /**
+     * Check if arg includes a list.
+     *
+     * @param Node $arg
+     *
+     * @return bool
+     */
+    protected function includesList(Node $arg)
+    {
+        $type = data_get($arg, 'type');
+
+        if ($type instanceof ListTypeNode) {
+            return true;
+        } elseif (! is_null($type)) {
+            return $this->includesList($type);
+        }
+
+        return false;
     }
 }

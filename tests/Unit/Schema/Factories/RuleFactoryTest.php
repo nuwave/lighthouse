@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Factories;
 
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 use Tests\TestCase;
@@ -23,7 +22,7 @@ class RuleFactoryTest extends TestCase
         }
         
         type Mutation {
-            createUser(input: UserInput): String
+            createUser(input: UserInput!): String
         }');
 
         $addressType = $documentAST->inputTypes()->first();
@@ -53,6 +52,44 @@ class RuleFactoryTest extends TestCase
     /**
      * @test
      */
+    public function itCanBuildRulesForInputListField()
+    {
+        $documentAST = DocumentAST::fromSource('
+        input UserInput {
+            email: String @rules(apply: ["required", "email"])
+        }
+        
+        type Mutation {
+            createUser(input: [UserInput]!): String
+        }');
+
+        $addressType = $documentAST->inputTypes()->first();
+        $input = $addressType->fields[0];
+
+        $documentAST = RuleFactory::build(
+            $input->directives[0],
+            $input,
+            $addressType,
+            $documentAST
+        );
+
+        $inputArg = $documentAST->mutationType()->fields[0]->arguments[0];
+
+        $this->assertCount(1, $documentAST->mutationType()->fields[0]->arguments);
+        $this->assertCount(1, $inputArg->directives);
+        $this->assertEquals(
+            'input.*.email',
+            $this->directiveArgValue($inputArg->directives[0], 'path')
+        );
+        $this->assertEquals(
+            ['required', 'email'],
+            $this->directiveArgValue($inputArg->directives[0], 'apply')
+        );
+    }
+
+    /**
+     * @test
+     */
     public function itCanBuildRulesForNestedInputField()
     {
         $documentAST = DocumentAST::fromSource('
@@ -62,7 +99,7 @@ class RuleFactoryTest extends TestCase
 
         input UserInput {
             email: String @rules(apply: ["required", "email"])
-            address: AddressInput
+            address: [AddressInput]
         }
 
         input FooInput {
@@ -109,7 +146,7 @@ class RuleFactoryTest extends TestCase
         $this->assertCount(2, $inputArg->directives);
 
         $this->assertEquals(
-            'input.address.street',
+            'input.address.*.street',
             $this->directiveArgValue($inputArg->directives[0], 'path')
         );
         $this->assertEquals(
@@ -125,22 +162,5 @@ class RuleFactoryTest extends TestCase
             ['required', 'email'],
             $this->directiveArgValue($inputArg->directives[1], 'apply')
         );
-    }
-
-    /**
-     * @test
-     */
-    public function itCanApplyRulesToResolver()
-    {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        input UserInput {
-            email: String @rules(apply: ["required", "email"])
-        }
-        
-        type Mutation {
-            createUser(input: UserInput): String
-        }');
-
-        dd($schema);
     }
 }
