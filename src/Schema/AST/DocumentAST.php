@@ -10,6 +10,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
@@ -49,13 +50,25 @@ class DocumentAST
     }
 
     /**
+     * Get instance of underlining document node.
+     *
+     * @return DocumentNode
+     */
+    public function documentNode()
+    {
+        return ASTHelper::cloneNode($this->documentNode);
+    }
+
+    /**
      * Get a collection of the contained definitions.
      *
      * @return Collection
      */
     public function definitions()
     {
-        return collect($this->documentNode->definitions);
+        return collect($this->documentNode->definitions)->map(function (Node $node) {
+            return ASTHelper::cloneNode($node);
+        });
     }
 
     /**
