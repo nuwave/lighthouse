@@ -26,25 +26,24 @@ class RuleFactoryTest extends TestCase
             createUser(input: UserInput): String
         }');
 
-        $inputType = $documentAST->inputTypes()->first();
-        $input = $inputType->fields[0];
+        $addressType = $documentAST->inputTypes()->first();
+        $input = $addressType->fields[0];
 
         $documentAST = RuleFactory::build(
             $input->directives[0],
             $input,
-            $inputType,
+            $addressType,
             $documentAST
         );
 
         $inputArg = $documentAST->mutationType()->fields[0]->arguments[0];
 
+        $this->assertCount(1, $documentAST->mutationType()->fields[0]->arguments);
         $this->assertCount(1, $inputArg->directives);
-
         $this->assertEquals(
-            'input',
+            'input.email',
             $this->directiveArgValue($inputArg->directives[0], 'path')
         );
-
         $this->assertEquals(
             ['required', 'email'],
             $this->directiveArgValue($inputArg->directives[0], 'apply')
@@ -65,21 +64,66 @@ class RuleFactoryTest extends TestCase
             email: String @rules(apply: ["required", "email"])
             address: AddressInput
         }
+
+        input FooInput {
+            bar: String @rules(apply: ["unique"])
+        }
         
         type Mutation {
             createUser(input: UserInput): String
         }');
 
-        $inputType = $documentAST->inputTypes()->first();
-        $input = $inputType->fields[0];
+        $addressInputType = $documentAST->inputTypes()[0];
+        $streetField = $addressInputType->fields[0];
+
+        $userInputType = $documentAST->inputTypes()[1];
+        $emailField = $userInputType->fields[0];
+
+        $fooInputType = $documentAST->inputTypes()[2];
+        $barField = $fooInputType->fields[0];
 
         $documentAST = RuleFactory::build(
-            $input->directives[0],
-            $input,
-            $inputType,
+            $streetField->directives[0],
+            $streetField,
+            $addressInputType,
             $documentAST
         );
 
-        // TODO: Test Document
+        $documentAST = RuleFactory::build(
+            $emailField->directives[0],
+            $emailField,
+            $userInputType,
+            $documentAST
+        );
+
+        $documentAST = RuleFactory::build(
+            $barField->directives[0],
+            $barField,
+            $fooInputType,
+            $documentAST
+        );
+
+        $inputArg = $documentAST->mutationType()->fields[0]->arguments[0];
+
+        $this->assertCount(1, $documentAST->mutationType()->fields[0]->arguments);
+        $this->assertCount(2, $inputArg->directives);
+
+        $this->assertEquals(
+            'input.address.street',
+            $this->directiveArgValue($inputArg->directives[0], 'path')
+        );
+        $this->assertEquals(
+            ['required'],
+            $this->directiveArgValue($inputArg->directives[0], 'apply')
+        );
+
+        $this->assertEquals(
+            'input.email',
+            $this->directiveArgValue($inputArg->directives[1], 'path')
+        );
+        $this->assertEquals(
+            ['required', 'email'],
+            $this->directiveArgValue($inputArg->directives[1], 'apply')
+        );
     }
 }

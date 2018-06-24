@@ -34,27 +34,44 @@ class RuleFactory
         InputObjectTypeDefinitionNode $input,
         DocumentAST $documentAST
     ) {
-        // $instance = new static();
-        // $documentAST = $instance->applyToMutation($directive, $input, $documentAST);
-        // $documentAST = self::applyToInputTypes();
+        $instance = new static();
+        $directiveClone = ASTHelper::cloneDefinition($directive);
+        $directiveClone = $instance->appendPath($directiveClone, $field);
+
+        $documentAST = $instance->applyToMutation($directiveClone, $input, $documentAST);
+        $documentAST = $instance->applyToInputTypes($directiveClone, $input, $documentAST);
 
         return $documentAST;
     }
 
     /**
      * Apply rules to input types.
+     *
+     * @param DirectiveNode                 $directive
+     * @param InputObjectTypeDefinitionNode $input
+     * @param DocumentAST                   $documentAST
+     *
+     * @return DocumentAST
      */
-    protected function applyToInputTypes()
-    {
+    protected function applyToInputTypes(
+        DirectiveNode $directive,
+        InputObjectTypeDefinitionNode $input,
+        DocumentAST $documentAST
+    ) {
         $documentAST->inputTypes()
-            ->each(function (InputObjectTypeDefinitionNode $inputType) use ($input) {
-                collect($inputType->fields)->filter(function (InputValueDefinitionNode $field) use ($input, $inputType) {
+            ->each(function (InputObjectTypeDefinitionNode $inputType) use ($directive, $input, $documentAST) {
+                collect($inputType->fields)->filter(function (InputValueDefinitionNode $field) use ($input) {
                     return $field->type->name->value === $input->name->value;
-                })->each(function ($field) use ($inputType) {
-                    // Recursively walk up tree to find mutation field.
-                    // dd($field->name->value, $inputType);
+                })->each(function ($field) use ($directive, $inputType, $documentAST) {
+                    $directiveClone = ASTHelper::cloneDefinition($directive);
+                    $directiveClone = $this->appendPath($directiveClone, $field);
+
+                    $documentAST = $this->applyToMutation($directiveClone, $inputType, $documentAST);
+                    $documentAST = $this->applyToInputTypes($directiveClone, $inputType, $documentAST);
                 });
             });
+
+        return $documentAST;
     }
 
     /**
@@ -73,51 +90,72 @@ class RuleFactory
     ) {
         $mutation = $documentAST->mutationType();
 
-        $fields = collect($mutation->fields)
-            ->map(function (FieldDefinitionNode $node) use ($directive, $input) {
-                $arguments = collect($node->arguments)
-                    ->filter(function (InputValueDefinitionNode $arg) use ($input) {
-                        return $arg->type->name->value === $input->name->value;
-                    })->map(function (InputValueDefinitionNode $arg) use ($directive) {
-                        $currentPath = $this->directiveArgValue($directive, 'path', '');
-                        $fullPath = $arg->name->value;
+        if (! $mutation) {
+            return $documentAST;
+        }
 
-                        if (! empty($currentPath)) {
-                            $fullPath = "{$fullPath}.{$currentPath}";
+        $fields = collect($mutation->fields)
+            ->map(function (FieldDefinitionNode $field) use ($directive, $input) {
+                $arguments = collect($field->arguments)
+                    ->map(function (InputValueDefinitionNode $arg) use ($directive, $input) {
+                        if ($arg->type->name->value !== $input->name->value) {
+                            return $arg;
                         }
 
-                        $inputType = PartialParser::inputObjectTypeDefinition("
-                        input Dummy {
-                            dummy: String @rules(path: \"{$fullPath}\")
-                        }");
-
-                        $path = $inputType->fields[0]->directives[0];
-                        $directive->arguments = ASTHelper::mergeNodeList(
-                            $directive->arguments, $path->arguments
-                        );
+                        $directiveClone = ASTHelper::cloneDefinition($directive);
+                        $this->appendPath($directiveClone, $arg);
 
                         $arg->directives = ASTHelper::mergeNodeList(
-                            $arg->directives, NodeList::create([$directive])
+                            $arg->directives, NodeList::create([$directiveClone])
                         );
 
                         return $arg;
                     })->toArray();
 
-                $node->arguments = ASTHelper::mergeNodeList(
-                    $node->arguments,
-                    new NodeList($arguments)
-                );
+                $field->arguments = new NodeList($arguments);
 
-                return $node;
+                return $field;
             })->toArray();
 
-        $mutation->fields = ASTHelper::mergeNodeList(
-            $mutation->fields,
-            new NodeList($fields)
-        );
+        $mutation->fields = new NodeList($fields);
 
-        $documentAST->setDefinition($mutation);
+        // NOTE: This is currently not needed because we've already
+        // mutated the fields on the original instance.
+        // $documentAST->setDefinition($mutation);
 
         return $documentAST;
+    }
+
+    /**
+     * Append current path to directive.
+     *
+     * @param DirectiveNode            $directive
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return DirectiveNode
+     */
+    protected function appendPath(DirectiveNode $directive, InputValueDefinitionNode $arg)
+    {
+        $currentPath = $this->directiveArgValue($directive, 'path', '');
+        $fullPath = $arg->name->value;
+
+        if (! empty($currentPath)) {
+            $fullPath = "{$fullPath}.{$currentPath}";
+        }
+
+        $inputType = PartialParser::inputObjectTypeDefinition("
+        input Dummy {
+            dummy: String @rules(path: \"{$fullPath}\")
+        }");
+
+        $pathDirective = $inputType->fields[0]->directives[0];
+        $directive->arguments = ASTHelper::mergeNodeList(
+            new NodeList(collect($directive->arguments)->reject(function ($arg) {
+                return 'path' === $arg->name->value;
+            })->toArray()),
+            $pathDirective->arguments
+        );
+
+        return $directive;
     }
 }
