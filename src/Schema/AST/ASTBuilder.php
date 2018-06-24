@@ -72,13 +72,19 @@ class ASTBuilder
         $document->objectTypes()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
             $name = $objectType->name->value;
 
-            $document->typeExtensions($name)->reduce(function (
+            $objectType = $document->typeExtensions($name)->reduce(function (
                 ObjectTypeDefinitionNode $relatedObjectType,
                 TypeExtensionDefinitionNode $typeExtension
             ) {
                 /** @var NodeList $fields */
                 $fields = $relatedObjectType->fields;
-                $relatedObjectType->fields = $fields->merge($typeExtension->definition->fields);
+                $relatedFields = collect($fields)->pluck('name.value')->all();
+                $unassignedFields = collect($typeExtension->definition->fields)
+                    ->reject(function ($field) use ($relatedFields) {
+                        return in_array($field->name->value, $relatedFields);
+                    })->values()->toArray();
+
+                $relatedObjectType->fields = $fields->merge($unassignedFields);
 
                 return $relatedObjectType;
             }, $objectType);

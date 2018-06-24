@@ -248,7 +248,7 @@ class DocumentAST
     public function setDefinition(DefinitionNode $definition)
     {
         $newName = $definition->name->value;
-        $newDefinitions = $this->definitions()
+        $newDefinitions = $this->originalDefinitions()
             ->reject(function (DefinitionNode $node) use ($newName) {
                 $nodeName = data_get($node, 'name.value');
                 // We only consider replacing nodes that have a name
@@ -278,5 +278,15 @@ class DocumentAST
         $this->setDefinition($objectType);
 
         return $this;
+    }
+
+    /**
+     * Get a collection of the contained definitions.
+     *
+     * @return Collection
+     */
+    protected function originalDefinitions()
+    {
+        return collect($this->documentNode->definitions);
     }
 }
