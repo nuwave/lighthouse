@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
@@ -66,19 +66,20 @@ class ModelDirective implements NodeMiddleware, NodeManipulator
      */
     protected function inferModelClassName($nodeName)
     {
-        return config('lighthouse.namespaces.models') . '\\' . $nodeName;
+        return config('lighthouse.namespaces.models').'\\'.$nodeName;
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $objectType
+     * @param Node        $node
      * @param DocumentAST $current
      * @param DocumentAST $original
      *
-     * @return DocumentAST
      * @throws \Exception
+     *
+     * @return DocumentAST
      */
-    public function manipulateSchema(ObjectTypeDefinitionNode $objectType, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
     {
-        return $this->attachNodeInterfaceToObjectType($objectType, $current);
+        return $this->attachNodeInterfaceToObjectType($node, $current);
     }
 }
