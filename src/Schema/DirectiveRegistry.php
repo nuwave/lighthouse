@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\InputValueManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
@@ -37,7 +38,7 @@ class DirectiveRegistry
         $this->directives = collect();
 
         // Load built-in directives from the default directory
-        $this->load(realpath(__DIR__ . '/Directives/'), 'Nuwave\\Lighthouse\\');
+        $this->load(realpath(__DIR__.'/Directives/'), 'Nuwave\\Lighthouse\\');
 
         // Load custom directives
         $this->load(config('lighthouse.directives', []));
@@ -58,8 +59,8 @@ class DirectiveRegistry
             ->filter(function ($path) {
                 return is_dir($path);
             })->map(function ($path) {
-            return realpath($path);
-        })->all();
+                return realpath($path);
+            })->all();
 
         if (empty($paths)) {
             return;
@@ -67,15 +68,15 @@ class DirectiveRegistry
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-        ? realpath(__DIR__ . '/../../src/')
+        ? realpath(__DIR__.'/../../src/')
         : app_path();
 
         /** @var SplFileInfo $file */
         foreach ((new Finder())->in($paths)->files() as $file) {
-            $className = $namespace . str_replace(
+            $className = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
-                str_after($file->getPathname(), $path . DIRECTORY_SEPARATOR)
+                str_after($file->getPathname(), $path.DIRECTORY_SEPARATOR)
             );
 
             $this->tryRegisterClassName($className);
@@ -122,7 +123,7 @@ class DirectiveRegistry
     {
         $handler = $this->directives->get($name);
 
-        if (!$handler) {
+        if (! $handler) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
@@ -182,6 +183,22 @@ class DirectiveRegistry
             return $directive instanceof FieldManipulator;
         })->map(function (FieldManipulator $directive) use ($fieldDefinition) {
             return $this->hydrate($directive, $fieldDefinition);
+        });
+    }
+
+    /**
+     * Extract maniuplators from input value.
+     *
+     * @param InputValueDefinitionNode $inputValue
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function inputValueManipulators(InputValueDefinitionNode $inputValue)
+    {
+        return $this->directives($inputValue)->filter(function (Directive $directive) {
+            return $directive instanceof InputValueManipulator;
+        })->map(function (InputValueManipulator $directive) use ($inputValue) {
+            return $this->hydrate($directive, $inputValue);
         });
     }
 
@@ -356,15 +373,15 @@ class DirectiveRegistry
     }
 
     /**
-     * @param Directive           $directive
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param Directive $directive
+     * @param Node      $node
      *
      * @return Directive
      */
-    protected function hydrate(Directive $directive, FieldDefinitionNode $fieldDefinition)
+    protected function hydrate(Directive $directive, Node $node)
     {
         return $directive instanceof BaseFieldDirective
-        ? $directive->hydrate($fieldDefinition)
-        : $directive;
+            ? $directive->hydrate($node)
+            : $directive;
     }
 }

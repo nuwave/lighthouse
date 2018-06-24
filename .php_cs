@@ -15,7 +15,7 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'linebreak_after_opening_tag' => true,
         'not_operator_with_successor_space' => true,
-        'no_unused_imports' => false,
+        'no_unused_imports' => true,
         'ordered_imports' => true,
         'phpdoc_order' => true,
         'not_operator_with_successor_space' => true

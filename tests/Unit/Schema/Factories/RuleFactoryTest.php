@@ -126,4 +126,21 @@ class RuleFactoryTest extends TestCase
             $this->directiveArgValue($inputArg->directives[1], 'apply')
         );
     }
+
+    /**
+     * @test
+     */
+    public function itCanApplyRulesToResolver()
+    {
+        $schema = $this->buildSchemaWithDefaultQuery('
+        input UserInput {
+            email: String @rules(apply: ["required", "email"])
+        }
+        
+        type Mutation {
+            createUser(input: UserInput): String
+        }');
+
+        dd($schema);
+    }
 }
