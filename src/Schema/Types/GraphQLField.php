@@ -119,6 +119,20 @@ class GraphQLField
     }
 
     /**
+     * Get validation rules.
+     *
+     * @return array
+     */
+    protected function getValidation()
+    {
+        return collect($this->args())->flatMap(function ($arg) {
+            return array_get($arg, 'validation', []);
+        })
+        ->filter()
+        ->toArray();
+    }
+
+    /**
      * Get the field resolver.
      *
      * @return array|void
@@ -145,11 +159,15 @@ class GraphQLField
             $arguments[1] = $this->resolveArgs($arguments[1]);
         }
 
-        $rules = call_user_func_array([$this, 'getRules'], $arguments);
+        $rules = array_merge(
+            call_user_func_array([$this, 'getRules'], $arguments),
+            call_user_func_array([$this, 'getValidation'], [])
+        );
 
         if (sizeof($rules)) {
             $input = $this->getInput($arguments);
             $validator = validator($input, $rules);
+
             if ($validator->fails()) {
                 throw with(new ValidationError('validation'))->setValidator($validator);
             }

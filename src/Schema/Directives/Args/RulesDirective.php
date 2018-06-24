@@ -10,9 +10,13 @@ use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\InputValueManipulator;
+use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class RulesDirective implements ArgMiddleware, InputValueManipulator
 {
+    // TODO: Remove this need for this
+    use HandlesDirectives;
+
     /**
      * Name of the directive.
      *
@@ -54,6 +58,25 @@ class RulesDirective implements ArgMiddleware, InputValueManipulator
      */
     public function handleArgument(ArgumentValue $value)
     {
-        return $value;
+        // NOTE: We currently cannot just get the current directive off of
+        // the value because the 'rules' get reset with each new ArgumentValue.
+        $rules = collect($value->getArg()->directives)
+            ->filter(function (DirectiveNode  $directive) {
+                return $directive->name->value === $this->name();
+            })->mapWithKeys(function (DirectiveNode $directive) {
+                $path = $this->directiveArgValue($directive, 'path');
+                $rules = $this->directiveArgValue($directive, 'apply', []);
+
+                if (empty($path) || empty($rules)) {
+                    return null;
+                }
+
+                return [$path => $rules];
+            })->filter()->toArray();
+
+        $current = $value->getValue();
+        $current['validation'] = array_merge(array_get($current, 'validation', []), $rules);
+
+        return $value->setValue($current);
     }
 }
