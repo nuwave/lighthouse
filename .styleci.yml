@@ -1,6 +1,8 @@
 preset: laravel
 
-risky: false
+enabled:
+  - phpdoc_order
+  - phpdoc_separation
+  - unalign_double_arrow
 
-finder:
-  name: "*.php"
+linting: true
