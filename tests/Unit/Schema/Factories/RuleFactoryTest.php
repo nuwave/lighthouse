@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Schema\Factories;
 
+use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
-use Tests\TestCase;
 
 class RuleFactoryTest extends TestCase
 {
@@ -46,7 +46,7 @@ class RuleFactoryTest extends TestCase
             email: String @rules(apply: ["required", "email"])
         }
         type Mutation {
-            createUser(input: UserInput): String
+            createUser(input: UserInput @rules(apply: ["required"])): String
         }');
 
         $variables = [
@@ -57,7 +57,125 @@ class RuleFactoryTest extends TestCase
 
         $rules = $this->factory->build($documentAST, $variables, 'createUser');
         $this->assertEquals([
+            'input' => ['required'],
             'input.email' => ['required', 'email'],
+        ], $rules);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanGenerateRulesForNestedInputArguments()
+    {
+        $documentAST = ASTBuilder::generate('
+        input AddressInput {
+            street: String @rules(apply: ["required"])
+            primary: Boolean @rules(apply: ["required"])
+        }
+        input UserInput {
+            email: String @rules(apply: ["required", "email"])
+            address: AddressInput @rules(apply: ["required"])
+        }
+        type Mutation {
+            createUser(input: UserInput @rules(apply: ["required"])): String
+        }');
+
+        $variables = [
+            'input' => [
+                'address' => [
+                    'street' => 'bar',
+                ],
+            ],
+        ];
+
+        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $this->assertEquals([
+            'input' => ['required'],
+            'input.email' => ['required', 'email'],
+            'input.address' => ['required'],
+            'input.address.street' => ['required'],
+            'input.address.primary' => ['required'],
+        ], $rules);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanGenerateRulesForNestedInputArgumentLists()
+    {
+        $documentAST = ASTBuilder::generate('
+        input AddressInput {
+            street: String @rules(apply: ["required"])
+            primary: Boolean @rules(apply: ["required"])
+        }
+        input UserInput {
+            email: String @rules(apply: ["required", "email"])
+            address: [AddressInput] @rules(apply: ["required"])
+        }
+        type Mutation {
+            createUser(input: UserInput @rules(apply: ["required"])): String
+        }');
+
+        $variables = [
+            'input' => [
+                'address' => [
+                    'street' => 'bar',
+                ],
+            ],
+        ];
+
+        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $this->assertEquals([
+            'input' => ['required'],
+            'input.email' => ['required', 'email'],
+            'input.address' => ['required'],
+            'input.address.*.street' => ['required'],
+            'input.address.*.primary' => ['required'],
+        ], $rules);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanGenerateRulesForSelfReferencingInputArguments()
+    {
+        $documentAST = ASTBuilder::generate('
+        input Setting {
+            option: String @rules(apply: ["required"])
+            value: String @rules(apply: ["required"])
+            setting: Setting
+        }
+        input UserInput {
+            email: String @rules(apply: ["required", "email"])
+            settings: [Setting] @rules(apply: ["required"])
+        }
+        type Mutation {
+            createUser(input: UserInput @rules(apply: ["required"])): String
+        }');
+
+        $variables = [
+            'input' => [
+                'settings' => [
+                    [
+                        'option' => 'foo',
+                        'value' => 'bar',
+                        'setting' => [
+                            'option' => 'bar',
+                            'value' => 'baz',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        dd($rules, 'rules');
+        $this->assertEquals([
+            'input' => ['required'],
+            'input.email' => ['required', 'email'],
+            'input.address' => ['required'],
+            'input.address.*.street' => ['required'],
+            'input.address.*.primary' => ['required'],
         ], $rules);
     }
 }

@@ -2,23 +2,23 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\DefinitionNode;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\FragmentDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
-use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\DefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\FragmentDefinitionNode;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
 class DocumentAST
 {
@@ -154,6 +154,16 @@ class DocumentAST
     }
 
     /**
+     * Get all definitions for input types.
+     *
+     * @return Collection
+     */
+    public function inputTypes()
+    {
+        return $this->definitionsByType(InputObjectTypeDefinitionNode::class);
+    }
+
+    /**
      * Get all interface definitions.
      *
      * @return Collection
@@ -215,6 +225,18 @@ class DocumentAST
     {
         return $this->objectTypes()->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
             return $objectType->name->value === $name;
+        });
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return InputObjectTypeDefinitionNode|null
+     */
+    public function inputType($name)
+    {
+        return $this->inputTypes()->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
+            return $inputType->name->value === $name;
         });
     }
 
