@@ -72,7 +72,7 @@ class ASTBuilder
         $document->objectTypes()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
             $name = $objectType->name->value;
 
-            $objectType = $document->typeExtensions($name)->reduce(function (
+            $document->typeExtensions($name)->reduce(function (
                 ObjectTypeDefinitionNode $relatedObjectType,
                 TypeExtensionDefinitionNode $typeExtension
             ) {
