@@ -10,6 +10,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
@@ -49,13 +50,31 @@ class DocumentAST
     }
 
     /**
+     * Get instance of underlining document node.
+     *
+     * @return DocumentNode
+     */
+    public function documentNode()
+    {
+        return ASTHelper::cloneNode($this->documentNode);
+    }
+
+    /**
      * Get a collection of the contained definitions.
      *
      * @return Collection
      */
     public function definitions()
     {
-        return collect($this->documentNode->definitions);
+        return collect($this->documentNode->definitions)->map(function (Node $node) {
+            $clone = ASTHelper::cloneNode($node);
+            $clone->spl_object_hash = spl_object_hash($node);
+            if ($node instanceof TypeExtensionDefinitionNode) {
+                $clone->definition->spl_object_hash = spl_object_hash($node->definition);
+            }
+
+            return $clone;
+        });
     }
 
     /**
@@ -234,14 +253,34 @@ class DocumentAST
      */
     public function setDefinition(DefinitionNode $definition)
     {
-        $newName = $definition->name->value;
-        $newDefinitions = $this->definitions()
-            ->reject(function (DefinitionNode $node) use ($newName) {
-                $nodeName = data_get($node, 'name.value');
-                // We only consider replacing nodes that have a name
-                // We can safely kick this by name because names must be unique
-                return $nodeName && $nodeName === $newName;
-            })->push($definition)
+        $found = false;
+
+        $newDefinitions = $this->originalDefinitions()
+            ->map(function (DefinitionNode $node) use ($definition, &$found) {
+                if (! $hashID = data_get($definition, 'spl_object_hash')) {
+                    // We didn't clone the new definition
+                    return $node;
+                }
+
+                $compareID = $node instanceof TypeExtensionDefinitionNode
+                    ? spl_object_hash($node->definition)
+                    : spl_object_hash($node);
+
+                if ($compareID === $hashID) {
+                    $found = true;
+
+                    if ($node instanceof TypeExtensionDefinitionNode) {
+                        $node->definition = $definition;
+                    } else {
+                        $node = $definition;
+                    }
+                }
+
+                return $node;
+            })
+            ->unless($found, function ($definitions) use ($definition) {
+                return $definitions->push($definition);
+            })
             // Reindex, otherwise offset errors might happen in subsequent runs
             ->values()
             ->all();
@@ -265,5 +304,15 @@ class DocumentAST
         $this->setDefinition($objectType);
 
         return $this;
+    }
+
+    /**
+     * Get a collection of the contained definitions.
+     *
+     * @return Collection
+     */
+    protected function originalDefinitions()
+    {
+        return collect($this->documentNode->definitions);
     }
 }
