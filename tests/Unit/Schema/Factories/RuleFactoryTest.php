@@ -99,7 +99,7 @@ class RuleFactoryTest extends TestCase
 
         input UserInput {
             email: String @rules(apply: ["required", "email"])
-            address: [AddressInput]
+            address: [AddressInput] @rules(apply: ["required", "min:1"])
         }
 
         input FooInput {
@@ -115,6 +115,7 @@ class RuleFactoryTest extends TestCase
 
         $userInputType = $documentAST->inputTypes()[1];
         $emailField = $userInputType->fields[0];
+        $addressField = $userInputType->fields[1];
 
         $fooInputType = $documentAST->inputTypes()[2];
         $barField = $fooInputType->fields[0];
@@ -134,6 +135,13 @@ class RuleFactoryTest extends TestCase
         );
 
         $documentAST = RuleFactory::build(
+            $addressField->directives[0],
+            $addressField,
+            $userInputType,
+            $documentAST
+        );
+
+        $documentAST = RuleFactory::build(
             $barField->directives[0],
             $barField,
             $fooInputType,
@@ -143,7 +151,7 @@ class RuleFactoryTest extends TestCase
         $inputArg = $documentAST->mutationType()->fields[0]->arguments[0];
 
         $this->assertCount(1, $documentAST->mutationType()->fields[0]->arguments);
-        $this->assertCount(2, $inputArg->directives);
+        $this->assertCount(3, $inputArg->directives);
 
         $this->assertEquals(
             'input.address.*.street',
@@ -161,6 +169,15 @@ class RuleFactoryTest extends TestCase
         $this->assertEquals(
             ['required', 'email'],
             $this->directiveArgValue($inputArg->directives[1], 'apply')
+        );
+
+        $this->assertEquals(
+            'input.address',
+            $this->directiveArgValue($inputArg->directives[2], 'path')
+        );
+        $this->assertEquals(
+            ['required', 'min:1'],
+            $this->directiveArgValue($inputArg->directives[2], 'apply')
         );
     }
 }

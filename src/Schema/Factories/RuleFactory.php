@@ -110,7 +110,7 @@ class RuleFactory
                         }
 
                         $directiveClone = ASTHelper::cloneDefinition($directive);
-                        $this->appendPath($directiveClone, $arg, $this->includesList($arg));
+                        $this->appendPath($directiveClone, $arg, $this->includesList($arg), true);
 
                         $arg->directives = ASTHelper::mergeNodeList(
                             $arg->directives, NodeList::create([$directiveClone])
@@ -142,8 +142,12 @@ class RuleFactory
      *
      * @return DirectiveNode
      */
-    protected function appendPath(DirectiveNode $directive, InputValueDefinitionNode $arg, $list)
-    {
+    protected function appendPath(
+        DirectiveNode $directive,
+        InputValueDefinitionNode $arg,
+        $list,
+        $final = false
+    ) {
         $currentPath = $this->directiveArgValue($directive, 'path', '');
         $fullPath = $arg->name->value;
 
@@ -153,6 +157,11 @@ class RuleFactory
 
         if (! empty($currentPath)) {
             $fullPath = "{$fullPath}.{$currentPath}";
+        }
+
+        $pop = ['.', '*'];
+        while ($final && ends_with($fullPath, $pop)) {
+            $fullPath = substr_replace($fullPath, '', -1);
         }
 
         $inputType = PartialParser::inputObjectTypeDefinition("
