@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
+use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 class GraphQLField
@@ -100,6 +101,7 @@ class GraphQLField
     public function getRules()
     {
         $arguments = func_get_args();
+        $rules = RuleFactory::build($arguments[1], $arguments[3]);
         $args = $this->args();
 
         return collect($args)->map(function ($arg, $name) use ($arguments) {
