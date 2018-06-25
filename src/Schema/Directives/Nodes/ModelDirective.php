@@ -10,11 +10,10 @@ use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\AttachesNodeInterface;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
-    use HandlesDirectives, AttachesNodeInterface;
+    use AttachesNodeInterface;
 
     /**
      * Directive name.

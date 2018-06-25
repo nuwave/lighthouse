@@ -30,8 +30,8 @@ class FieldDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $baseClassName = $this->associatedArgValue('class')
-            ?? str_before($this->associatedArgValue('resolver'), '@');
+        $baseClassName = $this->directiveArgValue('class')
+            ?? str_before($this->directiveArgValue('resolver'), '@');
 
 
         if (empty($baseClassName)) {
@@ -40,8 +40,8 @@ class FieldDirective extends BaseDirective implements FieldResolver
         }
 
         $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod = $this->associatedArgValue('method')
-            ?? str_after($this->associatedArgValue('resolver'), '@');
+        $resolverMethod = $this->directiveArgValue('method')
+            ?? str_after($this->directiveArgValue('resolver'), '@');
 
         if (! method_exists($resolverClass, $resolverMethod)) {
             throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
