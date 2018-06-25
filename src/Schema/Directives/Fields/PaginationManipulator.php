@@ -3,15 +3,17 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 
-abstract class PaginationManipulator extends BaseFieldDirective
+abstract class PaginationManipulator extends BaseDirective
 {
     const PAGINATION_TYPE_PAGINATOR = 'paginator';
     const PAGINATION_TYPE_CONNECTION = 'connection';
@@ -202,5 +204,21 @@ abstract class PaginationManipulator extends BaseFieldDirective
         $name = $objectType->name->value;
 
         return 'Query' === $name ? '' : $name . '_';
+    }
+
+    /**
+     * Unpack field definition type.
+     *
+     * @param Node $node
+     *
+     * @return string
+     */
+    protected function unpackNodeToString(Node $node)
+    {
+        if (in_array($node->kind, ['ListType', 'NonNullType', 'FieldDefinition'])) {
+            return $this->unpackNodeToString($node->type);
+        }
+
+        return $node->name->value;
     }
 }

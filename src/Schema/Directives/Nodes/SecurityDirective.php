@@ -6,15 +6,13 @@ use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class SecurityDirective implements NodeMiddleware
+class SecurityDirective extends BaseDirective implements NodeMiddleware
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -58,10 +56,7 @@ class SecurityDirective implements NodeMiddleware
      */
     protected function queryComplexity(NodeValue $value)
     {
-        $complexity = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'complexity'
-        );
+        $complexity = $this->directiveArgValue('complexity');
 
         if ($complexity) {
             DocumentValidator::addRule(
@@ -77,10 +72,7 @@ class SecurityDirective implements NodeMiddleware
      */
     protected function queryDepth(NodeValue $value)
     {
-        $depth = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'depth'
-        );
+        $depth = $this->directiveArgValue('depth');
 
         if ($depth) {
             DocumentValidator::addRule(
@@ -96,13 +88,12 @@ class SecurityDirective implements NodeMiddleware
      */
     protected function queryIntrospection(NodeValue $value)
     {
-        $introspection = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'introspection'
-        );
+        $introspection = $this->directiveArgValue('introspection');
 
         if (false === $introspection) {
-            DocumentValidator::addRule(new DisableIntrospection());
+            DocumentValidator::addRule(
+                new DisableIntrospection()
+            );
         }
     }
 }

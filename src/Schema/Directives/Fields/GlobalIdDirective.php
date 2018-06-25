@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class GlobalIdDirective extends BaseFieldDirective implements FieldMiddleware
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware
 {
     use HandlesGlobalId;
 
@@ -31,7 +32,7 @@ class GlobalIdDirective extends BaseFieldDirective implements FieldMiddleware
     {
         $type = $value->getNodeName();
         $resolver = $value->getResolver();
-        $process = $this->associatedArgValue('process', 'encode');
+        $process = $this->directiveArgValue('process', 'encode');
 
         return $value->setResolver(function () use ($resolver, $process, $type) {
             $args = func_get_args();

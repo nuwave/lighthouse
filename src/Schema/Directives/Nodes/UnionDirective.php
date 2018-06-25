@@ -3,14 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Type\Definition\UnionType;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class UnionDirective implements NodeResolver
+class UnionDirective extends BaseDirective implements NodeResolver
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -30,10 +28,7 @@ class UnionDirective implements NodeResolver
      */
     public function resolveNode(NodeValue $value)
     {
-        $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'resolver'
-        );
+        $resolver = $this->directiveArgValue('resolver');
 
         $namespace = array_get(explode('@', $resolver), '0');
         $method = array_get(explode('@', $resolver), '1', strtolower($value->getNodeName()));

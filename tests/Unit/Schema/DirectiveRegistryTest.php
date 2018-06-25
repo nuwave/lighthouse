@@ -3,7 +3,7 @@
 namespace Tests\Unit\Schema;
 
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Directives\Fields\BaseFieldDirective;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -110,14 +110,14 @@ class DirectiveRegistryTest extends TestCase
     /**
      * @test
      */
-    public function itHydratesAbstractFieldDirectives()
+    public function itHydratesBaseDirectives()
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String @foo
         ');
 
         graphql()->directives()->register(
-            new class() extends BaseFieldDirective implements FieldMiddleware
+            new class() extends BaseDirective implements FieldMiddleware
             {
                 public function name()
                 {
@@ -126,7 +126,7 @@ class DirectiveRegistryTest extends TestCase
 
                 public function getFieldDefinition()
                 {
-                    return $this->fieldDefinition;
+                    return $this->definitionNode;
                 }
 
                 public function handleField(FieldValue $value)
@@ -143,7 +143,7 @@ class DirectiveRegistryTest extends TestCase
      * @deprecated this test is for compatibility reasons and can likely be removed in v3
      * @test
      */
-    public function itDoesAllowNonAbstractFieldDirectives()
+    public function itSkipsHydrationForNonBaseDirectives()
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String @foo

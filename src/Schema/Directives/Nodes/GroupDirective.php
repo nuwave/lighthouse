@@ -9,10 +9,10 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 /**
  * Class GroupDirective.
@@ -22,10 +22,8 @@ use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
  *
  * @deprecated Will be removed in next major version
  */
-class GroupDirective implements NodeManipulator
+class GroupDirective extends BaseDirective implements NodeManipulator
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -37,7 +35,7 @@ class GroupDirective implements NodeManipulator
     }
 
     /**
-     * @param Node        $node
+     * @param Node $node
      * @param DocumentAST $current
      * @param DocumentAST $original
      *
@@ -49,7 +47,7 @@ class GroupDirective implements NodeManipulator
     {
         $nodeName = $node->name->value;
 
-        if (! in_array($nodeName, ['Query', 'Mutation'])) {
+        if (!in_array($nodeName, ['Query', 'Mutation'])) {
             $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
 
             throw new DirectiveException($message);
@@ -72,16 +70,13 @@ class GroupDirective implements NodeManipulator
      */
     protected function setMiddlewareDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
     {
-        $middlewareValues = $this->directiveArgValue(
-            $this->nodeDirective($objectType, self::name()),
-            'middleware'
-        );
+        $middlewareValues = $this->directiveArgValue('middleware');
 
-        if (! $middlewareValues) {
+        if (!$middlewareValues) {
             return $objectType;
         }
 
-        $middlewareValues = '["'.implode('", "', $middlewareValues).'"]';
+        $middlewareValues = '["' . implode('", "', $middlewareValues) . '"]';
         $middlewareDirective = PartialParser::directive("@middleware(checks: $middlewareValues)");
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
@@ -102,23 +97,20 @@ class GroupDirective implements NodeManipulator
      */
     protected function setNamespaceDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
     {
-        $namespaceValue = $this->directiveArgValue(
-            $this->nodeDirective($objectType, self::name()),
-            'namespace'
-        );
+        $namespaceValue = $this->directiveArgValue('namespace');
 
-        if (! $namespaceValue) {
+        if (!$namespaceValue) {
             return $objectType;
         }
 
-        if (! is_string($namespaceValue)) {
+        if (!is_string($namespaceValue)) {
             throw new DirectiveException('The value of the namespace directive on has to be a string');
         }
 
         $namespaceValue = addslashes($namespaceValue);
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
-            $previousNamespaces = $this->fieldDirective($fieldDefinition, (new NamespaceDirective())->name());
+            $previousNamespaces = $this->directiveDefinition((new NamespaceDirective())->name(), $fieldDefinition);
 
             $previousNamespaces = $previousNamespaces
                 ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)
@@ -132,7 +124,7 @@ class GroupDirective implements NodeManipulator
     }
 
     /**
-     * @param string        $namespaceValue
+     * @param string $namespaceValue
      * @param DirectiveNode $directive
      *
      * @return DirectiveNode
