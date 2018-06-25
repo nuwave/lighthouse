@@ -7,10 +7,13 @@ use GraphQL\Language\Parser;
 use Laravel\Scout\ScoutServiceProvider;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
+    use CanFormatError;
+
     /**
      * Get package providers.
      *
@@ -105,14 +108,14 @@ class TestCase extends BaseTestCase
     {
         return Parser::parse($schema);
     }
-    
+
     /**
      * Execute query/mutation.
      *
      * @param string $schema
      * @param string $query
-     * @param bool $lighthouse
-     * @param array $variables
+     * @param bool   $lighthouse
+     * @param array  $variables
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
@@ -130,6 +133,31 @@ class TestCase extends BaseTestCase
             null,
             $variables
         );
+    }
+
+    /*
+     * Execute query/mutation and format results.
+     *
+     * @param string $schema
+     * @param string $query
+     * @param bool   $lighthouse
+     * @param array  $variables
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     */
+    protected function executeAndFormat($schema, $query, $lighthouse = false, $variables = [])
+    {
+        $executionResult = $this->execute($schema, $query, $lighthouse, $variables);
+        $result = ['data' => $executionResult->data];
+
+        if (! empty($executionResult->errors)) {
+            $result['errors'] = array_map(
+                [$this, 'formatError'],
+                $executionResult->errors
+            );
+        }
+
+        return $result;
     }
 
     /**

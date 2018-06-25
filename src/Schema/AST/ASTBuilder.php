@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
@@ -11,6 +12,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\InputValueManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
 class ASTBuilder
@@ -30,6 +32,7 @@ class ASTBuilder
         $document = self::mergeTypeExtensions($document);
 
         $document = self::applyFieldManipulators($document);
+        $document = self::applyInputFieldManipulators($document);
         $document = self::applyArgManipulators($document);
 
         $document = self::addNodeSupport($document);
@@ -118,6 +121,45 @@ class ASTBuilder
                 }, $document);
             }, $document);
         }, $document);
+    }
+
+    /**
+     * Apply schema manipulation to input type fields.
+     *
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected static function applyInputFieldManipulators(DocumentAST $document)
+    {
+        $originalDocument = $document;
+
+        return $document->inputTypes()
+            ->reduce(function (
+                DocumentAST $document,
+                InputObjectTypeDefinitionNode $inputType
+            ) use ($originalDocument) {
+                return collect($inputType->fields)->reduce(function (
+                    DocumentAST $document,
+                    InputValueDefinitionNode $inputValue
+                ) use ($inputType, $originalDocument) {
+                    $inputValueManipulators = graphql()
+                        ->directives()
+                        ->inputValueManipulators($inputValue);
+
+                    return $inputValueManipulators->reduce(function (
+                        DocumentAST $document,
+                        InputValueManipulator $inputValueManipulator
+                    ) use ($inputValue, $inputType, $originalDocument) {
+                        return $inputValueManipulator->manipulateSchema(
+                            $inputValue,
+                            $inputType,
+                            $document,
+                            $originalDocument
+                        );
+                    }, $document);
+                }, $document);
+            }, $document);
     }
 
     /**

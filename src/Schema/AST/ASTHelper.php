@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Utils\AST;
 
 class ASTHelper
 {
@@ -28,5 +30,17 @@ class ASTHelper
         }
 
         return $original->merge($addition);
+    }
+
+    /**
+     * Clone definition node.
+     *
+     * @param Node $node
+     *
+     * @return Node
+     */
+    public static function cloneDefinition(Node $node)
+    {
+        return AST::fromArray($node->toArray(true));
     }
 }
