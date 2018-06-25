@@ -169,13 +169,14 @@ class RuleFactoryTest extends TestCase
         ];
 
         $rules = $this->factory->build($documentAST, $variables, 'createUser');
-        dd($rules, 'rules');
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
-            'input.address' => ['required'],
-            'input.address.*.street' => ['required'],
-            'input.address.*.primary' => ['required'],
+            'input.settings' => ['required'],
+            'input.settings.*.option' => ['required'],
+            'input.settings.*.value' => ['required'],
+            'input.settings.*.setting.option' => ['required'],
+            'input.settings.*.setting.value' => ['required'],
         ], $rules);
     }
 }

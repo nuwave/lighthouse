@@ -123,7 +123,7 @@ class RuleFactory
     protected function getRulesForPath(DocumentAST $documentAST, FieldDefinitionNode $field, $path, $retry = false)
     {
         $inputPath = explode('.', $path);
-        $poppedKey = array_pop($inputPath);
+        array_pop($inputPath);
         $pathKey = implode('.', $inputPath);
 
         if (in_array($pathKey, $this->resolved)) {
@@ -131,12 +131,21 @@ class RuleFactory
             return null;
         }
 
+        $resolvedPath = collect();
+
         /** @var InputValueDefinitionNode $input */
-        $input = collect($inputPath)->reduce(function ($node, $path) use ($documentAST) {
+        $input = collect($inputPath)->reduce(function ($node, $path) use ($documentAST, $resolvedPath) {
             if (is_null($node)) {
+                $resolvedPath->push($path);
+
                 return null;
             }
 
+            if ($this->includesList($node)) {
+                $resolvedPath->push('*');
+            }
+
+            $resolvedPath->push($path);
             $arguments = null;
 
             if ($node instanceof InputObjectTypeDefinitionNode) {
@@ -168,7 +177,7 @@ class RuleFactory
         $type = $this->unwrapType($input);
         $inputType = $documentAST->inputType($type->name->value);
 
-        return $inputType ? $this->getFieldRules($inputType->fields, $pathKey, $list) : null;
+        return $inputType ? $this->getFieldRules($inputType->fields, $resolvedPath->implode('.'), $list) : null;
     }
 
     /**
