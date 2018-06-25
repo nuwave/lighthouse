@@ -67,7 +67,13 @@ class DocumentAST
     public function definitions()
     {
         return collect($this->documentNode->definitions)->map(function (Node $node) {
-            return ASTHelper::cloneNode($node);
+            $clone = ASTHelper::cloneNode($node);
+            $clone->spl_object_hash = spl_object_hash($node);
+            if ($node instanceof TypeExtensionDefinitionNode) {
+                $clone->definition->spl_object_hash = spl_object_hash($node->definition);
+            }
+
+            return $clone;
         });
     }
 
@@ -247,14 +253,34 @@ class DocumentAST
      */
     public function setDefinition(DefinitionNode $definition)
     {
-        $newName = $definition->name->value;
+        $found = false;
+
         $newDefinitions = $this->originalDefinitions()
-            ->reject(function (DefinitionNode $node) use ($newName) {
-                $nodeName = data_get($node, 'name.value');
-                // We only consider replacing nodes that have a name
-                // We can safely kick this by name because names must be unique
-                return $nodeName && $nodeName === $newName;
-            })->push($definition)
+            ->map(function (DefinitionNode $node) use ($definition, &$found) {
+                if (! $hashID = data_get($definition, 'spl_object_hash')) {
+                    // We didn't clone the new definition
+                    return $node;
+                }
+
+                $compareID = $node instanceof TypeExtensionDefinitionNode
+                    ? spl_object_hash($node->definition)
+                    : spl_object_hash($node);
+
+                if ($compareID === $hashID) {
+                    $found = true;
+
+                    if ($node instanceof TypeExtensionDefinitionNode) {
+                        $node->definition = $definition;
+                    } else {
+                        $node = $definition;
+                    }
+                }
+
+                return $node;
+            })
+            ->unless($found, function ($definitions) use ($definition) {
+                return $definitions->push($definition);
+            })
             // Reindex, otherwise offset errors might happen in subsequent runs
             ->values()
             ->all();

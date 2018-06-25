@@ -78,13 +78,7 @@ class ASTBuilder
             ) {
                 /** @var NodeList $fields */
                 $fields = $relatedObjectType->fields;
-                $relatedFields = collect($fields)->pluck('name.value')->all();
-                $unassignedFields = collect($typeExtension->definition->fields)
-                    ->reject(function ($field) use ($relatedFields) {
-                        return in_array($field->name->value, $relatedFields);
-                    })->values()->toArray();
-
-                $relatedObjectType->fields = $fields->merge($unassignedFields);
+                $relatedObjectType->fields = $fields->merge($typeExtension->definition->fields);
 
                 return $relatedObjectType;
             }, $objectType);
