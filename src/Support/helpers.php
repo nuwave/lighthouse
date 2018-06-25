@@ -29,6 +29,7 @@ if (! function_exists('schema')) {
      * Get instance of schema container.
      *
      * @return \Nuwave\Lighthouse\Schema\TypeRegistry
+     * @deprecated Use graphql()->types() directly in the future
      */
     function schema()
     {
@@ -41,6 +42,7 @@ if (! function_exists('directives')) {
      * Get instance of directives container.
      *
      * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
+     * @deprecated Use graphql()->directives() directly in the future
      */
     function directives()
     {
