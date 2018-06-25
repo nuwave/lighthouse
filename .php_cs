@@ -16,7 +16,7 @@ return PhpCsFixer\Config::create()
         'linebreak_after_opening_tag' => true,
         'not_operator_with_successor_space' => true,
         'no_unused_imports' => false,
-        'ordered_imports' => true,
+        'ordered_imports' => ['sort_algorithm' => 'length'],
         'phpdoc_order' => true,
         'not_operator_with_successor_space' => true
     ])->setFinder($finder);
