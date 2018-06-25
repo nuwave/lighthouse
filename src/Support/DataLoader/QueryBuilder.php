@@ -29,18 +29,18 @@ class QueryBuilder
         $ids = [];
         $key = $models[0]->getKeyName();
         foreach ($models as $model) {
-            $ids[] = $model->{ $key };
+            $ids[] = $model->{$key};
         }
         $results = $builder->whereIn($key, $ids)->get();
 
         $dictionary = [];
         foreach ($results as $result) {
-            $dictionary[$result->{ $key }] = $result;
+            $dictionary[$result->{$key}] = $result;
         }
 
         foreach ($models as $model) {
-            if (isset($dictionary[$model->{ $key }])) {
-                $model->forceFill($dictionary[$model->{ $key }]->toArray());
+            if (isset($dictionary[$model->{$key}])) {
+                $model->forceFill($dictionary[$model->{$key}]->toArray());
             }
         }
 
@@ -54,6 +54,8 @@ class QueryBuilder
      * @param array   $models
      * @param int     $perPage
      * @param int     $page
+     *
+     * @throws \ReflectionException
      *
      * @return array
      */
@@ -82,32 +84,42 @@ class QueryBuilder
      * @param array   $models
      * @param array   $options
      *
+     * @throws \ReflectionException
+     *
      * @return array
      */
     protected function loadRelation(Builder $builder, Closure $constraints, array $models, array $options)
     {
         $relation = $builder->getRelation($options['name']);
-        $queries = $this->getQueries($builder, $models, $options['name'], $constraints);
-        $related = $queries->first()->getModel();
+        $relationQueries = $this->getRelationQueries($builder, $models, $options['name'], $constraints);
 
-        $bindings = $queries->map(function ($query) use ($options) {
-            return $query->when($options['paginated'], function ($q) use ($options) {
-                $q->forPage($options['page'], $options['perPage']);
-            })->getBindings();
-        })->collapse()->toArray();
+        // Just get the first of the relations to have an instance available
+        $relatedModel = $relationQueries->first()->getModel();
 
-        $sql = $queries->map(function ($query) use ($options) {
-            return $query->when($options['paginated'], function ($q) use ($options) {
-                $q->forPage($options['page'], $options['perPage']);
+        $relationQueries = $relationQueries->map(function (Relation $relation) use ($options) {
+            return $relation->when($options['paginated'], function (Builder $query) use ($options) {
+                return $query->forPage($options['page'], $options['perPage']);
             });
-        })->map(function ($query) {
-            return '('.$query->toSql().')';
-        })->implode(' UNION ALL ');
+        });
 
-        $table = $related->getTable();
-        $results = app('db')->select("SELECT * FROM ({$sql}) AS {$table}", $bindings);
-        $hydrated = $this->hydrate($related, $relation, $results);
-        $collection = $this->loadDefaultWith($related->newCollection($hydrated));
+        /** @var Builder $unitedRelations */
+        $unitedRelations = $relationQueries->reduce(
+            // Chain together the unions
+            function (Builder $builder, Relation $relation) {
+                return $builder->unionAll($relation->getQuery());
+            },
+            // Use the first query as the initial starting point
+            $relationQueries->shift()->getQuery()
+        );
+
+        /** @var \Illuminate\Database\Query\Builder $baseQuery */
+        $baseQuery = app('db')->query();
+        $results = $baseQuery->select()
+            ->fromSub($unitedRelations->getQuery(), $relatedModel->getTable())
+            ->get();
+
+        $hydrated = $this->hydrate($relatedModel, $relation, $results);
+        $collection = $this->loadDefaultWith($relatedModel->newCollection($hydrated));
         $matched = $relation->match($models, $collection, $options['name']);
 
         if ($options['paginated']) {
@@ -136,9 +148,9 @@ class QueryBuilder
      * @param string  $name
      * @param Closure $constraints
      *
-     * @return array
+     * @return Relation[]|Collection
      */
-    protected function getQueries(Builder $builder, array $models, $name, Closure $constraints)
+    protected function getRelationQueries(Builder $builder, array $models, $name, Closure $constraints)
     {
         return collect($models)->map(function ($model) use ($builder, $name, $constraints) {
             $relation = $builder->getRelation($name);
@@ -148,14 +160,14 @@ class QueryBuilder
             call_user_func_array($constraints, [$relation, $model]);
 
             if (method_exists($relation, 'shouldSelect')) {
-                $r = new ReflectionMethod(get_class($relation), 'shouldSelect');
-                $r->setAccessible(true);
-                $select = $r->invoke($relation, ['*']);
+                $shouldSelect = new ReflectionMethod(get_class($relation), 'shouldSelect');
+                $shouldSelect->setAccessible(true);
+                $select = $shouldSelect->invoke($relation, ['*']);
                 $relation->addSelect($select);
             } elseif (method_exists($relation, 'getSelectColumns')) {
-                $r = new ReflectionMethod(get_class($relation), 'getSelectColumns');
-                $r->setAccessible(true);
-                $select = $r->invoke($relation, ['*']);
+                $getSelectColumns = new ReflectionMethod(get_class($relation), 'getSelectColumns');
+                $getSelectColumns->setAccessible(true);
+                $select = $getSelectColumns->invoke($relation, ['*']);
                 $relation->addSelect($select);
             }
 
@@ -168,20 +180,22 @@ class QueryBuilder
     /**
      * Hydrate related models.
      *
-     * @param Model    $related
-     * @param Relation $relation
-     * @param array    $results
+     * @param Model      $related
+     * @param Relation   $relation
+     * @param Collection $results
+     *
+     * @throws \ReflectionException
      *
      * @return array
      */
-    protected function hydrate(Model $related, Relation $relation, array $results)
+    protected function hydrate(Model $related, Relation $relation, Collection $results)
     {
-        $models = $related->hydrate($results, $related->getConnectionName())->all();
+        $models = $related->hydrate($results->all(), $related->getConnectionName())->all();
 
         if (count($models) > 0 && method_exists($relation, 'hydratePivotRelation')) {
-            $r = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
-            $r->setAccessible(true);
-            $r->invoke($relation, $models);
+            $hydrationMethod = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
+            $hydrationMethod->setAccessible(true);
+            $hydrationMethod->invoke($relation, $models);
         }
 
         return $models;
@@ -192,16 +206,18 @@ class QueryBuilder
      *
      * @param Collection $collection
      *
+     * @throws \ReflectionException
+     *
      * @return Collection
      */
     protected function loadDefaultWith(Collection $collection)
     {
         if ($collection->isNotEmpty()) {
             $model = $collection->first();
-            $r = new ReflectionClass($model);
-            $p = $r->getProperty('with');
-            $p->setAccessible(true);
-            $with = array_filter($p->getValue($model), function ($relation) use ($model) {
+            $reflection = new ReflectionClass($model);
+            $withProperty = $reflection->getProperty('with');
+            $withProperty->setAccessible(true);
+            $with = array_filter($withProperty->getValue($model), function ($relation) use ($model) {
                 return ! $model->relationLoaded($relation);
             });
 

@@ -34,8 +34,8 @@ class QueryBuilderTest extends DBTestCase
     public function itCanLoadRelationshipsWithLimitsOnCollection()
     {
         $users = User::all();
-        $users->fetch(['tasks' => function ($q) {
-            $q->take(3);
+        $users->fetch(['tasks' => function ($query) {
+            $query->take(3);
         }]);
 
         $this->assertCount(3, $users[0]->tasks);
@@ -53,6 +53,7 @@ class QueryBuilderTest extends DBTestCase
     {
         $users = User::all();
         $users->fetchCount(['tasks']);
+
         $this->assertEquals($users[0]->tasks_count, 4);
         $this->assertEquals($users[1]->tasks_count, 5);
         $this->assertEquals($users[2]->tasks_count, 6);
