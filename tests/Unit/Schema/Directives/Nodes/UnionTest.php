@@ -35,7 +35,7 @@ class UnionTest extends TestCase
     {
         $type = isset($value['id']) ? 'User' : 'Employee';
 
-        return schema()->instance($type);
+        return graphql()->types()->instance($type);
     }
 
     protected function schema()
