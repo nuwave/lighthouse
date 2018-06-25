@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
 
@@ -35,13 +36,6 @@ class NodeValue
      * @var string
      */
     protected $namespace;
-
-    /**
-     * Registered interfaces.
-     *
-     * @var array
-     */
-    protected $interfaces = [];
 
     /**
      * Create new instance of node value.
@@ -85,7 +79,7 @@ class NodeValue
      *
      * @return self
      */
-    public function setType($type)
+    public function setType(Type $type)
     {
         $this->type = $type;
 
@@ -110,22 +104,6 @@ class NodeValue
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
-    }
-
-    /**
-     * Attach interface(s) to node.
-     *
-     * @param array|string $interface
-     *
-     * @return self
-     */
-    public function attachInterface($interface)
-    {
-        $interfaces = is_string($interface) ? [$interface] : $interface;
-
-        $this->interfaces = array_merge($this->interfaces, $interfaces);
-
-        return $this;
     }
 
     /**
@@ -191,38 +169,28 @@ class NodeValue
     }
 
     /**
-     * Get list of interfaces for node.
+     * Get a collection of the names of all interfaces the node has.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
-    public function getInterfaces()
+    public function getInterfaceNames()
     {
         return collect($this->node->interfaces)
-            ->map(function ($interface) {
+            ->map(function (NamedTypeNode $interface) {
                 return $interface->name->value;
-            })
-            ->merge($this->interfaces)
-            ->unique()
-            ->values()
-            ->toArray();
+            });
     }
 
     /**
      * Check if node implements a interface.
      *
-     * @param string $interface
+     * @param string $interfaceName
      *
      * @return bool
      */
-    public function hasInterface($interface)
+    public function hasInterface($interfaceName)
     {
-        return collect($this->node->interfaces)
-            ->reduce(function ($implements, $interfaceNode) use ($interface) {
-                if ($implements) {
-                    return true;
-                }
-
-                return data_get($interfaceNode, 'name.value') == $interface;
-            }, false);
+        return $this->getInterfaceNames()
+            ->containsStrict($interfaceName);
     }
 }

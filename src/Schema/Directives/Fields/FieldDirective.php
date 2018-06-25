@@ -9,20 +9,6 @@ use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 class FieldDirective extends BaseFieldDirective implements FieldResolver
 {
     /**
-     * Field resolver.
-     *
-     * @var string
-     */
-    protected $resolver;
-
-    /**
-     * Field resolver method.
-     *
-     * @var string
-     */
-    protected $method;
-
-    /**
      * Name of the directive.
      *
      * @return string
@@ -37,11 +23,14 @@ class FieldDirective extends BaseFieldDirective implements FieldResolver
      *
      * @param FieldValue $value
      *
+     * @throws DirectiveException
+     *
      * @return FieldValue
      */
     public function resolveField(FieldValue $value)
     {
-        $baseClassName = $this->associatedArgValue('class') ?? str_before($this->associatedArgValue('resolver'), '@');
+        $baseClassName = $this->associatedArgValue('class')
+            ?? str_before($this->associatedArgValue('resolver'), '@');
 
         if (empty($baseClassName)) {
             $directiveName = $this->name();
@@ -49,7 +38,8 @@ class FieldDirective extends BaseFieldDirective implements FieldResolver
         }
 
         $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod = $this->associatedArgValue('method') ?? str_after($this->associatedArgValue('resolver'), '@');
+        $resolverMethod = $this->associatedArgValue('method')
+            ?? str_after($this->associatedArgValue('resolver'), '@');
 
         if (! method_exists($resolverClass, $resolverMethod)) {
             throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
@@ -57,11 +47,13 @@ class FieldDirective extends BaseFieldDirective implements FieldResolver
 
         $additionalData = $this->associatedArgValue('args');
 
-        return $value->setResolver(function ($root, array $args, $context = null, $info = null) use ($resolverClass, $resolverMethod, $additionalData) {
-            return call_user_func_array(
-                [app($resolverClass), $resolverMethod],
-                [$root, array_merge($args, ['directive' => $additionalData]), $context, $info]
-            );
-        });
+        return $value->setResolver(
+            function ($root, array $args, $context = null, $info = null) use ($resolverClass, $resolverMethod, $additionalData) {
+                return call_user_func_array(
+                    [app($resolverClass), $resolverMethod],
+                    [$root, array_merge($args, ['directive' => $additionalData]), $context, $info]
+                );
+            }
+        );
     }
 }

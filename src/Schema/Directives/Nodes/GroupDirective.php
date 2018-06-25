@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -36,17 +37,17 @@ class GroupDirective implements NodeManipulator
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $objectType
-     * @param DocumentAST              $current
-     * @param DocumentAST              $original
+     * @param Node        $node
+     * @param DocumentAST $current
+     * @param DocumentAST $original
      *
      * @throws DirectiveException
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(ObjectTypeDefinitionNode $objectType, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
     {
-        $nodeName = $objectType->name->value;
+        $nodeName = $node->name->value;
 
         if (! in_array($nodeName, ['Query', 'Mutation'])) {
             $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
@@ -54,10 +55,10 @@ class GroupDirective implements NodeManipulator
             throw new DirectiveException($message);
         }
 
-        $objectType = $this->setMiddlewareDirectiveOnFields($objectType);
-        $objectType = $this->setNamespaceDirectiveOnFields($objectType);
+        $node = $this->setMiddlewareDirectiveOnFields($node);
+        $node = $this->setNamespaceDirectiveOnFields($node);
 
-        $current->setDefinition($objectType);
+        $current->setDefinition($node);
 
         return $current;
     }
@@ -117,7 +118,7 @@ class GroupDirective implements NodeManipulator
         $namespaceValue = addslashes($namespaceValue);
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
-            $previousNamespaces = $this->fieldDirective($fieldDefinition, (new NamespaceDirective)->name());
+            $previousNamespaces = $this->fieldDirective($fieldDefinition, (new NamespaceDirective())->name());
 
             $previousNamespaces = $previousNamespaces
                 ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)

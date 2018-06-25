@@ -16,6 +16,7 @@ class FieldFactory
      * @param FieldValue $value
      *
      * @return array
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      */
     public function handle(FieldValue $value)
     {
@@ -70,6 +71,7 @@ class FieldFactory
      * @param FieldValue $value
      *
      * @return FieldValue
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      */
     protected function useResolver(FieldValue $value)
     {
@@ -92,29 +94,8 @@ class FieldFactory
             case 'Query':
                 return $this->queryResolver($value);
             default:
-                return $this->defaultResolver($value);
+                return \Closure::fromCallable([\GraphQL\Executor\Executor::class, 'defaultFieldResolver']);
         }
-    }
-
-    /**
-     * Default field resolver.
-     *
-     * @param FieldValue $value
-     *
-     * @return \Closure|null
-     */
-    protected function defaultResolver(FieldValue $value)
-    {
-        if (! graphql()->directives()->hasFieldMiddleware($value->getField())) {
-            // Use graphql-php default resolver
-            return;
-        }
-
-        $name = $value->getFieldName();
-
-        return function ($parent, array $args) use ($name) {
-            return data_get($parent, $name);
-        };
     }
 
     /**

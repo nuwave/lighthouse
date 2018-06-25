@@ -50,7 +50,11 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->alias(GraphQL::class, 'graphql');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([]);
+            $this->commands([
+                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
+                \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
+                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
+            ]);
         }
     }
 
