@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-class RenameDirective extends BaseFieldDirective implements FieldResolver
+class RenameDirective extends BaseDirective implements FieldResolver
 {
     /**
      * Name of the directive.
@@ -28,7 +29,7 @@ class RenameDirective extends BaseFieldDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $attribute = $this->associatedArgValue('attribute');
+        $attribute = $this->directiveArgValue('attribute');
 
         if (!$attribute) {
             throw new DirectiveException(sprintf(

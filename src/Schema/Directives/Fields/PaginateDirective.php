@@ -5,18 +5,17 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Pagination\Paginator;
+use Nuwave\Lighthouse\Execution\QueryUtils;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
-use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
-use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
 class PaginateDirective extends PaginationManipulator implements FieldResolver, FieldManipulator
 {
-    use HandlesGlobalId, HandlesQueryFilter, HandlesQueries;
+    use HandlesGlobalId;
 
     /**
      * Name of the directive.
@@ -61,7 +60,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
     {
         $paginationType = $this->getPaginationType();
 
-        $model = $this->getModelClass($value);
+        $model = $this->getModelClass();
 
         switch ($paginationType) {
             case self::PAGINATION_TYPE_CONNECTION:
@@ -77,7 +76,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      */
     protected function getPaginationType()
     {
-        $paginationType = $this->associatedArgValue('type', self::PAGINATION_TYPE_PAGINATOR);
+        $paginationType = $this->directiveArgValue('type', self::PAGINATION_TYPE_PAGINATOR);
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
         if (!$this->isValidPaginationType($paginationType)) {
@@ -99,12 +98,12 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      */
     protected function paginatorTypeResolver(FieldValue $value, $model)
     {
-        return $value->setResolver(function ($root, array $args) use ($model, $value) {
+        return $value->setResolver(function ($root, array $args) use ($model) {
             $first = data_get($args, 'count', 15);
             $page = data_get($args, 'page', 1);
 
-            $query = $this->applyFilters($model::query(), $args);
-            $query = $this->applyScopes($query, $args, $value);
+            $query = QueryUtils::applyFilters($model::query(), $args);
+            $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
 
             Paginator::currentPageResolver(function () use ($page) {
                 return $page;
@@ -129,8 +128,8 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
             $after = $this->decodeCursor($args);
             $page = $first && $after ? floor(($first + $after) / $first) : 1;
 
-            $query = $this->applyFilters($model::query(), $args);
-            $query = $this->applyScopes($query, $args, $value);
+            $query = QueryUtils::applyFilters($model::query(), $args);
+            $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
 
             Paginator::currentPageResolver(function () use ($page) {
                 return $page;

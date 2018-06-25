@@ -19,9 +19,13 @@ trait AttachesNodeInterface
      */
     protected function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
     {
-        $objectType->interfaces = array_merge($objectType->interfaces, [Parser::parseType('Node')]);
+        $objectType->interfaces = array_merge(
+            collect($objectType->interfaces)->toArray(),
+            [Parser::parseType('Node')]
+        );
+
         $globalIdFieldName = config('lighthouse.global_id_field', '_id');
-        $globalIdFieldDefinition = PartialParser::fieldDefinition($globalIdFieldName . ': ID!');
+        $globalIdFieldDefinition = PartialParser::fieldDefinition($globalIdFieldName.': ID!');
         $objectType->fields->merge([$globalIdFieldDefinition]);
 
         return $documentAST->setDefinition($objectType);

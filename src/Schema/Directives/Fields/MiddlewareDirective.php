@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class MiddlewareDirective extends BaseFieldDirective implements FieldMiddleware
+class MiddlewareDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * Name of the directive.
@@ -58,7 +59,7 @@ class MiddlewareDirective extends BaseFieldDirective implements FieldMiddleware
             return null;
         }
 
-        $checks = $this->associatedArgValue('checks');
+        $checks = $this->directiveArgValue('checks');
 
         if (!$checks) {
             return null;

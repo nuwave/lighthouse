@@ -6,8 +6,15 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
+/**
+ * Trait HandlesQueries
+ * @package Nuwave\Lighthouse\Support\Traits
+ * @deprecated
+ */
 trait HandlesQueries
 {
+    use HandlesDirectives;
+
     /**
      * @param FieldValue $value
      *

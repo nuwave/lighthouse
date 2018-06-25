@@ -2,17 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\AttachesNodeInterface;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class NodeDirective implements NodeMiddleware, NodeManipulator
+class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
-    use HandlesDirectives, AttachesNodeInterface;
+    use AttachesNodeInterface;
 
     /**
      * Directive name.
@@ -54,10 +54,7 @@ class NodeDirective implements NodeMiddleware, NodeManipulator
      */
     protected function getResolver(NodeValue $value, $argKey)
     {
-        $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), self::name()),
-            $argKey
-        );
+        $resolver = $this->directiveArgValue($argKey);
 
         list($className, $method) = explode('@', $resolver);
 
@@ -72,8 +69,6 @@ class NodeDirective implements NodeMiddleware, NodeManipulator
      * @param Node        $node
      * @param DocumentAST $current
      * @param DocumentAST $original
-     *
-     * @throws \Exception
      *
      * @return DocumentAST
      */

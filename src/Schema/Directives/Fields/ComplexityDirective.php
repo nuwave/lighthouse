@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-class ComplexityDirective extends BaseFieldDirective implements FieldMiddleware
+class ComplexityDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * Name of the directive.
@@ -27,7 +28,7 @@ class ComplexityDirective extends BaseFieldDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $value)
     {
-        $baseClassName = $this->associatedArgValue('class') ?? str_before($this->associatedArgValue('resolver'), '@');
+        $baseClassName = $this->directiveArgValue('class') ?? str_before($this->directiveArgValue('resolver'), '@');
 
         if (empty($baseClassName)) {
             return $value->setComplexity(function ($childrenComplexity, $args) {
@@ -38,7 +39,7 @@ class ComplexityDirective extends BaseFieldDirective implements FieldMiddleware
         }
 
         $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod = $this->associatedArgValue('method') ?? str_after($this->associatedArgValue('resolver'), '@');
+        $resolverMethod = $this->directiveArgValue('method') ?? str_after($this->directiveArgValue('resolver'), '@');
 
         if (!method_exists($resolverClass, $resolverMethod)) {
             throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");

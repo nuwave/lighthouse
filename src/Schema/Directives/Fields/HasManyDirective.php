@@ -58,9 +58,9 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
      */
     public function resolveField(FieldValue $value)
     {
-        $relation = $this->associatedArgValue('relation', $value->getFieldName());
+        $relation = $this->directiveArgValue('relation', $value->getFieldName());
         $type = $this->getResolverType();
-        $scopes = $this->associatedArgValue('scopes', []);
+        $scopes = $this->directiveArgValue('scopes', []);
 
         return $value->setResolver(function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes, $type) {
             return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
@@ -77,7 +77,7 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
      */
     protected function getResolverType()
     {
-        $paginationType = $this->associatedArgValue('type', 'default');
+        $paginationType = $this->directiveArgValue('type', 'default');
 
         if ('default' === $paginationType) {
             return $paginationType;
@@ -86,7 +86,7 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
         $paginationType = $this->convertAliasToPaginationType($paginationType);
 
         if (!$this->isValidPaginationType($paginationType)) {
-            $fieldName = $this->fieldDefinition->name->value;
+            $fieldName = $this->definitionNode->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
         }

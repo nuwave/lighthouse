@@ -2,17 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Traits\AttachesNodeInterface;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class ModelDirective implements NodeMiddleware, NodeManipulator
+class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
-    use HandlesDirectives, AttachesNodeInterface;
+    use AttachesNodeInterface;
 
     /**
      * Directive name.
@@ -51,10 +52,7 @@ class ModelDirective implements NodeMiddleware, NodeManipulator
      */
     protected function getModelClassName(NodeValue $value)
     {
-        $className = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'class'
-        );
+        $className = $this->directiveArgValue('class');
 
         return $className ?? $this->inferModelClassName($value->getNodeName());
     }

@@ -31,7 +31,7 @@ class ArgumentFactory
      */
     protected function applyMiddleware(ArgumentValue $value)
     {
-        return directives()->argMiddleware($value->getArg())
+        return graphql()->directives()->argMiddleware($value->getArg())
             ->reduce(function (ArgumentValue $value, ArgMiddleware $middleware) {
                 return $middleware->handleArgument(
                     $value->setMiddlewareDirective($middleware->name())

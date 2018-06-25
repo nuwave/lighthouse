@@ -35,12 +35,13 @@ class ValidatorTest extends TestCase
             }
         ');
 
-        $fieldValue = new FieldValue(new NodeValue($typeDefinition), $typeDefinition->fields[0]);
+        $fieldDefinition = $typeDefinition->fields[0];
+        $fieldValue = new FieldValue(new NodeValue($typeDefinition), $fieldDefinition);
         $fieldValue->setResolver(function () {
             return 'foo';
         });
 
-        (new ValidateDirective())->handleField($fieldValue);
+        (new ValidateDirective())->hydrate($fieldDefinition)->handleField($fieldValue);
 
         $this->expectException(ValidationError::class);
         $fieldValue->getResolver()(

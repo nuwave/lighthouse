@@ -4,17 +4,14 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder;
+use Nuwave\Lighthouse\Execution\QueryUtils;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
-use Nuwave\Lighthouse\Support\Traits\HandlesQueries;
-use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class FindDirective implements FieldResolver
+class FindDirective extends BaseDirective implements FieldResolver
 {
-    use HandlesQueries, HandlesDirectives, HandlesQueryFilter;
-
     /**
      * Name of the directive.
      *
@@ -35,13 +32,14 @@ class FindDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $model = $this->getModelClass($value);
+        $model = $this->getModelClass();
 
-        return $value->setResolver(function ($root, $args) use ($model, $value) {
+        return $value->setResolver(function ($root, $args) use ($model) {
             /** @var Builder $query */
-            $query = $this->applyFilters($model::query(), $args);
-            $query = $this->applyScopes($query, $args, $value);
+            $query = QueryUtils::applyFilters($model::query(), $args);
+            $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
             $total = $query->count();
+
             if ($total > 1) {
                 throw new Error('Query returned more than one result.');
             }

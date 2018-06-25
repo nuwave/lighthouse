@@ -3,14 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Type\Definition\UnionType;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
-use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
-class UnionDirective implements NodeResolver
+class UnionDirective extends BaseDirective implements NodeResolver
 {
-    use HandlesDirectives;
-
     /**
      * Name of the directive.
      *
@@ -30,10 +28,7 @@ class UnionDirective implements NodeResolver
      */
     public function resolveNode(NodeValue $value)
     {
-        $resolver = $this->directiveArgValue(
-            $this->nodeDirective($value->getNode(), $this->name()),
-            'resolver'
-        );
+        $resolver = $this->directiveArgValue('resolver');
 
         $namespace = array_get(explode('@', $resolver), '0');
         $method = array_get(explode('@', $resolver), '1', strtolower($value->getNodeName()));
@@ -43,7 +38,7 @@ class UnionDirective implements NodeResolver
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
             'types' => function () use ($value) {
                 return collect($value->getNode()->types)->map(function ($type) {
-                    return schema()->instance($type->name->value);
+                    return graphql()->types()->instance($type->name->value);
                 })->filter()->toArray();
             },
             'resolveType' => function ($value) use ($namespace, $method) {
@@ -51,7 +46,7 @@ class UnionDirective implements NodeResolver
                     $instance = app($namespace);
                     return call_user_func_array([$instance, $method], [$value]);
                 }
-                return schema()->instance(last(explode('\\', get_class($value))));
+                return graphql()->types()->instance(last(explode('\\', get_class($value))));
             },
         ]));
     }
