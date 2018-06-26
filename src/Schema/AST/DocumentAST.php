@@ -21,6 +21,7 @@ use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Exceptions\DocumentASTException;
 
 class DocumentAST
 {
@@ -313,6 +314,12 @@ class DocumentAST
      */
     public function setDefinition(DefinitionNode $newDefinition): DocumentAST
     {
+        if ($this->locked) {
+            $nodeName = data_get($newDefinition, 'name.value', 'Node');
+            $message = "{$nodeName} cannot be added to the DocumentAST while it is locked.";
+            throw new DocumentASTException($message);
+        }
+
         $originalDefinitions = collect($this->documentNode->definitions);
 
         if (! $newHashID = data_get($newDefinition, 'spl_object_hash')) {

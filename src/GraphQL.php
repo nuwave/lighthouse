@@ -136,7 +136,6 @@ class GraphQL
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
-        $this->documentAST->lock();
 
         return GraphQLBase::executeQuery(
             $schema,
@@ -174,7 +173,7 @@ class GraphQL
                 : $this->buildAST();
         }
 
-        return $this->documentAST;
+        return $this->documentAST->lock();
     }
 
     /**
