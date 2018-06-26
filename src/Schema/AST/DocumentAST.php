@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\Parser;
+use GraphQL\Language\AST\DefinitionNode;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\FragmentDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\DefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FragmentDefinitionNode;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\Parser;
+use Illuminate\Support\Collection;
 
 class DocumentAST
 {
@@ -38,23 +40,23 @@ class DocumentAST
     }
 
     /**
-     * Create a new instance from a schema.
+     * Create a new DocumentAST instance from a schema.
      *
-     * @param $schema
+     * @param string $schema
      *
      * @return DocumentAST
      */
-    public static function fromSource($schema)
+    public static function fromSource(string $schema): DocumentAST
     {
         return new static(Parser::parse($schema));
     }
 
     /**
-     * Get instance of underlining document node.
+     * Get an instance of the underlying document node.
      *
      * @return DocumentNode
      */
-    public function documentNode()
+    public function document(): DocumentNode
     {
         return ASTHelper::cloneNode($this->documentNode);
     }
@@ -64,7 +66,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function definitions()
+    public function definitions(): Collection
     {
         return collect($this->documentNode->definitions)->map(function (Node $node) {
             $clone = ASTHelper::cloneNode($node);
@@ -82,7 +84,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function typeDefinitions()
+    public function typeDefinitions(): Collection
     {
         return $this->definitions()->filter(function (DefinitionNode $node) {
             return $node instanceof ScalarTypeDefinitionNode
@@ -99,7 +101,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function directives()
+    public function directiveDefinitions(): Collection
     {
         return $this->definitionsByType(DirectiveDefinitionNode::class);
     }
@@ -115,7 +117,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function typeExtensions($extendedTypeName = null)
+    public function typeExtensionDefinitions($extendedTypeName = null): Collection
     {
         return $this->definitionsByType(TypeExtensionDefinitionNode::class)
             ->filter(function (TypeExtensionDefinitionNode $typeExtension) use ($extendedTypeName) {
@@ -128,7 +130,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function operations()
+    public function operationDefinitions(): Collection
     {
         return $this->definitionsByType(OperationDefinitionNode::class);
     }
@@ -138,7 +140,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function fragments()
+    public function fragmentDefinitions(): Collection
     {
         return $this->definitionsByType(FragmentDefinitionNode::class);
     }
@@ -148,19 +150,43 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function objectTypes()
+    public function objectTypeDefinitions(): Collection
     {
         return $this->definitionsByType(ObjectTypeDefinitionNode::class);
     }
 
     /**
-     * Get all definitions for input types.
+     * Get a single object type definition by name.
      *
+     * @param string $name
+     *
+     * @return ObjectTypeDefinitionNode|null
+     */
+    public function objectTypeDefinition(string $name)
+    {
+        return $this->objectTypeDefinitions()->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
+            return $objectType->name->value === $name;
+        });
+    }
+
+    /**
      * @return Collection
      */
-    public function inputTypes()
+    public function inputObjectTypeDefinitions(): Collection
     {
         return $this->definitionsByType(InputObjectTypeDefinitionNode::class);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return InputObjectTypeDefinitionNode|null
+     */
+    public function inputObjectTypeDefinition(string $name)
+    {
+        return $this->inputObjectTypeDefinitions()->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
+            return $inputType->name->value === $name;
+        });
     }
 
     /**
@@ -168,7 +194,7 @@ class DocumentAST
      *
      * @return Collection
      */
-    public function interfaces()
+    public function interfaceDefinitions(): Collection
     {
         return $this->definitionsByType(InterfaceTypeDefinitionNode::class);
     }
@@ -178,7 +204,7 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    public function queryType()
+    public function queryTypeDefinition(): ObjectTypeDefinitionNode
     {
         return $this->objectTypeOrDefault('Query');
     }
@@ -188,7 +214,7 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    public function mutationType()
+    public function mutationTypeDefinition(): ObjectTypeDefinitionNode
     {
         return $this->objectTypeOrDefault('Mutation');
     }
@@ -198,7 +224,7 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    public function subscriptionType()
+    public function subscriptionTypeDefinition(): ObjectTypeDefinitionNode
     {
         return $this->objectTypeOrDefault('Subscription');
     }
@@ -210,45 +236,23 @@ class DocumentAST
      *
      * @return ObjectTypeDefinitionNode
      */
-    protected function objectTypeOrDefault($name)
+    protected function objectTypeOrDefault(string $name): ObjectTypeDefinitionNode
     {
-        return $this->objectType($name)
-            ?: PartialParser::objectTypeDefinition('type '.$name.'{}');
+        return $this->objectTypeDefinition($name)
+            ?? PartialParser::objectTypeDefinition('type ' . $name . '{}');
     }
 
     /**
-     * @param string $name
+     * Get all definitions of a
      *
-     * @return ObjectTypeDefinitionNode|null
-     */
-    public function objectType($name)
-    {
-        return $this->objectTypes()->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
-            return $objectType->name->value === $name;
-        });
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return InputObjectTypeDefinitionNode|null
-     */
-    public function inputType($name)
-    {
-        return $this->inputTypes()->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
-            return $inputType->name->value === $name;
-        });
-    }
-
-    /**
-     * @param string $type
+     * @param string $typeClassName
      *
      * @return Collection
      */
-    protected function definitionsByType($type)
+    protected function definitionsByType(string $typeClassName): Collection
     {
-        return $this->definitions()->filter(function ($node) use ($type) {
-            return $node instanceof $type;
+        return $this->definitions()->filter(function (Node $node) use ($typeClassName) {
+            return $node instanceof $typeClassName;
         });
     }
 
@@ -257,52 +261,58 @@ class DocumentAST
      *
      * @param FieldDefinitionNode $field
      *
-     * @return $this
+     * @return DocumentAST
      */
-    public function addFieldToQueryType(FieldDefinitionNode $field)
+    public function addFieldToQueryType(FieldDefinitionNode $field): DocumentAST
     {
-        $query = $this->queryType();
-        $query->fields = $query->fields->merge([$field]);
+        $query = $this->queryTypeDefinition();
+        $query->fields = ASTHelper::mergeNodeList($query->fields, [$field]);
+
         $this->setDefinition($query);
 
         return $this;
     }
 
     /**
-     * @param DefinitionNode $definition
+     * @param DefinitionNode $newDefinition
      *
      * @return DocumentAST
      */
-    public function setDefinition(DefinitionNode $definition)
+    public function setDefinition(DefinitionNode $newDefinition): DocumentAST
     {
-        $found = false;
+        $originalDefinitions = collect($this->documentNode->definitions);
 
-        $newDefinitions = $this->originalDefinitions()
-            ->map(function (DefinitionNode $node) use ($definition, &$found) {
-                if (! $hashID = data_get($definition, 'spl_object_hash')) {
-                    // We didn't clone the new definition
-                    return $node;
-                }
+        if (!$newHashID = data_get($newDefinition, 'spl_object_hash')) {
+            // This means the new definition is not a clone, so we do
+            // not have to look for an existing definition to replace
+            $newDefinitions = $originalDefinitions->push($newDefinition);
+        } else {
+            $found = false;
 
-                $compareID = $node instanceof TypeExtensionDefinitionNode
-                    ? spl_object_hash($node->definition)
-                    : spl_object_hash($node);
+            $newDefinitions = $originalDefinitions->map(function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
+                $originalHashID = $originalDefinition instanceof TypeExtensionDefinitionNode
+                    ? spl_object_hash($originalDefinition->definition)
+                    : spl_object_hash($originalDefinition);
 
-                if ($compareID === $hashID) {
+                if ($originalHashID === $newHashID) {
                     $found = true;
 
-                    if ($node instanceof TypeExtensionDefinitionNode) {
-                        $node->definition = $definition;
+                    if ($originalDefinition instanceof TypeExtensionDefinitionNode) {
+                        $originalDefinition->definition = $newDefinition;
                     } else {
-                        $node = $definition;
+                        $originalDefinition = $newDefinition;
                     }
                 }
 
-                return $node;
-            })
-            ->unless($found, function ($definitions) use ($definition) {
-                return $definitions->push($definition);
-            })
+                return $originalDefinition;
+            });
+
+            if (!$found) {
+                $newDefinitions = $newDefinitions->push($newDefinition);
+            };
+        }
+
+        $newDefinitions = $newDefinitions
             // Reindex, otherwise offset errors might happen in subsequent runs
             ->values()
             ->all();
@@ -311,30 +321,5 @@ class DocumentAST
         $this->documentNode->definitions = new NodeList($newDefinitions);
 
         return $this;
-    }
-
-    /**
-     * @param string $definition
-     *
-     * @throws \Exception
-     *
-     * @return static
-     */
-    public function setObjectTypeFromString($definition)
-    {
-        $objectType = self::parseObjectType($definition);
-        $this->setDefinition($objectType);
-
-        return $this;
-    }
-
-    /**
-     * Get a collection of the contained definitions.
-     *
-     * @return Collection
-     */
-    protected function originalDefinitions()
-    {
-        return collect($this->documentNode->definitions);
     }
 }

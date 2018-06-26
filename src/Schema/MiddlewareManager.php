@@ -32,9 +32,9 @@ class MiddlewareManager
     public function forRequest($request)
     {
         $document = DocumentAST::fromSource($request);
-        $fragments = $document->fragments();
+        $fragments = $document->fragmentDefinitions();
 
-        return $document->operations()
+        return $document->operationDefinitions()
             ->map(function (OperationDefinitionNode $node) use ($fragments) {
                 $definition = AST::toArray($node);
                 $operation = array_get($definition, 'operation');
@@ -133,18 +133,5 @@ class MiddlewareManager
     public function mutation($name)
     {
         return array_get($this->mutations, $name, []);
-    }
-
-    /**
-     * Get middleware by node.
-     *
-     * @param OperationDefinitionNode $node
-     * @param  string
-     *
-     * @return void
-     */
-    protected function byNode(OperationDefinitionNode $node, $operation)
-    {
-        dd('here');
     }
 }
