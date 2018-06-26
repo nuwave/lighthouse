@@ -217,7 +217,6 @@ class RuleFactoryTest extends TestCase
 
         $this->assertEquals([
             'requiredRules' => ['required'],
-            'requiredRules.required' => ['required'],
             'requiredSDL.required' => ['required'],
             'requiredBoth' => ['required'],
             'requiredBoth.required' => ['required'],

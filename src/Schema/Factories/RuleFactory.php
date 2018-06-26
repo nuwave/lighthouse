@@ -7,6 +7,7 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -67,7 +68,9 @@ class RuleFactory
         $mutationRules = $mutationArgs ? collect($this->getFieldRules($mutationArgs)) : collect();
 
         if ($mutationArgs) {
-            collect($mutationField->arguments)->each(function (InputValueDefinitionNode $arg) {
+            collect($mutationField->arguments)->filter(function (InputValueDefinitionNode $arg) {
+                return data_get($arg, 'type') instanceof NonNullTypeNode;
+            })->each(function (InputValueDefinitionNode $arg) {
                 if ($name = data_get($arg, 'name.value')) {
                     $this->nestedInputs = array_merge($this->nestedInputs, [
                         "{$name}.dummy",
@@ -109,14 +112,9 @@ class RuleFactory
                 $rules = $rules->merge($this->getRulesForPath(
                     $documentAST,
                     $mutationField,
-                    $fullPath
+                    $fullPath,
+                    $traverseOne
                 ));
-
-                if ($traverseOne) {
-                    $this->nestedInputs = array_merge($this->nestedInputs, [
-                        "{$fullPath}.dummy",
-                    ]);
-                }
 
                 $paths->pop();
             }
@@ -175,7 +173,7 @@ class RuleFactory
     ) {
         return collect($flatInput)->flip()
             ->flatMap(function ($path) use ($documentAST, $mutationField) {
-                return $this->getRulesForPath($documentAST, $mutationField, $path);
+                return $this->getRulesForPath($documentAST, $mutationField, $path, false);
             })->filter()->toArray();
     }
 
@@ -185,16 +183,17 @@ class RuleFactory
      * @param DocumentAST         $documentAST
      * @param FieldDefinitionNode $field
      * @param string              $path
+     * @param bool                $traverseOne
      *
      * @return array
      */
     protected function getRulesForPath(
         DocumentAST $documentAST,
         FieldDefinitionNode $field,
-        $path
+        $path,
+        $traverseOne
     ) {
         $inputPath = explode('.', $path);
-        array_pop($inputPath);
         $pathKey = implode('.', $inputPath);
 
         if (in_array($pathKey, $this->resolved)) {
@@ -241,7 +240,20 @@ class RuleFactory
         }, $field);
 
         if (! $input) {
-            return $this->getRulesForPath($documentAST, $field, $pathKey);
+            array_pop($inputPath);
+
+            return $this->getRulesForPath(
+                $documentAST,
+                $field,
+                implode('.', $inputPath),
+                false
+            );
+        }
+
+        if ($traverseOne && $input instanceof NonNullTypeNode) {
+            $this->nestedInputs = array_merge($this->nestedInputs, [
+                "{$path}.dummy",
+            ]);
         }
 
         $list = $this->includesList($input);
