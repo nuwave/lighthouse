@@ -183,50 +183,19 @@ class RuleFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itGeneratesOnlyMinimalNeededRules()
-    {
-        $documentAST = ASTBuilder::generate('
-        input FooInput {
-            self: FooInput
-            email: String @rules(apply: ["email"])
-        }
-        type Mutation {
-            createFoo(input: FooInput @rules(apply: ["required"])): String
-        }');
-
-        $variables = [
-            'input' => [
-                'self' => [
-                    'self' => [
-                        'email' => 'asdf'
-                    ],
-                ],
-            ],
-        ];
-
-        $rules = $this->factory->build($documentAST, $variables, 'createFoo');
-        $this->assertEquals([
-            'input' => ['required'],
-            'input.self.self.email' => ['email'],
-        ], $rules);
-    }
-    
-    /**
-     * @test
-     */
     public function itAlwaysGeneratesRequiredRules()
     {
         $documentAST = ASTBuilder::generate('
         type Mutation {
             createFoo(required: String @rules(apply: ["required"])): String
         }');
-        
+
         $rules = $this->factory->build($documentAST, [], 'createFoo');
         $this->assertEquals([
             'required' => ['required'],
         ], $rules);
     }
-    
+
     /**
      * @test
      */
@@ -245,13 +214,16 @@ class RuleFactoryTest extends TestCase
         }');
 
         $rules = $this->factory->build($documentAST, [], 'createFoo');
+
         $this->assertEquals([
+            'requiredRules' => ['required'],
+            'requiredRules.required' => ['required'],
             'requiredSDL.required' => ['required'],
             'requiredBoth' => ['required'],
             'requiredBoth.required' => ['required'],
         ], $rules);
     }
-    
+
     /**
      * @test
      */
@@ -268,8 +240,8 @@ class RuleFactoryTest extends TestCase
 
         $variables = [
             'input' => [
-                'self' => []
-            ]
+                'self' => [],
+            ],
         ];
 
         $rules = $this->factory->build($documentAST, $variables, 'createFoo');
