@@ -51,9 +51,11 @@ class RuleFactory
             }
         });
 
-        return $rules->merge(
-            $this->getFieldRules($mutationField->arguments)
-        )->toArray();
+        $mutationArgs = data_get($mutationField, 'arguments');
+
+        return $mutationArgs
+            ? $rules->merge($this->getFieldRules($mutationArgs))->toArray()
+            : $rules->toArray();
     }
 
     /**

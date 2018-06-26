@@ -2,16 +2,17 @@
 
 namespace Nuwave\Lighthouse;
 
-use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Schema\NodeContainer;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use GraphQL\Type\Schema;
+use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\NodeContainer;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
@@ -52,6 +53,13 @@ class GraphQL
      * @var Schema
      */
     protected $graphqlSchema;
+
+    /**
+     * Local instance of DocumentAST.
+     *
+     * @var DocumentAST
+     */
+    protected $documentAST;
 
     /**
      * Create instance of graphql container.
@@ -99,15 +107,15 @@ class GraphQL
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
                     info('GraphQL Error:', [
-                        'code' => $error->getCode(),
+                        'code'    => $error->getCode(),
                         'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
+                        'trace'   => $error->getTraceAsString(),
                     ]);
                 }
             }
 
             return [
-                'data' => $result->data,
+                'data'   => $result->data,
                 'errors' => array_map([$this, 'formatError'], $result->errors),
             ];
         }
@@ -157,11 +165,17 @@ class GraphQL
      */
     public function documentAST()
     {
-        return $this->documentAST = $this->documentAST ?? $this->shouldCacheAST()
+        if ($this->documentAST) {
+            return $this->documentAST;
+        }
+
+        $this->documentAST = $this->shouldCacheAST()
             ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
                 return $this->buildAST();
             })
             : $this->buildAST();
+
+        return $this->documentAST;
     }
 
     /**

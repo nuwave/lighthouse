@@ -120,10 +120,13 @@ class GraphQLField
 
         if (isset($arguments[1]) &&
             isset($arguments[3]) &&
-            'mutation' === data_get($arguments[3], 'operation.operation')
+            'mutation' === data_get($arguments, '3.operation.operation')
         ) {
+            $input = data_get($arguments, '1', []);
+            $fieldName = data_get($arguments, '3.fieldName');
+
             $rules = array_merge($rules, (new RuleFactory())->build(
-                graphql()->documentAST(), $arguments[1], $arguments[3]->fieldName
+                graphql()->documentAST(), $input, $fieldName
             ));
         }
 
