@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
-use GraphQL\Language\AST\DirectiveNode as Directive;
-use GraphQL\Language\AST\InputValueDefinitionNode as Argument;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\Type;
 
 class ArgumentValue
@@ -12,14 +11,14 @@ class ArgumentValue
     /**
      * Current input argument.
      *
-     * @var Argument
+     * @var InputValueDefinitionNode
      */
     protected $arg;
 
     /**
      * Current directive.
      *
-     * @var Directive
+     * @var DirectiveNode
      */
     protected $directive;
 
@@ -48,9 +47,9 @@ class ArgumentValue
      * Create a new argument value instance.
      *
      * @param FieldValue $field
-     * @param Argument   $arg
+     * @param InputValueDefinitionNode   $arg
      */
-    public function __construct(FieldValue $field, Argument $arg)
+    public function __construct(FieldValue $field, InputValueDefinitionNode $arg)
     {
         $this->field = $field;
         $this->arg = $arg;
@@ -59,11 +58,11 @@ class ArgumentValue
     /**
      * Set current directive.
      *
-     * @param Directive $directive
+     * @param DirectiveNode $directive
      *
      * @return self
      */
-    public function setDirective(Directive $directive)
+    public function setDirective(DirectiveNode $directive)
     {
         $this->directive = $directive;
 
@@ -73,11 +72,11 @@ class ArgumentValue
     /**
      * Set current argument.
      *
-     * @param Argument $arg
+     * @param InputValueDefinitionNode $arg
      *
      * @return self
      */
-    public function setArg(Argument $arg)
+    public function setArg(InputValueDefinitionNode $arg)
     {
         $this->arg = $arg;
 
@@ -125,7 +124,7 @@ class ArgumentValue
     public function setMiddlewareDirective($middleware)
     {
         $this->directive = collect($this->arg->directives)
-            ->first(function (Directive $directive) use ($middleware) {
+            ->first(function (DirectiveNode $directive) use ($middleware) {
                 return $directive->name->value === $middleware;
             });
 
@@ -135,11 +134,11 @@ class ArgumentValue
     /**
      * Set a argument resolver.
      *
-     * @param Closure $resolver
+     * @param \Closure $resolver
      *
      * @return self
      */
-    public function setResolver(Closure $resolver)
+    public function setResolver(\Closure $resolver)
     {
         $current = $this->getValue();
         $current['resolve'] = $resolver;
@@ -150,7 +149,7 @@ class ArgumentValue
     /**
      * Get current argument.
      *
-     * @return Argument
+     * @return InputValueDefinitionNode
      */
     public function getArg()
     {
@@ -170,7 +169,7 @@ class ArgumentValue
     /**
      * Get current directive.
      *
-     * @return Directive
+     * @return DirectiveNode
      */
     public function getDirective()
     {
