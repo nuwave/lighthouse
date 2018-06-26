@@ -8,6 +8,9 @@ use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 
 class RuleFactoryTest extends TestCase
 {
+    /**
+     * @var RuleFactory
+     */
     protected $factory;
 
     /**
@@ -30,7 +33,23 @@ class RuleFactoryTest extends TestCase
             createUser(email: String @rules(apply: ["required", "email"])): String
         }');
 
-        $rules = $this->factory->build($documentAST, [], 'createUser');
+        $rules = $this->factory->build($documentAST, [], 'createUser', 'Mutation');
+        $this->assertEquals([
+            'email' => ['required', 'email'],
+        ], $rules);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanGenerateRulesForQueryArguments()
+    {
+        $documentAST = ASTBuilder::generate('
+        type Query {
+            findUser(email: String @rules(apply: ["required", "email"])): String
+        }');
+
+        $rules = $this->factory->build($documentAST, [], 'findUser', 'Query');
         $this->assertEquals([
             'email' => ['required', 'email'],
         ], $rules);
@@ -55,7 +74,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build($documentAST, $variables, 'createUser', 'Mutation');
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
@@ -88,7 +107,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build($documentAST, $variables, 'createUser', 'Mutation');
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
@@ -124,7 +143,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build($documentAST, $variables, 'createUser', 'Mutation');
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
@@ -168,7 +187,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build($documentAST, $variables, 'createUser', 'Mutation');
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],

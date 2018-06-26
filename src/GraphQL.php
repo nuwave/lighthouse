@@ -65,9 +65,9 @@ class GraphQL
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry      $types
+     * @param TypeRegistry $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer     $nodes
+     * @param NodeContainer $nodes
      */
     public function __construct(
         DirectiveRegistry $directives,
@@ -165,17 +165,25 @@ class GraphQL
      */
     public function documentAST()
     {
-        if ($this->documentAST) {
-            return $this->documentAST;
+        if (! $this->documentAST) {
+            $this->documentAST = $this->shouldCacheAST()
+                ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+                    return $this->buildAST();
+                })
+                : $this->buildAST();
         }
 
-        $this->documentAST = $this->shouldCacheAST()
-            ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
-                return $this->buildAST();
-            })
-            : $this->buildAST();
-
         return $this->documentAST;
+    }
+
+    /**
+     * Temporary workaround to allow injecting a different schema when testing.
+     *
+     * @param DocumentAST $documentAST
+     */
+    public function setDocumentAST(DocumentAST $documentAST)
+    {
+        $this->documentAST = $documentAST;
     }
 
     /**

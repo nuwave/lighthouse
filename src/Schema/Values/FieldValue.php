@@ -51,12 +51,11 @@ class FieldValue
     protected $complexity;
 
     /**
-     * Additional args to inject
-     * into resolver.
+     * Additional args to inject into resolver.
      *
      * @var array
      */
-    protected $args = [];
+    protected $additionalArgs = [];
 
     /**
      * Create new field value instance.
@@ -150,13 +149,21 @@ class FieldValue
      *
      * @return self
      */
-    public function injectArg($key, $value)
+    public function injectArg(string $key, $value): FieldValue
     {
         $this->args = array_merge($this->args, [
             $key => $value,
         ]);
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalArgs(): array
+    {
+        return $this->additionalArgs;
     }
 
     /**
@@ -237,26 +244,5 @@ class FieldValue
     public function getNodeName()
     {
         return $this->getNode()->getNodeName();
-    }
-
-    /**
-     * Wrap resolver.
-     *
-     * @param Closure $resolver
-     *
-     * @return Closure
-     */
-    public function wrap(Closure $resolver)
-    {
-        if (empty($this->args)) {
-            return $resolver;
-        }
-
-        return function () use ($resolver) {
-            $args = func_get_args();
-            $args[1] = array_merge($args[1], $this->args);
-
-            return call_user_func_array($resolver, $args);
-        };
     }
 }

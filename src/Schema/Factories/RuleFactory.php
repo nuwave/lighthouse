@@ -2,16 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ListTypeNode;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Definition\FieldDefinition;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
 class RuleFactory
@@ -23,19 +21,24 @@ class RuleFactory
     /**
      * Build list of rules for field.
      *
-     * @param array       $variables
-     * @param ResolveInfo $info
-     *
+     * @param DocumentAST $documentAST
+     * @param array $variables
+     * @param string $fieldName
+     * @param string $parentType
      * @return array
      */
-    public function build(DocumentAST $documentAST, array $variables, $fieldName)
+    public function build(DocumentAST $documentAST, array $variables, string $fieldName, string $parentType)
     {
         $rules = collect();
-        $mutationField = $this->getMutationField($documentAST, $fieldName);
+
+        $fieldDefinition = collect($documentAST->objectType($parentType)->fields)
+            ->first(function (FieldDefinitionNode $fieldDefinition) use ($fieldName) {
+                return $fieldName === $fieldDefinition->name->value;
+            });
 
         collect(array_keys(array_dot($variables)))->sortByDesc(function ($key) {
             return strlen($key);
-        })->each(function ($key) use ($documentAST, $mutationField, &$rules) {
+        })->each(function ($key) use ($documentAST, $fieldDefinition, &$rules) {
             $paths = collect(explode('.', $key))->reject(function ($key) {
                 return is_numeric($key);
             })->values();
@@ -43,7 +46,7 @@ class RuleFactory
             while ($paths->isNotEmpty()) {
                 $rules = $rules->merge($this->getRulesForPath(
                     $documentAST,
-                    $mutationField,
+                    $fieldDefinition,
                     $paths->implode('.')
                 ));
 
@@ -51,7 +54,7 @@ class RuleFactory
             }
         });
 
-        $mutationArgs = data_get($mutationField, 'arguments');
+        $mutationArgs = data_get($fieldDefinition, 'arguments');
 
         return $mutationArgs
             ? $rules->merge($this->getFieldRules($mutationArgs))->toArray()
@@ -77,27 +80,11 @@ class RuleFactory
     }
 
     /**
-     * Get mutation field by name.
-     *
-     * @param DocumentAST $documentAST
-     * @param string      $fieldName
-     *
-     * @return FieldDefinitionNode
-     */
-    protected function getMutationField(DocumentAST $documentAST, $fieldName)
-    {
-        return collect($documentAST->mutationType()->fields)
-            ->first(function (FieldDefinitionNode $field) use ($fieldName) {
-                return $field->name->value === $fieldName;
-            });
-    }
-
-    /**
      * Get nested validation rules.
      *
-     * @param DocumentAST         $documentAST
+     * @param DocumentAST $documentAST
      * @param FieldDefinitionNode $mutationField
-     * @param array               $flatInput
+     * @param array $flatInput
      *
      * @return array
      */
@@ -105,24 +92,27 @@ class RuleFactory
         DocumentAST $documentAST,
         FieldDefinitionNode $mutationField,
         array $flatInput
-    ) {
-        return collect($flatInput)->flip()
+    )
+    {
+        return collect($flatInput)
+            ->flip()
             ->flatMap(function ($path) use ($documentAST, $mutationField) {
                 return $this->getRulesForPath($documentAST, $mutationField, $path);
-            })->filter()->toArray();
+            })
+            ->filter()
+            ->toArray();
     }
 
     /**
      * Generate rules for nested input object.
      *
-     * @param DocumentAST         $documentAST
+     * @param DocumentAST $documentAST
      * @param FieldDefinitionNode $field
-     * @param string              $path
-     * @param bool                $retry
+     * @param string $path
      *
-     * @return array
+     * @return array|null
      */
-    protected function getRulesForPath(DocumentAST $documentAST, FieldDefinitionNode $field, $path, $retry = false)
+    protected function getRulesForPath(DocumentAST $documentAST, FieldDefinitionNode $field, string $path)
     {
         $inputPath = explode('.', $path);
         array_pop($inputPath);
@@ -162,7 +152,7 @@ class RuleFactory
                 $arguments = data_get($node, 'arguments', data_get($node, 'fields'));
             }
 
-            if (! $arguments) {
+            if (!$arguments) {
                 return null;
             }
 
@@ -171,7 +161,7 @@ class RuleFactory
             });
         }, $field);
 
-        if (! $input) {
+        if (!$input) {
             return $this->getRulesForPath($documentAST, $field, $pathKey);
         }
 
@@ -185,25 +175,25 @@ class RuleFactory
     /**
      * Get rules for mutation field.
      *
-     * @param InputValueDefinitionNode[] $nodes
-     * @param string|null                $path
-     * @param bool                       $list
+     * @param NodeList $nodes
+     * @param string|null $path
+     * @param bool $list
      *
      * @return array
      */
-    protected function getFieldRules(NodeList $nodes, $path = null, $list = false)
+    protected function getFieldRules(NodeList $nodes, string $path = null, bool $list = false): array
     {
         $rules = collect($nodes)->map(function (InputValueDefinitionNode $arg) use ($path, $list) {
             $directive = collect($arg->directives)->first(function (DirectiveNode $node) use ($path) {
                 return 'rules' === $node->name->value;
             });
 
-            if (! $directive) {
+            if (!$directive) {
                 return null;
             }
 
             $rules = $this->directiveArgValue($directive, 'apply', []);
-            $path = $list && ! empty($path) ? $path.'.*' : $path;
+            $path = $list && !empty($path) ? $path . '.*' : $path;
             $path = $path ? "{$path}.{$arg->name->value}" : $arg->name->value;
 
             return empty($rules) ? null : compact('path', 'rules');
@@ -223,11 +213,11 @@ class RuleFactory
      *
      * @return Node
      */
-    protected function unwrapType(Node $node)
+    protected function unwrapType(Node $node): Node
     {
-        if (! data_get($node, 'type')) {
+        if (!data_get($node, 'type')) {
             return $node;
-        } elseif (! data_get($node, 'type.name')) {
+        } elseif (!data_get($node, 'type.name')) {
             return $this->unwrapType($node->type);
         }
 
@@ -241,13 +231,13 @@ class RuleFactory
      *
      * @return bool
      */
-    protected function includesList(Node $arg)
+    protected function includesList(Node $arg): bool
     {
         $type = data_get($arg, 'type');
 
         if ($type instanceof ListTypeNode) {
             return true;
-        } elseif (! is_null($type)) {
+        } elseif (!is_null($type)) {
             return $this->includesList($type);
         }
 
