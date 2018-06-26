@@ -101,10 +101,9 @@ class GraphQLField
     public function getRules()
     {
         $arguments = func_get_args();
-        $rules = RuleFactory::build($arguments[1], $arguments[3]);
         $args = $this->args();
 
-        return collect($args)->map(function ($arg, $name) use ($arguments) {
+        $rules = collect($args)->map(function ($arg, $name) use ($arguments) {
             $rules = data_get($arg, 'rules');
 
             if (! $rules) {
@@ -118,6 +117,17 @@ class GraphQLField
         ->merge(call_user_func_array([$this, 'rules'], $arguments))
         ->filter()
         ->toArray();
+
+        if (isset($arguments[1]) &&
+            isset($arguments[3]) &&
+            'mutation' === data_get($arguments[3], 'operation.operation')
+        ) {
+            $rules = array_merge($rules, (new RuleFactory())->build(
+                graphql()->documentAST(), $arguments[1], $arguments[3]->fieldName
+            ));
+        }
+
+        return $rules;
     }
 
     /**

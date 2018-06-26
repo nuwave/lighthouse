@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse;
 
-use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use GraphQL\GraphQL as GraphQLBase;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 
 class GraphQL
@@ -57,9 +57,9 @@ class GraphQL
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry $types
+     * @param TypeRegistry      $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer $nodes
+     * @param NodeContainer     $nodes
      */
     public function __construct(
         DirectiveRegistry $directives,
@@ -145,13 +145,23 @@ class GraphQL
      */
     public function buildSchema()
     {
-        $documentAST = $this->shouldCacheAST()
-        ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
-            return $this->buildAST();
-        })
-        : $this->buildAST();
+        $documentAST = $this->documentAST();
 
         return (new SchemaBuilder())->build($documentAST);
+    }
+
+    /**
+     * Get instance of DocumentAST.
+     *
+     * @return DocumentAST
+     */
+    public function documentAST()
+    {
+        return $this->documentAST = $this->documentAST ?? $this->shouldCacheAST()
+            ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+                return $this->buildAST();
+            })
+            : $this->buildAST();
     }
 
     /**
@@ -222,6 +232,7 @@ class GraphQL
      * * Get the type registry instance.
      *
      * @return TypeRegistry
+     *
      * @deprecated in favour of types()
      */
     public function schema()
