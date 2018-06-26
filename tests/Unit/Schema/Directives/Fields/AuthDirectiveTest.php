@@ -28,6 +28,6 @@ class AuthDirectiveTest extends TestCase
 
         $query = $schema->getType('Query');
         $resolver = array_get($query->config['fields'](), 'user.resolve');
-        $this->assertEquals('bar', data_get($resolver(), 'foo'));
+        $this->assertEquals('bar', data_get($resolver(null, []), 'foo'));
     }
 }

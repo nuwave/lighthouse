@@ -67,12 +67,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | A large part of the Schema generation is parsing into an AST.
-    | This operation is cached by default when APP_ENV is set to 'production'
+    | This operation is pretty expensive so it is recommended to enable
+    | caching in production mode.
     |
     */
     'cache' => [
-        'enable' => true,
-        'key' => 'lighthouse-schema',
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
+        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
     ],
 
     /*
