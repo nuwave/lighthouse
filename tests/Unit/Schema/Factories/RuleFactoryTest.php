@@ -230,21 +230,25 @@ class RuleFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itAlwaysGeneratesRequiredRulesForNestedInputs()
+    public function itAlwaysGeneratesRulesForRequiredNestedInputs()
     {
         $documentAST = ASTBuilder::generate('
         input FooInput {
-            self: FooInput
             required: String @rules(apply: ["required"])
         }
         type Mutation {
-            createFoo(input: FooInput @rules(apply: ["required"])): String
+            createFoo(
+                requiredSDL: FooInput!
+                requiredRules: FooInput @rules(apply: ["required"])
+                requiredBoth: FooInput! @rules(apply: ["required"])
+            ): String
         }');
 
         $rules = $this->factory->build($documentAST, [], 'createFoo');
         $this->assertEquals([
-            'input' => ['required'],
-            'input.required' => ['required'],
+            'requiredSDL.required' => ['required'],
+            'requiredBoth' => ['required'],
+            'requiredBoth.required' => ['required'],
         ], $rules);
     }
     
