@@ -20,6 +20,8 @@ class RuleFactory
 
     protected $resolved = [];
 
+    protected $nestedInputs = [];
+
     /**
      * Build list of rules for field.
      *
@@ -30,32 +32,97 @@ class RuleFactory
      */
     public function build(DocumentAST $documentAST, array $variables, $fieldName)
     {
-        $rules = collect();
         $mutationField = $this->getMutationField($documentAST, $fieldName);
+        $rules = $this->buildMutationRules($mutationField);
 
-        collect(array_keys(array_dot($variables)))->sortByDesc(function ($key) {
+        $inputRules = $this->buildRules(
+            $documentAST,
+            $mutationField,
+            array_keys(array_dot($variables)),
+            true
+        );
+
+        $nestedRules = $this->buildRules(
+            $documentAST,
+            $mutationField,
+            $this->nestedInputs,
+            false
+        );
+
+        $rules = $rules->merge($inputRules->all())->merge($nestedRules->all());
+
+        return $rules->all();
+    }
+
+    /**
+     * Build rules for mutation arguments.
+     *
+     * @param FieldDefinitionNode $mutationField
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function buildMutationRules(FieldDefinitionNode $mutationField)
+    {
+        $mutationArgs = data_get($mutationField, 'arguments');
+        $mutationRules = $mutationArgs ? collect($this->getFieldRules($mutationArgs)) : collect();
+
+        if ($mutationArgs) {
+            collect($mutationField->arguments)->each(function (InputValueDefinitionNode $arg) {
+                if ($name = data_get($arg, 'name.value')) {
+                    $this->nestedInputs = array_merge($this->nestedInputs, [
+                        "{$name}.dummy",
+                    ]);
+                }
+            });
+        }
+
+        return $mutationRules;
+    }
+
+    /**
+     * Build rules from key(s).
+     *
+     * @param DocumentAST         $documentAST
+     * @param FieldDefinitionNode $mutationField,
+     * @param array               $keys
+     * @param bool                $traverseOne
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function buildRules(
+        DocumentAST $documentAST,
+        FieldDefinitionNode $mutationField,
+        $keys,
+        $traverseOne
+    ) {
+        $rules = collect();
+
+        collect($keys)->sortByDesc(function ($key) {
             return strlen($key);
-        })->each(function ($key) use ($documentAST, $mutationField, &$rules) {
+        })->each(function ($key) use ($documentAST, $mutationField, &$rules, $traverseOne) {
             $paths = collect(explode('.', $key))->reject(function ($key) {
                 return is_numeric($key);
             })->values();
 
             while ($paths->isNotEmpty()) {
+                $fullPath = $paths->implode('.');
                 $rules = $rules->merge($this->getRulesForPath(
                     $documentAST,
                     $mutationField,
-                    $paths->implode('.')
+                    $fullPath
                 ));
+
+                if ($traverseOne) {
+                    $this->nestedInputs = array_merge($this->nestedInputs, [
+                        "{$fullPath}.dummy",
+                    ]);
+                }
 
                 $paths->pop();
             }
         });
 
-        $mutationArgs = data_get($mutationField, 'arguments');
-
-        return $mutationArgs
-            ? $rules->merge($this->getFieldRules($mutationArgs))->toArray()
-            : $rules->toArray();
+        return $rules;
     }
 
     /**
@@ -118,12 +185,14 @@ class RuleFactory
      * @param DocumentAST         $documentAST
      * @param FieldDefinitionNode $field
      * @param string              $path
-     * @param bool                $retry
      *
      * @return array
      */
-    protected function getRulesForPath(DocumentAST $documentAST, FieldDefinitionNode $field, $path, $retry = false)
-    {
+    protected function getRulesForPath(
+        DocumentAST $documentAST,
+        FieldDefinitionNode $field,
+        $path
+    ) {
         $inputPath = explode('.', $path);
         array_pop($inputPath);
         $pathKey = implode('.', $inputPath);
