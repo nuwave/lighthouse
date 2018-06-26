@@ -179,4 +179,35 @@ class RuleFactoryTest extends TestCase
             'input.settings.*.setting.value' => ['required'],
         ], $rules);
     }
+
+    /**
+     * @test
+     */
+    public function itGeneratesOnlyMinimalNeededRules()
+    {
+        $documentAST = ASTBuilder::generate('
+        input FooInput {
+            self: FooInput
+            email: String @rules(apply: ["email"])
+        }
+        type Mutation {
+            createFoo(input: FooInput @rules(apply: ["required"])): String
+        }');
+
+        $variables = [
+            'input' => [
+                'self' => [
+                    'self' => [
+                        'email' => 'asdf'
+                    ],
+                ],
+            ],
+        ];
+
+        $rules = $this->factory->build($documentAST, $variables, 'createFoo');
+        $this->assertEquals([
+            'input' => ['required'],
+            'input.self.self.email' => ['email'],
+        ], $rules);
+    }
 }
