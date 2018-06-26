@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
@@ -18,8 +18,9 @@ class FieldFactory
      *
      * @param FieldValue $fieldValue
      *
-     * @return array Configuration array for a FieldDefinition
      * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     *
+     * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
@@ -30,7 +31,6 @@ class FieldFactory
         $initialResolver = $this->hasResolverDirective($fieldValue)
             ? $this->useResolverDirective($fieldValue)
             : $this->defaultResolver($fieldValue);
-
 
         $args = $this->getArgDefinitions($fieldValue);
 
@@ -45,7 +45,6 @@ class FieldFactory
                 return $middleware->handleField($fieldValue);
             }, $fieldValue)
             ->getResolver();
-
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
@@ -76,8 +75,9 @@ class FieldFactory
      *
      * @param FieldValue $value
      *
-     * @return \Closure
      * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     *
+     * @return \Closure
      */
     protected function useResolverDirective(FieldValue $value)
     {
@@ -115,7 +115,7 @@ class FieldFactory
     protected function rootOperationResolver(string $fieldName, string $rootOperationType)
     {
         return function ($obj, array $args, $context = null, $info = null) use ($fieldName, $rootOperationType) {
-            $class = config("lighthouse.namespaces.{$rootOperationType}") . '\\' . studly_case($fieldName);
+            $class = config("lighthouse.namespaces.{$rootOperationType}").'\\'.studly_case($fieldName);
 
             return (new $class($obj, $args, $context, $info))->resolve();
         };
@@ -125,7 +125,7 @@ class FieldFactory
      * Wrap the resolver by injecting additional arg values.
      *
      * @param \Closure $resolver
-     * @param array $additionalArgs
+     * @param array    $additionalArgs
      *
      * @return \Closure
      */
@@ -214,7 +214,7 @@ class FieldFactory
             ->map(function ($inputValueDefinition) use ($resolveArgs) {
                 $rules = data_get($inputValueDefinition, 'rules');
 
-                if (!$rules) {
+                if (! $rules) {
                     return;
                 }
 
@@ -228,8 +228,12 @@ class FieldFactory
         // Nested fields are excluded because they are validated as part of the root field
         $parentOperationType = data_get($resolveInfo, 'parentType.name');
         if ('Mutation' === $parentOperationType || 'Query' === $parentOperationType) {
+            $documentAST = graphql()->documentAST();
             $rules = $rules->merge((new RuleFactory())->build(
-                graphql()->documentAST(), $inputArgs, $resolveInfo->fieldName, $parentOperationType
+                $documentAST,
+                $documentAST->objectTypeDefinition($parentOperationType),
+                $inputArgs,
+                $resolveInfo->fieldName
             ));
         }
 
