@@ -210,4 +210,69 @@ class RuleFactoryTest extends TestCase
             'input.self.self.email' => ['email'],
         ], $rules);
     }
+    
+    /**
+     * @test
+     */
+    public function itAlwaysGeneratesRequiredRules()
+    {
+        $documentAST = ASTBuilder::generate('
+        type Mutation {
+            createFoo(required: String @rules(apply: ["required"])): String
+        }');
+        
+        $rules = $this->factory->build($documentAST, [], 'createFoo');
+        $this->assertEquals([
+            'required' => ['required'],
+        ], $rules);
+    }
+    
+    /**
+     * @test
+     */
+    public function itAlwaysGeneratesRequiredRulesForNestedInputs()
+    {
+        $documentAST = ASTBuilder::generate('
+        input FooInput {
+            self: FooInput
+            required: String @rules(apply: ["required"])
+        }
+        type Mutation {
+            createFoo(input: FooInput @rules(apply: ["required"])): String
+        }');
+
+        $rules = $this->factory->build($documentAST, [], 'createFoo');
+        $this->assertEquals([
+            'input' => ['required'],
+            'input.required' => ['required'],
+        ], $rules);
+    }
+    
+    /**
+     * @test
+     */
+    public function itGeneratesRequiredNestedRulesWhenParentIsGiven()
+    {
+        $documentAST = ASTBuilder::generate('
+        input FooInput {
+            self: FooInput
+            required: String @rules(apply: ["required"])
+        }
+        type Mutation {
+            createFoo(input: FooInput @rules(apply: ["required"])): String
+        }');
+
+        $variables = [
+            'input' => [
+                'self' => []
+            ]
+        ];
+
+        $rules = $this->factory->build($documentAST, $variables, 'createFoo');
+        $this->assertEquals([
+            'input' => ['required'],
+            'input.required' => ['required'],
+            'input.self.required' => ['required'],
+        ], $rules);
+    }
 }
