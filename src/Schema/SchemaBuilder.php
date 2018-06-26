@@ -121,7 +121,7 @@ class SchemaBuilder
      */
     protected function convertDirectives(DocumentAST $document)
     {
-        return $document->directives()->map(function (DirectiveDefinitionNode $directive) {
+        return $document->directiveDefinitions()->map(function (DirectiveDefinitionNode $directive) {
             return new Directive([
                 'name' => $directive->name->value,
                 'locations' => collect($directive->locations)->map(function ($location) {

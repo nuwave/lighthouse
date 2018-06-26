@@ -29,7 +29,7 @@ class ASTBuilderTest extends TestCase
             }
         ');
 
-        $this->assertCount(3, $ast->objectType('Query')->fields);
+        $this->assertCount(3, $ast->objectTypeDefinition('Query')->fields);
     }
 
     /**
@@ -42,9 +42,9 @@ class ASTBuilderTest extends TestCase
             email: String
         }');
 
-        $originalDocument = new DocumentAST($documentAST->documentNode());
+        $originalDocument = new DocumentAST($documentAST->document());
 
-        $userType = $documentAST->objectType('User');
+        $userType = $documentAST->objectTypeDefinition('User');
         $this->assertCount(1, $userType->fields);
 
         $dummyType = PartialParser::objectTypeDefinition('
@@ -57,10 +57,10 @@ class ASTBuilderTest extends TestCase
             $dummyType->fields
         );
 
-        $this->assertCount(1, $documentAST->objectType('User')->fields);
+        $this->assertCount(1, $documentAST->objectTypeDefinition('User')->fields);
 
         $documentAST->setDefinition($userType);
-        $this->assertCount(2, $documentAST->objectType('User')->fields);
-        $this->assertCount(1, $originalDocument->objectType('User')->fields);
+        $this->assertCount(2, $documentAST->objectTypeDefinition('User')->fields);
+        $this->assertCount(1, $originalDocument->objectTypeDefinition('User')->fields);
     }
 }
