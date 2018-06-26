@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
@@ -54,12 +55,19 @@ class GraphQL
     protected $graphqlSchema;
 
     /**
+     * Local instance of DocumentAST.
+     *
+     * @var DocumentAST
+     */
+    protected $documentAST;
+
+    /**
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry $types
+     * @param TypeRegistry      $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer $nodes
+     * @param NodeContainer     $nodes
      */
     public function __construct(
         DirectiveRegistry $directives,
@@ -99,15 +107,15 @@ class GraphQL
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
                     info('GraphQL Error:', [
-                        'code' => $error->getCode(),
+                        'code'    => $error->getCode(),
                         'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
+                        'trace'   => $error->getTraceAsString(),
                     ]);
                 }
             }
 
             return [
-                'data' => $result->data,
+                'data'   => $result->data,
                 'errors' => array_map([$this, 'formatError'], $result->errors),
             ];
         }
@@ -145,13 +153,29 @@ class GraphQL
      */
     public function buildSchema()
     {
-        $documentAST = $this->shouldCacheAST()
-        ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
-            return $this->buildAST();
-        })
-        : $this->buildAST();
+        $documentAST = $this->documentAST();
 
         return (new SchemaBuilder())->build($documentAST);
+    }
+
+    /**
+     * Get instance of DocumentAST.
+     *
+     * @return DocumentAST
+     */
+    public function documentAST()
+    {
+        if ($this->documentAST) {
+            return $this->documentAST;
+        }
+
+        $this->documentAST = $this->shouldCacheAST()
+            ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+                return $this->buildAST();
+            })
+            : $this->buildAST();
+
+        return $this->documentAST;
     }
 
     /**
@@ -222,6 +246,7 @@ class GraphQL
      * * Get the type registry instance.
      *
      * @return TypeRegistry
+     *
      * @deprecated in favour of types()
      */
     public function schema()

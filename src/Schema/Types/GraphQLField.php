@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
+use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 class GraphQLField
@@ -102,7 +103,7 @@ class GraphQLField
         $arguments = func_get_args();
         $args = $this->args();
 
-        return collect($args)->map(function ($arg, $name) use ($arguments) {
+        $rules = collect($args)->map(function ($arg, $name) use ($arguments) {
             $rules = data_get($arg, 'rules');
 
             if (! $rules) {
@@ -116,6 +117,20 @@ class GraphQLField
         ->merge(call_user_func_array([$this, 'rules'], $arguments))
         ->filter()
         ->toArray();
+
+        if (isset($arguments[1]) &&
+            isset($arguments[3]) &&
+            'mutation' === data_get($arguments, '3.operation.operation')
+        ) {
+            $input = data_get($arguments, '1', []);
+            $fieldName = data_get($arguments, '3.fieldName');
+
+            $rules = array_merge($rules, (new RuleFactory())->build(
+                graphql()->documentAST(), $input, $fieldName
+            ));
+        }
+
+        return $rules;
     }
 
     /**
