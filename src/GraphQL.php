@@ -193,7 +193,7 @@ class GraphQL
      */
     protected function shouldCacheAST()
     {
-        return app()->environment('production') && config('cache.enable');
+        return app()->environment('production') && config('lighthouse.cache.enable');
     }
 
     /**
