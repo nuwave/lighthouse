@@ -166,7 +166,7 @@ class GraphQL
     public function documentAST()
     {
         if (! $this->documentAST) {
-            $this->documentAST = $this->shouldCacheAST()
+            $this->documentAST = config('lighthouse.cache.enable')
                 ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
                     return $this->buildAST();
                 })
@@ -184,16 +184,6 @@ class GraphQL
     public function setDocumentAST(DocumentAST $documentAST)
     {
         $this->documentAST = $documentAST;
-    }
-
-    /**
-     * Determine if the AST should be cached.
-     *
-     * @return bool
-     */
-    protected function shouldCacheAST()
-    {
-        return app()->environment('production') && config('lighthouse.cache.enable');
     }
 
     /**
