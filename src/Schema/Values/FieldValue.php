@@ -2,8 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use Closure;
-use GraphQL\Language\AST\FieldDefinitionNode as Field;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\Type;
 
 class FieldValue
@@ -11,14 +10,14 @@ class FieldValue
     /**
      * Current type.
      *
-     * @var Closure
+     * @var \Closure|Type
      */
     protected $type;
 
     /**
      * Current field.
      *
-     * @var Field
+     * @var FieldDefinitionNode
      */
     protected $field;
 
@@ -51,21 +50,20 @@ class FieldValue
     protected $complexity;
 
     /**
-     * Additional args to inject
-     * into resolver.
+     * Additional args to inject into resolver.
      *
      * @var array
      */
-    protected $args = [];
+    protected $additionalArgs = [];
 
     /**
      * Create new field value instance.
      *
      * @param NodeValue $node
-     * @param Field     $field
+     * @param FieldDefinitionNode     $field
      * @param string    $description
      */
-    public function __construct(NodeValue $node, $field, $description = '')
+    public function __construct(NodeValue $node, $field, string $description = '')
     {
         $this->node = $node;
         $this->field = $field;
@@ -76,12 +74,12 @@ class FieldValue
      * Initialize new field value.
      *
      * @param NodeValue $node
-     * @param Field     $field
+     * @param FieldDefinitionNode     $field
      * @param string    $description
      *
-     * @return self
+     * @return FieldValue
      */
-    public static function init(NodeValue $node, Field $field, $description = '')
+    public static function init(NodeValue $node, $field, string $description = ''): FieldValue
     {
         return new static($node, $field, $description);
     }
@@ -89,11 +87,11 @@ class FieldValue
     /**
      * Set current description.
      *
-     * @param Closure|Type $type
+     * @param \Closure|Type $type
      *
-     * @return self
+     * @return FieldValue
      */
-    public function setType($type)
+    public function setType($type): FieldValue
     {
         $this->type = $type;
 
@@ -103,11 +101,11 @@ class FieldValue
     /**
      * Set current resolver.
      *
-     * @param Closure|null $resolver
+     * @param \Closure|null $resolver
      *
      * @return FieldValue
      */
-    public function setResolver(Closure $resolver = null)
+    public function setResolver(\Closure $resolver = null): FieldValue
     {
         $this->resolver = $resolver;
 
@@ -119,9 +117,9 @@ class FieldValue
      *
      * @param string $description
      *
-     * @return self
+     * @return FieldValue
      */
-    public function setDescription($description)
+    public function setDescription(string $description): FieldValue
     {
         $this->description = $description;
 
@@ -135,7 +133,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setComplexity($complexity)
+    public function setComplexity(\Closure $complexity): FieldValue
     {
         $this->complexity = $complexity;
 
@@ -148,11 +146,11 @@ class FieldValue
      * @param string $key
      * @param mixed  $value
      *
-     * @return self
+     * @return FieldValue
      */
-    public function injectArg($key, $value)
+    public function injectArg(string $key, $value): FieldValue
     {
-        $this->args = array_merge($this->args, [
+        $this->additionalArgs = array_merge($this->additionalArgs, [
             $key => $value,
         ]);
 
@@ -160,9 +158,17 @@ class FieldValue
     }
 
     /**
+     * @return array
+     */
+    public function getAdditionalArgs(): array
+    {
+        return $this->additionalArgs;
+    }
+
+    /**
      * Get current type.
      *
-     * @return Closure|Type
+     * @return \Closure|Type
      */
     public function getType()
     {
@@ -174,7 +180,7 @@ class FieldValue
      *
      * @return NodeValue
      */
-    public function getNode()
+    public function getNode(): NodeValue
     {
         return $this->node;
     }
@@ -182,7 +188,7 @@ class FieldValue
     /**
      * Get current field.
      *
-     * @return Field
+     * @return FieldDefinitionNode
      */
     public function getField()
     {
@@ -192,9 +198,9 @@ class FieldValue
     /**
      * Get field resolver.
      *
-     * @return Closure
+     * @return \Closure
      */
-    public function getResolver()
+    public function getResolver(): \Closure
     {
         return $this->resolver;
     }
@@ -204,9 +210,10 @@ class FieldValue
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
-        return $this->description ?: trim(str_replace("\n", '', $this->getField()->description));
+        return $this->description
+            ?: trim(str_replace("\n", '', $this->getField()->description));
     }
 
     /**
@@ -224,7 +231,7 @@ class FieldValue
      *
      * @return string
      */
-    public function getFieldName()
+    public function getFieldName(): string
     {
         return $this->getField()->name->value;
     }
@@ -234,29 +241,8 @@ class FieldValue
      *
      * @return string
      */
-    public function getNodeName()
+    public function getNodeName(): string
     {
         return $this->getNode()->getNodeName();
-    }
-
-    /**
-     * Wrap resolver.
-     *
-     * @param Closure $resolver
-     *
-     * @return Closure
-     */
-    public function wrap(Closure $resolver)
-    {
-        if (empty($this->args)) {
-            return $resolver;
-        }
-
-        return function () use ($resolver) {
-            $args = func_get_args();
-            $args[1] = array_merge($args[1], $this->args);
-
-            return call_user_func_array($resolver, $args);
-        };
     }
 }

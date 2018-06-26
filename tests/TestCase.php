@@ -160,7 +160,12 @@ class TestCase extends BaseTestCase
      */
     protected function buildSchemaFromString($schema)
     {
-        return (new SchemaBuilder())->build(ASTBuilder::generate($schema));
+        $documentAST = ASTBuilder::generate($schema);
+
+        // Inject this into the singleton instance
+        graphql()->setDocumentAST($documentAST);
+
+        return (new SchemaBuilder())->build($documentAST);
     }
 
     /**

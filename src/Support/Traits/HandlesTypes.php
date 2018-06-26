@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use Closure;
+use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
@@ -117,11 +117,11 @@ trait HandlesTypes
 
         if (array_has($config, 'fields')) {
             $config['fields'] = collect($config['fields'])->mapWithKeys(function ($field, $key) {
-                $field['type'] = $field['type'] instanceof Closure
+                $field['type'] = $field['type'] instanceof \Closure
                 ? new SerializableClosure($field['type'])
                 : $field['type'];
 
-                if (array_has($field, 'resolve') && $field['resolve'] instanceof Closure) {
+                if (array_has($field, 'resolve') && $field['resolve'] instanceof \Closure) {
                     $field['resolve'] = new SerializableClosure($field['resolve']);
                 }
 
@@ -167,31 +167,19 @@ trait HandlesTypes
     /**
      * Get fields for node.
      *
-     * @param NodeValue $value
+     * @param NodeValue $nodeValue
      *
-     * @return array
+     * @return FieldDefinition[]
      */
-    protected function getFields(NodeValue $value)
+    protected function getFields(NodeValue $nodeValue): array
     {
-        $factory = $this->fieldFactory();
-
-        return collect($value->getNodeFields())
-            ->mapWithKeys(function ($field) use ($factory, $value) {
-                $fieldValue = new FieldValue($value, $field);
+        return collect($nodeValue->getNodeFields())
+            ->mapWithKeys(function ($field) use ($nodeValue) {
+                $fieldValue = new FieldValue($nodeValue, $field);
 
                 return [
-                    $fieldValue->getFieldName() => $factory->handle($fieldValue),
+                    $fieldValue->getFieldName() => (new FieldFactory())->handle($fieldValue),
                 ];
             })->toArray();
-    }
-
-    /**
-     * Get instance of field factory.
-     *
-     * @return FieldFactory
-     */
-    protected function fieldFactory()
-    {
-        return app(FieldFactory::class);
     }
 }
