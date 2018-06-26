@@ -12,6 +12,7 @@ use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Traits\HandlesDirectives;
 
@@ -26,26 +27,40 @@ class RuleFactory
     /**
      * Build list of rules for field.
      *
+     * @param DocumentAST $documentAST
      * @param array       $variables
-     * @param ResolveInfo $info
+     * @param string      $fieldName
+     * @param string      $parentName
      *
      * @return array
      */
-    public function build(DocumentAST $documentAST, array $variables, $fieldName)
-    {
-        $mutationField = $this->getMutationField($documentAST, $fieldName);
-        $rules = $this->buildMutationRules($mutationField);
+    public function build(
+        DocumentAST $documentAST,
+        ObjectTypeDefinitionNode $parent,
+        array $variables,
+        $fieldName
+    ) {
+        $field = collect($parent->fields)
+            ->first(function (FieldDefinitionNode $field) use ($fieldName) {
+                return $fieldName === $field->name->value;
+            });
+
+        if (! $field) {
+            return [];
+        }
+
+        $rules = $this->buildFieldRules($field);
 
         $inputRules = $this->buildRules(
             $documentAST,
-            $mutationField,
+            $field,
             array_keys(array_dot($variables)),
             true
         );
 
         $nestedRules = $this->buildRules(
             $documentAST,
-            $mutationField,
+            $field,
             $this->nestedInputs,
             false
         );
@@ -62,7 +77,7 @@ class RuleFactory
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function buildMutationRules(FieldDefinitionNode $mutationField)
+    protected function buildFieldRules(FieldDefinitionNode $mutationField)
     {
         $mutationArgs = data_get($mutationField, 'arguments');
         $mutationRules = $mutationArgs ? collect($this->getFieldRules($mutationArgs)) : collect();
@@ -139,22 +154,6 @@ class RuleFactory
         $this->resolved = array_unique(array_merge($this->resolved, [$path]));
 
         return $this->resolved;
-    }
-
-    /**
-     * Get mutation field by name.
-     *
-     * @param DocumentAST $documentAST
-     * @param string      $fieldName
-     *
-     * @return FieldDefinitionNode
-     */
-    protected function getMutationField(DocumentAST $documentAST, $fieldName)
-    {
-        return collect($documentAST->mutationTypeDefinition()->fields)
-            ->first(function (FieldDefinitionNode $field) use ($fieldName) {
-                return $field->name->value === $fieldName;
-            });
     }
 
     /**

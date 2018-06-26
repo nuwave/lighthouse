@@ -30,7 +30,13 @@ class RuleFactoryTest extends TestCase
             createUser(email: String @rules(apply: ["required", "email"])): String
         }');
 
-        $rules = $this->factory->build($documentAST, [], 'createUser');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            [],
+            'createUser'
+        );
+
         $this->assertEquals([
             'email' => ['required', 'email'],
         ], $rules);
@@ -55,7 +61,13 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            $variables,
+            'createUser'
+        );
+
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
@@ -88,7 +100,13 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            $variables,
+            'createUser'
+        );
+
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
@@ -124,7 +142,13 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            $variables,
+            'createUser'
+        );
+
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
@@ -168,7 +192,13 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createUser');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            $variables,
+            'createUser'
+        );
+
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
@@ -190,7 +220,13 @@ class RuleFactoryTest extends TestCase
             createFoo(required: String @rules(apply: ["required"])): String
         }');
 
-        $rules = $this->factory->build($documentAST, [], 'createFoo');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            [],
+            'createFoo'
+        );
+
         $this->assertEquals([
             'required' => ['required'],
         ], $rules);
@@ -213,7 +249,12 @@ class RuleFactoryTest extends TestCase
             ): String
         }');
 
-        $rules = $this->factory->build($documentAST, [], 'createFoo');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            [],
+            'createFoo'
+        );
 
         $this->assertEquals([
             'requiredRules' => ['required'],
@@ -243,7 +284,13 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createFoo');
+        $rules = $this->factory->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            $variables,
+            'createFoo'
+        );
+
         $this->assertEquals([
             'input' => ['required'],
             'input.required' => ['required'],
