@@ -46,7 +46,7 @@ class ASTBuilder
     {
         $originalDocument = $document;
 
-        return $document->typeExtensions()
+        return $document->typeExtensionDefinitions()
         // Unwrap extended types so they can be treated same as other types
             ->map(function (TypeExtensionDefinitionNode $typeExtension) {
                 return $typeExtension->definition;
@@ -69,10 +69,10 @@ class ASTBuilder
 
     protected static function mergeTypeExtensions(DocumentAST $document)
     {
-        $document->objectTypes()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
+        $document->objectTypeDefinitions()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
             $name = $objectType->name->value;
 
-            $document->typeExtensions($name)->reduce(function (
+            $document->typeExtensionDefinitions($name)->reduce(function (
                 ObjectTypeDefinitionNode $relatedObjectType,
                 TypeExtensionDefinitionNode $typeExtension
             ) {
@@ -99,7 +99,7 @@ class ASTBuilder
     {
         $originalDocument = $document;
 
-        return $document->objectTypes()->reduce(function (
+        return $document->objectTypeDefinitions()->reduce(function (
             DocumentAST $document,
             ObjectTypeDefinitionNode $objectType
         ) use ($originalDocument) {
@@ -129,7 +129,7 @@ class ASTBuilder
     {
         $originalDocument = $document;
 
-        return $document->objectTypes()->reduce(
+        return $document->objectTypeDefinitions()->reduce(
             function (DocumentAST $document, ObjectTypeDefinitionNode $parentType) use ($originalDocument) {
                 return collect($parentType->fields)->reduce(
                     function (DocumentAST $document, FieldDefinitionNode $parentField) use (
@@ -170,7 +170,7 @@ class ASTBuilder
      */
     protected static function addNodeSupport(DocumentAST $document)
     {
-        $hasTypeImplementingNode = $document->objectTypes()->contains(function (ObjectTypeDefinitionNode $objectType) {
+        $hasTypeImplementingNode = $document->objectTypeDefinitions()->contains(function (ObjectTypeDefinitionNode $objectType) {
             return collect($objectType->interfaces)->contains(function (NamedTypeNode $interface) {
                 return 'Node' === $interface->name->value;
             });

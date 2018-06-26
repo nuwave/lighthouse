@@ -86,7 +86,7 @@ class RuleFactory
      */
     protected function getMutationField(DocumentAST $documentAST, $fieldName)
     {
-        return collect($documentAST->mutationType()->fields)
+        return collect($documentAST->mutationTypeDefinition()->fields)
             ->first(function (FieldDefinitionNode $field) use ($fieldName) {
                 return $field->name->value === $fieldName;
             });
@@ -153,7 +153,7 @@ class RuleFactory
             if ($node instanceof InputObjectTypeDefinitionNode) {
                 $arguments = $node->fields;
             } elseif ($node instanceof InputValueDefinitionNode) {
-                $inputType = $documentAST->inputType($this->unwrapType($node->type)->name->value);
+                $inputType = $documentAST->inputObjectTypeDefinition($this->unwrapType($node->type)->name->value);
                 $arguments = $inputType ? $inputType->fields : null;
             } elseif ($node instanceof FieldDefinitionNode) {
                 $arguments = $node->arguments;
@@ -177,7 +177,7 @@ class RuleFactory
 
         $list = $this->includesList($input);
         $type = $this->unwrapType($input);
-        $inputType = $documentAST->inputType($type->name->value);
+        $inputType = $documentAST->inputObjectTypeDefinition($type->name->value);
 
         return $inputType ? $this->getFieldRules($inputType->fields, $resolvedPath->implode('.'), $list) : null;
     }
