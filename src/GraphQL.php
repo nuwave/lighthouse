@@ -65,9 +65,9 @@ class GraphQL
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry $types
+     * @param TypeRegistry      $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer $nodes
+     * @param NodeContainer     $nodes
      */
     public function __construct(
         DirectiveRegistry $directives,
@@ -136,6 +136,7 @@ class GraphQL
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
+        $this->documentAST->lock();
 
         return GraphQLBase::executeQuery(
             $schema,
