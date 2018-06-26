@@ -21,9 +21,17 @@ use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Exceptions\DocumentASTException;
 
 class DocumentAST
 {
+    /**
+     * Check if documentAST is currently locked.
+     *
+     * @var bool
+     */
+    protected $locked = false;
+
     /**
      * @var DocumentNode
      */
@@ -52,6 +60,30 @@ class DocumentAST
     }
 
     /**
+     * Mark the AST as locked.
+     *
+     * @return self
+     */
+    public function lock()
+    {
+        $this->locked = true;
+
+        return $this;
+    }
+
+    /**
+     * Mark the AST as unlocked.
+     *
+     * @return self
+     */
+    public function unlock()
+    {
+        $this->locked = false;
+
+        return $this;
+    }
+
+    /**
      * Get an instance of the underlying document node.
      *
      * @return DocumentNode
@@ -68,7 +100,9 @@ class DocumentAST
      */
     public function definitions(): Collection
     {
-        return collect($this->documentNode->definitions)->map(function (Node $node) {
+        $definitions = collect($this->documentNode->definitions);
+
+        return $this->locked ? $definitions : $definitions->map(function (Node $node) {
             $clone = ASTHelper::cloneNode($node);
             $clone->spl_object_hash = spl_object_hash($node);
             if ($node instanceof TypeExtensionDefinitionNode) {
@@ -239,11 +273,11 @@ class DocumentAST
     protected function objectTypeOrDefault(string $name): ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition($name)
-            ?? PartialParser::objectTypeDefinition('type ' . $name . '{}');
+            ?? PartialParser::objectTypeDefinition('type '.$name.'{}');
     }
 
     /**
-     * Get all definitions of a
+     * Get all definitions of a.
      *
      * @param string $typeClassName
      *
@@ -280,9 +314,15 @@ class DocumentAST
      */
     public function setDefinition(DefinitionNode $newDefinition): DocumentAST
     {
+        if ($this->locked) {
+            $nodeName = data_get($newDefinition, 'name.value', 'Node');
+            $message = "{$nodeName} cannot be added to the DocumentAST while it is locked.";
+            throw new DocumentASTException($message);
+        }
+
         $originalDefinitions = collect($this->documentNode->definitions);
 
-        if (!$newHashID = data_get($newDefinition, 'spl_object_hash')) {
+        if (! $newHashID = data_get($newDefinition, 'spl_object_hash')) {
             // This means the new definition is not a clone, so we do
             // not have to look for an existing definition to replace
             $newDefinitions = $originalDefinitions->push($newDefinition);
@@ -307,9 +347,9 @@ class DocumentAST
                 return $originalDefinition;
             });
 
-            if (!$found) {
+            if (! $found) {
                 $newDefinitions = $newDefinitions->push($newDefinition);
-            };
+            }
         }
 
         $newDefinitions = $newDefinitions

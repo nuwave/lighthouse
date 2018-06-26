@@ -65,9 +65,9 @@ class GraphQL
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry $types
+     * @param TypeRegistry      $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer $nodes
+     * @param NodeContainer     $nodes
      */
     public function __construct(
         DirectiveRegistry $directives,
@@ -173,7 +173,7 @@ class GraphQL
                 : $this->buildAST();
         }
 
-        return $this->documentAST;
+        return $this->documentAST->lock();
     }
 
     /**
