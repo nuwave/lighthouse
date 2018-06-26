@@ -223,7 +223,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createFoo');
+        $rules = $this->factory->build($documentAST, $variables, 'createFoo', 'Mutation');
         $this->assertEquals([
             'input' => ['required'],
             'input.self.self.email' => ['email'],
@@ -240,7 +240,7 @@ class RuleFactoryTest extends TestCase
             createFoo(required: String @rules(apply: ["required"])): String
         }');
         
-        $rules = $this->factory->build($documentAST, [], 'createFoo');
+        $rules = $this->factory->build($documentAST, [], 'createFoo', 'Mutation');
         $this->assertEquals([
             'required' => ['required'],
         ], $rules);
@@ -263,7 +263,7 @@ class RuleFactoryTest extends TestCase
             ): String
         }');
 
-        $rules = $this->factory->build($documentAST, [], 'createFoo');
+        $rules = $this->factory->build($documentAST, [], 'createFoo', 'Mutation');
         $this->assertEquals([
             'requiredSDL.required' => ['required'],
             'requiredBoth' => ['required'],
@@ -291,7 +291,7 @@ class RuleFactoryTest extends TestCase
             ]
         ];
 
-        $rules = $this->factory->build($documentAST, $variables, 'createFoo');
+        $rules = $this->factory->build($documentAST, $variables, 'createFoo', 'Mutation');
         $this->assertEquals([
             'input' => ['required'],
             'input.required' => ['required'],

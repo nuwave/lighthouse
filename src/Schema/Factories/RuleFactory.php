@@ -31,7 +31,7 @@ class RuleFactory
     {
         $rules = collect();
 
-        $fieldDefinition = collect($documentAST->objectType($parentType)->fields)
+        $fieldDefinition = collect($documentAST->objectTypeDefinition($parentType)->fields)
             ->first(function (FieldDefinitionNode $fieldDefinition) use ($fieldName) {
                 return $fieldName === $fieldDefinition->name->value;
             });
