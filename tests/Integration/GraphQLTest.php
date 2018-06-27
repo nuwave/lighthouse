@@ -10,6 +10,27 @@ use Tests\Utils\Models\User;
 class GraphQLTest extends DBTestCase
 {
     use RefreshDatabase;
+    
+    protected $schema = '
+    type User {
+        id: ID!
+        name: String!
+        email: String!
+        created_at: String!
+        updated_at: String!
+        tasks: [Task!]! @hasMany
+    }
+    type Task {
+        id: ID!
+        name: String!
+        created_at: String!
+        updated_at: String!
+        user: User! @belongsTo
+    }
+    type Query {
+        user: User @auth
+    }
+    ';
 
     /**
      * Auth user.
@@ -34,29 +55,6 @@ class GraphQLTest extends DBTestCase
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('lighthouse.route_enable_get', true);
-
-        $path = $this->store('schema.graphql', '
-        type User {
-            id: ID!
-            name: String!
-            email: String!
-            created_at: String!
-            updated_at: String!
-            tasks: [Task!]! @hasMany
-        }
-        type Task {
-            id: ID!
-            name: String!
-            created_at: String!
-            updated_at: String!
-            user: User! @belongsTo
-        }
-        type Query {
-            user: User @auth
-        }
-        ');
-
-        $app['config']->set('lighthouse.schema.register', $path);
     }
 
     /**

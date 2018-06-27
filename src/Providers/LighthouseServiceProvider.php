@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
 
 class LighthouseServiceProvider extends ServiceProvider
@@ -49,6 +51,13 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
 
+        $this->app->bind(
+            SchemaSourceProvider::class,
+            function () {
+                return new SchemaStitcher(config('lighthouse.schema.register', ''));
+            }
+        );
+        
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Nuwave\Lighthouse\Console\ClearCacheCommand::class,

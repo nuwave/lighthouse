@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use PHPUnit\Framework\TestCase;
 
 class SchemaStitcherTest extends TestCase
@@ -56,7 +56,8 @@ class SchemaStitcherTest extends TestCase
      */
     public function itConcatsSchemas()
     {
-        $schema = SchemaStitcher::stitch(__DIR__.'/schema/baz.graphql');
+        $schema = (new SchemaStitcher(__DIR__.'/schema/baz.graphql'))->getSchemaString();
+        
         $this->assertContains('type Baz', $schema);
     }
 
@@ -65,7 +66,8 @@ class SchemaStitcherTest extends TestCase
      */
     public function itCanImportSchemas()
     {
-        $schema = SchemaStitcher::stitch(__DIR__.'/foo.graphql');
+        $schema = (new SchemaStitcher(__DIR__.'/foo.graphql'))->getSchemaString();
+        
         $this->assertContains('type Foo', $schema);
         $this->assertContains('type Bar', $schema);
         $this->assertContains('type Baz', $schema);

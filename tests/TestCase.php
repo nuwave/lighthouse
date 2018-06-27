@@ -2,15 +2,25 @@
 
 namespace Tests;
 
-use GraphQL\GraphQL;
+use GraphQL\Executor\ExecutionResult;
 use GraphQL\Language\Parser;
+use GraphQL\Type\Schema;
 use Laravel\Scout\ScoutServiceProvider;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
+    /**
+     * This variable is injected the main GraphQL class
+     * during execution of each test. It may be set either
+     * for an entire test class or for a single test.
+     *
+     * @var string
+     */
+    protected $schema = '';
+    
     /**
      * Get package providers.
      *
@@ -21,21 +31,9 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            \Nuwave\Lighthouse\Providers\LighthouseServiceProvider::class,
+            LighthouseServiceProvider::class,
             ScoutServiceProvider::class,
         ];
-    }
-
-    /**
-     * Get package aliases.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     *
-     * @return array
-     */
-    protected function getPackageAliases($app)
-    {
-        return [];
     }
 
     /**
@@ -45,8 +43,14 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $app->bind(
+            SchemaSourceProvider::class,
+            function () {
+                return new TestSchemaProvider($this->schema);
+            }
+        );
+        
         $app['config']->set('lighthouse.directives', []);
-        $app['config']->set('lighthouse.schema.register', null);
         $app['config']->set('lighthouse.global_id_field', '_id');
 
         $app['config']->set(
@@ -71,30 +75,6 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * Load schema from directory.
-     *
-     * @param string $schema
-     *
-     * @return string
-     */
-    protected function loadSchema($schema = 'schema.graphql')
-    {
-        return file_get_contents(__DIR__."/Utils/Schemas/{$schema}");
-    }
-
-    /**
-     * Get parsed schema.
-     *
-     * @param string $schema
-     *
-     * @return \GraphQL\Language\AST\DocumentNode
-     */
-    protected function parseSchema($schema = 'schema.graphql')
-    {
-        return Parser::parse($this->loadSchema($schema));
-    }
-
-    /**
      * Parse raw schema.
      *
      * @param string $schema
@@ -116,56 +96,16 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function execute($schema, $query, $lighthouse = false, $variables = [])
+    protected function execute($schema, $query, $lighthouse = false, $variables = []): ExecutionResult
     {
         if ($lighthouse) {
-            $addDefaultSchema = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
-            $schema = $addDefaultSchema."\n".$schema;
+            $addDefaultSchema = file_get_contents(realpath(__DIR__ . '/../assets/schema.graphql'));
+            $schema = $addDefaultSchema . "\n" . $schema;
         }
 
-        return GraphQL::executeQuery(
-            $this->buildSchemaFromString($schema),
-            $query,
-            null,
-            null,
-            $variables
-        );
-    }
-
-    /**
-     * Store file contents.
-     *
-     * @param string $fileName
-     * @param string $contents
-     *
-     * @return string
-     */
-    protected function store($fileName, $contents)
-    {
-        $path = __DIR__.'/storage/'.$fileName;
-
-        if (file_exists(__DIR__.'/storage/'.$fileName)) {
-            unlink($path);
-        }
-
-        file_put_contents($path, $contents);
-
-        return $path;
-    }
-
-    /**
-     * @param string $schema
-     *
-     * @return \GraphQL\Type\Schema
-     */
-    protected function buildSchemaFromString($schema)
-    {
-        $documentAST = ASTBuilder::generate($schema);
-
-        // Inject this into the singleton instance
-        graphql()->setDocumentAST($documentAST);
-
-        return (new SchemaBuilder())->build($documentAST);
+        $this->schema = $schema;
+        
+        return graphql()->queryAndReturnResult($query, null, $variables);
     }
 
     /**
@@ -176,12 +116,24 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaWithDefaultQuery($schema)
+    protected function buildSchemaWithDefaultQuery($schema): Schema
     {
-        return $this->buildSchemaFromString($schema.'
+        return $this->buildSchemaFromString($schema . '
             type Query {
                 dummy: String
             }
         ');
+    }
+    
+    /**
+     * @param string $schema
+     *
+     * @return \GraphQL\Type\Schema
+     */
+    protected function buildSchemaFromString(string $schema): Schema
+    {
+        $this->schema = $schema;
+        
+        return graphql()->buildSchema();
     }
 }
