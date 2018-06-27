@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class HasManyDirectiveTest extends DBTestCase
 {
@@ -74,8 +74,12 @@ class HasManyDirectiveTest extends DBTestCase
         $schema = '
         type User {
             tasks: [Task!]! @hasMany(type:"paginator")
+            posts: [Post!]! @hasMany(type:"paginator")
         }
         type Task {
+            id: Int!
+        }
+        type Post {
             id: Int!
         }
         type Query {

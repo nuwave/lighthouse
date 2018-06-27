@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\DefinitionNode;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\FragmentDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
-use GraphQL\Language\Parser;
 use Illuminate\Support\Collection;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\DefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\FragmentDefinitionNode;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Exceptions\DocumentASTException;
 
 class DocumentAST
@@ -104,12 +104,8 @@ class DocumentAST
 
         return $this->locked ? $definitions : $definitions->map(function (Node $node) {
             $clone = ASTHelper::cloneNode($node);
-            $clone->spl_object_hash = spl_object_hash($node);
-            if ($node instanceof TypeExtensionDefinitionNode) {
-                $clone->definition->spl_object_hash = spl_object_hash($node->definition);
-            }
 
-            return $clone;
+            return $this->assignDefinitionNodeHash($clone, $node);
         });
     }
 
@@ -330,12 +326,11 @@ class DocumentAST
             $found = false;
 
             $newDefinitions = $originalDefinitions->map(function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
-                $originalHashID = $originalDefinition instanceof TypeExtensionDefinitionNode
-                    ? spl_object_hash($originalDefinition->definition)
-                    : spl_object_hash($originalDefinition);
+                $originalHashID = $this->getDefinitionNodeHash($originalDefinition, true);
 
                 if ($originalHashID === $newHashID) {
                     $found = true;
+                    $newDefinition->spl_object_hash = $originalHashID;
 
                     if ($originalDefinition instanceof TypeExtensionDefinitionNode) {
                         $originalDefinition->definition = $newDefinition;
@@ -361,5 +356,48 @@ class DocumentAST
         $this->documentNode->definitions = new NodeList($newDefinitions);
 
         return $this;
+    }
+
+    /**
+     * Get node's original/current has.
+     *
+     * @param DefinitionNode $node
+     *
+     * @return string
+     */
+    protected function getDefinitionNodeHash(DefinitionNode $node, $unwrap = false): string
+    {
+        return $node instanceof TypeExtensionDefinitionNode && $unwrap
+            ? data_get($node, 'definition.spl_object_hash', spl_object_hash($node->definition))
+            : data_get($node, 'spl_object_hash', spl_object_hash($node));
+    }
+
+    /**
+     * Assign definition node(s) a hash.
+     *
+     * @param DefinitionNode $newDefinition
+     * @param DefinitionNode $currentDefinition
+     *
+     * @return DefinitionNode
+     */
+    protected function assignDefinitionNodeHash(
+        DefinitionNode $newDefinition,
+        DefinitionNode $currentDefinition = null
+    ): DefinitionNode {
+        $newDefinition->spl_object_hash = data_get(
+            $currentDefinition,
+            'spl_object_hash',
+            spl_object_hash($currentDefinition)
+        );
+
+        if ($currentDefinition instanceof TypeExtensionDefinitionNode) {
+            $newDefinition->definition->spl_object_hash = data_get(
+                $currentDefinition,
+                'definition.spl_object_hash',
+                spl_object_hash($currentDefinition->definition)
+            );
+        }
+
+        return $newDefinition;
     }
 }
