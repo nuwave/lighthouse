@@ -7,39 +7,27 @@ use Tests\TestCase;
 
 class GraphQLTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $path = $this->store('schema.graphql', '
-        type User {
-            id: ID!
-            created_at: String!
-            updated_at: String!
-        }
-        type Query {
-            user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
-        }
-        ');
-
-        $app['config']->set('lighthouse.schema.register', $path);
+    protected $schema = '
+    type User {
+        id: ID!
+        created_at: String!
+        updated_at: String!
     }
-
+    type Query {
+        user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
+    }
+    ';
+    
     /**
      * @test
      */
     public function itCanBuildGraphQLSchema()
     {
         $schema = graphql()->buildSchema();
-
+        
         $this->assertInstanceOf(Schema::class, $schema);
     }
-
+    
     /**
      * @test
      */
@@ -54,18 +42,20 @@ class GraphQLTest extends TestCase
             }
         }
         ';
-
-        $expected = ['data' => [
-            'user' => [
-                'id' => 1,
-                'created_at' => now()->format('Y-m-d'),
-                'updated_at' => now()->format('Y-m-d'),
+        
+        $expected = [
+            'data' => [
+                'user' => [
+                    'id' => 1,
+                    'created_at' => now()->format('Y-m-d'),
+                    'updated_at' => now()->format('Y-m-d'),
+                ],
             ],
-        ]];
-
+        ];
+        
         $this->assertEquals($expected, graphql()->execute($query));
     }
-
+    
     public function user($root, array $args, $context, $info)
     {
         return [

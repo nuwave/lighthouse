@@ -2,12 +2,14 @@
 
 namespace Nuwave\Lighthouse;
 
+use GraphQL\Deferred;
+use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
 use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\NodeContainer;
@@ -83,8 +85,10 @@ class GraphQL
 
     /**
      * Prepare graphql schema.
+     *
+     * @return Schema
      */
-    public function prepSchema()
+    public function prepSchema(): Schema
     {
         return $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
     }
@@ -99,7 +103,7 @@ class GraphQL
      *
      * @return array
      */
-    public function execute($query, $context = null, $variables = [], $rootValue = null)
+    public function execute($query, $context = null, $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
@@ -133,7 +137,7 @@ class GraphQL
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null)
+    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
 
@@ -151,7 +155,7 @@ class GraphQL
      *
      * @return Schema
      */
-    public function buildSchema()
+    public function buildSchema(): Schema
     {
         $documentAST = $this->documentAST();
 
@@ -163,7 +167,7 @@ class GraphQL
      *
      * @return DocumentAST
      */
-    public function documentAST()
+    public function documentAST(): DocumentAST
     {
         if (! $this->documentAST) {
             $this->documentAST = config('lighthouse.cache.enable')
@@ -187,15 +191,13 @@ class GraphQL
     }
 
     /**
-     * Get the stitched schema and build an AST out of it.
+     * Get the schema string and build an AST out of it.
      *
      * @return DocumentAST
      */
-    protected function buildAST()
+    protected function buildAST(): DocumentAST
     {
-        $schemaString = SchemaStitcher::stitch(
-            config('lighthouse.schema.register')
-        );
+        $schemaString = app(SchemaSourceProvider::class)->getSchemaString();
 
         return ASTBuilder::generate($schemaString);
     }
@@ -210,7 +212,7 @@ class GraphQL
      *
      * @return \GraphQL\Deferred
      */
-    public function batch($abstract, $key, array $data = [], $name = null)
+    public function batch($abstract, $key, array $data = [], $name = null): Deferred
     {
         $name = $name ?: $abstract;
         $instance = app()->has($name)
@@ -225,7 +227,7 @@ class GraphQL
      *
      * @return DirectiveRegistry
      */
-    public function directives()
+    public function directives(): DirectiveRegistry
     {
         return $this->directives;
     }
@@ -235,7 +237,7 @@ class GraphQL
      *
      * @return TypeRegistry
      */
-    public function types()
+    public function types(): TypeRegistry
     {
         return $this->types;
     }
@@ -247,7 +249,7 @@ class GraphQL
      *
      * @deprecated in favour of types()
      */
-    public function schema()
+    public function schema(): TypeRegistry
     {
         return $this->types();
     }
@@ -257,7 +259,7 @@ class GraphQL
      *
      * @return MiddlewareManager
      */
-    public function middleware()
+    public function middleware(): MiddlewareManager
     {
         return $this->middleware;
     }
@@ -267,7 +269,7 @@ class GraphQL
      *
      * @return NodeContainer
      */
-    public function nodes()
+    public function nodes(): NodeContainer
     {
         return $this->nodes;
     }
