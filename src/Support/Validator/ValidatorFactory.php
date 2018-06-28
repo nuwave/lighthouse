@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Validator;
 
-use Illuminate\Validation\Validator;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Validation\Validator;
 
 class ValidatorFactory
 {
@@ -47,31 +47,6 @@ class ValidatorFactory
         $info = $validator->getResolveInfo();
 
         if ('Mutation' !== data_get($info, 'parentType.name')) {
-            return true;
-        }
-
-        if (in_array($info->fieldName, $parameters)) {
-            return ! empty($value);
-        }
-
-        return true;
-    }
-
-    /**
-     * Validate the value is present on a query field.
-     *
-     * @param string           $attribute
-     * @param mixed            $value
-     * @param array            $parameters
-     * @param GraphQLValidator $validator
-     *
-     * @return bool
-     */
-    public function requiredWithQuery($attribute, $value, $parameters, $validator)
-    {
-        $info = $validator->getResolveInfo();
-
-        if ('Query' !== data_get($info, 'parentType.name')) {
             return true;
         }
 

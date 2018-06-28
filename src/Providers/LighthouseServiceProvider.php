@@ -102,6 +102,5 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         Validator::extendImplicit('required_with_mutation', ValidatorFactory::class.'@requiredWithMutation');
-        Validator::extendImplicit('required_with_query', ValidatorFactory::class.'@requiredWithQuery');
     }
 }
