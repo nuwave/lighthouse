@@ -8,18 +8,6 @@ use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 
 class RuleFactoryTest extends TestCase
 {
-    protected $factory;
-
-    /**
-     * Set up test environment.
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->factory = new RuleFactory();
-    }
-
     /**
      * @test
      */
@@ -30,7 +18,7 @@ class RuleFactoryTest extends TestCase
             createUser(email: String @rules(apply: ["required", "email"])): String
         }');
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             [],
@@ -61,7 +49,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             $variables,
@@ -100,7 +88,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             $variables,
@@ -142,7 +130,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             $variables,
@@ -192,7 +180,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             $variables,
@@ -220,7 +208,7 @@ class RuleFactoryTest extends TestCase
             createFoo(required: String @rules(apply: ["required"])): String
         }');
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             [],
@@ -249,7 +237,7 @@ class RuleFactoryTest extends TestCase
             ): String
         }');
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             [],
@@ -284,7 +272,7 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = $this->factory->build(
+        $rules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             $variables,
@@ -296,5 +284,45 @@ class RuleFactoryTest extends TestCase
             'input.required' => ['required'],
             'input.self.required' => ['required'],
         ], $rules);
+    }
+    
+    /**
+     * @test
+     */
+    public function itHandlesNestedRulesOnQueriesAndMutations()
+    {
+        $documentAST = ASTBuilder::generate('
+        input Foo {
+            bar: Int @rules(apply: ["required"])
+        }
+        type Mutation {
+            foo(input: Foo): String
+        }
+        type Query {
+            foo(input: Foo): String
+        }
+        ');
+    
+        $variables = [
+            'input' => [
+                'bar' => 42,
+            ],
+        ];
+    
+        $mutationRules = (new RuleFactory())->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Mutation'),
+            $variables,
+            'foo'
+        );
+        
+        $queryRules = (new RuleFactory())->build(
+            $documentAST,
+            $documentAST->objectTypeDefinition('Query'),
+            $variables,
+            'foo'
+        );
+        
+        $this->assertSame($mutationRules, $queryRules);
     }
 }
