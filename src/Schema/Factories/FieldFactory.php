@@ -239,10 +239,10 @@ class FieldFactory
             })
             ->filter();
 
-        // Rules are applied to the fields which are on the root Mutation type.
+        // Rules are applied to the fields which are on one of the root operation types.
         // Nested fields are excluded because they are validated as part of the root field.
         $parentOperationType = data_get($resolveInfo, 'parentType.name');
-        if ('Mutation' === $parentOperationType) {
+        if ('Mutation' === $parentOperationType || 'Query' === $parentOperationType) {
             $documentAST = graphql()->documentAST();
             $rules = $rules->merge((new RuleFactory())->build(
                 $documentAST,

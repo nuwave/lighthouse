@@ -11,15 +11,27 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanValidateQueryRootFieldArguments()
     {
-        $query = '{
-            me {
+        $query = '
+        {
+            foo {
                 first_name
             }
-        }';
+        }
+        ';
 
         $result = $this->executeAndFormat($this->schema(), $query, false, [], true);
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
-        $this->assertNull($result['data']['me']);
+        $this->assertNull($result['data']['foo']);
+        
+        $mutation = '
+        mutation {
+            foo {
+                first_name
+            }
+        }
+        ';
+        $mutationResult = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
+        $this->assertSame($result, $mutationResult);
     }
 
     /**
@@ -27,19 +39,34 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanReturnValidFieldsAndErrorMessagesForInvalidFields()
     {
-        $query = '{
-            me(required: "foo") {
+        $query = '
+        {
+            foo(bar: "foo") {
                 first_name
                 last_name
                 full_name
             }
-        }';
+        }
+        ';
 
         $result = $this->executeAndFormat($this->schema(), $query, false, [], true);
-        $this->assertEquals('John', array_get($result, 'data.me.first_name'));
-        $this->assertEquals('Doe', array_get($result, 'data.me.last_name'));
-        $this->assertNull(array_get($result, 'data.me.full_name'));
+        $this->assertEquals('John', array_get($result, 'data.foo.first_name'));
+        $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
+        $this->assertNull(array_get($result, 'data.foo.full_name'));
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
+    
+        $mutation = '
+        mutation {
+            foo(bar: "foo") {
+                first_name
+                last_name
+                full_name
+            }
+        }
+        ';
+        
+        $mutationResult = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
+        $this->assertSame($result, $mutationResult);
     }
 
     /**
@@ -54,11 +81,25 @@ class RulesDirectiveTest extends TestCase
                 last_name
                 full_name
             }
-        }';
+        }
+        ';
 
         $result = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
         $this->assertNull(array_get($result, 'data.foo'));
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
+        
+        $query = '
+        {
+            foo {
+                first_name
+                last_name
+                full_name
+            }
+        }
+        ';
+    
+        $queryResult = $this->executeAndFormat($this->schema(), $query, false, [], true);
+        $this->assertSame($result, $queryResult);
     }
 
     /**
@@ -73,13 +114,27 @@ class RulesDirectiveTest extends TestCase
                 last_name
                 full_name
             }
-        }';
+        }
+        ';
 
         $result = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
         $this->assertEquals('John', array_get($result, 'data.foo.first_name'));
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
+    
+        $query = '
+        {
+            foo(bar: "foo") {
+                first_name
+                last_name
+                full_name
+            }
+        }
+        ';
+    
+        $queryResult = $this->executeAndFormat($this->schema(), $query, false, [], true);
+        $this->assertSame($result, $queryResult);
     }
 
     public function resolve()
@@ -106,7 +161,7 @@ class RulesDirectiveTest extends TestCase
                 @field(resolver: \"{$resolver}\")
         }
         type Query {
-            me(required: String @rules(apply: [\"required\"])): User
+            foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
         }";
     }

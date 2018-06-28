@@ -30,10 +30,7 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
      */
     public function handleArgument(ArgumentValue $value)
     {
-        // Mutation arguments are handled in the RuleFactory. This check
-        // should be unnecessary when additional interfaces are created for
-        // more fine-grain control.
-        if ('Mutation' === $value->getField()->getNodeName()) {
+        if (in_array($value->getField()->getNodeName(), ['Query', 'Mutation'])) {
             return $value;
         }
 
