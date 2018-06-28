@@ -157,6 +157,16 @@ class FieldFactory
             });
     }
 
+    /**
+     * Wrap field resolver function w/ validation logic.
+     *
+     * @param \Closure                       $resolver
+     * @param \Illuminate\Support\Collection $inputValueDefinitions
+     *
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\ValidationError
+     *
+     * @return \Closure
+     */
     protected function wrapResolverWithValidation(\Closure $resolver, $inputValueDefinitions)
     {
         return function ($rootValue, $inputArgs, $context = null, $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
@@ -165,7 +175,12 @@ class FieldFactory
             $rules = $this->getRules($rootValue, $inputArgs, $context, $resolveInfo, $inputValueDefinitions);
 
             if (sizeof($rules)) {
-                $validator = validator($inputArgs, $rules);
+                $validator = validator($inputArgs, $rules, [], [
+                    'root' => $rootValue,
+                    'context' => $context,
+                    'resolveInfo' => $resolveInfo,
+                ]);
+
                 if ($validator->fails()) {
                     throw with(new ValidationError('validation'))->setValidator($validator);
                 }
@@ -224,10 +239,10 @@ class FieldFactory
             })
             ->filter();
 
-        // Rules are applied to the fields which are on the root operation types
-        // Nested fields are excluded because they are validated as part of the root field
+        // Rules are applied to the fields which are on the root Mutation type.
+        // Nested fields are excluded because they are validated as part of the root field.
         $parentOperationType = data_get($resolveInfo, 'parentType.name');
-        if ('Mutation' === $parentOperationType || 'Query' === $parentOperationType) {
+        if ('Mutation' === $parentOperationType) {
             $documentAST = graphql()->documentAST();
             $rules = $rules->merge((new RuleFactory())->build(
                 $documentAST,
