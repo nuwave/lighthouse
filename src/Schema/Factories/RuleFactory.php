@@ -6,11 +6,11 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -24,14 +24,14 @@ class RuleFactory
     protected $resolved = [];
 
     protected $nestedInputs = [];
-    
+
     /**
      * Build list of rules for field.
      *
-     * @param DocumentAST $documentAST
+     * @param DocumentAST              $documentAST
      * @param ObjectTypeDefinitionNode $parent
-     * @param array $variables
-     * @param string $fieldName
+     * @param array                    $variables
+     * @param string                   $fieldName
      *
      * @return array
      */
@@ -68,7 +68,17 @@ class RuleFactory
 
         $rules = $rules->merge($inputRules->all())->merge($nestedRules->all());
 
-        return $rules->all();
+        return [
+            'rules' => $rules->mapWithKeys(function ($rule, $key) {
+                return [$key => $rule['rules']];
+            })->toArray(),
+            'messages' => $rules->flatMap(function ($rule, $key) {
+                return collect($rule['messages'])
+                    ->mapWithKeys(function ($message, $path) use ($key) {
+                        return ["{$key}.{$path}" => $message];
+                    });
+            })->toArray(),
+        ];
     }
 
     /**
@@ -262,7 +272,7 @@ class RuleFactory
 
         return $inputType ? $this->getFieldRules($inputType->fields, $resolvedPath->implode('.'), $list) : null;
     }
-    
+
     /**
      * Get rules for field.
      *
@@ -284,12 +294,16 @@ class RuleFactory
             }
 
             $rules = $this->directiveArgValue($directive, 'apply', []);
+            $messages = $this->directiveArgValue($directive, 'messages', []);
             $path = $list && ! empty($path) ? $path.'.*' : $path;
             $path = $path ? "{$path}.{$arg->name->value}" : $arg->name->value;
 
-            return empty($rules) ? null : compact('path', 'rules');
+            return empty($rules) ? null : compact('path', 'rules', 'messages');
         })->filter()->mapWithKeys(function ($ruleSet) {
-            return [$ruleSet['path'] => $ruleSet['rules']];
+            return [$ruleSet['path'] => [
+                'messages' => $ruleSet['messages'],
+                'rules' => $ruleSet['rules'],
+            ]];
         })->toArray();
 
         $this->pushResolvedPath($path);
