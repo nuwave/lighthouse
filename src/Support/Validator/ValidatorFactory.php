@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Validator;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Validation\Validator;
+use GraphQL\Type\Definition\ResolveInfo;
 
 class ValidatorFactory
 {
@@ -51,7 +51,7 @@ class ValidatorFactory
         }
 
         if (in_array($info->fieldName, $parameters)) {
-            return ! empty($value);
+            return ! is_null($value);
         }
 
         return true;
