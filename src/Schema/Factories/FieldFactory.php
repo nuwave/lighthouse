@@ -166,7 +166,7 @@ class FieldFactory
 
             if (sizeof($rules)) {
                 $validator = validator($inputArgs, $rules, [], [
-                    'root' => $root,
+                    'root' => $rootValue,
                     'context' => $context,
                     'resolveInfo' => $resolveInfo,
                 ]);
