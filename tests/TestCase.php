@@ -2,16 +2,19 @@
 
 namespace Tests;
 
-use GraphQL\Executor\ExecutionResult;
-use GraphQL\Language\Parser;
 use GraphQL\Type\Schema;
+use GraphQL\Language\Parser;
+use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
-use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
 
 class TestCase extends BaseTestCase
 {
+    use CanFormatError;
+
     /**
      * This variable is injected the main GraphQL class
      * during execution of each test. It may be set either
@@ -20,7 +23,7 @@ class TestCase extends BaseTestCase
      * @var string
      */
     protected $schema = '';
-    
+
     /**
      * Get package providers.
      *
@@ -49,7 +52,7 @@ class TestCase extends BaseTestCase
                 return new TestSchemaProvider($this->schema);
             }
         );
-        
+
         $app['config']->set('lighthouse.directives', []);
         $app['config']->set('lighthouse.global_id_field', '_id');
 
@@ -85,27 +88,62 @@ class TestCase extends BaseTestCase
     {
         return Parser::parse($schema);
     }
-    
+
     /**
      * Execute query/mutation.
      *
      * @param string $schema
      * @param string $query
-     * @param bool $lighthouse
-     * @param array $variables
+     * @param bool   $lighthouse
+     * @param array  $variables
+     * @param bool   $format
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function execute($schema, $query, $lighthouse = false, $variables = []): ExecutionResult
+    protected function execute($schema, $query, $lighthouse = false, $variables = [], $format = false): ExecutionResult
     {
         if ($lighthouse) {
-            $addDefaultSchema = file_get_contents(realpath(__DIR__ . '/../assets/schema.graphql'));
-            $schema = $addDefaultSchema . "\n" . $schema;
+            $addDefaultSchema = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
+            $schema = $addDefaultSchema."\n".$schema;
         }
 
         $this->schema = $schema;
-        
+
         return graphql()->queryAndReturnResult($query, null, $variables);
+    }
+
+    /**
+     * Execute query/mutation.
+     *
+     * @param string $schema
+     * @param string $query
+     * @param bool   $lighthouse
+     * @param array  $variables
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     */
+    protected function executeAndFormat($schema, $query, $lighthouse = false, $variables = [])
+    {
+        $result = $this->execute($schema, $query, $lighthouse, $variables);
+
+        if (! empty($result->errors)) {
+            foreach ($result->errors as $error) {
+                if ($error instanceof \Exception) {
+                    info('GraphQL Error:', [
+                        'code' => $error->getCode(),
+                        'message' => $error->getMessage(),
+                        'trace' => $error->getTraceAsString(),
+                    ]);
+                }
+            }
+
+            return [
+                'data' => $result->data,
+                'errors' => array_map([$this, 'formatError'], $result->errors),
+            ];
+        }
+
+        return ['data' => $result->data];
     }
 
     /**
@@ -118,13 +156,13 @@ class TestCase extends BaseTestCase
      */
     protected function buildSchemaWithDefaultQuery($schema): Schema
     {
-        return $this->buildSchemaFromString($schema . '
+        return $this->buildSchemaFromString($schema.'
             type Query {
                 dummy: String
             }
         ');
     }
-    
+
     /**
      * @param string $schema
      *
@@ -133,7 +171,7 @@ class TestCase extends BaseTestCase
     protected function buildSchemaFromString(string $schema): Schema
     {
         $this->schema = $schema;
-        
+
         return graphql()->buildSchema();
     }
 }
