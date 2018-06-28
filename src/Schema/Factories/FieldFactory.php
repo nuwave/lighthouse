@@ -165,7 +165,12 @@ class FieldFactory
             $rules = $this->getRules($rootValue, $inputArgs, $context, $resolveInfo, $inputValueDefinitions);
 
             if (sizeof($rules)) {
-                $validator = validator($inputArgs, $rules);
+                $validator = validator($inputArgs, $rules, [], [
+                    'root' => $root,
+                    'context' => $context,
+                    'resolveInfo' => $resolveInfo,
+                ]);
+
                 if ($validator->fails()) {
                     throw with(new ValidationError('validation'))->setValidator($validator);
                 }
