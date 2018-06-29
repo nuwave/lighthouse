@@ -27,7 +27,7 @@ class RuleFactoryTest extends TestCase
 
         $this->assertEquals([
             'email' => ['required', 'email'],
-        ], $rules);
+        ], $rules['rules']);
     }
 
     /**
@@ -59,7 +59,7 @@ class RuleFactoryTest extends TestCase
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
-        ], $rules);
+        ], $rules['rules']);
     }
 
     /**
@@ -70,7 +70,12 @@ class RuleFactoryTest extends TestCase
         $documentAST = ASTBuilder::generate('
         input AddressInput {
             street: String @rules(apply: ["required"])
-            primary: Boolean @rules(apply: ["required"])
+            primary: Boolean @rules(
+                apply: ["required"]
+                messages: { 
+                    required: "foobar" 
+                }
+            )
         }
         input UserInput {
             email: String @rules(apply: ["required", "email"])
@@ -101,7 +106,11 @@ class RuleFactoryTest extends TestCase
             'input.address' => ['required'],
             'input.address.street' => ['required'],
             'input.address.primary' => ['required'],
-        ], $rules);
+        ], $rules['rules']);
+
+        $this->assertEquals([
+            'input.address.primary.required' => 'foobar',
+        ], $rules['messages']);
     }
 
     /**
@@ -112,7 +121,12 @@ class RuleFactoryTest extends TestCase
         $documentAST = ASTBuilder::generate('
         input AddressInput {
             street: String @rules(apply: ["required"])
-            primary: Boolean @rules(apply: ["required"])
+            primary: Boolean @rules(
+                apply: ["required"]
+                messages: { 
+                    required: "foobar" 
+                }
+            )
         }
         input UserInput {
             email: String @rules(apply: ["required", "email"])
@@ -143,7 +157,11 @@ class RuleFactoryTest extends TestCase
             'input.address' => ['required'],
             'input.address.*.street' => ['required'],
             'input.address.*.primary' => ['required'],
-        ], $rules);
+        ], $rules['rules']);
+
+        $this->assertEquals([
+            'input.address.*.primary.required' => 'foobar',
+        ], $rules['messages']);
     }
 
     /**
@@ -154,7 +172,12 @@ class RuleFactoryTest extends TestCase
         $documentAST = ASTBuilder::generate('
         input Setting {
             option: String @rules(apply: ["required"])
-            value: String @rules(apply: ["required"])
+            value: String @rules(
+                apply: ["required"]
+                messages: {
+                    required: "foobar"
+                }
+            )
             setting: Setting
         }
         input UserInput {
@@ -195,7 +218,12 @@ class RuleFactoryTest extends TestCase
             'input.settings.*.value' => ['required'],
             'input.settings.*.setting.option' => ['required'],
             'input.settings.*.setting.value' => ['required'],
-        ], $rules);
+        ], $rules['rules']);
+
+        $this->assertEquals([
+            'input.settings.*.value.required' => 'foobar',
+            'input.settings.*.setting.value.required' => 'foobar',
+        ], $rules['messages']);
     }
 
     /**
@@ -217,7 +245,7 @@ class RuleFactoryTest extends TestCase
 
         $this->assertEquals([
             'required' => ['required'],
-        ], $rules);
+        ], $rules['rules']);
     }
 
     /**
@@ -249,7 +277,7 @@ class RuleFactoryTest extends TestCase
             'requiredSDL.required' => ['required'],
             'requiredBoth' => ['required'],
             'requiredBoth.required' => ['required'],
-        ], $rules);
+        ], $rules['rules']);
     }
 
     /**
@@ -260,7 +288,12 @@ class RuleFactoryTest extends TestCase
         $documentAST = ASTBuilder::generate('
         input FooInput {
             self: FooInput
-            required: String @rules(apply: ["required"])
+            required: String @rules(
+                apply: ["required"]
+                messages: {
+                    required: "foobar"
+                }
+            )
         }
         type Mutation {
             createFoo(input: FooInput @rules(apply: ["required"])): String
@@ -283,9 +316,14 @@ class RuleFactoryTest extends TestCase
             'input' => ['required'],
             'input.required' => ['required'],
             'input.self.required' => ['required'],
-        ], $rules);
+        ], $rules['rules']);
+
+        $this->assertEquals([
+            'input.required.required' => 'foobar',
+            'input.self.required.required' => 'foobar',
+        ], $rules['messages']);
     }
-    
+
     /**
      * @test
      */
@@ -302,27 +340,27 @@ class RuleFactoryTest extends TestCase
             foo(input: Foo): String
         }
         ');
-    
+
         $variables = [
             'input' => [
                 'bar' => 42,
             ],
         ];
-    
+
         $mutationRules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Mutation'),
             $variables,
             'foo'
         );
-        
+
         $queryRules = (new RuleFactory())->build(
             $documentAST,
             $documentAST->objectTypeDefinition('Query'),
             $variables,
             'foo'
         );
-        
+
         $this->assertSame($mutationRules, $queryRules);
     }
 }

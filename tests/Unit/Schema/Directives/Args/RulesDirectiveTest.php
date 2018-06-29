@@ -22,7 +22,7 @@ class RulesDirectiveTest extends TestCase
         $result = $this->executeAndFormat($this->schema(), $query, false, [], true);
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
         $this->assertNull($result['data']['foo']);
-        
+
         $mutation = '
         mutation {
             foo {
@@ -54,7 +54,8 @@ class RulesDirectiveTest extends TestCase
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
-    
+        $this->assertEquals('foobar', array_get($result, 'errors.0.validation.0'));
+
         $mutation = '
         mutation {
             foo(bar: "foo") {
@@ -64,7 +65,7 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-        
+
         $mutationResult = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
         $this->assertSame($result, $mutationResult);
     }
@@ -87,7 +88,7 @@ class RulesDirectiveTest extends TestCase
         $result = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
         $this->assertNull(array_get($result, 'data.foo'));
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
-        
+
         $query = '
         {
             foo {
@@ -97,7 +98,7 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-    
+
         $queryResult = $this->executeAndFormat($this->schema(), $query, false, [], true);
         $this->assertSame($result, $queryResult);
     }
@@ -122,7 +123,7 @@ class RulesDirectiveTest extends TestCase
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
-    
+
         $query = '
         {
             foo(bar: "foo") {
@@ -132,7 +133,7 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-    
+
         $queryResult = $this->executeAndFormat($this->schema(), $query, false, [], true);
         $this->assertSame($result, $queryResult);
     }
@@ -154,7 +155,14 @@ class RulesDirectiveTest extends TestCase
         type User {
             first_name: String
             last_name: String
-            full_name(formatted: Boolean @rules(apply: [\"required\"])): String
+            full_name(
+                formatted: Boolean @rules(
+                    apply: [\"required\"]
+                    messages: {
+                        required: \"foobar\"
+                    }
+                )
+            ): String
         }
         type Mutation {
             foo(bar: String @rules(apply: [\"required\"])): User

@@ -33,9 +33,7 @@ class FieldFactory
             : $this->defaultResolver($fieldValue);
 
         $args = $this->getArgDefinitions($fieldValue);
-
         $resolverWithAdditionalArgs = $this->injectAdditionalArgs($initialResolver, $fieldValue->getAdditionalArgs());
-
         $resolverWithValidation = $this->wrapResolverWithValidation($resolverWithAdditionalArgs, $args);
 
         $fieldValue->setResolver($resolverWithValidation);
@@ -171,15 +169,25 @@ class FieldFactory
     {
         return function ($rootValue, $inputArgs, $context = null, $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
             $inputArgs = $this->resolveArgs($inputArgs, $inputValueDefinitions);
+            $rules = $this->getRules(
+                $rootValue,
+                $inputArgs,
+                $context,
+                $resolveInfo,
+                $inputValueDefinitions
+            );
 
-            $rules = $this->getRules($rootValue, $inputArgs, $context, $resolveInfo, $inputValueDefinitions);
-
-            if (sizeof($rules)) {
-                $validator = validator($inputArgs, $rules, [], [
-                    'root' => $rootValue,
-                    'context' => $context,
-                    'resolveInfo' => $resolveInfo,
-                ]);
+            if (sizeof(array_get($rules, 'rules', []))) {
+                $validator = validator(
+                    $inputArgs,
+                    array_get($rules, 'rules'),
+                    array_get($rules, 'messages', []),
+                    [
+                        'root' => $rootValue,
+                        'context' => $context,
+                        'resolveInfo' => $resolveInfo,
+                    ]
+                );
 
                 if ($validator->fails()) {
                     throw with(new ValidationError('validation'))->setValidator($validator);
@@ -193,7 +201,8 @@ class FieldFactory
     /**
      * Resolve argument(s).
      *
-     * @param array $inputArguments
+     * @param array      $inputArguments
+     * @param Collection $argumentValues
      *
      * @return array
      */
@@ -219,39 +228,69 @@ class FieldFactory
     /**
      * Get rules for field.
      *
+     * @param mixed            $rootValue
+     * @param array            $inputArgs
+     * @param mixed            $context
+     * @param ResolveInfo|null $resolveInfo
+     * @param Collection       $inputValueDefinitions
+     *
      * @return array
      */
-    public function getRules($rootValue, $inputArgs, $context, ResolveInfo $resolveInfo = null, Collection $inputValueDefinitions): array
-    {
+    public function getRules(
+        $rootValue,
+        $inputArgs,
+        $context,
+        ResolveInfo $resolveInfo = null,
+        Collection $inputValueDefinitions
+    ): array {
         $resolveArgs = [$rootValue, $inputArgs, $context, $resolveInfo];
 
-        $rules = $inputValueDefinitions
-            ->map(function ($inputValueDefinition) use ($resolveArgs) {
+        $validation = $inputValueDefinitions
+            ->map(function ($inputValueDefinition, $key) use ($resolveArgs) {
                 $rules = data_get($inputValueDefinition, 'rules');
 
                 if (! $rules) {
                     return;
                 }
 
-                return is_callable($rules)
+                $rules = is_callable($rules)
                     ? call_user_func_array($inputValueDefinition['rules'], $resolveArgs)
                     : $rules;
+
+                return [
+                    'rules' => [$key => $rules],
+                    'messages' => data_get($inputValueDefinition, 'messages', []),
+                ];
             })
-            ->filter();
+            ->filter()
+            ->values();
+
+        $rules = $validation->flatMap(function ($validation) {
+            return $validation['rules'];
+        });
+        $messages = $validation->flatMap(function ($validation) {
+            return $validation['messages'];
+        });
 
         // Rules are applied to the fields which are on one of the root operation types.
         // Nested fields are excluded because they are validated as part of the root field.
         $parentOperationType = data_get($resolveInfo, 'parentType.name');
         if ('Mutation' === $parentOperationType || 'Query' === $parentOperationType) {
             $documentAST = graphql()->documentAST();
-            $rules = $rules->merge((new RuleFactory())->build(
+            $nestedValidation = (new RuleFactory())->build(
                 $documentAST,
                 $documentAST->objectTypeDefinition($parentOperationType),
                 $inputArgs,
                 $resolveInfo->fieldName
-            ));
+            );
+
+            $rules = $rules->merge(array_get($nestedValidation, 'rules', []));
+            $messages = $messages->merge(array_get($nestedValidation, 'messages', []));
         }
 
-        return $rules->toArray();
+        return [
+            'rules' => $rules->toArray(),
+            'messages' => $messages->toArray(),
+        ];
     }
 }
