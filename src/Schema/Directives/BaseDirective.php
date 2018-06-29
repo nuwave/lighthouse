@@ -2,16 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
-use GraphQL\Language\AST\ValueNode;
-use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 abstract class BaseDirective implements Directive
 {
@@ -26,6 +27,7 @@ abstract class BaseDirective implements Directive
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
      * @todo Make this type annotation a hard requirement as soon as the underlying implementation is fixed
+     *
      * @param TypeSystemDefinitionNode $definitionNode
      *
      * @return $this
@@ -40,7 +42,7 @@ abstract class BaseDirective implements Directive
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *
-     * @param string|null $name
+     * @param string|null                   $name
      * @param TypeSystemDefinitionNode|null $definitionNode
      *
      * @return DirectiveNode|null
@@ -58,8 +60,8 @@ abstract class BaseDirective implements Directive
     /**
      * Get directive argument value.
      *
-     * @param string $name
-     * @param mixed|null $default
+     * @param string             $name
+     * @param mixed|null         $default
      * @param DirectiveNode|null $directive
      *
      * @return mixed
@@ -69,7 +71,7 @@ abstract class BaseDirective implements Directive
         // Get the definition associated with the class of the directive, unless explicitely given
         $directive = $directive ?? $this->directiveDefinition();
 
-        if (!$directive) {
+        if (! $directive) {
             return $default;
         }
 
@@ -91,17 +93,17 @@ abstract class BaseDirective implements Directive
     {
         $model = $this->directiveArgValue('model');
 
-        if (!$model) {
+        if (! $model) {
             throw new DirectiveException(
                 'A `model` argument must be assigned to the '
-                . $this->name() . 'directive on ' . $this->definitionNode->name->value);
+                .$this->name().'directive on '.$this->definitionNode->name->value);
         }
 
-        if (!class_exists($model)) {
-            $model = config('lighthouse.namespaces.models') . '\\' . $model;
+        if (! class_exists($model)) {
+            $model = config('lighthouse.namespaces.models').'\\'.$model;
         }
 
-        if(!class_exists($model)){
+        if (! class_exists($model)) {
             $model = $this->namespaceClassName($model);
         }
 
@@ -119,9 +121,9 @@ abstract class BaseDirective implements Directive
      */
     protected function namespaceClassName($baseClassName)
     {
-        $className = $this->associatedNamespace() . '\\' . $baseClassName;
+        $className = $this->associatedNamespace().'\\'.$baseClassName;
 
-        if (!class_exists($className)) {
+        if (! class_exists($className)) {
             $directiveName = static::name();
             throw new DirectiveException("No class '$className' was found for directive '$directiveName'");
         }
@@ -151,16 +153,16 @@ abstract class BaseDirective implements Directive
     /**
      * Get argument's value.
      *
-     * @param ArgumentNode $arg
+     * @param Node  $arg
      * @param mixed $default
      *
      * @return mixed
      */
-    protected function argValue(ArgumentNode $arg, $default = null)
+    protected function argValue(Node $arg, $default = null)
     {
         $valueNode = $arg->value;
 
-        if (!$valueNode) {
+        if (! $valueNode) {
             return $default;
         }
 

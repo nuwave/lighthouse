@@ -37,7 +37,14 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
         $current = $value->getValue();
         $current['rules'] = array_merge(
             array_get($value->getArg(), 'rules', []),
-            $this->directiveArgValue('apply')
+            $this->directiveArgValue('apply', [])
+        );
+        $current['messages'] = array_merge(
+            array_get($value->getArg(), 'messages', []),
+            collect($this->directiveArgValue('messages', []))
+                ->mapWithKeys(function ($message, $path) use ($value) {
+                    return [$value->getArgName().".{$path}" => $message];
+                })->toArray()
         );
 
         return $value->setValue($current);
