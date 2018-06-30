@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Schema;
 
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class NodeTest extends DBTestCase
 {
@@ -31,7 +31,37 @@ class NodeTest extends DBTestCase
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
         $query = '
         {
-            node(id: "' . $globalId . '") {
+            node(id: "'.$globalId.'") {
+                ...on User {
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query, true);
+
+        $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveNodesWithDefaultTypeResolver()
+    {
+        $schema = '
+        type User @node(
+            resolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNode"
+        ) {
+            name: String!
+        }
+        
+        type Query {}
+        ';
+
+        $globalId = $this->encodeGlobalId('User', $this->node['id']);
+        $query = '
+        {
+            node(id: "'.$globalId.'") {
                 ...on User {
                     name
                 }
@@ -60,7 +90,7 @@ class NodeTest extends DBTestCase
         $globalId = $this->encodeGlobalId('User', $user->getKey());
         $query = '
         {
-            node(id: "' . $globalId . '") {
+            node(id: "'.$globalId.'") {
                 ...on User {
                     name
                 }
