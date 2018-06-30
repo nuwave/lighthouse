@@ -56,7 +56,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     {
         $resolver = $this->directiveArgValue($argKey);
 
-        if (! $resolver) {
+        if (! $resolver && 'typeResolver' === $argKey) {
             $nodeName = $value->getNodeName();
 
             return function () use ($nodeName) {
