@@ -78,6 +78,14 @@ class NodeDirective implements NodeMiddleware
             'typeResolver'
         );
 
+        if (! $resolver) {
+            $nodeName = $value->getNodeName();
+
+            return function () use ($nodeName) {
+                return schema()->instance($nodeName);
+            };
+        }
+
         $namespace = array_get(explode('@', $resolver), '0');
         $method = array_get(explode('@', $resolver), '1');
 

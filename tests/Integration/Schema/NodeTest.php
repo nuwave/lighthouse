@@ -37,6 +37,36 @@ class NodeTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanResolveNodesWithDefaultTypeResolver()
+    {
+        $schema = '
+        type User @node(
+            resolver: "Tests\\\Integration\\\Schema\\\NodeTest@resolveNode"
+        ) {
+            name: String!
+        }
+        
+        type Query {}
+        ';
+
+        $globalId = $this->encodeGlobalId('User', $this->node['id']);
+        $query = '
+        {
+            node(id: "'.$globalId.'") {
+                ...on User {
+                    name
+                }
+            }
+        }
+        ';
+
+        $result = $this->execute($schema, $query, true);
+        $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
+    }
+
+    /**
+     * @test
+     */
     public function itCanResolveModelsNodes()
     {
         $user = factory(User::class)->create();
