@@ -29,9 +29,19 @@ class TypeRegistry
      *
      * @return Type
      */
-    public function instance($typeName)
+    public function get(string $typeName): Type
     {
-        return $this->get($typeName);
+        return $this->types->get($typeName);
+    }
+
+    /**
+     * Register type with registry.
+     *
+     * @param Type $type
+     */
+    public function register(Type $type)
+    {
+        $this->types->put($type->name, $type);
     }
 
     /**
@@ -40,10 +50,11 @@ class TypeRegistry
      * @param string $typeName
      *
      * @return Type
+     * @deprecated in favour of get()
      */
-    public function get($typeName)
+    public function instance(string $typeName): Type
     {
-        return $this->types->get($typeName);
+        return $this->get($typeName);
     }
 
     /**
@@ -55,15 +66,5 @@ class TypeRegistry
     public function type(Type $type)
     {
         $this->register($type);
-    }
-
-    /**
-     * Register type with registry.
-     *
-     * @param Type $type
-     */
-    public function register(Type $type)
-    {
-        $this->types->put($type->name, $type);
     }
 }

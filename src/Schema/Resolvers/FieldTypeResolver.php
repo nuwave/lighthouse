@@ -18,7 +18,7 @@ class FieldTypeResolver
      *
      * @return FieldValue
      */
-    public static function resolve(FieldValue $value)
+    public static function resolve(FieldValue $value): FieldValue
     {
         return $value->setType(
             (new static())->resolveNodeType($value->getField())
@@ -32,7 +32,7 @@ class FieldTypeResolver
      *
      * @return Type
      */
-    public static function resolveInput(InputValueDefinitionNode $input)
+    public static function resolveInput(InputValueDefinitionNode $input): Type
     {
         return (new static())->resolveNodeType($input);
     }
@@ -44,7 +44,7 @@ class FieldTypeResolver
      *
      * @return Type
      */
-    public static function unpack($type)
+    public static function unpack($type): Type
     {
         return (new static())->unpackNodeType($type);
     }
@@ -92,7 +92,7 @@ class FieldTypeResolver
      *
      * @return Type
      */
-    public function unpackNodeType($type, array $wrappers = [])
+    public function unpackNodeType($type, array $wrappers = []): Type
     {
         $type = is_callable($type) ? $type() : $type;
 
@@ -160,7 +160,7 @@ class FieldTypeResolver
     protected function convertCustomType($name)
     {
         return function () use ($name) {
-            return graphql()->types()->instance($name);
+            return graphql()->types()->get($name);
         };
     }
 }

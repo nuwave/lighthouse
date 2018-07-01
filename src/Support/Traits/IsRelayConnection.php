@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
 trait IsRelayConnection
 {
     use HandlesGlobalId;
@@ -12,9 +14,9 @@ trait IsRelayConnection
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $args
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
-    public function scopeRelayConnection($query, array $args)
+    public function scopeRelayConnection($query, array $args): LengthAwarePaginator
     {
         $first = data_get($args, 'first', 15);
         $page = data_get($args, 'page', 1);
@@ -30,9 +32,9 @@ trait IsRelayConnection
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array $args
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
-    public function scopePaginatorConnection($query, array $args)
+    public function scopePaginatorConnection($query, array $args): LengthAwarePaginator
     {
         $first = data_get($args, 'count', 15);
         $page = data_get($args, 'page', 1);

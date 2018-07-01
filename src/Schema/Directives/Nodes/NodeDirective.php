@@ -19,7 +19,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'node';
     }
@@ -31,7 +31,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value): NodeValue
     {
         graphql()->nodes()->node(
             $value->getNodeName(),
@@ -52,7 +52,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @return \Closure
      */
-    protected function getResolver(NodeValue $value, $argKey)
+    protected function getResolver(NodeValue $value, string $argKey): \Closure
     {
         $resolver = $this->directiveArgValue($argKey);
 
@@ -74,13 +74,14 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     }
 
     /**
-     * @param Node        $node
+     * @param Node $node
      * @param DocumentAST $current
      * @param DocumentAST $original
      *
      * @return DocumentAST
+     * @throws \Exception
      */
-    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original): DocumentAST
     {
         return $this->attachNodeInterfaceToObjectType($node, $current);
     }

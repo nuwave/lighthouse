@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -9,33 +10,45 @@ use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 class ArgumentFactory
 {
     /**
-     * Convert argument definition to type.
+     * Enrich the argument value and apply directives on it.
      *
-     * @param ArgumentValue $value
+     * @param ArgumentValue $argumentValue
      *
-     * @return array
+     * @return ArgumentValue
      */
-    public function handle(ArgumentValue $value)
+    public static function handle(ArgumentValue $argumentValue): ArgumentValue
     {
-        $value->setType(NodeResolver::resolve($value->getArg()->type));
+        $argumentValue->setType(NodeResolver::resolve($argumentValue->getArg()->type));
 
-        return $this->applyMiddleware($value)->getValue();
+        return self::applyMiddleware($argumentValue);
     }
 
     /**
      * Apply argument middleware.
      *
-     * @param ArgumentValue $value
+     * @param ArgumentValue $argumentValue
      *
      * @return ArgumentValue
      */
-    protected function applyMiddleware(ArgumentValue $value)
+    protected static function applyMiddleware(ArgumentValue $argumentValue): ArgumentValue
     {
-        return graphql()->directives()->argMiddleware($value->getArg())
-            ->reduce(function (ArgumentValue $value, ArgMiddleware $middleware) {
-                return $middleware->handleArgument(
-                    $value->setMiddlewareDirective($middleware->name())
-                );
-            }, $value);
+        return graphql()->directives()->argMiddleware($argumentValue->getArg())
+            ->reduce(function (ArgumentValue $argumentValue, ArgMiddleware $middleware) {
+                return $middleware->handleArgument($argumentValue);
+            }, $argumentValue);
+    }
+
+    /**
+     * @param Collection $argumentValues
+     *
+     * @return array
+     */
+    public static function convertToExecutable(Collection $argumentValues): array
+    {
+        return $argumentValues->mapWithKeys(function (ArgumentValue $argumentValue) {
+            return [$argumentValue->getArgName() =>
+                ['type' => $argumentValue->getType()]
+            ];
+        })->toArray();
     }
 }

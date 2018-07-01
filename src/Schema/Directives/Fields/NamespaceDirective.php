@@ -24,7 +24,7 @@ class NamespaceDirective implements Directive
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'namespace';
     }

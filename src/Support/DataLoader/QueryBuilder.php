@@ -24,7 +24,7 @@ class QueryBuilder
      *
      * @return array
      */
-    public function eagerLoadCount(Builder $builder, array $models)
+    public function eagerLoadCount(Builder $builder, array $models): array
     {
         $ids = [];
         $key = $models[0]->getKeyName();
@@ -59,7 +59,7 @@ class QueryBuilder
      *
      * @return array
      */
-    public function eagerLoadRelations(Builder $builder, array $models, $perPage = null, $page = null)
+    public function eagerLoadRelations(Builder $builder, array $models, int $perPage = null, int $page = null): array
     {
         foreach ($builder->getEagerLoads() as $name => $constraints) {
             if (false === strpos($name, '.')) {
@@ -88,7 +88,7 @@ class QueryBuilder
      *
      * @return array
      */
-    protected function loadRelation(Builder $builder, Closure $constraints, array $models, array $options)
+    protected function loadRelation(Builder $builder, Closure $constraints, array $models, array $options): array
     {
         $relation = $builder->getRelation($options['name']);
         $relationQueries = $this->getRelationQueries($builder, $models, $options['name'], $constraints);
@@ -150,7 +150,7 @@ class QueryBuilder
      *
      * @return Relation[]|Collection
      */
-    protected function getRelationQueries(Builder $builder, array $models, $name, Closure $constraints)
+    protected function getRelationQueries(Builder $builder, array $models, $name, Closure $constraints): Collection
     {
         return collect($models)->map(function ($model) use ($builder, $name, $constraints) {
             $relation = $builder->getRelation($name);
@@ -188,7 +188,7 @@ class QueryBuilder
      *
      * @return array
      */
-    protected function hydrate(Model $related, Relation $relation, Collection $results)
+    protected function hydrate(Model $related, Relation $relation, Collection $results): array
     {
         $models = $related->hydrate($results->all(), $related->getConnectionName())->all();
 
@@ -210,7 +210,7 @@ class QueryBuilder
      *
      * @return Collection
      */
-    protected function loadDefaultWith(Collection $collection)
+    protected function loadDefaultWith(Collection $collection): Collection
     {
         if ($collection->isNotEmpty()) {
             $model = $collection->first();

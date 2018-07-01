@@ -17,7 +17,7 @@ class ScoutDirective extends BaseDirective implements ArgMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'search';
     }
@@ -29,7 +29,7 @@ class ScoutDirective extends BaseDirective implements ArgMiddleware
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument)
+    public function handleArgument(ArgumentValue $argument): ArgumentValue
     {
         $arg = $argument->getArgName();
 

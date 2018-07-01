@@ -15,7 +15,7 @@ trait HandlesQueryFilter
      *
      * @return ArgumentValue
      */
-    protected function injectFilter(ArgumentValue $argument, array $filter)
+    protected function injectFilter(ArgumentValue $argument, array $filter): ArgumentValue
     {
         $key = $this->queryFilterKey($argument);
         $query = QueryFilter::getInstance($argument);
@@ -40,7 +40,7 @@ trait HandlesQueryFilter
      *
      * @return ArgumentValue
      */
-    protected function injectKeyedFilter(ArgumentValue $argument, array $filter)
+    protected function injectKeyedFilter(ArgumentValue $argument, array $filter): ArgumentValue
     {
         $key = $this->queryFilterKey($argument);
         $query = QueryFilter::getInstance($argument);
@@ -67,7 +67,7 @@ trait HandlesQueryFilter
      *
      * @return string
      */
-    protected function queryFilterKey(ArgumentValue $argument)
+    protected function queryFilterKey(ArgumentValue $argument): string
     {
         return $this->directiveArgValue(
             'key',

@@ -14,7 +14,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'inject';
     }
@@ -25,8 +25,9 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      * @param FieldValue $value
      *
      * @return FieldValue
+     * @throws DirectiveException
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value): FieldValue
     {
         $resolver = $value->getResolver();
         $attr = $this->directiveArgValue('context');

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Schema\Context;
 
@@ -27,12 +28,12 @@ class GraphQLController extends Controller
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
-    public function query(Request $request)
+    public function query(Request $request): array
     {
         $query = $request->input('query');
-        $variables = $request->input('variables');
+        $variables = $request->input('variables', []);
 
         if (is_string($variables)) {
             $variables = json_decode($variables, true);

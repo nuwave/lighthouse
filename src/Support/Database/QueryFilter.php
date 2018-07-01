@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Database;
 
+use Illuminate\Database\Query\Builder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class QueryFilter
@@ -18,9 +19,9 @@ class QueryFilter
      *
      * @param ArgumentValue $value
      *
-     * @return self
+     * @return QueryFilter
      */
-    public static function getInstance(ArgumentValue $value)
+    public static function getInstance(ArgumentValue $value): QueryFilter
     {
         $handler = sprintf(
             'query.filter.%s.%s',
@@ -36,10 +37,10 @@ class QueryFilter
     /**
      * Build query with filter(s).
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $args
+     * @param Builder $query
+     * @param array   $args
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return Builder
      */
     public static function build($query, array $args)
     {
@@ -53,10 +54,10 @@ class QueryFilter
     /**
      * Run query through filter.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $args
+     * @param Builder $query
+     * @param array   $args
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return Builder
      */
     public function filter($query, array $args = [])
     {
@@ -82,7 +83,7 @@ class QueryFilter
      *
      * @return array
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return $this->filters;
     }
@@ -95,7 +96,7 @@ class QueryFilter
      *
      * @return array|null
      */
-    public function getFilter($key, $default = null)
+    public function getFilter($key, array $default = null)
     {
         return array_get($this->filters, $key, $default);
     }

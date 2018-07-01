@@ -14,7 +14,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'field';
     }
@@ -28,7 +28,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         $baseClassName = $this->directiveArgValue('class')
             ?? str_before($this->directiveArgValue('resolver'), '@');

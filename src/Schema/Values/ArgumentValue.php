@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\Type;
 
@@ -16,38 +15,43 @@ class ArgumentValue
     protected $arg;
 
     /**
-     * Current directive.
-     *
-     * @var DirectiveNode
-     */
-    protected $directive;
-
-    /**
      * Current field.
      *
      * @var FieldValue
      */
     protected $field;
-
-    /**
-     * Current value.
-     *
-     * @var array
-     */
-    protected $value;
-
     /**
      * Set current arg type.
      *
      * @var Type
      */
     protected $type;
+    /**
+     * The resolver function for the arg.
+     *
+     * @var \Closure
+     */
+    protected $resolver;
+
+    /**
+     * Validation rules.
+     *
+     * @var array
+     */
+    protected $rules;
+
+    /**
+     * Messages for the validation rules.
+     *
+     * @var array
+     */
+    protected $messages;
 
     /**
      * Create a new argument value instance.
      *
      * @param FieldValue $field
-     * @param InputValueDefinitionNode   $arg
+     * @param InputValueDefinitionNode $arg
      */
     public function __construct(FieldValue $field, InputValueDefinitionNode $arg)
     {
@@ -56,104 +60,43 @@ class ArgumentValue
     }
 
     /**
-     * Set current directive.
-     *
-     * @param DirectiveNode $directive
-     *
-     * @return self
+     * @return array|null
      */
-    public function setDirective(DirectiveNode $directive)
+    public function getRules()
     {
-        $this->directive = $directive;
+        return $this->rules;
+    }
+
+    /**
+     * @param array $rules
+     *
+     * @return ArgumentValue
+     */
+    public function setRules(array $rules): ArgumentValue
+    {
+        $this->rules = $rules;
 
         return $this;
     }
 
     /**
-     * Set current argument.
-     *
-     * @param InputValueDefinitionNode $arg
-     *
-     * @return self
+     * @return array|null
      */
-    public function setArg(InputValueDefinitionNode $arg)
+    public function getMessages()
     {
-        $this->arg = $arg;
+        return $this->messages;
+    }
+
+    /**
+     * @param array $messages
+     *
+     * @return ArgumentValue
+     */
+    public function setMessages(array $messages): ArgumentValue
+    {
+        $this->messages = $messages;
 
         return $this;
-    }
-
-    /**
-     * Get current argument type.
-     *
-     * @param Type $type
-     *
-     * @return self
-     */
-    public function setType(Type $type)
-    {
-        $this->type = $type;
-
-        $value = $this->getValue();
-        $value['type'] = $type;
-
-        return $this->setValue($value);
-    }
-
-    /**
-     * Set the current value.
-     *
-     * @param array $value
-     *
-     * @return self
-     */
-    public function setValue(array $value)
-    {
-        $this->value = $value;
-
-        return $this;
-    }
-
-    /**
-     * Set directive for middleware.
-     *
-     * @param string $middleware
-     *
-     * @return self
-     */
-    public function setMiddlewareDirective($middleware)
-    {
-        $this->directive = collect($this->arg->directives)
-            ->first(function (DirectiveNode $directive) use ($middleware) {
-                return $directive->name->value === $middleware;
-            });
-
-        return $this;
-    }
-
-    /**
-     * Set a argument resolver.
-     *
-     * @param \Closure $resolver
-     *
-     * @return self
-     */
-    public function setResolver(\Closure $resolver)
-    {
-        $current = $this->getValue();
-        $current['resolve'] = $resolver;
-
-        return $this->setValue($current);
-    }
-
-    /**
-     * Get current argument.
-     *
-     * @return InputValueDefinitionNode
-     */
-    public function getArg()
-    {
-        return $this->arg;
     }
 
     /**
@@ -161,19 +104,9 @@ class ArgumentValue
      *
      * @return FieldValue
      */
-    public function getField()
+    public function getField(): FieldValue
     {
         return $this->field;
-    }
-
-    /**
-     * Get current directive.
-     *
-     * @return DirectiveNode
-     */
-    public function getDirective()
-    {
-        return $this->directive;
     }
 
     /**
@@ -181,19 +114,47 @@ class ArgumentValue
      *
      * @return Type
      */
-    public function getType()
+    public function getType(): Type
     {
         return $this->type;
     }
 
     /**
-     * Get the current value.
+     * Get current argument type.
      *
-     * @return array
+     * @param Type $type
+     *
+     * @return ArgumentValue
      */
-    public function getValue()
+    public function setType(Type $type): ArgumentValue
     {
-        return $this->value;
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get the associated resolver function.
+     *
+     * @return \Closure|null
+     */
+    public function getResolver()
+    {
+        return $this->resolver;
+    }
+
+    /**
+     * Set a argument resolver.
+     *
+     * @param \Closure $resolver
+     *
+     * @return ArgumentValue
+     */
+    public function setResolver(\Closure $resolver): ArgumentValue
+    {
+        $this->resolver = $resolver;
+
+        return $this;
     }
 
     /**
@@ -201,8 +162,32 @@ class ArgumentValue
      *
      * @return string
      */
-    public function getArgName()
+    public function getArgName(): string
     {
         return $this->getArg()->name->value;
+    }
+
+    /**
+     * Get current argument.
+     *
+     * @return InputValueDefinitionNode
+     */
+    public function getArg(): InputValueDefinitionNode
+    {
+        return $this->arg;
+    }
+
+    /**
+     * Set current argument.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return ArgumentValue
+     */
+    public function setArg(InputValueDefinitionNode $arg): ArgumentValue
+    {
+        $this->arg = $arg;
+
+        return $this;
     }
 }

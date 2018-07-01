@@ -11,14 +11,14 @@ use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
-class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMiddleware
+class ValidateDirective extends BaseDirective implements FieldMiddleware
 {
     /**
      * Directive name.
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'validate';
     }
@@ -31,7 +31,7 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
      * @return FieldValue
      * @throws DirectiveException
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value): FieldValue
     {
         $validator = $this->directiveArgValue('validator');
 
@@ -51,43 +51,10 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
             $context = array_get($funcArgs, '2');
             $info = array_get($funcArgs, '3');
 
+            // The array keys are named for more convenient retrieval in custom validator classes
             app($validator, compact('root', 'args', 'context', 'info'))->validate();
 
             return call_user_func_array($resolver, $funcArgs);
         });
-    }
-
-    /**
-     * Resolve the field directive.
-     *
-     * @param ArgumentValue $value
-     *
-     * @return ArgumentValue
-     */
-    public function handleArgument(ArgumentValue $value)
-    {
-        // TODO: Rename "getValue" to something more descriptive like "toArray"
-        // and consider using for NodeValue/FieldValue.
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
-            $this->getRules($value->getDirective())
-        );
-
-        return $value->setValue($current);
-    }
-
-    /**
-     * Get array of rules to apply to field.
-     *
-     * @param DirectiveNode $directive
-     *
-     * @return array
-     */
-    protected function getRules(DirectiveNode $directive)
-    {
-        return collect($directive->arguments)->map(function (ArgumentNode $arg) {
-            return $this->argValue($arg);
-        })->collapse()->toArray();
     }
 }

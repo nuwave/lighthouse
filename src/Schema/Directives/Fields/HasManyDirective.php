@@ -19,22 +19,26 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'hasMany';
     }
 
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
+     * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
-     * @param DocumentAST              $original
-     *
-     * @throws DirectiveException
+     * @param DocumentAST $current
+     * @param DocumentAST $original
      *
      * @return DocumentAST
+     * @throws DirectiveException
      */
-    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $current,
+        DocumentAST $original
+    ): DocumentAST
     {
         $paginationType = $this->getResolverType();
 
@@ -55,8 +59,9 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
      * @param FieldValue $value
      *
      * @return FieldValue
+     * @throws DirectiveException
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         $relation = $this->directiveArgValue('relation', $value->getFieldName());
         $type = $this->getResolverType();

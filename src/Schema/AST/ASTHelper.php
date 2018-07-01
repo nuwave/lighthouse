@@ -19,7 +19,7 @@ class ASTHelper
      * Remove this method (and possibly the entire class) once it is resolved.
      *
      * @param NodeList|array $original
-     * @param array          $addition
+     * @param NodeList|array $addition
      *
      * @return NodeList
      */
@@ -37,7 +37,7 @@ class ASTHelper
      * be removed from the original list if the name exists in both lists.
      *
      * @param NodeList|array $original
-     * @param array          $addition
+     * @param NodeList|array $addition
      *
      * @return NodeList
      */
@@ -58,7 +58,7 @@ class ASTHelper
      *
      * @return Node
      */
-    public static function cloneNode(Node $node)
+    public static function cloneNode(Node $node): Node
     {
         return AST::fromArray($node->toArray(true));
     }

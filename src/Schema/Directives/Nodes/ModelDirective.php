@@ -20,7 +20,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'model';
     }
@@ -32,7 +32,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value): NodeValue
     {
         $modelClassName = $this->getModelClassName($value);
 
@@ -50,7 +50,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      *
      * @return string
      */
-    protected function getModelClassName(NodeValue $value)
+    protected function getModelClassName(NodeValue $value): string
     {
         $className = $this->directiveArgValue('class');
 
@@ -62,7 +62,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      *
      * @return string
      */
-    protected function inferModelClassName($nodeName)
+    protected function inferModelClassName(string $nodeName): string
     {
         return config('lighthouse.namespaces.models').'\\'.$nodeName;
     }
@@ -76,7 +76,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original): DocumentAST
     {
         return $this->attachNodeInterfaceToObjectType($node, $current);
     }

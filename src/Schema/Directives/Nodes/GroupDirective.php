@@ -29,7 +29,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'group';
     }
@@ -42,8 +42,9 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      * @throws DirectiveException
      *
      * @return DocumentAST
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
      */
-    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original): DocumentAST
     {
         $nodeName = $node->name->value;
 
@@ -68,7 +69,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      *
      * @return ObjectTypeDefinitionNode
      */
-    protected function setMiddlewareDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
+    protected function setMiddlewareDirectiveOnFields(ObjectTypeDefinitionNode $objectType): ObjectTypeDefinitionNode
     {
         $middlewareValues = $this->directiveArgValue('middleware');
 
@@ -95,7 +96,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      *
      * @return ObjectTypeDefinitionNode
      */
-    protected function setNamespaceDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
+    protected function setNamespaceDirectiveOnFields(ObjectTypeDefinitionNode $objectType): ObjectTypeDefinitionNode
     {
         $namespaceValue = $this->directiveArgValue('namespace');
 
@@ -129,7 +130,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      *
      * @return DirectiveNode
      */
-    protected function mergeNamespaceOnExistingDirective($namespaceValue, DirectiveNode $directive)
+    protected function mergeNamespaceOnExistingDirective($namespaceValue, DirectiveNode $directive): DirectiveNode
     {
         $namespaces = PartialParser::arguments([
             "field: \"$namespaceValue\"",

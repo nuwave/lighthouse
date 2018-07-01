@@ -32,7 +32,7 @@ abstract class BaseDirective implements Directive
      *
      * @return $this
      */
-    public function hydrate($definitionNode)
+    public function hydrate($definitionNode): BaseDirective
     {
         $this->definitionNode = $definitionNode;
 
@@ -66,7 +66,7 @@ abstract class BaseDirective implements Directive
      *
      * @return mixed
      */
-    protected function directiveArgValue($name, $default = null, $directive = null)
+    protected function directiveArgValue(string $name, $default = null, $directive = null)
     {
         // Get the definition associated with the class of the directive, unless explicitely given
         $directive = $directive ?? $this->directiveDefinition();
@@ -87,9 +87,9 @@ abstract class BaseDirective implements Directive
     /**
      * @throws DirectiveException
      *
-     * @return mixed|string
+     * @return string
      */
-    protected function getModelClass()
+    protected function getModelClass(): string
     {
         $model = $this->directiveArgValue('model');
 
@@ -119,7 +119,7 @@ abstract class BaseDirective implements Directive
      *
      * @return string
      */
-    protected function namespaceClassName($baseClassName)
+    protected function namespaceClassName(string $baseClassName): string
     {
         $className = $this->associatedNamespace().'\\'.$baseClassName;
 
@@ -136,7 +136,7 @@ abstract class BaseDirective implements Directive
      *
      * @return string
      */
-    protected function associatedNamespace()
+    protected function associatedNamespace(): string
     {
         $namespaceDirective = $this->directiveDefinition(
             (new NamespaceDirective())->name()

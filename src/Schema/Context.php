@@ -2,12 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Illuminate\Http\Request;
+
 class Context
 {
     /**
      * Http request.
      *
-     * @var \Illuminate\Http\Request
+     * @var Request
      */
     public $request;
 
@@ -21,10 +23,10 @@ class Context
     /**
      * Create new context.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param mixed                    $user
+     * @param Request $request
+     * @param mixed   $user
      */
-    public function __construct($request, $user)
+    public function __construct(Request $request, $user)
     {
         $this->request = $request;
         $this->user = $user;

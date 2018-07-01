@@ -21,5 +21,5 @@ interface FieldManipulator extends Directive
         ObjectTypeDefinitionNode $parentType,
         DocumentAST $current,
         DocumentAST $original
-    );
+    ): DocumentAST;
 }

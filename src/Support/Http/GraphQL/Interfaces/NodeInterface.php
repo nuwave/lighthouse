@@ -11,7 +11,7 @@ class NodeInterface
     /**
      * Resolve node value.
      *
-     * @param string $value
+     * @param mixed $value
      *
      * @return mixed
      */

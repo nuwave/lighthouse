@@ -18,7 +18,7 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'security';
     }
@@ -29,8 +29,9 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
      * @param NodeValue $value
      *
      * @return NodeValue
+     * @throws DirectiveException
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value): NodeValue
     {
         if ('Query' !== $value->getNodeName()) {
             $message = sprintf(
@@ -42,19 +43,17 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
             throw new DirectiveException($message);
         }
 
-        $this->queryDepth($value);
-        $this->queryComplexity($value);
-        $this->queryIntrospection($value);
+        $this->queryDepth();
+        $this->queryComplexity();
+        $this->queryIntrospection();
 
         return $value;
     }
 
     /**
      * Set the max query complexity.
-     *
-     * @param NodeValue $value
      */
-    protected function queryComplexity(NodeValue $value)
+    protected function queryComplexity()
     {
         $complexity = $this->directiveArgValue('complexity');
 
@@ -67,10 +66,8 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
 
     /**
      * Set max query depth.
-     *
-     * @param NodeValue $value
      */
-    protected function queryDepth(NodeValue $value)
+    protected function queryDepth()
     {
         $depth = $this->directiveArgValue('depth');
 
@@ -83,10 +80,8 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
 
     /**
      * Set introspection rule.
-     *
-     * @param NodeValue $value
      */
-    protected function queryIntrospection(NodeValue $value)
+    protected function queryIntrospection()
     {
         $introspection = $this->directiveArgValue('introspection');
 

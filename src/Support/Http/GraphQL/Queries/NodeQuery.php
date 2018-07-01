@@ -14,7 +14,8 @@ class NodeQuery
      * @param mixed $root
      * @param array $args
      *
-     * @return string
+     * @return mixed
+     * @throws \GraphQL\Error\Error
      */
     public function resolve($root, array $args)
     {

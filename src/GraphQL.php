@@ -103,7 +103,7 @@ class GraphQL
      *
      * @return array
      */
-    public function execute($query, $context = null, $variables = [], $rootValue = null): array
+    public function execute(string $query, $context = null, array $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
@@ -137,7 +137,7 @@ class GraphQL
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    public function queryAndReturnResult(string $query, $context = null, array $variables = [], $rootValue = null): ExecutionResult
     {
         $schema = $this->graphqlSchema ?: $this->buildSchema();
 
@@ -212,7 +212,7 @@ class GraphQL
      *
      * @return \GraphQL\Deferred
      */
-    public function batch($abstract, $key, array $data = [], $name = null): Deferred
+    public function batch(string $abstract, $key, array $data = [], $name = null): Deferred
     {
         $name = $name ?: $abstract;
         $instance = app()->has($name)

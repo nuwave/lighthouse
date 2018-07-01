@@ -14,7 +14,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'can';
     }
@@ -26,7 +26,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value): FieldValue
     {
         $policies = $this->directiveArgValue('if');
         $model = $this->directiveArgValue('model');

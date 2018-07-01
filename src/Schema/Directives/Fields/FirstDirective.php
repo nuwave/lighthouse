@@ -14,7 +14,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'first';
     }
@@ -27,7 +27,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
      * @return FieldValue
      * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         $model = $this->getModelClass();
 

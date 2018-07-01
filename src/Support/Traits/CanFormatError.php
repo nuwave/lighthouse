@@ -19,7 +19,7 @@ trait CanFormatError
      *
      * @param \Closure $handler
      */
-    public function error($handler)
+    public function error(\Closure $handler)
     {
         $this->errorHandler = $handler;
     }
@@ -31,7 +31,7 @@ trait CanFormatError
      *
      * @return array
      */
-    public function formatError(Error $e)
+    public function formatError(Error $e): array
     {
         $error = ['message' => $e->getMessage()];
         $locations = $e->getLocations();

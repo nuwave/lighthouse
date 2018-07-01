@@ -12,9 +12,9 @@ class NodeResolver
      *
      * @param mixed $node
      *
-     * @return \GraphQL\Type\Definition\Type
+     * @return Type
      */
-    public static function resolve($node)
+    public static function resolve($node): Type
     {
         return (new static())->fromNode($node);
     }
@@ -89,7 +89,7 @@ class NodeResolver
             case 'String':
                 return Type::string();
             default:
-                return graphql()->types()->instance($node->name->value);
+                return graphql()->types()->get($node->name->value);
         }
     }
 }
