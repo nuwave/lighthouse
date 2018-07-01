@@ -3,12 +3,6 @@
 Hey, thank you for contributing to Lighthouse. Here are some tips to make
 it easy for you.
 
-## Have a question?
-
-If you can not figure out something works in Lighthouse, want to know more
-about it or have any other questions, you can always hop into our
-[Slack Channel](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWI1ZDQ1YWM1NmM2MmQ0NTU0NGNjZWFkMTJhY2VjMDAwZmMyZDFlZTc1Mjc3ZGY0MWM1Y2Q5MWNjYmJmYWJkYmU)
-
 ## Testing
 
 We use **PHPUnit** for unit tests and integration tests.
@@ -50,3 +44,10 @@ Look through some of the code to get a feel for the naming conventi qons.
 Use type hints whenever possible and make sure to include proper **PHPDocs**
 
 Prefer explicit naming and short functions over excessive comments.
+
+## Documentation
+
+The docs for Lighthouse are maintained in a [seperate repo](https://github.com/nuwave/lighthouse-docs)
+
+Head over there if you want to contribute to the docs, or if you made a PR
+here and want to document your changes.
