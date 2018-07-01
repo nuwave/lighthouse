@@ -14,5 +14,5 @@ interface NodeManipulator extends Directive
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original);
+    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original): DocumentAST;
 }
