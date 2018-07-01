@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Utils\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Utils\AST;
 
 class ASTHelper
 {
@@ -30,6 +30,25 @@ class ASTHelper
         }
 
         return $original->merge($addition);
+    }
+
+    /**
+     * This function will merge two lists uniquely by name. Fields will
+     * be removed from the original list if the name exists in both lists.
+     *
+     * @param NodeList|array $original
+     * @param array          $addition
+     *
+     * @return NodeList
+     */
+    public static function mergeUniqueNodeList($original, $addition)
+    {
+        $newFields = collect($addition)->pluck('name.value')->filter()->all();
+        $filteredList = collect($original)->filter(function ($field) use ($newFields) {
+            return ! in_array(data_get($field, 'name.value'), $newFields);
+        })->values()->all();
+
+        return self::mergeNodeList($filteredList, $addition);
     }
 
     /**
