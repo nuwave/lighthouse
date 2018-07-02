@@ -1,3 +1,5 @@
+<img src="logo.png" width="150" height="150">
+
 # Lighthouse
 
 [![Build Status](https://travis-ci.org/nuwave/lighthouse.svg?branch=master)](https://travis-ci.org/nuwave/lighthouse)
