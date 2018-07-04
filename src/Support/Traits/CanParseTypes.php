@@ -22,7 +22,7 @@ trait CanParseTypes
      */
     public function parseSchema($schema)
     {
-        return Parser::parse($schema);
+        return Parser::parse($schema, ['noLocation' => true]);
     }
 
     /**

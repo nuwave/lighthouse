@@ -5,12 +5,15 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
@@ -42,7 +45,7 @@ class PartialParser
     public static function objectTypeDefinition($definition)
     {
         return self::getFirstAndValidateType(
-            Parser::parse($definition)->definitions,
+            self::parse($definition)->definitions,
             ObjectTypeDefinitionNode::class
         );
     }
@@ -126,7 +129,7 @@ class PartialParser
     public static function operationDefinition($operation)
     {
         return self::getFirstAndValidateType(
-            Parser::parse($operation)->definitions,
+            self::parse($operation)->definitions,
             OperationDefinitionNode::class
         );
     }
@@ -183,7 +186,7 @@ class PartialParser
     public static function directiveDefinition($directiveDefinition)
     {
         return self::getFirstAndValidateType(
-            Parser::parse($directiveDefinition)->definitions,
+            self::parse($directiveDefinition)->definitions,
             DirectiveDefinitionNode::class
         );
     }
@@ -210,7 +213,7 @@ class PartialParser
     public static function interfaceTypeDefinition($interfaceDefinition)
     {
         return self::getFirstAndValidateType(
-            Parser::parse($interfaceDefinition)->definitions,
+            self::parse($interfaceDefinition)->definitions,
             InterfaceTypeDefinitionNode::class
         );
     }
@@ -225,7 +228,7 @@ class PartialParser
     public static function inputObjectTypeDefinition($inputTypeDefinition)
     {
         return self::getFirstAndValidateType(
-            Parser::parse($inputTypeDefinition)->definitions,
+            self::parse($inputTypeDefinition)->definitions,
             InputObjectTypeDefinitionNode::class
         );
     }
@@ -240,7 +243,7 @@ class PartialParser
     public static function scalarTypeDefinition($scalarDefinition)
     {
         return self::getFirstAndValidateType(
-            Parser::parse($scalarDefinition)->definitions,
+            self::parse($scalarDefinition)->definitions,
             ScalarTypeDefinitionNode::class
         );
     }
@@ -255,9 +258,45 @@ class PartialParser
     public static function enumTypeDefinition($enumDefinition)
     {
         return self::getFirstAndValidateType(
-            Parser::parse($enumDefinition)->definitions,
+            self::parse($enumDefinition)->definitions,
             EnumTypeDefinitionNode::class
         );
+    }
+    
+    /**
+     * @param string $typeName
+     *
+     * @return NamedTypeNode
+     * @throws ParseException
+     */
+    public static function namedType(string $typeName): NamedTypeNode
+    {
+        return self::validateType(
+            self::parseType($typeName),
+            NamedTypeNode::class
+        );
+    }
+    
+    /**
+     * @param string $definition
+     *
+     * @return \GraphQL\Language\AST\DocumentNode
+     */
+    protected static function parse(string $definition): DocumentNode
+    {
+        // Ignore location since it only bloats the AST
+        return Parser::parse($definition, ['noLocation' => true]);
+    }
+    
+    /**
+     * @param string $definition
+     *
+     * @return Node
+     */
+    protected static function parseType(string $definition): Node
+    {
+        // Ignore location since it only bloats the AST
+        return Parser::parseType($definition, ['noLocation' => true]);
     }
 
     /**
@@ -268,20 +307,32 @@ class PartialParser
      *
      * @throws ParseException
      *
-     * @return mixed
+     * @return Node
      */
-    protected static function getFirstAndValidateType(NodeList $list, $expectedType)
+    protected static function getFirstAndValidateType(NodeList $list, string $expectedType): Node
     {
         if (1 !== $list->count()) {
-            throw new ParseException('  More than one definition was found in the passed in schema.');
+            throw new ParseException('More than one definition was found in the passed in schema.');
         }
 
         $node = $list[0];
-
-        if (! $node instanceof $expectedType) {
+    
+        return self::validateType($node, $expectedType);
+    }
+    
+    /**
+     * @param Node $node
+     * @param string $expectedType
+     *
+     * @return Node
+     * @throws ParseException
+     */
+    protected static function validateType(Node $node, string $expectedType): Node
+    {
+        if (!$node instanceof $expectedType) {
             throw new ParseException("The given definition was not of type: $expectedType");
         }
-
+        
         return $node;
     }
 }

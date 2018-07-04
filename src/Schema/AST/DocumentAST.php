@@ -7,6 +7,7 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Utils\AST;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\DefinitionNode;
@@ -23,7 +24,7 @@ use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Exceptions\DocumentASTException;
 
-class DocumentAST
+class DocumentAST implements \Serializable
 {
     /**
      * Check if documentAST is currently locked.
@@ -56,7 +57,24 @@ class DocumentAST
      */
     public static function fromSource(string $schema): DocumentAST
     {
-        return new static(Parser::parse($schema));
+        // Ignore location since it only bloats the AST
+        return new static(Parser::parse($schema, ['noLocation' => true]));
+    }
+
+    /**
+     * Strip out irrelevant information to make serialization more efficient.
+     */
+    public function serialize()
+    {
+        return serialize(AST::toArray($this->documentNode));
+    }
+
+    /**
+     * Construct from the string representation.
+     */
+    public function unserialize($serialized)
+    {
+        $this->documentNode = AST::fromArray(unserialize($serialized));
     }
 
     /**
