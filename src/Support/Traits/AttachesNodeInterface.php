@@ -21,7 +21,7 @@ trait AttachesNodeInterface
     {
         $objectType->interfaces = array_merge(
             collect($objectType->interfaces)->toArray(),
-            [Parser::parseType('Node')]
+            [Parser::parseType('Node', ['noLocation' => true])]
         );
 
         $globalIdFieldName = config('lighthouse.global_id_field', '_id');
