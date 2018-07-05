@@ -14,5 +14,5 @@ interface NodeResolver extends Directive
      *
      * @return Type
      */
-    public function resolveNode(NodeValue $value): Type;
+    public function resolveNode(NodeValue $value);
 }
