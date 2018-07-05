@@ -23,5 +23,6 @@ interface ArgManipulator extends Directive
         FieldDefinitionNode $fieldDefinition,
         ObjectTypeDefinitionNode $parentType,
         DocumentAST $current,
-        DocumentAST $original): DocumentAST;
+        DocumentAST $original
+    );
 }
