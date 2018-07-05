@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
@@ -15,7 +16,7 @@ class EnumDirective extends BaseDirective implements NodeResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'enum';
     }
@@ -25,9 +26,9 @@ class EnumDirective extends BaseDirective implements NodeResolver
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\Type
+     * @return Type
      */
-    public function resolveNode(NodeValue $value)
+    public function resolveNode(NodeValue $value): Type
     {
         return new EnumType([
             'name' => $value->getNodeName(),
@@ -54,7 +55,7 @@ class EnumDirective extends BaseDirective implements NodeResolver
      *
      * @return string
      */
-    protected function safeDescription($description = '')
+    protected function safeDescription(string $description = ''): string
     {
         return trim(str_replace(["\n", "\t"], '', $description));
     }

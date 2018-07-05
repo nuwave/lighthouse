@@ -36,7 +36,7 @@ class NodeFactory
      * @return Type
      * @throws \Exception
      */
-    public function handle(NodeValue $value)
+    public function handle(NodeValue $value): Type
     {
         $value->setType(
             $this->hasTypeResolver($value)
@@ -53,6 +53,7 @@ class NodeFactory
      * @param NodeValue $value
      *
      * @return bool
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      */
     protected function hasTypeResolver(NodeValue $value)
     {
@@ -65,13 +66,13 @@ class NodeFactory
      * @param NodeValue $value
      *
      * @return Type
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      */
-    protected function resolveTypeViaDirective(NodeValue $value)
+    protected function resolveTypeViaDirective(NodeValue $value): Type
     {
         return graphql()->directives()
-            ->forNode($value->getNode())
-            ->resolveNode($value)
-            ->getType();
+            ->nodeResolver($value->getNode())
+            ->resolveNode($value);
     }
 
     /**
@@ -82,7 +83,7 @@ class NodeFactory
      * @throws \Exception
      * @return Type
      */
-    protected function resolveType(NodeValue $value)
+    protected function resolveType(NodeValue $value): Type
     {
         // We do not have to consider TypeExtensionNode since they
         // are merged before we get here
@@ -111,7 +112,7 @@ class NodeFactory
      *
      * @return EnumType
      */
-    public function enum(NodeValue $enumNodeValue)
+    public function enum(NodeValue $enumNodeValue): EnumType
     {
         $enumDirective = (new EnumDirective())->hydrate($enumNodeValue->getNode());
 
@@ -125,7 +126,7 @@ class NodeFactory
      *
      * @return ScalarType
      */
-    protected function scalar(NodeValue $value)
+    protected function scalar(NodeValue $value): ScalarType
     {
         return ScalarResolver::resolve($value)->getType();
     }
@@ -137,7 +138,7 @@ class NodeFactory
      *
      * @return InterfaceType
      */
-    protected function interface(NodeValue $value)
+    protected function interface(NodeValue $value): InterfaceType
     {
         return new InterfaceType([
             'name' => $value->getNodeName(),
@@ -152,7 +153,7 @@ class NodeFactory
      *
      * @return ObjectType
      */
-    protected function objectType(NodeValue $value)
+    protected function objectType(NodeValue $value): ObjectType
     {
         return new ObjectType([
             'name' => $value->getNodeName(),
@@ -174,7 +175,7 @@ class NodeFactory
      *
      * @return InputObjectType
      */
-    protected function inputObjectType(NodeValue $value)
+    protected function inputObjectType(NodeValue $value): InputObjectType
     {
         return new InputObjectType([
             'name' => $value->getNodeName(),
@@ -191,7 +192,7 @@ class NodeFactory
      *
      * @return NodeValue
      */
-    protected function applyMiddleware(NodeValue $value)
+    protected function applyMiddleware(NodeValue $value): NodeValue
     {
         return graphql()->directives()->nodeMiddleware($value->getNode())
             ->reduce(function (NodeValue $value, NodeMiddleware $middleware) {

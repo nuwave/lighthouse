@@ -19,8 +19,9 @@ class ASTBuilder
      * @param string $schema
      *
      * @return DocumentAST
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
      */
-    public static function generate($schema)
+    public static function generate(string $schema): DocumentAST
     {
         $document = DocumentAST::fromSource($schema);
 
@@ -42,7 +43,7 @@ class ASTBuilder
      *
      * @return DocumentAST
      */
-    protected static function applyNodeManipulators(DocumentAST $document)
+    protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
     {
         $originalDocument = $document;
 
@@ -67,7 +68,12 @@ class ASTBuilder
             }, $document);
     }
 
-    protected static function mergeTypeExtensions(DocumentAST $document)
+    /**
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected static function mergeTypeExtensions(DocumentAST $document): DocumentAST
     {
         $document->objectTypeDefinitions()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
             $name = $objectType->name->value;
@@ -164,11 +170,12 @@ class ASTBuilder
      *
      * @param DocumentAST $document
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
-     *
      * @return DocumentAST
+     *
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
      */
-    protected static function addNodeSupport(DocumentAST $document)
+    protected static function addNodeSupport(DocumentAST $document): DocumentAST
     {
         $hasTypeImplementingNode = $document->objectTypeDefinitions()->contains(function (ObjectTypeDefinitionNode $objectType) {
             return collect($objectType->interfaces)->contains(function (NamedTypeNode $interface) {

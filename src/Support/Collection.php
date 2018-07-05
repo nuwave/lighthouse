@@ -13,7 +13,10 @@ use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
  */
 class Collection
 {
-    public function fetch()
+    /**
+     * @return \Closure
+     */
+    public function fetch(): \Closure
     {
         return function ($relations = null) {
             if (count($this->items) > 0) {
@@ -28,7 +31,10 @@ class Collection
         };
     }
 
-    public function fetchCount()
+    /**
+     * @return \Closure
+     */
+    public function fetchCount(): \Closure
     {
         return function ($relations = null) {
             if (count($this->items) > 0) {
@@ -44,7 +50,10 @@ class Collection
         };
     }
 
-    public function fetchForPage()
+    /**
+     * @return \Closure
+     */
+    public function fetchForPage(): \Closure
     {
         return function ($perPage, $page, $relations) {
             if (count($this->items) > 0) {

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Validator;
 
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Validation\Validator;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -10,21 +11,21 @@ class ValidatorFactory
     /**
      * Resolve a new Validator instance.
      *
-     * @param \Illuminate\Contracts\Translation\Translator $translator
-     * @param array                                        $data
-     * @param array                                        $rules
-     * @param array                                        $messages
-     * @param array                                        $customAttributes
+     * @param Translator $translator
+     * @param array      $data
+     * @param array      $rules
+     * @param array      $messages
+     * @param array      $customAttributes
      *
-     * @return \Illuminate\Validation\Validator
+     * @return Validator
      */
     public static function resolve(
-        $translator,
+        Translator $translator,
         array $data,
         array $rules,
         array $messages,
         array $customAttributes
-    ) {
+    ): Validator {
         $resolveInfo = array_get($customAttributes, 'resolveInfo');
 
         return $resolveInfo instanceof ResolveInfo
@@ -42,7 +43,7 @@ class ValidatorFactory
      *
      * @return bool
      */
-    public function requiredWithMutation($attribute, $value, $parameters, $validator)
+    public function requiredWithMutation(string $attribute, $value, array $parameters, GraphQLValidator $validator): bool
     {
         $info = $validator->getResolveInfo();
 

@@ -20,7 +20,7 @@ class EnumResolver extends AbstractResolver
      *
      * @return EnumType
      */
-    public function generate()
+    public function generate(): EnumType
     {
         $config = [
             'name' => $this->getName(),
@@ -35,7 +35,7 @@ class EnumResolver extends AbstractResolver
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->node->name->value;
     }
@@ -45,7 +45,7 @@ class EnumResolver extends AbstractResolver
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         return collect($this->node->values)
             ->mapWithKeys(function (EnumValueDefinitionNode $node) {
@@ -60,7 +60,7 @@ class EnumResolver extends AbstractResolver
      *
      * @return string
      */
-    protected function getEnumValueKey(EnumValueDefinitionNode $node)
+    protected function getEnumValueKey(EnumValueDefinitionNode $node): string
     {
         return $node->name->value;
     }
@@ -72,7 +72,7 @@ class EnumResolver extends AbstractResolver
      *
      * @return array
      */
-    protected function parseEnumNode(EnumValueDefinitionNode $node)
+    protected function parseEnumNode(EnumValueDefinitionNode $node): array
     {
         $directive = $this->getDirective($node, 'enum');
 

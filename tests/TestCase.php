@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Schema;
 use GraphQL\Language\Parser;
 use GraphQL\Executor\ExecutionResult;
@@ -31,7 +32,7 @@ class TestCase extends BaseTestCase
      *
      * @return array
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             LighthouseServiceProvider::class,
@@ -84,7 +85,7 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Language\AST\DocumentNode
      */
-    protected function parse($schema)
+    protected function parse(string $schema): DocumentNode
     {
         return Parser::parse($schema);
     }
@@ -96,11 +97,10 @@ class TestCase extends BaseTestCase
      * @param string $query
      * @param bool   $lighthouse
      * @param array  $variables
-     * @param bool   $format
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function execute($schema, $query, $lighthouse = false, $variables = [], $format = false): ExecutionResult
+    protected function execute(string $schema, string $query, $lighthouse = false, $variables = []): ExecutionResult
     {
         if ($lighthouse) {
             $addDefaultSchema = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
@@ -120,9 +120,9 @@ class TestCase extends BaseTestCase
      * @param bool   $lighthouse
      * @param array  $variables
      *
-     * @return \GraphQL\Executor\ExecutionResult
+     * @return array
      */
-    protected function executeAndFormat($schema, $query, $lighthouse = false, $variables = [])
+    protected function executeAndFormat(string $schema, string $query, bool $lighthouse = false, array $variables = []): array
     {
         $result = $this->execute($schema, $query, $lighthouse, $variables);
 
@@ -154,7 +154,7 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaWithDefaultQuery($schema): Schema
+    protected function buildSchemaWithDefaultQuery(string $schema): Schema
     {
         return $this->buildSchemaFromString($schema.'
             type Query {

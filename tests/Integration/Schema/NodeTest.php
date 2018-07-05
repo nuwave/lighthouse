@@ -112,7 +112,7 @@ class NodeTest extends DBTestCase
     public function resolveNodeType($value)
     {
         if (is_array($value) && isset($value['name'])) {
-            return graphql()->types()->instance('User');
+            return graphql()->types()->get('User');
         }
     }
 }

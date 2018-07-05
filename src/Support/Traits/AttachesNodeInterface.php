@@ -17,7 +17,7 @@ trait AttachesNodeInterface
      *
      * @return DocumentAST
      */
-    protected function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
+    protected function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST): DocumentAST
     {
         $objectType->interfaces = array_merge(
             collect($objectType->interfaces)->toArray(),

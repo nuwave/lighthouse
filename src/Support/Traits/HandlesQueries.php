@@ -20,9 +20,9 @@ trait HandlesQueries
      *
      * @throws DirectiveException
      *
-     * @return mixed|string
+     * @return string
      */
-    public function getModelClass(FieldValue $value)
+    public function getModelClass(FieldValue $value): string
     {
         $model = $this->directiveArgValue(
             $this->fieldDirective($value->getField(), $this->name()),
@@ -54,7 +54,7 @@ trait HandlesQueries
      *
      * @return array
      */
-    protected function getScopes(FieldValue $value)
+    protected function getScopes(FieldValue $value): array
     {
         return $this->directiveArgValue(
             $this->fieldDirective($value->getField(), $this->name()),
@@ -63,13 +63,26 @@ trait HandlesQueries
         );
     }
 
-    public function applyFilters($query, $args)
+    /**
+     * @param $query
+     * @param array $args
+     *
+     * @return mixed
+     */
+    public function applyFilters($query, array $args)
     {
         return $query->when(isset($args['query.filter']), function ($q) use ($args) {
             return QueryFilter::build($q, $args);
         });
     }
 
+    /**
+     * @param $query
+     * @param $args
+     * @param FieldValue $value
+     *
+     * @return mixed
+     */
     public function applyScopes($query, $args, FieldValue $value)
     {
         foreach ($this->getScopes($value) as $scope) {

@@ -17,7 +17,7 @@ class FindDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'find';
     }
@@ -30,7 +30,7 @@ class FindDirective extends BaseDirective implements FieldResolver
      * @return FieldValue
      * @throws DirectiveException
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         $model = $this->getModelClass();
 

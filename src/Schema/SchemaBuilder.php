@@ -37,7 +37,7 @@ class SchemaBuilder
      *
      * @return Schema
      */
-    public function build($documentAST)
+    public function build(DocumentAST $documentAST): Schema
     {
         $types = $this->convertTypes($documentAST);
         $this->loadRootOperationFields($types);
@@ -85,7 +85,7 @@ class SchemaBuilder
      *
      * @return \Closure
      */
-    protected function isOperationType()
+    protected function isOperationType(): \Closure
     {
         return function (Type $type) {
             return in_array($type->name, ['Query', 'Mutation', 'Subscription']);
@@ -99,7 +99,7 @@ class SchemaBuilder
      *
      * @return Collection
      */
-    public function convertTypes(DocumentAST $document)
+    public function convertTypes(DocumentAST $document): Collection
     {
         return $document->typeDefinitions()
             ->sortBy(function (TypeDefinitionNode $typeDefinition) {
@@ -119,7 +119,7 @@ class SchemaBuilder
      *
      * @return Collection
      */
-    protected function convertDirectives(DocumentAST $document)
+    protected function convertDirectives(DocumentAST $document): Collection
     {
         return $document->directiveDefinitions()->map(function (DirectiveDefinitionNode $directive) {
             return new Directive([

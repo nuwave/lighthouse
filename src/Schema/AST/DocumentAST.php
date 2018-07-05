@@ -62,9 +62,9 @@ class DocumentAST
     /**
      * Mark the AST as locked.
      *
-     * @return self
+     * @return DocumentAST
      */
-    public function lock()
+    public function lock(): DocumentAST
     {
         $this->locked = true;
 
@@ -74,9 +74,9 @@ class DocumentAST
     /**
      * Mark the AST as unlocked.
      *
-     * @return self
+     * @return DocumentAST
      */
-    public function unlock()
+    public function unlock(): DocumentAST
     {
         $this->locked = false;
 
@@ -359,9 +359,10 @@ class DocumentAST
     }
 
     /**
-     * Get node's original/current has.
+     * Get node's original/current hash.
      *
      * @param DefinitionNode $node
+     * @param bool $unwrap
      *
      * @return string
      */

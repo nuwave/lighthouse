@@ -13,7 +13,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'middleware';
     }
@@ -25,7 +25,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value): FieldValue
     {
         $checks = $this->getChecks($value);
 

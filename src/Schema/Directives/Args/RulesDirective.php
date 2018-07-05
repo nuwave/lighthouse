@@ -2,21 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
-class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
+class RulesDirective extends BaseDirective implements ArgMiddleware
 {
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'rules';
     }
@@ -24,29 +21,23 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param ArgumentValue $value
+     * @param ArgumentValue $argumentValue
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $argumentValue): ArgumentValue
     {
-        if (in_array($value->getField()->getNodeName(), ['Query', 'Mutation'])) {
-            return $value;
+        if (in_array($argumentValue->getField()->getNodeName(), ['Query', 'Mutation'])) {
+            return $argumentValue;
         }
 
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
+        return $argumentValue->setRules(
             $this->directiveArgValue('apply', [])
-        );
-        $current['messages'] = array_merge(
-            array_get($value->getArg(), 'messages', []),
+        )->setMessages(
             collect($this->directiveArgValue('messages', []))
-                ->mapWithKeys(function ($message, $path) use ($value) {
-                    return [$value->getArgName().".{$path}" => $message];
+                ->mapWithKeys(function (string $message, string $path) use ($argumentValue) {
+                    return [$argumentValue->getArgName().".{$path}" => $message];
                 })->toArray()
         );
-
-        return $value->setValue($current);
     }
 }

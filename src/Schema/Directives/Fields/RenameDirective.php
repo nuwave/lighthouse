@@ -14,7 +14,7 @@ class RenameDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'rename';
     }
@@ -27,7 +27,7 @@ class RenameDirective extends BaseDirective implements FieldResolver
      * @return FieldValue
      * @throws DirectiveException
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         $attribute = $this->directiveArgValue('attribute');
 

@@ -29,7 +29,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function forRequest($request)
+    public function forRequest(string $request): array
     {
         $document = DocumentAST::fromSource($request);
         $fragments = $document->fragmentDefinitions();
@@ -67,10 +67,8 @@ class MiddlewareManager
      *
      * @param string $name
      * @param array $middleware
-     *
-     * @return void
      */
-    public function registerQuery($name, array $middleware)
+    public function registerQuery(string $name, array $middleware)
     {
         $this->queries = array_merge($this->queries, [$name => $middleware]);
     }
@@ -80,10 +78,8 @@ class MiddlewareManager
      *
      * @param string $name
      * @param array $middleware
-     *
-     * @return void
      */
-    public function registerMutation($name, array $middleware)
+    public function registerMutation(string $name, array $middleware)
     {
         $this->mutations = array_merge($this->mutations, [$name => $middleware]);
     }
@@ -96,7 +92,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function operation($operation, array $fields)
+    public function operation(string $operation, array $fields): array
     {
         if ('mutation' === $operation) {
             return array_collapse(array_map(function ($field) {
@@ -118,7 +114,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function query($name)
+    public function query(string $name): array
     {
         return array_get($this->queries, $name, []);
     }
@@ -130,7 +126,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function mutation($name)
+    public function mutation(string $name): array
     {
         return array_get($this->mutations, $name, []);
     }

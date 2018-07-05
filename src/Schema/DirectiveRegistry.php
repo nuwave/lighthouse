@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -26,7 +27,7 @@ class DirectiveRegistry
     /**
      * Collection of registered directives.
      *
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     protected $directives;
 
@@ -47,10 +48,13 @@ class DirectiveRegistry
     /**
      * Gather all directives from a given directory and register them.
      *
-     * Works similar to https://github.com/laravel/framework/blob/5.6/src/Illuminate/Foundation/Console/Kernel.php#L191-L225
+     * Works similar to
+     * https://github.com/laravel/framework/blob/5.6/src/Illuminate/Foundation/Console/Kernel.php#L191-L225
      *
      * @param array|string $paths
-     * @param null         $namespace
+     * @param string|null $namespace
+     *
+     * @throws \ReflectionException
      */
     protected function load($paths, $namespace = null)
     {
@@ -59,8 +63,8 @@ class DirectiveRegistry
             ->filter(function ($path) {
                 return is_dir($path);
             })->map(function ($path) {
-            return realpath($path);
-        })->all();
+                return realpath($path);
+            })->all();
 
         if (empty($paths)) {
             return;
@@ -68,16 +72,16 @@ class DirectiveRegistry
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-        ? realpath(__DIR__ . '/../../src/')
-        : app_path();
+            ? realpath(__DIR__ . '/../../src/')
+            : app_path();
 
         /** @var SplFileInfo $file */
         foreach ((new Finder())->in($paths)->files() as $file) {
             $className = $namespace . str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                str_after($file->getPathname(), $path . DIRECTORY_SEPARATOR)
-            );
+                    ['/', '.php'],
+                    ['\\', ''],
+                    str_after($file->getPathname(), $path . DIRECTORY_SEPARATOR)
+                );
 
             $this->tryRegisterClassName($className);
         }
@@ -90,7 +94,7 @@ class DirectiveRegistry
      *
      * @throws \ReflectionException
      */
-    protected function tryRegisterClassName($className)
+    protected function tryRegisterClassName(string $className)
     {
         $reflection = new \ReflectionClass($className);
 
@@ -118,8 +122,24 @@ class DirectiveRegistry
      * @throws DirectiveException
      *
      * @return Directive
+     *
+     * @deprecated Will be removed in next major release
      */
-    public function get($name)
+    public function handler(string $name): Directive
+    {
+        return $this->get($name);
+    }
+
+    /**
+     * Get directive instance by name.
+     *
+     * @param string $name
+     *
+     * @throws DirectiveException
+     *
+     * @return Directive
+     */
+    public function get(string $name): Directive
     {
         $handler = $this->directives->get($name);
 
@@ -131,43 +151,11 @@ class DirectiveRegistry
     }
 
     /**
-     * Get directive instance by name.
-     *
-     * @param string $name
-     *
-     * @throws DirectiveException
-     *
-     * @return Directive
-     *
-     * @deprecated Will be removed in next major release
-     */
-    public function handler($name)
-    {
-        return $this->get($name);
-    }
-
-    /**
-     * Get all directives associated with a node.
-     *
      * @param Node $node
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    protected function directives(Node $node)
-    {
-        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->get($directive->name->value);
-        })->map(function (Directive $directive) use ($node){
-            return $this->hydrate($directive, $node);
-        });
-    }
-
-    /**
-     * @param Node $node
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function nodeManipulators(Node $node)
+    public function nodeManipulators(Node $node): Collection
     {
         return $this->directives($node)->filter(function (Directive $directive) {
             return $directive instanceof NodeManipulator;
@@ -175,11 +163,41 @@ class DirectiveRegistry
     }
 
     /**
+     * Get all directives associated with a node.
+     *
+     * @param Node $node
+     *
+     * @return Collection
+     */
+    protected function directives(Node $node): Collection
+    {
+        return collect(data_get($node, 'directives', []))
+            ->map(function (DirectiveNode $directive) {
+                return $this->get($directive->name->value);
+            })->map(function (Directive $directive) use ($node) {
+                return $this->hydrate($directive, $node);
+            });
+    }
+
+    /**
+     * @param Directive $directive
+     * @param TypeSystemDefinitionNode $definitionNode
+     *
+     * @return Directive
+     */
+    protected function hydrate(Directive $directive, $definitionNode): Directive
+    {
+        return $directive instanceof BaseDirective
+            ? $directive->hydrate($definitionNode)
+            : $directive;
+    }
+
+    /**
      * @param FieldDefinitionNode $fieldDefinition
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function fieldManipulators(FieldDefinitionNode $fieldDefinition)
+    public function fieldManipulators(FieldDefinitionNode $fieldDefinition): Collection
     {
         return $this->directives($fieldDefinition)->filter(function (Directive $directive) {
             return $directive instanceof FieldManipulator;
@@ -189,9 +207,9 @@ class DirectiveRegistry
     /**
      * @param $inputValueDefinition
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function argManipulators(InputValueDefinitionNode $inputValueDefinition)
+    public function argManipulators(InputValueDefinitionNode $inputValueDefinition): Collection
     {
         return $this->directives($inputValueDefinition)->filter(function (Directive $directive) {
             return $directive instanceof ArgManipulator;
@@ -203,7 +221,9 @@ class DirectiveRegistry
      *
      * @param Node $node
      *
-     * @return NodeResolver
+     * @return NodeResolver|null
+     * @throws DirectiveException
+     * @deprecated in favour of nodeResolver
      */
     public function forNode(Node $node)
     {
@@ -215,7 +235,8 @@ class DirectiveRegistry
      *
      * @param Node $node
      *
-     * @return NodeResolver
+     * @return NodeResolver|null
+     * @throws DirectiveException
      */
     public function nodeResolver(Node $node)
     {
@@ -228,6 +249,7 @@ class DirectiveRegistry
             throw new DirectiveException("Node $nodeName can only have one NodeResolver directive. Check your schema definition");
         }
 
+
         return $resolvers->first();
     }
 
@@ -237,8 +259,9 @@ class DirectiveRegistry
      * @param Node $typeDefinition
      *
      * @return bool
+     * @throws DirectiveException
      */
-    public function hasNodeResolver(Node $typeDefinition)
+    public function hasNodeResolver(Node $typeDefinition): bool
     {
         return $this->nodeResolver($typeDefinition) instanceof NodeResolver;
     }
@@ -247,8 +270,10 @@ class DirectiveRegistry
      * @param FieldDefinitionNode $fieldDefinition
      *
      * @return bool
+     * @throws DirectiveException
+     * @deprecated in favour of hasFieldResolver
      */
-    public function hasResolver($fieldDefinition)
+    public function hasResolver($fieldDefinition): bool
     {
         return $this->hasFieldResolver($fieldDefinition);
     }
@@ -259,26 +284,11 @@ class DirectiveRegistry
      * @param FieldDefinitionNode $fieldDefinition
      *
      * @return bool
+     * @throws DirectiveException
      */
-    public function hasFieldResolver($fieldDefinition)
+    public function hasFieldResolver($fieldDefinition): bool
     {
         return $this->fieldResolver($fieldDefinition) instanceof FieldResolver;
-    }
-
-    /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldDefinitionNode $field
-     *
-     * @return bool
-     */
-    public function hasFieldMiddleware($field)
-    {
-        return collect($field->directives)->map(function (DirectiveNode $directive) {
-            return $this->get($directive->name->value);
-        })->reduce(function ($has, $handler) {
-            return $handler instanceof FieldMiddleware ? true : $has;
-        }, false);
     }
 
     /**
@@ -311,13 +321,29 @@ class DirectiveRegistry
     }
 
     /**
+     * Check if field has a resolver directive.
+     *
+     * @param FieldDefinitionNode $field
+     *
+     * @return bool
+     */
+    public function hasFieldMiddleware($field): bool
+    {
+        return collect($field->directives)->map(function (DirectiveNode $directive) {
+            return $this->get($directive->name->value);
+        })->reduce(function ($has, $handler) {
+            return $handler instanceof FieldMiddleware ? true : $has;
+        }, false);
+    }
+
+    /**
      * Get all middleware directive for a type definitions.
      *
      * @param Node $typeDefinition
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function nodeMiddleware(Node $typeDefinition)
+    public function nodeMiddleware(Node $typeDefinition): Collection
     {
         return $this->directives($typeDefinition)->filter(function (Directive $directive) {
             return $directive instanceof NodeMiddleware;
@@ -329,9 +355,9 @@ class DirectiveRegistry
      *
      * @param FieldDefinitionNode $fieldDefinition
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function fieldMiddleware($fieldDefinition)
+    public function fieldMiddleware($fieldDefinition): Collection
     {
         return $this->directives($fieldDefinition)->filter(function ($handler) {
             return $handler instanceof FieldMiddleware;
@@ -343,25 +369,12 @@ class DirectiveRegistry
      *
      * @param InputValueDefinitionNode $arg
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function argMiddleware(InputValueDefinitionNode $arg)
+    public function argMiddleware(InputValueDefinitionNode $arg): Collection
     {
         return $this->directives($arg)->filter(function (Directive $directive) {
             return $directive instanceof ArgMiddleware;
         });
-    }
-
-    /**
-     * @param Directive $directive
-     * @param TypeSystemDefinitionNode $definitionNode
-     *
-     * @return Directive
-     */
-    protected function hydrate(Directive $directive, $definitionNode)
-    {
-        return $directive instanceof BaseDirective
-            ? $directive->hydrate($definitionNode)
-            : $directive;
     }
 }

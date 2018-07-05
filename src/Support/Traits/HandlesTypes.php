@@ -20,7 +20,7 @@ trait HandlesTypes
      *
      * @return bool
      */
-    protected function hasPackedTypes(array $types)
+    protected function hasPackedTypes(array $types): bool
     {
         return collect($types)->reduce(function ($packed, $type) {
             return $packed ?: $this->isTypePacked($type);
@@ -34,7 +34,7 @@ trait HandlesTypes
      *
      * @return bool
      */
-    protected function isTypePacked(Type $type)
+    protected function isTypePacked(Type $type): bool
     {
         if (is_callable(array_get($type->config, 'fields'))) {
             return true;
@@ -111,7 +111,7 @@ trait HandlesTypes
      *
      * @return Type
      */
-    protected function serializeableType(Type $type)
+    protected function serializeableType(Type $type): Type
     {
         $config = $type->config;
 
@@ -142,7 +142,7 @@ trait HandlesTypes
      *
      * @return Type
      */
-    protected function unpackFieldType($type, $wrappers = [])
+    protected function unpackFieldType(Type $type, array $wrappers = []): Type
     {
         if (method_exists($type, 'getWrappedType')) {
             return $this->unpackFieldType(

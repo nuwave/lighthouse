@@ -2,7 +2,10 @@
 
 namespace Tests\Unit\Support\Validator;
 
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -19,7 +22,7 @@ class ValidatorTest extends TestCase
     {
         $this->app->bind('foo.validator', function ($app, $params) {
             return new class($params['root'], $params['args'], $params['context'], $params['info']) extends Validator {
-                protected function rules()
+                protected function rules(): array
                 {
                     return [
                         'foo' => ['min:5'],
@@ -46,7 +49,9 @@ class ValidatorTest extends TestCase
         $this->expectException(ValidationError::class);
         $fieldValue->getResolver()(
             null,
-            ['bar' => 'foo', 'baz' => 1]
+            ['bar' => 'foo', 'baz' => 1],
+            new Context(new Request(), null),
+            new ResolveInfo([])
         );
     }
 }

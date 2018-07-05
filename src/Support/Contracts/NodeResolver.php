@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 interface NodeResolver extends Directive
@@ -11,7 +12,7 @@ interface NodeResolver extends Directive
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\Type
+     * @return Type
      */
     public function resolveNode(NodeValue $value);
 }

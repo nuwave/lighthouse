@@ -6,7 +6,7 @@ if (! function_exists('graphql')) {
      *
      * @return \Nuwave\Lighthouse\GraphQL
      */
-    function graphql()
+    function graphql(): \Nuwave\Lighthouse\GraphQL
     {
         return app('graphql');
     }
@@ -18,7 +18,7 @@ if (! function_exists('auth')) {
      *
      * @return \Illuminate\Auth\AuthManager
      */
-    function auth()
+    function auth(): \Illuminate\Auth\AuthManager
     {
         return app('auth');
     }
@@ -31,7 +31,7 @@ if (! function_exists('schema')) {
      * @return \Nuwave\Lighthouse\Schema\TypeRegistry
      * @deprecated Use graphql()->types() directly in the future
      */
-    function schema()
+    function schema(): \Nuwave\Lighthouse\Schema\TypeRegistry
     {
         return graphql()->types();
     }
@@ -44,7 +44,7 @@ if (! function_exists('directives')) {
      * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
      * @deprecated Use graphql()->directives() directly in the future
      */
-    function directives()
+    function directives(): \Nuwave\Lighthouse\Schema\DirectiveRegistry
     {
         return graphql()->directives();
     }
@@ -58,7 +58,7 @@ if (! function_exists('config_path')) {
      *
      * @return string
      */
-    function config_path($path = '')
+    function config_path(string $path = ''): string
     {
         return app()->basePath().'/config'.($path ? '/'.$path : $path);
     }
@@ -72,7 +72,7 @@ if (! function_exists('app_path')) {
      *
      * @return string
      */
-    function app_path($path = '')
+    function app_path(string $path = ''): string
     {
         return app()->basePath().'/app'.($path ? '/'.$path : $path);
     }
@@ -86,7 +86,7 @@ if (! function_exists('resolve')) {
      *
      * @return mixed
      */
-    function resolve($name)
+    function resolve(string $name)
     {
         return app($name);
     }

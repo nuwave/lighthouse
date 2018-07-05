@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class NodeContainer
@@ -37,10 +38,8 @@ class NodeContainer
      * @param string  $type
      * @param Closure $resolver
      * @param Closure $resolveType
-     *
-     * @return mixed
      */
-    public function node($type, Closure $resolver, Closure $resolveType)
+    public function node(string $type, Closure $resolver, Closure $resolveType)
     {
         $this->types[$type] = $resolveType;
         $this->nodes[$type] = $resolver;
@@ -51,10 +50,8 @@ class NodeContainer
      *
      * @param string $type
      * @param string $model
-     *
-     * @return void
      */
-    public function model($type, $model)
+    public function model(string $type, string $model)
     {
         $this->models[$model] = $type;
 
@@ -69,8 +66,9 @@ class NodeContainer
      * @param string $globalId
      *
      * @return mixed
+     * @throws Error
      */
-    public function resolve($globalId)
+    public function resolve(string $globalId)
     {
         $type = $this->decodeRelayType($globalId);
 
@@ -88,12 +86,12 @@ class NodeContainer
      *
      * @param mixed $value
      *
-     * @return \GraphQL\Type\Definition\Type
+     * @return Type
      */
-    public function resolveType($value)
+    public function resolveType($value): Type
     {
         if (is_object($value) && isset($this->models[get_class($value)])) {
-            return graphql()->types()->instance($this->models[get_class($value)]);
+            return graphql()->types()->get($this->models[get_class($value)]);
         }
 
         return collect($this->types)
@@ -108,7 +106,7 @@ class NodeContainer
                 $resolver = $item['resolver'];
                 $type = $item['type'];
 
-                return $resolver($value) ? graphql()->types()->instance($type) : $instance;
+                return $resolver($value) ? graphql()->types()->get($type) : $instance;
             });
     }
 }

@@ -22,7 +22,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'paginate';
     }
@@ -37,7 +37,12 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $current,
+        DocumentAST $original
+    ): DocumentAST
     {
         switch ($this->getPaginationType()) {
             case self::PAGINATION_TYPE_CONNECTION:
@@ -56,7 +61,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         $paginationType = $this->getPaginationType();
 
@@ -74,7 +79,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      * @return string
      * @throws DirectiveException
      */
-    protected function getPaginationType()
+    protected function getPaginationType(): string
     {
         $paginationType = $this->directiveArgValue('type', self::PAGINATION_TYPE_PAGINATOR);
 
@@ -96,7 +101,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      *
      * @return FieldValue
      */
-    protected function paginatorTypeResolver(FieldValue $value, $model)
+    protected function paginatorTypeResolver(FieldValue $value, string $model): FieldValue
     {
         return $value->setResolver(function ($root, array $args) use ($model) {
             $first = data_get($args, 'count', 15);
@@ -121,7 +126,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      *
      * @return FieldValue
      */
-    protected function connectionTypeResolver(FieldValue $value, $model)
+    protected function connectionTypeResolver(FieldValue $value, string $model): FieldValue
     {
         return $value->setResolver(function ($root, array $args) use ($model, $value) {
             $first = data_get($args, 'first', 15);

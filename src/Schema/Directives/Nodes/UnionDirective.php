@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -14,7 +15,7 @@ class UnionDirective extends BaseDirective implements NodeResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'union';
     }
@@ -24,21 +25,21 @@ class UnionDirective extends BaseDirective implements NodeResolver
      *
      * @param NodeValue $value
      *
-     * @return mixed
+     * @return Type
      */
-    public function resolveNode(NodeValue $value)
+    public function resolveNode(NodeValue $value): Type
     {
         $resolver = $this->directiveArgValue('resolver');
 
         $namespace = array_get(explode('@', $resolver), '0');
         $method = array_get(explode('@', $resolver), '1', strtolower($value->getNodeName()));
 
-        return $value->setType(new UnionType([
+        return new UnionType([
             'name' => $value->getNodeName(),
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
             'types' => function () use ($value) {
                 return collect($value->getNode()->types)->map(function ($type) {
-                    return graphql()->types()->instance($type->name->value);
+                    return graphql()->types()->get($type->name->value);
                 })->filter()->toArray();
             },
             'resolveType' => function ($value) use ($namespace, $method) {
@@ -46,8 +47,8 @@ class UnionDirective extends BaseDirective implements NodeResolver
                     $instance = app($namespace);
                     return call_user_func_array([$instance, $method], [$value]);
                 }
-                return graphql()->types()->instance(last(explode('\\', get_class($value))));
+                return graphql()->types()->get(last(explode('\\', get_class($value))));
             },
-        ]));
+        ]);
     }
 }

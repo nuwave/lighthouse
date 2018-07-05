@@ -12,7 +12,7 @@ trait HandlesGlobalId
      *
      * @return string
      */
-    public function encodeGlobalId($type, $id)
+    public function encodeGlobalId(string $type, $id): string
     {
         $resolver = config('lighthouse.globalId.encode');
 
@@ -30,7 +30,7 @@ trait HandlesGlobalId
      *
      * @return array
      */
-    public function decodeGlobalId($id)
+    public function decodeGlobalId(string $id): array
     {
         return explode(':', base64_decode($id));
     }
@@ -42,7 +42,7 @@ trait HandlesGlobalId
      *
      * @return string
      */
-    public function decodeRelayId($id)
+    public function decodeRelayId(string $id): string
     {
         $resolver = config('lighthouse.globalId.decodeId');
 
@@ -62,7 +62,7 @@ trait HandlesGlobalId
      *
      * @return string
      */
-    public function decodeRelayType($id)
+    public function decodeRelayType(string $id): string
     {
         $resolver = config('lighthouse.globalId.decodeType');
 
@@ -82,7 +82,7 @@ trait HandlesGlobalId
      *
      * @return int
      */
-    protected function decodeCursor(array $args)
+    protected function decodeCursor(array $args): int
     {
         $resolver = config('lighthouse.globalId.decodeCursor');
 
@@ -102,7 +102,7 @@ trait HandlesGlobalId
      *
      * @return int
      */
-    protected function getCursorId($cursor)
+    protected function getCursorId(string $cursor): int
     {
         $resolver = config('lighthouse.globalId.getCursorId');
 

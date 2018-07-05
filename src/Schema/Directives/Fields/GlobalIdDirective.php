@@ -16,7 +16,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'globalId';
     }
@@ -28,7 +28,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value): FieldValue
     {
         $type = $value->getNodeName();
         $resolver = $value->getResolver();

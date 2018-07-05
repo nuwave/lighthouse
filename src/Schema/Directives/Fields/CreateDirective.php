@@ -14,7 +14,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'create';
     }
@@ -25,8 +25,9 @@ class CreateDirective extends BaseDirective implements FieldResolver
      * @param FieldValue $value
      *
      * @return FieldValue
+     * @throws DirectiveException
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         // TODO: create a model registry so we can auto-resolve this.
         $model = $this->directiveArgValue('model');

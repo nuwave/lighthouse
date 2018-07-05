@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nuwave\Lighthouse\Support\Validator;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 abstract class Validator
@@ -24,7 +28,7 @@ abstract class Validator
     /**
      * GraphQL Context.
      *
-     * @var \Nuwave\Lighthouse\Schema\Context
+     * @var Context
      */
     protected $context;
 
@@ -40,23 +44,24 @@ abstract class Validator
      *
      * @param mixed                                $root
      * @param array                                $args
-     * @param \Nuwave\Lighthouse\Schema\Context    $context
-     * @param \GraphQL\Type\Definition\ResolveInfo $info
+     * @param Context    $context
+     * @param ResolveInfo $info
      */
-    public function __construct($root, array $args, $context, $info)
+    public function __construct($root, array $args, Context $context, ResolveInfo $info)
     {
         $this->root = $root;
         $this->args = $args;
         $this->context = $context;
         $this->info = $info;
     }
-
+    
     /**
      * Process validator for field.
      *
      * @return bool
+     * @throws Error
      */
-    public function validate()
+    public function validate(): bool
     {
         if (! $this->can()) {
             $this->handleUnauthorized();
@@ -83,7 +88,7 @@ abstract class Validator
      *
      * @return mixed
      */
-    protected function argument($key, $default = null)
+    protected function argument(string $key, $default = null)
     {
         return array_get($this->args, $key, $default);
     }
@@ -93,7 +98,7 @@ abstract class Validator
      *
      * @return array
      */
-    protected function args()
+    protected function args(): array
     {
         return $this->args;
     }
@@ -118,7 +123,7 @@ abstract class Validator
      *
      * @return array
      */
-    protected function messages()
+    protected function messages(): array
     {
         return [];
     }
@@ -128,13 +133,15 @@ abstract class Validator
      *
      * @return bool
      */
-    protected function can()
+    protected function can(): bool
     {
         return true;
     }
-
+    
     /**
      * Handle an unauthorized request.
+     *
+     * @throws Error
      */
     protected function handleUnauthorized()
     {
@@ -146,7 +153,7 @@ abstract class Validator
      *
      * @param \Illuminate\Contracts\Validation\Validator $validator
      */
-    protected function handleInvalid($validator)
+    protected function handleInvalid(\Illuminate\Contracts\Validation\Validator $validator)
     {
         throw with(new ValidationError('validation'))->setValidator($validator);
     }
@@ -156,5 +163,5 @@ abstract class Validator
      *
      * @return array
      */
-    abstract protected function rules();
+    abstract protected function rules(): array;
 }

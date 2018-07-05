@@ -32,9 +32,9 @@ class FieldFactory
             ? $this->useResolverDirective($fieldValue)
             : $this->defaultResolver($fieldValue);
 
-        $args = $this->getArgDefinitions($fieldValue);
+        $argDefinitions = $this->getArgDefinitions($fieldValue);
         $resolverWithAdditionalArgs = $this->injectAdditionalArgs($initialResolver, $fieldValue->getAdditionalArgs());
-        $resolverWithValidation = $this->wrapResolverWithValidation($resolverWithAdditionalArgs, $args);
+        $resolverWithValidation = $this->wrapResolverWithValidation($resolverWithAdditionalArgs, $argDefinitions);
 
         $fieldValue->setResolver($resolverWithValidation);
 
@@ -49,7 +49,7 @@ class FieldFactory
         return [
             'name' => $fieldValue->getFieldName(),
             'type' => $fieldValue->getType(),
-            'args' => $args->toArray(),
+            'args' => ArgumentFactory::convertToExecutable($argDefinitions),
             'resolve' => $resolverWithMiddleware,
             'description' => $fieldValue->getDescription(),
             'complexity' => $fieldValue->getComplexity(),
@@ -63,9 +63,9 @@ class FieldFactory
      *
      * @return bool
      */
-    protected function hasResolverDirective(FieldValue $value)
+    protected function hasResolverDirective(FieldValue $value): bool
     {
-        return graphql()->directives()->hasResolver($value->getField());
+        return graphql()->directives()->hasFieldResolver($value->getField());
     }
 
     /**
@@ -77,7 +77,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function useResolverDirective(FieldValue $value)
+    protected function useResolverDirective(FieldValue $value): \Closure
     {
         return graphql()->directives()->fieldResolver($value->getField())
             ->resolveField($value)->getResolver();
@@ -90,7 +90,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function defaultResolver(FieldValue $fieldValue)
+    protected function defaultResolver(FieldValue $fieldValue): \Closure
     {
         switch ($fieldValue->getNodeName()) {
             case 'Mutation':
@@ -110,7 +110,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function rootOperationResolver(string $fieldName, string $rootOperationType)
+    protected function rootOperationResolver(string $fieldName, string $rootOperationType): \Closure
     {
         return function ($obj, array $args, $context = null, $info = null) use ($fieldName, $rootOperationType) {
             $class = config("lighthouse.namespaces.{$rootOperationType}").'\\'.studly_case($fieldName);
@@ -127,7 +127,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function injectAdditionalArgs(\Closure $resolver, array $additionalArgs)
+    protected function injectAdditionalArgs(\Closure $resolver, array $additionalArgs): \Closure
     {
         return function () use ($resolver, $additionalArgs) {
             $resolverArgs = func_get_args();
@@ -143,29 +143,27 @@ class FieldFactory
      *
      * @param FieldValue $fieldValue
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    protected function getArgDefinitions(FieldValue $fieldValue)
+    protected function getArgDefinitions(FieldValue $fieldValue): Collection
     {
         return collect(data_get($fieldValue->getField(), 'arguments', []))
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
-                $argValue = new ArgumentValue($fieldValue, $inputValueDefinition);
+                $argumentValue = new ArgumentValue($fieldValue, $inputValueDefinition);
 
-                return [$argValue->getArgName() => (new ArgumentFactory())->handle($argValue)];
+                return [$argumentValue->getArgName() => ArgumentFactory::handle($argumentValue)];
             });
     }
 
     /**
      * Wrap field resolver function w/ validation logic.
      *
-     * @param \Closure                       $resolver
-     * @param \Illuminate\Support\Collection $inputValueDefinitions
-     *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ValidationError
+     * @param \Closure   $resolver
+     * @param Collection $inputValueDefinitions
      *
      * @return \Closure
      */
-    protected function wrapResolverWithValidation(\Closure $resolver, $inputValueDefinitions)
+    protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
         return function ($rootValue, $inputArgs, $context = null, $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
             $inputArgs = $this->resolveArgs($inputArgs, $inputValueDefinitions);
@@ -206,20 +204,14 @@ class FieldFactory
      *
      * @return array
      */
-    protected function resolveArgs(array $inputArguments, Collection $argumentValues)
+    protected function resolveArgs(array $inputArguments, Collection $argumentValues): array
     {
-        $resolvers = $argumentValues->filter(function ($arg) {
-            return array_has($arg, 'resolve');
-        });
-
-        if ($resolvers->isEmpty()) {
-            return $inputArguments;
-        }
-
         return collect($inputArguments)
-            ->map(function ($arg, $key) use ($resolvers) {
-                return $resolvers->has($key)
-                    ? $resolvers->get($key)['resolve']($arg)
+            ->map(function ($arg, string $key) use ($argumentValues) {
+                $resolver = $argumentValues->get($key)->getResolver();
+
+                return $resolver
+                    ? $resolver($arg)
                     : $arg;
             })
             ->toArray();
@@ -238,7 +230,7 @@ class FieldFactory
      */
     public function getRules(
         $rootValue,
-        $inputArgs,
+        array $inputArgs,
         $context,
         ResolveInfo $resolveInfo = null,
         Collection $inputValueDefinitions
@@ -246,20 +238,21 @@ class FieldFactory
         $resolveArgs = [$rootValue, $inputArgs, $context, $resolveInfo];
 
         $validation = $inputValueDefinitions
-            ->map(function ($inputValueDefinition, $key) use ($resolveArgs) {
-                $rules = data_get($inputValueDefinition, 'rules');
+            ->map(function (ArgumentValue $inputValueDefinition, string $key) use ($resolveArgs) {
+                $rules = $inputValueDefinition->getRules();
 
                 if (! $rules) {
                     return;
                 }
 
+                // TODO why is this here
                 $rules = is_callable($rules)
                     ? call_user_func_array($inputValueDefinition['rules'], $resolveArgs)
                     : $rules;
 
                 return [
                     'rules' => [$key => $rules],
-                    'messages' => data_get($inputValueDefinition, 'messages', []),
+                    'messages' => $inputValueDefinition->getMessages() ?? [],
                 ];
             })
             ->filter()

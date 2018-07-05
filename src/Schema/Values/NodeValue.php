@@ -5,7 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
 
 class NodeValue
 {
@@ -52,8 +54,9 @@ class NodeValue
      *
      * @param Node $node
      * @return NodeValue
+     * @deprecated Just use the constructor
      */
-    public static function init(Node $node)
+    public static function init(Node $node): NodeValue
     {
         return new static($node);
     }
@@ -63,9 +66,9 @@ class NodeValue
      *
      * @param Node $node
      *
-     * @return self
+     * @return NodeValue
      */
-    public function setNode(Node $node)
+    public function setNode(Node $node): NodeValue
     {
         $this->node = $node;
 
@@ -77,9 +80,9 @@ class NodeValue
      *
      * @param Type $type
      *
-     * @return self
+     * @return NodeValue
      */
-    public function setType(Type $type)
+    public function setType(Type $type): NodeValue
     {
         $this->type = $type;
 
@@ -90,18 +93,24 @@ class NodeValue
      * Set the current directive.
      *
      * @param DirectiveNode $directive
+     *
+     * @return NodeValue
      */
-    public function setDirective(DirectiveNode $directive)
+    public function setDirective(DirectiveNode $directive): NodeValue
     {
         $this->directive = $directive;
+
+        return $this;
     }
 
     /**
      * Set the current namespace.
      *
      * @param string $namespace
+     *
+     * @return NodeValue
      */
-    public function setNamespace($namespace)
+    public function setNamespace(string $namespace): NodeValue
     {
         $this->namespace = $namespace;
     }
@@ -111,7 +120,7 @@ class NodeValue
      *
      * @return Node
      */
-    public function getNode()
+    public function getNode(): Node
     {
         return $this->node;
     }
@@ -143,7 +152,7 @@ class NodeValue
      *
      * @return string
      */
-    public function getNamespace($class = null)
+    public function getNamespace(string $class = null): string
     {
         return $class ? $this->namespace.'\\'.$class : $this->namespace;
     }
@@ -153,7 +162,7 @@ class NodeValue
      *
      * @return string
      */
-    public function getNodeName()
+    public function getNodeName(): string
     {
         return data_get($this->getNode(), 'name.value');
     }
@@ -161,7 +170,7 @@ class NodeValue
     /**
      * Get fields for node.
      *
-     * @return array
+     * @return NodeList|array
      */
     public function getNodeFields()
     {
@@ -171,9 +180,9 @@ class NodeValue
     /**
      * Get a collection of the names of all interfaces the node has.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function getInterfaceNames()
+    public function getInterfaceNames(): Collection
     {
         return collect($this->node->interfaces)
             ->map(function (NamedTypeNode $interface) {
@@ -188,7 +197,7 @@ class NodeValue
      *
      * @return bool
      */
-    public function hasInterface($interfaceName)
+    public function hasInterface(string $interfaceName): bool
     {
         return $this->getInterfaceNames()
             ->containsStrict($interfaceName);

@@ -24,10 +24,10 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return bool
      */
-    protected function isValidPaginationType($paginationType)
+    protected function isValidPaginationType(string $paginationType): bool
     {
-        return self::PAGINATION_TYPE_PAGINATOR === $paginationType ||
-        self::PAGINATION_TYPE_CONNECTION === $paginationType;
+        return self::PAGINATION_TYPE_PAGINATOR === $paginationType
+            || self::PAGINATION_TYPE_CONNECTION === $paginationType;
     }
 
     /**
@@ -35,7 +35,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function convertAliasToPaginationType($paginationType)
+    protected function convertAliasToPaginationType(string $paginationType): string
     {
         if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
             return self::PAGINATION_TYPE_CONNECTION;
@@ -56,7 +56,12 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return DocumentAST
      */
-    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    protected function registerConnection(
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $current,
+        DocumentAST $original
+    ): DocumentAST
     {
         $connectionTypeName = $this->connectionTypeName($fieldDefinition, $parentType);
         $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
@@ -105,7 +110,12 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return DocumentAST
      */
-    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    protected function registerPaginator(
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $current,
+        DocumentAST $original
+    ): DocumentAST
     {
         $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType);
         $paginatorFieldClassName = addslashes(PaginatorField::class);
@@ -141,7 +151,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function paginatorTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent)
+    protected function paginatorTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent): string
     {
         return studly_case(
             $this->parentTypeName($parent)
@@ -158,7 +168,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function connectionTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent)
+    protected function connectionTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent): string
     {
         return studly_case(
             $this->parentTypeName($parent)
@@ -175,7 +185,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function connectionEdgeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent)
+    protected function connectionEdgeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent): string
     {
         return studly_case(
             $this->parentTypeName($parent)
@@ -189,7 +199,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function singularFieldName(FieldDefinitionNode $fieldDefinition)
+    protected function singularFieldName(FieldDefinitionNode $fieldDefinition): string
     {
         return str_singular($fieldDefinition->name->value);
     }
@@ -199,7 +209,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function parentTypeName(ObjectTypeDefinitionNode $objectType)
+    protected function parentTypeName(ObjectTypeDefinitionNode $objectType): string
     {
         $name = $objectType->name->value;
 
@@ -213,7 +223,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function unpackNodeToString(Node $node)
+    protected function unpackNodeToString(Node $node): string
     {
         if (in_array($node->kind, ['ListType', 'NonNullType', 'FieldDefinition'])) {
             return $this->unpackNodeToString($node->type);

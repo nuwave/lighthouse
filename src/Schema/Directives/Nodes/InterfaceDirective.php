@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
@@ -17,7 +18,7 @@ class InterfaceDirective extends BaseDirective implements NodeResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'interface';
     }
@@ -27,16 +28,16 @@ class InterfaceDirective extends BaseDirective implements NodeResolver
      *
      * @param NodeValue $value
      *
-     * @return mixed
+     * @return Type
      */
-    public function resolveNode(NodeValue $value)
+    public function resolveNode(NodeValue $value): Type
     {
         $resolver = $this->directiveArgValue('resolver');
 
         $instance = app(array_get(explode('@', $resolver), '0'));
         $method = array_get(explode('@', $resolver), '1');
 
-        return $value->setType(new InterfaceType([
+        return new InterfaceType([
             'name' => $value->getNodeName(),
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
             'fields' => function () use ($value) {
@@ -45,6 +46,6 @@ class InterfaceDirective extends BaseDirective implements NodeResolver
             'resolveType' => function ($value) use ($instance, $method) {
                 return call_user_func_array([$instance, $method], [$value]);
             },
-        ]));
+        ]);
     }
 }
