@@ -2,27 +2,27 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
-use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\EnumDirective;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
-use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
+use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
+use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\EnumDirective;
+use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
 
 class NodeFactory
 {
@@ -33,8 +33,9 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
-     * @return Type
      * @throws \Exception
+     *
+     * @return Type
      */
     public function handle(NodeValue $value)
     {
@@ -80,6 +81,7 @@ class NodeFactory
      * @param NodeValue $value
      *
      * @throws \Exception
+     *
      * @return Type
      */
     protected function resolveType(NodeValue $value)

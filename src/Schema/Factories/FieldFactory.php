@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
@@ -149,7 +148,7 @@ class FieldFactory
     {
         return collect(data_get($fieldValue->getField(), 'arguments', []))
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
-                $argValue = new ArgumentValue($fieldValue, $inputValueDefinition);
+                $argValue = graphql()->values()->arg($fieldValue, $inputValueDefinition);
 
                 return [$argValue->getArgName() => (new ArgumentFactory())->handle($argValue)];
             });

@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class FieldValue
 {
@@ -59,9 +60,9 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param NodeValue $node
-     * @param FieldDefinitionNode     $field
-     * @param string    $description
+     * @param NodeValue           $node
+     * @param FieldDefinitionNode $field
+     * @param string              $description
      */
     public function __construct(NodeValue $node, $field, string $description = '')
     {
@@ -73,9 +74,9 @@ class FieldValue
     /**
      * Initialize new field value.
      *
-     * @param NodeValue $node
-     * @param FieldDefinitionNode     $field
-     * @param string    $description
+     * @param NodeValue           $node
+     * @param FieldDefinitionNode $field
+     * @param string              $description
      *
      * @return FieldValue
      */
