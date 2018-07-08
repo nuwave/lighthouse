@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
@@ -25,12 +26,13 @@ class WhereNotBetweenFilterDirective extends BaseDirective implements ArgMiddlew
      * Resolve the field directive.
      *
      * @param ArgumentValue $argument
+     * @param Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument)
+    public function handleArgument(ArgumentValue $argument, Closure $next)
     {
-        return $this->injectKeyedFilter($argument, [
+        $argument = $this->injectKeyedFilter($argument, [
             'resolve' => function ($query, $key, array $args) {
                 $between = collect($args['resolveArgs'])->map(function ($arg) use ($args) {
                     return array_get($args, $arg);
@@ -39,5 +41,7 @@ class WhereNotBetweenFilterDirective extends BaseDirective implements ArgMiddlew
                 return $query->whereNotBetween($key, $between);
             },
         ]);
+
+        return $next($argument);
     }
 }

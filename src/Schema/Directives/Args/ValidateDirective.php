@@ -64,10 +64,11 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
      * Resolve the field directive.
      *
      * @param ArgumentValue $value
+     * @param Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value, Closure $next)
     {
         // TODO: Rename "getValue" to something more descriptive like "toArray"
         // and consider using for NodeValue/FieldValue.
@@ -77,7 +78,7 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
             $this->getRules($value->getDirective())
         );
 
-        return $value->setValue($current);
+        return $next($value->setValue($current));
     }
 
     /**
