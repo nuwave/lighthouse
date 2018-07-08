@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware
@@ -22,10 +23,11 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
+     * @param Closure    $next
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $checks = $this->getChecks($value);
 
@@ -43,7 +45,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
             }
         }
 
-        return $value;
+        return $next($value);
     }
 
     /**
@@ -55,13 +57,13 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
      */
     protected function getChecks(FieldValue $value)
     {
-        if (!in_array($value->getNodeName(), ['Mutation', 'Query'])) {
+        if (! in_array($value->getNodeName(), ['Mutation', 'Query'])) {
             return null;
         }
 
         $checks = $this->directiveArgValue('checks');
 
-        if (!$checks) {
+        if (! $checks) {
             return null;
         }
 

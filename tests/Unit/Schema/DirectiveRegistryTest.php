@@ -2,15 +2,15 @@
 
 namespace Tests\Unit\Schema;
 
+use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 
 class DirectiveRegistryTest extends TestCase
 {
@@ -95,8 +95,7 @@ class DirectiveRegistryTest extends TestCase
      */
     public function itCanRegisterDirectivesDirectly()
     {
-        $fooDirective = new class() implements Directive
-        {
+        $fooDirective = new class() implements Directive {
             public function name()
             {
                 return 'foo';
@@ -117,8 +116,7 @@ class DirectiveRegistryTest extends TestCase
         ');
 
         graphql()->directives()->register(
-            new class() extends BaseDirective implements FieldMiddleware
-            {
+            new class() extends BaseDirective implements FieldMiddleware {
                 public function name()
                 {
                     return 'foo';
@@ -129,7 +127,7 @@ class DirectiveRegistryTest extends TestCase
                     return $this->definitionNode;
                 }
 
-                public function handleField(FieldValue $value)
+                public function handleField(FieldValue $value, \Closure $next)
                 {
                 }
             }
@@ -149,14 +147,13 @@ class DirectiveRegistryTest extends TestCase
             foo: String @foo
         ');
 
-        $originalDefinition = new class() implements FieldMiddleware
-        {
+        $originalDefinition = new class() implements FieldMiddleware {
             public function name()
             {
                 return 'foo';
             }
 
-            public function handleField(FieldValue $value)
+            public function handleField(FieldValue $value, \Closure $next)
             {
             }
         };

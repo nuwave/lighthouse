@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Support\Validator;
 
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
-use Nuwave\Lighthouse\Support\Validator\Validator;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Validator\Validator;
+use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
+use Nuwave\Lighthouse\Schema\Directives\Args\ValidateDirective;
 
 class ValidatorTest extends TestCase
 {
@@ -41,7 +41,12 @@ class ValidatorTest extends TestCase
             return 'foo';
         });
 
-        (new ValidateDirective())->hydrate($fieldDefinition)->handleField($fieldValue);
+        (new ValidateDirective())->hydrate($fieldDefinition)->handleField(
+            $fieldValue,
+            function ($fieldValue) {
+                return $fieldValue;
+            }
+        );
 
         $this->expectException(ValidationError::class);
         $fieldValue->getResolver()(
