@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class EventDirective extends BaseDirective implements FieldMiddleware
@@ -22,22 +23,24 @@ class EventDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
+     * @param Closure    $next
+     *
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      *
      * @return FieldValue
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $eventBaseName = $this->directiveArgValue('fire') ?? $this->directiveArgValue('class');
         $eventClassName = $this->namespaceClassName($eventBaseName);
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function () use ($resolver, $eventClassName) {
+        return $next($value->setResolver(function () use ($resolver, $eventClassName) {
             $args = func_get_args();
             $value = call_user_func_array($resolver, $args);
             event(new $eventClassName($value));
 
             return $value;
-        });
+        }));
     }
 }
