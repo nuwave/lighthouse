@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use GraphQL\Validator\DocumentValidator;
-use GraphQL\Validator\Rules\DisableIntrospection;
-use GraphQL\Validator\Rules\QueryComplexity;
+use Closure;
 use GraphQL\Validator\Rules\QueryDepth;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
@@ -27,10 +28,11 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
      * Handle node value.
      *
      * @param NodeValue $value
+     * @param Closure   $next
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value, Closure $next)
     {
         if ('Query' !== $value->getNodeName()) {
             $message = sprintf(
@@ -46,7 +48,7 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
         $this->queryComplexity($value);
         $this->queryIntrospection($value);
 
-        return $value;
+        return $next($value);
     }
 
     /**

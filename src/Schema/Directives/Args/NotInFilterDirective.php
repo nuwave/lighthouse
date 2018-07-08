@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
@@ -25,17 +26,20 @@ class NotInFilterDirective extends BaseDirective implements ArgMiddleware
      * Resolve the field directive.
      *
      * @param ArgumentValue $argument
+     * @param Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument)
+    public function handleArgument(ArgumentValue $argument, Closure $next)
     {
         $arg = $argument->getArgName();
 
-        return $this->injectFilter($argument, [
+        $argument = $this->injectFilter($argument, [
             'resolve' => function ($query, $key, array $args) use ($arg) {
                 return $query->whereNotIn($key, array_get($args, $arg));
             },
         ]);
+
+        return $next($argument);
     }
 }
