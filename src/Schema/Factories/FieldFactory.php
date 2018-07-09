@@ -2,14 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
+use Nuwave\Lighthouse\Support\Pipeline;
 
 class FieldFactory
 {
@@ -151,7 +150,7 @@ class FieldFactory
     {
         return collect(data_get($fieldValue->getField(), 'arguments', []))
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
-                $argValue = graphql()->values()->arg($fieldValue, $inputValueDefinition);
+                $argValue = app(ValueFactory::class)->arg($fieldValue, $inputValueDefinition);
 
                 return [$argValue->getArgName() => (new ArgumentFactory())->handle($argValue)];
             });

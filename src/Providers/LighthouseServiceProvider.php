@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse\Providers;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
-use Illuminate\Support\Collection;
-use Illuminate\Support\ServiceProvider;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Facades\Validator;
-use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
+use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
+use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -57,6 +57,8 @@ class LighthouseServiceProvider extends ServiceProvider
     {
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
+
+        $this->app->singleton(ValueFactory::class);
 
         $this->app->bind(
             SchemaSourceProvider::class,

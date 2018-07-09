@@ -2,18 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Type\Schema;
-use GraphQL\Type\SchemaConfig;
-use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
-use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Language\AST\TypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Schema;
+use GraphQL\Type\SchemaConfig;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 
 class SchemaBuilder
@@ -104,7 +105,7 @@ class SchemaBuilder
             ->sortBy(function (TypeDefinitionNode $typeDefinition) {
                 return array_get($this->weights, get_class($typeDefinition), 9);
             })->map(function (TypeDefinitionNode $typeDefinition) {
-                $nodeValue = graphql()->values()->node($typeDefinition);
+                $nodeValue = app(ValueFactory::class)->node($typeDefinition);
 
                 return (new NodeFactory())->handle($nodeValue);
             })->each(function (Type $type) {
