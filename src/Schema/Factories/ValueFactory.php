@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -14,28 +13,28 @@ class ValueFactory
     /**
      * Node value resolver.
      *
-     * @var Closure
+     * @var \Closure
      */
     protected $node;
 
     /**
      * Field value resolver.
      *
-     * @var Closure
+     * @var\Closure
      */
     protected $field;
 
     /**
      * Argument value resolver.
      *
-     * @var Closure
+     * @var\Closure
      */
     protected $arg;
 
     /**
      * Set node value instance resolver.
      *
-     * @param Closure $resolver
+     * @param\Closure $resolver
      *
      * @return self
      */
@@ -49,7 +48,7 @@ class ValueFactory
     /**
      * Set field value instance resolver.
      *
-     * @param Closure $resolver
+     * @param\Closure $resolver
      *
      * @return self
      */
@@ -63,7 +62,7 @@ class ValueFactory
     /**
      * Set arg value instance resolver.
      *
-     * @param Closure $resolver
+     * @param\Closure $resolver
      *
      * @return self
      */

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
@@ -35,12 +34,12 @@ class NodeContainer
      * Store resolver for node.
      *
      * @param string  $type
-     * @param Closure $resolver
-     * @param Closure $resolveType
+     * @param \Closure $resolver
+     * @param \Closure $resolveType
      *
      * @return mixed
      */
-    public function node($type, Closure $resolver, Closure $resolveType)
+    public function node($type, \Closure $resolver, \Closure $resolveType)
     {
         $this->types[$type] = $resolveType;
         $this->nodes[$type] = $resolver;

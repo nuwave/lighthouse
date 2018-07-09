@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support;
 
-use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 
@@ -27,9 +26,9 @@ class Pipeline extends BasePipeline
     }
 
     /**
-     * Get a Closure that represents a slice of the application onion.
+     * Get a \Closure that represents a slice of the application onion.
      *
-     * @return Closure
+     * @return \Closure
      */
     protected function carry()
     {
@@ -50,7 +49,7 @@ class Pipeline extends BasePipeline
     /**
      * Set always variable.
      *
-     * @param Closure $always
+     * @param \Closure $always
      *
      * @return self
      */
