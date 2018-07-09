@@ -20,25 +20,25 @@ class ValueFactory
     /**
      * Field value resolver.
      *
-     * @var\Closure
+     * @var \Closure
      */
     protected $field;
 
     /**
      * Argument value resolver.
      *
-     * @var\Closure
+     * @var \Closure
      */
     protected $arg;
 
     /**
      * Set node value instance resolver.
      *
-     * @param\Closure $resolver
+     * @param \Closure $resolver
      *
      * @return self
      */
-    public function nodeResolver(Closure $resolver)
+    public function nodeResolver(\Closure $resolver)
     {
         $this->node = $resolver;
 
@@ -48,11 +48,11 @@ class ValueFactory
     /**
      * Set field value instance resolver.
      *
-     * @param\Closure $resolver
+     * @param \Closure $resolver
      *
      * @return self
      */
-    public function fieldResolver(Closure $resolver)
+    public function fieldResolver(\Closure $resolver)
     {
         $this->field = $resolver;
 
@@ -62,11 +62,11 @@ class ValueFactory
     /**
      * Set arg value instance resolver.
      *
-     * @param\Closure $resolver
+     * @param \Closure $resolver
      *
      * @return self
      */
-    public function argResolver(Closure $resolver)
+    public function argResolver(\Closure $resolver)
     {
         $this->arg = $resolver;
 

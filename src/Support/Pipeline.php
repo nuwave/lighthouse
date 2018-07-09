@@ -53,7 +53,7 @@ class Pipeline extends BasePipeline
      *
      * @return self
      */
-    public function always(Closure $always)
+    public function always(\Closure $always)
     {
         $this->always = $always;
 
