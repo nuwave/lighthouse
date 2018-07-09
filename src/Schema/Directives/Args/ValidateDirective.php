@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -27,11 +28,13 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
      * Resolve the field directive.
      *
      * @param FieldValue $value
+     * @param Closure    $next
+     *
+     * @throws DirectiveException
      *
      * @return FieldValue
-     * @throws DirectiveException
      */
-    public function handleField(FieldValue $value)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $validator = $this->directiveArgValue('validator');
 
@@ -44,7 +47,7 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
 
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function () use ($validator, $resolver) {
+        return $next($value->setResolver(function () use ($validator, $resolver) {
             $funcArgs = func_get_args();
             $root = array_get($funcArgs, '0');
             $args = array_get($funcArgs, '1');
@@ -54,17 +57,18 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
             app($validator, compact('root', 'args', 'context', 'info'))->validate();
 
             return call_user_func_array($resolver, $funcArgs);
-        });
+        }));
     }
 
     /**
      * Resolve the field directive.
      *
      * @param ArgumentValue $value
+     * @param Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value, Closure $next)
     {
         // TODO: Rename "getValue" to something more descriptive like "toArray"
         // and consider using for NodeValue/FieldValue.
@@ -74,7 +78,7 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
             $this->getRules($value->getDirective())
         );
 
-        return $value->setValue($current);
+        return $next($value->setValue($current));
     }
 
     /**

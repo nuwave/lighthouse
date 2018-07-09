@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -25,10 +26,11 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
      * Resolve the field directive.
      *
      * @param ArgumentValue $value
+     * @param Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value)
+    public function handleArgument(ArgumentValue $value, Closure $next)
     {
         if (in_array($value->getField()->getNodeName(), ['Query', 'Mutation'])) {
             return $value;
@@ -47,6 +49,6 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
                 })->toArray()
         );
 
-        return $value->setValue($current);
+        return $next($value->setValue($current));
     }
 }
