@@ -2,14 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use GraphQL\Type\Definition\FieldDefinition;
-use GraphQL\Type\Definition\ListOfType;
-use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use GraphQL\Type\Definition\NonNull;
 use Opis\Closure\SerializableClosure;
+use GraphQL\Type\Definition\ListOfType;
+use GraphQL\Type\Definition\FieldDefinition;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 
 trait HandlesTypes
 {
@@ -67,7 +66,7 @@ trait HandlesTypes
      */
     protected function unpackType($type)
     {
-        if (!isset($type->config['fields'])) {
+        if (! isset($type->config['fields'])) {
             return $type;
         }
 
@@ -175,7 +174,7 @@ trait HandlesTypes
     {
         return collect($nodeValue->getNodeFields())
             ->mapWithKeys(function ($field) use ($nodeValue) {
-                $fieldValue = new FieldValue($nodeValue, $field);
+                $fieldValue = graphql()->values()->field($nodeValue, $field);
 
                 return [
                     $fieldValue->getFieldName() => (new FieldFactory())->handle($fieldValue),
