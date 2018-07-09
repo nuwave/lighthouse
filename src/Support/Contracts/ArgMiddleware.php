@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 interface ArgMiddleware extends Directive
@@ -10,8 +11,9 @@ interface ArgMiddleware extends Directive
      * Apply transformations on the ArgumentValue.
      *
      * @param ArgumentValue $argument
+     * @param Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument);
+    public function handleArgument(ArgumentValue $argument, Closure $next);
 }

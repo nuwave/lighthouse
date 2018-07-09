@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Closure;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Traits\AttachesNodeInterface;
 
 class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
@@ -29,10 +29,11 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      * Handle type construction.
      *
      * @param NodeValue $value
+     * @param Closure   $next
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value)
+    public function handleNode(NodeValue $value, Closure $next)
     {
         $modelClassName = $this->getModelClassName($value);
 
@@ -40,7 +41,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
             $value->getNodeName(), $modelClassName
         );
 
-        return $value;
+        return $next($value);
     }
 
     /**

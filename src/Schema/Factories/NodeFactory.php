@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
+use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\InputObjectType;
@@ -195,9 +196,12 @@ class NodeFactory
      */
     protected function applyMiddleware(NodeValue $value)
     {
-        return graphql()->directives()->nodeMiddleware($value->getNode())
-            ->reduce(function (NodeValue $value, NodeMiddleware $middleware) {
-                return $middleware->handleNode($value);
-            }, $value);
+        return app(Pipeline::class)
+            ->send($value)
+            ->through(directives()->nodeMiddleware($value->getNode()))
+            ->via('handleNode')
+            ->then(function (NodeValue $value) {
+                return $value;
+            });
     }
 }

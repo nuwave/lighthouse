@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -37,11 +38,13 @@ class FieldFactory
 
         $fieldValue->setResolver($resolverWithValidation);
 
-        $resolverWithMiddleware = graphql()->directives()->fieldMiddleware($fieldValue->getField())
-            ->reduce(function (FieldValue $fieldValue, FieldMiddleware $middleware) {
-                return $middleware->handleField($fieldValue);
-            }, $fieldValue)
-            ->getResolver();
+        $resolverWithMiddleware = app(Pipeline::class)
+            ->send($fieldValue)
+            ->through(directives()->fieldMiddleware($fieldValue->getField()))
+            ->via('handleField')
+            ->then(function (FieldValue $fieldValue) {
+                return $fieldValue;
+            })->getResolver();
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
