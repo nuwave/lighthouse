@@ -1,22 +1,38 @@
 <?php
 
 return [
+    
     /*
     |--------------------------------------------------------------------------
-    | LightHouse endpoint & middleware
+    | GraphQL endpoint
     |--------------------------------------------------------------------------
     |
-    | Setup this values as required,
-    | default route endpoints is yourdomain.com/graphql
-    | get requests to your graphql endpoint are disabled by default, you may enable them below
-    | setup middleware here for all request,
-    | setup more endpoints, ej: pointing to the controller value inside your route file
+    | Set the endpoint to which the GraphQL server responds.
+    | The default route endpoint is "yourdomain.com/graphql".
     |
     */
     'route_name' => 'graphql',
-
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Enable GET requests
+    |--------------------------------------------------------------------------
+    |
+    | This setting controls if GET requests to the GraphQL endpoint are allowed.
+    |
+    */
     'route_enable_get' => false,
-
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Route configuration
+    |--------------------------------------------------------------------------
+    |
+    | Additional configuration for the route group.
+    | This may be used to prefix the endpoints or to apply some
+    | middleware to all requests
+    |
+    */
     'route' => [
         'prefix' => '',
         // 'middleware' => ['web','api'],    // [ 'loghttp']
