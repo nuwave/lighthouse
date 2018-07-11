@@ -50,6 +50,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $cacheExp = $maxAge ? now()->addSeconds($maxAge) : null;
             $cacheKey = $cacheValue->getKey();
+            $cacheTags = $cacheValue->getTags();
 
             if ($cache->has($cacheKey)) {
                 return $cache->get($cacheKey);
@@ -57,24 +58,41 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $value = call_user_func_array($resolver, $arguments);
 
-            if ($value instanceof \GraphQL\Deferred) {
-                $value->then(function ($result) use ($cache, $cacheKey, $cacheExp) {
-                    if ($cacheExp) {
-                        $cache->put($cacheKey, $result, $cacheExp);
-
-                        return;
-                    }
-
-                    $cache->forever($cacheKey, $result);
-                });
-            } elseif ($cacheExp) {
-                $cache->put($cacheKey, $value, $cacheExp);
-            } else {
-                $cache->forever($cacheKey, $value);
-            }
+            ($value instanceof \GraphQL\Deferred)
+                ? $value->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags) {
+                    $this->store($cache, $cacheKey, $result, $cacheExp, $cacheTags);
+                })
+                : $this->store($cache, $cacheKey, $value, $cacheExp, $cacheTags);
 
             return $value;
         });
+    }
+
+    /**
+     * Store value in cache.
+     *
+     * @param \Illuminate\Support\Facades\Cache $cache
+     * @param string                            $key
+     * @param mixed                             $value
+     * @param \Carbon\Carbon|null               $expiration
+     * @param array                             $tags
+     */
+    protected function store($cache, $key, $value, $expiration, $tags)
+    {
+        $store = $cache->store();
+        $supportsTags = method_exists($store, 'tags') && config('lighthouse.cache.tags', false);
+
+        if ($expiration) {
+            ($supportsTags)
+                ? $cache->tags($tags)->put($key, $value, $expiration)
+                : $cache->put($key, $value, $expiration);
+
+            return;
+        }
+
+        ($supportsTags)
+            ? $cache->tags($tags)->forever($key, $value)
+            : $cache->forever($key, $value);
     }
 
     /**

@@ -90,13 +90,20 @@ class CacheValue
      */
     public function getTags()
     {
+        $typeTag = collect([
+            'graphql',
+            strtolower($this->fieldValue->getNodeName()),
+            $this->fieldKey,
+        ])->filter()->values()->implode(':');
+
         $fieldTag = collect([
+            'graphql',
             strtolower($this->fieldValue->getNodeName()),
             $this->resolveInfo->fieldName,
             $this->fieldKey,
         ])->filter()->values()->implode(':');
 
-        return ['graphql', $fieldTag];
+        return [$typeTag, $fieldTag];
     }
 
     /**

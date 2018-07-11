@@ -107,7 +107,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->execute($schema, $query, true);
 
-        $posts = app('cache')->tags('graphql')->get("user:{$user->getKey()}:posts:count:3");
+        $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
     }
@@ -140,6 +140,33 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->execute($schema, '{ user { name } }');
         $this->assertEquals('foobar', app('cache')->get('foo'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanAttachTagsToCache()
+    {
+        config(['lighthouse.cache.tags' => true]);
+
+        $tags = ['graphql:user:1', 'graphql:user:name:1'];
+        $resolver = addslashes(self::class).'@resolve';
+        $schema = "
+        type User {
+            id: ID!
+            name: String @cache
+        }
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $cache = app('cache');
+        $result = $this->execute($schema, '{ user { name } }');
+        $this->assertEquals('foobar', array_get($result->data, 'user.name'));
+        $this->assertEquals('foobar', $cache->tags($tags)->get('user:1:name'));
+
+        $cache->tags($tags[0])->flush();
+        $this->assertNull($cache->tags($tags)->get('user:1:name'));
     }
 
     public function resolve()
