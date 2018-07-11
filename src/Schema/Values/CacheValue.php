@@ -53,6 +53,22 @@ class CacheValue
     }
 
     /**
+     * Convert input arguments to keys.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function argKeys()
+    {
+        return collect($this->args)
+            ->sortKeys()
+            ->map(function ($value, $key) {
+                $keyValue = is_array($value) ? json_encode($value, true) : $value;
+
+                return "{$key}:{$keyValue}";
+            });
+    }
+
+    /**
      * Resolve key from root value.
      *
      * @param string $key
@@ -63,12 +79,14 @@ class CacheValue
     {
         $cacheFieldKey = $this->fieldValue->getNode()->getCacheKey();
         $key = $cacheFieldKey ? data_get($this->rootValue, $cacheFieldKey) : null;
+        $argKeys = $this->argKeys();
 
         return sprintf(
-            '%s:%s:%s',
+            '%s:%s:%s%s',
             strtolower($this->fieldValue->getNodeName()),
             $key,
-            strtolower($this->fieldValue->getFieldName())
+            strtolower($this->fieldValue->getFieldName()),
+            $argKeys->isNotEmpty() ? ':'.$argKeys->implode(':') : null
         );
     }
 }

@@ -60,7 +60,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->execute($schema, $query, true);
 
-        $result = app('cache')->get('query::users');
+        $result = app('cache')->get('query::users:count:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
@@ -105,7 +105,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->execute($schema, $query, true);
 
-        $posts = app('cache')->get("user:{$user->getKey()}:posts");
+        $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
     }
