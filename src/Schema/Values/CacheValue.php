@@ -32,6 +32,11 @@ class CacheValue
     protected $resolveInfo;
 
     /**
+     * @var mixed
+     */
+    protected $fieldKey;
+
+    /**
      * @param FieldValue  $fieldValue
      * @param mixed       $rootValue
      * @param array       $args
@@ -50,6 +55,48 @@ class CacheValue
         $this->args = $args;
         $this->context = $context;
         $this->resolveInfo = $resolveInfo;
+
+        $this->setFieldKey();
+    }
+
+    /**
+     * Resolve key from root value.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function getKey()
+    {
+        $argKeys = $this->argKeys();
+
+        return sprintf(
+            '%s:%s:%s%s',
+            strtolower($this->resolveInfo->parentType->name),
+            $this->fieldKey,
+            strtolower($this->resolveInfo->fieldName),
+            $argKeys->isNotEmpty() ? ':'.$argKeys->implode(':') : null
+        );
+    }
+
+    /**
+     * Get cache tags.
+     *
+     * @todo Check to see if tags are available on the
+     * cache store (or add to config) and use tags to
+     * flush cache w/out args.
+     *
+     * @return array
+     */
+    public function getTags()
+    {
+        $fieldTag = collect([
+            strtolower($this->fieldValue->getNodeName()),
+            $this->resolveInfo->fieldName,
+            $this->fieldKey,
+        ])->filter()->values()->implode(':');
+
+        return ['graphql', $fieldTag];
     }
 
     /**
@@ -69,24 +116,14 @@ class CacheValue
     }
 
     /**
-     * Resolve key from root value.
-     *
-     * @param string $key
-     *
-     * @return mixed
+     * Set the field key.
      */
-    public function getKey()
+    protected function setFieldKey()
     {
         $cacheFieldKey = $this->fieldValue->getNode()->getCacheKey();
-        $key = $cacheFieldKey ? data_get($this->rootValue, $cacheFieldKey) : null;
-        $argKeys = $this->argKeys();
 
-        return sprintf(
-            '%s:%s:%s%s',
-            strtolower($this->fieldValue->getNodeName()),
-            $key,
-            strtolower($this->fieldValue->getFieldName()),
-            $argKeys->isNotEmpty() ? ':'.$argKeys->implode(':') : null
-        );
+        if ($cacheFieldKey) {
+            $this->fieldKey = data_get($this->rootValue, $cacheFieldKey);
+        }
     }
 }

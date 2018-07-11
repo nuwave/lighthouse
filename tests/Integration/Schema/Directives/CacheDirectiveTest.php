@@ -7,7 +7,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 
 class CacheDirectiveTest extends DBTestCase
 {
@@ -105,9 +107,39 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->execute($schema, $query, true);
 
-        $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
+        $posts = app('cache')->tags('graphql')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUseCustomCacheValue()
+    {
+        $resolver = addslashes(self::class).'@resolve';
+        $schema = "
+        type User {
+            id: ID!
+            name: String @cache
+        }
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        /** @var ValueFactory $valueFactory */
+        $valueFactory = app(ValueFactory::class);
+        $valueFactory->cacheResolver(function (...$args) {
+            return new class(...$args) extends CacheValue {
+                public function getKey()
+                {
+                    return 'foo';
+                }
+            };
+        });
+
+        $this->execute($schema, '{ user { name } }');
+        $this->assertEquals('foobar', app('cache')->get('foo'));
     }
 
     public function resolve()
