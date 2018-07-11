@@ -1,0 +1,133 @@
+<?php
+
+namespace Nuwave\Lighthouse\Schema\Directives;
+
+use Closure;
+use GraphQL\Language\AST\DirectiveNode;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+
+class CacheDirective extends BaseDirective implements FieldMiddleware
+{
+    /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name()
+    {
+        return 'cache';
+    }
+
+    /**
+     * Resolve the field directive.
+     *
+     * @param FieldValue $value
+     * @param Closure    $next
+     *
+     * @return FieldValue
+     */
+    public function handleField(FieldValue $value, Closure $next)
+    {
+        $this->setNodeKey($value->getNode());
+
+        $value = $next($value);
+        $resolver = $value->getResolver();
+        $maxAge = $this->directiveArgValue('maxAge');
+
+        return $value->setResolver(function () use ($value, $resolver, $maxAge) {
+            $arguments = func_get_args();
+            /** @var \Illuminate\Support\Facades\Cache $cache */
+            $cache = app('cache');
+            /** @var \Nuwave\Lighthouse\Schema\Values\CacheValue $cacheValue */
+            $cacheValue = call_user_func_array(
+                [app(ValueFactory::class), 'cache'],
+                array_merge([$value], $arguments)
+            );
+
+            $cacheExp = $maxAge ? now()->addSeconds($maxAge) : null;
+            $cacheKey = $cacheValue->getKey();
+
+            if ($cache->has($cacheKey)) {
+                return $cache->get($cacheKey);
+            }
+
+            $value = call_user_func_array($resolver, $arguments);
+
+            if ($value instanceof \GraphQL\Deferred) {
+                $value->then(function ($result) use ($cache, $cacheKey, $cacheExp) {
+                    if ($cacheExp) {
+                        $cache->put($cacheKey, $result, $cacheExp);
+
+                        return;
+                    }
+
+                    $cache->forever($cacheKey, $result);
+                });
+            } elseif ($cacheExp) {
+                $cache->put($cacheKey, $value, $cacheExp);
+            } else {
+                $cache->forever($cacheKey, $value);
+            }
+
+            return $value;
+        });
+    }
+
+    /**
+     * Set node's cache key.
+     *
+     * @param NodeValue $nodeValue
+     */
+    protected function setNodeKey(NodeValue $nodeValue)
+    {
+        if ($nodeValue->getCacheKey()) {
+            return;
+        }
+
+        $fields = data_get($nodeValue->getNode(), 'fields', []);
+        $nodeKey = collect($fields)->reduce(function ($key, $field) {
+            if ($key) {
+                return $key;
+            }
+
+            $hasCacheKey = collect(data_get($field, 'directives', []))
+                ->contains(function (DirectiveNode $directive) {
+                    return 'cacheKey' === $directive->name->value;
+                });
+
+            return $hasCacheKey ? data_get($field, 'name.value') : $key;
+        });
+
+        if (! $nodeKey) {
+            $nodeKey = collect($fields)->reduce(function ($key, $field) {
+                if ($key) {
+                    return $key;
+                }
+
+                $type = $field->type;
+                while (! is_null(data_get($type, 'type'))) {
+                    $type = data_get($type, 'type');
+                }
+
+                return 'ID' === data_get($type, 'name.value')
+                    ? data_get($field, 'name.value')
+                    : $key;
+            });
+        }
+
+        if (! $nodeKey && 'Query' !== $nodeValue->getNodeName()) {
+            $message = sprintf(
+                'No @cacheKey or ID field defined on %s',
+                $nodeValue->getNodeName()
+            );
+
+            throw new DirectiveException($message);
+        }
+
+        $nodeValue->setCacheKey($nodeKey);
+    }
+}

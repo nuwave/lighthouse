@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class FieldValue
 {
