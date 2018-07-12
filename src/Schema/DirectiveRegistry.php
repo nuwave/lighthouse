@@ -127,7 +127,7 @@ class DirectiveRegistry
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
-        return $handler;
+        return new $handler;
     }
 
     /**
