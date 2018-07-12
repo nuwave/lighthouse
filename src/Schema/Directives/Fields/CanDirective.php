@@ -31,13 +31,12 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     public function handleField(FieldValue $value, Closure $next)
     {
         $policies = $this->directiveArgValue('if');
-        $model = $this->directiveArgValue('model');
         $resolver = $value->getResolver();
 
         return $next($value->setResolver(
-            function () use ($policies, $resolver, $model) {
+            function () use ($policies, $resolver) {
                 $args = func_get_args();
-                $model = $model ?: get_class($args[0]);
+                $model = $this->getModelClass() ?: get_class($args[0]);
 
                 $can = collect($policies)->reduce(function ($allowed, $policy) use ($model) {
                     if (! app('auth')->user()->can($policy, $model)) {
