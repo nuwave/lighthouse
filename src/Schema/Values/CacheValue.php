@@ -68,15 +68,17 @@ class CacheValue
      */
     public function getKey()
     {
+        $private = $this->fieldValue->isPrivateCache();
         $argKeys = $this->argKeys();
 
-        return sprintf(
-            '%s:%s:%s%s',
+        return $this->implode([
+            $private ? 'auth' : null,
+            $private ? auth()->user()->getKey() : null,
             strtolower($this->resolveInfo->parentType->name),
             $this->fieldKey,
             strtolower($this->resolveInfo->fieldName),
-            $argKeys->isNotEmpty() ? ':'.$argKeys->implode(':') : null
-        );
+            $argKeys->isNotEmpty() ? $argKeys->implode(':') : null,
+        ]);
     }
 
     /**
@@ -90,18 +92,18 @@ class CacheValue
      */
     public function getTags()
     {
-        $typeTag = collect([
+        $typeTag = $this->implode([
             'graphql',
             strtolower($this->fieldValue->getNodeName()),
             $this->fieldKey,
-        ])->filter()->values()->implode(':');
+        ]);
 
-        $fieldTag = collect([
+        $fieldTag = $this->implode([
             'graphql',
             strtolower($this->fieldValue->getNodeName()),
             $this->fieldKey,
             $this->resolveInfo->fieldName,
-        ])->filter()->values()->implode(':');
+        ]);
 
         return [$typeTag, $fieldTag];
     }
@@ -132,5 +134,19 @@ class CacheValue
         if ($cacheFieldKey) {
             $this->fieldKey = data_get($this->rootValue, $cacheFieldKey);
         }
+    }
+
+    /**
+     * Implode value to create string.
+     *
+     * @param array $items
+     *
+     * @return string
+     */
+    protected function implode($items)
+    {
+        return collect($items)->filter()
+            ->values()
+            ->implode(':');
     }
 }

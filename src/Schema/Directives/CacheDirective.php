@@ -38,6 +38,10 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         $resolver = $value->getResolver();
         $maxAge = $this->directiveArgValue('maxAge');
 
+        if (true === $this->directiveArgValue('private')) {
+            $value->isPrivateCache(true);
+        }
+
         return $value->setResolver(function () use ($value, $resolver, $maxAge) {
             $arguments = func_get_args();
             /** @var \Illuminate\Support\Facades\Cache $cache */

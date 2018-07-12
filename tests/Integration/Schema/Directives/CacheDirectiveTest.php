@@ -38,6 +38,29 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanStoreResolverResultInPrivateCache()
+    {
+        $user = factory(User::class)->create();
+        $resolver = addslashes(self::class).'@resolve';
+        $schema = "
+        type User {
+            id: ID!
+            name: String @cache(private: true)
+        }
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $this->be($user);
+        $cacheKey = "auth:{$user->getKey()}:user:1:name";
+        $result = $this->execute($schema, '{ user { name } }');
+        $this->assertEquals('foobar', array_get($result->data, 'user.name'));
+        $this->assertEquals('foobar', app('cache')->get($cacheKey));
+    }
+
+    /**
+     * @test
+     */
     public function itCanStorePaginateResolverInCache()
     {
         factory(User::class, 5)->create();
@@ -62,7 +85,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->execute($schema, $query, true);
 
-        $result = app('cache')->get('query::users:count:5');
+        $result = app('cache')->get('query:users:count:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);

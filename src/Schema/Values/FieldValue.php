@@ -50,6 +50,13 @@ class FieldValue
     protected $complexity;
 
     /**
+     * Cache key should be private.
+     *
+     * @var bool
+     */
+    protected $privateCache = false;
+
+    /**
      * Additional args to inject into resolver.
      *
      * @var array
@@ -224,6 +231,22 @@ class FieldValue
     public function getComplexity()
     {
         return $this->complexity;
+    }
+
+    /**
+     * Get private cache flag.
+     *
+     * @return FieldValue|bool
+     */
+    public function isPrivateCache($flag = null)
+    {
+        if (null === $flag) {
+            return $this->privateCache;
+        }
+
+        $this->privateCache = $flag;
+
+        return $this;
     }
 
     /**
