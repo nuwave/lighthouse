@@ -105,11 +105,30 @@ class CacheDirectiveTest extends DBTestCase
             }
         }';
 
-        $this->execute($schema, $query, true);
-
+        $result = $this->execute($schema, $query, true)->data;
         $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
+
+        $queries = 0;
+        \DB::listen(function ($query) use (&$queries) {
+            // TODO: Find a better way of doing this
+            if (! str_contains($query->sql, [
+                'drop',
+                'delete',
+                'migrations',
+                'aggregate',
+                'limit 1',
+            ])) {
+                ++$queries;
+            }
+        });
+
+        $cache = $this->execute($schema, $query, true)->data;
+
+        // Get the the original user and the `find` directive checks the count
+        $this->assertEquals(0, $queries);
+        $this->assertEquals($result, $cache);
     }
 
     /**
@@ -149,24 +168,62 @@ class CacheDirectiveTest extends DBTestCase
     {
         config(['lighthouse.cache.tags' => true]);
 
-        $tags = ['graphql:user:1', 'graphql:user:name:1'];
-        $resolver = addslashes(self::class).'@resolve';
-        $schema = "
+        $user = factory(User::class)->create();
+        factory(Post::class, 3)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $tags = ['graphql:user:1', 'graphql:user:1:posts'];
+        $schema = '
+        type Post {
+            id: ID!
+            title: String
+        }
         type User {
             id: ID!
-            name: String @cache
+            name: String!
+            posts: [Post] @hasMany(type: "paginator") @cache
         }
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
-        }";
+            user(id: ID! @eq): User @find(model: "User")
+        }';
 
-        $cache = app('cache');
-        $result = $this->execute($schema, '{ user { name } }');
-        $this->assertEquals('foobar', array_get($result->data, 'user.name'));
-        $this->assertEquals('foobar', $cache->tags($tags)->get('user:1:name'));
+        $query = '{
+            user(id: '.$user->getKey().') {
+                id
+                name
+                posts(count: 3) {
+                    data {
+                        title
+                    }
+                }
+            }
+        }';
 
-        $cache->tags($tags[0])->flush();
-        $this->assertNull($cache->tags($tags)->get('user:1:name'));
+        $result = $this->execute($schema, $query, true)->data;
+        $posts = app('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
+        $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
+        $this->assertCount(3, $posts);
+
+        $queries = 0;
+        \DB::listen(function ($query) use (&$queries) {
+            // TODO: Find a better way of doing this
+            if (! str_contains($query->sql, [
+                'drop',
+                'delete',
+                'migrations',
+                'aggregate',
+                'limit 1',
+            ])) {
+                ++$queries;
+            }
+        });
+
+        $cache = $this->execute($schema, $query, true)->data;
+
+        // Get the the original user and the `find` directive checks the count
+        $this->assertEquals(0, $queries);
+        $this->assertEquals($result, $cache);
     }
 
     public function resolve()

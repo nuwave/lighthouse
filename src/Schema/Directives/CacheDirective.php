@@ -48,12 +48,16 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                 array_merge([$value], $arguments)
             );
 
+            $useTags = $this->useTags();
             $cacheExp = $maxAge ? now()->addSeconds($maxAge) : null;
             $cacheKey = $cacheValue->getKey();
             $cacheTags = $cacheValue->getTags();
+            $cacheHas = $useTags ? $cache->tags($cacheTags)->has($cacheKey) : $cache->has($cacheKey);
 
-            if ($cache->has($cacheKey)) {
-                return $cache->get($cacheKey);
+            if ($cacheHas) {
+                return $useTags
+                    ? $cache->tags($cacheTags)->get($cacheKey)
+                    : $cache->get($cacheKey);
             }
 
             $value = call_user_func_array($resolver, $arguments);
@@ -80,7 +84,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     protected function store($cache, $key, $value, $expiration, $tags)
     {
         $store = $cache->store();
-        $supportsTags = method_exists($store, 'tags') && config('lighthouse.cache.tags', false);
+        $supportsTags = $this->useTags();
 
         if ($expiration) {
             ($supportsTags)
@@ -93,6 +97,16 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         ($supportsTags)
             ? $cache->tags($tags)->forever($key, $value)
             : $cache->forever($key, $value);
+    }
+
+    /**
+     * Check if tags should be used.
+     *
+     * @return bool
+     */
+    protected function useTags()
+    {
+        return config('lighthouse.cache.tags', false) && method_exists(app('cache')->store(), 'tags');
     }
 
     /**

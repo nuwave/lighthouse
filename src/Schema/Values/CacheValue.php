@@ -99,8 +99,8 @@ class CacheValue
         $fieldTag = collect([
             'graphql',
             strtolower($this->fieldValue->getNodeName()),
-            $this->resolveInfo->fieldName,
             $this->fieldKey,
+            $this->resolveInfo->fieldName,
         ])->filter()->values()->implode(':');
 
         return [$typeTag, $fieldTag];
