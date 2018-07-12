@@ -28,19 +28,8 @@ class CreateDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        // TODO: create a model registry so we can auto-resolve this.
-        $model = $this->directiveArgValue('model');
-
-        if (!$model) {
-            throw new DirectiveException(sprintf(
-                'The `create` directive on %s [%s] must have a `model` argument',
-                $value->getNodeName(),
-                $value->getFieldName()
-            ));
-        }
-
-        return $value->setResolver(function ($root, array $args) use ($model) {
-            return $model::create($args);
+        return $value->setResolver(function ($root, array $args){
+            return $this->getModelClass()::create($args);
         });
     }
 }

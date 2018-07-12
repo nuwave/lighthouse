@@ -34,16 +34,8 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     public function resolveField(FieldValue $value)
     {
         $idArg = $this->getIDField($value);
-        $class = $this->directiveArgValue('model');
         $globalId = $this->directiveArgValue('globalId', false);
 
-        if (!$class) {
-            throw new DirectiveException(sprintf(
-                'The `delete` directive on %s [%s] must have a `model` argument',
-                $value->getNodeName(),
-                $value->getFieldName()
-            ));
-        }
 
         if (!$idArg) {
             new DirectiveException(sprintf(
@@ -52,9 +44,9 @@ class DeleteDirective extends BaseDirective implements FieldResolver
             ));
         }
 
-        return $value->setResolver(function ($root, array $args) use ($class, $idArg, $globalId) {
+        return $value->setResolver(function ($root, array $args) use ($idArg, $globalId) {
             $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg))[1] : array_get($args, $idArg);
-            $model = $class::find($id);
+            $model = $this->getModelClass()::find($id);
 
             if ($model) {
                 $model->delete();
