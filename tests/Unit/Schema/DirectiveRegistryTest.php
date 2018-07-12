@@ -103,7 +103,8 @@ class DirectiveRegistryTest extends TestCase
         };
 
         graphql()->directives()->register($fooDirective);
-        $this->assertSame($fooDirective, graphql()->directives()->get('foo'));
+        $this->assertEquals($fooDirective, graphql()->directives()->get('foo'));
+        $this->assertNotSame($fooDirective, graphql()->directives()->get('foo'));
     }
 
     /**
@@ -160,6 +161,7 @@ class DirectiveRegistryTest extends TestCase
         graphql()->directives()->register($originalDefinition);
 
         $fromRegistry = graphql()->directives()->fieldMiddleware($fieldDefinition)->first();
-        $this->assertSame($originalDefinition, $fromRegistry);
+        $this->assertEquals($originalDefinition, $fromRegistry);
+        $this->assertNotSame($originalDefinition, $fromRegistry);
     }
 }
