@@ -20,6 +20,16 @@ abstract class GraphQLExtension implements \JsonSerializable
     }
 
     /**
+     * Handle request start.
+     *
+     * @param ExtensionRequest $request
+     */
+    public function requestDidStart(ExtensionRequest $request)
+    {
+        return;
+    }
+
+    /**
      * Specify data which should be serialized to JSON.
      *
      * @return array

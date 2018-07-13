@@ -13,6 +13,11 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 class TraceExtension extends GraphQLExtension
 {
     /**
+     * @var Carbon
+     */
+    protected $requestStart;
+
+    /**
      * Trace entries.
      *
      * @var \Illuminate\Support\Collection
@@ -34,7 +39,7 @@ class TraceExtension extends GraphQLExtension
      */
     public function name()
     {
-        return 'trace';
+        return 'tracing';
     }
 
     /**
@@ -69,6 +74,18 @@ class TraceExtension extends GraphQLExtension
     }
 
     /**
+     * Handle request start.
+     *
+     * @param ExtensionRequest $request
+     */
+    public function requestDidStart(ExtensionRequest $request)
+    {
+        $this->requestStart = now();
+
+        return;
+    }
+
+    /**
      * Record resolver execution time.
      *
      * @param ResolveInfo $info
@@ -94,6 +111,15 @@ class TraceExtension extends GraphQLExtension
      */
     public function toArray()
     {
-        return $this->resolvers->toArray();
+        $end = now();
+        $duration = $end->micro - $this->requestStart->micro;
+
+        return [
+            'version' => 1,
+            'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.u\Z"),
+            'endTime' => $end->format("Y-m-d\TH:i:s.u\Z"),
+            'duration' => $duration,
+            'resolvers' => $this->resolvers->toArray(),
+        ];
     }
 }

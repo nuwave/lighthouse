@@ -66,16 +66,28 @@ class ExtensionRegistry
     }
 
     /**
-     * Process formatted data.
+     * Handle request start.
+     *
+     * @param ExtensionRequest $request
+     */
+    public function requestDidStart(ExtensionRequest $request)
+    {
+        $this->active()->each(function (GraphQLExtension $extension) use ($request) {
+            $extension->requestDidStart($request);
+        });
+    }
+
+    /**
+     * Get output for all extensions.
      *
      * @return array
      */
-    public function format()
+    public function toArray()
     {
         return $this->extensions
             ->only(config('lighthouse.extensions', []))
             ->mapWithKeys(function (GraphQLExtension $extension) {
-                return [$extension->name() => $extension->format()];
+                return [$extension->name() => $extension->toArray()];
             })
             ->toArray();
     }

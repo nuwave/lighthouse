@@ -16,7 +16,7 @@ class TraceExtensionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('lighthouse.extensions', ['trace']);
+        $app['config']->set('lighthouse.extensions', ['tracing']);
     }
 
     /**
@@ -32,7 +32,8 @@ class TraceExtensionTest extends TestCase
         }";
 
         $result = $this->execute($schema, '{ foo }', true);
-        dd(app(TraceExtension::class)->toArray());
+        $this->assertArrayHasKey('tracing', $result->extensions);
+        $this->assertArrayHasKey('resolvers', $result->extensions['tracing']);
     }
 
     public function resolve()

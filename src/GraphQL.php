@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -118,6 +119,11 @@ class GraphQL
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
+        $output = [
+            'data' => $result->data,
+            'extensions' => $result->extensions,
+        ];
+
         if (! empty($result->errors)) {
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
@@ -129,13 +135,12 @@ class GraphQL
                 }
             }
 
-            return [
-                'data' => $result->data,
+            $output = array_merge($output, [
                 'errors' => array_map([$this, 'formatError'], $result->errors),
-            ];
+            ]);
         }
 
-        return ['data' => $result->data];
+        return $output;
     }
 
     /**
@@ -150,15 +155,25 @@ class GraphQL
      */
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
-        $schema = $this->graphqlSchema ?: $this->buildSchema();
+        $this->extensions->requestDidStart(new ExtensionRequest([
+            'request' => request(),
+            'query_string' => $query,
+            'operationName' => request()->input('operationName'),
+            'variables' => $variables,
+        ]));
 
-        return GraphQLBase::executeQuery(
+        $schema = $this->graphqlSchema ?: $this->buildSchema();
+        $result = GraphQLBase::executeQuery(
             $schema,
             $query,
             $rootValue,
             $context,
             $variables
         );
+
+        $result->extensions = $this->extensions->toArray();
+
+        return $result;
     }
 
     /**
