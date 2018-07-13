@@ -37,24 +37,23 @@ class CacheValue
     protected $fieldKey;
 
     /**
-     * @param FieldValue  $fieldValue
-     * @param mixed       $rootValue
-     * @param array       $args
-     * @param mixed       $context
-     * @param ResolveInfo $resolveInfo
+     * @var bool
      */
-    public function __construct(
-        $fieldValue,
-        $rootValue,
-        $args,
-        $context,
-        $resolveInfo
-    ) {
-        $this->fieldValue = $fieldValue;
-        $this->rootValue = $rootValue;
-        $this->args = $args;
-        $this->context = $context;
-        $this->resolveInfo = $resolveInfo;
+    protected $privateCache;
+
+    /**
+     * Create instance of cache value.
+     *
+     * @param array $arguments
+     */
+    public function __construct(array $arguments = [])
+    {
+        $this->fieldValue = array_get($arguments, 'field_value');
+        $this->rootValue = array_get($arguments, 'root');
+        $this->args = array_get($arguments, 'args');
+        $this->context = array_get($arguments, 'context');
+        $this->resolveInfo = array_get($arguments, 'resolve_info');
+        $this->privateCache = array_get($arguments, 'private_cache');
 
         $this->setFieldKey();
     }
@@ -68,12 +67,11 @@ class CacheValue
      */
     public function getKey()
     {
-        $private = $this->fieldValue->isPrivateCache();
         $argKeys = $this->argKeys();
 
         return $this->implode([
-            $private ? 'auth' : null,
-            $private ? auth()->user()->getKey() : null,
+            $this->privateCache ? 'auth' : null,
+            $this->privateCache ? auth()->user()->getKey() : null,
             strtolower($this->resolveInfo->parentType->name),
             $this->fieldKey,
             strtolower($this->resolveInfo->fieldName),
@@ -129,6 +127,10 @@ class CacheValue
      */
     protected function setFieldKey()
     {
+        if (! $this->fieldValue || ! $this->rootValue) {
+            return null;
+        }
+
         $cacheFieldKey = $this->fieldValue->getNode()->getCacheKey();
 
         if ($cacheFieldKey) {

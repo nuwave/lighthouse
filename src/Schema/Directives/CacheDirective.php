@@ -37,20 +37,20 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         $value = $next($value);
         $resolver = $value->getResolver();
         $maxAge = $this->directiveArgValue('maxAge');
+        $privateCache = $this->directiveArgValue('private', false);
 
-        if (true === $this->directiveArgValue('private')) {
-            $value->isPrivateCache(true);
-        }
-
-        return $value->setResolver(function () use ($value, $resolver, $maxAge) {
-            $arguments = func_get_args();
+        return $value->setResolver(function ($root, $args, $context, $info) use ($value, $resolver, $maxAge, $privateCache) {
             /** @var \Illuminate\Support\Facades\Cache $cache */
             $cache = app('cache');
             /** @var \Nuwave\Lighthouse\Schema\Values\CacheValue $cacheValue */
-            $cacheValue = call_user_func_array(
-                [app(ValueFactory::class), 'cache'],
-                array_merge([$value], $arguments)
-            );
+            $cacheValue = call_user_func([app(ValueFactory::class), 'cache'], [
+                'field_value' => $value,
+                'root' => $root,
+                'args' => $args,
+                'context' => $context,
+                'resolve_info' => $info,
+                'private_cache' => $privateCache,
+            ]);
 
             $useTags = $this->useTags();
             $cacheExp = $maxAge ? now()->addSeconds($maxAge) : null;
@@ -64,7 +64,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                     : $cache->get($cacheKey);
             }
 
-            $value = call_user_func_array($resolver, $arguments);
+            $value = call_user_func($resolver, $root, $args, $context, $info);
 
             ($value instanceof \GraphQL\Deferred)
                 ? $value->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags) {
@@ -87,7 +87,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      */
     protected function store($cache, $key, $value, $expiration, $tags)
     {
-        $store = $cache->store();
         $supportsTags = $this->useTags();
 
         if ($expiration) {

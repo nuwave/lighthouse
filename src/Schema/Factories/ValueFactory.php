@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Closure;
 use GraphQL\Language\AST\TypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class ValueFactory
 {
@@ -142,36 +142,12 @@ class ValueFactory
     /**
      * Create cache value for field.
      *
-     * @param FieldValue  $fieldValue
-     * @param mixed       $rootValue
-     * @param array       $args
-     * @param mixed       $context
-     * @param ResolveInfo $resolveInfo
+     * @param array $arguments
      */
-    public function cache(
-        $fieldValue,
-        $rootValue,
-        $args,
-        $context,
-        $resolveInfo
-    ) {
-        if ($this->cache) {
-            return call_user_func(
-                $this->cache,
-                $fieldValue,
-                $rootValue,
-                $args,
-                $context,
-                $resolveInfo
-            );
-        }
-
-        return new CacheValue(
-            $fieldValue,
-            $rootValue,
-            $args,
-            $context,
-            $resolveInfo
-        );
+    public function cache(array $arguments)
+    {
+        return $this->cache
+            ? call_user_func($this->cache, $arguments)
+            : new CacheValue($arguments);
     }
 }

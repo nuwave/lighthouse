@@ -171,8 +171,8 @@ class CacheDirectiveTest extends DBTestCase
 
         /** @var ValueFactory $valueFactory */
         $valueFactory = app(ValueFactory::class);
-        $valueFactory->cacheResolver(function (...$args) {
-            return new class(...$args) extends CacheValue {
+        $valueFactory->cacheResolver(function ($arguments) {
+            return new class($arguments) extends CacheValue {
                 public function getKey()
                 {
                     return 'foo';
