@@ -2,16 +2,17 @@
 
 namespace Nuwave\Lighthouse\Providers;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Illuminate\Support\Collection;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
-use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
+use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
+use Nuwave\Lighthouse\Schema\Extensions\TraceExtension;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
+use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -32,6 +33,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->registerMacros();
         $this->registerValidator();
+        $this->registerExtensions();
     }
 
     /**
@@ -107,5 +109,17 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         Validator::extendImplicit('required_with_mutation', ValidatorFactory::class.'@requiredWithMutation');
+    }
+
+    /**
+     * Register extensions w/ registry.
+     */
+    public function registerExtensions()
+    {
+        $this->app->singleton(TraceExtension::class);
+
+        graphql()->extensions()->registerMany([
+            $this->app->get(TraceExtension::class),
+        ]);
     }
 }
