@@ -19,7 +19,7 @@ class ClientDirectiveTest extends TestCase
             foo: String @field(resolver: "'.$resolver.'")
         }';
 
-        $result = $this->execute($schema, '{ foo @filter(key: "baz") }');
+        $result = $this->queryAndReturnResult($schema, '{ foo @filter(key: "baz") }');
         $this->assertEquals(['foo' => 'baz'], $result->data);
     }
 

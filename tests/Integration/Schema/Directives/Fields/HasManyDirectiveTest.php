@@ -61,7 +61,7 @@ class HasManyDirectiveTest extends DBTestCase
 
         $this->be($this->user);
 
-        $result = $this->execute($schema, '{ user { tasks { id } } }');
+        $result = $this->queryAndReturnResult($schema, '{ user { tasks { id } } }');
 
         $this->assertCount(3, array_get($result->data, 'user.tasks'));
     }
@@ -87,9 +87,9 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->execute($schema, '
+        $result = $this->queryAndReturnResult($schema, '
         { user { tasks(count: 2) { paginatorInfo { total count hasMorePages } data { id } } } }
-        ', true);
+        ');
 
         $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
         $this->assertEquals(3, array_get($result->data, 'user.tasks.paginatorInfo.total'));
@@ -114,9 +114,9 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->execute($schema, '
+        $result = $this->queryAndReturnResult($schema, '
         { user { tasks(first: 2) { pageInfo { hasNextPage } edges { node { id } } } } }
-        ', true);
+        ');
 
         $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
         $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));

@@ -67,7 +67,7 @@ class BelongsToTest extends DBTestCase
 
         $this->be($this->user);
 
-        $result = $this->execute($schema, '{ user { company { name } } }');
+        $result = $this->queryAndReturnResult($schema, '{ user { company { name } } }');
         $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
     }
 
@@ -89,7 +89,7 @@ class BelongsToTest extends DBTestCase
         ';
 
         $this->be($this->user);
-        $result = $this->execute($schema, '{ user { account { name } } }');
+        $result = $this->queryAndReturnResult($schema, '{ user { account { name } } }');
         $this->assertEquals($this->company->name, array_get($result->data, 'user.account.name'));
     }
 
@@ -116,7 +116,7 @@ class BelongsToTest extends DBTestCase
 
         $this->be($this->user);
 
-        $result = $this->execute($schema, '{ user { company { name } team { name } } }');
+        $result = $this->queryAndReturnResult($schema, '{ user { company { name } team { name } } }');
         $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
         $this->assertEquals($this->team->name, array_get($result->data, 'user.team.name'));
     }

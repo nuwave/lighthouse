@@ -45,7 +45,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(1, array_get($result->data, 'users.data'));
     }
 
@@ -72,7 +72,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(4, array_get($result->data, 'users.data'));
     }
 
@@ -102,7 +102,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(2, array_get($result->data, 'users.data'));
     }
 
@@ -132,7 +132,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(3, array_get($result->data, 'users.data'));
     }
 
@@ -161,7 +161,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(4, array_get($result->data, 'users.data'));
     }
 
@@ -202,7 +202,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(2, array_get($result->data, 'users.data'));
     }
 
@@ -243,7 +243,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(3, array_get($result->data, 'users.data'));
     }
 
@@ -281,7 +281,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(2, array_get($result->data, 'users.data'));
     }
 
@@ -309,7 +309,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(1, array_get($result->data, 'users.data'));
     }
 }

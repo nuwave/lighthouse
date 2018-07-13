@@ -35,7 +35,7 @@ class ValueFactoryTest extends TestCase
             };
         });
 
-        $result = $this->execute('
+        $result = $this->queryAndReturnResult('
             type Query {
                 bar: String
             }',
@@ -61,7 +61,7 @@ class ValueFactoryTest extends TestCase
             };
         });
 
-        $result = $this->execute('
+        $result = $this->queryAndReturnResult('
             type Query {
                 foo: String
             }',
