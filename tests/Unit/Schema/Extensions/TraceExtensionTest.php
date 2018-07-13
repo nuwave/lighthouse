@@ -28,12 +28,12 @@ class TraceExtensionTest extends TestCase
 
         $schema = "
         type Query {
-            foo: String @field(resolver: \"{$resolver}\")
+            foo: String! @field(resolver: \"{$resolver}\")
         }";
 
         $result = $this->execute($schema, '{ foo }', true);
         $this->assertArrayHasKey('tracing', $result->extensions);
-        $this->assertArrayHasKey('resolvers', $result->extensions['tracing']);
+        $this->assertArrayHasKey('resolvers', $result->extensions['tracing']['execution']);
     }
 
     public function resolve()

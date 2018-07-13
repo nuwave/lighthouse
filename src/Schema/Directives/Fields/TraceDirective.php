@@ -37,7 +37,11 @@ class TraceDirective extends BaseDirective implements FieldMiddleware
             $start = now();
             $result = call_user_func($resolver, $root, $args, $context, $info);
 
-            app(TraceExtension::class)->record($info, $start, now());
+            ($result instanceof \GraphQL\Deferred)
+                ? $result->then(function (&$items) use ($info, $start) {
+                    app(TraceExtension::class)->record($info, $start);
+                })
+                : app(TraceExtension::class)->record($info, $start);
 
             return $result;
         });

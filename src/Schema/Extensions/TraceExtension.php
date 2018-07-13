@@ -4,6 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Carbon\Carbon;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\ListOfType;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -54,7 +57,7 @@ class TraceExtension extends GraphQLExtension
     {
         $trace = PartialParser::directive('@trace');
 
-        return $current->typeDefinitions()
+        return $current->objectTypeDefinitions()
             ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($trace) {
                 if (! data_get($objectType, 'name.value')) {
                     return $document;
@@ -90,16 +93,19 @@ class TraceExtension extends GraphQLExtension
      *
      * @param ResolveInfo $info
      * @param Carbon      $start
-     * @param Carbon      $end
      */
-    public function record(ResolveInfo $info, Carbon $start, Carbon $end)
+    public function record(ResolveInfo $info, Carbon $start)
     {
-        $duration = $end->micro - $start->micro;
+        $end = now();
+        $startOffset = ($start->micro - $this->requestStart->micro) * 1000;
+        $duration = ($end->micro - $start->micro) * 1000;
 
         $this->resolvers->push([
             'path' => $info->path,
             'parentType' => $info->parentType->name,
+            'returnType' => $this->getReturnType($info->returnType),
             'fieldName' => $info->fieldName,
+            'startOffset' => $startOffset,
             'duration' => $duration,
         ]);
     }
@@ -112,14 +118,43 @@ class TraceExtension extends GraphQLExtension
     public function toArray()
     {
         $end = now();
-        $duration = $end->micro - $this->requestStart->micro;
+        $duration = ($end->micro - $this->requestStart->micro) * 1000;
 
         return [
             'version' => 1,
-            'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.u\Z"),
-            'endTime' => $end->format("Y-m-d\TH:i:s.u\Z"),
+            'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.v\Z"),
+            'endTime' => $end->format("Y-m-d\TH:i:s.v\Z"),
             'duration' => $duration,
-            'resolvers' => $this->resolvers->toArray(),
+            'execution' => [
+                'resolvers' => $this->resolvers->toArray(),
+            ],
         ];
+    }
+
+    /**
+     * Get field return type.
+     *
+     * @param mixed $type
+     *
+     * @return string
+     */
+    protected function getReturnType($type)
+    {
+        $wrappers = [];
+
+        while (method_exists($type, 'getWrappedType')) {
+            if ($type instanceof NonNull) {
+                $wrappers[] = '%s!';
+            } elseif ($type instanceof ListOfType) {
+                $wrappers[] = '[%s]';
+            }
+
+            $type = $type->getWrappedType();
+        }
+
+        return str_replace('%s', '', collect(array_merge($wrappers, [$type->name]))
+            ->reduce(function ($string, $type) {
+                return sprintf($string, $type);
+            }, '%s'));
     }
 }
