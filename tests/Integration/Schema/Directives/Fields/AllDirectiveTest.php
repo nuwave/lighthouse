@@ -79,6 +79,7 @@ class AllDirectiveTest extends DBTestCase
         ';
 
         $result = $this->queryAndReturnResult($schema, $query);
+      
         $this->assertCount(1, array_get($result->data, 'users'));
         $this->assertCount(10, array_get($result->data, 'users.0.posts'));
     }
