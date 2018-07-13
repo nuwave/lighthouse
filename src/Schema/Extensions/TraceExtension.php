@@ -93,17 +93,17 @@ class TraceExtension extends GraphQLExtension
      *
      * @param ResolveInfo $info
      * @param Carbon      $start
+     * @param Carbon      $end
      */
-    public function record(ResolveInfo $info, Carbon $start)
+    public function record(ResolveInfo $info, Carbon $start, Carbon $end)
     {
-        $end = now();
-        $startOffset = ($start->micro - $this->requestStart->micro) * 1000;
-        $duration = ($end->micro - $start->micro) * 1000;
+        $startOffset = abs(($start->micro - $this->requestStart->micro) * 1000);
+        $duration = abs(($end->micro - $start->micro) * 1000);
 
         $this->resolvers->push([
             'path' => $info->path,
             'parentType' => $info->parentType->name,
-            'returnType' => $this->getReturnType($info->returnType),
+            'returnType' => $info->returnType->__toString(),
             'fieldName' => $info->fieldName,
             'startOffset' => $startOffset,
             'duration' => $duration,
@@ -118,7 +118,7 @@ class TraceExtension extends GraphQLExtension
     public function toArray()
     {
         $end = now();
-        $duration = ($end->micro - $this->requestStart->micro) * 1000;
+        $duration = abs(($end->micro - $this->requestStart->micro) * 1000);
 
         return [
             'version' => 1,
@@ -129,32 +129,5 @@ class TraceExtension extends GraphQLExtension
                 'resolvers' => $this->resolvers->toArray(),
             ],
         ];
-    }
-
-    /**
-     * Get field return type.
-     *
-     * @param mixed $type
-     *
-     * @return string
-     */
-    protected function getReturnType($type)
-    {
-        $wrappers = [];
-
-        while (method_exists($type, 'getWrappedType')) {
-            if ($type instanceof NonNull) {
-                $wrappers[] = '%s!';
-            } elseif ($type instanceof ListOfType) {
-                $wrappers[] = '[%s]';
-            }
-
-            $type = $type->getWrappedType();
-        }
-
-        return str_replace('%s', '', collect(array_merge($wrappers, [$type->name]))
-            ->reduce(function ($string, $type) {
-                return sprintf($string, $type);
-            }, '%s'));
     }
 }
