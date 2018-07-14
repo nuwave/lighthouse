@@ -100,6 +100,7 @@ class TestCase extends BaseTestCase
      */
     protected function queryAndReturnResult(string $schema, string $query, array $variables = []): ExecutionResult
     {
+        // The schema is injected into the runtime during execution of the query
         $this->schema = $schema;
 
         return graphql()->queryAndReturnResult($query, null, $variables);

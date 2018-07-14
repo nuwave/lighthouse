@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use GraphQL\Type\Schema;
 use Tests\TestCase;
+use GraphQL\Type\Schema;
 
 class GraphQLTest extends TestCase
 {
@@ -17,17 +17,17 @@ class GraphQLTest extends TestCase
         user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
     }
     ';
-    
+
     /**
      * @test
      */
     public function itCanBuildGraphQLSchema()
     {
         $schema = graphql()->buildSchema();
-        
+
         $this->assertInstanceOf(Schema::class, $schema);
     }
-    
+
     /**
      * @test
      */
@@ -42,7 +42,7 @@ class GraphQLTest extends TestCase
             }
         }
         ';
-        
+
         $expected = [
             'data' => [
                 'user' => [
@@ -51,11 +51,12 @@ class GraphQLTest extends TestCase
                     'updated_at' => now()->format('Y-m-d'),
                 ],
             ],
+            'extensions' => [],
         ];
-        
+
         $this->assertEquals($expected, graphql()->execute($query));
     }
-    
+
     public function user($root, array $args, $context, $info)
     {
         return [

@@ -2,9 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use Exception;
 use GraphQL\Utils\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 
 class ASTHelper
 {
@@ -23,7 +28,7 @@ class ASTHelper
      *
      * @return NodeList
      */
-    public static function mergeNodeList($original, $addition)
+    public static function mergeNodeList($original, $addition): NodeList
     {
         if (! $original instanceof NodeList) {
             $original = new NodeList($original);
@@ -41,7 +46,7 @@ class ASTHelper
      *
      * @return NodeList
      */
-    public static function mergeUniqueNodeList($original, $addition)
+    public static function mergeUniqueNodeList($original, $addition): NodeList
     {
         $newFields = collect($addition)->pluck('name.value')->filter()->all();
         $filteredList = collect($original)->filter(function ($field) use ($newFields) {
@@ -58,8 +63,46 @@ class ASTHelper
      *
      * @return Node
      */
-    public static function cloneNode(Node $node)
+    public static function cloneNode(Node $node): Node
     {
         return AST::fromArray($node->toArray(true));
+    }
+    
+    /**
+     * @param FieldDefinitionNode $field
+     *
+     * @return string
+     * @throws Exception
+     */
+    public static function getFieldTypeName(FieldDefinitionNode $field): string
+    {
+        $type = $field->type;
+        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode){
+            $type = self::getUnderlyingNamedTypeNode($type);
+        }
+        
+        /** @var NamedTypeNode $type */
+        return $type->name->value;
+    }
+    
+    /**
+     * @param Node $node
+     *
+     * @return NamedTypeNode
+     * @throws Exception
+     */
+    public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
+    {
+        if($node instanceof NamedTypeNode){
+            return $node;
+        }
+        
+        $type = data_get($node, 'type');
+        
+        if(!$type){
+            throw new Exception("The node '$node->kind' does not have a type associated with it.");
+        }
+        
+        return self::getUnderlyingNamedTypeNode($type);
     }
 }

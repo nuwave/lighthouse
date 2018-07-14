@@ -2,15 +2,15 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GraphQLTest extends DBTestCase
 {
     use RefreshDatabase;
-    
+
     protected $schema = '
     type User {
         id: ID!
@@ -97,6 +97,7 @@ class GraphQLTest extends DBTestCase
                     })->toArray(),
                 ],
             ],
+            'extensions' => [],
         ];
 
         $this->assertEquals($expected, $data);
@@ -130,6 +131,7 @@ class GraphQLTest extends DBTestCase
                     })->toArray(),
                 ],
             ],
+            'extensions' => [],
         ];
 
         $this->assertEquals($expected, $data);
@@ -152,7 +154,7 @@ class GraphQLTest extends DBTestCase
         }
         ';
 
-        $uri = 'graphql?' . http_build_query(['query' => $query]);
+        $uri = 'graphql?'.http_build_query(['query' => $query]);
 
         $data = $this->getJson($uri)->json();
 
@@ -165,6 +167,7 @@ class GraphQLTest extends DBTestCase
                     })->toArray(),
                 ],
             ],
+            'extensions' => [],
         ];
 
         $this->assertEquals($expected, $data);

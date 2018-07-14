@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class FieldValue
 {
@@ -49,6 +48,13 @@ class FieldValue
      * @var \Closure
      */
     protected $complexity;
+
+    /**
+     * Cache key should be private.
+     *
+     * @var bool
+     */
+    protected $privateCache = false;
 
     /**
      * Additional args to inject into resolver.
@@ -225,6 +231,22 @@ class FieldValue
     public function getComplexity()
     {
         return $this->complexity;
+    }
+
+    /**
+     * Get private cache flag.
+     *
+     * @return FieldValue|bool
+     */
+    public function isPrivateCache($flag = null)
+    {
+        if (null === $flag) {
+            return $this->privateCache;
+        }
+
+        $this->privateCache = $flag;
+
+        return $this;
     }
 
     /**

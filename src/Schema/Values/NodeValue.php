@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\NamedTypeNode;
 
 class NodeValue
 {
@@ -38,6 +38,13 @@ class NodeValue
     protected $namespace;
 
     /**
+     * Cache key for node.
+     *
+     * @var string
+     */
+    protected $cacheKey;
+
+    /**
      * Create new instance of node value.
      *
      * @param Node $node
@@ -51,6 +58,7 @@ class NodeValue
      * Create new instance of node value.
      *
      * @param Node $node
+     *
      * @return NodeValue
      */
     public static function init(Node $node)
@@ -104,6 +112,16 @@ class NodeValue
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
+    }
+
+    /**
+     * Set node cache key.
+     *
+     * @param string $key
+     */
+    public function setCacheKey($key)
+    {
+        $this->cacheKey = $key;
     }
 
     /**
@@ -179,6 +197,16 @@ class NodeValue
             ->map(function (NamedTypeNode $interface) {
                 return $interface->name->value;
             });
+    }
+
+    /**
+     * Get node's cache key.
+     *
+     * @return string|null
+     */
+    public function getCacheKey()
+    {
+        return $this->cacheKey;
     }
 
     /**
