@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-
 class ExtensionRegistry
 {
     /**
@@ -60,9 +58,13 @@ class ExtensionRegistry
      */
     public function active()
     {
-        return $this->extensions->only(
-            config('lighthouse.extensions', [])
-        );
+        $extensions = config('lighthouse.extensions', []);
+
+        if (is_string($extensions)) {
+            $extensions = explode(',', $extensions);
+        }
+
+        return $this->extensions->only($extensions);
     }
 
     /**
