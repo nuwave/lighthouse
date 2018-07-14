@@ -86,8 +86,7 @@ class ExtensionRegistry
      */
     public function toArray()
     {
-        return $this->extensions
-            ->only(config('lighthouse.extensions', []))
+        return $this->active()
             ->mapWithKeys(function (GraphQLExtension $extension) {
                 return [$extension->name() => $extension->toArray()];
             })
