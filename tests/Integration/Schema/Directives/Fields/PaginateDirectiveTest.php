@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
+use Tests\Utils\Models\Comment;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PaginateDirectiveTest extends DBTestCase
 {
@@ -26,8 +26,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         type Query {
             users: [User!]! @paginate(type: "paginator" model: "User")
-        }
-        ';
+        }';
 
         $query = '{
             users(count: 5) {
