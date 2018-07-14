@@ -3,19 +3,21 @@
 namespace Nuwave\Lighthouse;
 
 use GraphQL\Deferred;
-use GraphQL\Executor\ExecutionResult;
-use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Type\Schema;
+use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Cache;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\NodeContainer;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Schema\NodeContainer;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
@@ -50,6 +52,13 @@ class GraphQL
     protected $middleware;
 
     /**
+     * Extension registry.
+     *
+     * @var ExtensionRegistry
+     */
+    protected $extensions;
+
+    /**
      * GraphQL Schema.
      *
      * @var Schema
@@ -70,17 +79,20 @@ class GraphQL
      * @param TypeRegistry      $types
      * @param MiddlewareManager $middleware
      * @param NodeContainer     $nodes
+     * @param ExtensionRegistry $extensions
      */
     public function __construct(
         DirectiveRegistry $directives,
         TypeRegistry $types,
         MiddlewareManager $middleware,
-        NodeContainer $nodes
+        NodeContainer $nodes,
+        ExtensionRegistry $extensions
     ) {
         $this->directives = $directives;
         $this->types = $types;
         $this->middleware = $middleware;
         $this->nodes = $nodes;
+        $this->extensions = $extensions;
     }
 
     /**
@@ -107,6 +119,11 @@ class GraphQL
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
 
+        $output = [
+            'data' => $result->data,
+            'extensions' => $result->extensions,
+        ];
+
         if (! empty($result->errors)) {
             foreach ($result->errors as $error) {
                 if ($error instanceof \Exception) {
@@ -118,13 +135,12 @@ class GraphQL
                 }
             }
 
-            return [
-                'data' => $result->data,
+            $output = array_merge($output, [
                 'errors' => array_map([$this, 'formatError'], $result->errors),
-            ];
+            ]);
         }
 
-        return ['data' => $result->data];
+        return $output;
     }
 
     /**
@@ -139,15 +155,25 @@ class GraphQL
      */
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
-        $schema = $this->graphqlSchema ?: $this->buildSchema();
+        $this->extensions->requestDidStart(new ExtensionRequest([
+            'request' => request(),
+            'query_string' => $query,
+            'operationName' => request()->input('operationName'),
+            'variables' => $variables,
+        ]));
 
-        return GraphQLBase::executeQuery(
+        $schema = $this->graphqlSchema ?: $this->buildSchema();
+        $result = GraphQLBase::executeQuery(
             $schema,
             $query,
             $rootValue,
             $context,
             $variables
         );
+
+        $result->extensions = $this->extensions->toArray();
+
+        return $result;
     }
 
     /**
@@ -272,5 +298,15 @@ class GraphQL
     public function nodes(): NodeContainer
     {
         return $this->nodes;
+    }
+
+    /**
+     * Get instance of extension registry.
+     *
+     * @return ExtensionRegistry
+     */
+    public function extensions(): ExtensionRegistry
+    {
+        return $this->extensions;
     }
 }

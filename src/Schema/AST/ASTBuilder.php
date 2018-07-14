@@ -2,16 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class ASTBuilder
 {
@@ -33,6 +34,7 @@ class ASTBuilder
         $document = self::applyArgManipulators($document);
 
         $document = self::addNodeSupport($document);
+        $document = self::applyExtensions($document);
 
         return $document;
     }
@@ -67,6 +69,11 @@ class ASTBuilder
             }, $document);
     }
 
+    /**
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
     protected static function mergeTypeExtensions(DocumentAST $document)
     {
         $document->objectTypeDefinitions()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
@@ -170,11 +177,13 @@ class ASTBuilder
      */
     protected static function addNodeSupport(DocumentAST $document)
     {
-        $hasTypeImplementingNode = $document->objectTypeDefinitions()->contains(function (ObjectTypeDefinitionNode $objectType) {
-            return collect($objectType->interfaces)->contains(function (NamedTypeNode $interface) {
-                return 'Node' === $interface->name->value;
+        $hasTypeImplementingNode = $document->objectTypeDefinitions()
+            ->contains(function (ObjectTypeDefinitionNode $objectType) {
+                return collect($objectType->interfaces)
+                    ->contains(function (NamedTypeNode $interface) {
+                        return 'Node' === $interface->name->value;
+                    });
             });
-        });
 
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
@@ -198,5 +207,25 @@ class ASTBuilder
         $document->addFieldToQueryType($nodeQuery);
 
         return $document;
+    }
+
+    /**
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected static function applyExtensions(DocumentAST $document)
+    {
+        $originalDocument = $document;
+
+        return graphql()
+            ->extensions()
+            ->active()
+            ->reduce(function (
+                DocumentAST $document,
+                GraphQLExtension $extension
+            ) use ($originalDocument) {
+                return $extension->manipulateSchema($document, $originalDocument);
+            }, $document);
     }
 }
