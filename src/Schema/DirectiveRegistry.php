@@ -2,24 +2,24 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Language\AST\Node;
+use Symfony\Component\Finder\Finder;
 use GraphQL\Language\AST\DirectiveNode;
+use Symfony\Component\Finder\SplFileInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 class DirectiveRegistry
 {
@@ -38,7 +38,7 @@ class DirectiveRegistry
         $this->directives = collect();
 
         // Load built-in directives from the default directory
-        $this->load(realpath(__DIR__ . '/Directives/'), 'Nuwave\\Lighthouse\\');
+        $this->load(realpath(__DIR__.'/Directives/'), 'Nuwave\\Lighthouse\\');
 
         // Load custom directives
         $this->load(config('lighthouse.directives', []));
@@ -59,8 +59,8 @@ class DirectiveRegistry
             ->filter(function ($path) {
                 return is_dir($path);
             })->map(function ($path) {
-            return realpath($path);
-        })->all();
+                return realpath($path);
+            })->all();
 
         if (empty($paths)) {
             return;
@@ -68,15 +68,15 @@ class DirectiveRegistry
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-        ? realpath(__DIR__ . '/../../src/')
+        ? realpath(__DIR__.'/../../src/')
         : app_path();
 
         /** @var SplFileInfo $file */
         foreach ((new Finder())->in($paths)->files() as $file) {
-            $className = $namespace . str_replace(
+            $className = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
-                str_after($file->getPathname(), $path . DIRECTORY_SEPARATOR)
+                str_after($file->getPathname(), $path.DIRECTORY_SEPARATOR)
             );
 
             $this->tryRegisterClassName($className);
@@ -95,8 +95,7 @@ class DirectiveRegistry
         $reflection = new \ReflectionClass($className);
 
         if ($reflection->isInstantiable() && $reflection->isSubclassOf(Directive::class)) {
-            $directive = $reflection->newInstance();
-            $this->register($directive);
+            $this->register(app($reflection->getName()));
         }
     }
 
@@ -123,11 +122,11 @@ class DirectiveRegistry
     {
         $handler = $this->directives->get($name);
 
-        if (!$handler) {
+        if (! $handler) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
-        return new $handler;
+        return app(get_class($handler));
     }
 
     /**
@@ -157,7 +156,7 @@ class DirectiveRegistry
     {
         return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
             return $this->get($directive->name->value);
-        })->map(function (Directive $directive) use ($node){
+        })->map(function (Directive $directive) use ($node) {
             return $this->hydrate($directive, $node);
         });
     }
@@ -353,7 +352,7 @@ class DirectiveRegistry
     }
 
     /**
-     * @param Directive $directive
+     * @param Directive                $directive
      * @param TypeSystemDefinitionNode $definitionNode
      *
      * @return Directive
