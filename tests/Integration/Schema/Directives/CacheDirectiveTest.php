@@ -38,6 +38,27 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanPlaceCacheKeyOnAnyField()
+    {
+        $resolver = addslashes(self::class).'@resolve';
+        $schema = "
+        type User {
+            id: ID!
+            name: String @cache
+            email: String @cacheKey
+        }
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $result = $this->execute($schema, '{ user { name } }');
+        $this->assertEquals('foobar', array_get($result->data, 'user.name'));
+        $this->assertEquals('foobar', app('cache')->get('user:foo@bar.com:name'));
+    }
+
+    /**
+     * @test
+     */
     public function itCanStoreResolverResultInPrivateCache()
     {
         $user = factory(User::class)->create();
@@ -254,6 +275,7 @@ class CacheDirectiveTest extends DBTestCase
         return [
             'id' => 1,
             'name' => 'foobar',
+            'email' => 'foo@bar.com',
         ];
     }
 }

@@ -1,12 +1,13 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Closure;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
