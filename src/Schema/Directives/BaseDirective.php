@@ -9,6 +9,8 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
@@ -30,9 +32,9 @@ abstract class BaseDirective implements Directive
      *
      * @param TypeSystemDefinitionNode $definitionNode
      *
-     * @return $this
+     * @return BaseDirective
      */
-    public function hydrate($definitionNode)
+    public function hydrate($definitionNode): BaseDirective
     {
         $this->definitionNode = $definitionNode;
 
@@ -66,7 +68,7 @@ abstract class BaseDirective implements Directive
      *
      * @return mixed
      */
-    protected function directiveArgValue($name, $default = null, $directive = null)
+    protected function directiveArgValue(string $name, $default = null, $directive = null)
     {
         // Get the definition associated with the class of the directive, unless explicitely given
         $directive = $directive ?? $this->directiveDefinition();
@@ -83,15 +85,21 @@ abstract class BaseDirective implements Directive
             ? $this->argValue($arg, $default)
             : $default;
     }
-
+    
     /**
      * @throws DirectiveException
+     * @throws \Exception
      *
-     * @return mixed|string
+     * @return string
      */
-    protected function getModelClass()
+    protected function getModelClass(): string
     {
         $model = $this->directiveArgValue('model');
+
+        // Fallback to using the return type of the field
+        if(! $model && $this->definitionNode instanceof FieldDefinitionNode){
+            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+        }
 
         if (! $model) {
             throw new DirectiveException(
@@ -119,7 +127,7 @@ abstract class BaseDirective implements Directive
      *
      * @return string
      */
-    protected function namespaceClassName($baseClassName)
+    protected function namespaceClassName(string $baseClassName): string
     {
         $className = $this->associatedNamespace().'\\'.$baseClassName;
 
@@ -136,7 +144,7 @@ abstract class BaseDirective implements Directive
      *
      * @return string
      */
-    protected function associatedNamespace()
+    protected function associatedNamespace(): string
     {
         $namespaceDirective = $this->directiveDefinition(
             (new NamespaceDirective())->name()

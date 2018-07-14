@@ -107,6 +107,7 @@ class TestCase extends BaseTestCase
             $schema = $addDefaultSchema."\n".$schema;
         }
 
+        // The schema is injected into the runtime during execution of the query
         $this->schema = $schema;
 
         return graphql()->queryAndReturnResult($query, null, $variables);
