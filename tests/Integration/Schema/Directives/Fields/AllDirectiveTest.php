@@ -29,7 +29,6 @@ class AllDirectiveTest extends DBTestCase
             users: [User!]! @all(model: "User")
         }
         ';
-
         $query = '
         {
             users {
@@ -38,9 +37,9 @@ class AllDirectiveTest extends DBTestCase
             }
         }
         ';
+        $result = $this->execute($schema, $query);
 
-        $result = $this->queryAndReturnResult($schema, $query);
-        $this->assertCount(10, $result->data['users']);
+        $this->assertCount(10, array_get($result, 'data.users'));
     }
 
     /**
@@ -67,7 +66,6 @@ class AllDirectiveTest extends DBTestCase
             users: [User!]! @all(model: "User")
         }
         ';
-
         $query = '
         {
             users {
@@ -77,10 +75,9 @@ class AllDirectiveTest extends DBTestCase
             }
         }
         ';
-
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->execute($schema, $query);
       
-        $this->assertCount(1, array_get($result->data, 'users'));
-        $this->assertCount(10, array_get($result->data, 'users.0.posts'));
+        $this->assertCount(1, array_get($result, 'data.users'));
+        $this->assertCount(10, array_get($result, 'data.users.0.posts'));
     }
 }
