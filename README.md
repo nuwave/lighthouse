@@ -19,7 +19,7 @@ giving you full control over your data.
 
 If you have an existing Laravel project, all you really need is two steps:
 
-1. Install via `compose require nuwave/lighthouse`
+1. Install via `composer require nuwave/lighthouse`
 
 2. Define your schema in `routes/graphql/schema.graphql`
 
