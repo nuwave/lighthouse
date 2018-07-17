@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -24,11 +23,11 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param Closure    $next
+     * @param \Closure    $next
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next)
+    public function handleField(FieldValue $value, \Closure $next)
     {
         $resolver = $value->getResolver();
         $attr = $this->directiveArgValue('context');

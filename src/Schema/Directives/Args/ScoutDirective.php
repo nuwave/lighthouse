@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -27,11 +26,11 @@ class ScoutDirective extends BaseDirective implements ArgMiddleware
      * Resolve the field directive.
      *
      * @param ArgumentValue $argument
-     * @param Closure       $next
+     * @param \Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, Closure $next)
+    public function handleArgument(ArgumentValue $argument, \Closure $next)
     {
         $arg = $argument->getArgName();
 

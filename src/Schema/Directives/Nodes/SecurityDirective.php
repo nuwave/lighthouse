@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use Closure;
 use GraphQL\Validator\Rules\QueryDepth;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -28,11 +27,11 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
      * Handle node value.
      *
      * @param NodeValue $value
-     * @param Closure   $next
+     * @param \Closure   $next
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handleNode(NodeValue $value, \Closure $next)
     {
         if ('Query' !== $value->getNodeName()) {
             $message = sprintf(

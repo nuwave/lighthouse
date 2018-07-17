@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use Closure;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -29,11 +28,11 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      * Handle type construction.
      *
      * @param NodeValue $value
-     * @param Closure   $next
+     * @param \Closure   $next
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handleNode(NodeValue $value, \Closure $next)
     {
         graphql()->nodes()->node(
             $value->getNodeName(),
