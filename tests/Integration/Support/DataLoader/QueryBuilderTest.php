@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Support\DataLoader;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class QueryBuilderTest extends DBTestCase
 {
@@ -76,5 +76,24 @@ class QueryBuilderTest extends DBTestCase
         $this->assertEquals($users[0]->getKey(), $users[0]->tasks[0]->user_id);
         $this->assertEquals($users[1]->getKey(), $users[1]->tasks[0]->user_id);
         $this->assertEquals($users[2]->getKey(), $users[2]->tasks[0]->user_id);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanHandleSoftDeletes()
+    {
+        $user = User::first();
+        $count = $user->tasks()->count();
+        $task = $user->tasks()->get()->last();
+        $task->delete();
+
+        $users = User::all();
+        $users->fetch(['tasks' => function ($query) use ($count) {
+            $query->take($count);
+        }]);
+
+        $expectedCount = $count - 1;
+        $this->assertCount($expectedCount, $users[0]->tasks);
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class QueryBuilder
 {
@@ -78,10 +78,10 @@ class QueryBuilder
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param Builder $builder
+     * @param Builder  $builder
      * @param \Closure $constraints
-     * @param array   $models
-     * @param array   $options
+     * @param array    $models
+     * @param array    $options
      *
      * @throws \ReflectionException
      *
@@ -94,6 +94,7 @@ class QueryBuilder
 
         // Just get the first of the relations to have an instance available
         $relatedModel = $relationQueries->first()->getModel();
+        $relatedTable = $relatedModel->getTable();
 
         $relationQueries = $relationQueries->map(function (Relation $relation) use ($options) {
             return $relation->when($options['paginated'], function (Builder $query) use ($options) {
@@ -113,9 +114,11 @@ class QueryBuilder
 
         /** @var \Illuminate\Database\Query\Builder $baseQuery */
         $baseQuery = app('db')->query();
-        $results = $baseQuery->select()
-            ->fromSub($unitedRelations->getQuery(), $relatedModel->getTable())
-            ->get();
+        $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($relatedTable);
+        $results = $baseQuery->select()->fromRaw(
+            $fromExpression,
+            $unitedRelations->getBindings()
+        )->get();
 
         $hydrated = $this->hydrate($relatedModel, $relation, $results);
         $collection = $this->loadDefaultWith($relatedModel->newCollection($hydrated));
@@ -142,9 +145,9 @@ class QueryBuilder
     /**
      * Get queries to fetch relationships.
      *
-     * @param Builder $builder
-     * @param array   $models
-     * @param string  $name
+     * @param Builder  $builder
+     * @param array    $models
+     * @param string   $name
      * @param \Closure $constraints
      *
      * @return Relation[]|Collection
