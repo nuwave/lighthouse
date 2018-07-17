@@ -115,10 +115,10 @@ class QueryBuilder
         /** @var \Illuminate\Database\Query\Builder $baseQuery */
         $baseQuery = app('db')->query();
         $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($relatedTable);
-        $results = $baseQuery->select()->fromRaw(
-            $fromExpression,
-            $unitedRelations->getBindings()
-        )->get();
+        $results = $baseQuery->select()
+            ->from($baseQuery->raw($fromExpression))
+            ->setBindings($unitedRelations->getBindings())
+            ->get();
 
         $hydrated = $this->hydrate($relatedModel, $relation, $results);
         $collection = $this->loadDefaultWith($relatedModel->newCollection($hydrated));
