@@ -2,74 +2,174 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use PHPUnit\Framework\TestCase;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
+use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 
 class SchemaStitcherTest extends TestCase
 {
+    const SCHEMA_PATH = __DIR__ . '/schema/';
+    const ROOT_SCHEMA_FILENAME = 'root-schema';
+
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
     /**
      * Set up test case.
      */
     protected function setUp()
     {
-        if (! is_dir(__DIR__.'/schema')) {
-            mkdir(__DIR__.'/schema');
-        }
+        $currentDir = new Filesystem(new Local(__DIR__));
 
-        file_put_contents(__DIR__.'/foo.graphql', '
-            #import ./schema/bar.graphql
-            type Foo {
-                foo: String!
-            }
-        ');
+        $currentDir->deleteDir('schema');
+        $currentDir->createDir('schema');
 
-        file_put_contents(__DIR__.'/schema/bar.graphql', '
-            #import ./baz.graphql
-            type Bar {
-                bar: String!
-            }
-        ');
-
-        file_put_contents(__DIR__.'/schema/baz.graphql', '
-            type Baz {
-                baz: String!
-            }
-        ');
+        $this->filesystem = new Filesystem(new Local(self::SCHEMA_PATH));
     }
 
-    /**
-     * Tear down test case.
-     */
     protected function tearDown()
     {
-        unlink(__DIR__.'/foo.graphql');
-        unlink(__DIR__.'/schema/bar.graphql');
-        unlink(__DIR__.'/schema/baz.graphql');
+        $currentDir = new Filesystem(new Local(__DIR__));
 
-        if (is_dir(__DIR__.'/schema')) {
-            rmdir(__DIR__.'/schema');
-        }
+        $currentDir->deleteDir('schema');
+    }
+
+    protected function assertSchemaResultIsSame(string $expected)
+    {
+        $schema = (new SchemaStitcher(self::SCHEMA_PATH . self::ROOT_SCHEMA_FILENAME))->getSchemaString();
+        $this->assertSame($expected, $schema);
+    }
+
+    protected function putRootSchema(string $schema)
+    {
+        $this->filesystem->put(self::ROOT_SCHEMA_FILENAME, $schema);
     }
 
     /**
      * @test
      */
-    public function itConcatsSchemas()
+    public function itLeavesImportlessFileAsBefore()
     {
-        $schema = (new SchemaStitcher(__DIR__.'/schema/baz.graphql'))->getSchemaString();
-        
-        $this->assertContains('type Baz', $schema);
+        $foo = <<<EOT
+foo
+
+EOT;
+        $this->putRootSchema($foo);
+        $this->assertSchemaResultIsSame($foo);
     }
 
     /**
      * @test
      */
-    public function itCanImportSchemas()
+    public function itReplacesImportWithFileContent()
     {
-        $schema = (new SchemaStitcher(__DIR__.'/foo.graphql'))->getSchemaString();
-        
-        $this->assertContains('type Foo', $schema);
-        $this->assertContains('type Bar', $schema);
-        $this->assertContains('type Baz', $schema);
+        $this->putRootSchema(<<<EOT
+foo
+#import bar
+
+EOT
+        );
+
+        $this->filesystem->put('bar', <<<EOT
+bar
+
+EOT
+        );
+
+        $this->assertSchemaResultIsSame(<<<EOT
+foo
+bar
+
+EOT
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itImportsRecursively()
+    {
+        $this->putRootSchema(<<<EOT
+foo
+#import bar
+
+EOT
+        );
+
+        $this->filesystem->put('bar', <<<EOT
+bar
+#import baz
+EOT
+        );
+
+        $this->filesystem->put('baz', <<<EOT
+baz
+
+EOT
+        );
+
+        $this->assertSchemaResultIsSame(<<<EOT
+foo
+bar
+baz
+
+EOT
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itImportsFromSubdirectory()
+    {
+        $this->putRootSchema(<<<EOT
+foo
+#import subdir/bar
+
+EOT
+        );
+
+        $this->filesystem->createDir('subdir');
+        $this->filesystem->put('subdir/bar', <<<EOT
+bar
+
+EOT
+        );
+
+        $this->assertSchemaResultIsSame(<<<EOT
+foo
+bar
+
+EOT
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itKeepsIndententation()
+    {
+        $this->putRootSchema(<<<EOT
+    foo
+#import bar
+
+EOT
+        );
+
+        $this->filesystem->put('bar', <<<EOT
+        bar
+
+EOT
+        );
+
+        $this->assertSchemaResultIsSame(<<<EOT
+    foo
+        bar
+
+EOT
+        );
     }
 }

@@ -19,7 +19,7 @@ class RulesDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->executeAndFormat($this->schema(), $query, false, [], true);
+        $result = $this->execute($this->schema(), $query);
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
         $this->assertNull($result['data']['foo']);
 
@@ -30,7 +30,7 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-        $mutationResult = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
+        $mutationResult = $this->execute($this->schema(), $mutation);
         $this->assertSame($result, $mutationResult);
     }
 
@@ -49,7 +49,7 @@ class RulesDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->executeAndFormat($this->schema(), $query, false, [], true);
+        $result = $this->execute($this->schema(), $query);
         $this->assertEquals('John', array_get($result, 'data.foo.first_name'));
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
@@ -66,7 +66,7 @@ class RulesDirectiveTest extends TestCase
         }
         ';
 
-        $mutationResult = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
+        $mutationResult = $this->execute($this->schema(), $mutation);
         $this->assertSame($result, $mutationResult);
     }
 
@@ -85,7 +85,7 @@ class RulesDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
+        $result = $this->execute($this->schema(), $mutation);
         $this->assertNull(array_get($result, 'data.foo'));
         $this->assertCount(1, array_get($result, 'errors.0.validation'));
 
@@ -99,7 +99,7 @@ class RulesDirectiveTest extends TestCase
         }
         ';
 
-        $queryResult = $this->executeAndFormat($this->schema(), $query, false, [], true);
+        $queryResult = $this->execute($this->schema(), $query);
         $this->assertSame($result, $queryResult);
     }
 
@@ -118,7 +118,7 @@ class RulesDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->executeAndFormat($this->schema(), $mutation, false, [], true);
+        $result = $this->execute($this->schema(), $mutation);
         $this->assertEquals('John', array_get($result, 'data.foo.first_name'));
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
@@ -134,7 +134,7 @@ class RulesDirectiveTest extends TestCase
         }
         ';
 
-        $queryResult = $this->executeAndFormat($this->schema(), $query, false, [], true);
+        $queryResult = $this->execute($this->schema(), $query);
         $this->assertSame($result, $queryResult);
     }
 

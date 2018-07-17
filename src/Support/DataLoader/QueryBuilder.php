@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
-use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -80,7 +79,7 @@ class QueryBuilder
      * Eagerly load the relationship on a set of models.
      *
      * @param Builder $builder
-     * @param Closure $constraints
+     * @param \Closure $constraints
      * @param array   $models
      * @param array   $options
      *
@@ -88,7 +87,7 @@ class QueryBuilder
      *
      * @return array
      */
-    protected function loadRelation(Builder $builder, Closure $constraints, array $models, array $options)
+    protected function loadRelation(Builder $builder, \Closure $constraints, array $models, array $options)
     {
         $relation = $builder->getRelation($options['name']);
         $relationQueries = $this->getRelationQueries($builder, $models, $options['name'], $constraints);
@@ -146,11 +145,11 @@ class QueryBuilder
      * @param Builder $builder
      * @param array   $models
      * @param string  $name
-     * @param Closure $constraints
+     * @param \Closure $constraints
      *
      * @return Relation[]|Collection
      */
-    protected function getRelationQueries(Builder $builder, array $models, $name, Closure $constraints)
+    protected function getRelationQueries(Builder $builder, array $models, $name, \Closure $constraints)
     {
         return collect($models)->map(function ($model) use ($builder, $name, $constraints) {
             $relation = $builder->getRelation($name);

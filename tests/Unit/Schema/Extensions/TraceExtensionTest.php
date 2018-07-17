@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\Extensions\TraceExtension;
 
 class TraceExtensionTest extends TestCase
 {
@@ -29,11 +28,17 @@ class TraceExtensionTest extends TestCase
         $schema = "
         type Query {
             foo: String! @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
+        $query = '
+        {
+            foo
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $result = $this->execute($schema, '{ foo }', true);
-        $this->assertArrayHasKey('tracing', $result->extensions);
-        $this->assertArrayHasKey('resolvers', $result->extensions['tracing']['execution']);
+        $this->assertArrayHasKey('tracing', array_get($result, 'extensions'));
+        $this->assertArrayHasKey('resolvers', array_get($result, 'extensions.tracing.execution'));
     }
 
     public function resolve()

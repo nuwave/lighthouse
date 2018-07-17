@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
-use Closure;
 use GraphQL\Language\AST\FieldDefinitionNode;
 
 abstract class FieldResolver
@@ -17,7 +16,7 @@ abstract class FieldResolver
     /**
      * Field resolver.
      *
-     * @var Closure
+     * @var \Closure
      */
     protected $resolver;
 
@@ -25,9 +24,9 @@ abstract class FieldResolver
      * Create a new instance of field resolver.
      *
      * @param FieldDefinitionNode $field
-     * @param Closure|null        $resolver
+     * @param \Closure|null        $resolver
      */
-    public function __construct(FieldDefinitionNode $field, Closure $resolver = null)
+    public function __construct(FieldDefinitionNode $field, \Closure $resolver = null)
     {
         $this->field = $field;
         $this->resolver = $resolver;
@@ -37,11 +36,11 @@ abstract class FieldResolver
      * Resolve field type from field.
      *
      * @param FieldDefinitionNode $field
-     * @param Closure|null        $resolver
+     * @param \Closure|null        $resolver
      *
      * @return array
      */
-    public static function resolve(FieldDefinitionNode $field, Closure $resolver = null)
+    public static function resolve(FieldDefinitionNode $field, \Closure $resolver = null)
     {
         $instance = new static($field, $resolver);
 
