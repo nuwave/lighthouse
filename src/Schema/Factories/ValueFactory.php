@@ -83,11 +83,11 @@ class ValueFactory
     /**
      * Set cache value instance resolver.
      *
-     * @param Closure $resolver
+     * @param \Closure $resolver
      *
      * @return self
      */
-    public function cacheResolver(Closure $resolver)
+    public function cacheResolver(\Closure $resolver)
     {
         return $this->cache = $resolver;
 
