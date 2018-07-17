@@ -35,14 +35,19 @@ class ValueFactoryTest extends TestCase
             };
         });
 
-        $result = $this->execute('
-            type Query {
-                bar: String
-            }',
-            '{ foo }'
-        );
+        $schema = '
+        type Query {
+            foo: String
+        }
+        ';
+        $query = '
+        {
+            foo
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->assertEquals(['foo' => 'bar'], $result->data);
+        $this->assertEquals(['foo' => 'bar'], $result['data']);
     }
 
     /**
@@ -61,13 +66,18 @@ class ValueFactoryTest extends TestCase
             };
         });
 
-        $result = $this->execute('
-            type Query {
-                foo: String
-            }',
-            '{ foo }'
-        );
+        $schema = '
+        type Query {
+            foo: String
+        }
+        ';
+        $query = '
+        {
+            foo
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->assertEquals(['foo' => 'foobar'], $result->data);
+        $this->assertEquals(['foo' => 'foobar'], $result['data']);
     }
 }

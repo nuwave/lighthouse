@@ -11,7 +11,7 @@ class UnionTest extends TestCase
      */
     public function itResolvesUnionUser()
     {
-        $result = $this->execute($this->schema(), '{ person(type: "user") { ...on User { id } } }');
+        $result = $this->queryAndReturnResult($this->schema(), '{ person(type: "user") { ...on User { id } } }');
         $this->assertEquals('user.id', array_get($result->data, 'person.id'));
     }
 
@@ -20,7 +20,7 @@ class UnionTest extends TestCase
      */
     public function itResolverUnionEmployee()
     {
-        $result = $this->execute($this->schema(), '{ person(type: "employee") { ...on Employee { employeeId } } }');
+        $result = $this->queryAndReturnResult($this->schema(), '{ person(type: "employee") { ...on Employee { employeeId } } }');
         $this->assertEquals('employee.id', array_get($result->data, 'person.employeeId'));
     }
 

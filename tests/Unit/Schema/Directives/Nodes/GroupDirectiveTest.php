@@ -21,10 +21,10 @@ class GroupDirectiveTest extends TestCase
             you: String @field(resolver: "Foo@bar")
         }';
 
-        $result = $this->execute($schema, '{ me }');
+        $result = $this->queryAndReturnResult($schema, '{ me }');
         $this->assertEquals('foo.bar', $result->data['me']);
 
-        $result = $this->execute($schema, '{ you }');
+        $result = $this->queryAndReturnResult($schema, '{ you }');
         $this->assertEquals('foo.bar', $result->data['you']);
     }
 
@@ -40,7 +40,7 @@ class GroupDirectiveTest extends TestCase
         }
         ';
 
-        $this->execute($schema, '{ me }');
+        $this->queryAndReturnResult($schema, '{ me }');
         $middleware = graphql()->middleware()->query('me');
         $this->assertCount(2, $middleware);
         $this->assertEquals('foo', $middleware[0]);

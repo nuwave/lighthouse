@@ -78,7 +78,7 @@ class ScoutDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
     }
@@ -127,7 +127,7 @@ class ScoutDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
     }

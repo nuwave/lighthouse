@@ -94,19 +94,12 @@ class TestCase extends BaseTestCase
      *
      * @param string $schema
      * @param string $query
-     * @param bool   $lighthouse
      * @param array  $variables
-     * @param bool   $format
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function execute($schema, $query, $lighthouse = false, $variables = [], $format = false): ExecutionResult
+    protected function queryAndReturnResult(string $schema, string $query, array $variables = []): ExecutionResult
     {
-        if ($lighthouse) {
-            $addDefaultSchema = file_get_contents(realpath(__DIR__.'/../assets/schema.graphql'));
-            $schema = $addDefaultSchema."\n".$schema;
-        }
-
         // The schema is injected into the runtime during execution of the query
         $this->schema = $schema;
 
@@ -114,37 +107,19 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * Execute query/mutation.
+     * Execute and get the result as an array.
      *
      * @param string $schema
      * @param string $query
-     * @param bool   $lighthouse
      * @param array  $variables
      *
-     * @return \GraphQL\Executor\ExecutionResult
+     * @return array
      */
-    protected function executeAndFormat($schema, $query, $lighthouse = false, $variables = [])
+    protected function execute(string $schema, string $query, array $variables = []): array
     {
-        $result = $this->execute($schema, $query, $lighthouse, $variables);
+        $this->schema = $schema;
 
-        if (! empty($result->errors)) {
-            foreach ($result->errors as $error) {
-                if ($error instanceof \Exception) {
-                    info('GraphQL Error:', [
-                        'code' => $error->getCode(),
-                        'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
-                    ]);
-                }
-            }
-
-            return [
-                'data' => $result->data,
-                'errors' => array_map([$this, 'formatError'], $result->errors),
-            ];
-        }
-
-        return ['data' => $result->data];
+        return graphql()->execute($query, null, $variables);
     }
 
     /**

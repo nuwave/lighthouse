@@ -53,6 +53,8 @@ class BelongsToTest extends DBTestCase
      */
     public function itCanResolveBelongsToRelationship()
     {
+        $this->be($this->user);
+
         $schema = '
         type Company {
             name: String!
@@ -64,11 +66,18 @@ class BelongsToTest extends DBTestCase
             user: User @auth
         }
         ';
+        $query = '
+        {
+            user {
+                company {
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->be($this->user);
-
-        $result = $this->execute($schema, '{ user { company { name } } }');
-        $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
+        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
     }
 
     /**
@@ -76,21 +85,33 @@ class BelongsToTest extends DBTestCase
      */
     public function itCanResolveBelongsToWithCustomName()
     {
+        $this->be($this->user);
+
         $schema = '
         type Company {
             name: String!
         }
+        
         type User {
             account: Company @belongsTo(relation: "company")
         }
+        
         type Query {
             user: User @auth
         }
         ';
+        $query = '
+        {
+            user {
+                account {
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->be($this->user);
-        $result = $this->execute($schema, '{ user { account { name } } }');
-        $this->assertEquals($this->company->name, array_get($result->data, 'user.account.name'));
+        $this->assertEquals($this->company->name, array_get($result, 'data.user.account.name'));
     }
 
     /**
@@ -98,26 +119,41 @@ class BelongsToTest extends DBTestCase
      */
     public function itCanResolveBelongsToRelationshipWithTwoRelation()
     {
+        $this->be($this->user);
+
         $schema = '
         type Company {
             name: String!
         }
+        
         type Team {
             name: String!
         }
+        
         type User {
             company: Company @belongsTo
             team: Team @belongsTo
         }
+        
         type Query {
             user: User @auth
         }
         ';
+        $query = '
+        {
+            user {
+                company {
+                    name
+                }
+                team {
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->be($this->user);
-
-        $result = $this->execute($schema, '{ user { company { name } team { name } } }');
-        $this->assertEquals($this->company->name, array_get($result->data, 'user.company.name'));
-        $this->assertEquals($this->team->name, array_get($result->data, 'user.team.name'));
+        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
+        $this->assertEquals($this->team->name, array_get($result, 'data.user.team.name'));
     }
 }

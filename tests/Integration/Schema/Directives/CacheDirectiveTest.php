@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Deferred;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -20,18 +19,27 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanStoreResolverResultInCache()
     {
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = addslashes(self::class) . '@resolve';
         $schema = "
         type User {
             id: ID!
             name: String @cache
         }
+        
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $result = $this->execute($schema, '{ user { name } }');
-        $this->assertEquals('foobar', array_get($result->data, 'user.name'));
+        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
         $this->assertEquals('foobar', app('cache')->get('user:1:name'));
     }
 
@@ -40,19 +48,28 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanPlaceCacheKeyOnAnyField()
     {
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = addslashes(self::class) . '@resolve';
         $schema = "
         type User {
             id: ID!
             name: String @cache
             email: String @cacheKey
         }
+        
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
+        $query = '
+        {
+            user {
+                name
+             }
+         }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $result = $this->execute($schema, '{ user { name } }');
-        $this->assertEquals('foobar', array_get($result->data, 'user.name'));
+        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
         $this->assertEquals('foobar', app('cache')->get('user:foo@bar.com:name'));
     }
 
@@ -62,20 +79,30 @@ class CacheDirectiveTest extends DBTestCase
     public function itCanStoreResolverResultInPrivateCache()
     {
         $user = factory(User::class)->create();
-        $resolver = addslashes(self::class).'@resolve';
+        $this->be($user);
+        $cacheKey = "auth:{$user->getKey()}:user:1:name";
+
+        $resolver = addslashes(self::class) . '@resolve';
         $schema = "
         type User {
             id: ID!
             name: String @cache(private: true)
         }
+        
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->be($user);
-        $cacheKey = "auth:{$user->getKey()}:user:1:name";
-        $result = $this->execute($schema, '{ user { name } }');
-        $this->assertEquals('foobar', array_get($result->data, 'user.name'));
+        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
         $this->assertEquals('foobar', app('cache')->get($cacheKey));
     }
 
@@ -91,20 +118,22 @@ class CacheDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
+        
         type Query {
             users: [User] @paginate(type: "paginator", model: "User") @cache
-        }';
-
-        $query = '{
+        }
+        ';
+        $query = '
+        {
             users(count: 5) {
                 data {
                     id
                     name
                 }
             }
-        }';
-
-        $this->execute($schema, $query, true);
+        }
+        ';
+        $this->execute($schema, $query);
 
         $result = app('cache')->get('query:users:count:5');
 
@@ -128,17 +157,20 @@ class CacheDirectiveTest extends DBTestCase
             id: ID!
             title: String
         }
+        
         type User {
             id: ID!
             name: String!
             posts: [Post] @hasMany(type: "paginator") @cache
         }
+        
         type Query {
             user(id: ID! @eq): User @find(model: "User")
-        }';
-
-        $query = '{
-            user(id: '.$user->getKey().') {
+        }
+        ';
+        $query = '
+        {
+            user(id: ' . $user->getKey() . ') {
                 id
                 name
                 posts(count: 3) {
@@ -147,9 +179,10 @@ class CacheDirectiveTest extends DBTestCase
                     }
                 }
             }
-        }';
+        }
+        ';
+        $result = $this->execute($schema, $query)['data'];
 
-        $result = $this->execute($schema, $query, true)->data;
         $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
@@ -157,7 +190,7 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (! str_contains($query->sql, [
+            if (!str_contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',
@@ -168,7 +201,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $cache = $this->execute($schema, $query, true)->data;
+        $cache = $this->execute($schema, $query)['data'];
 
         // Get the the original user and the `find` directive checks the count
         $this->assertEquals(0, $queries);
@@ -180,20 +213,11 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanUseCustomCacheValue()
     {
-        $resolver = addslashes(self::class).'@resolve';
-        $schema = "
-        type User {
-            id: ID!
-            name: String @cache
-        }
-        type Query {
-            user: User @field(resolver: \"{$resolver}\")
-        }";
-
         /** @var ValueFactory $valueFactory */
         $valueFactory = app(ValueFactory::class);
         $valueFactory->cacheResolver(function ($arguments) {
-            return new class($arguments) extends CacheValue {
+            return new class($arguments) extends CacheValue
+            {
                 public function getKey()
                 {
                     return 'foo';
@@ -201,7 +225,26 @@ class CacheDirectiveTest extends DBTestCase
             };
         });
 
-        $this->execute($schema, '{ user { name } }');
+        $resolver = addslashes(self::class) . '@resolve';
+        $schema = "
+        type User {
+            id: ID!
+            name: String @cache
+        }
+        
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }
+        ";
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+        $this->execute($schema, $query);
+
         $this->assertEquals('foobar', app('cache')->get('foo'));
     }
 
@@ -218,6 +261,7 @@ class CacheDirectiveTest extends DBTestCase
         ]);
 
         $tags = ['graphql:user:1', 'graphql:user:1:posts'];
+
         $schema = '
         type Post {
             id: ID!
@@ -230,10 +274,11 @@ class CacheDirectiveTest extends DBTestCase
         }
         type Query {
             user(id: ID! @eq): User @find(model: "User")
-        }';
-
-        $query = '{
-            user(id: '.$user->getKey().') {
+        }
+        ';
+        $query = '
+        {
+            user(id: ' . $user->getKey() . ') {
                 id
                 name
                 posts(count: 3) {
@@ -242,9 +287,10 @@ class CacheDirectiveTest extends DBTestCase
                     }
                 }
             }
-        }';
+        }
+        ';
+        $result = $this->execute($schema, $query)['data'];
 
-        $result = $this->execute($schema, $query, true)->data;
         $posts = app('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
@@ -252,7 +298,7 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (! str_contains($query->sql, [
+            if (!str_contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',
@@ -263,7 +309,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $cache = $this->execute($schema, $query, true)->data;
+        $cache = $this->execute($schema, $query)['data'];
 
         // Get the the original user and the `find` directive checks the count
         $this->assertEquals(0, $queries);

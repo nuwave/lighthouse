@@ -21,7 +21,7 @@ class ASTBuilder
      *
      * @return DocumentAST
      */
-    public static function generate($schema)
+    public static function generate(string $schema): DocumentAST
     {
         $document = DocumentAST::fromSource($schema);
 
@@ -34,6 +34,7 @@ class ASTBuilder
         $document = self::applyArgManipulators($document);
 
         $document = self::addNodeSupport($document);
+        $document = self::addPaginationInfoTypes($document);
         $document = self::applyExtensions($document);
 
         return $document;
@@ -44,7 +45,7 @@ class ASTBuilder
      *
      * @return DocumentAST
      */
-    protected static function applyNodeManipulators(DocumentAST $document)
+    protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
     {
         $originalDocument = $document;
 
@@ -68,13 +69,13 @@ class ASTBuilder
                 }, $document);
             }, $document);
     }
-
+  
     /**
      * @param DocumentAST $document
      *
      * @return DocumentAST
      */
-    protected static function mergeTypeExtensions(DocumentAST $document)
+    protected static function mergeTypeExtensions(DocumentAST $document): DocumentAST
     {
         $document->objectTypeDefinitions()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
             $name = $objectType->name->value;
@@ -102,7 +103,7 @@ class ASTBuilder
      *
      * @return DocumentAST
      */
-    protected static function applyFieldManipulators(DocumentAST $document)
+    protected static function applyFieldManipulators(DocumentAST $document): DocumentAST
     {
         $originalDocument = $document;
 
@@ -132,7 +133,7 @@ class ASTBuilder
      *
      * @return DocumentAST
      */
-    protected static function applyArgManipulators(DocumentAST $document)
+    protected static function applyArgManipulators(DocumentAST $document): DocumentAST
     {
         $originalDocument = $document;
 
@@ -172,10 +173,11 @@ class ASTBuilder
      * @param DocumentAST $document
      *
      * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
      *
      * @return DocumentAST
      */
-    protected static function addNodeSupport(DocumentAST $document)
+    protected static function addNodeSupport(DocumentAST $document): DocumentAST
     {
         $hasTypeImplementingNode = $document->objectTypeDefinitions()
             ->contains(function (ObjectTypeDefinitionNode $objectType) {
@@ -212,9 +214,80 @@ class ASTBuilder
     /**
      * @param DocumentAST $document
      *
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     *
      * @return DocumentAST
      */
-    protected static function applyExtensions(DocumentAST $document)
+    protected static function addPaginationInfoTypes(DocumentAST $document): DocumentAST
+    {
+        $paginatorInfo = PartialParser::objectTypeDefinition('
+        type PaginatorInfo {
+          # Total count of available items in the page.
+          count: Int!
+        
+          # Current pagination page.
+          currentPage: Int!
+        
+          # Index of first item in the current page.
+          firstItem: Int!
+        
+          # If collection has more pages.
+          hasMorePages: Boolean!
+        
+          # Index of last item in the current page.
+          lastItem: Int!
+        
+          # Last page number of the collection.
+          lastPage: Int!
+        
+          # Number of items per page in the collection.
+          perPage: Int!
+        
+          # Total items available in the collection.
+          total: Int!
+        }
+        ');
+        $document->setDefinition($paginatorInfo);
+
+        $pageInfo = PartialParser::objectTypeDefinition('
+        type PageInfo {
+          # When paginating forwards, are there more items?
+          hasNextPage: Boolean!
+        
+          # When paginating backwards, are there more items?
+          hasPreviousPage: Boolean!
+        
+          # When paginating backwards, the cursor to continue.
+          startCursor: String
+        
+          # When paginating forwards, the cursor to continue.
+          endCursor: String
+        
+          # Total number of node in connection.
+          total: Int
+        
+          # Count of nodes in current request.
+          count: Int
+        
+          # Current page of request.
+          currentPage: Int
+        
+          # Last page in connection.
+          lastPage: Int
+        }
+        ');
+        $document->setDefinition($pageInfo);
+
+        return $document;
+    }
+  
+     /**
+     * @param DocumentAST $document
+     *
+     * @return DocumentAST
+     */
+    protected static function applyExtensions(DocumentAST $document): DocumentAST
     {
         $originalDocument = $document;
 
