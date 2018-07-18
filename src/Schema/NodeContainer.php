@@ -92,7 +92,7 @@ class NodeContainer
     public function resolveType($value)
     {
         if (is_object($value) && isset($this->models[get_class($value)])) {
-            return graphql()->types()->instance($this->models[get_class($value)]);
+            return graphql()->types()->get($this->models[get_class($value)]);
         }
 
         return collect($this->types)
@@ -107,7 +107,7 @@ class NodeContainer
                 $resolver = $item['resolver'];
                 $type = $item['type'];
 
-                return $resolver($value) ? graphql()->types()->instance($type) : $instance;
+                return $resolver($value) ? graphql()->types()->get($type) : $instance;
             });
     }
 }

@@ -28,6 +28,7 @@ class TypeRegistry
      * @param string $typeName
      *
      * @return Type
+     * @deprecated in favour of get()
      */
     public function instance($typeName)
     {
