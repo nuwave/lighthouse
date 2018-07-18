@@ -38,7 +38,7 @@ class UnionDirective extends BaseDirective implements NodeResolver
             'description' => trim(str_replace("\n", '', $value->getNode()->description)),
             'types' => function () use ($value) {
                 return collect($value->getNode()->types)->map(function ($type) {
-                    return graphql()->types()->instance($type->name->value);
+                    return graphql()->types()->get($type->name->value);
                 })->filter()->toArray();
             },
             'resolveType' => function ($value) use ($namespace, $method) {
@@ -46,7 +46,7 @@ class UnionDirective extends BaseDirective implements NodeResolver
                     $instance = app($namespace);
                     return call_user_func_array([$instance, $method], [$value]);
                 }
-                return graphql()->types()->instance(last(explode('\\', get_class($value))));
+                return graphql()->types()->get(last(explode('\\', get_class($value))));
             },
         ]));
     }
