@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
 use Carbon\Carbon;
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Language\AST\StringValueNode;
 
 class DateTime extends ScalarType
 {

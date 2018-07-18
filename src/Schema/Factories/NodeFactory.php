@@ -19,7 +19,6 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\EnumDirective;
@@ -93,7 +92,7 @@ class NodeFactory
             case EnumTypeDefinitionNode::class:
                 return $this->enum($value);
             case ScalarTypeDefinitionNode::class:
-                return $this->scalar($value);
+                throw new \Exception('Define scalar types through classes. The location is defined in the config under namespaces.scalars');
             case InterfaceTypeDefinitionNode::class:
                 return $this->interface($value);
             case ObjectTypeDefinitionNode::class:
@@ -119,18 +118,6 @@ class NodeFactory
         $enumDirective = (new EnumDirective())->hydrate($enumNodeValue->getNode());
 
         return $enumDirective->resolveNode($enumNodeValue);
-    }
-
-    /**
-     * Resolve scalar definition to type.
-     *
-     * @param NodeValue $value
-     *
-     * @return ScalarType
-     */
-    protected function scalar(NodeValue $value)
-    {
-        return ScalarResolver::resolve($value)->getType();
     }
 
     /**
