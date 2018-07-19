@@ -68,23 +68,6 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itCanResolveScalarTypes()
-    {
-        $this->app['config']->set(
-            'lighthouse.namespaces.scalars',
-            'Nuwave\Lighthouse\Schema\Types\Scalars'
-        );
-
-        $schema = $this->buildSchemaWithDefaultQuery('
-        scalar DateTime @scalar(class:"DateTime")
-        ');
-
-        $this->assertInstanceOf(ScalarType::class, $schema->getType('DateTime'));
-    }
-
-    /**
-     * @test
-     */
     public function itCanResolveObjectTypes()
     {
         $schema = $this->buildSchemaWithDefaultQuery('
