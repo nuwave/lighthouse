@@ -5,10 +5,10 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
@@ -50,11 +50,7 @@ class ASTBuilder
         $originalDocument = $document;
 
         return $document->typeExtensionDefinitions()
-        // Unwrap extended types so they can be treated same as other types
-            ->map(function (TypeExtensionDefinitionNode $typeExtension) {
-                return $typeExtension->definition;
-            })
-        // This is just temporarily merged together
+            // This is just temporarily merged together
             ->concat($document->typeDefinitions())
             ->reduce(function (DocumentAST $document, Node $node) use (
                 $originalDocument
@@ -82,11 +78,11 @@ class ASTBuilder
 
             $document->typeExtensionDefinitions($name)->reduce(function (
                 ObjectTypeDefinitionNode $relatedObjectType,
-                TypeExtensionDefinitionNode $typeExtension
+                TypeExtensionNode $typeExtension
             ) {
                 /** @var NodeList $fields */
                 $fields = $relatedObjectType->fields;
-                $relatedObjectType->fields = $fields->merge($typeExtension->definition->fields);
+                $relatedObjectType->fields = $fields->merge($typeExtension->fields);
 
                 return $relatedObjectType;
             }, $objectType);

@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Type\Definition\EnumType;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use GraphQL\Language\AST\EnumValueDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class EnumDirective extends BaseDirective implements NodeResolver
 {
@@ -41,21 +41,9 @@ class EnumDirective extends BaseDirective implements NodeResolver
 
                     return [$field->name->value => [
                         'value' => $this->directiveArgValue('value', null, $directive),
-                        'description' => $this->safeDescription($field->description),
+                        'description' => $field->description
                     ]];
                 })->toArray(),
         ]);
-    }
-
-    /**
-     * Strip description of invalid characters.
-     *
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function safeDescription($description = '')
-    {
-        return trim(str_replace(["\n", "\t"], '', $description));
     }
 }

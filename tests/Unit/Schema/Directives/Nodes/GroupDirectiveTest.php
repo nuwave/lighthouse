@@ -13,18 +13,33 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetNamespaces()
     {
         $schema = '
-        type Query {}
+        type Query {
+            dummy: Int        
+        }
+        
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             me: String @field(resolver: "Foo@bar")
         }
+        
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             you: String @field(resolver: "Foo@bar")
-        }';
+        }
+        ';
 
-        $result = $this->queryAndReturnResult($schema, '{ me }');
+        $query = '
+        {
+            me
+        }
+        ';
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals('foo.bar', $result->data['me']);
 
-        $result = $this->queryAndReturnResult($schema, '{ you }');
+        $query = '
+        {
+            you
+        }
+        ';
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals('foo.bar', $result->data['you']);
     }
 
@@ -34,13 +49,21 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetMiddleware()
     {
         $schema = '
-        type Query {}
+        type Query {
+            dummy: Int
+        }
+        
         extend type Query @group(middleware: ["foo", "bar"]) {
             me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
         ';
+        $query = '
+        {
+            me
+        }
+        ';
+        $this->queryAndReturnResult($schema, $query);
 
-        $this->queryAndReturnResult($schema, '{ me }');
         $middleware = graphql()->middleware()->query('me');
         $this->assertCount(2, $middleware);
         $this->assertEquals('foo', $middleware[0]);

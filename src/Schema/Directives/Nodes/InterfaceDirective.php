@@ -39,7 +39,7 @@ class InterfaceDirective extends BaseDirective implements NodeResolver
 
         return new InterfaceType([
             'name' => $value->getNodeName(),
-            'description' => trim(str_replace("\n", '', $value->getNode()->description)),
+            'description' => $value->getNode()->description,
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },

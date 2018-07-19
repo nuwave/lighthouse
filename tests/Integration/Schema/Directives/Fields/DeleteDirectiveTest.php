@@ -26,7 +26,9 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUser(id: ID): User @delete
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
         $query = "
         mutation {

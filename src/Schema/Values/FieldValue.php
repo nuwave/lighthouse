@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 
 class FieldValue
@@ -36,13 +37,6 @@ class FieldValue
     protected $resolver;
 
     /**
-     * Current description.
-     *
-     * @var string
-     */
-    protected $description;
-
-    /**
      * Field complexity.
      *
      * @var \Closure
@@ -68,31 +62,15 @@ class FieldValue
      *
      * @param NodeValue           $node
      * @param FieldDefinitionNode $field
-     * @param string              $description
      */
-    public function __construct(NodeValue $node, $field, string $description = '')
+    public function __construct(NodeValue $node, $field)
     {
         $this->node = $node;
         $this->field = $field;
-        $this->description = $description;
     }
 
     /**
-     * Initialize new field value.
-     *
-     * @param NodeValue           $node
-     * @param FieldDefinitionNode $field
-     * @param string              $description
-     *
-     * @return FieldValue
-     */
-    public static function init(NodeValue $node, $field, string $description = ''): FieldValue
-    {
-        return new static($node, $field, $description);
-    }
-
-    /**
-     * Set current description.
+     * Set current type.
      *
      * @param \Closure|Type $type
      *
@@ -115,20 +93,6 @@ class FieldValue
     public function setResolver(\Closure $resolver = null): FieldValue
     {
         $this->resolver = $resolver;
-
-        return $this;
-    }
-
-    /**
-     * Set current description.
-     *
-     * @param string $description
-     *
-     * @return FieldValue
-     */
-    public function setDescription(string $description): FieldValue
-    {
-        $this->description = $description;
 
         return $this;
     }
@@ -215,12 +179,11 @@ class FieldValue
     /**
      * Get current description.
      *
-     * @return string
+     * @return StringValueNode|null
      */
-    public function getDescription(): string
+    public function getDescription()
     {
-        return $this->description
-            ?: trim(str_replace("\n", '', $this->getField()->description));
+        return $this->field->description;
     }
 
     /**
@@ -256,7 +219,7 @@ class FieldValue
      */
     public function getFieldName(): string
     {
-        return $this->getField()->name->value;
+        return $this->field->name->value;
     }
 
     /**

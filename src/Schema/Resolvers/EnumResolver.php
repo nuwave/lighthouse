@@ -82,7 +82,7 @@ class EnumResolver extends AbstractResolver
 
         return [
             'value' => $this->directiveArgValue($directive, 'value'),
-            'description' => $this->safeDescription($node->description),
+            'description' => $node->description,
         ];
     }
 }
