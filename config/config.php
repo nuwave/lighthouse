@@ -1,7 +1,6 @@
 <?php
 
 return [
-    
     /*
     |--------------------------------------------------------------------------
     | GraphQL endpoint
@@ -12,7 +11,7 @@ return [
     |
     */
     'route_name' => 'graphql',
-    
+
     /*
     |--------------------------------------------------------------------------
     | Enable GET requests
@@ -22,7 +21,7 @@ return [
     |
     */
     'route_enable_get' => false,
-    
+
     /*
     |--------------------------------------------------------------------------
     | Route configuration
@@ -114,6 +113,9 @@ return [
     |
     */
     'schema' => [
+        'output' => storage_path('app/lighthouse-schema.graphql'),
         'register' => base_path('routes/graphql/schema.graphql'),
+        'config_file' => base_path('.graphqlconfig'),
+        'config_options' => [],
     ],
 ];
