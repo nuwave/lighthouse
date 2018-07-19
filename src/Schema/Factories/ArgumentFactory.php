@@ -16,7 +16,7 @@ class ArgumentFactory
      *
      * @return array
      */
-    public function handle(ArgumentValue $value)
+    public function handle(ArgumentValue $value): array
     {
         $value->setType(NodeResolver::resolve($value->getArg()->type));
 
@@ -30,11 +30,11 @@ class ArgumentFactory
      *
      * @return ArgumentValue
      */
-    protected function applyMiddleware(ArgumentValue $value)
+    protected function applyMiddleware(ArgumentValue $value): ArgumentValue
     {
         return app(Pipeline::class)
             ->send($value)
-            ->through(directives()->argMiddleware($value->getArg()))
+            ->through(graphql()->directives()->argMiddleware($value->getArg()))
             ->via('handleArgument')
             ->always(function (ArgumentValue $value, ArgMiddleware $middleware) {
                 return $value->setMiddlewareDirective($middleware->name());
