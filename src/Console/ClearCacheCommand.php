@@ -12,22 +12,22 @@ class ClearCacheCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'lighthouse:clear-cache';
-    
+    protected $signature = 'lighthouse:cache:clear';
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Clear the cache for the GraphQL AST.';
-    
+
     /**
      * Execute the console command.
      */
     public function handle()
     {
         Cache::forget(config('lighthouse.cache.key'));
-        
+
         $this->info('GraphQL AST schema cache deleted.');
     }
 }

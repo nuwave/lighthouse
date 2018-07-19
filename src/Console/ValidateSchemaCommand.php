@@ -12,14 +12,14 @@ class ValidateSchemaCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'lighthouse:validate-schema';
+    protected $signature = 'lighthouse:schema:validate';
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Validate the defined schema.';
-    
+
     /**
      * Execute the console command.
      */
