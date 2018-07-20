@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use Nuwave\Lighthouse\Support\Utils\GlobalIdUtil;
+use Nuwave\Lighthouse\Schema\Execution\Utils\GlobalIdUtil;
 
 /**
  * @deprecated use the GlobalIdUtil class instead, this trait

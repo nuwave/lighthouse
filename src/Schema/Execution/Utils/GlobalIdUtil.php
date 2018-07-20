@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Utils;
+namespace Nuwave\Lighthouse\Schema\Execution\Utils;
 
 class GlobalIdUtil
 {

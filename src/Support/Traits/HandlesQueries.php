@@ -7,14 +7,12 @@ use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 /**
- * Trait HandlesQueries
- * @package Nuwave\Lighthouse\Support\Traits
+ * Trait HandlesQueries.
+ *
  * @deprecated
  */
 trait HandlesQueries
 {
-    use HandlesDirectives;
-
     /**
      * @param FieldValue $value
      *
@@ -24,8 +22,8 @@ trait HandlesQueries
      */
     public function getModelClass(FieldValue $value)
     {
-        $model = $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+        $model = DirectiveUtil::directiveArgValue(
+            DirectiveUtil::fieldDirective($value->getField(), $this->name()),
             'model'
         );
 
@@ -56,8 +54,8 @@ trait HandlesQueries
      */
     protected function getScopes(FieldValue $value)
     {
-        return $this->directiveArgValue(
-            $this->fieldDirective($value->getField(), $this->name()),
+        return DirectiveUtil::directiveArgValue(
+            DirectiveUtil::fieldDirective($value->getField(), $this->name()),
             'scopes',
             []
         );

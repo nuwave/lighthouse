@@ -3,7 +3,7 @@
 namespace Tests\Unit\Support\Utils;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Support\Utils\GlobalIdUtil;
+use Nuwave\Lighthouse\Schema\Execution\Utils\GlobalIdUtil;
 
 class GlobalIdUtilTest extends TestCase
 {

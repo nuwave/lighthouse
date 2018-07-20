@@ -3,14 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Schema\Execution\Utils\GlobalIdUtil;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware
 {
-    use HandlesGlobalId;
-
     /**
      * Name of the directive.
      *
@@ -25,7 +23,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure   $next
      *
      * @return FieldValue
      */
@@ -40,8 +38,8 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware
             $value = call_user_func_array($resolver, $args);
 
             return 'encode' === $process
-            ? $this->encodeGlobalId($type, $value)
-            : $this->decodeRelayId($value);
+                ? GlobalIdUtil::encodeGlobalId($type, $value)
+                : GlobalIdUtil::decodeRelayId($value);
         }));
     }
 }
