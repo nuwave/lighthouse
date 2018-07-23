@@ -2,10 +2,7 @@
 
 namespace Tests\Utils\Mutations;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\Mutation;
-
-class Bar implements Mutation
+class Bar
 {
     protected $obj;
 
