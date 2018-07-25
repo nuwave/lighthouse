@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
 
-class ScoutDirective extends BaseDirective implements ArgMiddleware
+class SearchDirective extends BaseDirective implements ArgMiddleware
 {
     use HandlesQueryFilter;
 
