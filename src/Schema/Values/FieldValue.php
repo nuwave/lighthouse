@@ -196,8 +196,11 @@ class FieldValue
         return $this->complexity;
     }
 
+
     /**
      * Get private cache flag.
+     *
+     * @param null $flag
      *
      * @return FieldValue|bool
      */

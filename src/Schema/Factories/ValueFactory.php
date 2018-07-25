@@ -142,6 +142,8 @@ class ValueFactory
      * Create cache value for field.
      *
      * @param array $arguments
+     *
+     * @return mixed|CacheValue
      */
     public function cache(array $arguments)
     {
