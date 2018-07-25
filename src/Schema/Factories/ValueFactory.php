@@ -89,7 +89,7 @@ class ValueFactory
      */
     public function cacheResolver(\Closure $resolver)
     {
-        return $this->cache = $resolver;
+        $this->cache = $resolver;
 
         return $this;
     }
