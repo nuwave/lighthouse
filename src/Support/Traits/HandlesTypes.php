@@ -111,7 +111,7 @@ trait HandlesTypes
      *
      * @return Type
      */
-    protected function serializeableType(Type $type)
+    protected function serializableType(Type $type)
     {
         $config = $type->config;
 

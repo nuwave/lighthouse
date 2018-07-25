@@ -70,7 +70,7 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, $default = null, $directive = null)
     {
-        // Get the definition associated with the class of the directive, unless explicitely given
+        // Get the definition associated with the class of the directive, unless explicitly given
         $directive = $directive ?? $this->directiveDefinition();
 
         if (! $directive) {
@@ -85,7 +85,7 @@ abstract class BaseDirective implements Directive
             ? $this->argValue($arg, $default)
             : $default;
     }
-    
+
     /**
      * @throws DirectiveException
      * @throws \Exception
