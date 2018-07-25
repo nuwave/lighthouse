@@ -2,17 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 /**
  * Class GroupDirective.
@@ -62,13 +63,13 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $objectType
+     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
      *
      * @throws \Exception
      *
-     * @return ObjectTypeDefinitionNode
+     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      */
-    protected function setMiddlewareDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
+    protected function setMiddlewareDirectiveOnFields($objectType)
     {
         $middlewareValues = $this->directiveArgValue('middleware');
 
@@ -89,13 +90,13 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $objectType
+     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
      *
      * @throws \Exception
      *
-     * @return ObjectTypeDefinitionNode
+     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      */
-    protected function setNamespaceDirectiveOnFields(ObjectTypeDefinitionNode $objectType)
+    protected function setNamespaceDirectiveOnFields($objectType)
     {
         $namespaceValue = $this->directiveArgValue('namespace');
 
@@ -129,7 +130,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      *
      * @return DirectiveNode
      */
-    protected function mergeNamespaceOnExistingDirective($namespaceValue, DirectiveNode $directive)
+    protected function mergeNamespaceOnExistingDirective(string $namespaceValue, DirectiveNode $directive): DirectiveNode
     {
         $namespaces = PartialParser::arguments([
             "field: \"$namespaceValue\"",

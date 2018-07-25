@@ -49,10 +49,10 @@ class NodeFactoryTest extends TestCase
     {
         $schema = '
         enum Role {
-            # Company administrator.
+            "Company administrator."
             ADMIN @enum(value:"admin")
 
-            # Company employee.
+            "Company employee."
             EMPLOYEE @enum(value:"employee")
         }
         ';

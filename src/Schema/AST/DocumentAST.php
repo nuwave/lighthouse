@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Utils\AST;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\DefinitionNode;
+use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;
@@ -20,7 +21,6 @@ use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Exceptions\DocumentASTException;
 
@@ -80,9 +80,9 @@ class DocumentAST implements \Serializable
     /**
      * Mark the AST as locked.
      *
-     * @return self
+     * @return DocumentAST
      */
-    public function lock()
+    public function lock(): DocumentAST
     {
         $this->locked = true;
 
@@ -92,9 +92,9 @@ class DocumentAST implements \Serializable
     /**
      * Mark the AST as unlocked.
      *
-     * @return self
+     * @return DocumentAST
      */
-    public function unlock()
+    public function unlock(): DocumentAST
     {
         $this->locked = false;
 
@@ -165,11 +165,11 @@ class DocumentAST implements \Serializable
      *
      * @return Collection
      */
-    public function typeExtensionDefinitions($extendedTypeName = null): Collection
+    public function typeExtensionDefinitions(string $extendedTypeName = null): Collection
     {
-        return $this->definitionsByType(TypeExtensionDefinitionNode::class)
-            ->filter(function (TypeExtensionDefinitionNode $typeExtension) use ($extendedTypeName) {
-                return is_null($extendedTypeName) || $extendedTypeName === $typeExtension->definition->name->value;
+        return $this->definitionsByType(TypeExtensionNode::class)
+            ->filter(function (TypeExtensionNode $typeExtension) use ($extendedTypeName) {
+                return is_null($extendedTypeName) || $extendedTypeName === $typeExtension->name->value;
             });
     }
 
@@ -344,17 +344,13 @@ class DocumentAST implements \Serializable
             $found = false;
 
             $newDefinitions = $originalDefinitions->map(function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
-                $originalHashID = $this->getDefinitionNodeHash($originalDefinition, true);
+                $originalHashID = $this->getDefinitionNodeHash($originalDefinition);
 
                 if ($originalHashID === $newHashID) {
                     $found = true;
                     $newDefinition->spl_object_hash = $originalHashID;
 
-                    if ($originalDefinition instanceof TypeExtensionDefinitionNode) {
-                        $originalDefinition->definition = $newDefinition;
-                    } else {
-                        $originalDefinition = $newDefinition;
-                    }
+                    $originalDefinition = $newDefinition;
                 }
 
                 return $originalDefinition;
@@ -377,17 +373,15 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * Get node's original/current has.
+     * Get node's original/current hash.
      *
      * @param DefinitionNode $node
      *
      * @return string
      */
-    protected function getDefinitionNodeHash(DefinitionNode $node, $unwrap = false): string
+    protected function getDefinitionNodeHash(DefinitionNode $node): string
     {
-        return $node instanceof TypeExtensionDefinitionNode && $unwrap
-            ? data_get($node, 'definition.spl_object_hash', spl_object_hash($node->definition))
-            : data_get($node, 'spl_object_hash', spl_object_hash($node));
+        return data_get($node, 'spl_object_hash', spl_object_hash($node));
     }
 
     /**
@@ -407,14 +401,6 @@ class DocumentAST implements \Serializable
             'spl_object_hash',
             spl_object_hash($currentDefinition)
         );
-
-        if ($currentDefinition instanceof TypeExtensionDefinitionNode) {
-            $newDefinition->definition->spl_object_hash = data_get(
-                $currentDefinition,
-                'definition.spl_object_hash',
-                spl_object_hash($currentDefinition->definition)
-            );
-        }
 
         return $newDefinition;
     }

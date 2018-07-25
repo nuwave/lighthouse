@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
-use GraphQL\SyntaxError;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Support\Exceptions\ParseException;
 use Tests\TestCase;
+use GraphQL\Error\SyntaxError;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Support\Exceptions\ParseException;
 
 class PartialParserTest extends TestCase
 {

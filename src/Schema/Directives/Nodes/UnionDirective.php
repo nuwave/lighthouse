@@ -36,7 +36,7 @@ class UnionDirective extends BaseDirective implements NodeResolver
 
         return new UnionType([
             'name' => $value->getNodeName(),
-            'description' => trim(str_replace("\n", '', $value->getNode()->description)),
+            'description' => $value->getNode()->description,
             'types' => function () use ($value) {
                 return collect($value->getNode()->types)->map(function ($type) {
                     return graphql()->types()->get($type->name->value);

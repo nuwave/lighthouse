@@ -25,7 +25,9 @@ class NodeTest extends DBTestCase
             name: String!
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
@@ -55,7 +57,9 @@ class NodeTest extends DBTestCase
             name: String!
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
@@ -83,7 +87,9 @@ class NodeTest extends DBTestCase
             name: String!
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
 
         $user = factory(User::class)->create();

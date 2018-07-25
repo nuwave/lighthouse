@@ -2,23 +2,23 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\FieldNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\AST\FieldNode;
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\Parser;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Exceptions\ParseException;
 
 class PartialParser
@@ -28,7 +28,7 @@ class PartialParser
      *
      * @return ObjectTypeDefinitionNode[]
      */
-    public static function objectTypeDefinitions($objectTypes)
+    public static function objectTypeDefinitions(array $objectTypes): array
     {
         return array_map(function ($objectType) {
             return self::objectTypeDefinition($objectType);
@@ -42,7 +42,7 @@ class PartialParser
      *
      * @return ObjectTypeDefinitionNode
      */
-    public static function objectTypeDefinition($definition)
+    public static function objectTypeDefinition(string $definition): ObjectTypeDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::parse($definition)->definitions,
@@ -57,7 +57,7 @@ class PartialParser
      *
      * @return InputValueDefinitionNode
      */
-    public static function inputValueDefinition($inputValueDefinition)
+    public static function inputValueDefinition(string $inputValueDefinition): InputValueDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::fieldDefinition("field($inputValueDefinition): String")->arguments,
@@ -70,7 +70,7 @@ class PartialParser
      *
      * @return InputValueDefinitionNode[]
      */
-    public static function inputValueDefinitions($inputValueDefinitions)
+    public static function inputValueDefinitions(array $inputValueDefinitions): array
     {
         return array_map(function ($inputValueDefinition) {
             return self::inputValueDefinition($inputValueDefinition);
@@ -84,7 +84,7 @@ class PartialParser
      *
      * @return NodeList
      */
-    public static function argument($argumentDefinition)
+    public static function argument(string $argumentDefinition): NodeList
     {
         return self::getFirstAndValidateType(
             self::field("field($argumentDefinition): String")->arguments,
@@ -97,7 +97,7 @@ class PartialParser
      *
      * @return InputValueDefinitionNode[]
      */
-    public static function arguments($argumentDefinitions)
+    public static function arguments(array $argumentDefinitions): array
     {
         return array_map(function ($argumentDefinition) {
             return self::argument($argumentDefinition);
@@ -111,7 +111,7 @@ class PartialParser
      *
      * @return FieldNode
      */
-    public static function field($field)
+    public static function field(string $field): FieldNode
     {
         return self::getFirstAndValidateType(
             self::operationDefinition("{ $field }")->selectionSet->selections,
@@ -126,7 +126,7 @@ class PartialParser
      *
      * @return OperationDefinitionNode
      */
-    public static function operationDefinition($operation)
+    public static function operationDefinition(string $operation): OperationDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::parse($operation)->definitions,
@@ -141,7 +141,7 @@ class PartialParser
      *
      * @return FieldDefinitionNode
      */
-    public static function fieldDefinition($fieldDefinition)
+    public static function fieldDefinition(string $fieldDefinition): FieldDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::objectTypeDefinition("type Dummy { $fieldDefinition }")->fields,
@@ -156,10 +156,14 @@ class PartialParser
      *
      * @return DirectiveNode
      */
-    public static function directive($directive)
+    public static function directive(string $directive): DirectiveNode
     {
         return self::getFirstAndValidateType(
-            self::objectTypeDefinition("type Dummy $directive {}")->directives,
+            self::objectTypeDefinition("
+            type Dummy $directive {
+                dummy: Int
+            }
+            ")->directives,
             DirectiveNode::class
         );
     }
@@ -169,7 +173,7 @@ class PartialParser
      *
      * @return DirectiveNode[]
      */
-    public static function directives($directives)
+    public static function directives(array $directives): array
     {
         return array_map(function ($directive) {
             return self::inputValueDefinition($directive);
@@ -183,7 +187,7 @@ class PartialParser
      *
      * @return DirectiveDefinitionNode
      */
-    public static function directiveDefinition($directiveDefinition)
+    public static function directiveDefinition(string $directiveDefinition): DirectiveDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::parse($directiveDefinition)->definitions,
@@ -196,7 +200,7 @@ class PartialParser
      *
      * @return DirectiveDefinitionNode[]
      */
-    public static function directiveDefinitions($directiveDefinitions)
+    public static function directiveDefinitions(array $directiveDefinitions): array
     {
         return array_map(function ($directiveDefinition) {
             return self::inputValueDefinition($directiveDefinition);
@@ -204,13 +208,13 @@ class PartialParser
     }
 
     /**
-     * @param $interfaceDefinition
+     * @param string $interfaceDefinition
      *
      * @throws ParseException
      *
      * @return InterfaceTypeDefinitionNode
      */
-    public static function interfaceTypeDefinition($interfaceDefinition)
+    public static function interfaceTypeDefinition(string $interfaceDefinition): InterfaceTypeDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::parse($interfaceDefinition)->definitions,
@@ -225,7 +229,7 @@ class PartialParser
      *
      * @return InputObjectTypeDefinitionNode
      */
-    public static function inputObjectTypeDefinition($inputTypeDefinition)
+    public static function inputObjectTypeDefinition(string $inputTypeDefinition): InputObjectTypeDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::parse($inputTypeDefinition)->definitions,
@@ -240,7 +244,7 @@ class PartialParser
      *
      * @return ScalarTypeDefinitionNode
      */
-    public static function scalarTypeDefinition($scalarDefinition)
+    public static function scalarTypeDefinition(string $scalarDefinition): ScalarTypeDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::parse($scalarDefinition)->definitions,
@@ -249,13 +253,13 @@ class PartialParser
     }
 
     /**
-     * @param $enumDefinition
+     * @param string $enumDefinition
      *
      * @throws ParseException
      *
-     * @return mixed
+     * @return EnumTypeDefinitionNode
      */
-    public static function enumTypeDefinition($enumDefinition)
+    public static function enumTypeDefinition(string $enumDefinition): EnumTypeDefinitionNode
     {
         return self::getFirstAndValidateType(
             self::parse($enumDefinition)->definitions,
@@ -266,8 +270,9 @@ class PartialParser
     /**
      * @param string $typeName
      *
-     * @return NamedTypeNode
      * @throws ParseException
+     *
+     * @return NamedTypeNode
      */
     public static function namedType(string $typeName): NamedTypeNode
     {
@@ -324,8 +329,9 @@ class PartialParser
      * @param Node $node
      * @param string $expectedType
      *
-     * @return Node
      * @throws ParseException
+     *
+     * @return Node
      */
     protected static function validateType(Node $node, string $expectedType): Node
     {

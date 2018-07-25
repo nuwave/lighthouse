@@ -131,16 +131,4 @@ trait HandlesDirectives
                 return sprintf($string, $type);
             }, '%s'));
     }
-
-    /**
-     * Strip description of invalid characters.
-     *
-     * @param string $description
-     *
-     * @return string
-     */
-    protected function safeDescription($description = '')
-    {
-        return trim(str_replace(["\n", "\t"], '', $description));
-    }
 }
