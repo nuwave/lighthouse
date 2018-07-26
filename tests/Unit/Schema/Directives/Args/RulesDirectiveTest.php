@@ -106,7 +106,7 @@ class RulesDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanProcessMutationsWithInvalidRetunObjectFields()
+    public function itCanProcessMutationsWithInvalidRetunrObjectFields()
     {
         $mutation = '
         mutation {

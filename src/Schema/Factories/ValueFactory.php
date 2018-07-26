@@ -89,7 +89,7 @@ class ValueFactory
      */
     public function cacheResolver(\Closure $resolver)
     {
-        return $this->cache = $resolver;
+        $this->cache = $resolver;
 
         return $this;
     }
@@ -142,6 +142,8 @@ class ValueFactory
      * Create cache value for field.
      *
      * @param array $arguments
+     *
+     * @return mixed|CacheValue
      */
     public function cache(array $arguments)
     {

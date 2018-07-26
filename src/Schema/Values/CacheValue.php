@@ -61,8 +61,6 @@ class CacheValue
     /**
      * Resolve key from root value.
      *
-     * @param string $key
-     *
      * @return mixed
      */
     public function getKey()
