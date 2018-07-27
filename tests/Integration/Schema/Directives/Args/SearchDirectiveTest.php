@@ -1,23 +1,16 @@
 <?php
 
-
 namespace Tests\Integration\Schema\Directives\Args;
 
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-use Laravel\Scout\Builder;
-use Laravel\Scout\EngineManager;
-use Laravel\Scout\Engines\Engine;
-use Laravel\Scout\Engines\NullEngine;
 use Mockery;
 use Mockery\Mock;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\User;
+use Laravel\Scout\EngineManager;
+use Laravel\Scout\Engines\NullEngine;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ScoutDirectiveTest extends DBTestCase
+class SearchDirectiveTest extends DBTestCase
 {
     use RefreshDatabase;
 
@@ -27,25 +20,9 @@ class ScoutDirectiveTest extends DBTestCase
     /** @var Mock */
     protected $engine;
 
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->engineManager = Mockery::mock();
-        $this->engine = Mockery::mock(NullEngine::class)->makePartial();
-
-        $this->app->singleton(EngineManager::class, function ($app) {
-            return $this->engineManager;
-        });
-
-        $this->engineManager->shouldReceive('engine')
-            ->andReturn($this->engine);
-    }
-
-
     /** @test */
     public function canSearch()
     {
-
         $postA = factory(Post::class)->create([
             'title' => 'great title'
         ]);
@@ -78,7 +55,7 @@ class ScoutDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
     }
@@ -86,7 +63,6 @@ class ScoutDirectiveTest extends DBTestCase
     /** @test */
     public function canSearchWithCustomIndex()
     {
-
         $postA = factory(Post::class)->create([
             'title' => 'great title'
         ]);
@@ -100,10 +76,10 @@ class ScoutDirectiveTest extends DBTestCase
         $this->engine->shouldReceive("map")->andReturn(collect([$postA, $postB]))->once();
 
         $this->engine->shouldReceive('paginate')->with(
-                Mockery::on(function ($argument) {
-                    return $argument->index == "my.index";
-                }), Mockery::any(), Mockery::any()
-            )
+            Mockery::on(function ($argument) {
+                return $argument->index == "my.index";
+            }), Mockery::any(), Mockery::any()
+        )
             ->andReturn(collect([$postA, $postB]))
             ->once();
 
@@ -127,9 +103,22 @@ class ScoutDirectiveTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
     }
 
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->engineManager = Mockery::mock();
+        $this->engine = Mockery::mock(NullEngine::class)->makePartial();
+
+        $this->app->singleton(EngineManager::class, function ($app) {
+            return $this->engineManager;
+        });
+
+        $this->engineManager->shouldReceive('engine')
+            ->andReturn($this->engine);
+    }
 }

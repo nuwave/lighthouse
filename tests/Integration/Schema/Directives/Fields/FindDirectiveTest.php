@@ -35,7 +35,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ";
-        $result = $this->execute($schema, $query);
+        $result = $this->queryAndReturnResult($schema, $query);
 
         $this->assertEquals('B', $result->data['user']['name']);
     }
@@ -63,7 +63,8 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ";
-        $result = $this->execute($schema, $query);
+ 
+        $result = $this->queryAndReturnResult($schema, $query);
 
         $this->assertEquals('A', $result->data['user']['name']);
     }
@@ -92,7 +93,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->queryAndReturnResult($schema, $query);
 
         $this->assertCount(1, $result->errors);
     }
@@ -128,7 +129,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->queryAndReturnResult($schema, $query);
 
         $this->assertEquals($userA->id, $result->data['user']['id']);
         $this->assertEquals('A', $result->data['user']['name']);

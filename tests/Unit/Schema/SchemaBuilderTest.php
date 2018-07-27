@@ -39,10 +39,10 @@ class SchemaBuilderTest extends TestCase
     {
         $schema = $this->buildSchemaWithDefaultQuery('
         enum Role {
-            # Company administrator.
+            "Company administrator."
             admin @enum(value:"admin")
 
-            # Company employee.
+            "Company employee."
             employee @enum(value:"employee")
         }
         ');
@@ -57,7 +57,7 @@ class SchemaBuilderTest extends TestCase
     {
         $schema = $this->buildSchemaWithDefaultQuery('
         interface Foo {
-            # bar is baz
+            "bar is baz"
             bar: String!
         }
         ');
@@ -68,28 +68,11 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itCanResolveScalarTypes()
-    {
-        $this->app['config']->set(
-            'lighthouse.namespaces.scalars',
-            'Nuwave\Lighthouse\Schema\Types\Scalars'
-        );
-
-        $schema = $this->buildSchemaWithDefaultQuery('
-        scalar DateTime @scalar(class:"DateTime")
-        ');
-
-        $this->assertInstanceOf(ScalarType::class, $schema->getType('DateTime'));
-    }
-
-    /**
-     * @test
-     */
     public function itCanResolveObjectTypes()
     {
         $schema = $this->buildSchemaWithDefaultQuery('
         type Foo {
-            # bar attribute of Foo
+            "bar attribute of Foo"
             bar: String!
         }
         ');
@@ -99,7 +82,9 @@ class SchemaBuilderTest extends TestCase
 
         $config = $foo->config;
         $this->assertEquals('Foo', data_get($config, 'name'));
-        $this->assertEquals('bar attribute of Foo', array_get($config['fields'](), 'bar.description'));
+
+        $resolvedFields = $config['fields']();
+        $this->assertEquals('bar attribute of Foo', $resolvedFields['bar']['description']->value);
     }
 
     /**

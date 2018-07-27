@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Closure;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -26,11 +25,11 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
      * Resolve the field directive.
      *
      * @param ArgumentValue $value
-     * @param Closure       $next
+     * @param \Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value, Closure $next)
+    public function handleArgument(ArgumentValue $value, \Closure $next)
     {
         if (in_array($value->getField()->getNodeName(), ['Query', 'Mutation'])) {
             return $value;

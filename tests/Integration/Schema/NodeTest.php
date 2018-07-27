@@ -25,7 +25,9 @@ class NodeTest extends DBTestCase
             name: String!
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
@@ -38,7 +40,7 @@ class NodeTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -55,7 +57,9 @@ class NodeTest extends DBTestCase
             name: String!
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
 
         $globalId = $this->encodeGlobalId('User', $this->node['id']);
@@ -68,7 +72,7 @@ class NodeTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -83,7 +87,9 @@ class NodeTest extends DBTestCase
             name: String!
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
 
         $user = factory(User::class)->create();
@@ -98,7 +104,7 @@ class NodeTest extends DBTestCase
         }
         ';
 
-        $result = $this->execute($schema, $query, true);
+        $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals($user->name, array_get($result->data, 'node.name'));
     }
 
@@ -112,7 +118,7 @@ class NodeTest extends DBTestCase
     public function resolveNodeType($value)
     {
         if (is_array($value) && isset($value['name'])) {
-            return graphql()->types()->instance('User');
+            return graphql()->types()->get('User');
         }
     }
 }

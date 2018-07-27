@@ -26,7 +26,7 @@
         "illuminate/routing": "^5.4",
         "illuminate/support": "^5.4",
         "opis/closure": "^3.0",
-        "webonyx/graphql-php": "^0.11.5"
+        "webonyx/graphql-php": "^0.12"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.10",

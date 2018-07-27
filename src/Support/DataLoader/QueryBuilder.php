@@ -2,14 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
-use Closure;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class QueryBuilder
 {
@@ -79,22 +78,23 @@ class QueryBuilder
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param Builder $builder
-     * @param Closure $constraints
-     * @param array   $models
-     * @param array   $options
+     * @param Builder  $builder
+     * @param \Closure $constraints
+     * @param array    $models
+     * @param array    $options
      *
      * @throws \ReflectionException
      *
      * @return array
      */
-    protected function loadRelation(Builder $builder, Closure $constraints, array $models, array $options)
+    protected function loadRelation(Builder $builder, \Closure $constraints, array $models, array $options)
     {
         $relation = $builder->getRelation($options['name']);
         $relationQueries = $this->getRelationQueries($builder, $models, $options['name'], $constraints);
 
         // Just get the first of the relations to have an instance available
         $relatedModel = $relationQueries->first()->getModel();
+        $relatedTable = $relatedModel->getTable();
 
         $relationQueries = $relationQueries->map(function (Relation $relation) use ($options) {
             return $relation->when($options['paginated'], function (Builder $query) use ($options) {
@@ -114,8 +114,10 @@ class QueryBuilder
 
         /** @var \Illuminate\Database\Query\Builder $baseQuery */
         $baseQuery = app('db')->query();
+        $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($relatedTable);
         $results = $baseQuery->select()
-            ->fromSub($unitedRelations->getQuery(), $relatedModel->getTable())
+            ->from($baseQuery->raw($fromExpression))
+            ->setBindings($unitedRelations->getBindings())
             ->get();
 
         $hydrated = $this->hydrate($relatedModel, $relation, $results);
@@ -143,14 +145,14 @@ class QueryBuilder
     /**
      * Get queries to fetch relationships.
      *
-     * @param Builder $builder
-     * @param array   $models
-     * @param string  $name
-     * @param Closure $constraints
+     * @param Builder  $builder
+     * @param array    $models
+     * @param string   $name
+     * @param \Closure $constraints
      *
      * @return Relation[]|Collection
      */
-    protected function getRelationQueries(Builder $builder, array $models, $name, Closure $constraints)
+    protected function getRelationQueries(Builder $builder, array $models, $name, \Closure $constraints)
     {
         return collect($models)->map(function ($model) use ($builder, $name, $constraints) {
             $relation = $builder->getRelation($name);

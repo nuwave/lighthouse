@@ -4,11 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
@@ -17,13 +15,10 @@ use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Resolvers\ScalarResolver;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\EnumDirective;
-use GraphQL\Language\AST\TypeExtensionDefinitionNode as Extension;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 
 class NodeFactory
 {
@@ -38,7 +33,7 @@ class NodeFactory
      *
      * @return Type
      */
-    public function handle(NodeValue $value)
+    public function handle(NodeValue $value): Type
     {
         $value->setType(
             $this->hasTypeResolver($value)
@@ -56,7 +51,7 @@ class NodeFactory
      *
      * @return bool
      */
-    protected function hasTypeResolver(NodeValue $value)
+    protected function hasTypeResolver(NodeValue $value): bool
     {
         return graphql()->directives()->hasNodeResolver($value->getNode());
     }
@@ -68,12 +63,11 @@ class NodeFactory
      *
      * @return Type
      */
-    protected function resolveTypeViaDirective(NodeValue $value)
+    protected function resolveTypeViaDirective(NodeValue $value): Type
     {
         return graphql()->directives()
             ->forNode($value->getNode())
-            ->resolveNode($value)
-            ->getType();
+            ->resolveNode($value);
     }
 
     /**
@@ -85,7 +79,7 @@ class NodeFactory
      *
      * @return Type
      */
-    protected function resolveType(NodeValue $value)
+    protected function resolveType(NodeValue $value): Type
     {
         // We do not have to consider TypeExtensionNode since they
         // are merged before we get here
@@ -114,7 +108,7 @@ class NodeFactory
      *
      * @return EnumType
      */
-    public function enum(NodeValue $enumNodeValue)
+    public function enum(NodeValue $enumNodeValue): EnumType
     {
         $enumDirective = (new EnumDirective())->hydrate($enumNodeValue->getNode());
 
@@ -124,13 +118,15 @@ class NodeFactory
     /**
      * Resolve scalar definition to type.
      *
-     * @param NodeValue $value
+     * @param NodeValue $scalarNodeValue
      *
      * @return ScalarType
      */
-    protected function scalar(NodeValue $value)
+    protected function scalar(NodeValue $scalarNodeValue): ScalarType
     {
-        return ScalarResolver::resolve($value)->getType();
+        $scalarDirective = (new ScalarDirective())->hydrate($scalarNodeValue->getNode());
+
+        return $scalarDirective->resolveNode($scalarNodeValue);
     }
 
     /**
@@ -140,7 +136,7 @@ class NodeFactory
      *
      * @return InterfaceType
      */
-    protected function interface(NodeValue $value)
+    protected function interface(NodeValue $value): InterfaceType
     {
         return new InterfaceType([
             'name' => $value->getNodeName(),
@@ -155,7 +151,7 @@ class NodeFactory
      *
      * @return ObjectType
      */
-    protected function objectType(NodeValue $value)
+    protected function objectType(NodeValue $value): ObjectType
     {
         return new ObjectType([
             'name' => $value->getNodeName(),
@@ -177,7 +173,7 @@ class NodeFactory
      *
      * @return InputObjectType
      */
-    protected function inputObjectType(NodeValue $value)
+    protected function inputObjectType(NodeValue $value): InputObjectType
     {
         return new InputObjectType([
             'name' => $value->getNodeName(),
@@ -194,11 +190,11 @@ class NodeFactory
      *
      * @return NodeValue
      */
-    protected function applyMiddleware(NodeValue $value)
+    protected function applyMiddleware(NodeValue $value): NodeValue
     {
         return app(Pipeline::class)
             ->send($value)
-            ->through(directives()->nodeMiddleware($value->getNode()))
+            ->through(graphql()->directives()->nodeMiddleware($value->getNode()))
             ->via('handleNode')
             ->then(function (NodeValue $value) {
                 return $value;

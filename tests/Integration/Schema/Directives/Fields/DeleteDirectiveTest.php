@@ -14,6 +14,7 @@ class DeleteDirectiveTest extends DBTestCase
     public function itDeletesUser()
     {
         $user = factory(User::class)->create(['name' => 'A']);
+        $this->assertCount(1, User::all());
 
         $schema = '
         type User {
@@ -25,7 +26,9 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUser(id: ID): User @delete
         }
         
-        type Query {}
+        type Query {
+            dummy: Int
+        }
         ';
         $query = "
         mutation {
@@ -34,12 +37,9 @@ class DeleteDirectiveTest extends DBTestCase
             }
         }
         ";
-        $this->assertCount(1, User::all());
-
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('A', $result->data['deleteUser']['name']);
-
+        $this->assertEquals('A', array_get($result, 'data.deleteUser.name'));
         $this->assertCount(0, User::all());
     }
 }

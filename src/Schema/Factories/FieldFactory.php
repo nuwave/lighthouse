@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 use Nuwave\Lighthouse\Support\Pipeline;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 class FieldFactory
 {
@@ -39,7 +39,7 @@ class FieldFactory
 
         $resolverWithMiddleware = app(Pipeline::class)
             ->send($fieldValue)
-            ->through(directives()->fieldMiddleware($fieldValue->getField()))
+            ->through(graphql()->directives()->fieldMiddleware($fieldValue->getField()))
             ->via('handleField')
             ->then(function (FieldValue $fieldValue) {
                 return $fieldValue;
@@ -64,9 +64,10 @@ class FieldFactory
      *
      * @return bool
      */
-    protected function hasResolverDirective(FieldValue $value)
+    protected function hasResolverDirective(FieldValue $value): bool
     {
-        return graphql()->directives()->hasResolver($value->getField());
+        return graphql()->directives()
+            ->hasResolver($value->getField());
     }
 
     /**
@@ -78,10 +79,12 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function useResolverDirective(FieldValue $value)
+    protected function useResolverDirective(FieldValue $value): \Closure
     {
-        return graphql()->directives()->fieldResolver($value->getField())
-            ->resolveField($value)->getResolver();
+        return graphql()->directives()
+            ->fieldResolver($value->getField())
+            ->resolveField($value)
+            ->getResolver();
     }
 
     /**
@@ -91,7 +94,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function defaultResolver(FieldValue $fieldValue)
+    protected function defaultResolver(FieldValue $fieldValue): \Closure
     {
         switch ($fieldValue->getNodeName()) {
             case 'Mutation':
@@ -111,7 +114,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function rootOperationResolver(string $fieldName, string $rootOperationType)
+    protected function rootOperationResolver(string $fieldName, string $rootOperationType): \Closure
     {
         return function ($obj, array $args, $context = null, $info = null) use ($fieldName, $rootOperationType) {
             $class = config("lighthouse.namespaces.{$rootOperationType}").'\\'.studly_case($fieldName);
@@ -128,7 +131,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function injectAdditionalArgs(\Closure $resolver, array $additionalArgs)
+    protected function injectAdditionalArgs(\Closure $resolver, array $additionalArgs): \Closure
     {
         return function () use ($resolver, $additionalArgs) {
             $resolverArgs = func_get_args();
@@ -146,7 +149,7 @@ class FieldFactory
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function getArgDefinitions(FieldValue $fieldValue)
+    protected function getArgDefinitions(FieldValue $fieldValue): Collection
     {
         return collect(data_get($fieldValue->getField(), 'arguments', []))
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
@@ -166,7 +169,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function wrapResolverWithValidation(\Closure $resolver, $inputValueDefinitions)
+    protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
         return function ($rootValue, $inputArgs, $context = null, $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
             $inputArgs = $this->resolveArgs($inputArgs, $inputValueDefinitions);
@@ -207,7 +210,7 @@ class FieldFactory
      *
      * @return array
      */
-    protected function resolveArgs(array $inputArguments, Collection $argumentValues)
+    protected function resolveArgs(array $inputArguments, Collection $argumentValues): array
     {
         $resolvers = $argumentValues->filter(function ($arg) {
             return array_has($arg, 'resolve');

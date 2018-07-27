@@ -61,8 +61,6 @@ class CacheValue
     /**
      * Resolve key from root value.
      *
-     * @param string $key
-     *
      * @return mixed
      */
     public function getKey()
@@ -113,13 +111,15 @@ class CacheValue
      */
     protected function argKeys()
     {
-        return collect($this->args)
-            ->sortKeys()
-            ->map(function ($value, $key) {
-                $keyValue = is_array($value) ? json_encode($value, true) : $value;
+        $args = $this->args;
 
-                return "{$key}:{$keyValue}";
-            });
+        ksort($args);
+
+        return collect($args)->map(function ($value, $key) {
+            $keyValue = is_array($value) ? json_encode($value, true) : $value;
+
+            return "{$key}:{$keyValue}";
+        });
     }
 
     /**
