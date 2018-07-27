@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
-class NestedMutationExecutor
+class MutationExecutor
 {
-    public static function executeCreate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
+    public static function executeCreate(Model $model, Collection $args, HasMany $parentRelation = null): Model
     {
         list($belongsTo, $remaining) = self::extractBelongsToArgs($model, $args);
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $remaining);
-        
+
         $model->fill($remaining->all());
-        
+
         $belongsTo->each(function ($value, $key) use ($model) {
             $model->{$key}()->associate($value);
         });
@@ -38,14 +38,14 @@ class NestedMutationExecutor
         return $model;
     }
     
-    protected static function handleHasManyCreate(Collection $multiValues, HasMany $relation): void
+    protected static function handleHasManyCreate(Collection $multiValues, HasMany $relation)
     {
         $multiValues->each(function ($singleValues) use ($relation) {
             self::executeCreate($relation->getModel()->newInstance(), collect($singleValues), $relation);
         });
     }
     
-    public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
+    public static function executeUpdate(Model $model, Collection $args, HasMany $parentRelation = null): Model
     {
         list($belongsTo, $remaining) = self::extractBelongsToArgs($model, $args);
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $remaining);
