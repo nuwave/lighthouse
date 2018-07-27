@@ -1,21 +1,21 @@
 type Query {
-    users: [User!]! @paginate(type: "paginator" model: "User")
-    user(id: ID @eq): User @find(model: "User")
+    users: [User!]! @paginate(type: "paginator" model: "App\\User")
+    user(id: ID @eq): User @find(model: "App\\User")
 }
 
 type Mutation {
     createUser(
         name: String @rules(apply: ["required"])
         email: String @rules(apply: ["required", "email", "unique:users,email"])
-    ): User @create(model: "User")
+    ): User @create(model: "App\\User")
     updateUser(
         id: ID @rules(apply: ["required"])
         name: String
         email: String @rules(apply: ["email"])
-    ): User @update(model: "User")
+    ): User @update(model: "App\\User")
     deleteUser(
         id: ID @rules(apply: ["required"])
-    ): User @delete(model: "User")
+    ): User @delete(model: "App\\User")
 }
 
 type User {
