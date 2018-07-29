@@ -29,7 +29,7 @@ class GraphQLController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function query(Request $request)
+    public function __invoke(Request $request)
     {
         $query = $request->input('query');
         $variables = $request->input('variables');
