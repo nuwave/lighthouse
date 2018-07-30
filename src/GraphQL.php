@@ -14,14 +14,13 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Support\Exceptions\Handler;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
-    use CanFormatError;
 
     /**
      * Directive registry container.
@@ -118,29 +117,15 @@ class GraphQL
     public function execute($query, $context = null, $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
+        $result->setErrorsHandler([app(config('lighthouse.handlers.error', Handler::class)), 'handler']);
 
-        $output = [
-            'data' => $result->data,
-            'extensions' => $result->extensions,
-        ];
+        $data = $result->toArray();
 
-        if (! empty($result->errors)) {
-            foreach ($result->errors as $error) {
-                if ($error instanceof \Exception) {
-                    info('GraphQL Error:', [
-                        'code' => $error->getCode(),
-                        'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
-                    ]);
-                }
-            }
-
-            $output = array_merge($output, [
-                'errors' => array_map([$this, 'formatError'], $result->errors),
-            ]);
+        if(!isset($data['extensions'])) {
+            $data['extensions'] = [];
         }
 
-        return $output;
+        return $data;
     }
 
     /**
