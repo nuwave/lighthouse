@@ -61,6 +61,10 @@ class QueryFilter
     public function filter($query, array $args = [])
     {
         foreach ($this->filters as $key => $filter) {
+            if (strpos($key, '.')) {
+                $key = explode('.', $key)[1];
+            }
+
             if (! isset($args[array_get($filter, 'key', $key)])
                 && 0 === count(array_intersect(array_get($filter, 'resolveArgs', []), array_keys($args)))) {
                 continue;
