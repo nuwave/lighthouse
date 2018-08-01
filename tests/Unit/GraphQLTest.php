@@ -57,6 +57,39 @@ class GraphQLTest extends TestCase
         $this->assertEquals($expected, graphql()->execute($query));
     }
 
+    /**
+     * @test
+     */
+    public function itCanExecuteQueryWithNamedOperation()
+    {
+        $query = '
+        query User {
+            user {
+                id
+                created_at
+                updated_at
+            }
+        }
+        query userOnlyId {
+            user {
+                id
+            }
+        }
+        ';
+        request()->merge(['operationName' => 'userOnlyId']);
+
+        $expected = [
+            'data' => [
+                'user' => [
+                    'id' => 1,
+                ],
+            ],
+            'extensions' => [],
+        ];
+
+        $this->assertEquals($expected, graphql()->execute($query));
+    }
+
     public function user($root, array $args, $context, $info)
     {
         return [
