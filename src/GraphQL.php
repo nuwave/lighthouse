@@ -168,7 +168,8 @@ class GraphQL
             $query,
             $rootValue,
             $context,
-            $variables
+            $variables,
+            request()->input('operationName')
         );
 
         $result->extensions = $this->extensions->toArray();
