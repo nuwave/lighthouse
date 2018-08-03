@@ -61,20 +61,13 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
      * Resolve the field directive.
      *
      * @param ArgumentValue $value
-     * @param \Closure       $next
+     * @param \Closure $next
      *
      * @return ArgumentValue
+     * @deprecated Will be removed in favour of the RulesDirective
      */
     public function handleArgument(ArgumentValue $value, \Closure $next)
     {
-        $rules = $this->directiveArgValue('rules', []);
-
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
-            $rules
-        );
-
-        return $next($value->setValue($current));
+        return graphql()->directives()->get('rules')->handleArgument($value, $next);
     }
 }
