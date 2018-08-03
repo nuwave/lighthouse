@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -23,34 +24,36 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure $next
      *
      * @return FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next)
     {
-        $policies = $this->directiveArgValue('if');
         $resolver = $value->getResolver();
 
-        return $next($value->setResolver(
-            function () use ($policies, $resolver) {
-                $args = func_get_args();
-                $model = $this->getModelClass() ?: get_class($args[0]);
+        return $next(
+            $value->setResolver(
+                function () use ($resolver) {
+                    /** @var Authorizable $user */
+                    $user = app('auth')->user();
 
-                $can = collect($policies)->reduce(function ($allowed, $policy) use ($model) {
-                    if (! app('auth')->user()->can($policy, $model)) {
-                        return false;
+                    if (!$user) {
+                        throw new Error('Authentication is required to access this field.');
                     }
 
-                    return $allowed;
-                }, true);
+                    $model = $this->getModelClass();
+                    $policies = $this->directiveArgValue('if');
 
-                if (! $can) {
-                    throw new Error('Not authorized to access resource');
+                    collect($policies)->each(function (string $policy) use ($user, $model) {
+                        if (!$user->can($policy, $model)) {
+                            throw new Error('Not authorized to access this field.');
+                        }
+                    });
+
+                    return call_user_func_array($resolver, func_get_args());
                 }
-
-                return call_user_func_array($resolver, $args);
-            }
-        ));
+            )
+        );
     }
 }

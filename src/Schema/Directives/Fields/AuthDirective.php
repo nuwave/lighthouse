@@ -27,10 +27,8 @@ class AuthDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $guard = $this->directiveArgValue('name');
-
-        return $value->setResolver(function () use ($guard) {
-            return auth($guard)->user();
+        return $value->setResolver(function (){
+            return auth()->user();
         });
     }
 }
