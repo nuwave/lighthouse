@@ -168,6 +168,36 @@ class QueryFilterDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanAttachTwoWhereFilterWithTheSameKeyToQuery()
+    {
+        $schema = '
+        type User {
+            id: ID!
+            name: String
+            email: String
+        }
+        type Query {
+            users(start: Int @where(key: "id", operator: ">"), end: Int @where(key: "id", operator: "<")): [User!]!
+                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+        }';
+
+        $user1 = $this->users->first()->getKey();
+        $user2 = $this->users->last()->getKey();
+        $query = '{
+            users(count: 5 start: '.$user1.' end: '.$user2.') {
+                data {
+                    id
+                }
+            }
+        }';
+
+        $result = $this->queryAndReturnResult($schema, $query);
+        $this->assertCount(3, array_get($result->data, 'users.data'));
+    }
+
+    /**
+     * @test
+     */
     public function itCanAttachWhereBetweenFilterToQuery()
     {
         $schema = '

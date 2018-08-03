@@ -17,11 +17,14 @@ trait HandlesQueryFilter
      */
     protected function injectFilter(ArgumentValue $argument, array $filter)
     {
-        $key = $this->queryFilterKey($argument);
+        $argName = $argument->getArgName();
         $query = QueryFilter::getInstance($argument);
 
+        // Here we create a composed key made up of argument name and key.
+        $key = $argName.'.'.$this->queryFilterKey($argument);
+
         $query->setFilter($key, array_merge([
-            'key' => $argument->getArgName(),
+            'key' => $argName,
         ], $filter));
 
         $argument->getField()->injectArg(
