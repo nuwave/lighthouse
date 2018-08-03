@@ -69,16 +69,10 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
     {
         $rules = $this->directiveArgValue('rules', []);
 
-        $messages = $this->directiveArgValue('messages', []);
-
         $current = $value->getValue();
         $current['rules'] = array_merge(
             array_get($value->getArg(), 'rules', []),
             $rules
-        );
-        $current['messages'] = array_merge(
-            array_get($value->getArg(), 'messages', []),
-            $messages
         );
 
         return $next($value->setValue($current));
