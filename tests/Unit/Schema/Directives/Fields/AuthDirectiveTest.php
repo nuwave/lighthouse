@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tests\TestCase;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class AuthDirectiveTest extends TestCase
 {
@@ -22,9 +22,11 @@ class AuthDirectiveTest extends TestCase
         type User {
             foo: String!
         }
+        
         type Query {
             user: User! @auth
-        }');
+        }
+        ');
 
         $query = $schema->getType('Query');
         $resolver = array_get($query->config['fields'](), 'user.resolve');

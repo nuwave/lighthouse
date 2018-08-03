@@ -10,6 +10,7 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
+use Tests\Utils\Policies\AuthServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -36,6 +37,7 @@ class TestCase extends BaseTestCase
         return [
             LighthouseServiceProvider::class,
             ScoutServiceProvider::class,
+            AuthServiceProvider::class,
         ];
     }
 
