@@ -72,26 +72,36 @@ class GraphQL
     protected $documentAST;
 
     /**
+     * Exception handler.
+     *
+     * @var Handler
+     */
+    protected $exceptionHandler;
+
+    /**
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry      $types
+     * @param TypeRegistry $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer     $nodes
+     * @param NodeContainer $nodes
      * @param ExtensionRegistry $extensions
+     * @param Handler $exceptionHandler
      */
     public function __construct(
         DirectiveRegistry $directives,
         TypeRegistry $types,
         MiddlewareManager $middleware,
         NodeContainer $nodes,
-        ExtensionRegistry $extensions
+        ExtensionRegistry $extensions,
+        Handler $exceptionHandler
     ) {
         $this->directives = $directives;
         $this->types = $types;
         $this->middleware = $middleware;
         $this->nodes = $nodes;
         $this->extensions = $extensions;
+        $this->exceptionHandler = $exceptionHandler;
     }
 
     /**
@@ -117,7 +127,7 @@ class GraphQL
     public function execute($query, $context = null, $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
-        $result->setErrorsHandler([app(config('lighthouse.handlers.error', Handler::class)), 'handler']);
+        $result->setErrorsHandler([$this->exceptionHandler(), 'handler']);
 
         $data = $result->toArray();
 
@@ -293,5 +303,15 @@ class GraphQL
     public function extensions(): ExtensionRegistry
     {
         return $this->extensions;
+    }
+
+    /**
+     * Get the instance of the exception handler.
+     *
+     * @return Handler
+     */
+    public function exceptionHandler(): Handler
+    {
+        return $this->exceptionHandler;
     }
 }

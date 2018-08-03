@@ -6,6 +6,7 @@ namespace Nuwave\Lighthouse\Support\Exceptions;
 use Exception;
 use GraphQL\Error\Error as GraphError;
 use GraphQL\Error\FormattedError;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use Nuwave\Lighthouse\Support\Contracts\Errorable;
 
@@ -63,6 +64,28 @@ class Handler
         }
 
         // Printing random error instead of message as we don't want to leak sensitive application info.
-        return Error::default();
+        return $this->convertExceptionToError($exception);
+    }
+
+
+    /**
+     * Convert the given exception to an array.
+     *
+     * @param  \Exception  $e
+     * @return Error
+     */
+    protected function convertExceptionToError(Exception $e) : Error
+    {
+        return config('app.debug') ?
+            Error::fromArray([
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => collect($e->getTrace())->map(function ($trace) {
+                    return Arr::except($trace, ['args']);
+                })->all(),
+            ])
+            : Error::default();
     }
 }

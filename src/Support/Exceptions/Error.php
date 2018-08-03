@@ -32,14 +32,22 @@ class Error implements Arrayable
         return new Error("Random error encountered.");
     }
 
+    /**
+     * Creates an error from an array.
+     * The array has to contain a `message` key and can contain
+     * other attributes which you would like to specify in the error.
+     *
+     * @param array $data
+     * @return Error
+     */
     public static function fromArray(array $data) : Error
     {
-        if(!Arr::has($data, ['message', 'locations'])) {
+        if(!Arr::has($data, ['message'])) {
             return Error::default();
         }
         return new Error(
             $data['message'],
-            $data['locations'],
+            $data['locations'] ?? null,
             Arr::except($data, ['message', 'locations'])
         );
     }
