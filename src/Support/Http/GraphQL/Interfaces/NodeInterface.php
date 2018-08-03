@@ -2,12 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Http\GraphQL\Interfaces;
 
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
-
 class NodeInterface
 {
-    use HandlesGlobalId;
-
     /**
      * Resolve node value.
      *

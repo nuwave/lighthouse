@@ -2,16 +2,17 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\ObjectValueNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Support\Utils\DirectiveUtil;
 
 /**
- * Trait HandlesDirectives
- * @package Nuwave\Lighthouse\Support\Traits
- * @deprecated Use the BaseDirective class instead
+ * Trait HandlesDirectives.
+ *
+ * @deprecated Use the BaseDirective class or DirectiveUtil instead
  */
 trait HandlesDirectives
 {
@@ -36,13 +37,14 @@ trait HandlesDirectives
      * @param FieldDefinitionNode $field
      * @param string              $name
      *
+     * @deprecated this method will be depreciated in the next version in
+     * favor of the DirectiveUtil class
+     *
      * @return DirectiveNode
      */
     protected function fieldDirective($field, $name)
     {
-        return collect($field->directives)->first(function (DirectiveNode $directive) use ($name) {
-            return $directive->name->value === $name;
-        });
+        return DirectiveUtil::fieldDirective($field, $name);
     }
 
     /**
@@ -52,15 +54,14 @@ trait HandlesDirectives
      * @param string        $name
      * @param mixed         $default
      *
+     * @deprecated this method will be depreciated in the next version in
+     * favor of the DirectiveUtil class
+     *
      * @return mixed
      */
     protected function directiveArgValue(DirectiveNode $directive, $name, $default = null)
     {
-        $arg = collect($directive->arguments)->first(function ($arg) use ($name) {
-            return $arg->name->value === $name;
-        });
-
-        return $arg ? $this->argValue($arg) : $default;
+        return DirectiveUtil::directiveArgValue($directive, $name, $default);
     }
 
     /**
@@ -69,29 +70,14 @@ trait HandlesDirectives
      * @param mixed $arg
      * @param mixed $default
      *
+     * @deprecated this method will be depreciated in the next version in
+     * favor of the DirectiveUtil class
+     *
      * @return mixed
      */
     protected function argValue($arg, $default = null)
     {
-        $value = data_get($arg, 'value');
-
-        if (! $value) {
-            return $default;
-        }
-
-        if ($value instanceof ListValueNode) {
-            return collect($value->values)->map(function ($node) {
-                return $node->value;
-            })->toArray();
-        }
-
-        if ($value instanceof ObjectValueNode) {
-            return collect($value->fields)->mapWithKeys(function ($field) {
-                return [$field->name->value => $this->argValue($field)];
-            })->toArray();
-        }
-
-        return $value->value;
+        return DirectiveUtil::argValue($arg, $default);
     }
 
     /**

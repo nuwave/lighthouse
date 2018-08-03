@@ -2,6 +2,12 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use Nuwave\Lighthouse\Schema\Execution\Utils\GlobalIdUtil;
+
+/**
+ * @deprecated use the GlobalIdUtil class instead, this trait
+ * will be removed in the next version
+ */
 trait HandlesGlobalId
 {
     /**
@@ -14,13 +20,7 @@ trait HandlesGlobalId
      */
     public function encodeGlobalId($type, $id)
     {
-        $resolver = config('lighthouse.globalId.encode');
-
-        if (is_callable($resolver)) {
-            return $resolver($type, $id);
-        }
-
-        return base64_encode($type.':'.$id);
+        return GlobalIdUtil::encodeGlobalId($type, $id);
     }
 
     /**
@@ -32,7 +32,7 @@ trait HandlesGlobalId
      */
     public function decodeGlobalId($id)
     {
-        return explode(':', base64_decode($id));
+        return GlobalIdUtil::decodeGlobalId($id);
     }
 
     /**
@@ -44,15 +44,7 @@ trait HandlesGlobalId
      */
     public function decodeRelayId($id)
     {
-        $resolver = config('lighthouse.globalId.decodeId');
-
-        if (is_callable($resolver)) {
-            return $resolver($id);
-        }
-
-        list($type, $id) = $this->decodeGlobalId($id);
-
-        return $id;
+        return GlobalIdUtil::decodeRelayId($id);
     }
 
     /**
@@ -64,15 +56,7 @@ trait HandlesGlobalId
      */
     public function decodeRelayType($id)
     {
-        $resolver = config('lighthouse.globalId.decodeType');
-
-        if (is_callable($resolver)) {
-            return $resolver($id);
-        }
-
-        list($type, $id) = $this->decodeGlobalId($id);
-
-        return $type;
+        return GlobalIdUtil::decodeRelayType($id);
     }
 
     /**
@@ -84,15 +68,7 @@ trait HandlesGlobalId
      */
     protected function decodeCursor(array $args)
     {
-        $resolver = config('lighthouse.globalId.decodeCursor');
-
-        if (is_callable($resolver)) {
-            return $resolver($args);
-        }
-
-        return isset($args['after']) && ! empty($args['after'])
-            ? $this->getCursorId($args['after'])
-            : 0;
+        return GlobalIdUtil::decodeCursor($args);
     }
 
     /**
@@ -104,12 +80,6 @@ trait HandlesGlobalId
      */
     protected function getCursorId($cursor)
     {
-        $resolver = config('lighthouse.globalId.getCursorId');
-
-        if (is_callable($resolver)) {
-            return $resolver($cursor);
-        }
-
-        return (int) $this->decodeRelayId($cursor);
+        return GlobalIdUtil::getCursorId($cursor);
     }
 }

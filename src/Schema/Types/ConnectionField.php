@@ -4,12 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Types;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Schema\Execution\Utils\GlobalIdUtil;
 
 class ConnectionField
 {
-    use HandlesGlobalId;
-
     /**
      * Resolve page info for connection.
      *
@@ -32,11 +30,11 @@ class ConnectionField
         $lastPage = $root->lastPage();
         $hasNextPage = $root->hasMorePages();
         $hasPreviousPage = $root->currentPage() > 1;
-        $startCursor = $this->encodeGlobalId(
+        $startCursor = GlobalIdUtil::encodeGlobalId(
             'arrayconnection',
             $root->firstItem()
         );
-        $endCursor = $this->encodeGlobalId(
+        $endCursor = GlobalIdUtil::encodeGlobalId(
             'arrayconnection',
             $root->lastItem()
         );
@@ -73,7 +71,7 @@ class ConnectionField
 
         return $root->values()->map(function ($item, $x) use ($first) {
             $cursor = $first + $x;
-            $encodedCursor = $this->encodeGlobalId('arrayconnection', $cursor);
+            $encodedCursor = GlobalIdUtil::encodeGlobalId('arrayconnection', $cursor);
 
             return ['cursor' => $encodedCursor, 'node' => $item];
         });
