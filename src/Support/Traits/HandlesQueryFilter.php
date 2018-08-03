@@ -20,7 +20,7 @@ trait HandlesQueryFilter
         $argName = $argument->getArgName();
         $query = QueryFilter::getInstance($argument);
 
-        // Here we create a composed made up of argName and key.
+        // Here we create a composed key made up of argument name and key.
         $key = $argName.'.'.$this->queryFilterKey($argument);
 
         $query->setFilter($key, array_merge([
