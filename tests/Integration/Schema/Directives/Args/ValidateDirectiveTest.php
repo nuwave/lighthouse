@@ -15,7 +15,7 @@ class ValidateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function it_can_add_messages_to_validation()
+    public function itCanAddMessagesToValidation()
     {
         $users = factory(User::class, 10)->create();
 
@@ -47,7 +47,7 @@ class ValidateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function it_can_throw_validation_exceptions()
+    public function itCanThrowValidationExceptions()
     {
         $users = factory(User::class, 10)->create();
 

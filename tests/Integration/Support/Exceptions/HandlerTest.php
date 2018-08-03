@@ -13,7 +13,7 @@ use Tests\Utils\Models\User;
 class HandlerTest extends DBTestCase
 {
     /** @test */
-    public function can_implement_custom_exception()
+    public function canImplementCustomException()
     {
         $schema = '
         type User {
@@ -37,7 +37,7 @@ class HandlerTest extends DBTestCase
     }
 
     /** @test */
-    public function can_convert_exception_to_default_error()
+    public function canConvertExceptionToDefaultError()
     {
         $schema = '
         type User {
@@ -61,7 +61,7 @@ class HandlerTest extends DBTestCase
     }
 
     /** @test */
-    public function can_convert_exception_to_error_in_debugging()
+    public function canConvertExceptionToErrorInDebugging()
     {
         $this->app['config']->set('app.debug', true);
 
