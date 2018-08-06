@@ -12,6 +12,8 @@ class DateTime extends ScalarType
 {
     public $name = 'DateTime';
 
+    public $description = 'A date string with format Y-m-d H:i:s. Example: "2018-01-01 13:00:00"';
+
     public function serialize($value)
     {
         return $value->toAtomString();
