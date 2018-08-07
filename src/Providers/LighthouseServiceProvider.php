@@ -21,11 +21,12 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('lighthouse.php'),
             __DIR__.'/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
         ]);
-        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
+
 
         if (config('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
