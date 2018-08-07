@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
 use GraphQL\Deferred;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class BatchLoader
 {
@@ -33,7 +33,7 @@ abstract class BatchLoader
      */
     public static function key(Model $root, $relation, ResolveInfo $info = null)
     {
-        $path = ! empty(data_get($info, 'path')) ? array_last($info->path) : $relation;
+        $path = ! empty(data_get($info, 'path')) ? implode('_', $info->path) : $relation;
 
         return camel_case($root->getTable().'_'.$path);
     }
