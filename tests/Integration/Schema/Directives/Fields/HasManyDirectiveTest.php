@@ -125,6 +125,55 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanQueryHasManyNestedRelationships()
+    {
+        $schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type:"relay")
+        }
+        type Task {
+            id: Int!
+            user: User @belongsTo
+        }
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->queryAndReturnResult($schema, '
+        { 
+            user { 
+                tasks(first: 2) { 
+                    pageInfo { 
+                        hasNextPage 
+                    } 
+                    edges { 
+                        node { 
+                            id
+                            user {
+                                tasks(first: 2) {
+                                    edges {
+                                        node {
+                                            id
+                                        }
+                                    }
+                                }
+                            }
+                        } 
+                    } 
+                } 
+            } 
+        }
+        ');
+
+        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
+    }
+
+    /**
+     * @test
+     */
     public function itThrowsErrorWithUnknownTypeArg()
     {
         $this->expectException(DirectiveException::class);
