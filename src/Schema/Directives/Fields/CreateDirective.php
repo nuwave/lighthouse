@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class CreateDirective extends BaseDirective implements FieldResolver
 {
@@ -28,8 +28,14 @@ class CreateDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        return $value->setResolver(function ($root, array $args){
-            return $this->getModelClass()::create($args);
+        return $value->setResolver(function ($root, $args) {
+            $modelClassName = $this->getModelClass();
+            $model = new $modelClassName();
+
+            $flatten = $this->directiveArgValue('flatten', false);
+            $args = $flatten ? reset($args) : $args;
+
+            return MutationExecutor::executeCreate($model, collect($args));
         });
     }
 }
