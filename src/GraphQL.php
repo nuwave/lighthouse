@@ -7,6 +7,7 @@ use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -156,9 +157,9 @@ class GraphQL
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
         $this->extensions->requestDidStart(new ExtensionRequest([
-            'request' => request(),
+            'request' => Request::instance(),
             'query_string' => $query,
-            'operationName' => request()->input('operationName'),
+            'operationName' => Request::input('operationName'),
             'variables' => $variables,
         ]));
 
@@ -169,7 +170,7 @@ class GraphQL
             $rootValue,
             $context,
             $variables,
-            request()->input('operationName')
+            Request::input('operationName')
         );
 
         $result->extensions = $this->extensions->toArray();
