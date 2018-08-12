@@ -36,8 +36,6 @@ class NodeContainer
      * @param string  $type
      * @param \Closure $resolver
      * @param \Closure $resolveType
-     *
-     * @return mixed
      */
     public function node($type, \Closure $resolver, \Closure $resolveType)
     {

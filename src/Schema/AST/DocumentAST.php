@@ -71,6 +71,8 @@ class DocumentAST implements \Serializable
 
     /**
      * Construct from the string representation.
+     *
+     * @param $serialized
      */
     public function unserialize($serialized)
     {

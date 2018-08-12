@@ -64,8 +64,8 @@ class CacheDirectiveTest extends DBTestCase
         {
             user {
                 name
-             }
-         }
+            }
+        }
         ';
         $result = $this->execute($schema, $query);
 

@@ -165,8 +165,6 @@ class FieldFactory
      * @param \Closure                       $resolver
      * @param \Illuminate\Support\Collection $inputValueDefinitions
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ValidationError
-     *
      * @return \Closure
      */
     protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure

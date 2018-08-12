@@ -143,7 +143,7 @@ class ValueFactory
      *
      * @param array $arguments
      *
-     * @return mixed|CacheValue
+     * @return CacheValue
      */
     public function cache(array $arguments)
     {

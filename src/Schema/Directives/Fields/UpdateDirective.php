@@ -29,7 +29,6 @@ class UpdateDirective extends BaseDirective implements FieldResolver
      * @param FieldValue $value
      *
      * @return FieldValue
-     * @throws DirectiveException
      */
     public function resolveField(FieldValue $value)
     {

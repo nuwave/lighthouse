@@ -4,9 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Carbon\Carbon;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Type\Definition\NonNull;
-use GraphQL\Type\Definition\ListOfType;
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;

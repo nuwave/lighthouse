@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Client;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Tests\TestCase;
+use GraphQL\Type\Definition\ResolveInfo;
 
 class ClientDirectiveTest extends TestCase
 {
@@ -20,7 +20,11 @@ class ClientDirectiveTest extends TestCase
             foo: String @field(resolver: "'.$resolver.'")
         }
         ';
-        $query = '{ foo @filter(key: "baz") }';
+        $query = '
+        {
+            foo @filter(key: "baz")
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
 
         $this->assertEquals(['foo' => 'baz'], $result->data);

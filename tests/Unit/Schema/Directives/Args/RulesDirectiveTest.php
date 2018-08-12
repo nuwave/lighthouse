@@ -164,13 +164,16 @@ class RulesDirectiveTest extends TestCase
                 )
             ): String
         }
+        
         type Mutation {
             foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
         }
+        
         type Query {
             foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
     }
 }
