@@ -9,8 +9,9 @@ use GraphQL\Error\FormattedError;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use Nuwave\Lighthouse\Support\Contracts\Errorable;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 
-class Handler
+class Handler implements ExceptionHandler
 {
     /**
      * @param array|GraphError[] $errors

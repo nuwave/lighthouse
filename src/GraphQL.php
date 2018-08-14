@@ -14,6 +14,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 use Nuwave\Lighthouse\Support\Exceptions\Handler;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
@@ -86,7 +87,7 @@ class GraphQL
      * @param MiddlewareManager $middleware
      * @param NodeContainer $nodes
      * @param ExtensionRegistry $extensions
-     * @param Handler $exceptionHandler
+     * @param ExceptionHandler $exceptionHandler
      */
     public function __construct(
         DirectiveRegistry $directives,
@@ -94,7 +95,7 @@ class GraphQL
         MiddlewareManager $middleware,
         NodeContainer $nodes,
         ExtensionRegistry $extensions,
-        Handler $exceptionHandler
+        ExceptionHandler $exceptionHandler
     ) {
         $this->directives = $directives;
         $this->types = $types;
@@ -308,9 +309,9 @@ class GraphQL
     /**
      * Get the instance of the exception handler.
      *
-     * @return Handler
+     * @return ExceptionHandler
      */
-    public function exceptionHandler(): Handler
+    public function exceptionHandler(): ExceptionHandler
     {
         return $this->exceptionHandler;
     }
