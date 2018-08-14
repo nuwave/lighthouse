@@ -193,9 +193,7 @@ class FieldFactory
                     ]
                 );
 
-                if ($validator->fails()) {
-                    throw with(new ValidationError('validation'))->setValidator($validator);
-                }
+                $validator->validate();
             }
 
             return call_user_func_array($resolver, [$rootValue, $inputArgs, $context, $resolveInfo]);

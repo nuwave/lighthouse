@@ -15,14 +15,14 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
+use Nuwave\Lighthouse\Support\Exceptions\Handler;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
-    use CanFormatError;
 
     /**
      * Directive registry container.
@@ -74,26 +74,36 @@ class GraphQL
     protected $documentAST;
 
     /**
+     * Exception handler.
+     *
+     * @var Handler
+     */
+    protected $exceptionHandler;
+
+    /**
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry      $types
+     * @param TypeRegistry $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer     $nodes
+     * @param NodeContainer $nodes
      * @param ExtensionRegistry $extensions
+     * @param ExceptionHandler $exceptionHandler
      */
     public function __construct(
         DirectiveRegistry $directives,
         TypeRegistry $types,
         MiddlewareManager $middleware,
         NodeContainer $nodes,
-        ExtensionRegistry $extensions
+        ExtensionRegistry $extensions,
+        ExceptionHandler $exceptionHandler
     ) {
         $this->directives = $directives;
         $this->types = $types;
         $this->middleware = $middleware;
         $this->nodes = $nodes;
         $this->extensions = $extensions;
+        $this->exceptionHandler = $exceptionHandler;
     }
 
     /**
@@ -119,29 +129,15 @@ class GraphQL
     public function execute($query, $context = null, $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
+        $result->setErrorsHandler([$this->exceptionHandler(), 'handler']);
 
-        $output = [
-            'data' => $result->data,
-            'extensions' => $result->extensions,
-        ];
+        $data = $result->toArray();
 
-        if (! empty($result->errors)) {
-            foreach ($result->errors as $error) {
-                if ($error instanceof \Exception) {
-                    info('GraphQL Error:', [
-                        'code' => $error->getCode(),
-                        'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
-                    ]);
-                }
-            }
-
-            $output = array_merge($output, [
-                'errors' => array_map([$this, 'formatError'], $result->errors),
-            ]);
+        if(!isset($data['extensions'])) {
+            $data['extensions'] = [];
         }
 
-        return $output;
+        return $data;
     }
 
     /**
@@ -310,5 +306,15 @@ class GraphQL
     public function extensions(): ExtensionRegistry
     {
         return $this->extensions;
+    }
+
+    /**
+     * Get the instance of the exception handler.
+     *
+     * @return ExceptionHandler
+     */
+    public function exceptionHandler(): ExceptionHandler
+    {
+        return $this->exceptionHandler;
     }
 }

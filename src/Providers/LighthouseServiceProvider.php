@@ -11,6 +11,8 @@ use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Extensions\TraceExtension;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
+use Nuwave\Lighthouse\Support\Exceptions\Handler;
 use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
 use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
 
@@ -60,6 +62,7 @@ class LighthouseServiceProvider extends ServiceProvider
     {
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
+        $this->app->bind(ExceptionHandler::class, Handler::class);
 
         $this->app->singleton(ValueFactory::class);
 
