@@ -3,7 +3,6 @@
 namespace Tests;
 
 use GraphQL\Type\Schema;
-use GraphQL\Language\Parser;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -75,18 +74,6 @@ class TestCase extends BaseTestCase
             'lighthouse.namespaces.models',
             'Tests\\Utils\\Models'
         );
-    }
-
-    /**
-     * Parse raw schema.
-     *
-     * @param string $schema
-     *
-     * @return \GraphQL\Language\AST\DocumentNode
-     */
-    protected function parse($schema)
-    {
-        return Parser::parse($schema);
     }
 
     /**
