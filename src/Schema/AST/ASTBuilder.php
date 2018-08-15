@@ -193,9 +193,9 @@ class ASTBuilder
 
         // Double slashes to escape the slashes in the namespace.
         $interface = PartialParser::interfaceTypeDefinition("
-            # Node global interface
+            \"Node global interface\"
             interface Node @interface(resolver: \"Nuwave\\\\Lighthouse\\\\Support\\\\Http\\\\GraphQL\\\\Interfaces\\\\NodeInterface@resolve\") {
-              # Global identifier that can be used to resolve any Node implementation.
+              \"Global identifier that can be used to resolve any Node implementation.\"
               $globalId: ID!
             }
         ");
@@ -219,28 +219,28 @@ class ASTBuilder
     {
         $paginatorInfo = PartialParser::objectTypeDefinition('
         type PaginatorInfo {
-          # Total count of available items in the page.
+          "Total count of available items in the page."
           count: Int!
         
-          # Current pagination page.
+          "Current pagination page."
           currentPage: Int!
         
-          # Index of first item in the current page.
+          "Index of first item in the current page."
           firstItem: Int!
         
-          # If collection has more pages.
+          "If collection has more pages."
           hasMorePages: Boolean!
         
-          # Index of last item in the current page.
+          "Index of last item in the current page."
           lastItem: Int!
         
-          # Last page number of the collection.
+          "Last page number of the collection."
           lastPage: Int!
         
-          # Number of items per page in the collection.
+          "Number of items per page in the collection."
           perPage: Int!
         
-          # Total items available in the collection.
+          "Total items available in the collection."
           total: Int!
         }
         ');
@@ -248,28 +248,28 @@ class ASTBuilder
 
         $pageInfo = PartialParser::objectTypeDefinition('
         type PageInfo {
-          # When paginating forwards, are there more items?
+          "When paginating forwards, are there more items?"
           hasNextPage: Boolean!
         
-          # When paginating backwards, are there more items?
+          "When paginating backwards, are there more items?"
           hasPreviousPage: Boolean!
         
-          # When paginating backwards, the cursor to continue.
+          "When paginating backwards, the cursor to continue."
           startCursor: String
         
-          # When paginating forwards, the cursor to continue.
+          "When paginating forwards, the cursor to continue."
           endCursor: String
         
-          # Total number of node in connection.
+          "Total number of node in connection."
           total: Int
         
-          # Count of nodes in current request.
+          "Count of nodes in current request."
           count: Int
         
-          # Current page of request.
+          "Current page of request."
           currentPage: Int
         
-          # Last page in connection.
+          "Last page in connection."
           lastPage: Int
         }
         ');
