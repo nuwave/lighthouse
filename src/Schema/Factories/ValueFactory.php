@@ -34,7 +34,7 @@ class ValueFactory
     /**
      * Cache value resolver.
      *
-     * @var Closure
+     * @var \Closure
      */
     protected $cache;
 
@@ -43,9 +43,9 @@ class ValueFactory
      *
      * @param \Closure $resolver
      *
-     * @return self
+     * @return ValueFactory
      */
-    public function nodeResolver(\Closure $resolver)
+    public function nodeResolver(\Closure $resolver): ValueFactory
     {
         $this->node = $resolver;
 
@@ -57,9 +57,9 @@ class ValueFactory
      *
      * @param \Closure $resolver
      *
-     * @return self
+     * @return ValueFactory
      */
-    public function fieldResolver(\Closure $resolver)
+    public function fieldResolver(\Closure $resolver): ValueFactory
     {
         $this->field = $resolver;
 
@@ -71,9 +71,9 @@ class ValueFactory
      *
      * @param \Closure $resolver
      *
-     * @return self
+     * @return ValueFactory
      */
-    public function argResolver(\Closure $resolver)
+    public function argResolver(\Closure $resolver): ValueFactory
     {
         $this->arg = $resolver;
 
@@ -85,9 +85,9 @@ class ValueFactory
      *
      * @param \Closure $resolver
      *
-     * @return self
+     * @return ValueFactory
      */
-    public function cacheResolver(\Closure $resolver)
+    public function cacheResolver(\Closure $resolver): ValueFactory
     {
         $this->cache = $resolver;
 
@@ -101,7 +101,7 @@ class ValueFactory
      *
      * @return NodeValue
      */
-    public function node(TypeDefinitionNode $node)
+    public function node(TypeDefinitionNode $node): NodeValue
     {
         return $this->node
             ? call_user_func($this->node, $node)
@@ -116,7 +116,7 @@ class ValueFactory
      *
      * @return FieldValue
      */
-    public function field(NodeValue $nodeValue, $field)
+    public function field(NodeValue $nodeValue, $field): FieldValue
     {
         return $this->field
             ? call_user_func($this->field, $nodeValue, $field)
@@ -131,7 +131,7 @@ class ValueFactory
      *
      * @return ArgumentValue
      */
-    public function arg(FieldValue $fieldValue, $arg)
+    public function arg(FieldValue $fieldValue, $arg): ArgumentValue
     {
         return $this->arg
             ? call_user_func($this->arg, $fieldValue, $arg)
@@ -145,7 +145,7 @@ class ValueFactory
      *
      * @return mixed|CacheValue
      */
-    public function cache(array $arguments)
+    public function cache(array $arguments): CacheValue
     {
         return $this->cache
             ? call_user_func($this->cache, $arguments)

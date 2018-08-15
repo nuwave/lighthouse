@@ -316,7 +316,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertEquals($result, $cache);
     }
 
-    public function resolve()
+    public function resolve(): array
     {
         return [
             'id' => 1,

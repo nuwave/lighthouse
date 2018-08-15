@@ -22,9 +22,11 @@ class ExtensionRegistry
      *
      * @param GraphQLExtension $extension
      */
-    public function register(GraphQLExtension $extension)
+    public function register(GraphQLExtension $extension): ExtensionRegistry
     {
         $this->extensions->put($extension->name(), $extension);
+
+        return $this;
     }
 
     /**
@@ -32,11 +34,13 @@ class ExtensionRegistry
      *
      * @param array $extensions
      */
-    public function registerMany($extensions)
+    public function registerMany(array $extensions): ExtensionRegistry
     {
         foreach ($extensions as $extension) {
             $this->register($extension);
         }
+
+        return $this;
     }
 
     /**
@@ -46,7 +50,7 @@ class ExtensionRegistry
      *
      * @return GraphQLExtension|null
      */
-    public function get($name)
+    public function get(string $name)
     {
         return $this->extensions->get($name);
     }
@@ -56,7 +60,7 @@ class ExtensionRegistry
      *
      * @return \Illuminate\Support\Collection
      */
-    public function active()
+    public function active(): Collection
     {
         $extensions = config('lighthouse.extensions', []);
 
@@ -72,11 +76,13 @@ class ExtensionRegistry
      *
      * @param ExtensionRequest $request
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function requestDidStart(ExtensionRequest $request): ExtensionRegistry
     {
         $this->active()->each(function (GraphQLExtension $extension) use ($request) {
             $extension->requestDidStart($request);
         });
+
+        return $this;
     }
 
     /**
@@ -84,7 +90,7 @@ class ExtensionRegistry
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->active()
             ->mapWithKeys(function (GraphQLExtension $extension) {
