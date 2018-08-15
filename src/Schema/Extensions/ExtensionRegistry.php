@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Support\Collection;
+
 class ExtensionRegistry
 {
     /**
@@ -58,7 +60,7 @@ class ExtensionRegistry
     /**
      * Get active extensions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function active(): Collection
     {
