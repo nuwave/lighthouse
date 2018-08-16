@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;

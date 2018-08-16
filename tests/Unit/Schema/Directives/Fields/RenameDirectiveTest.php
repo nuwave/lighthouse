@@ -15,10 +15,12 @@ class RenameDirectiveTest extends TestCase
         $schema = $this->buildSchemaWithDefaultQuery('
         type Foo {
             fooBar: String! @rename(attribute: "foo_bar")
-        }');
+        }
+        ');
         $type = $schema->getType('Foo');
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'fooBar.resolve');
+
         $this->assertEquals('bar', $resolver(['foo_bar' => 'bar', 'fooBar' => 'baz'], []));
     }
 
@@ -31,7 +33,8 @@ class RenameDirectiveTest extends TestCase
         $schema = $this->buildSchemaWithDefaultQuery('
         type Foo {
             fooBar: String! @rename
-        }');
+        }
+        ');
 
         $type = $schema->getType('Foo');
         $type->config['fields']();

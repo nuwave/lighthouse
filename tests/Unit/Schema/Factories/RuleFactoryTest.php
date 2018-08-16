@@ -16,7 +16,8 @@ class RuleFactoryTest extends TestCase
         $documentAST = ASTBuilder::generate('
         type Mutation {
             createUser(email: String @rules(apply: ["required", "email"])): String
-        }');
+        }
+        ');
 
         $rules = (new RuleFactory())->build(
             $documentAST,
@@ -39,9 +40,11 @@ class RuleFactoryTest extends TestCase
         input UserInput {
             email: String @rules(apply: ["required", "email"])
         }
+        
         type Mutation {
             createUser(input: UserInput @rules(apply: ["required"])): String
-        }');
+        }
+        ');
 
         $variables = [
             'input' => [
@@ -77,13 +80,16 @@ class RuleFactoryTest extends TestCase
                 }
             )
         }
+        
         input UserInput {
             email: String @rules(apply: ["required", "email"])
             address: AddressInput @rules(apply: ["required"])
         }
+        
         type Mutation {
             createUser(input: UserInput @rules(apply: ["required"])): String
-        }');
+        }
+        ');
 
         $variables = [
             'input' => [
@@ -128,13 +134,16 @@ class RuleFactoryTest extends TestCase
                 }
             )
         }
+        
         input UserInput {
             email: String @rules(apply: ["required", "email"])
             address: [AddressInput] @rules(apply: ["required"])
         }
+        
         type Mutation {
             createUser(input: UserInput @rules(apply: ["required"])): String
-        }');
+        }
+        ');
 
         $variables = [
             'input' => [
@@ -180,13 +189,16 @@ class RuleFactoryTest extends TestCase
             )
             setting: Setting
         }
+        
         input UserInput {
             email: String @rules(apply: ["required", "email"])
             settings: [Setting] @rules(apply: ["required"])
         }
+        
         type Mutation {
             createUser(input: UserInput @rules(apply: ["required"])): String
-        }');
+        }
+        ');
 
         $variables = [
             'input' => [
@@ -234,7 +246,8 @@ class RuleFactoryTest extends TestCase
         $documentAST = ASTBuilder::generate('
         type Mutation {
             createFoo(required: String @rules(apply: ["required"])): String
-        }');
+        }
+        ');
 
         $rules = (new RuleFactory())->build(
             $documentAST,
@@ -257,13 +270,15 @@ class RuleFactoryTest extends TestCase
         input FooInput {
             required: String @rules(apply: ["required"])
         }
+        
         type Mutation {
             createFoo(
                 requiredSDL: FooInput!
                 requiredRules: FooInput @rules(apply: ["required"])
                 requiredBoth: FooInput! @rules(apply: ["required"])
             ): String
-        }');
+        }
+        ');
 
         $rules = (new RuleFactory())->build(
             $documentAST,
@@ -295,9 +310,11 @@ class RuleFactoryTest extends TestCase
                 }
             )
         }
+        
         type Mutation {
             createFoo(input: FooInput @rules(apply: ["required"])): String
-        }');
+        }
+        ');
 
         $variables = [
             'input' => [
@@ -333,9 +350,11 @@ class RuleFactoryTest extends TestCase
         input Foo {
             bar: Int @rules(apply: ["required"])
         }
+        
         type Mutation {
             foo(input: Foo): String
         }
+        
         type Query {
             foo(input: Foo): String
         }

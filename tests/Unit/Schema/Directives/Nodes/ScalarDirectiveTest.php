@@ -66,7 +66,7 @@ class ScalarDirectiveTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $this->buildSchemaWithDefaultQuery('
         scalar WhatEver
         ');
     }
@@ -78,7 +78,7 @@ class ScalarDirectiveTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $this->buildSchemaWithDefaultQuery('
         scalar DateTime @scalar(class: "WhatEver")
         ');
     }

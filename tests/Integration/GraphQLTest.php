@@ -20,6 +20,7 @@ class GraphQLTest extends DBTestCase
         updated_at: String!
         tasks: [Task!]! @hasMany
     }
+    
     type Task {
         id: ID!
         name: String!
@@ -27,6 +28,7 @@ class GraphQLTest extends DBTestCase
         updated_at: String!
         user: User! @belongsTo
     }
+    
     type Query {
         user: User @auth
     }
@@ -54,6 +56,7 @@ class GraphQLTest extends DBTestCase
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
+
         $app['config']->set('lighthouse.route_enable_get', true);
     }
 

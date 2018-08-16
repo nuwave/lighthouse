@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Support\Collection;
+
 class ExtensionRegistry
 {
     /**
@@ -18,9 +20,11 @@ class ExtensionRegistry
     }
 
     /**
-     * Register graphql extension.
+     * Register a single GraphQL extension.
      *
      * @param GraphQLExtension $extension
+     *
+     * @return ExtensionRegistry
      */
     public function register(GraphQLExtension $extension)
     {
@@ -28,9 +32,11 @@ class ExtensionRegistry
     }
 
     /**
-     * Register graphql extensions.
+     * Register multiple GraphQL extensions.
      *
      * @param array $extensions
+     *
+     * @return ExtensionRegistry
      */
     public function registerMany($extensions)
     {
@@ -40,9 +46,9 @@ class ExtensionRegistry
     }
 
     /**
-     * Get extension.
+     * Get extension by name.
      *
-     * @param name $name
+     * @param string $name
      *
      * @return GraphQLExtension|null
      */
@@ -54,7 +60,7 @@ class ExtensionRegistry
     /**
      * Get active extensions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function active()
     {
@@ -71,6 +77,8 @@ class ExtensionRegistry
      * Handle request start.
      *
      * @param ExtensionRequest $request
+     *
+     * @return ExtensionRegistry
      */
     public function requestDidStart(ExtensionRequest $request)
     {

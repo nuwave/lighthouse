@@ -17,13 +17,15 @@ class ASTHelperTest extends TestCase
         type User {
             first_name: String
             email: String
-        }');
+        }
+        ');
 
         $objectType2 = PartialParser::objectTypeDefinition('
         type User {
             first_name: String @foo
             last_name: String
-        }');
+        }
+        ');
 
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,

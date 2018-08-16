@@ -73,7 +73,7 @@ class NodeResolver
      *
      * @param NamedTypeNode $node
      *
-     * @return mixed
+     * @return Type
      */
     protected function convertNamedType(NamedTypeNode $node)
     {

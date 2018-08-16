@@ -1,10 +1,8 @@
 <?php
 
-use Faker\Generator as Faker;
-use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
+use Faker\Generator as Faker;
 
 $factory->define(Post::class, function (Faker $faker) {
     return [

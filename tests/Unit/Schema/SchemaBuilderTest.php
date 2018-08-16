@@ -2,13 +2,12 @@
 
 namespace Tests\Unit\Schema;
 
+use Tests\TestCase;
+use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputType;
-use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Type\Schema;
-use Tests\TestCase;
+use GraphQL\Type\Definition\InterfaceType;
 
 class SchemaBuilderTest extends TestCase
 {
@@ -160,6 +159,7 @@ class SchemaBuilderTest extends TestCase
         type Foo {
             bar: String!
         }
+        
         extend type Foo {
             baz: String!
         }
@@ -179,6 +179,7 @@ class SchemaBuilderTest extends TestCase
         type Query {
             foo: String!
         }
+        
         extend type Query {
             bar: String!
         }
@@ -198,6 +199,7 @@ class SchemaBuilderTest extends TestCase
         type Mutation {
             foo: String!
         }
+        
         extend type Mutation {
             bar: String!
         }
@@ -214,13 +216,13 @@ class SchemaBuilderTest extends TestCase
     public function itCanGenerateGraphQLSchema()
     {
         $schema = $this->buildSchemaFromString('
-            type Query {
-                foo: String!
-            }
+        type Query {
+            foo: String!
+        }
 
-            type Mutation {
-                foo: String!
-            }
+        type Mutation {
+            foo: String!
+        }
         ');
 
         $this->assertInstanceOf(Schema::class, $schema);
