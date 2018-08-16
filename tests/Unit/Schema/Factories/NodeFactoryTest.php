@@ -2,14 +2,15 @@
 
 namespace Tests\Unit\Schema\Factories;
 
+use Tests\TestCase;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
-use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 
 class NodeFactoryTest extends TestCase
 {
@@ -47,7 +48,7 @@ class NodeFactoryTest extends TestCase
      */
     public function itCanTransformEnums()
     {
-        $schema = '
+        $enumNode = PartialParser::enumTypeDefinition('
         enum Role {
             "Company administrator."
             ADMIN @enum(value:"admin")
@@ -55,9 +56,7 @@ class NodeFactoryTest extends TestCase
             "Company employee."
             EMPLOYEE @enum(value:"employee")
         }
-        ';
-
-        $enumNode = $this->parse($schema)->definitions[0];
+        ');
         $type = $this->factory->handle(new NodeValue($enumNode));
 
         $this->assertInstanceOf(EnumType::class, $type);
@@ -69,15 +68,13 @@ class NodeFactoryTest extends TestCase
      */
     public function itCanTransformScalars()
     {
-        $schema = '
-        scalar DateTime @scalar(class:"DateTime")
-        ';
+        $scalarNode = PartialParser::scalarTypeDefinition('
+        scalar DateTime @scalar
+        ');
+        $scalarType = $this->factory->handle(new NodeValue($scalarNode));
 
-        $scalarNode = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($scalarNode));
-
-        $this->assertInstanceOf(ScalarType::class, $type);
-        $this->assertEquals('DateTime', $type->name);
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
+        $this->assertEquals('DateTime', $scalarType->name);
     }
 
     /**
@@ -85,18 +82,16 @@ class NodeFactoryTest extends TestCase
      */
     public function itCanTransformInterfaces()
     {
-        $schema = '
+        $interfaceNode = PartialParser::interfaceTypeDefinition('
         interface Node {
             _id: ID!
         }
-        ';
+        ');
+        $interfaceType = $this->factory->handle(new NodeValue($interfaceNode));
 
-        $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($interface));
-
-        $this->assertInstanceOf(InterfaceType::class, $type);
-        $this->assertEquals('Node', $type->name);
-        $this->assertArrayHasKey('_id', $type->config['fields']);
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
+        $this->assertEquals('Node', $interfaceType->name);
+        $this->assertArrayHasKey('_id', $interfaceType->config['fields']);
     }
 
     /**
@@ -104,18 +99,16 @@ class NodeFactoryTest extends TestCase
      */
     public function itCanTransformObjectTypes()
     {
-        $schema = '
+        $objectTypeNode = PartialParser::objectTypeDefinition('
         type User {
             foo(bar: String! @bcrypt): String!
         }
-        ';
+        ');
+        $objectType = $this->factory->handle(new NodeValue($objectTypeNode));
 
-        $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($interface));
-
-        $this->assertInstanceOf(ObjectType::class, $type);
-        $this->assertEquals('User', $type->name);
-        $this->assertArrayHasKey('foo', $type->config['fields']());
+        $this->assertInstanceOf(ObjectType::class, $objectType);
+        $this->assertEquals('User', $objectType->name);
+        $this->assertArrayHasKey('foo', $objectType->config['fields']());
     }
 
     /**
@@ -123,17 +116,15 @@ class NodeFactoryTest extends TestCase
      */
     public function itCanTransformInputObjectTypes()
     {
-        $schema = '
+        $inputNode = PartialParser::inputObjectTypeDefinition('
         input UserInput {
             foo: String!
         }
-        ';
+        ');
+        $inputType = $this->factory->handle(new NodeValue($inputNode));
 
-        $interface = $this->parse($schema)->definitions[0];
-        $type = $this->factory->handle(new NodeValue($interface));
-
-        $this->assertInstanceOf(InputObjectType::class, $type);
-        $this->assertEquals('UserInput', $type->name);
-        $this->assertArrayHasKey('foo', $type->config['fields']());
+        $this->assertInstanceOf(InputObjectType::class, $inputType);
+        $this->assertEquals('UserInput', $inputType->name);
+        $this->assertArrayHasKey('foo', $inputType->config['fields']());
     }
 }
