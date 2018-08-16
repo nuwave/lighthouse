@@ -44,6 +44,8 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
                 return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
             case self::PAGINATION_TYPE_PAGINATOR:
                 return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
+            default:
+                return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
         }
     }
 
@@ -66,6 +68,8 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
             case self::PAGINATION_TYPE_CONNECTION:
                 return $this->connectionTypeResolver($value, $model);
             case self::PAGINATION_TYPE_PAGINATOR:
+                return $this->paginatorTypeResolver($value, $model);
+            default:
                 return $this->paginatorTypeResolver($value, $model);
         }
     }

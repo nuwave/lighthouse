@@ -59,13 +59,13 @@ class NodeResolver
      *
      * @param mixed $node
      *
-     * @return mixed
+     * @return Type|null
      */
     protected function extractTypeFromNode($node)
     {
-        if ($node instanceof NamedTypeNode) {
-            return $this->convertNamedType($node);
-        }
+        return $node instanceof NamedTypeNode
+            ? $this->convertNamedType($node)
+            : null;
     }
 
     /**
@@ -75,7 +75,7 @@ class NodeResolver
      *
      * @return Type
      */
-    protected function convertNamedType(NamedTypeNode $node)
+    protected function convertNamedType(NamedTypeNode $node): Type
     {
         switch ($node->name->value) {
             case 'ID':

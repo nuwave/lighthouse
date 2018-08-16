@@ -250,7 +250,7 @@ class FieldFactory
                 $rules = data_get($inputValueDefinition, 'rules');
 
                 if (! $rules) {
-                    return;
+                    return null;
                 }
 
                 $rules = is_callable($rules)
