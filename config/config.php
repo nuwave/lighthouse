@@ -29,8 +29,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Additional configuration for the route group.
-    | This may be used to prefix the endpoints or to apply some
-    | middleware to all requests
+    | Check options here https://lumen.laravel.com/docs/routing#route-groups
     |
     */
     'route' => [
@@ -40,24 +39,50 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Directive registry
+    | Schema declaration
     |--------------------------------------------------------------------------
     |
-    | This package allows you to create your own server-side directives.
-    | List directories that will be scanned for custom directives.
-    | Hint: Directives must implement \Nuwave\Lighthouse\Schema\Directives\Directive
+    | This is a path that points to where your GraphQL schema is located
+    | relative to the app path. You should define your entire GraphQL
+    | schema in this file (additional files may be imported).
+    |
+    */
+    'schema' => [
+        'register' => base_path('routes/graphql/schema.graphql'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Schema Cache
+    |--------------------------------------------------------------------------
+    |
+    | A large part of the Schema generation is parsing into an AST.
+    | This operation is pretty expensive so it is recommended to enable
+    | caching in production mode.
+    |
+    */
+    'cache' => [
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
+        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Directives
+    |--------------------------------------------------------------------------
+    |
+    | List directories that will be scanned for custom server-side directives.
     |
     */
     'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
 
     /*
     |--------------------------------------------------------------------------
-    | Namespace registry
+    | Namespaces
     |--------------------------------------------------------------------------
     |
-    | This package provides a set of commands to make it easy for you to
-    | create new parts in your GraphQL schema. Change these values to
-    | match the namespaces you'd like each piece to be created in.
+    | These are the default namespaces where Lighthouse looks for classes
+    | that extend functionality of the schema.
     |
     */
     'namespaces' => [
@@ -79,21 +104,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Schema Cache
-    |--------------------------------------------------------------------------
-    |
-    | A large part of the Schema generation is parsing into an AST.
-    | This operation is pretty expensive so it is recommended to enable
-    | caching in production mode.
-    |
-    */
-    'cache' => [
-        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
-        'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Global ID
     |--------------------------------------------------------------------------
     |
@@ -102,18 +112,4 @@ return [
     |
     */
     'global_id_field' => '_id',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Schema declaration
-    |--------------------------------------------------------------------------
-    |
-    | This is a path that points to where your GraphQL schema is located
-    | relative to the app path. You should define your entire GraphQL
-    | schema in this file (additional files may be imported).
-    |
-    */
-    'schema' => [
-        'register' => base_path('routes/graphql/schema.graphql'),
-    ],
 ];
