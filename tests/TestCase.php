@@ -5,10 +5,10 @@ namespace Tests;
 use GraphQL\Type\Schema;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
+use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
-use Tests\Utils\Policies\AuthServiceProvider;
 
 class TestCase extends BaseTestCase
 {
