@@ -154,7 +154,7 @@ class GraphQL
     {
         $this->extensions->requestDidStart(new ExtensionRequest([
             'request' => Request::instance(),
-            'query_string' => $query,
+            'queryString' => $query,
             'operationName' => Request::input('operationName'),
             'variables' => $variables,
         ]));
