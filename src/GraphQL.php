@@ -7,23 +7,25 @@ use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Cache;
+use GraphQL\Validator\Rules\QueryDepth;
 use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 use Nuwave\Lighthouse\Support\Exceptions\Handler;
+use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
-
     /**
      * Directive registry container.
      *
@@ -166,7 +168,9 @@ class GraphQL
             $rootValue,
             $context,
             $variables,
-            Request::input('operationName')
+            Request::input('operationName'),
+            null,
+            $this->getValidationRules()
         );
 
         $result->extensions = $this->extensions->toArray();
@@ -316,5 +320,19 @@ class GraphQL
     public function exceptionHandler(): ExceptionHandler
     {
         return $this->exceptionHandler;
+    }
+
+    /**
+     * Construct the validation rules from the config.
+     *
+     * @return array
+     */
+    protected function getValidationRules(): array
+    {
+        return [
+            new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
+            new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
+            new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
+        ];
     }
 }
