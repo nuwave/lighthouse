@@ -19,7 +19,7 @@ class ValidatorTest extends TestCase
     {
         $this->app->bind('foo.validator', function ($app, $params) {
             return new class($params['root'], $params['args'], $params['context'], $params['info']) extends Validator {
-                protected function rules()
+                protected function rules(): array
                 {
                     return [
                         'foo' => ['min:5'],
