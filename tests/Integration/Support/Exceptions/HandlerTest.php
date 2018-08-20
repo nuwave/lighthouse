@@ -39,6 +39,8 @@ class HandlerTest extends DBTestCase
     /** @test */
     public function canConvertExceptionToDefaultError()
     {
+        $this->app['config']->set('app.debug', false);
+
         $schema = '
         type User {
             id: ID!
