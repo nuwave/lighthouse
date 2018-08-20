@@ -57,7 +57,7 @@ class HandlerTest extends DBTestCase
 
         $result = $this->execute($schema, $query);
         $this->assertCount(1, $result['errors']);
-        $this->assertEquals("Random error encountered.", $result['errors'][0]['message']);
+        $this->assertEquals(Error::DEFAULT_ERROR_MESSAGE, $result['errors'][0]['message']);
     }
 
     /** @test */
