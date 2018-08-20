@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 
 class Error implements Arrayable
 {
+    const DEFAULT_ERROR_MESSAGE = 'Random error encountered.';
     public $message;
     public $locations = null;
     public $custom = [];
@@ -25,11 +26,6 @@ class Error implements Arrayable
         $this->custom = $custom;
     }
 
-    public static function default() : Error
-    {
-        return new Error("Random error encountered.");
-    }
-
     /**
      * Creates an error from an array.
      * The array has to contain a `message` key and can contain
@@ -40,7 +36,7 @@ class Error implements Arrayable
      */
     public static function fromArray(array $data): Error
     {
-        if(!Arr::has($data, ['message'])) {
+        if (!Arr::has($data, ['message'])) {
             return Error::default();
         }
         return new Error(
@@ -50,6 +46,10 @@ class Error implements Arrayable
         );
     }
 
+    public static function default(): Error
+    {
+        return new Error(self::DEFAULT_ERROR_MESSAGE);
+    }
 
     /**
      * Get the instance as an array.

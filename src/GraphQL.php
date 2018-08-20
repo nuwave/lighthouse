@@ -7,23 +7,25 @@ use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Cache;
+use GraphQL\Validator\Rules\QueryDepth;
 use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 use Nuwave\Lighthouse\Support\Exceptions\Handler;
+use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
-
     /**
      * Directive registry container.
      *
@@ -126,7 +128,7 @@ class GraphQL
      *
      * @return array
      */
-    public function execute($query, $context = null, $variables = [], $rootValue = null): array
+    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
         $result->setErrorsHandler([$this->exceptionHandler(), 'handler']);
@@ -166,7 +168,9 @@ class GraphQL
             $rootValue,
             $context,
             $variables,
-            Request::input('operationName')
+            Request::input('operationName'),
+            null,
+            $this->getValidationRules()
         );
 
         $result->extensions = $this->extensions->toArray();
@@ -202,16 +206,6 @@ class GraphQL
         }
 
         return $this->documentAST->lock();
-    }
-
-    /**
-     * Temporary workaround to allow injecting a different schema when testing.
-     *
-     * @param DocumentAST $documentAST
-     */
-    public function setDocumentAST(DocumentAST $documentAST)
-    {
-        $this->documentAST = $documentAST;
     }
 
     /**
@@ -267,7 +261,7 @@ class GraphQL
     }
 
     /**
-     * * Get the type registry instance.
+     * Get the type registry instance.
      *
      * @return TypeRegistry
      *
@@ -316,5 +310,19 @@ class GraphQL
     public function exceptionHandler(): ExceptionHandler
     {
         return $this->exceptionHandler;
+    }
+
+    /**
+     * Construct the validation rules from the config.
+     *
+     * @return array
+     */
+    protected function getValidationRules(): array
+    {
+        return [
+            new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
+            new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
+            new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
+        ];
     }
 }

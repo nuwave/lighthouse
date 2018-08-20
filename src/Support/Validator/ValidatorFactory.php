@@ -16,7 +16,7 @@ class ValidatorFactory
      * @param array                                        $messages
      * @param array                                        $customAttributes
      *
-     * @return \Illuminate\Validation\Validator
+     * @return Validator
      */
     public static function resolve(
         $translator,
@@ -24,7 +24,7 @@ class ValidatorFactory
         array $rules,
         array $messages,
         array $customAttributes
-    ) {
+    ): Validator {
         $resolveInfo = array_get($customAttributes, 'resolveInfo');
 
         return $resolveInfo instanceof ResolveInfo
@@ -42,7 +42,7 @@ class ValidatorFactory
      *
      * @return bool
      */
-    public function requiredWithMutation($attribute, $value, $parameters, $validator)
+    public function requiredWithMutation(string $attribute, $value, array $parameters, GraphQLValidator $validator): bool
     {
         $info = $validator->getResolveInfo();
 

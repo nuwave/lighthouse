@@ -92,6 +92,22 @@ return [
         'scalars' => 'App\\Http\\GraphQL\\Scalars',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Security
+    |--------------------------------------------------------------------------
+    |
+    | Control how Lighthouse handles security related query validation.
+    | This configures the options from http://webonyx.github.io/graphql-php/security/
+    | A setting of "0" means that the validation rule is disabled.
+    |
+    */
+    'security' => [
+        'max_query_complexity' => 0,
+        'max_query_depth' => 0,
+        'disable_introspection' => false,
+    ],
+
      /*
      |--------------------------------------------------------------------------
      | GraphQL Controller

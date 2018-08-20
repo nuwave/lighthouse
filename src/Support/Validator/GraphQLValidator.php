@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Support\Validator;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Validation\Validator;
+use Nuwave\Lighthouse\Schema\Context;
 
 class GraphQLValidator extends Validator
 {
@@ -19,9 +21,9 @@ class GraphQLValidator extends Validator
     /**
      * Get context object.
      *
-     * @return \Nuwave\Lighthouse\Schema\Context
+     * @return Context
      */
-    public function getContext()
+    public function getContext(): Context
     {
         return array_get($this->customAttributes, 'context');
     }
@@ -29,9 +31,9 @@ class GraphQLValidator extends Validator
     /**
      * Get field resolve info.
      *
-     * @return \GraphQL\Type\Definition\ResolveInfo
+     * @return ResolveInfo
      */
-    public function getResolveInfo()
+    public function getResolveInfo(): ResolveInfo
     {
         return array_get($this->customAttributes, 'resolveInfo');
     }
