@@ -105,7 +105,7 @@ return [
     'security' => [
         'max_query_complexity' => 0,
         'max_query_depth' => 0,
-        'disable_introspection' => false,
+        'disable_introspection' => 0,
     ],
 
      /*
