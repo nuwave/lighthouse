@@ -33,9 +33,23 @@ abstract class BatchLoader
      */
     public static function key(Model $root, $relation, ResolveInfo $info = null)
     {
-        $path = ! empty(data_get($info, 'path')) ? implode('_', $info->path) : $relation;
+        $path = ! empty(data_get($info, 'path')) ? self::buildPath($info->path) : $relation;
 
-        return camel_case($root->getTable().'_'.$path);
+        return camel_case($path);
+    }
+
+    /**
+     * Build batch path.
+     *
+     * @param array $path
+     *
+     * @return string
+     */
+    public static function buildPath(array $path)
+    {
+        return collect($path)->filter(function ($path) {
+            return ! is_numeric($path);
+        })->implode('_');
     }
 
     /**
