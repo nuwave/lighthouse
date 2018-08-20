@@ -12,9 +12,9 @@ class NodeResolver
      *
      * @param mixed $node
      *
-     * @return \GraphQL\Type\Definition\Type
+     * @return Type
      */
-    public static function resolve($node)
+    public static function resolve($node): Type
     {
         return (new static())->fromNode($node);
     }

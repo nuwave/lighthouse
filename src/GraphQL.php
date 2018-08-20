@@ -128,7 +128,7 @@ class GraphQL
      *
      * @return array
      */
-    public function execute($query, $context = null, $variables = [], $rootValue = null): array
+    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
         $result->setErrorsHandler([$this->exceptionHandler(), 'handler']);
@@ -209,16 +209,6 @@ class GraphQL
     }
 
     /**
-     * Temporary workaround to allow injecting a different schema when testing.
-     *
-     * @param DocumentAST $documentAST
-     */
-    public function setDocumentAST(DocumentAST $documentAST)
-    {
-        $this->documentAST = $documentAST;
-    }
-
-    /**
      * Get the schema string and build an AST out of it.
      *
      * @return DocumentAST
@@ -271,7 +261,7 @@ class GraphQL
     }
 
     /**
-     * * Get the type registry instance.
+     * Get the type registry instance.
      *
      * @return TypeRegistry
      *
