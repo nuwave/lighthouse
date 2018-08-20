@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\NamedTypeNode;
 
 class NodeResolver
 {

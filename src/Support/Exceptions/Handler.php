@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Support\Exceptions;
 
 use Exception;
-use GraphQL\Error\Error as GraphError;
-use GraphQL\Error\FormattedError;
 use Illuminate\Support\Arr;
+use GraphQL\Error\FormattedError;
+use GraphQL\Error\Error as GraphError;
 use Illuminate\Validation\ValidationException;
 use Nuwave\Lighthouse\Support\Contracts\Errorable;
 use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
@@ -15,6 +14,9 @@ class Handler implements ExceptionHandler
 {
     /**
      * @param array|GraphError[] $errors
+     *
+     * @throws \Throwable
+     *
      * @return array
      */
     public function handler(array $errors) : array
@@ -40,9 +42,12 @@ class Handler implements ExceptionHandler
         return $response;
     }
 
+    /**
+     * @param Exception $exception
+     */
     public function report(Exception $exception)
     {
-        //throw $exception;
+        // throw $exception;
         info('GraphQL Error:', [
             'code' => $exception->getCode(),
             'message' => $exception->getMessage(),
@@ -50,6 +55,13 @@ class Handler implements ExceptionHandler
         ]);
     }
 
+    /**
+     * @param Exception $exception
+     *
+     * @throws \Throwable
+     *
+     * @return Error
+     */
     public function render(Exception $exception) : Error
     {
         if($exception instanceof Errorable) {
@@ -77,8 +89,8 @@ class Handler implements ExceptionHandler
      */
     protected function convertExceptionToError(Exception $e) : Error
     {
-        return config('app.debug') ?
-            Error::fromArray([
+        return config('app.debug')
+            ? Error::fromArray([
                 'message' => $e->getMessage(),
                 'exception' => get_class($e),
                 'file' => $e->getFile(),

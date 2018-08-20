@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\Support\Exceptions;
-
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
@@ -36,7 +34,7 @@ class Error implements Arrayable
      * @param array $data
      * @return Error
      */
-    public static function fromArray(array $data) : Error
+    public static function fromArray(array $data): Error
     {
         if (!Arr::has($data, ['message'])) {
             return Error::default();
@@ -58,7 +56,7 @@ class Error implements Arrayable
      *
      * @return array
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return array_merge($this->custom, [
             'message' => $this->message,
