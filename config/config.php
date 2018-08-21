@@ -1,5 +1,7 @@
 <?php
 
+use GraphQL\Validator\Rules\DisableIntrospection;
+
 return [
     
     /*
@@ -105,7 +107,7 @@ return [
     'security' => [
         'max_query_complexity' => 0,
         'max_query_depth' => 0,
-        'disable_introspection' => 0,
+        'disable_introspection' => DisableIntrospection::DISABLED,
     ],
 
      /*
