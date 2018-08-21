@@ -30,7 +30,7 @@ class GraphQLController extends Controller
      *
      * @return Response
      */
-    public function query(Request $request): Response
+    public function query(Request $request)
     {
         $query = $request->input('query');
         $variables = $request->input('variables');
