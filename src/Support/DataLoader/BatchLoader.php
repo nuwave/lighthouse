@@ -3,8 +3,6 @@
 namespace Nuwave\Lighthouse\Support\DataLoader;
 
 use GraphQL\Deferred;
-use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
 
 abstract class BatchLoader
 {
@@ -16,79 +14,65 @@ abstract class BatchLoader
     protected $keys = [];
 
     /**
+     * Map of loaded results.
+     *
+     * [key => resolvedValue]
+     *
+     * @var array
+     */
+    private $results = [];
+
+    /**
      * Check if data has been loaded.
      *
      * @var bool
      */
-    protected $hasLoaded = false;
+    private $hasLoaded = false;
 
     /**
-     * Generate key for field.
-     *
-     * @param Model       $root
-     * @param ResolveInfo $info
-     * @param string      $relation
-     *
-     * @return string
-     */
-    public static function key(Model $root, $relation, ResolveInfo $info = null)
-    {
-        $path = ! empty(data_get($info, 'path')) ? self::buildPath($info->path) : $relation;
-
-        return camel_case($path);
-    }
-
-    /**
-     * Build batch path.
+     * Generate a unique key for the instance, using the path in the query.
      *
      * @param array $path
      *
      * @return string
      */
-    public static function buildPath(array $path)
+    public static function instanceKey(array $path): string
     {
-        return collect($path)->filter(function ($path) {
-            return ! is_numeric($path);
-        })->implode('_');
+        return collect($path)
+            ->filter(function ($path) {
+                // Ignore numeric path entries, as those signify an array of fields
+                // Those are the very purpose for this batch loader, so they must not be included.
+                return !is_numeric($path);
+            })
+            ->implode('_');
     }
 
     /**
      * Load object by key.
      *
      * @param mixed $key
-     * @param array $data
+     * @param array $metaInfo
      *
      * @return Deferred
      */
-    public function load($key, array $data = [])
+    public function load($key, array $metaInfo = []): Deferred
     {
-        $this->keys[$key] = $data;
+        $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
-            if (! $this->hasLoaded) {
-                $this->resolve();
+            if (!$this->hasLoaded) {
+                $this->results = $this->resolve();
                 $this->hasLoaded = true;
             }
 
-            return array_get($this->keys, "$key.value");
+            return $this->results[$key];
         });
     }
 
     /**
-     * Set key value.
+     * Resolve the keys.
      *
-     * @param mixed $key
-     * @param mixed $value
+     * The result has to be a map: [key => result]
      */
-    protected function set($key, $value)
-    {
-        if ($field = array_get($this->keys, $key)) {
-            $this->keys[$key] = array_merge($field, compact('value'));
-        }
-    }
-
-    /**
-     * Resolve keys.
-     */
-    abstract public function resolve();
+    abstract public function resolve(): array;
 }

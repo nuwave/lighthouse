@@ -2,33 +2,42 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 
 class BelongsToLoader extends BatchLoader
 {
     /**
+     * @var string
+     */
+    protected $relation;
+    /**
+     * @var array
+     */
+    protected $resolveArgs;
+
+    public function __construct(string $relation, array $resolveArgs)
+    {
+        $this->relation = $relation;
+        $this->resolveArgs = $resolveArgs;
+    }
+
+    /**
      * Resolve keys.
      */
-    public function resolve()
+    public function resolve(): array
     {
-        collect($this->keys)->map(function ($item) {
-            return array_merge($item, ['json' => json_encode($item['args'])]);
-        })->groupBy('json')->each(function ($items) {
-            $relation = array_get($items->first(), 'relation');
-            $models = Collection::make($items->pluck('root')->all());
-            $args = array_get($items->first(), 'args', []);
+        $parents = \Illuminate\Database\Eloquent\Collection::make(
+            collect($this->keys)->pluck('parent')
+        );
 
-            $models->load([$relation => function ($q) use ($args) {
-                $q->when(isset($args['query.filter']), function ($q) use ($args) {
-                    return QueryFilter::build($q, $args);
-                });
-            }]);
-
-            $models->each(function ($model) use ($relation) {
-                $this->set($model->getKey(), $model->getRelation($relation));
+        return $parents->load([$this->relation => function ($query) {
+            $query->when(isset($args['query.filter']), function ($query) {
+                return QueryFilter::build($query, $this->resolveArgs);
             });
-        });
+        }])->mapWithKeys(function (Model $model) {
+            return [$model->getKey() => $model->getRelation($this->relation)];
+        })->all();
     }
 }

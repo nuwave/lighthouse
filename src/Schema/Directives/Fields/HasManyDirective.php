@@ -2,15 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 
 class HasManyDirective extends PaginationManipulator implements FieldResolver, FieldManipulator
 {
@@ -25,18 +26,19 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
     }
 
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
+     * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
-     * @param DocumentAST              $original
+     * @param DocumentAST $current
+     * @param DocumentAST $original
      *
      * @throws DirectiveException
+     * @throws \Exception
      *
      * @return DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
     {
-        $paginationType = $this->getResolverType();
+        $paginationType = $this->getPaginationType();
 
         switch ($paginationType) {
             case self::PAGINATION_TYPE_PAGINATOR:
@@ -58,16 +60,23 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
      */
     public function resolveField(FieldValue $value)
     {
-        $relation = $this->directiveArgValue('relation', $value->getFieldName());
-        $type = $this->getResolverType();
-        $scopes = $this->directiveArgValue('scopes', []);
+        return $value->setResolver(
+            function (Model $parent, array $resolveArgs, $context = null, ResolveInfo $resolveInfo = null) {
+                /** @var HasManyLoader $hasManyLoader */
+                $hasManyLoader = graphql()->batchLoader(
+                    HasManyLoader::class,
+                    $resolveInfo->path,
+                    [
+                        'relation' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
+                        'resolveArgs' => $resolveArgs,
+                        'scopes' => $this->directiveArgValue('scopes', []),
+                        'paginationType' => $this->getPaginationType()
+                    ]
+                );
 
-        return $value->setResolver(function ($parent, array $args, $context = null, ResolveInfo $info = null) use ($relation, $scopes, $type) {
-            return graphql()->batch(HasManyLoader::class, $parent->getKey(), array_merge(
-                compact('relation', 'parent', 'args', 'scopes'),
-                ['type' => $type]
-            ), HasManyLoader::key($parent, $relation, $info));
-        });
+                return $hasManyLoader->load($parent->getKey(), ['parent' => $parent]);
+            }
+        );
     }
 
     /**
@@ -75,7 +84,7 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
      *
      * @return string
      */
-    protected function getResolverType()
+    protected function getPaginationType(): string
     {
         $paginationType = $this->directiveArgValue('type', 'default');
 

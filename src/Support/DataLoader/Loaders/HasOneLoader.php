@@ -2,14 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
-use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 
-class HasManyLoader extends BatchLoader
+class HasOneLoader extends BatchLoader
 {
     use HandlesGlobalId;
 
@@ -25,23 +24,17 @@ class HasManyLoader extends BatchLoader
      * @var array
      */
     protected $scopes;
-    /**
-     * @var string
-     */
-    protected $paginationType;
 
     /**
      * @param string $relation
      * @param array $resolveArgs
      * @param array $scopes
-     * @param string $paginationType
      */
-    public function __construct(string $relation, array $resolveArgs, array $scopes, string $paginationType)
+    public function __construct(string $relation, array $resolveArgs, array $scopes)
     {
         $this->relation = $relation;
         $this->resolveArgs = $resolveArgs;
         $this->scopes = $scopes;
-        $this->paginationType = $paginationType;
     }
 
     /**
@@ -61,24 +54,7 @@ class HasManyLoader extends BatchLoader
 
         /** @var Collection $parents */
         $parents = collect($this->keys)->pluck('parent');
-        switch ($this->paginationType) {
-            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-            case PaginationManipulator::PAGINATION_ALIAS_RELAY:
-                $first = data_get($this->resolveArgs, 'first', 15);
-                $after = $this->decodeCursor($this->resolveArgs);
-                $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
-                $parents->fetchForPage($first, $currentPage, $eagerLoadRelationWithConstraints);
-                break;
-            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-                // count must be set
-                $count = $this->resolveArgs['count'];
-                $page = data_get($this->resolveArgs, 'page', 1);
-                $parents->fetchForPage($count, $page, $eagerLoadRelationWithConstraints);
-                break;
-            default:
-                $parents->fetch($eagerLoadRelationWithConstraints);
-                break;
-        }
+        $parents->fetch($eagerLoadRelationWithConstraints);
 
         return $parents->mapWithKeys(function (Model $model) {
             return [$model->getKey() => $model->getRelation($this->relation)];
