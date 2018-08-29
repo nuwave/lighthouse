@@ -14,7 +14,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(DocumentAST $current, DocumentAST $original): DocumentAST
+    public function manipulateSchema(DocumentAST $current, DocumentAST $original)
     {
         return $current;
     }
