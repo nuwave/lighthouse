@@ -18,7 +18,10 @@ class UnionDirectiveTest extends DBTestCase
     public function itCanResolveUnionTypes()
     {
         // This creates a user with it
-        factory(Post::class)->create();
+        factory(Post::class)->create(
+            // Prevent creating more users through nested factory
+            ['task_id' => 1]
+        );
 
         $schema = '
         union Stuff @union(resolver: "' . addslashes(self::class) . '@resolveType") =
