@@ -16,6 +16,7 @@ class CreateTestbenchPostsTable extends Migration
             $table->string('title');
             $table->string('body');
             $table->unsignedInteger('user_id');
+            $table->unsignedInteger('task_id');
             $table->timestamps();
         });
     }
