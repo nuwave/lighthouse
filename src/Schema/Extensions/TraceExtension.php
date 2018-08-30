@@ -37,7 +37,7 @@ class TraceExtension extends GraphQLExtension
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'tracing';
     }
@@ -48,9 +48,11 @@ class TraceExtension extends GraphQLExtension
      * @param DocumentAST $current
      * @param DocumentAST $original
      *
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     *
      * @return DocumentAST
      */
-    public function manipulateSchema(DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(DocumentAST $current, DocumentAST $original): DocumentAST
     {
         $trace = PartialParser::directive('@trace');
 
@@ -112,7 +114,7 @@ class TraceExtension extends GraphQLExtension
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $end = now();
         $duration = abs(($end->micro - $this->requestStart->micro) * 1000);

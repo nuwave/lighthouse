@@ -34,7 +34,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
@@ -44,12 +44,12 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @return string
      */
-    abstract public function name();
+    abstract public function name(): string;
 
     /**
      * Format extension output.
      *
      * @return array
      */
-    abstract public function toArray();
+    abstract public function toArray(): array;
 }
