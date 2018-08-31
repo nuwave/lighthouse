@@ -7,7 +7,7 @@ use GraphQL\Error\SyntaxError;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Exceptions\ParseException;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 
 class PartialParserTest extends TestCase
 {

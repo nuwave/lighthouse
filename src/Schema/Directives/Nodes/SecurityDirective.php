@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 /**
  * Class SecurityDirective

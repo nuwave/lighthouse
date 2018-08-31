@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Exceptions;
+namespace Nuwave\Lighthouse\Exceptions;
 
 use Exception;
 use GraphQL\Error\ClientAware;
 
-class DocumentASTException extends Exception implements ClientAware
+class DirectiveException extends Exception implements ClientAware
 {
     /**
      * Returns true when exception message is safe to be displayed to a client.

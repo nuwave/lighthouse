@@ -25,7 +25,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
      * @param FieldValue $value
      *
      * @return FieldValue
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function resolveField(FieldValue $value)
     {

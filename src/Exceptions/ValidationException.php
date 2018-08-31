@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Exceptions;
+namespace Nuwave\Lighthouse\Exceptions;
 
 use GraphQL\Error\ClientAware;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;

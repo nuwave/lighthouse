@@ -19,7 +19,7 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Exceptions\ParseException;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 
 class PartialParser
 {

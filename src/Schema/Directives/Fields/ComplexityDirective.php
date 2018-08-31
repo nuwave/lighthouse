@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class ComplexityDirective extends BaseDirective implements FieldMiddleware
 {

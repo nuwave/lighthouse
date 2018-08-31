@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Execution;
 use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 
 class GraphQLValidator extends Validator
 {

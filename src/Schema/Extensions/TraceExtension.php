@@ -48,7 +48,7 @@ class TraceExtension extends GraphQLExtension
      * @param DocumentAST $current
      * @param DocumentAST $original
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return DocumentAST
      */

@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 /**
  * Trait HandlesQueries

@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Error\FormattedError;
 use Nuwave\Lighthouse\Support\Contracts\ErrorFormatter;
-use Nuwave\Lighthouse\Support\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 
 class ExceptionFormatter implements ErrorFormatter
 {

@@ -19,7 +19,7 @@ class FieldFactory
      *
      * @param FieldValue $fieldValue
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return array Configuration array for a FieldDefinition
      */
@@ -77,7 +77,7 @@ class FieldFactory
      *
      * @param FieldValue $value
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return \Closure
      */

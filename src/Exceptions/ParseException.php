@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Exceptions;
+namespace Nuwave\Lighthouse\Exceptions;
 
+use Exception;
 use GraphQL\Error\ClientAware;
 
-class AuthenticationException extends \Illuminate\Auth\AuthenticationException implements ClientAware
+class ParseException extends Exception implements ClientAware
 {
-
     /**
      * Returns true when exception message is safe to be displayed to a client.
      *
@@ -15,7 +15,7 @@ class AuthenticationException extends \Illuminate\Auth\AuthenticationException i
      */
     public function isClientSafe()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -28,6 +28,6 @@ class AuthenticationException extends \Illuminate\Auth\AuthenticationException i
      */
     public function getCategory()
     {
-        return 'authentication';
+        return 'schema';
     }
 }

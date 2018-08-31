@@ -18,7 +18,7 @@ use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Execution\ExceptionFormatter;
-use Nuwave\Lighthouse\Support\Exceptions\NewHandler;
+use Nuwave\Lighthouse\Exceptions\NewHandler;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Contracts\ErrorsHandler;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;

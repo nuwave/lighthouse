@@ -116,6 +116,7 @@ class TestCase extends BaseTestCase
      */
     protected function execute(string $schema, string $query, array $variables = []): array
     {
+        // For test execution, it is more convenient to throw Exceptions so they show up in the PHPUnit command line
         return $this->executeQuery($schema, $query, $variables)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
     }
 
@@ -127,7 +128,7 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaWithDefaultQuery($schema): Schema
+    protected function buildSchemaWithDefaultQuery(string $schema): Schema
     {
         return $this->buildSchemaFromString($schema.'
         type Query {

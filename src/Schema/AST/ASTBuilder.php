@@ -168,8 +168,8 @@ class ASTBuilder
      *
      * @param DocumentAST $document
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\DocumentASTException
      *
      * @return DocumentAST
      */
@@ -210,8 +210,8 @@ class ASTBuilder
     /**
      * @param DocumentAST $document
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\DocumentASTException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return DocumentAST
      */
