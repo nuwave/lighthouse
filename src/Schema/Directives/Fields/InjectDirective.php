@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -23,7 +24,9 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure $next
+     *
+     * @throws DirectiveException
      *
      * @return FieldValue
      */
@@ -33,7 +36,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
         $attr = $this->directiveArgValue('context');
         $name = $this->directiveArgValue('name');
 
-        if (! $attr) {
+        if (!$attr) {
             throw new DirectiveException(sprintf(
                 'The `inject` directive on %s [%s] must have a `context` argument',
                 $value->getNodeName(),
@@ -41,7 +44,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
             ));
         }
 
-        if (! $name) {
+        if (!$name) {
             throw new DirectiveException(sprintf(
                 'The `inject` directive on %s [%s] must have a `name` argument',
                 $value->getNodeName(),
@@ -49,12 +52,17 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
             ));
         }
 
-        return $next($value->setResolver(function () use ($attr, $name, $resolver) {
-            $args = func_get_args();
-            $context = $args[2];
-            $args[1] = array_merge($args[1], [$name => data_get($context, $attr)]);
-
-            return call_user_func_array($resolver, $args);
-        }));
+        return $next(
+            $value->setResolver(
+                function ($rootValue, $args, $context, ResolveInfo $resolveInfo) use ($attr, $name, $resolver) {
+                    return call_user_func_array($resolver, [
+                        $rootValue,
+                        array_merge($args, [$name => data_get($context, $attr)]),
+                        $context,
+                        $resolveInfo
+                    ]);
+                }
+            )
+        );
     }
 }
