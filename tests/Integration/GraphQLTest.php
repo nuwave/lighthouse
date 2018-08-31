@@ -90,7 +90,7 @@ class GraphQLTest extends DBTestCase
         }
         ';
 
-        $data = graphql()->execute($query);
+        $data = graphql()->executeQuery($query)->toArray();
         $expected = [
             'data' => [
                 'user' => [
@@ -100,7 +100,6 @@ class GraphQLTest extends DBTestCase
                     })->toArray(),
                 ],
             ],
-            'extensions' => [],
         ];
 
         $this->assertEquals($expected, $data);
@@ -134,7 +133,6 @@ class GraphQLTest extends DBTestCase
                     })->toArray(),
                 ],
             ],
-            'extensions' => [],
         ];
 
         $this->assertEquals($expected, $data);
@@ -170,7 +168,6 @@ class GraphQLTest extends DBTestCase
                     })->toArray(),
                 ],
             ],
-            'extensions' => [],
         ];
 
         $this->assertEquals($expected, $data);

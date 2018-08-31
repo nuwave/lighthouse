@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class RenameDirectiveTest extends TestCase
 {

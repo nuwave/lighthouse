@@ -79,12 +79,14 @@ class TraceExtension extends GraphQLExtension
      * Handle request start.
      *
      * @param ExtensionRequest $request
+     *
+     * @return TraceExtension
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function requestDidStart(ExtensionRequest $request): TraceExtension
     {
         $this->requestStart = now();
 
-        return;
+        return $this;
     }
 
     /**

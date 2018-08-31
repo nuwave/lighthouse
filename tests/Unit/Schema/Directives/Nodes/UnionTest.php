@@ -21,7 +21,7 @@ class UnionTest extends TestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($this->schema(), $query);
+        $result = $this->executeQuery($this->schema(), $query);
 
         $this->assertEquals('user.id', array_get($result->data, 'person.id'));
     }
@@ -40,7 +40,7 @@ class UnionTest extends TestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($this->schema(), $query);
+        $result = $this->executeQuery($this->schema(), $query);
 
         $this->assertEquals('employee.id', array_get($result->data, 'person.employeeId'));
     }

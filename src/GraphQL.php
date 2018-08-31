@@ -4,164 +4,84 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
-use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Cache;
-use GraphQL\Validator\Rules\QueryDepth;
+use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Request;
+use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use GraphQL\Validator\Rules\QueryComplexity;
+use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Support\Exceptions\Handler;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Execution\ExceptionFormatter;
+use Nuwave\Lighthouse\Support\Exceptions\NewHandler;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
+use Nuwave\Lighthouse\Support\Contracts\ErrorsHandler;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
-    /**
-     * Directive registry container.
-     *
-     * @var DirectiveRegistry
-     */
-    protected $directives;
+    /** @var Schema */
+    protected $executableSchema;
 
-    /**
-     * Type registry container.
-     *
-     * @var TypeRegistry
-     */
-    protected $types;
-
-    /**
-     * Instance of node container.
-     *
-     * @var NodeContainer
-     */
-    protected $nodes;
-
-    /**
-     * Middleware manager.
-     *
-     * @var MiddlewareManager
-     */
-    protected $middleware;
-
-    /**
-     * Extension registry.
-     *
-     * @var ExtensionRegistry
-     */
-    protected $extensions;
-
-    /**
-     * GraphQL Schema.
-     *
-     * @var Schema
-     */
-    protected $graphqlSchema;
-
-    /**
-     * Local instance of DocumentAST.
-     *
-     * @var DocumentAST
-     */
+    /** @var DocumentAST */
     protected $documentAST;
 
     /**
-     * Exception handler.
-     *
-     * @var Handler
-     */
-    protected $exceptionHandler;
-
-    /**
-     * Create instance of graphql container.
-     *
-     * @param DirectiveRegistry $directives
-     * @param TypeRegistry $types
-     * @param MiddlewareManager $middleware
-     * @param NodeContainer $nodes
-     * @param ExtensionRegistry $extensions
-     * @param ExceptionHandler $exceptionHandler
-     */
-    public function __construct(
-        DirectiveRegistry $directives,
-        TypeRegistry $types,
-        MiddlewareManager $middleware,
-        NodeContainer $nodes,
-        ExtensionRegistry $extensions,
-        ExceptionHandler $exceptionHandler
-    ) {
-        $this->directives = $directives;
-        $this->types = $types;
-        $this->middleware = $middleware;
-        $this->nodes = $nodes;
-        $this->extensions = $extensions;
-        $this->exceptionHandler = $exceptionHandler;
-    }
-
-    /**
-     * Prepare graphql schema.
+     * Ensure an executable GraphQL schema is present.
      *
      * @return Schema
      */
     public function prepSchema(): Schema
     {
-        return $this->graphqlSchema = $this->graphqlSchema ?: $this->buildSchema();
+        return $this->executableSchema = $this->executableSchema ?: $this->buildSchema();
     }
 
     /**
-     * Execute GraphQL query.
-     *
      * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
      *
      * @return array
+     * @deprecated use executeQuery()->toArray() instead
      */
     public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
     {
-        $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
-        $result->setErrorsHandler([$this->exceptionHandler(), 'handler']);
-
-        $data = $result->toArray();
-
-        if(!isset($data['extensions'])) {
-            $data['extensions'] = [];
-        }
-
-        return $data;
+        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
     }
 
     /**
-     * Execute GraphQL query.
-     *
      * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
      *
      * @return \GraphQL\Executor\ExecutionResult
+     * @deprecated renamed to executeQuery
      */
-    public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
-        $this->extensions->requestDidStart(new ExtensionRequest([
-            'request' => Request::instance(),
-            'queryString' => $query,
-            'operationName' => Request::input('operationName'),
-            'variables' => $variables,
-        ]));
+        return $this->executeQuery($query, $context, $variables, $rootValue);
+    }
 
-        $schema = $this->graphqlSchema ?: $this->buildSchema();
+    /**
+     * @param string $query
+     * @param null $context
+     * @param array $variables
+     * @param null $rootValue
+     *
+     * @return ExecutionResult
+     */
+    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    {
+        $schema = $this->executableSchema ?: $this->buildSchema();
+
         $result = GraphQLBase::executeQuery(
             $schema,
             $query,
@@ -173,7 +93,8 @@ class GraphQL
             $this->getValidationRules()
         );
 
-        $result->extensions = $this->extensions->toArray();
+        $result->extensions = resolve(ExtensionRegistry::class)->toArray();
+        $result->setErrorFormatter([ExceptionFormatter::class, 'format']);
 
         return $result;
     }
@@ -197,7 +118,7 @@ class GraphQL
      */
     public function documentAST(): DocumentAST
     {
-        if (! $this->documentAST) {
+        if (!$this->documentAST) {
             $this->documentAST = config('lighthouse.cache.enable')
                 ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
                     return $this->buildAST();
@@ -241,7 +162,7 @@ class GraphQL
             ? resolve($instanceName)
             : app()->instance($instanceName, app()->makeWith($loaderClass, $constructorArgs));
 
-        if(!$instance instanceof BatchLoader){
+        if (!$instance instanceof BatchLoader) {
             throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Support\DataLoader\BatchLoader");
         }
 
@@ -249,31 +170,26 @@ class GraphQL
     }
 
     /**
-     * Get the directive registry instance.
-     *
      * @return DirectiveRegistry
+     * @deprecated Use resolve() instead, will be removed in v3
      */
     public function directives(): DirectiveRegistry
     {
-        return $this->directives;
+        return resolve(DirectiveRegistry::class);
     }
 
     /**
-     * Get the type registry instance.
-     *
      * @return TypeRegistry
+     * @deprecated Use resolve() instead, will be removed in v3
      */
     public function types(): TypeRegistry
     {
-        return $this->types;
+        return resolve(TypeRegistry::class);
     }
 
     /**
-     * Get the type registry instance.
-     *
      * @return TypeRegistry
-     *
-     * @deprecated in favour of types()
+     * @deprecated Use resolve() instead, will be removed in v3
      */
     public function schema(): TypeRegistry
     {
@@ -281,43 +197,39 @@ class GraphQL
     }
 
     /**
-     * Get the middleware manager instance.
-     *
      * @return MiddlewareManager
+     * @deprecated Use resolve() instead, will be removed in v3
      */
     public function middleware(): MiddlewareManager
     {
-        return $this->middleware;
+        return resolve(MiddlewareManager::class);
     }
 
     /**
-     * Get the instance of the node container.
-     *
      * @return NodeContainer
+     * @deprecated Use resolve() instead, will be removed in v3
      */
     public function nodes(): NodeContainer
     {
-        return $this->nodes;
+        return resolve(NodeContainer::class);
     }
 
     /**
-     * Get instance of extension registry.
-     *
      * @return ExtensionRegistry
+     * @deprecated Use resolve() instead, will be removed in v3
      */
     public function extensions(): ExtensionRegistry
     {
-        return $this->extensions;
+        return resolve(ExtensionRegistry::class);
     }
 
     /**
-     * Get the instance of the exception handler.
-     *
-     * @return ExceptionHandler
+     * @return ErrorsHandler
+     * @deprecated Use resolve() instead, will be removed in v3
      */
-    public function exceptionHandler(): ExceptionHandler
+    public function exceptionHandler(): ErrorsHandler
     {
-        return $this->exceptionHandler;
+        return resolve(ErrorsHandler::class);
     }
 
     /**

@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Support\Exceptions\AuthenticationException;
 
 class CanDirective extends BaseDirective implements FieldMiddleware
 {
@@ -39,7 +40,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                     $user = app('auth')->user();
 
                     if (!$user) {
-                        throw new Error('Authentication is required to access this field.');
+                        throw new AuthenticationException('Not authenticated to access this field.');
                     }
 
                     $model = $this->getModelClass();
@@ -47,7 +48,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
                     collect($policies)->each(function (string $policy) use ($user, $model) {
                         if (!$user->can($policy, $model)) {
-                            throw new Error('Not authorized to access this field.');
+                            throw new AuthorizationException('Not authorized to access this field.');
                         }
                     });
 

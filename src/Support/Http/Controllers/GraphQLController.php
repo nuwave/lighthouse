@@ -6,9 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Schema\Context;
+use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQLController extends Controller
 {
+    /** @var string */
+    private $query;
+    /** @var array */
+    private $variables;
+
     /**
      * Inject middleware into request.
      *
@@ -16,11 +24,20 @@ class GraphQLController extends Controller
      */
     public function __construct(Request $request)
     {
+        $this->query = $request->input('query');
+        $this->variables = is_string($variables = $request->input('variables'))
+            ? json_decode($variables, true)
+            : $variables;
+
+        resolve(ExtensionRegistry::class)->requestDidStart(
+            new ExtensionRequest($request, $this->query, $this->variables)
+        );
+
         graphql()->prepSchema();
 
-        $this->middleware(graphql()->middleware()->forRequest(
-            $request->input('query', '{ empty }')
-        ));
+        $this->middleware(
+            resolve(MiddlewareManager::class)->forRequest($this->query)
+        );
     }
 
     /**
@@ -32,19 +49,16 @@ class GraphQLController extends Controller
      */
     public function query(Request $request)
     {
-        $query = $request->input('query');
-        $variables = $request->input('variables');
-
-        if (is_string($variables)) {
-            $variables = json_decode($variables, true);
-        }
+        $debug = config('app.debug')
+            ? config('lighthouse.debug')
+            : false;
 
         return response(
-            graphql()->execute(
-                $query,
+            graphql()->executeQuery(
+                $this->query,
                 new Context($request, app('auth')->user()),
-                $variables
-            )
+                $this->variables
+            )->toArray($debug)
         );
     }
 }

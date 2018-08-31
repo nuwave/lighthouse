@@ -40,7 +40,7 @@ class NodeTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -72,7 +72,7 @@ class NodeTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -104,7 +104,7 @@ class NodeTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
         $this->assertEquals($user->name, array_get($result->data, 'node.name'));
     }
 

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema;
 
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -21,7 +22,7 @@ class DirectiveRegistryTest extends TestCase
     {
         $this->assertInstanceOf(
             ScalarDirective::class,
-            graphql()->directives()->get((new ScalarDirective())->name())
+            app(DirectiveRegistry::class)->get((new ScalarDirective())->name())
         );
     }
 
@@ -34,7 +35,7 @@ class DirectiveRegistryTest extends TestCase
             scalar Email @scalar(class: "Email")
         ');
 
-        $scalarResolver = graphql()->directives()->nodeResolver($definition);
+        $scalarResolver = app(DirectiveRegistry::class)->nodeResolver($definition);
         $this->assertInstanceOf(ScalarDirective::class, $scalarResolver);
     }
 
@@ -59,7 +60,7 @@ class DirectiveRegistryTest extends TestCase
             foo: [Foo!]! @hasMany
         ');
 
-        $resolver = graphql()->directives()->fieldResolver($fieldDefinition);
+        $resolver = app(DirectiveRegistry::class)->fieldResolver($fieldDefinition);
         $this->assertInstanceOf(FieldResolver::class, $resolver);
     }
 
@@ -74,7 +75,7 @@ class DirectiveRegistryTest extends TestCase
             bar: [Bar!]! @hasMany @belongsTo
         ');
 
-        graphql()->directives()->fieldResolver($fieldDefinition);
+        app(DirectiveRegistry::class)->fieldResolver($fieldDefinition);
     }
 
     /**
@@ -86,7 +87,7 @@ class DirectiveRegistryTest extends TestCase
             bar: String @can(if: ["viewBar"]) @event
         ');
 
-        $middleware = graphql()->directives()->fieldMiddleware($fieldDefinition);
+        $middleware = app(DirectiveRegistry::class)->fieldMiddleware($fieldDefinition);
         $this->assertCount(2, $middleware);
     }
 
@@ -102,7 +103,7 @@ class DirectiveRegistryTest extends TestCase
             }
         };
 
-        graphql()->directives()->register($fooDirective);
+        app(DirectiveRegistry::class)->register($fooDirective);
         $this->assertEquals($fooDirective, graphql()->directives()->get('foo'));
         $this->assertNotSame($fooDirective, graphql()->directives()->get('foo'));
     }
@@ -116,7 +117,7 @@ class DirectiveRegistryTest extends TestCase
             foo: String @foo
         ');
 
-        graphql()->directives()->register(
+        app(DirectiveRegistry::class)->register(
             new class() extends BaseDirective implements FieldMiddleware {
                 public function name()
                 {
@@ -134,7 +135,7 @@ class DirectiveRegistryTest extends TestCase
             }
         );
 
-        $fooDirective = graphql()->directives()->fieldMiddleware($fieldDefinition)->first();
+        $fooDirective = app(DirectiveRegistry::class)->fieldMiddleware($fieldDefinition)->first();
         $this->assertSame($fieldDefinition, $fooDirective->getFieldDefinition());
     }
 
@@ -158,9 +159,9 @@ class DirectiveRegistryTest extends TestCase
             {
             }
         };
-        graphql()->directives()->register($originalDefinition);
+        app(DirectiveRegistry::class)->register($originalDefinition);
 
-        $fromRegistry = graphql()->directives()->fieldMiddleware($fieldDefinition)->first();
+        $fromRegistry = app(DirectiveRegistry::class)->fieldMiddleware($fieldDefinition)->first();
         $this->assertEquals($originalDefinition, $fromRegistry);
         $this->assertNotSame($originalDefinition, $fromRegistry);
     }

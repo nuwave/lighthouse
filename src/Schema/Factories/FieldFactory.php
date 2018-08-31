@@ -6,9 +6,11 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
-use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
+use Nuwave\Lighthouse\Support\Validator\GraphQLValidator;
+use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
 
 class FieldFactory
 {
@@ -39,7 +41,7 @@ class FieldFactory
 
         $resolverWithMiddleware = app(Pipeline::class)
             ->send($fieldValue)
-            ->through(graphql()->directives()->fieldMiddleware($fieldValue->getField()))
+            ->through(app(DirectiveRegistry::class)->fieldMiddleware($fieldValue->getField()))
             ->via('handleField')
             ->then(function (FieldValue $fieldValue) {
                 return $fieldValue;
@@ -66,7 +68,7 @@ class FieldFactory
      */
     protected function hasResolverDirective(FieldValue $value): bool
     {
-        return graphql()->directives()
+        return app(DirectiveRegistry::class)
             ->hasResolver($value->getField());
     }
 
@@ -81,7 +83,7 @@ class FieldFactory
      */
     protected function useResolverDirective(FieldValue $value): \Closure
     {
-        return graphql()->directives()
+        return app(DirectiveRegistry::class)
             ->fieldResolver($value->getField())
             ->resolveField($value)
             ->getResolver();
@@ -180,6 +182,7 @@ class FieldFactory
             );
 
             if (sizeof(array_get($rules, 'rules', []))) {
+                /** @var GraphQLValidator $validator */
                 $validator = validator(
                     $inputArgs,
                     array_get($rules, 'rules'),
@@ -187,6 +190,7 @@ class FieldFactory
                     [
                         'root' => $rootValue,
                         'context' => $context,
+                        // This makes it so that we get an instance of our own Validator class
                         'resolveInfo' => $resolveInfo,
                     ]
                 );

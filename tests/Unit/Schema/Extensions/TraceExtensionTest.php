@@ -18,24 +18,23 @@ class TraceExtensionTest extends TestCase
         $app['config']->set('lighthouse.extensions', ['tracing']);
     }
 
+    protected $schema = <<<SCHEMA
+type Query {
+    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TraceExtensionTest@resolve")
+}
+SCHEMA;
+
     /**
      * @test
      */
     public function itCanAddTraceExtensionMetaToResult()
     {
-        $resolver = addslashes(self::class).'@resolve';
-
-        $schema = "
-        type Query {
-            foo: String! @field(resolver: \"{$resolver}\")
-        }
-        ";
         $query = '
         {
             foo
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->postJson('graphql', ['query' => $query])->json();
 
         $this->assertArrayHasKey('tracing', array_get($result, 'extensions'));
         $this->assertArrayHasKey('resolvers', array_get($result, 'extensions.tracing.execution'));

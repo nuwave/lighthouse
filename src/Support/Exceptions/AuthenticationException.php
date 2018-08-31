@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Support\Exceptions;
 
-use Exception;
 use GraphQL\Error\ClientAware;
 
-class DirectiveException extends Exception implements ClientAware
+class AuthenticationException extends \Illuminate\Auth\AuthenticationException implements ClientAware
 {
+
     /**
      * Returns true when exception message is safe to be displayed to a client.
      *
@@ -15,7 +15,7 @@ class DirectiveException extends Exception implements ClientAware
      */
     public function isClientSafe()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -28,6 +28,6 @@ class DirectiveException extends Exception implements ClientAware
      */
     public function getCategory()
     {
-        return 'schema';
+        return 'authentication';
     }
 }

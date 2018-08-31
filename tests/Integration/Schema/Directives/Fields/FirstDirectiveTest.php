@@ -30,7 +30,7 @@ class FirstDirectiveTest extends DBTestCase
         $userC = factory(User::class)->create(['name' => 'C']);
 
 
-        $result = $this->queryAndReturnResult($schema, "{ user(id:{$userB->id}) { name } }");
+        $result = $this->executeQuery($schema, "{ user(id:{$userB->id}) { name } }");
         $this->assertEquals('B', $result->data['user']['name']);
     }
 
@@ -52,7 +52,7 @@ class FirstDirectiveTest extends DBTestCase
         $userC = factory(User::class)->create(['name' => 'B']);
 
 
-        $result = $this->queryAndReturnResult($schema, "{ user(name: \"A\") { id } }");
+        $result = $this->executeQuery($schema, "{ user(name: \"A\") { id } }");
         $this->assertEquals($userA->id, $result->data['user']['id']);
     }
 }

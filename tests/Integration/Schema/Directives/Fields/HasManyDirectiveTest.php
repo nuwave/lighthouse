@@ -61,7 +61,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         {
             user {
                 tasks {
@@ -98,7 +98,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         {
             user {
                 tasks(count: 2) {
@@ -140,7 +140,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         {
             user {
                 tasks(first: 2) {
@@ -181,7 +181,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         { 
             user { 
                 tasks(first: 2) { 

@@ -2,9 +2,10 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use GraphQL\Error\Error;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Support\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Support\Exceptions\AuthenticationException;
 
 class CanDirectiveTest extends TestCase
 {
@@ -13,8 +14,6 @@ class CanDirectiveTest extends TestCase
      */
     public function itThrowsWhenNotAuthenticated()
     {
-        $this->be(new User);
-
         $schema = $this->buildSchemaWithDefaultQuery('
         type Query {
             user: User! @can(if: "adminOnly")
@@ -28,7 +27,7 @@ class CanDirectiveTest extends TestCase
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'user.resolve');
 
-        $this->expectException(Error::class);
+        $this->expectException(AuthenticationException::class);
         $resolver();
     }
 
@@ -52,7 +51,7 @@ class CanDirectiveTest extends TestCase
         $fields = $type->config['fields']();
         $resolver = array_get($fields, 'user.resolve');
 
-        $this->expectException(Error::class);
+        $this->expectException(AuthorizationException::class);
         $resolver();
     }
 

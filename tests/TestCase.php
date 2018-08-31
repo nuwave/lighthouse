@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
@@ -12,7 +13,6 @@ use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
 
 class TestCase extends BaseTestCase
 {
-
     /**
      * This variable is injected the main GraphQL class
      * during execution of each test. It may be set either
@@ -85,12 +85,24 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function queryAndReturnResult(string $schema, string $query, array $variables = []): ExecutionResult
+    protected function executeQuery(string $schema, string $query, array $variables = []): ExecutionResult
     {
         // The schema is injected into the runtime during execution of the query
         $this->schema = $schema;
 
-        return graphql()->queryAndReturnResult($query, null, $variables);
+        return graphql()->executeQuery($query, null, $variables);
+    }
+
+    /**
+     * @param string $schema
+     * @param string $query
+     * @param array $variables
+     *
+     * @return array
+     */
+    protected function executeWithoutDebug(string $schema, string $query, array $variables = []): array
+    {
+        return $this->executeQuery($schema, $query, $variables)->toArray();
     }
 
     /**
@@ -104,9 +116,7 @@ class TestCase extends BaseTestCase
      */
     protected function execute(string $schema, string $query, array $variables = []): array
     {
-        $this->schema = $schema;
-
-        return graphql()->execute($query, null, $variables);
+        return $this->executeQuery($schema, $query, $variables)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
     }
 
     /**
@@ -120,9 +130,9 @@ class TestCase extends BaseTestCase
     protected function buildSchemaWithDefaultQuery($schema): Schema
     {
         return $this->buildSchemaFromString($schema.'
-            type Query {
-                dummy: String
-            }
+        type Query {
+            dummy: String
+        }
         ');
     }
 

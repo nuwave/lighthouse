@@ -1,5 +1,6 @@
 <?php
 
+use GraphQL\Error\Debug;
 use GraphQL\Validator\Rules\DisableIntrospection;
 
 return [
@@ -109,6 +110,17 @@ return [
         'max_query_depth' => 0,
         'disable_introspection' => DisableIntrospection::DISABLED,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Debug
+    |--------------------------------------------------------------------------
+    |
+    | Control the debug level as described in http://webonyx.github.io/graphql-php/error-handling/
+    | Debugging is only applied if the global Laravel debug config is set to true.
+    |
+    */
+    'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
 
      /*
      |--------------------------------------------------------------------------
