@@ -238,7 +238,7 @@ class QueryBuilder
      *
      * @return string
      */
-    private function tableAlias($name)
+    private function tableAlias(string $name): string
     {
         $table = explode('.',$name);
 
