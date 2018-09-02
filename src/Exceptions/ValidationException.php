@@ -2,10 +2,9 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use GraphQL\Error\ClientAware;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 
-class ValidationException extends \Illuminate\Validation\ValidationException implements ClientAware
+class ValidationException extends \Illuminate\Validation\ValidationException implements RendersErrorsExtensions
 {
     /**
      * Create a new exception instance.
@@ -31,5 +30,10 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
     public function getCategory()
     {
         return 'validation';
+    }
+
+    public function extensionsContent(): array
+    {
+        return ['validation' => $this->errors()];
     }
 }

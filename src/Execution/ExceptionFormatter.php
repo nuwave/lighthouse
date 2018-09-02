@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Error\FormattedError;
 use Nuwave\Lighthouse\Support\Contracts\ErrorFormatter;
-use Nuwave\Lighthouse\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 
 class ExceptionFormatter implements ErrorFormatter
 {
@@ -23,11 +23,8 @@ class ExceptionFormatter implements ErrorFormatter
 
         $underlyingException = $throwable->getPrevious();
 
-        if ($underlyingException instanceof ValidationException) {
-            // Format validation messages
-            $formatted['extensions'] = [
-                'validation' => $underlyingException->errors()
-            ];
+        if ($underlyingException instanceof RendersErrorsExtensions) {
+            $formatted['extensions'] = $underlyingException->extensionsContent();
         }
 
         return $formatted;

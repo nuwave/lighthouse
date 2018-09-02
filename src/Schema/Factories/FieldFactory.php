@@ -7,10 +7,9 @@ use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
-use Nuwave\Lighthouse\Support\Validator\GraphQLValidator;
-use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
 
 class FieldFactory
 {
@@ -45,7 +44,8 @@ class FieldFactory
             ->via('handleField')
             ->then(function (FieldValue $fieldValue) {
                 return $fieldValue;
-            })->getResolver();
+            })
+            ->getResolver();
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()

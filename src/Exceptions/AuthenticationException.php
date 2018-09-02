@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-use GraphQL\Error\ClientAware;
-
-class AuthenticationException extends \Illuminate\Auth\AuthenticationException implements ClientAware
+class AuthenticationException extends \Illuminate\Auth\AuthenticationException implements RendersErrorsExtensions
 {
 
     /**
@@ -29,5 +27,16 @@ class AuthenticationException extends \Illuminate\Auth\AuthenticationException i
     public function getCategory()
     {
         return 'authentication';
+    }
+
+    /**
+     * Return the content that is put in the "extensions" part
+     * of the returned error.
+     *
+     * @return array
+     */
+    public function extensionsContent(): array
+    {
+        return ['guards' => $this->guards];
     }
 }
