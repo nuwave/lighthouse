@@ -271,7 +271,7 @@ class FieldFactory
             })
             ->filter();
 
-        $messages = $inputValueDefinitions->pluck('messages');
+        $messages = $inputValueDefinitions->pluck('messages')->collapse();
 
         // Rules are applied to the fields which are on one of the root operation types.
         $parentOperationType = data_get($resolveInfo, 'parentType.name');

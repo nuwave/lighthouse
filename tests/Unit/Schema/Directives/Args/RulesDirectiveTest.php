@@ -57,7 +57,7 @@ class RulesDirectiveTest extends TestCase
         $this->assertNull(array_get($result, 'data.foo.full_name'));
         $this->assertCount(1, array_get($result, 'errors'));
         $this->assertSame('Validation failed for the field [foo.full_name]', array_get($result, 'errors.0.message'));
-        $this->assertSame(['formatted.required' => ['foobar']], array_get($result, 'errors.0.extensions.validation'));
+        $this->assertSame(['formatted' => ['foobar']], array_get($result, 'errors.0.extensions.validation'));
 
         $mutation = '
         mutation {
