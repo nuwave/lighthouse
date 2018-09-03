@@ -12,16 +12,32 @@ class RenameDirectiveTest extends TestCase
      */
     public function itCanRenameAField()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
-            fooBar: String! @rename(attribute: "foo_bar")
-        }
-        ');
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'fooBar.resolve');
+        $resolver = addslashes(self::class).'@resolve';
 
-        $this->assertEquals('bar', $resolver(['foo_bar' => 'bar', 'fooBar' => 'baz'], []));
+        $schema = "
+        type Query {
+            bar: Bar @field(resolver: \"{$resolver}\")
+        }
+        
+        type Bar {
+            bar: String! @rename(attribute: \"baz\")
+        }
+        ";
+        $query = '
+        {
+            bar {
+                bar
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertEquals('asdf', array_get($result, 'data.bar.bar'));
+    }
+
+    public function resolve()
+    {
+        return new Bar;
     }
 
     /**
@@ -30,13 +46,19 @@ class RenameDirectiveTest extends TestCase
     public function itThrowsAnExceptionIfNoAttributeDefined()
     {
         $this->expectException(DirectiveException::class);
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
-            fooBar: String! @rename
+        $this->execute('
+        type Query {
+            foo: String! @rename
+        }
+        ', '
+        {
+            fooBar
         }
         ');
-
-        $type = $schema->getType('Foo');
-        $type->config['fields']();
     }
+}
+
+class Bar
+{
+    public $baz = 'asdf';
 }

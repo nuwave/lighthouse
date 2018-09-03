@@ -11,23 +11,15 @@ class MethodDirectiveTest extends TestCase
      */
     public function itWillCallAMethodToResolveField()
     {
-        $root = new class() {
-            public function foobar()
-            {
-                return 'baz';
+        $result = $this->execute($this->schema(), '
+        {
+            foo {
+                bar
             }
-        };
-
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
-            bar: String! @method(name: "foobar")
         }
         ');
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'bar.resolve');
-        $this->assertEquals('baz', $resolver($root, []));
+        $this->assertEquals('foo', array_get($result, 'data.foo.bar'));
     }
 
     /**
@@ -35,22 +27,41 @@ class MethodDirectiveTest extends TestCase
      */
     public function itWillCallAMethodWithArgsToResolveField()
     {
-        $root = new class() {
-            public function bar(array $args)
-            {
-                return array_get($args, 'baz');
+        $result = $this->execute($this->schema(), '
+        {
+            foo {
+                bar(baz: "asdf")
             }
-        };
-
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
-            bar(baz: String!): String! @method(name: "bar")
         }
         ');
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'bar.resolve');
-        $this->assertEquals('foo', $resolver($root, ['baz' => 'foo']));
+        $this->assertEquals('fooasdf', array_get($result, 'data.foo.bar'));
+    }
+
+    public function resolve()
+    {
+        return new Foo;
+    }
+
+    protected function schema()
+    {
+        $resolver = addslashes(self::class).'@resolve';
+
+        return "
+        type Query {
+            foo: Foo @field(resolver: \"{$resolver}\")
+        }
+        
+        type Foo {
+            bar(baz: String): String! @method(name: \"foobar\")
+        }
+        ";
+    }
+}
+
+class Foo {
+    public function foobar(array $args = []): string
+    {
+        return 'foo' . array_get($args, 'baz');
     }
 }
