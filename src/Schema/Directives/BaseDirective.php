@@ -2,13 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\ListValueNode;
-use GraphQL\Language\AST\ObjectFieldNode;
-use GraphQL\Language\AST\ObjectValueNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
@@ -54,9 +48,10 @@ abstract class BaseDirective implements Directive
         $name = $name ?? static::name();
         $definitionNode = $definitionNode ?? $this->definitionNode;
 
-        return collect($definitionNode->directives)->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
-            return $directiveDefinitionNode->name->value === $name;
-        });
+        return collect($definitionNode->directives)
+            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
+                return $directiveDefinitionNode->name->value === $name;
+            });
     }
 
     /**
@@ -77,13 +72,7 @@ abstract class BaseDirective implements Directive
             return $default;
         }
 
-        $arg = collect($directive->arguments)->first(function (ArgumentNode $argumentNode) use ($name) {
-            return $argumentNode->name->value === $name;
-        });
-
-        return $arg
-            ? $this->argValue($arg, $default)
-            : $default;
+        return ASTHelper::directiveArgValue($directive, $name, $default);
     }
 
     /**
@@ -156,36 +145,5 @@ abstract class BaseDirective implements Directive
             ? $this->directiveArgValue(static::name(), '', $namespaceDirective)
             // Default to an empty namespace if the namespace directive does not exist
             : '';
-    }
-
-    /**
-     * Get argument's value.
-     *
-     * @param Node  $arg
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    protected function argValue(Node $arg, $default = null)
-    {
-        $valueNode = $arg->value;
-
-        if (! $valueNode) {
-            return $default;
-        }
-
-        if ($valueNode instanceof ListValueNode) {
-            return collect($valueNode->values)->map(function (ValueNode $valueNode) {
-                return $valueNode->value;
-            })->toArray();
-        }
-
-        if ($valueNode instanceof ObjectValueNode) {
-            return collect($valueNode->fields)->mapWithKeys(function (ObjectFieldNode $field) {
-                return [$field->name->value => $this->argValue($field)];
-            })->toArray();
-        }
-
-        return $valueNode->value;
     }
 }
