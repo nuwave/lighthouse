@@ -273,20 +273,15 @@ class FieldFactory
 
         $messages = $inputValueDefinitions->pluck('messages')->collapse();
 
-        // Rules are applied to the fields which are on one of the root operation types.
-        $parentOperationType = data_get($resolveInfo, 'parentType.name');
-        if ('Mutation' === $parentOperationType || 'Query' === $parentOperationType) {
-            $documentAST = graphql()->documentAST();
-            $nestedValidation = (new RuleFactory())->build(
-                $documentAST,
-                $documentAST->objectTypeDefinition($parentOperationType),
-                $inputArgs,
-                $resolveInfo->fieldName
-            );
+        list($nestedRules, $nestedMessages) = RuleFactory::build(
+            $resolveInfo->fieldName,
+            $resolveInfo->parentType->name,
+            $inputArgs,
+            graphql()->documentAST()
+        );
 
-            $rules = $rules->merge(array_get($nestedValidation, 'rules', []));
-            $messages = $messages->merge(array_get($nestedValidation, 'messages', []));
-        }
+        $rules = $rules->merge($nestedRules);
+        $messages = $messages->merge($nestedMessages);
 
         return [ $rules->toArray(), $messages->toArray(), ];
     }

@@ -147,6 +147,7 @@ class RulesDirectiveTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'full_name' => 'John Doe',
+            'input_object' => true
         ];
     }
 
@@ -155,17 +156,9 @@ class RulesDirectiveTest extends TestCase
         $resolver = addslashes(self::class).'@resolve';
 
         return "
-        type User {
-            first_name: String
-            last_name: String
-            full_name(
-                formatted: Boolean @rules(
-                    apply: [\"required\"]
-                    messages: {
-                        required: \"foobar\"
-                    }
-                )
-            ): String
+        type Query {
+            foo(bar: String @rules(apply: [\"required\"])): User
+                @field(resolver: \"{$resolver}\")
         }
         
         type Mutation {
@@ -173,10 +166,33 @@ class RulesDirectiveTest extends TestCase
                 @field(resolver: \"{$resolver}\")
         }
         
-        type Query {
-            foo(bar: String @rules(apply: [\"required\"])): User
-                @field(resolver: \"{$resolver}\")
+        type User {
+            first_name: String
+            last_name: String
+            full_name(
+                formatted: Boolean
+                    @rules(
+                        apply: [\"required\"]
+                        messages: {
+                            required: \"foobar\"
+                        }
+                    )
+            ): String
+            input_object(
+                input: UserInput
+            ): Boolean
         }
+        
+        input UserInput {
+            self: UserInput
+            email: String
+                @rules(
+                    apply: [\"email\"]
+                    messages: {
+                        email: \"Not an email\"
+                    }
+                )
+        }           
         ";
     }
 }

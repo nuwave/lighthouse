@@ -28,51 +28,55 @@ class RuleFactory
     /**
      * Build list of rules for field.
      *
-     * @param DocumentAST              $documentAST
-     * @param ObjectTypeDefinitionNode $parent
-     * @param array                    $variables
-     * @param string                   $fieldName
+     * @param string $fieldName
+     * @param string $parentTypeName
+     * @param array $variables
+     * @param DocumentAST $documentAST
      *
-     * @return array
+     * @return array [$rules, $messages]
      */
-    public function build(
-        DocumentAST $documentAST,
-        ObjectTypeDefinitionNode $parent,
+    public static function build(
+        string $fieldName,
+        string $parentTypeName,
         array $variables,
-        string $fieldName
+        DocumentAST $documentAST
     ): array {
-        $field = collect($parent->fields)
+        $instance = new static;
+
+        $parentDefinition = $documentAST->objectTypeDefinition($parentTypeName);
+
+        $fieldDefinition = collect($parentDefinition->fields)
             ->first(function (FieldDefinitionNode $field) use ($fieldName) {
                 return $fieldName === $field->name->value;
             });
 
-        if (! $field) {
+        if (! $fieldDefinition) {
             return [];
         }
 
-        $rules = $this->buildFieldRules($field);
+        $rules = $instance->buildFieldRules($fieldDefinition);
 
-        $inputRules = $this->buildRules(
+        $inputRules = $instance->buildRules(
             $documentAST,
-            $field,
+            $fieldDefinition,
             array_keys(array_dot($variables)),
             true
         );
 
-        $nestedRules = $this->buildRules(
+        $nestedRules = $instance->buildRules(
             $documentAST,
-            $field,
-            $this->nestedInputs,
+            $fieldDefinition,
+            $instance->nestedInputs,
             false
         );
 
         $rules = $rules->merge($inputRules->all())->merge($nestedRules->all());
 
         return [
-            'rules' => $rules->mapWithKeys(function ($rule, $key) {
+            $rules->mapWithKeys(function ($rule, $key) {
                 return [$key => $rule['rules']];
             })->toArray(),
-            'messages' => $rules->flatMap(function ($rule, $key) {
+            $rules->flatMap(function ($rule, $key) {
                 return collect($rule['messages'])
                     ->mapWithKeys(function ($message, $path) use ($key) {
                         return ["{$key}.{$path}" => $message];

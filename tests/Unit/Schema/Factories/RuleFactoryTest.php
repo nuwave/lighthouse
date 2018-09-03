@@ -19,16 +19,16 @@ class RuleFactoryTest extends TestCase
         }
         ');
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createUser',
+            'Mutation',
             [],
-            'createUser'
+            $documentAST
         );
 
         $this->assertEquals([
             'email' => ['required', 'email'],
-        ], $rules['rules']);
+        ], $rules);
     }
 
     /**
@@ -52,17 +52,17 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createUser',
+            'Mutation',
             $variables,
-            'createUser'
+            $documentAST
         );
 
         $this->assertEquals([
             'input' => ['required'],
             'input.email' => ['required', 'email'],
-        ], $rules['rules']);
+        ], $rules);
     }
 
     /**
@@ -99,11 +99,11 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createUser',
+            'Mutation',
             $variables,
-            'createUser'
+            $documentAST
         );
 
         $this->assertEquals([
@@ -112,11 +112,11 @@ class RuleFactoryTest extends TestCase
             'input.address' => ['required'],
             'input.address.street' => ['required'],
             'input.address.primary' => ['required'],
-        ], $rules['rules']);
+        ], $rules);
 
         $this->assertEquals([
             'input.address.primary.required' => 'foobar',
-        ], $rules['messages']);
+        ], $messages);
     }
 
     /**
@@ -153,11 +153,11 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createUser',
+            'Mutation',
             $variables,
-            'createUser'
+            $documentAST
         );
 
         $this->assertEquals([
@@ -166,11 +166,11 @@ class RuleFactoryTest extends TestCase
             'input.address' => ['required'],
             'input.address.*.street' => ['required'],
             'input.address.*.primary' => ['required'],
-        ], $rules['rules']);
+        ], $rules);
 
         $this->assertEquals([
             'input.address.*.primary.required' => 'foobar',
-        ], $rules['messages']);
+        ], $messages);
     }
 
     /**
@@ -215,11 +215,11 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createUser',
+            'Mutation',
             $variables,
-            'createUser'
+            $documentAST
         );
 
         $this->assertEquals([
@@ -230,12 +230,12 @@ class RuleFactoryTest extends TestCase
             'input.settings.*.value' => ['required'],
             'input.settings.*.setting.option' => ['required'],
             'input.settings.*.setting.value' => ['required'],
-        ], $rules['rules']);
+        ], $rules);
 
         $this->assertEquals([
             'input.settings.*.value.required' => 'foobar',
             'input.settings.*.setting.value.required' => 'foobar',
-        ], $rules['messages']);
+        ], $messages);
     }
 
     /**
@@ -249,16 +249,16 @@ class RuleFactoryTest extends TestCase
         }
         ');
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createFoo',
+            'Mutation',
             [],
-            'createFoo'
+            $documentAST
         );
 
         $this->assertEquals([
             'required' => ['required'],
-        ], $rules['rules']);
+        ], $rules);
     }
 
     /**
@@ -280,11 +280,11 @@ class RuleFactoryTest extends TestCase
         }
         ');
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createFoo',
+            'Mutation',
             [],
-            'createFoo'
+            $documentAST
         );
 
         $this->assertEquals([
@@ -292,7 +292,7 @@ class RuleFactoryTest extends TestCase
             'requiredSDL.required' => ['required'],
             'requiredBoth' => ['required'],
             'requiredBoth.required' => ['required'],
-        ], $rules['rules']);
+        ], $rules);
     }
 
     /**
@@ -322,23 +322,23 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $rules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        list($rules, $messages) = RuleFactory::build(
+            'createFoo',
+            'Mutation',
             $variables,
-            'createFoo'
+            $documentAST
         );
 
         $this->assertEquals([
             'input' => ['required'],
             'input.required' => ['required'],
             'input.self.required' => ['required'],
-        ], $rules['rules']);
+        ], $rules);
 
         $this->assertEquals([
             'input.required.required' => 'foobar',
             'input.self.required.required' => 'foobar',
-        ], $rules['messages']);
+        ], $messages);
     }
 
     /**
@@ -366,18 +366,18 @@ class RuleFactoryTest extends TestCase
             ],
         ];
 
-        $mutationRules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Mutation'),
+        $mutationRules = RuleFactory::build(
+            'foo',
+            'Mutation',
             $variables,
-            'foo'
+            $documentAST
         );
 
-        $queryRules = (new RuleFactory())->build(
-            $documentAST,
-            $documentAST->objectTypeDefinition('Query'),
+        $queryRules = RuleFactory::build(
+            'foo',
+            'Query',
             $variables,
-            'foo'
+            $documentAST
         );
 
         $this->assertSame($mutationRules, $queryRules);

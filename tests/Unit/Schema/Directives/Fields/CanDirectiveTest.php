@@ -14,7 +14,7 @@ class CanDirectiveTest extends TestCase
      */
     public function itThrowsWhenNotAuthenticated()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: "adminOnly")
         }
@@ -22,13 +22,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
 
         $this->expectException(AuthenticationException::class);
-        $resolver();
+        $this->execute($schema, $query);
     }
 
     /**
@@ -38,7 +42,7 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: "adminOnly")
         }
@@ -46,13 +50,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
 
         $this->expectException(AuthorizationException::class);
-        $resolver();
+        $this->execute($schema, $query);
     }
 
     /**
@@ -64,7 +72,7 @@ class CanDirectiveTest extends TestCase
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: "adminOnly") @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
@@ -72,13 +80,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
-        $result = $resolver(null, []);
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', $result->name);
+        $this->assertSame('foo', array_get($result, 'data.user.name'));
     }
 
     /**
@@ -90,7 +102,7 @@ class CanDirectiveTest extends TestCase
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: ["adminOnly", "alwaysTrue"]) @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
@@ -98,13 +110,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
-        $result = $resolver(null, []);
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', $result->name);
+        $this->assertSame('foo', array_get($result, 'data.user.name'));
     }
 
     public function resolveUser()
