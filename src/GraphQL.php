@@ -17,10 +17,9 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Execution\ExceptionFormatter;
-use Nuwave\Lighthouse\Exceptions\NewHandler;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\ErrorsHandler;
+use Nuwave\Lighthouse\Support\Contracts\FormatsErrors;
+use Nuwave\Lighthouse\Support\Contracts\HandlesErrors;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -94,7 +93,8 @@ class GraphQL
         );
 
         $result->extensions = resolve(ExtensionRegistry::class)->toArray();
-        $result->setErrorFormatter([ExceptionFormatter::class, 'format']);
+        $result->setErrorFormatter([app(FormatsErrors::class), 'format']);
+        $result->setErrorsHandler([app(HandlesErrors::class), 'handle']);
 
         return $result;
     }
@@ -224,12 +224,12 @@ class GraphQL
     }
 
     /**
-     * @return ErrorsHandler
+     * @return HandlesErrors
      * @deprecated Use resolve() instead, will be removed in v3
      */
-    public function exceptionHandler(): ErrorsHandler
+    public function exceptionHandler(): HandlesErrors
     {
-        return resolve(ErrorsHandler::class);
+        return resolve(HandlesErrors::class);
     }
 
     /**

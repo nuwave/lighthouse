@@ -3,10 +3,11 @@
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Error\FormattedError;
-use Nuwave\Lighthouse\Support\Contracts\ErrorFormatter;
+use Nuwave\Lighthouse\Support\Contracts\FormatsErrors;
 use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
+use Nuwave\Lighthouse\Support\Contracts\HandlesErrors;
 
-class ExceptionFormatter implements ErrorFormatter
+class LighthouseErrorHandler implements FormatsErrors, HandlesErrors
 {
     /**
      * A function that can be set as an Error Handler on GraphQL\Executor\ExecutionResult->setErrorHandler()
@@ -28,5 +29,18 @@ class ExceptionFormatter implements ErrorFormatter
         }
 
         return $formatted;
+    }
+
+    /**
+     * A function that can be set as an Error Handler on GraphQL\Executor\ExecutionResult->setErrorHandler()
+     *
+     * @param array $errors
+     * @param callable $formatter
+     * @return array
+     */
+    public static function handle(array $errors, callable $formatter): array
+    {
+        // Reimplement the default behaviour ATM
+        return array_map($formatter, $errors);
     }
 }

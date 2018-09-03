@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-interface ErrorsHandler
+interface HandlesErrors
 {
     /**
      * A function that can be set as an Error Handler on GraphQL\Executor\ExecutionResult->setErrorHandler()
