@@ -122,6 +122,20 @@ return [
     */
     'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Error Handlers
+    |--------------------------------------------------------------------------
+    |
+    | Register error handlers that receive the Errors that occur during execution and
+    | handle them. You may use this to log, filter or format the errors.
+    | The classes must implement Nuwave\Lighthouse\Execution\ErrorHandler
+    |
+    */
+    'error_handlers' => [
+        \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
+    ],
+
      /*
      |--------------------------------------------------------------------------
      | GraphQL Controller

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse;
 
+use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
 use Illuminate\Support\Facades\Cache;
@@ -14,14 +15,14 @@ use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Execution\HandlesErrors;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\Contracts\FormatsErrors;
-use Nuwave\Lighthouse\Support\Contracts\HandlesErrors;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Support\Pipeline;
 
 class GraphQL
 {
@@ -93,8 +94,34 @@ class GraphQL
         );
 
         $result->extensions = resolve(ExtensionRegistry::class)->toArray();
-        $result->setErrorFormatter([app(FormatsErrors::class), 'format']);
-        $result->setErrorsHandler([app(HandlesErrors::class), 'handle']);
+        $result->setErrorsHandler(function (array $errors, callable $formatter): array {
+            // Do report: Errors that are not client safe, schema definition errors
+            // Do not report: Validation, Errors that are meant for the final user
+            // Misformed Queries: Log if you are dog-fooding your app
+
+            // Allow to register multiple formatters and pipe the errors through all of them
+
+            //report()
+
+            // Reimplement the default behaviour ATM
+
+            /**
+             * Formatters are defined as classes in the config.
+             * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
+             */
+            $handlers = config('lighthouse.error_handlers', []);
+
+            return collect($errors)
+                ->map(function (Error $error) use ($handlers, $formatter) {
+                    return app(Pipeline::class)
+                        ->send($error)
+                        ->through($handlers)
+                        ->then(function (Error $error) use ($formatter){
+                            return $formatter($error);
+                        });
+                })
+                ->toArray();
+        });
 
         return $result;
     }

@@ -15,11 +15,8 @@ use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
-use Nuwave\Lighthouse\Support\Contracts\HandlesErrors;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
-use Nuwave\Lighthouse\Support\Contracts\FormatsErrors;
 use Nuwave\Lighthouse\Schema\Extensions\TraceExtension;
-use Nuwave\Lighthouse\Execution\LighthouseErrorHandler;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -83,8 +80,6 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new SchemaStitcher(config('lighthouse.schema.register', ''));
             }
         );
-        $this->app->bind(FormatsErrors::class, LighthouseErrorHandler::class);
-        $this->app->bind(HandlesErrors::class, LighthouseErrorHandler::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([
