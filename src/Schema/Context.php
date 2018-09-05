@@ -17,7 +17,9 @@ class Context
     /**
      * Authenticated user.
      *
-     * @var User
+     * May be null since some fields may be accessible without authentication.
+     *
+     * @var User|null
      */
     public $user;
 
@@ -25,9 +27,9 @@ class Context
      * Create new context.
      *
      * @param Request $request
-     * @param User $user
+     * @param User|null $user
      */
-    public function __construct(Request $request, User $user)
+    public function __construct(Request $request, User $user = null)
     {
         $this->request = $request;
         $this->user = $user;

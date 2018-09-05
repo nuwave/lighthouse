@@ -31,7 +31,6 @@ SCHEMA;
      */
     public function itCanAddTracingExtensionMetaToResult()
     {
-        $this->be(new User);
         $query = '
         {
             foo
