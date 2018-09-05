@@ -165,8 +165,6 @@ class FieldFactory
      * @param \Closure                       $resolver
      * @param \Illuminate\Support\Collection $inputValueDefinitions
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ValidationError
-     *
      * @return \Closure
      */
     protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
@@ -193,9 +191,7 @@ class FieldFactory
                     ]
                 );
 
-                if ($validator->fails()) {
-                    throw with(new ValidationError('validation'))->setValidator($validator);
-                }
+                $validator->validate();
             }
 
             return call_user_func_array($resolver, [$rootValue, $inputArgs, $context, $resolveInfo]);
@@ -254,7 +250,7 @@ class FieldFactory
                 $rules = data_get($inputValueDefinition, 'rules');
 
                 if (! $rules) {
-                    return;
+                    return null;
                 }
 
                 $rules = is_callable($rules)

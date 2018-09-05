@@ -20,7 +20,7 @@ class RulesDirectiveTest extends TestCase
         ';
 
         $result = $this->execute($this->schema(), $query);
-        $this->assertCount(1, array_get($result, 'errors.0.validation'));
+        $this->assertCount(1, array_get($result, 'errors'));
         $this->assertNull($result['data']['foo']);
 
         $mutation = '
@@ -53,8 +53,8 @@ class RulesDirectiveTest extends TestCase
         $this->assertEquals('John', array_get($result, 'data.foo.first_name'));
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
-        $this->assertCount(1, array_get($result, 'errors.0.validation'));
-        $this->assertEquals('foobar', array_get($result, 'errors.0.validation.0'));
+        $this->assertCount(1, array_get($result, 'errors'));
+        $this->assertEquals('foobar', array_get($result, 'errors.0.message'));
 
         $mutation = '
         mutation {
@@ -87,7 +87,7 @@ class RulesDirectiveTest extends TestCase
 
         $result = $this->execute($this->schema(), $mutation);
         $this->assertNull(array_get($result, 'data.foo'));
-        $this->assertCount(1, array_get($result, 'errors.0.validation'));
+        $this->assertCount(1, array_get($result, 'errors'));
 
         $query = '
         {
@@ -106,7 +106,7 @@ class RulesDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanProcessMutationsWithInvalidRetunrObjectFields()
+    public function itCanProcessMutationsWithInvalidReturnObjectFields()
     {
         $mutation = '
         mutation {
@@ -122,7 +122,7 @@ class RulesDirectiveTest extends TestCase
         $this->assertEquals('John', array_get($result, 'data.foo.first_name'));
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
-        $this->assertCount(1, array_get($result, 'errors.0.validation'));
+        $this->assertCount(1, array_get($result, 'errors'));
 
         $query = '
         {
@@ -164,13 +164,16 @@ class RulesDirectiveTest extends TestCase
                 )
             ): String
         }
+        
         type Mutation {
             foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
         }
+        
         type Query {
             foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
     }
 }

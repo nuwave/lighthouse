@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Http\Request;
+
 class ExtensionRequest
 {
     /**
@@ -32,7 +34,7 @@ class ExtensionRequest
     public function __construct(array $options)
     {
         $this->request = array_get($options, 'request');
-        $this->queryString = array_get($options, 'query_string');
+        $this->queryString = array_get($options, 'queryString');
         $this->operationName = array_get($options, 'operationName');
         $this->variables = array_get($options, 'variables');
     }
@@ -40,9 +42,9 @@ class ExtensionRequest
     /**
      * Get request instance.
      *
-     * @return \Illuminate\Http\Request
+     * @return Request
      */
-    public function request()
+    public function request(): Request
     {
         return $this->request;
     }
@@ -52,7 +54,7 @@ class ExtensionRequest
      *
      * @return string
      */
-    public function queryString()
+    public function queryString(): string
     {
         return $this->queryString;
     }
@@ -62,7 +64,7 @@ class ExtensionRequest
      *
      * @return string
      */
-    public function operationName()
+    public function operationName(): string
     {
         return $this->operationName;
     }
@@ -72,18 +74,8 @@ class ExtensionRequest
      *
      * @return array
      */
-    public function variables()
+    public function variables(): array
     {
         return $this->variables;
-    }
-
-    /**
-     * GraphQL schema.
-     *
-     * @return \GraphQL\Type\Schema
-     */
-    public function schema()
-    {
-        return $this->schema;
     }
 }

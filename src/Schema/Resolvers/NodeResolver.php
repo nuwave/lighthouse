@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Resolvers;
 
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\NamedTypeNode;
 
 class NodeResolver
 {
@@ -12,9 +12,9 @@ class NodeResolver
      *
      * @param mixed $node
      *
-     * @return \GraphQL\Type\Definition\Type
+     * @return Type
      */
-    public static function resolve($node)
+    public static function resolve($node): Type
     {
         return (new static())->fromNode($node);
     }
@@ -59,13 +59,13 @@ class NodeResolver
      *
      * @param mixed $node
      *
-     * @return mixed
+     * @return Type|null
      */
     protected function extractTypeFromNode($node)
     {
-        if ($node instanceof NamedTypeNode) {
-            return $this->convertNamedType($node);
-        }
+        return $node instanceof NamedTypeNode
+            ? $this->convertNamedType($node)
+            : null;
     }
 
     /**
@@ -73,9 +73,9 @@ class NodeResolver
      *
      * @param NamedTypeNode $node
      *
-     * @return mixed
+     * @return Type
      */
-    protected function convertNamedType(NamedTypeNode $node)
+    protected function convertNamedType(NamedTypeNode $node): Type
     {
         switch ($node->name->value) {
             case 'ID':

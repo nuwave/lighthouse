@@ -25,7 +25,6 @@ class BcryptDirectiveTest extends TestCase
         type Foo {
             bar: String
         }
-        
         ';
         $mutationQuery = '
         mutation {

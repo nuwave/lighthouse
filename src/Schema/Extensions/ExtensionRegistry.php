@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Support\Collection;
+
 class ExtensionRegistry
 {
     /**
@@ -18,35 +20,43 @@ class ExtensionRegistry
     }
 
     /**
-     * Register graphql extension.
+     * Register a single GraphQL extension.
      *
      * @param GraphQLExtension $extension
+     *
+     * @return ExtensionRegistry
      */
-    public function register(GraphQLExtension $extension)
+    public function register(GraphQLExtension $extension): ExtensionRegistry
     {
         $this->extensions->put($extension->name(), $extension);
+
+        return $this;
     }
 
     /**
-     * Register graphql extensions.
+     * Register multiple GraphQL extensions.
      *
      * @param array $extensions
+     *
+     * @return ExtensionRegistry
      */
-    public function registerMany($extensions)
+    public function registerMany(array $extensions): ExtensionRegistry
     {
         foreach ($extensions as $extension) {
             $this->register($extension);
         }
+
+        return $this;
     }
 
     /**
-     * Get extension.
+     * Get extension by name.
      *
-     * @param name $name
+     * @param string $name
      *
      * @return GraphQLExtension|null
      */
-    public function get($name)
+    public function get(string $name)
     {
         return $this->extensions->get($name);
     }
@@ -54,9 +64,9 @@ class ExtensionRegistry
     /**
      * Get active extensions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function active()
+    public function active(): Collection
     {
         $extensions = config('lighthouse.extensions', []);
 
@@ -71,12 +81,16 @@ class ExtensionRegistry
      * Handle request start.
      *
      * @param ExtensionRequest $request
+     *
+     * @return ExtensionRegistry
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function requestDidStart(ExtensionRequest $request): ExtensionRegistry
     {
         $this->active()->each(function (GraphQLExtension $extension) use ($request) {
             $extension->requestDidStart($request);
         });
+
+        return $this;
     }
 
     /**
@@ -84,7 +98,7 @@ class ExtensionRegistry
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->active()
             ->mapWithKeys(function (GraphQLExtension $extension) {

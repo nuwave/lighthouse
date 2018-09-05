@@ -17,18 +17,21 @@ class PaginateDirectiveTest extends DBTestCase
      */
     public function itCanCreateQueryPaginators()
     {
-        $users = factory(User::class, 10)->create();
+        factory(User::class, 10)->create();
 
         $schema = '
         type User {
             id: ID!
             name: String!
         }
+        
         type Query {
             users: [User!]! @paginate(type: "paginator" model: "User")
-        }';
+        }
+        ';
 
-        $query = '{
+        $query = '
+        {
             users(count: 5) {
                 paginatorInfo {
                     count
@@ -40,7 +43,8 @@ class PaginateDirectiveTest extends DBTestCase
                     name
                 }
             }
-        }';
+        }
+        ';
 
         $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals(5, array_get($result->data, 'users.paginatorInfo.count'));
@@ -58,7 +62,7 @@ class PaginateDirectiveTest extends DBTestCase
         $posts = factory(Post::class, 10)->create([
             'user_id' => $users->first()->id,
         ]);
-        $comments = factory(Comment::class, 10)->create([
+        factory(Comment::class, 10)->create([
             'post_id' => $posts->first()->id,
         ]);
 
@@ -83,7 +87,8 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $query = '{
+        $query = '
+        {
             users(count:3 page: 1) {
                 paginatorInfo {
                     count
@@ -109,7 +114,8 @@ class PaginateDirectiveTest extends DBTestCase
                     }
                 }
             }
-        }';
+        }
+        ';
 
         $result = $this->queryAndReturnResult($schema, $query);
         $this->assertEquals(1, array_get($result->data, 'users.paginatorInfo.currentPage'));
@@ -122,19 +128,21 @@ class PaginateDirectiveTest extends DBTestCase
      */
     public function itCanCreateQueryConnections()
     {
-        $users = factory(User::class, 10)->create();
+        factory(User::class, 10)->create();
 
         $schema = '
         type User {
             id: ID!
             name: String!
         }
+        
         type Query {
             users: [User!]! @paginate(type: "relay" model: "User")
         }
         ';
 
-        $query = '{
+        $query = '
+        {
             users(first: 5) {
                 pageInfo {
                     hasNextPage
@@ -146,7 +154,8 @@ class PaginateDirectiveTest extends DBTestCase
                     }
                 }
             }
-        }';
+        }
+        ';
 
         $result = $this->queryAndReturnResult($schema, $query);
         $this->assertTrue(array_get($result->data, 'users.pageInfo.hasNextPage'));

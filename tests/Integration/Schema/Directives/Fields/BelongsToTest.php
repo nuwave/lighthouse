@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Company;
-use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
+use Tests\Utils\Models\Team;
+use Tests\Utils\Models\Company;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BelongsToTest extends DBTestCase
 {
@@ -59,9 +59,11 @@ class BelongsToTest extends DBTestCase
         type Company {
             name: String!
         }
+        
         type User {
             company: Company @belongsTo
         }
+        
         type Query {
             user: User @auth
         }

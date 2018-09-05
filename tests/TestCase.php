@@ -3,18 +3,15 @@
 namespace Tests;
 
 use GraphQL\Type\Schema;
-use GraphQL\Language\Parser;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
+use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Nuwave\Lighthouse\Support\Traits\CanFormatError;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
-use Tests\Utils\Policies\AuthServiceProvider;
 
 class TestCase extends BaseTestCase
 {
-    use CanFormatError;
 
     /**
      * This variable is injected the main GraphQL class
@@ -77,18 +74,6 @@ class TestCase extends BaseTestCase
             'lighthouse.namespaces.models',
             'Tests\\Utils\\Models'
         );
-    }
-
-    /**
-     * Parse raw schema.
-     *
-     * @param string $schema
-     *
-     * @return \GraphQL\Language\AST\DocumentNode
-     */
-    protected function parse($schema)
-    {
-        return Parser::parse($schema);
     }
 
     /**

@@ -27,7 +27,9 @@ class ValidateSchemaCommand extends Command
     {
         // Clear the cache so this always validates the current schema
         Cache::forget(config('lighthouse.cache.key'));
+
         graphql()->prepSchema()->assertValid();
+
         $this->info('The defined schema is valid.');
     }
 }

@@ -3,6 +3,9 @@
 namespace Nuwave\Lighthouse\Support\Validator;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
 
 abstract class Validator
@@ -24,26 +27,26 @@ abstract class Validator
     /**
      * GraphQL Context.
      *
-     * @var \Nuwave\Lighthouse\Schema\Context
+     * @var Context
      */
     protected $context;
 
     /**
      * Field resolve info.
      *
-     * @var \GraphQL\Type\Definition\ResolveInfo
+     * @var ResolveInfo
      */
     protected $info;
 
     /**
      * Create new instance of field validator.
      *
-     * @param mixed                                $root
-     * @param array                                $args
-     * @param \Nuwave\Lighthouse\Schema\Context    $context
-     * @param \GraphQL\Type\Definition\ResolveInfo $info
+     * @param mixed $root
+     * @param array $args
+     * @param Context $context
+     * @param ResolveInfo $info
      */
-    public function __construct($root, array $args, $context, $info)
+    public function __construct($root, array $args, $context, ResolveInfo $info)
     {
         $this->root = $root;
         $this->args = $args;
@@ -54,16 +57,18 @@ abstract class Validator
     /**
      * Process validator for field.
      *
+     * @throws Error
+     *
      * @return bool
      */
-    public function validate()
+    public function validate(): bool
     {
-        if (! $this->can()) {
+        if (!$this->can()) {
             $this->handleUnauthorized();
         }
 
         $validator = validator(
-            $this->args(),
+            $this->args,
             $this->rules(),
             $this->messages()
         );
@@ -76,33 +81,69 @@ abstract class Validator
     }
 
     /**
-     * Get field argument.
+     * Check if user is authorized.
      *
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
+     * @return bool
      */
-    protected function argument($key, $default = null)
+    protected function can(): bool
     {
-        return array_get($this->args, $key, $default);
+        return true;
     }
 
     /**
-     * Get field arguments.
+     * Handle an unauthorized request.
+     * @throws Error
+     */
+    protected function handleUnauthorized()
+    {
+        throw new Error('Unauthorized');
+    }
+
+    /**
+     * Get rules for field.
      *
      * @return array
      */
-    protected function args()
+    abstract protected function rules(): array;
+
+    /**
+     * Get validator messages.
+     *
+     * @return array
+     */
+    protected function messages(): array
     {
-        return $this->args;
+        return [];
+    }
+
+    /**
+     * Handle an invalid request.
+     *
+     * @param ValidatorContract $validator
+     */
+    protected function handleInvalid(ValidatorContract $validator)
+    {
+        throw with(new ValidationError('validation'))->setValidator($validator);
+    }
+
+    /**
+     * Get field argument.
+     *
+     * @param string $key
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    protected function argument(string $key, $default = null)
+    {
+        return array_get($this->args, $key, $default);
     }
 
     /**
      * Get input (or input argument).
      *
      * @param string|null $key
-     * @param mixed|null  $default
+     * @param mixed|null $default
      *
      * @return \Illuminate\Support\Collection|mixed
      */
@@ -112,49 +153,4 @@ abstract class Validator
             ? array_get($this->args, $key, $default)
             : collect($this->args);
     }
-
-    /**
-     * Get validator messages.
-     *
-     * @return array
-     */
-    protected function messages()
-    {
-        return [];
-    }
-
-    /**
-     * Check if user is authorized.
-     *
-     * @return bool
-     */
-    protected function can()
-    {
-        return true;
-    }
-
-    /**
-     * Handle an unauthorized request.
-     */
-    protected function handleUnauthorized()
-    {
-        throw new Error('Unauthorized');
-    }
-
-    /**
-     * Handle an invalid request.
-     *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
-     */
-    protected function handleInvalid($validator)
-    {
-        throw with(new ValidationError('validation'))->setValidator($validator);
-    }
-
-    /**
-     * Get rules for field.
-     *
-     * @return array
-     */
-    abstract protected function rules();
 }

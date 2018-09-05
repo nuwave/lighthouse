@@ -46,15 +46,14 @@ class AllDirectiveTest extends DBTestCase
      */
     public function itCanGetAllAsNestedField()
     {
-        $users = factory(User::class, 1)->create();
-        $userId = $users->first()->id;
         factory(Post::class, 2)->create([
-            'user_id' => $userId,
+            // Do not create those, as they would create more users
+            'task_id' => 1,
         ]);
 
         $schema = '
         type User {
-            posts: [Post!]! @all(model: "Post")
+            posts: [Post!]! @all
         }
 
         type Post {
@@ -62,7 +61,7 @@ class AllDirectiveTest extends DBTestCase
         }
 
         type Query {
-            users: [User!]! @all(model: "User")
+            users: [User!]! @all
         }
         ';
         $query = '
@@ -76,8 +75,12 @@ class AllDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(1, array_get($result, 'data.users'));
-        $this->assertCount(2, array_get($result, 'data.users.0.posts'));
+        $this->assertSame([
+            'users' => [
+                ['posts' => [['id' => '1'], ['id' => '2']]],
+                ['posts' => [['id' => '1'], ['id' => '2']]],
+            ],
+        ], $result['data']);
     }
 
     /**

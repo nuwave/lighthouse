@@ -1,10 +1,9 @@
 <?php
 
-use Faker\Generator as Faker;
-use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\Team;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Faker\Generator as Faker;
 
 $factory->define(Post::class, function (Faker $faker) {
     return [
@@ -12,6 +11,9 @@ $factory->define(Post::class, function (Faker $faker) {
         'body' => $faker->sentence,
         'user_id' => function () {
             return factory(User::class)->create()->getKey();
+        },
+        'task_id' => function () {
+            return factory(Task::class)->create()->getKey();
         },
     ];
 });

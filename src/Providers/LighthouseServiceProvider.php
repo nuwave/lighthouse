@@ -7,10 +7,12 @@ use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
+use Nuwave\Lighthouse\Support\Exceptions\Handler;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Extensions\TraceExtension;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
 use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
 
@@ -21,11 +23,12 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
+
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('lighthouse.php'),
             __DIR__.'/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
         ]);
-        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
 
         if (config('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
@@ -60,6 +63,8 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
 
+        $this->app->bind(ExceptionHandler::class, Handler::class);
+
         $this->app->singleton(ValueFactory::class);
 
         $this->app->bind(
@@ -87,11 +92,10 @@ class LighthouseServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register graphql validator.
+     * Register GraphQL validator.
      */
     public function registerValidator()
     {
-        // TODO: Check compatibility w/ Lumen
         app(\Illuminate\Validation\Factory::class)->resolver(function (
             $translator,
             $data,

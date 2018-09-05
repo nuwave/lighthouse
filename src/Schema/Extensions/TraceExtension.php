@@ -4,9 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Carbon\Carbon;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Type\Definition\NonNull;
-use GraphQL\Type\Definition\ListOfType;
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -40,7 +37,7 @@ class TraceExtension extends GraphQLExtension
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'tracing';
     }
@@ -51,9 +48,11 @@ class TraceExtension extends GraphQLExtension
      * @param DocumentAST $current
      * @param DocumentAST $original
      *
+     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     *
      * @return DocumentAST
      */
-    public function manipulateSchema(DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(DocumentAST $current, DocumentAST $original): DocumentAST
     {
         $trace = PartialParser::directive('@trace');
 
@@ -115,7 +114,7 @@ class TraceExtension extends GraphQLExtension
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $end = now();
         $duration = abs(($end->micro - $this->requestStart->micro) * 1000);
