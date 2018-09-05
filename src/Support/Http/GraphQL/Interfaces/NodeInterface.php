@@ -21,6 +21,6 @@ class NodeInterface
      */
     public function resolve($value)
     {
-        return $this->resolve(NodeRegistry::class)->resolveType($value);
+        return resolve(NodeRegistry::class)->resolveType($value);
     }
 }
