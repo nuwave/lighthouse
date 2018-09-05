@@ -7,6 +7,7 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
