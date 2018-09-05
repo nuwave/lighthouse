@@ -50,18 +50,26 @@ class HasManyDirectiveTest extends DBTestCase
         type User {
             tasks: [Task!]! @hasMany
         }
+        
         type Task {
             id: Int
             foo: String
         }
+        
         type Query {
             user: User @auth
         }
         ';
 
-        $this->be($this->user);
-
-        $result = $this->queryAndReturnResult($schema, '{ user { tasks { id } } }');
+        $result = $this->queryAndReturnResult($schema, '
+        {
+            user {
+                tasks {
+                    id
+                }
+            }
+        }
+        ');
 
         $this->assertCount(3, array_get($result->data, 'user.tasks'));
     }
@@ -76,19 +84,35 @@ class HasManyDirectiveTest extends DBTestCase
             tasks: [Task!]! @hasMany(type:"paginator")
             posts: [Post!]! @hasMany(type:"paginator")
         }
+        
         type Task {
             id: Int!
         }
+        
         type Post {
             id: Int!
         }
+        
         type Query {
             user: User @auth
         }
         ';
 
         $result = $this->queryAndReturnResult($schema, '
-        { user { tasks(count: 2) { paginatorInfo { total count hasMorePages } data { id } } } }
+        {
+            user {
+                tasks(count: 2) {
+                    paginatorInfo {
+                        total
+                        count
+                        hasMorePages
+                    }
+                    data {
+                        id
+                    }
+                }
+            }
+        }
         ');
 
         $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
@@ -106,16 +130,31 @@ class HasManyDirectiveTest extends DBTestCase
         type User {
             tasks: [Task!]! @hasMany(type:"relay")
         }
+        
         type Task {
             id: Int!
         }
+        
         type Query {
             user: User @auth
         }
         ';
 
         $result = $this->queryAndReturnResult($schema, '
-        { user { tasks(first: 2) { pageInfo { hasNextPage } edges { node { id } } } } }
+        {
+            user {
+                tasks(first: 2) {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
         ');
 
         $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
@@ -125,16 +164,71 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanQueryHasManyNestedRelationships()
+    {
+        $schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type:"relay")
+        }
+        
+        type Task {
+            id: Int!
+            user: User @belongsTo
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->queryAndReturnResult($schema, '
+        { 
+            user { 
+                tasks(first: 2) { 
+                    pageInfo { 
+                        hasNextPage 
+                    } 
+                    edges { 
+                        node { 
+                            id
+                            user {
+                                tasks(first: 2) {
+                                    edges {
+                                        node {
+                                            id
+                                        }
+                                    }
+                                }
+                            }
+                        } 
+                    } 
+                } 
+            } 
+        }
+        ');
+
+        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
+    }
+
+    /**
+     * @test
+     */
     public function itThrowsErrorWithUnknownTypeArg()
     {
         $this->expectException(DirectiveException::class);
+
         $schema = $this->buildSchemaWithDefaultQuery('
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
         }
+        
         type Task {
             foo: String
-        }');
+        }
+        ');
+
         $type = $schema->getType('User');
         $type->config['fields']();
     }

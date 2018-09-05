@@ -32,19 +32,17 @@ class InterfaceDirective extends BaseDirective implements NodeResolver
      */
     public function resolveNode(NodeValue $value)
     {
-        $resolver = $this->directiveArgValue('resolver');
-
-        $instance = app(array_get(explode('@', $resolver), '0'));
-        $method = array_get(explode('@', $resolver), '1');
-
         return new InterfaceType([
             'name' => $value->getNodeName(),
             'description' => $value->getNode()->description,
             'fields' => function () use ($value) {
                 return $this->getFields($value);
             },
-            'resolveType' => function ($value) use ($instance, $method) {
-                return call_user_func_array([$instance, $method], [$value]);
+            'resolveType' => function ($value){
+                $resolver = $this->directiveArgValue('resolver');
+                list($className, $method) = explode('@', $resolver);
+
+                return call_user_func_array([app($className), $method], [$value]);
             },
         ]);
     }

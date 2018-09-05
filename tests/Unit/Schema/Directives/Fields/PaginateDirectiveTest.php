@@ -20,13 +20,13 @@ class PaginateDirectiveTest extends TestCase
     protected function getConnectionQueryField($type)
     {
         return $this->buildSchemaFromString("
-            type Users {
-                name: String
-            }
-            
-            type Query {
-                users: [User!]! @paginate(type: \"$type\" model: \"User\")
-            }
+        type Users {
+            name: String
+        }
+        
+        type Query {
+            users: [User!]! @paginate(type: \"$type\" model: \"User\")
+        }
         ")->getQueryType()->getField('users');
     }
 }

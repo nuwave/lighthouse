@@ -18,7 +18,7 @@ class Pipeline extends BasePipeline
      */
     public function through($pipes)
     {
-        if ($pipes instanceof \Illuminate\Support\Collection) {
+        if ($pipes instanceof Collection) {
             $pipes = $pipes->toArray();
         }
 

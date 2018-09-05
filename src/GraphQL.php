@@ -2,27 +2,30 @@
 
 namespace Nuwave\Lighthouse;
 
-use GraphQL\Deferred;
 use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Cache;
+use GraphQL\Validator\Rules\QueryDepth;
+use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeContainer;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
+use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareManager;
-use Nuwave\Lighthouse\Support\Traits\CanFormatError;
+use Nuwave\Lighthouse\Support\Exceptions\Handler;
+use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
-    use CanFormatError;
-
     /**
      * Directive registry container.
      *
@@ -73,26 +76,36 @@ class GraphQL
     protected $documentAST;
 
     /**
+     * Exception handler.
+     *
+     * @var Handler
+     */
+    protected $exceptionHandler;
+
+    /**
      * Create instance of graphql container.
      *
      * @param DirectiveRegistry $directives
-     * @param TypeRegistry      $types
+     * @param TypeRegistry $types
      * @param MiddlewareManager $middleware
-     * @param NodeContainer     $nodes
+     * @param NodeContainer $nodes
      * @param ExtensionRegistry $extensions
+     * @param ExceptionHandler $exceptionHandler
      */
     public function __construct(
         DirectiveRegistry $directives,
         TypeRegistry $types,
         MiddlewareManager $middleware,
         NodeContainer $nodes,
-        ExtensionRegistry $extensions
+        ExtensionRegistry $extensions,
+        ExceptionHandler $exceptionHandler
     ) {
         $this->directives = $directives;
         $this->types = $types;
         $this->middleware = $middleware;
         $this->nodes = $nodes;
         $this->extensions = $extensions;
+        $this->exceptionHandler = $exceptionHandler;
     }
 
     /**
@@ -115,32 +128,18 @@ class GraphQL
      *
      * @return array
      */
-    public function execute($query, $context = null, $variables = [], $rootValue = null): array
+    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
     {
         $result = $this->queryAndReturnResult($query, $context, $variables, $rootValue);
+        $result->setErrorsHandler([$this->exceptionHandler(), 'handler']);
 
-        $output = [
-            'data' => $result->data,
-            'extensions' => $result->extensions,
-        ];
+        $data = $result->toArray();
 
-        if (! empty($result->errors)) {
-            foreach ($result->errors as $error) {
-                if ($error instanceof \Exception) {
-                    info('GraphQL Error:', [
-                        'code' => $error->getCode(),
-                        'message' => $error->getMessage(),
-                        'trace' => $error->getTraceAsString(),
-                    ]);
-                }
-            }
-
-            $output = array_merge($output, [
-                'errors' => array_map([$this, 'formatError'], $result->errors),
-            ]);
+        if(!isset($data['extensions'])) {
+            $data['extensions'] = [];
         }
 
-        return $output;
+        return $data;
     }
 
     /**
@@ -156,9 +155,9 @@ class GraphQL
     public function queryAndReturnResult($query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
         $this->extensions->requestDidStart(new ExtensionRequest([
-            'request' => request(),
-            'query_string' => $query,
-            'operationName' => request()->input('operationName'),
+            'request' => Request::instance(),
+            'queryString' => $query,
+            'operationName' => Request::input('operationName'),
             'variables' => $variables,
         ]));
 
@@ -169,7 +168,9 @@ class GraphQL
             $rootValue,
             $context,
             $variables,
-            request()->input('operationName')
+            Request::input('operationName'),
+            null,
+            $this->getValidationRules()
         );
 
         $result->extensions = $this->extensions->toArray();
@@ -208,16 +209,6 @@ class GraphQL
     }
 
     /**
-     * Temporary workaround to allow injecting a different schema when testing.
-     *
-     * @param DocumentAST $documentAST
-     */
-    public function setDocumentAST(DocumentAST $documentAST)
-    {
-        $this->documentAST = $documentAST;
-    }
-
-    /**
      * Get the schema string and build an AST out of it.
      *
      * @return DocumentAST
@@ -230,23 +221,31 @@ class GraphQL
     }
 
     /**
-     * Batch field resolver.
+     * Return an instance of a BatchLoader for a specific field.
      *
-     * @param string $abstract
-     * @param mixed  $key
-     * @param array  $data
-     * @param string $name
+     * @param string $loaderClass
+     * @param array $pathToField
+     * @param array $constructorArgs Those arguments are passed to the constructor of the instance
      *
-     * @return \GraphQL\Deferred
+     * @throws \Exception
+     *
+     * @return BatchLoader
      */
-    public function batch($abstract, $key, array $data = [], $name = null): Deferred
+    public function batchLoader(string $loaderClass, array $pathToField, array $constructorArgs = []): BatchLoader
     {
-        $name = $name ?: $abstract;
-        $instance = app()->has($name)
-            ? resolve($name)
-            : app()->instance($name, resolve($abstract));
+        // The path to the field serves as the unique key for the instance
+        $instanceName = BatchLoader::instanceKey($pathToField);
 
-        return $instance->load($key, $data);
+        // Only register a new instance if it is not already bound
+        $instance = app()->bound($instanceName)
+            ? resolve($instanceName)
+            : app()->instance($instanceName, app()->makeWith($loaderClass, $constructorArgs));
+
+        if(!$instance instanceof BatchLoader){
+            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Support\DataLoader\BatchLoader");
+        }
+
+        return $instance;
     }
 
     /**
@@ -270,7 +269,7 @@ class GraphQL
     }
 
     /**
-     * * Get the type registry instance.
+     * Get the type registry instance.
      *
      * @return TypeRegistry
      *
@@ -309,5 +308,29 @@ class GraphQL
     public function extensions(): ExtensionRegistry
     {
         return $this->extensions;
+    }
+
+    /**
+     * Get the instance of the exception handler.
+     *
+     * @return ExceptionHandler
+     */
+    public function exceptionHandler(): ExceptionHandler
+    {
+        return $this->exceptionHandler;
+    }
+
+    /**
+     * Construct the validation rules from the config.
+     *
+     * @return array
+     */
+    protected function getValidationRules(): array
+    {
+        return [
+            new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
+            new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
+            new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
+        ];
     }
 }

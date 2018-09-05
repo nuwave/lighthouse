@@ -15,10 +15,11 @@ class ComplexityDirectiveTest extends TestCase
         type User {
             posts: [Post!]! @complexity @hasMany
         }
+        
         type Post {
             title: String
-        }');
-
+        }
+        ');
         $type = $schema->getType('User');
         $fields = $type->config['fields']();
         $complexity = $fields['posts']['complexity'];
@@ -40,12 +41,15 @@ class ComplexityDirectiveTest extends TestCase
                 @complexity(resolver: "'.$resolver.'@complexity")
                 @hasMany
         }
+        
         type Post {
             title: String
-        }');
+        }
+        ');
         $type = $schema->getType('User');
         $fields = $type->config['fields']();
         $complexity = $fields['posts']['complexity'];
+
         $this->assertEquals(100, $complexity(10, ['foo' => 10]));
     }
 

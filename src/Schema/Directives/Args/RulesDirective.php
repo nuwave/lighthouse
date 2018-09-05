@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -43,7 +41,7 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
         $current['messages'] = array_merge(
             array_get($value->getArg(), 'messages', []),
             collect($this->directiveArgValue('messages', []))
-                ->mapWithKeys(function ($message, $path) use ($value) {
+                ->mapWithKeys(function (string $message, string $path) use ($value) {
                     return [$value->getArgName().".{$path}" => $message];
                 })->toArray()
         );

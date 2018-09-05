@@ -2,61 +2,86 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
-use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 
 class HasManyLoader extends BatchLoader
 {
     use HandlesGlobalId;
 
     /**
-     * Resolve keys.
+     * @var string
      */
-    public function resolve()
+    protected $relation;
+    /**
+     * @var array
+     */
+    protected $resolveArgs;
+    /**
+     * @var array
+     */
+    protected $scopes;
+    /**
+     * @var string
+     */
+    protected $paginationType;
+
+    /**
+     * @param string $relation
+     * @param array $resolveArgs
+     * @param array $scopes
+     * @param string $paginationType
+     */
+    public function __construct(string $relation, array $resolveArgs, array $scopes, string $paginationType)
     {
-        collect($this->keys)->map(function ($item) {
-            return array_merge($item, ['json' => json_encode($item['args'])]);
-        })->groupBy('json')->each(function ($items) {
-            $first = $items->first();
-            $parents = $items->pluck('parent');
-            $scopes = array_get($first, 'scopes', []);
-            $relation = $first['relation'];
-            $type = $first['type'];
-            $args = $first['args'];
+        $this->relation = $relation;
+        $this->resolveArgs = $resolveArgs;
+        $this->scopes = $scopes;
+        $this->paginationType = $paginationType;
+    }
 
-            $constraints = [$relation => function ($q) use ($scopes, $args) {
-                foreach ($scopes as $scope) {
-                    call_user_func_array([$q, $scope], [$args]);
-                }
-
-                $q->when(isset($args['query.filter']), function ($q) use ($args) {
-                    return QueryFilter::build($q, $args);
-                });
-            }];
-
-            switch ($type) {
-                case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                case PaginationManipulator::PAGINATION_ALIAS_RELAY:
-                    $first = data_get($args, 'first', 15);
-                    $after = $this->decodeCursor($args);
-                    $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
-                    $parents->fetchForPage($first, $currentPage, $constraints);
-                    break;
-                case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-                    $first = data_get($args, 'count', 15);
-                    $page = data_get($args, 'page', 1);
-                    $parents->fetchForPage($first, $page, $constraints);
-                    break;
-                default:
-                    $parents->fetch($constraints);
-                    break;
+    /**
+     * {@inheritdoc}
+     */
+    public function resolve(): array
+    {
+        $eagerLoadRelationWithConstraints = [$this->relation => function ($query) {
+            foreach ($this->scopes as $scope) {
+                call_user_func_array([$query, $scope], [$this->resolveArgs]);
             }
 
-            $parents->each(function ($model) use ($relation) {
-                $this->set($model->getKey(), $model->getRelation($relation));
+            $query->when(isset($args['query.filter']), function ($q) {
+                return QueryFilter::build($q, $this->resolveArgs);
             });
-        });
+        }];
+
+        /** @var Collection $parents */
+        $parents = collect($this->keys)->pluck('parent');
+        switch ($this->paginationType) {
+            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
+            case PaginationManipulator::PAGINATION_ALIAS_RELAY:
+                $first = data_get($this->resolveArgs, 'first', 15);
+                $after = $this->decodeCursor($this->resolveArgs);
+                $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
+                $parents->fetchForPage($first, $currentPage, $eagerLoadRelationWithConstraints);
+                break;
+            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
+                // count must be set
+                $count = $this->resolveArgs['count'];
+                $page = data_get($this->resolveArgs, 'page', 1);
+                $parents->fetchForPage($count, $page, $eagerLoadRelationWithConstraints);
+                break;
+            default:
+                $parents->fetch($eagerLoadRelationWithConstraints);
+                break;
+        }
+
+        return $parents->mapWithKeys(function (Model $model) {
+            return [$model->getKey() => $model->getRelation($this->relation)];
+        })->all();
     }
 }

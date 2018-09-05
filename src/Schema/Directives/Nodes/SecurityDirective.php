@@ -11,6 +11,11 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
+/**
+ * Class SecurityDirective
+ * @package Nuwave\Lighthouse\Schema\Directives\Nodes
+ * @deprecated will be defined through the config file as of v3
+ */
 class SecurityDirective extends BaseDirective implements NodeMiddleware
 {
     /**
@@ -27,7 +32,9 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
      * Handle node value.
      *
      * @param NodeValue $value
-     * @param \Closure   $next
+     * @param \Closure $next
+     *
+     * @throws DirectiveException
      *
      * @return NodeValue
      */
@@ -43,58 +50,46 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
             throw new DirectiveException($message);
         }
 
-        $this->queryDepth($value);
-        $this->queryComplexity($value);
-        $this->queryIntrospection($value);
+        $this->queryDepth();
+        $this->queryComplexity();
+        $this->queryIntrospection();
 
         return $next($value);
     }
 
     /**
      * Set the max query complexity.
-     *
-     * @param NodeValue $value
      */
-    protected function queryComplexity(NodeValue $value)
+    protected function queryComplexity()
     {
         $complexity = $this->directiveArgValue('complexity');
 
         if ($complexity) {
-            DocumentValidator::addRule(
-                new QueryComplexity($complexity)
-            );
+            config(['lighthouse.security.max_query_complexity' => $complexity]);
         }
     }
 
     /**
      * Set max query depth.
-     *
-     * @param NodeValue $value
      */
-    protected function queryDepth(NodeValue $value)
+    protected function queryDepth()
     {
         $depth = $this->directiveArgValue('depth');
 
         if ($depth) {
-            DocumentValidator::addRule(
-                new QueryDepth($depth)
-            );
+            config(['lighthouse.security.max_query_depth' => $depth]);
         }
     }
 
     /**
      * Set introspection rule.
-     *
-     * @param NodeValue $value
      */
-    protected function queryIntrospection(NodeValue $value)
+    protected function queryIntrospection()
     {
-        $introspection = $this->directiveArgValue('introspection');
+        $enableIntrospection = $this->directiveArgValue('introspection');
 
-        if (false === $introspection) {
-            DocumentValidator::addRule(
-                new DisableIntrospection()
-            );
+        if (false === $enableIntrospection) {
+            config(['lighthouse.security.disable_introspection' => !$enableIntrospection]);
         }
     }
 }

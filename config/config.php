@@ -1,5 +1,7 @@
 <?php
 
+use GraphQL\Validator\Rules\DisableIntrospection;
+
 return [
     
     /*
@@ -21,7 +23,7 @@ return [
     | This setting controls if GET requests to the GraphQL endpoint are allowed.
     |
     */
-    'route_enable_get' => false,
+    'route_enable_get' => true,
     
     /*
     |--------------------------------------------------------------------------
@@ -29,8 +31,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Additional configuration for the route group.
-    | This may be used to prefix the endpoints or to apply some
-    | middleware to all requests
+    | Check options here https://lumen.laravel.com/docs/routing#route-groups
     |
     */
     'route' => [
@@ -40,42 +41,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Directive registry
+    | Schema declaration
     |--------------------------------------------------------------------------
     |
-    | This package allows you to create your own server-side directives.
-    | List directories that will be scanned for custom directives.
-    | Hint: Directives must implement \Nuwave\Lighthouse\Schema\Directives\Directive
+    | This is a path that points to where your GraphQL schema is located
+    | relative to the app path. You should define your entire GraphQL
+    | schema in this file (additional files may be imported).
     |
     */
-    'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Namespace registry
-    |--------------------------------------------------------------------------
-    |
-    | This package provides a set of commands to make it easy for you to
-    | create new parts in your GraphQL schema. Change these values to
-    | match the namespaces you'd like each piece to be created in.
-    |
-    */
-    'namespaces' => [
-        'models' => 'App\\Models',
-        'mutations' => 'App\\Http\\GraphQL\\Mutations',
-        'queries' => 'App\\Http\\GraphQL\\Queries',
-        'scalars' => 'App\\Http\\GraphQL\\Scalars',
+    'schema' => [
+        'register' => base_path('routes/graphql/schema.graphql'),
     ],
-
-     /*
-     |--------------------------------------------------------------------------
-     | GraphQL Controller
-     |--------------------------------------------------------------------------
-     |
-     | Specify which controller (and method) you want to handle GraphQL requests.
-     |
-     */
-    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
 
     /*
     |--------------------------------------------------------------------------
@@ -94,6 +70,58 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Directives
+    |--------------------------------------------------------------------------
+    |
+    | List directories that will be scanned for custom server-side directives.
+    |
+    */
+    'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Namespaces
+    |--------------------------------------------------------------------------
+    |
+    | These are the default namespaces where Lighthouse looks for classes
+    | that extend functionality of the schema.
+    |
+    */
+    'namespaces' => [
+        'models' => 'App\\Models',
+        'mutations' => 'App\\Http\\GraphQL\\Mutations',
+        'queries' => 'App\\Http\\GraphQL\\Queries',
+        'scalars' => 'App\\Http\\GraphQL\\Scalars',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Security
+    |--------------------------------------------------------------------------
+    |
+    | Control how Lighthouse handles security related query validation.
+    | This configures the options from http://webonyx.github.io/graphql-php/security/
+    | A setting of "0" means that the validation rule is disabled.
+    |
+    */
+    'security' => [
+        'max_query_complexity' => 0,
+        'max_query_depth' => 0,
+        'disable_introspection' => DisableIntrospection::DISABLED,
+    ],
+
+     /*
+     |--------------------------------------------------------------------------
+     | GraphQL Controller
+     |--------------------------------------------------------------------------
+     |
+     | Specify which controller (and method) you want to handle GraphQL requests.
+     |
+     */
+    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
+
+    /*
+    |--------------------------------------------------------------------------
     | Global ID
     |--------------------------------------------------------------------------
     |
@@ -102,18 +130,4 @@ return [
     |
     */
     'global_id_field' => '_id',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Schema declaration
-    |--------------------------------------------------------------------------
-    |
-    | This is a path that points to where your GraphQL schema is located
-    | relative to the app path. You should define your entire GraphQL
-    | schema in this file (additional files may be imported).
-    |
-    */
-    'schema' => [
-        'register' => base_path('routes/graphql/schema.graphql'),
-    ],
 ];

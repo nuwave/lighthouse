@@ -16,10 +16,10 @@ class PartialParserTest extends TestCase
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             PartialParser::objectTypeDefinition('
-                type Foo {
-                    foo: String
-                }
-        ')
+            type Foo {
+                foo: String
+            }
+            ')
         );
     }
 
@@ -35,13 +35,13 @@ class PartialParserTest extends TestCase
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinition('
-            type Foo {
-                foo: String
-            }
-            
-            type Bar {
-                bar: Int
-            }
+        type Foo {
+            foo: String
+        }
+        
+        type Bar {
+            bar: Int
+        }
         ');
     }
 
@@ -49,22 +49,22 @@ class PartialParserTest extends TestCase
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinition('
-            interface Foo {
-                foo: String
-            }
+        interface Foo {
+            foo: String
+        }
         ');
     }
 
     public function testParsesObjectTypesArray()
     {
         $objectTypes = PartialParser::objectTypeDefinitions(['
-            type Foo {
-                foo: String
-            }
+        type Foo {
+            foo: String
+        }
         ', '
-            type Bar {
-                bar: Int
-            }
+        type Bar {
+            bar: Int
+        }
         ']);
 
         $this->assertCount(2, $objectTypes);
@@ -76,13 +76,13 @@ class PartialParserTest extends TestCase
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinitions(['
-            type Foo {
-                foo: String
-            }
+        type Foo {
+            foo: String
+        }
         ', '
-            interface Bar {
-                bar: Int
-            }
+        interface Bar {
+            bar: Int
+        }
         ']);
     }
 
@@ -90,13 +90,13 @@ class PartialParserTest extends TestCase
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinitions(['
-            type Foo {
-                foo: String
-            }
-            
-            type Bar {
-                bar: Int
-            }
+        type Foo {
+            foo: String
+        }
+        
+        type Bar {
+            bar: Int
+        }
         ']);
     }
 

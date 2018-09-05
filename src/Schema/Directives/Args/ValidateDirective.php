@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -69,28 +67,14 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
      */
     public function handleArgument(ArgumentValue $value, \Closure $next)
     {
-        // TODO: Rename "getValue" to something more descriptive like "toArray"
-        // and consider using for NodeValue/FieldValue.
+        $rules = $this->directiveArgValue('rules', []);
+
         $current = $value->getValue();
         $current['rules'] = array_merge(
             array_get($value->getArg(), 'rules', []),
-            $this->getRules($value->getDirective())
+            $rules
         );
 
         return $next($value->setValue($current));
-    }
-
-    /**
-     * Get array of rules to apply to field.
-     *
-     * @param DirectiveNode $directive
-     *
-     * @return array
-     */
-    protected function getRules(DirectiveNode $directive)
-    {
-        return collect($directive->arguments)->map(function (ArgumentNode $arg) {
-            return $this->argValue($arg);
-        })->collapse()->toArray();
     }
 }

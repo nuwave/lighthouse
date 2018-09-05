@@ -33,19 +33,22 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(id: ID @eq): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
-
-        $query = '{
+        }
+        ';
+        $query = '
+        {
             users(count: 5 id: '.$this->users->first()->getKey().') {
                 data {
                     id
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertCount(1, array_get($result->data, 'users.data'));
     }
 
@@ -60,19 +63,22 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(id: ID @neq): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
-
-        $query = '{
+        }
+        ';
+        $query = '
+        {
             users(count: 5 id: '.$this->users->first()->getKey().') {
                 data {
                     id
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertCount(4, array_get($result->data, 'users.data'));
     }
 
@@ -87,20 +93,24 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(include: [Int] @in(key: "id")): [User!]!
                 @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
-        $query = '{
+        $query = '
+        {
             users(count: 5 include: ['.$user1.', '.$user2.']) {
                 data {
                     id
                 }
             }
-        }';
+        }
+        ';
 
         $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(2, array_get($result->data, 'users.data'));
@@ -117,22 +127,26 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(exclude: [Int] @notIn(key: "id")): [User!]!
                 @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
-        $query = '{
+        $query = '
+        {
             users(count: 5 exclude: ['.$user1.', '.$user2.']) {
                 data {
                     id
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertCount(3, array_get($result->data, 'users.data'));
     }
 
@@ -147,19 +161,23 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(id: Int @where(operator: ">")): [User!]!
                 @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
         $user1 = $this->users->first()->getKey();
-        $query = '{
+        $query = '
+        {
             users(count: 5 id: '.$user1.') {
                 data {
                     id
                 }
             }
-        }';
+        }
+        ';
 
         $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(4, array_get($result->data, 'users.data'));
@@ -176,20 +194,24 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(start: Int @where(key: "id", operator: ">"), end: Int @where(key: "id", operator: "<")): [User!]!
                 @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
-        $query = '{
+        $query = '
+        {
             users(count: 5 start: '.$user1.' end: '.$user2.') {
                 data {
                     id
                 }
             }
-        }';
+        }
+        ';
 
         $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(3, array_get($result->data, 'users.data'));
@@ -206,12 +228,14 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(
                 start: String! @whereBetween(key: "created_at")
                 end: String! @whereBetween(key: "created_at")
             ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
         $user = $this->users[0];
         $user->created_at = now()->subDay();
@@ -224,15 +248,17 @@ class QueryFilterDirectiveTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $query = '{
+        $query = '
+        {
             users(count: 5 start: "'.$start.'" end: "'.$end.'") {
                 data {
                     id
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertCount(2, array_get($result->data, 'users.data'));
     }
 
@@ -247,12 +273,14 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(
                 start: String! @whereNotBetween(key: "created_at")
                 end: String! @whereNotBetween(key: "created_at")
             ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
         $user = $this->users[0];
         $user->created_at = now()->subDay();
@@ -265,15 +293,17 @@ class QueryFilterDirectiveTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $query = '{
+        $query = '
+        {
             users(count: 5 start: "'.$start.'" end: "'.$end.'") {
                 data {
                     id
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertCount(3, array_get($result->data, 'users.data'));
     }
 
@@ -288,10 +318,12 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(created_at: String! @where(clause: "whereYear")): [User!]!
                 @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
         $user = $this->users[0];
         $user->created_at = now()->subYear();
@@ -303,13 +335,15 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $year = now()->subYear()->format('Y');
 
-        $query = '{
+        $query = '
+        {
             users(count: 5 created_at: "'.$year.'") {
                 data {
                     id
                 }
             }
-        }';
+        }
+        ';
 
         $result = $this->queryAndReturnResult($schema, $query);
         $this->assertCount(2, array_get($result->data, 'users.data'));
@@ -326,20 +360,23 @@ class QueryFilterDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(id: ID @eq, name: String @where(operator: "like")): [User!]!
                 @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
-
-        $query = '{
+        }
+        ';
+        $query = '
+        {
             users(count: 5 name: "'.$this->users->first()->name.'") {
                 data {
                     id
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertCount(1, array_get($result->data, 'users.data'));
     }
 }

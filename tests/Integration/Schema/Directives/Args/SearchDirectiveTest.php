@@ -20,6 +20,20 @@ class SearchDirectiveTest extends DBTestCase
     /** @var Mock */
     protected $engine;
 
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->engineManager = Mockery::mock();
+        $this->engine = Mockery::mock(NullEngine::class)->makePartial();
+
+        $this->app->singleton(EngineManager::class, function ($app) {
+            return $this->engineManager;
+        });
+
+        $this->engineManager->shouldReceive('engine')
+            ->andReturn($this->engine);
+    }
+
     /** @test */
     public function canSearch()
     {
@@ -45,17 +59,18 @@ class SearchDirectiveTest extends DBTestCase
             posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
         }
         ';
-
-        $query = '{
+        $query = '
+        {
             posts(count: 10 search: "great") {
                 data {
                     id
                     title
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
     }
@@ -93,32 +108,19 @@ class SearchDirectiveTest extends DBTestCase
             posts(search: String @search(within: "my.index")): [Post!]! @paginate(type: "paginator" model: "Post")
         }
         ';
-
-        $query = '{
+        $query = '
+        {
             posts(count: 10 search: "great") {
                 data {
                     id
                     title
                 }
             }
-        }';
-
+        }
+        ';
         $result = $this->queryAndReturnResult($schema, $query);
+
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->engineManager = Mockery::mock();
-        $this->engine = Mockery::mock(NullEngine::class)->makePartial();
-
-        $this->app->singleton(EngineManager::class, function ($app) {
-            return $this->engineManager;
-        });
-
-        $this->engineManager->shouldReceive('engine')
-            ->andReturn($this->engine);
     }
 }
