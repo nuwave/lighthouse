@@ -9,14 +9,13 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Manipulate the schema.
      *
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST $documentAST
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(DocumentAST $documentAST)
     {
-        return $current;
+        return $documentAST;
     }
 
     /**
@@ -30,26 +29,9 @@ abstract class GraphQLExtension implements \JsonSerializable
     }
 
     /**
-     * Specify data which should be serialized to JSON.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return $this->toArray();
-    }
-
-    /**
-     * Extension name.
+     * The extension name controls under which key the extensions shows up in the result.
      *
      * @return string
      */
-    abstract public function name();
-
-    /**
-     * Format extension output.
-     *
-     * @return array
-     */
-    abstract public function toArray();
+    abstract public static function name();
 }

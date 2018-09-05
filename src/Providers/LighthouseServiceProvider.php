@@ -16,7 +16,6 @@ use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
-use Nuwave\Lighthouse\Schema\Extensions\TraceExtension;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -40,7 +39,6 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->registerCollectionMacros();
         $this->registerValidator();
-        $this->registerExtensions();
     }
 
     /**
@@ -174,13 +172,5 @@ class LighthouseServiceProvider extends ServiceProvider
                 return true;
             }
         );
-    }
-
-    /**
-     * Register extensions w/ registry.
-     */
-    protected function registerExtensions()
-    {
-        $this->app->make(ExtensionRegistry::class)->register(new TraceExtension);
     }
 }

@@ -12,7 +12,6 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -37,7 +36,7 @@ class ASTBuilder
 
         $document = self::addNodeSupport($document);
         $document = self::addPaginationInfoTypes($document);
-        $document = self::applyExtensions($document);
+        $document = resolve(ExtensionRegistry::class)->manipulate($document);
 
         return $document;
     }
@@ -278,24 +277,5 @@ class ASTBuilder
         $document->setDefinition($pageInfo);
 
         return $document;
-    }
-  
-     /**
-     * @param DocumentAST $document
-     *
-     * @return DocumentAST
-     */
-    protected static function applyExtensions(DocumentAST $document): DocumentAST
-    {
-        $originalDocument = $document;
-
-        return resolve(ExtensionRegistry::class)
-            ->active()
-            ->reduce(function (
-                DocumentAST $document,
-                GraphQLExtension $extension
-            ) use ($originalDocument) {
-                return $extension->manipulateSchema($document, $originalDocument);
-            }, $document);
     }
 }

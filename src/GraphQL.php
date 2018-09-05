@@ -86,7 +86,7 @@ class GraphQL
             $this->getValidationRules()
         );
 
-        $result->extensions = $this->extensionRegistry->toArray();
+        $result->extensions = $this->extensionRegistry->jsonSerialize();
 
         $result->setErrorsHandler(function (array $errors, callable $formatter): array {
             // Do report: Errors that are not client safe, schema definition errors

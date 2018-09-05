@@ -3,8 +3,9 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
-class TraceExtensionTest extends TestCase
+class TracingExtensionTest extends TestCase
 {
     /**
      * Define environment setup.
@@ -15,19 +16,19 @@ class TraceExtensionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('lighthouse.extensions', ['tracing']);
+        $app['config']->set('lighthouse.extensions', [TracingExtension::class]);
     }
 
     protected $schema = <<<SCHEMA
 type Query {
-    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TraceExtensionTest@resolve")
+    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TracingExtensionTest@resolve")
 }
 SCHEMA;
 
     /**
      * @test
      */
-    public function itCanAddTraceExtensionMetaToResult()
+    public function itCanAddTracingExtensionMetaToResult()
     {
         $query = '
         {

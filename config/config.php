@@ -136,6 +136,18 @@ return [
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Extensions
+    |--------------------------------------------------------------------------
+    |
+    | Register extension classes that extend \Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension
+    |
+    */
+    'extensions' => [
+        #\Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class
+    ],
+
      /*
      |--------------------------------------------------------------------------
      | GraphQL Controller
