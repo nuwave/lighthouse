@@ -8,21 +8,21 @@ use GraphQL\GraphQL as GraphQLBase;
 use Illuminate\Support\Facades\Cache;
 use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Request;
+use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\NodeContainer;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Execution\HandlesErrors;
-use Nuwave\Lighthouse\Schema\MiddlewareManager;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Support\Pipeline;
 
 class GraphQL
 {
@@ -32,45 +32,23 @@ class GraphQL
     /** @var DocumentAST */
     protected $documentAST;
 
+    /** @var ExtensionRegistry */
+    protected $extensionRegistry;
+
     /**
-     * Ensure an executable GraphQL schema is present.
-     *
-     * @return Schema
+     * @param ExtensionRegistry $extensionRegistry
      */
-    public function prepSchema(): Schema
+    public function __construct(ExtensionRegistry $extensionRegistry)
     {
-        return $this->executableSchema = $this->executableSchema ?: $this->buildSchema();
+        $this->extensionRegistry = $extensionRegistry;
     }
 
     /**
-     * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
+     * Execute a GraphQL query on the Lighthouse schema and return the raw ExecutionResult.
      *
-     * @return array
-     * @deprecated use executeQuery()->toArray() instead
-     */
-    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
-    {
-        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
-    }
-
-    /**
-     * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
+     * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
+     * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
-     * @return \GraphQL\Executor\ExecutionResult
-     * @deprecated renamed to executeQuery
-     */
-    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
-    {
-        return $this->executeQuery($query, $context, $variables, $rootValue);
-    }
-
-    /**
      * @param string $query
      * @param null $context
      * @param array $variables
@@ -93,37 +71,72 @@ class GraphQL
             $this->getValidationRules()
         );
 
-        $result->extensions = resolve(ExtensionRegistry::class)->toArray();
+        $result->extensions = $this->extensionRegistry->toArray();
+
         $result->setErrorsHandler(function (array $errors, callable $formatter): array {
             // Do report: Errors that are not client safe, schema definition errors
             // Do not report: Validation, Errors that are meant for the final user
             // Misformed Queries: Log if you are dog-fooding your app
 
-            // Allow to register multiple formatters and pipe the errors through all of them
-
-            //report()
-
-            // Reimplement the default behaviour ATM
-
             /**
-             * Formatters are defined as classes in the config.
+             * Handlers are defined as classes in the config.
              * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
+             * This allows the user to register multiple handlers and pipe the errors through.
              */
             $handlers = config('lighthouse.error_handlers', []);
 
-            return collect($errors)
-                ->map(function (Error $error) use ($handlers, $formatter) {
-                    return app(Pipeline::class)
+            return array_map(
+                function (Error $error) use ($handlers, $formatter) {
+                    return resolve(Pipeline::class)
                         ->send($error)
                         ->through($handlers)
                         ->then(function (Error $error) use ($formatter){
                             return $formatter($error);
                         });
-                })
-                ->toArray();
+                },
+                $errors
+            );
         });
 
         return $result;
+    }
+
+    /**
+     * Ensure an executable GraphQL schema is present.
+     *
+     * @return Schema
+     */
+    public function prepSchema(): Schema
+    {
+        return $this->executableSchema = $this->executableSchema ?: $this->buildSchema();
+    }
+
+    /**
+     * @param string $query
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
+     *
+     * @return array
+     * @deprecated use executeQuery()->toArray() instead. This allows to control the debug settings.
+     */
+    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
+    {
+        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
+    }
+
+    /**
+     * @param string $query
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     * @deprecated renamed to executeQuery to match webonyx/graphql-php
+     */
+    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    {
+        return $this->executeQuery($query, $context, $variables, $rootValue);
     }
 
     /**
@@ -163,7 +176,7 @@ class GraphQL
      */
     protected function buildAST(): DocumentAST
     {
-        $schemaString = app(SchemaSourceProvider::class)->getSchemaString();
+        $schemaString = resolve(SchemaSourceProvider::class)->getSchemaString();
 
         return ASTBuilder::generate($schemaString);
     }
@@ -224,21 +237,21 @@ class GraphQL
     }
 
     /**
-     * @return MiddlewareManager
+     * @return MiddlewareRegistry
      * @deprecated Use resolve() instead, will be removed in v3
      */
-    public function middleware(): MiddlewareManager
+    public function middleware(): MiddlewareRegistry
     {
-        return resolve(MiddlewareManager::class);
+        return resolve(MiddlewareRegistry::class);
     }
 
     /**
-     * @return NodeContainer
+     * @return NodeRegistry
      * @deprecated Use resolve() instead, will be removed in v3
      */
-    public function nodes(): NodeContainer
+    public function nodes(): NodeRegistry
     {
-        return resolve(NodeContainer::class);
+        return resolve(NodeRegistry::class);
     }
 
     /**
@@ -248,15 +261,6 @@ class GraphQL
     public function extensions(): ExtensionRegistry
     {
         return resolve(ExtensionRegistry::class);
-    }
-
-    /**
-     * @return HandlesErrors
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function exceptionHandler(): HandlesErrors
-    {
-        return resolve(HandlesErrors::class);
     }
 
     /**

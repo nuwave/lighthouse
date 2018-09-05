@@ -6,6 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UnionDirectiveTest extends DBTestCase
@@ -61,10 +62,12 @@ class UnionDirectiveTest extends DBTestCase
 
     public function resolveType($value): \GraphQL\Type\Definition\ObjectType
     {
+        /** @var TypeRegistry $typeRegistry */
+        $typeRegistry = resolve(TypeRegistry::class);
         if ($value instanceof User) {
-            return graphql()->types()->get('User');
+            return $typeRegistry->get('User');
         } elseif($value instanceof Post){
-            return graphql()->types()->get('Post');
+            return $typeRegistry->get('Post');
         }
     }
 

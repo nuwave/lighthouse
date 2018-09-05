@@ -6,7 +6,7 @@ use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\OperationDefinitionNode;
 
-class MiddlewareManager
+class MiddlewareRegistry
 {
     /**
      * Registered query middleware.
@@ -68,9 +68,9 @@ class MiddlewareManager
      * @param string $name
      * @param array $middleware
      *
-     * @return MiddlewareManager
+     * @return MiddlewareRegistry
      */
-    public function registerQuery(string $name, array $middleware): MiddlewareManager
+    public function registerQuery(string $name, array $middleware): MiddlewareRegistry
     {
         $this->queries = array_merge($this->queries, [$name => $middleware]);
 
@@ -83,9 +83,9 @@ class MiddlewareManager
      * @param string $name
      * @param array $middleware
      *
-     * @return MiddlewareManager
+     * @return MiddlewareRegistry
      */
-    public function registerMutation($name, array $middleware): MiddlewareManager
+    public function registerMutation($name, array $middleware): MiddlewareRegistry
     {
         $this->mutations = array_merge($this->mutations, [$name => $middleware]);
 

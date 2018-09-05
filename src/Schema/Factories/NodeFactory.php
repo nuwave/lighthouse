@@ -7,9 +7,11 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Support\Pipeline;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -23,6 +25,23 @@ use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 class NodeFactory
 {
     use HandlesTypes;
+
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+
+    /** @var TypeRegistry */
+    protected $typeRegistry;
+
+    /**
+     * NodeFactory constructor.
+     * @param DirectiveRegistry $directiveRegistry
+     * @param TypeRegistry $typeRegistry
+     */
+    public function __construct(DirectiveRegistry $directiveRegistry, TypeRegistry $typeRegistry)
+    {
+        $this->directiveRegistry = $directiveRegistry;
+        $this->typeRegistry = $typeRegistry;
+    }
 
     /**
      * Transform node to type.
@@ -53,7 +72,7 @@ class NodeFactory
      */
     protected function hasTypeResolver(NodeValue $value): bool
     {
-        return graphql()->directives()->hasNodeResolver($value->getNode());
+        return $this->directiveRegistry->hasNodeResolver($value->getNode());
     }
 
     /**
@@ -65,8 +84,8 @@ class NodeFactory
      */
     protected function resolveTypeViaDirective(NodeValue $value): Type
     {
-        return graphql()->directives()
-            ->forNode($value->getNode())
+        return $this->directiveRegistry
+            ->nodeResolver($value->getNode())
             ->resolveNode($value);
     }
 
@@ -160,7 +179,7 @@ class NodeFactory
             },
             'interfaces' => function () use ($value) {
                 return $value->getInterfaceNames()->map(function ($interfaceName) {
-                    return graphql()->types()->get($interfaceName);
+                    return $this->typeRegistry->get($interfaceName);
                 })->toArray();
             },
         ]);
@@ -194,7 +213,7 @@ class NodeFactory
     {
         return app(Pipeline::class)
             ->send($value)
-            ->through(graphql()->directives()->nodeMiddleware($value->getNode()))
+            ->through($this->directiveRegistry->nodeMiddleware($value->getNode()))
             ->via('handleNode')
             ->then(function (NodeValue $value) {
                 return $value;

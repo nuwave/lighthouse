@@ -2,8 +2,12 @@
 
 namespace Nuwave\Lighthouse\Support\Http\GraphQL\Queries;
 
+use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
+/**
+ * @deprecated in favour of NodeRegistry
+ */
 class NodeQuery
 {
     use HandlesGlobalId;
@@ -18,6 +22,6 @@ class NodeQuery
      */
     public function resolve($root, array $args)
     {
-        return graphql()->nodes()->resolve($args['id']);
+        return resolve(NodeRegistry::class)->resolve($args['id']);
     }
 }

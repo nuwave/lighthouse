@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\Directives\Fields\MiddlewareDirective;
 
 class GroupDirectiveTest extends TestCase
 {
@@ -64,7 +65,7 @@ class GroupDirectiveTest extends TestCase
         ';
         $this->executeQuery($schema, $query);
 
-        $middleware = graphql()->middleware()->query('me');
+        $middleware = resolve(MiddlewareDirective::class)->query('me');
         $this->assertCount(2, $middleware);
         $this->assertEquals('foo', $middleware[0]);
         $this->assertEquals('bar', $middleware[1]);

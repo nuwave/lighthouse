@@ -52,7 +52,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
         return $value->setResolver(
             function ($root, array $args, $context = null, $info = null) use ($resolverClass, $resolverMethod, $additionalData) {
                 return call_user_func_array(
-                    [app($resolverClass), $resolverMethod],
+                    [resolve($resolverClass), $resolverMethod],
                     [$root, array_merge($args, ['directive' => $additionalData]), $context, $info]
                 );
             }

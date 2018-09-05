@@ -9,8 +9,8 @@ use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Validator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Schema\NodeContainer;
-use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
@@ -70,8 +70,8 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(ValueFactory::class);
         $this->app->singleton(DirectiveRegistry::class);
         $this->app->singleton(ExtensionRegistry::class);
-        $this->app->singleton(NodeContainer::class);
-        $this->app->singleton(MiddlewareManager::class);
+        $this->app->singleton(NodeRegistry::class);
+        $this->app->singleton(MiddlewareRegistry::class);
         $this->app->singleton(TypeRegistry::class);
 
         $this->app->bind(

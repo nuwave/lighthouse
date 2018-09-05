@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -36,7 +37,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     {
         $modelClassName = $this->getModelClassName($value);
 
-        graphql()->nodes()->model(
+        resolve(NodeRegistry::class)->model(
             $value->getNodeName(), $modelClassName
         );
 

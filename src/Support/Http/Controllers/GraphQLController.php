@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Schema\Context;
-use Nuwave\Lighthouse\Schema\MiddlewareManager;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -36,7 +36,7 @@ class GraphQLController extends Controller
         graphql()->prepSchema();
 
         $this->middleware(
-            resolve(MiddlewareManager::class)->forRequest($this->query)
+            resolve(MiddlewareRegistry::class)->forRequest($this->query)
         );
     }
 
@@ -56,7 +56,7 @@ class GraphQLController extends Controller
         return response(
             graphql()->executeQuery(
                 $this->query,
-                new Context($request, app('auth')->user()),
+                new Context($request, auth()->user()),
                 $this->variables
             )->toArray($debug)
         );

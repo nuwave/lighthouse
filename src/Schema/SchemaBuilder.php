@@ -48,7 +48,7 @@ class SchemaBuilder
             ->setTypes($types->reject($this->isOperationType())->toArray())
             ->setDirectives($this->convertDirectives($documentAST)->toArray())
             ->setTypeLoader(function ($name) {
-                return graphql()->types()->get($name);
+                return resolve(TypeRegistry::class)->get($name);
             });
 
         // Those are optional so only add them if they are present in the schema
@@ -105,12 +105,12 @@ class SchemaBuilder
             ->sortBy(function (TypeDefinitionNode $typeDefinition) {
                 return array_get($this->weights, get_class($typeDefinition), 9);
             })->map(function (TypeDefinitionNode $typeDefinition) {
-                $nodeValue = app(ValueFactory::class)->node($typeDefinition);
+                $nodeValue = resolve(ValueFactory::class)->node($typeDefinition);
 
                 return (new NodeFactory())->handle($nodeValue);
             })->each(function (Type $type) {
                 // Register in global type registry
-                graphql()->types()->register($type);
+                resolve(TypeRegistry::class)->register($type);
             });
     }
 

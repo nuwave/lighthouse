@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class ASTBuilder
 {
@@ -55,7 +56,7 @@ class ASTBuilder
             ->reduce(function (DocumentAST $document, Node $node) use (
                 $originalDocument
             ) {
-                $nodeManipulators = graphql()->directives()->nodeManipulators($node);
+                $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
 
                 return $nodeManipulators->reduce(function (DocumentAST $document, NodeManipulator $nodeManipulator) use (
                     $originalDocument,
@@ -111,7 +112,7 @@ class ASTBuilder
                 DocumentAST $document,
                 FieldDefinitionNode $fieldDefinition
             ) use ($objectType, $originalDocument) {
-                $fieldManipulators = graphql()->directives()->fieldManipulators($fieldDefinition);
+                $fieldManipulators = resolve(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
 
                 return $fieldManipulators->reduce(function (
                     DocumentAST $document,
@@ -146,7 +147,7 @@ class ASTBuilder
                                 $parentField,
                                 $originalDocument
                             ) {
-                                $argManipulators = graphql()->directives()->argManipulators($argDefinition);
+                                $argManipulators = resolve(DirectiveRegistry::class)->argManipulators($argDefinition);
 
                                 return $argManipulators->reduce(
                                     function (DocumentAST $document, ArgManipulator $argManipulator) use (
@@ -287,8 +288,7 @@ class ASTBuilder
     {
         $originalDocument = $document;
 
-        return graphql()
-            ->extensions()
+        return resolve(ExtensionRegistry::class)
             ->active()
             ->reduce(function (
                 DocumentAST $document,

@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -34,7 +36,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      */
     public function handleNode(NodeValue $value, \Closure $next)
     {
-        graphql()->nodes()->node(
+        resolve(NodeRegistry::class)->node(
             $value->getNodeName(),
             // Resolver for the node itself
             $this->getResolver($value, 'resolver'),
@@ -61,14 +63,14 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
             $nodeName = $value->getNodeName();
 
             return function () use ($nodeName) {
-                return graphql()->types()->get($nodeName);
+                return resolve(TypeRegistry::class)->get($nodeName);
             };
         }
 
         list($className, $method) = explode('@', $resolver);
 
         return function ($id) use ($className, $method) {
-            $instance = app($className);
+            $instance = resolve($className);
 
             return call_user_func_array([$instance, $method], [$id]);
         };
