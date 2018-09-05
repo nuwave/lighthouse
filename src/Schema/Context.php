@@ -12,21 +12,12 @@ class Context
     public $request;
 
     /**
-     * Authenticated user.
-     *
-     * @var mixed
-     */
-    public $user;
-
-    /**
      * Create new context.
      *
      * @param \Illuminate\Http\Request $request
-     * @param mixed                    $user
      */
-    public function __construct($request, $user)
+    public function __construct($request)
     {
         $this->request = $request;
-        $this->user = $user;
     }
 }
