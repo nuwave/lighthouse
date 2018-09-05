@@ -20,8 +20,24 @@ class RulesDirectiveTest extends TestCase
         ';
 
         $result = $this->executeWithoutDebug($this->schema(), $query);
-        $this->assertCount(1, array_get($result, 'errors'));
-        $this->assertNull($result['data']['foo']);
+        $this->assertEquals([
+            'data' => ['foo' => null],
+            'errors' => [
+                [
+                    'path' => ['foo'],
+                    'locations' => [['line' => 3, 'column' => 13]],
+                    'message' => 'Validation failed for the field [foo]',
+                    'category' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'bar' => [
+                                'The bar field is required.'
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        ], $result);
 
         $mutation = '
         mutation {
@@ -141,6 +157,43 @@ class RulesDirectiveTest extends TestCase
         $this->assertSame($result, $queryResult);
     }
 
+    /**
+     * @test
+     */
+    public function itCanReturnCorrectValidationForInputObjects()
+    {
+        $query = '
+        {
+            foo(bar: "got it") {
+                input_object(
+                    input: {
+                        email: "not-email"
+                        self: {
+                            email: "nested-not-email"
+                            self: {
+                                email: "finally@valid.email"
+                                self: {
+                                    email: "this-would-be-valid-but-is@too.long"
+                                }
+                            }
+                        }
+                    }
+                )
+                first_name
+            }
+        }
+        ';
+
+        $queryResult = $this->executeWithoutDebug($this->schema(), $query);
+
+        $this->assertSame('John', array_get($queryResult, 'data.foo.first_name'));
+        $this->assertEquals([
+            'input.email' => ['Not an email'],
+            'input.self.email' => ['Not an email'],
+            'input.self.self.self.email' => ['The input.self.self.self.email may not be greater than 20 characters.'],
+        ], array_get($queryResult, 'errors.0.extensions.validation'));
+    }
+
     public function resolve()
     {
         return [
@@ -184,14 +237,14 @@ class RulesDirectiveTest extends TestCase
         }
         
         input UserInput {
-            self: UserInput
             email: String
                 @rules(
-                    apply: [\"email\"]
+                    apply: [\"email\", \"max:20\"]
                     messages: {
                         email: \"Not an email\"
                     }
                 )
+            self: UserInput
         }           
         ";
     }

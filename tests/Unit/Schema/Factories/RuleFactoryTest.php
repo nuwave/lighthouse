@@ -26,9 +26,11 @@ class RuleFactoryTest extends TestCase
             $documentAST
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             'email' => ['required', 'email'],
         ], $rules);
+
+        $this->assertSame([], $messages);
     }
 
     /**
@@ -63,6 +65,8 @@ class RuleFactoryTest extends TestCase
             'input' => ['required'],
             'input.email' => ['required', 'email'],
         ], $rules);
+
+        $this->assertSame([], $messages);
     }
 
     /**
@@ -114,7 +118,7 @@ class RuleFactoryTest extends TestCase
             'input.address.primary' => ['required'],
         ], $rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'input.address.primary.required' => 'foobar',
         ], $messages);
     }
@@ -168,7 +172,7 @@ class RuleFactoryTest extends TestCase
             'input.address.*.primary' => ['required'],
         ], $rules);
 
-        $this->assertEquals([
+        $this->assertSame([
             'input.address.*.primary.required' => 'foobar',
         ], $messages);
     }
@@ -256,7 +260,7 @@ class RuleFactoryTest extends TestCase
             $documentAST
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             'required' => ['required'],
         ], $rules);
     }
