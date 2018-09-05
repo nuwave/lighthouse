@@ -101,7 +101,7 @@ class LighthouseServiceProvider extends ServiceProvider
                     $eagerLoadRelations = [$eagerLoadRelations];
                 }
                 $query = $this->first()::with($eagerLoadRelations);
-                $this->items = app(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
+                $this->items = resolve(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
             }
 
             return $this;
@@ -114,7 +114,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 }
 
                 $query = $this->first()::withCount($eagerLoadRelations);
-                $this->items = app(QueryBuilder::class)->eagerLoadCount($query, $this->items);
+                $this->items = resolve(QueryBuilder::class)->eagerLoadCount($query, $this->items);
             }
 
             return $this;
@@ -128,7 +128,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
                 $this->items = $this->fetchCount($eagerLoadRelations)->items;
                 $query = $this->first()::with($eagerLoadRelations);
-                $this->items = app(QueryBuilder::class)
+                $this->items = resolve(QueryBuilder::class)
                     ->eagerLoadRelations($query, $this->items, $perPage, $page);
             }
 

@@ -122,13 +122,13 @@ class DirectiveRegistry
      */
     public function get($name)
     {
-        $handler = $this->directives->get($name);
+        $directive = $this->directives->get($name);
 
-        if (! $handler) {
+        if (! $directive) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
-        return resolve(get_class($handler));
+        return resolve(get_class($directive));
     }
 
     /**

@@ -12,14 +12,17 @@ class ArgumentFactory
 {
     /** @var DirectiveRegistry */
     protected $directiveRegistry;
+    /** @var Pipeline */
+    protected $pipeline;
 
     /**
-     * ArgumentFactory constructor.
      * @param DirectiveRegistry $directiveRegistry
+     * @param Pipeline $pipeline
      */
-    public function __construct(DirectiveRegistry $directiveRegistry)
+    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
     {
         $this->directiveRegistry = $directiveRegistry;
+        $this->pipeline = $pipeline;
     }
 
     /**
@@ -45,7 +48,7 @@ class ArgumentFactory
      */
     protected function applyMiddleware(ArgumentValue $value): ArgumentValue
     {
-        return app(Pipeline::class)
+        return $this->pipeline
             ->send($value)
             ->through($this->directiveRegistry->argMiddleware($value->getArg()))
             ->via('handleArgument')

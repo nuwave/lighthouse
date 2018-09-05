@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -35,12 +35,27 @@ class GraphQL
     /** @var ExtensionRegistry */
     protected $extensionRegistry;
 
+    /** @var SchemaBuilder */
+    protected $schemaBuilder;
+
+    /** @var SchemaSourceProvider */
+    protected $schemaSourceProvider;
+
+    /** @var Pipeline */
+    protected $pipeline;
+
     /**
      * @param ExtensionRegistry $extensionRegistry
+     * @param SchemaBuilder $schemaBuilder
+     * @param SchemaSourceProvider $schemaSourceProvider
+     * @param Pipeline $pipeline
      */
-    public function __construct(ExtensionRegistry $extensionRegistry)
+    public function __construct(ExtensionRegistry $extensionRegistry, SchemaBuilder $schemaBuilder, SchemaSourceProvider $schemaSourceProvider, Pipeline $pipeline)
     {
         $this->extensionRegistry = $extensionRegistry;
+        $this->schemaBuilder = $schemaBuilder;
+        $this->schemaSourceProvider = $schemaSourceProvider;
+        $this->pipeline = $pipeline;
     }
 
     /**
@@ -87,7 +102,7 @@ class GraphQL
 
             return array_map(
                 function (Error $error) use ($handlers, $formatter) {
-                    return resolve(Pipeline::class)
+                    return $this->pipeline
                         ->send($error)
                         ->through($handlers)
                         ->then(function (Error $error) use ($formatter){
@@ -148,7 +163,7 @@ class GraphQL
     {
         $documentAST = $this->documentAST();
 
-        return (new SchemaBuilder())->build($documentAST);
+        return $this->schemaBuilder->build($documentAST);
     }
 
     /**
@@ -176,7 +191,7 @@ class GraphQL
      */
     protected function buildAST(): DocumentAST
     {
-        $schemaString = resolve(SchemaSourceProvider::class)->getSchemaString();
+        $schemaString = $this->schemaSourceProvider->getSchemaString();
 
         return ASTBuilder::generate($schemaString);
     }

@@ -13,6 +13,29 @@ use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 
 class FieldFactory
 {
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+    /** @var ValueFactory */
+    protected $valueFactory;
+    /** @var ArgumentFactory */
+    protected $argumentFactory;
+    /** @var Pipeline */
+    protected $pipeline;
+
+    /**
+     * @param DirectiveRegistry $directiveRegistry
+     * @param ValueFactory $valueFactory
+     * @param ArgumentFactory $argumentFactory
+     * @param Pipeline $pipeline
+     */
+    public function __construct(DirectiveRegistry $directiveRegistry, ValueFactory $valueFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
+    {
+        $this->directiveRegistry = $directiveRegistry;
+        $this->valueFactory = $valueFactory;
+        $this->argumentFactory = $argumentFactory;
+        $this->pipeline = $pipeline;
+    }
+
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
@@ -38,9 +61,9 @@ class FieldFactory
 
         $fieldValue->setResolver($resolverWithValidation);
 
-        $resolverWithMiddleware = app(Pipeline::class)
+        $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through(app(DirectiveRegistry::class)->fieldMiddleware($fieldValue->getField()))
+            ->through($this->directiveRegistry->fieldMiddleware($fieldValue->getField()))
             ->via('handleField')
             ->then(function (FieldValue $fieldValue) {
                 return $fieldValue;
@@ -68,8 +91,7 @@ class FieldFactory
      */
     protected function hasResolverDirective(FieldValue $value): bool
     {
-        return app(DirectiveRegistry::class)
-            ->hasResolver($value->getField());
+        return $this->directiveRegistry->hasResolver($value->getField());
     }
 
     /**
@@ -83,7 +105,7 @@ class FieldFactory
      */
     protected function useResolverDirective(FieldValue $value): \Closure
     {
-        return app(DirectiveRegistry::class)
+        return $this->directiveRegistry
             ->fieldResolver($value->getField())
             ->resolveField($value)
             ->getResolver();
@@ -155,9 +177,9 @@ class FieldFactory
     {
         return collect(data_get($fieldValue->getField(), 'arguments', []))
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
-                $argValue = app(ValueFactory::class)->arg($fieldValue, $inputValueDefinition);
+                $argValue = $this->valueFactory->arg($fieldValue, $inputValueDefinition);
 
-                return [$argValue->getArgName() => (new ArgumentFactory())->handle($argValue)];
+                return [$argValue->getArgName() => $this->argumentFactory->handle($argValue)];
             });
     }
 
@@ -202,7 +224,7 @@ class FieldFactory
                 $validator->validate();
             }
 
-            return call_user_func_array($resolver, [$rootValue, $inputArgs, $context, $resolveInfo]);
+            return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
         };
     }
 

@@ -6,12 +6,24 @@ use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class QueryBuilder
 {
+    /** @var DatabaseManager */
+    protected $databaseManager;
+
+    /**
+     * @param DatabaseManager $databaseManager
+     */
+    public function __construct(DatabaseManager $databaseManager)
+    {
+        $this->databaseManager = $databaseManager;
+    }
+
     /**
      * Eager load count on collection of models.
      *
@@ -112,8 +124,7 @@ class QueryBuilder
             $relationQueries->shift()->getQuery()
         );
 
-        /** @var \Illuminate\Database\Query\Builder $baseQuery */
-        $baseQuery = app('db')->query();
+        $baseQuery = $this->databaseManager->query();
         $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($relatedTable);
         $results = $baseQuery->select()
             ->from($baseQuery->raw($fromExpression))

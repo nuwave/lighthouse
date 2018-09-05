@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class ScalarDirective extends BaseDirective implements NodeResolver
 {
@@ -26,8 +26,10 @@ class ScalarDirective extends BaseDirective implements NodeResolver
      *
      * @param NodeValue $value
      *
-     * @return \GraphQL\Type\Definition\Type
      * @throws DirectiveException
+     * @throws \ReflectionException
+     *
+     * @return \GraphQL\Type\Definition\Type
      */
     public function resolveNode(NodeValue $value)
     {
@@ -45,6 +47,13 @@ class ScalarDirective extends BaseDirective implements NodeResolver
         return new $scalarClass;
     }
 
+    /**
+     * @param string $className
+     *
+     * @throws \ReflectionException
+     *
+     * @return bool
+     */
     protected function isValidScalarClass(string $className): bool
     {
         if(! class_exists($className)){

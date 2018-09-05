@@ -37,7 +37,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
             $value->setResolver(
                 function () use ($resolver) {
                     /** @var Authorizable $user */
-                    $user = app('auth')->user();
+                    $user = auth()->user();
 
                     if (!$user) {
                         throw new AuthenticationException('Not authenticated to access this field.');

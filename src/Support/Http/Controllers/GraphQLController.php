@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
@@ -16,27 +17,34 @@ class GraphQLController extends Controller
     private $query;
     /** @var array */
     private $variables;
+    /** @var GraphQL */
+    private $graphQL;
 
     /**
      * Inject middleware into request.
      *
      * @param Request $request
+     * @param ExtensionRegistry $extensionRegistry
+     * @param MiddlewareRegistry $middlewareRegistry
+     * @param GraphQL $graphQL
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, ExtensionRegistry $extensionRegistry, MiddlewareRegistry $middlewareRegistry, GraphQL $graphQL)
     {
+        $this->graphQL = $graphQL;
+
         $this->query = $request->input('query');
         $this->variables = is_string($variables = $request->input('variables'))
             ? json_decode($variables, true)
             : $variables;
 
-        resolve(ExtensionRegistry::class)->requestDidStart(
+        $extensionRegistry->requestDidStart(
             new ExtensionRequest($request, $this->query, $this->variables)
         );
 
-        graphql()->prepSchema();
+        $this->graphQL->prepSchema();
 
         $this->middleware(
-            resolve(MiddlewareRegistry::class)->forRequest($this->query)
+            $middlewareRegistry->forRequest($this->query)
         );
     }
 
@@ -54,11 +62,13 @@ class GraphQLController extends Controller
             : false;
 
         return response(
-            graphql()->executeQuery(
-                $this->query,
-                new Context($request, auth()->user()),
-                $this->variables
-            )->toArray($debug)
+            $this->graphQL
+                ->executeQuery(
+                    $this->query,
+                    new Context($request, auth()->user()),
+                    $this->variables
+                )
+                ->toArray($debug)
         );
     }
 }

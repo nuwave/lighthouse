@@ -28,19 +28,21 @@ class NodeFactory
 
     /** @var DirectiveRegistry */
     protected $directiveRegistry;
-
     /** @var TypeRegistry */
     protected $typeRegistry;
+    /** @var Pipeline */
+    protected $pipeline;
 
     /**
-     * NodeFactory constructor.
      * @param DirectiveRegistry $directiveRegistry
      * @param TypeRegistry $typeRegistry
+     * @param Pipeline $pipeline
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, TypeRegistry $typeRegistry)
+    public function __construct(DirectiveRegistry $directiveRegistry, TypeRegistry $typeRegistry, Pipeline $pipeline)
     {
         $this->directiveRegistry = $directiveRegistry;
         $this->typeRegistry = $typeRegistry;
+        $this->pipeline = $pipeline;
     }
 
     /**
@@ -211,7 +213,7 @@ class NodeFactory
      */
     protected function applyMiddleware(NodeValue $value): NodeValue
     {
-        return app(Pipeline::class)
+        return $this->pipeline
             ->send($value)
             ->through($this->directiveRegistry->nodeMiddleware($value->getNode()))
             ->via('handleNode')
