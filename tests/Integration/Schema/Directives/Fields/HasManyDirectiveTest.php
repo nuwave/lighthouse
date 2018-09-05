@@ -215,6 +215,52 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanQueryHasManySelfReferencingRelationships()
+    {
+        factory(Post::class, 1)->create();
+
+        $schema = '
+        type Post {
+            id: Int!
+            parent: Post @belongsTo
+        }
+        
+        type Query {
+            posts: [Post!]! @all
+        }
+        ';
+
+        $result = $this->queryAndReturnResult($schema, '
+        { 
+            posts {
+                id
+                
+                parent {
+                    id
+                    
+                    parent {
+                        id
+                    }
+                }
+            } 
+        }
+        ');
+
+        $posts = collect($result->data['posts'])
+            ->where('parent', '!=', null)
+            ->values();
+
+        $this->assertCount(1, $posts);
+        $this->assertNotNull($posts[0]['parent']);
+
+        $parent = $posts[0]['parent'];
+
+        $this->assertNotNull($parent['parent']);
+    }
+
+    /**
+     * @test
+     */
     public function itThrowsErrorWithUnknownTypeArg()
     {
         $this->expectException(DirectiveException::class);

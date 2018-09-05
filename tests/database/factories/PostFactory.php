@@ -15,5 +15,8 @@ $factory->define(Post::class, function (Faker $faker) {
         'task_id' => function () {
             return factory(Task::class)->create()->getKey();
         },
+        'parent_id' => function() {
+            return factory(Post::class)->create(['parent_id' => null]);
+        }
     ];
 });
