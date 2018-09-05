@@ -30,23 +30,9 @@ class FieldDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $baseClassName = $this->directiveArgValue('class')
-            ?? str_before($this->directiveArgValue('resolver'), '@');
-
-
-        if (empty($baseClassName)) {
-            $directiveName = $this->name();
-            throw new DirectiveException("Directive '{$directiveName}' must have a `class` argument.");
-        }
-
-        $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod = $this->directiveArgValue('method')
-            ?? str_after($this->directiveArgValue('resolver'), '@');
-
-        if (! method_exists($resolverClass, $resolverMethod)) {
-            throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
-        }
-
+        $resolver = $this->getResolver();
+        $resolverClass = $resolver->className();
+        $resolverMethod = $resolver->methodName();
         $additionalData = $this->directiveArgValue('args');
 
         return $value->setResolver(

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\AST\ArgumentNode;
+use Nuwave\Lighthouse\Support\Resolver;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\ObjectFieldNode;
@@ -84,6 +85,33 @@ abstract class BaseDirective implements Directive
         return $arg
             ? $this->argValue($arg, $default)
             : $default;
+    }
+
+    /**
+     * Get the resolver from an argument.
+     * An argument name can be specified optionally.
+     *
+     * @param  string $argumentName
+     *
+     * @return Resolver
+     * @throws DirectiveException
+     */
+    protected function getResolver(string $argumentName = 'resolver'): Resolver
+    {
+        $baseClassName = $this->directiveArgValue('class')
+                         ?? str_before($this->directiveArgValue('resolver'), '@');
+
+        if (empty($baseClassName)) {
+            $directiveName = $this->name();
+            throw new DirectiveException("Directive '{$directiveName}' must have a `class` argument.");
+        }
+
+        $resolverClass = $this->namespaceClassName($baseClassName);
+        $resolverMethod = $this->directiveArgValue('method')
+                          ?? str_after($this->directiveArgValue('resolver'), '@')
+                             ?? 'resolver';
+
+        return new Resolver($resolverClass, $resolverMethod);
     }
 
     /**

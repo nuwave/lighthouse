@@ -37,9 +37,9 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
         graphql()->nodes()->node(
             $value->getNodeName(),
             // Resolver for the node itself
-            $this->getResolver($value, 'resolver'),
+            $this->getNodeResolver($value, 'resolver'),
             // Interface type resolver
-            $this->getResolver($value, 'typeResolver')
+            $this->getNodeResolver($value, 'typeResolver')
         );
 
         return $next($value);
@@ -53,7 +53,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @return \Closure
      */
-    protected function getResolver(NodeValue $value, $argKey)
+    protected function getNodeResolver(NodeValue $value, $argKey)
     {
         $resolver = $this->directiveArgValue($argKey);
 
@@ -65,7 +65,9 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
             };
         }
 
-        list($className, $method) = explode('@', $resolver);
+        $resolver = $this->getResolver($argKey);
+        $className = $resolver->className();
+        $method = $resolver->methodName();
 
         return function ($id) use ($className, $method) {
             $instance = app($className);
