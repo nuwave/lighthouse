@@ -62,6 +62,7 @@ class GraphQLController extends Controller
             : false;
 
         return response(
+
             $this->graphQL
                 ->executeQuery(
                     $this->query,
