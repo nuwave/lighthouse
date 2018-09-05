@@ -114,7 +114,7 @@ class QueryBuilder
 
         /** @var \Illuminate\Database\Query\Builder $baseQuery */
         $baseQuery = app('db')->query();
-        $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($relatedTable);
+        $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($this->tableAlias($relatedTable));
         $results = $baseQuery->select()
             ->from($baseQuery->raw($fromExpression))
             ->setBindings($unitedRelations->getBindings())
@@ -229,5 +229,23 @@ class QueryBuilder
         }
 
         return $collection;
+    }
+    
+    /**
+     * Get alias for a table name.
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    private function tableAlias(string $name): string
+    {
+        $table = explode('.',$name);
+
+        if (count($table) > 1) {
+            $name = implode('_', $table);
+        }
+
+        return $name;
     }
 }
