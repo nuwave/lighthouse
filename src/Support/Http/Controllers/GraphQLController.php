@@ -65,7 +65,7 @@ class GraphQLController extends Controller
             $this->graphQL
                 ->executeQuery(
                     $this->query,
-                    new Context($request, auth()->user()),
+                    new Context($request, app()->bound('auth') ? auth()->user() : null),
                     $this->variables
                 )
                 ->toArray($debug)
