@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\AST\ArgumentNode;
-use Nuwave\Lighthouse\Support\Resolver;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\ObjectFieldNode;
@@ -86,32 +85,44 @@ abstract class BaseDirective implements Directive
             ? $this->argValue($arg, $default)
             : $default;
     }
-
+    
     /**
-     * Get the resolver from an argument.
-     * An argument name can be specified optionally.
+     * Get the resolver that is specified in the current directive.
      *
-     * @param  string $argumentName
+     * @param \Closure $defaultResolver Add in a default resolver to return if no resolver class is given.
+     * @param string $argumentName If the name of the directive argument is not "resolver" you may overwrite it.
      *
-     * @return Resolver
      * @throws DirectiveException
+     *
+     * @return \Closure
      */
-    protected function getResolver(string $argumentName = 'resolver'): Resolver
+    protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
     {
-        $baseClassName = $this->directiveArgValue('class')
-                         ?? str_before($this->directiveArgValue('resolver'), '@');
+        $baseClassName =
+            $this->directiveArgValue('class')
+            ?? str_before($this->directiveArgValue($argumentName), '@');
 
         if (empty($baseClassName)) {
+            // If a default is given, simply return it
+            if($defaultResolver){
+                return $defaultResolver;
+            }
+            
             $directiveName = $this->name();
-            throw new DirectiveException("Directive '{$directiveName}' must have a `class` argument.");
+            throw new DirectiveException("Directive '{$directiveName}' must have a resolver class specified.");
+        }
+        
+        $resolverClass = $this->namespaceClassName($baseClassName);
+        $resolverMethod =
+            $this->directiveArgValue('method')
+            ?? str_after($this->directiveArgValue($argumentName), '@')
+            ?? 'resolve';
+
+        if (! method_exists($resolverClass, $resolverMethod)) {
+            throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
         }
 
-        $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod = $this->directiveArgValue('method')
-                          ?? str_after($this->directiveArgValue('resolver'), '@')
-                             ?? 'resolver';
-
-        return new Resolver($resolverClass, $resolverMethod);
+        return \Closure::fromCallable([app($resolverClass), $resolverMethod]);
     }
 
     /**
