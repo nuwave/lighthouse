@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\User;
+use Illuminate\Contracts\Auth\Authenticatable as User;
 
 class Context
 {
