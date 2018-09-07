@@ -29,25 +29,14 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $value, \Closure $next)
     {
-        $baseClassName = $this->directiveArgValue('class') ?? str_before($this->directiveArgValue('resolver'), '@');
-
-        if (empty($baseClassName)) {
-            return $next($value->setComplexity(function ($childrenComplexity, $args) {
+        $resolver = $this->getResolver(
+            function ($childrenComplexity, $args) {
                 $complexity = array_get($args, 'first', array_get($args, 'count', 1));
 
                 return $childrenComplexity * $complexity;
-            }));
-        }
-
-        $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod = $this->directiveArgValue('method') ?? str_after($this->directiveArgValue('resolver'), '@');
-
-        if (! method_exists($resolverClass, $resolverMethod)) {
-            throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
-        }
-
-        return $next($value->setComplexity(function () use ($resolverClass, $resolverMethod) {
-            return call_user_func_array([app($resolverClass), $resolverMethod], func_get_args());
-        }));
+            }
+        );
+        
+        return $next($value->setComplexity($resolver));
     }
 }
