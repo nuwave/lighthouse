@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Support\Exceptions;
 
-use Exception;
 use Tests\DBTestCase;
 use Nuwave\Lighthouse\Support\Exceptions\Error;
 use Nuwave\Lighthouse\Support\Contracts\Errorable;
@@ -112,7 +111,7 @@ class Resolver
 
     public function randomException()
     {
-        throw new Exception('random message');
+        throw new \Exception('random message');
     }
 
     public function customException()
@@ -121,7 +120,7 @@ class Resolver
     }
 }
 
-class ResolverException extends Exception implements Errorable
+class ResolverException extends \Exception implements Errorable
 {
     public function toError(): Error
     {
@@ -131,6 +130,6 @@ class ResolverException extends Exception implements Errorable
     }
 }
 
-class CustomException extends Exception
+class CustomException extends \Exception
 {
 }

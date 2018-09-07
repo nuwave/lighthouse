@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Exceptions;
 
-use Exception;
-
-class DocumentASTException extends Exception
+class DocumentASTException extends \Exception
 {
 }
