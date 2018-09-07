@@ -119,7 +119,7 @@ class FieldFactory
         return function ($obj, array $args, $context = null, $info = null) use ($fieldName, $rootOperationType) {
             $class = config("lighthouse.namespaces.{$rootOperationType}").'\\'.studly_case($fieldName);
     
-            return (new $class($obj, $args, $context, $info))->resolve();
+            return resolve($class)->resolve($obj, $args, $context, $info);
         };
     }
 
