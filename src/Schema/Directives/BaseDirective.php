@@ -146,15 +146,16 @@ abstract class BaseDirective implements Directive
                 .$this->name().'directive on '.$this->definitionNode->name->value);
         }
 
-        if (! class_exists($model)) {
-            $model = config('lighthouse.namespaces.models').'\\'.$model;
+        if(class_exists($model)){
+            return $model;
         }
 
-        if (! class_exists($model)) {
-            $model = $this->namespaceClassName($model);
+        $modelWithDefaultNamespace = config('lighthouse.namespaces.models').'\\'.$model;
+        if(class_exists($modelWithDefaultNamespace)){
+            return $model;
         }
 
-        return $model;
+        return $this->namespaceClassName($model);
     }
 
     /**
@@ -186,7 +187,7 @@ abstract class BaseDirective implements Directive
     protected function associatedNamespace(): string
     {
         $namespaceDirective = $this->directiveDefinition(
-            (new NamespaceDirective())->name()
+            (new NamespaceDirective)->name()
         );
 
         return $namespaceDirective
