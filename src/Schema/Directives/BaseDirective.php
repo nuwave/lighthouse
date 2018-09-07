@@ -99,27 +99,29 @@ abstract class BaseDirective implements Directive
      */
     protected function getResolver(Closure $defaultResolver = null, string $argumentName = 'resolver'): Closure
     {
+        $resolverFragments = explode('@', $this->directiveArgValue($argumentName) ?? '');
+
         $baseClassName =
             $this->directiveArgValue('class')
-            ?? str_before($this->directiveArgValue($argumentName), '@');
+            ?? $resolverFragments[0];
 
         if (empty($baseClassName)) {
             // If a default is given, simply return it
-            if($defaultResolver){
+            if ($defaultResolver) {
                 return $defaultResolver;
             }
-            
+
             $directiveName = $this->name();
             throw new DirectiveException("Directive '{$directiveName}' must have a resolver class specified.");
         }
-        
+
         $resolverClass = $this->namespaceClassName($baseClassName);
         $resolverMethod =
             $this->directiveArgValue('method')
-            ?? str_after($this->directiveArgValue($argumentName), '@')
+            ?? $resolverFragments[1]
             ?? 'resolve';
 
-        if (! method_exists($resolverClass, $resolverMethod)) {
+        if ( ! method_exists($resolverClass, $resolverMethod)) {
             throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
         }
 
