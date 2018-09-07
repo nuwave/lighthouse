@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Closure;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\AST\ArgumentNode;
@@ -89,14 +90,14 @@ abstract class BaseDirective implements Directive
     /**
      * Get the resolver that is specified in the current directive.
      *
-     * @param \Closure $defaultResolver Add in a default resolver to return if no resolver class is given.
+     * @param Closure $defaultResolver Add in a default resolver to return if no resolver class is given.
      * @param string $argumentName If the name of the directive argument is not "resolver" you may overwrite it.
      *
      * @throws DirectiveException
      *
-     * @return \Closure
+     * @return Closure
      */
-    protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
+    protected function getResolver(Closure $defaultResolver = null, string $argumentName = 'resolver'): Closure
     {
         $baseClassName =
             $this->directiveArgValue('class')
@@ -122,7 +123,7 @@ abstract class BaseDirective implements Directive
             throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
         }
 
-        return \Closure::fromCallable([app($resolverClass), $resolverMethod]);
+        return Closure::fromCallable([app($resolverClass), $resolverMethod]);
     }
 
     /**
