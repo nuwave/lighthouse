@@ -110,7 +110,7 @@ class FieldFactory
      * Get the default resolver for a field of the root operation types.
      *
      * @param string $fieldName
-     * @param string $rootOperationType One of queries|mutations
+     * @param string $rootOperationType One of [queries|mutations]
      *
      * @return \Closure
      */
@@ -118,8 +118,8 @@ class FieldFactory
     {
         return function ($obj, array $args, $context = null, $info = null) use ($fieldName, $rootOperationType) {
             $class = config("lighthouse.namespaces.{$rootOperationType}").'\\'.studly_case($fieldName);
-            
-            return app($class)->resolve($obj, $args, $context, $info);
+    
+            return resolve($class)->resolve($obj, $args, $context, $info);
         };
     }
 

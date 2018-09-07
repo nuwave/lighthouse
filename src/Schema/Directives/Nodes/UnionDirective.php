@@ -29,10 +29,13 @@ class UnionDirective extends BaseDirective implements NodeResolver
      */
     public function resolveNode(NodeValue $value)
     {
-        $resolver = $this->directiveArgValue('resolver');
-
-        $namespace = array_get(explode('@', $resolver), '0');
-        $method = array_get(explode('@', $resolver), '1', strtolower($value->getNodeName()));
+        $resolver = $this->getResolver(
+            function() use ($value){
+                return graphql()->types()->get(
+                    str_after('\\', get_class($value))
+                );
+            }
+        );
 
         return new UnionType([
             'name' => $value->getNodeName(),
@@ -42,12 +45,8 @@ class UnionDirective extends BaseDirective implements NodeResolver
                     return graphql()->types()->get($type->name->value);
                 })->filter()->toArray();
             },
-            'resolveType' => function ($value) use ($namespace, $method) {
-                if ($namespace) {
-                    $instance = app($namespace);
-                    return call_user_func_array([$instance, $method], [$value]);
-                }
-                return graphql()->types()->get(last(explode('\\', get_class($value))));
+            'resolveType' => function ($value) use ($resolver) {
+                return $resolver($value);
             },
         ]);
     }

@@ -85,6 +85,45 @@ abstract class BaseDirective implements Directive
             ? $this->argValue($arg, $default)
             : $default;
     }
+    
+    /**
+     * Get the resolver that is specified in the current directive.
+     *
+     * @param \Closure $defaultResolver Add in a default resolver to return if no resolver class is given.
+     * @param string $argumentName If the name of the directive argument is not "resolver" you may overwrite it.
+     *
+     * @throws DirectiveException
+     *
+     * @return \Closure
+     */
+    protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
+    {
+        $baseClassName =
+            $this->directiveArgValue('class')
+            ?? str_before($this->directiveArgValue($argumentName), '@');
+
+        if (empty($baseClassName)) {
+            // If a default is given, simply return it
+            if($defaultResolver){
+                return $defaultResolver;
+            }
+            
+            $directiveName = $this->name();
+            throw new DirectiveException("Directive '{$directiveName}' must have a resolver class specified.");
+        }
+        
+        $resolverClass = $this->namespaceClassName($baseClassName);
+        $resolverMethod =
+            $this->directiveArgValue('method')
+            ?? str_after($this->directiveArgValue($argumentName), '@')
+            ?? 'resolve';
+
+        if (! method_exists($resolverClass, $resolverMethod)) {
+            throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
+        }
+
+        return \Closure::fromCallable([app($resolverClass), $resolverMethod]);
+    }
 
     /**
      * @throws DirectiveException

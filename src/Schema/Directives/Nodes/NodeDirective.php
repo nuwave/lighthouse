@@ -28,7 +28,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      * Handle type construction.
      *
      * @param NodeValue $value
-     * @param \Closure   $next
+     * @param \Closure $next
      *
      * @return NodeValue
      */
@@ -37,47 +37,37 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
         graphql()->nodes()->node(
             $value->getNodeName(),
             // Resolver for the node itself
-            $this->getResolver($value, 'resolver'),
+            $this->getResolver(),
             // Interface type resolver
-            $this->getResolver($value, 'typeResolver')
+            $this->getTypeResolver($value)
         );
 
         return $next($value);
     }
 
     /**
-     * Get node resolver.
-     *
      * @param NodeValue $value
-     * @param string    $argKey
      *
      * @return \Closure
      */
-    protected function getResolver(NodeValue $value, $argKey)
+    protected function getTypeResolver(NodeValue $value): \Closure
     {
-        $resolver = $this->directiveArgValue($argKey);
+        $nodeName = $value->getNodeName();
 
-        if (! $resolver && 'typeResolver' === $argKey) {
-            $nodeName = $value->getNodeName();
-
-            return function () use ($nodeName) {
+        return $this->getResolver(
+            function () use ($nodeName) {
                 return graphql()->types()->get($nodeName);
-            };
-        }
-
-        list($className, $method) = explode('@', $resolver);
-
-        return function ($id) use ($className, $method) {
-            $instance = app($className);
-
-            return call_user_func_array([$instance, $method], [$id]);
-        };
+            },
+            'typeResolver'
+        );
     }
 
     /**
-     * @param Node        $node
+     * @param Node $node
      * @param DocumentAST $current
      * @param DocumentAST $original
+     *
+     * @throws \Exception
      *
      * @return DocumentAST
      */
