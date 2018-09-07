@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Closure;
+use Exception;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\AST\ArgumentNode;
@@ -89,72 +91,122 @@ abstract class BaseDirective implements Directive
     /**
      * Get the resolver that is specified in the current directive.
      *
-     * @param \Closure $defaultResolver Add in a default resolver to return if no resolver class is given.
+     * @param Closure $defaultResolver Add in a default resolver to return if no resolver class is given.
      * @param string $argumentName If the name of the directive argument is not "resolver" you may overwrite it.
      *
      * @throws DirectiveException
      *
-     * @return \Closure
+     * @return Closure
      */
-    protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
+    protected function getResolver(Closure $defaultResolver = null, string $argumentName = 'resolver'): Closure
     {
+        $resolverFragments = explode('@', $this->directiveArgValue($argumentName) ?? '');
+
         $baseClassName =
             $this->directiveArgValue('class')
-            ?? str_before($this->directiveArgValue($argumentName), '@');
+            ?? $resolverFragments[0];
 
         if (empty($baseClassName)) {
             // If a default is given, simply return it
-            if($defaultResolver){
+            if ($defaultResolver) {
                 return $defaultResolver;
             }
-            
+
             $directiveName = $this->name();
             throw new DirectiveException("Directive '{$directiveName}' must have a resolver class specified.");
         }
-        
+
         $resolverClass = $this->namespaceClassName($baseClassName);
         $resolverMethod =
             $this->directiveArgValue('method')
-            ?? str_after($this->directiveArgValue($argumentName), '@')
+            ?? $resolverFragments[1]
             ?? 'resolve';
 
-        if (! method_exists($resolverClass, $resolverMethod)) {
+        if ( ! method_exists($resolverClass, $resolverMethod)) {
             throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
         }
 
-        return \Closure::fromCallable([app($resolverClass), $resolverMethod]);
+        return Closure::fromCallable([app($resolverClass), $resolverMethod]);
     }
 
     /**
+     * Get the model class from `model` argument of field.
+     * If `model` argument not provided, fallback to:
+     * 1. `field return type` + namespace
+     * 2. `field name(singular)` + namespace
+     *
      * @throws DirectiveException
-     * @throws \Exception
      *
      * @return string
      */
     protected function getModelClass(): string
     {
-        $model = $this->directiveArgValue('model');
+        $modelClassFromArg = $this->directiveArgValue('model');
 
-        // Fallback to using the return type of the field
-        if(! $model && $this->definitionNode instanceof FieldDefinitionNode){
-            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+        if ($modelClassFromArg && \class_exists($modelClassFromArg)) {
+            return $modelClassFromArg;
         }
 
-        if (! $model) {
+        $classFromArg = function () use ($modelClassFromArg) {
+            return $modelClassFromArg;
+        };
+
+        $classFromFieldReturnType = function () {
+            return $this->definitionNode instanceof FieldDefinitionNode ?
+                ASTHelper::getFieldTypeName($this->definitionNode) :
+                null;
+        };
+
+        $classFromfieldName = function () {
+            return $this->definitionNode instanceof FieldDefinitionNode ?
+                studly_case(str_singular($this->definitionNode->name->value)) :
+                null;
+        };
+
+        $defaultNamespace = config('lighthouse.namespaces.models');
+        $namespace = $this->associatedNamespace() ?: $defaultNamespace;
+        $fallbackClass = null;
+
+        collect([
+            $classFromArg,
+            $classFromFieldReturnType,
+            $classFromfieldName,
+        ])->first(function (Closure $getBaseClassName) use ($namespace, &$fallbackClass) {
+            // Try to locate a valid class by using the following pattern.
+            // Lower number has higher priority.
+            // 1. 'model' argument + namespace
+            // 2. return type + namespace
+            // 3. field name + namespace
+
+            try {
+                $baseClassName = $getBaseClassName();
+
+                if(!$baseClassName){
+                    return false;
+                }
+
+                $className = "$namespace\\$baseClassName";
+                $classExists = \class_exists($className);
+
+                if ($classExists) {
+                    $fallbackClass = $className;
+
+                    return true;
+                }
+            } catch (Exception $e) {}
+
+            return false;
+        });
+
+        if ( ! $fallbackClass) {
+            $nodeName = $this->definitionNode->name->value;
+            $directiveName = $this->name();
             throw new DirectiveException(
-                'A `model` argument must be assigned to the '
-                .$this->name().'directive on '.$this->definitionNode->name->value);
+                "A valid model class for `$directiveName` directive on `$nodeName` not found."
+            );
         }
 
-        if (! class_exists($model)) {
-            $model = config('lighthouse.namespaces.models').'\\'.$model;
-        }
-
-        if (! class_exists($model)) {
-            $model = $this->namespaceClassName($model);
-        }
-
-        return $model;
+        return $fallbackClass;
     }
 
     /**
