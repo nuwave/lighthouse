@@ -156,7 +156,7 @@ abstract class BaseDirective implements Directive
 
         $modelWithDefaultNamespace = config('lighthouse.namespaces.models').'\\'.$model;
         if(class_exists($modelWithDefaultNamespace)){
-            return $model;
+            return $modelWithDefaultNamespace;
         }
 
         return $this->namespaceClassName($model);
