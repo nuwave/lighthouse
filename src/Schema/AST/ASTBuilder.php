@@ -7,12 +7,13 @@ use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class ASTBuilder
 {
@@ -35,7 +36,7 @@ class ASTBuilder
 
         $document = self::addNodeSupport($document);
         $document = self::addPaginationInfoTypes($document);
-        $document = self::applyExtensions($document);
+        $document = resolve(ExtensionRegistry::class)->manipulate($document);
 
         return $document;
     }
@@ -55,7 +56,7 @@ class ASTBuilder
             ->reduce(function (DocumentAST $document, Node $node) use (
                 $originalDocument
             ) {
-                $nodeManipulators = graphql()->directives()->nodeManipulators($node);
+                $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
 
                 return $nodeManipulators->reduce(function (DocumentAST $document, NodeManipulator $nodeManipulator) use (
                     $originalDocument,
@@ -111,7 +112,7 @@ class ASTBuilder
                 DocumentAST $document,
                 FieldDefinitionNode $fieldDefinition
             ) use ($objectType, $originalDocument) {
-                $fieldManipulators = graphql()->directives()->fieldManipulators($fieldDefinition);
+                $fieldManipulators = resolve(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
 
                 return $fieldManipulators->reduce(function (
                     DocumentAST $document,
@@ -146,7 +147,7 @@ class ASTBuilder
                                 $parentField,
                                 $originalDocument
                             ) {
-                                $argManipulators = graphql()->directives()->argManipulators($argDefinition);
+                                $argManipulators = resolve(DirectiveRegistry::class)->argManipulators($argDefinition);
 
                                 return $argManipulators->reduce(
                                     function (DocumentAST $document, ArgManipulator $argManipulator) use (
@@ -168,8 +169,8 @@ class ASTBuilder
      *
      * @param DocumentAST $document
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\DocumentASTException
      *
      * @return DocumentAST
      */
@@ -210,8 +211,8 @@ class ASTBuilder
     /**
      * @param DocumentAST $document
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DocumentASTException
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\DocumentASTException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return DocumentAST
      */
@@ -276,25 +277,5 @@ class ASTBuilder
         $document->setDefinition($pageInfo);
 
         return $document;
-    }
-  
-     /**
-     * @param DocumentAST $document
-     *
-     * @return DocumentAST
-     */
-    protected static function applyExtensions(DocumentAST $document): DocumentAST
-    {
-        $originalDocument = $document;
-
-        return graphql()
-            ->extensions()
-            ->active()
-            ->reduce(function (
-                DocumentAST $document,
-                GraphQLExtension $extension
-            ) use ($originalDocument) {
-                return $extension->manipulateSchema($document, $originalDocument);
-            }, $document);
     }
 }

@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class PaginateDirective extends PaginationManipulator implements FieldResolver, FieldManipulator

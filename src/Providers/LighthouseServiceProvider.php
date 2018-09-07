@@ -6,15 +6,18 @@ use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Validator;
-use Nuwave\Lighthouse\Support\Exceptions\Handler;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
-use Nuwave\Lighthouse\Schema\Extensions\TraceExtension;
+use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Support\Contracts\ExceptionHandler;
-use Nuwave\Lighthouse\Support\Validator\ValidatorFactory;
-use Nuwave\Lighthouse\Support\Collection as LighthouseCollection;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -23,20 +26,19 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/config.php', 'lighthouse');
 
         $this->publishes([
-            __DIR__.'/../../config/config.php' => config_path('lighthouse.php'),
-            __DIR__.'/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
+            __DIR__ . '/../../config/config.php' => config_path('lighthouse.php'),
+            __DIR__ . '/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
         ]);
 
         if (config('lighthouse.controller')) {
-            $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__ . '/../Support/Http/routes.php');
         }
 
-        $this->registerMacros();
+        $this->registerCollectionMacros();
         $this->registerValidator();
-        $this->registerExtensions();
     }
 
     /**
@@ -63,9 +65,12 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
 
-        $this->app->bind(ExceptionHandler::class, Handler::class);
-
         $this->app->singleton(ValueFactory::class);
+        $this->app->singleton(DirectiveRegistry::class);
+        $this->app->singleton(ExtensionRegistry::class);
+        $this->app->singleton(NodeRegistry::class);
+        $this->app->singleton(MiddlewareRegistry::class);
+        $this->app->singleton(TypeRegistry::class);
 
         $this->app->bind(
             SchemaSourceProvider::class,
@@ -86,44 +91,86 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * Register lighthouse macros.
      */
-    public function registerMacros()
+    protected function registerCollectionMacros()
     {
-        Collection::mixin(new LighthouseCollection());
+        Collection::macro('fetch', function ($eagerLoadRelations = null) {
+            if (count($this->items) > 0) {
+                if (is_string($eagerLoadRelations)) {
+                    $eagerLoadRelations = [$eagerLoadRelations];
+                }
+                $query = $this->first()::with($eagerLoadRelations);
+                $this->items = resolve(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
+            }
+
+            return $this;
+        });
+
+        Collection::macro('fetchCount', function ($eagerLoadRelations = null) {
+            if (count($this->items) > 0) {
+                if (is_string($eagerLoadRelations)) {
+                    $eagerLoadRelations = [$eagerLoadRelations];
+                }
+
+                $query = $this->first()::withCount($eagerLoadRelations);
+                $this->items = resolve(QueryBuilder::class)->eagerLoadCount($query, $this->items);
+            }
+
+            return $this;
+        });
+
+        Collection::macro('fetchForPage', function ($perPage, $page, $eagerLoadRelations) {
+            if (count($this->items) > 0) {
+                if (is_string($eagerLoadRelations)) {
+                    $eagerLoadRelations = [$eagerLoadRelations];
+                }
+
+                $this->items = $this->fetchCount($eagerLoadRelations)->items;
+                $query = $this->first()::with($eagerLoadRelations);
+                $this->items = resolve(QueryBuilder::class)
+                    ->eagerLoadRelations($query, $this->items, $perPage, $page);
+            }
+
+            return $this;
+        });
     }
 
     /**
      * Register GraphQL validator.
      */
-    public function registerValidator()
+    protected function registerValidator()
     {
-        app(\Illuminate\Validation\Factory::class)->resolver(function (
-            $translator,
-            $data,
-            $rules,
-            $messages,
-            $customAttributes
-        ) {
-            return ValidatorFactory::resolve(
+        $this->app->make(\Illuminate\Validation\Factory::class)->resolver(
+            function (
                 $translator,
-                $data,
-                $rules,
-                $messages,
-                $customAttributes
-            );
-        });
+                array $data,
+                array $rules,
+                array $messages,
+                array $customAttributes
+            ): \Illuminate\Validation\Validator {
+                // This determines whether we are resolving a GraphQL field
+                $resolveInfo = array_get($customAttributes, 'resolveInfo');
 
-        Validator::extendImplicit('required_with_mutation', ValidatorFactory::class.'@requiredWithMutation');
-    }
+                return $resolveInfo instanceof ResolveInfo
+                    ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
+                    : new \Illuminate\Validation\Validator($translator, $data, $rules, $messages, $customAttributes);
+            }
+        );
 
-    /**
-     * Register extensions w/ registry.
-     */
-    public function registerExtensions()
-    {
-        $this->app->singleton(TraceExtension::class);
+        Validator::extendImplicit(
+            'required_with_mutation',
+            function (string $attribute, $value, array $parameters, GraphQLValidator $validator): bool {
+                $info = $validator->getResolveInfo();
 
-        graphql()->extensions()->registerMany([
-            $this->app->get(TraceExtension::class),
-        ]);
+                if ('Mutation' !== data_get($info, 'parentType.name')) {
+                    return true;
+                }
+
+                if (in_array($info->fieldName, $parameters)) {
+                    return !is_null($value);
+                }
+
+                return true;
+            }
+        );
     }
 }

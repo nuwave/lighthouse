@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class UnionTest extends TestCase
 {
@@ -21,7 +22,7 @@ class UnionTest extends TestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($this->schema(), $query);
+        $result = $this->executeQuery($this->schema(), $query);
 
         $this->assertEquals('user.id', array_get($result->data, 'person.id'));
     }
@@ -40,7 +41,7 @@ class UnionTest extends TestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($this->schema(), $query);
+        $result = $this->executeQuery($this->schema(), $query);
 
         $this->assertEquals('employee.id', array_get($result->data, 'person.employeeId'));
     }
@@ -56,7 +57,7 @@ class UnionTest extends TestCase
     {
         $type = isset($value['id']) ? 'User' : 'Employee';
 
-        return graphql()->types()->get($type);
+        return resolve(TypeRegistry::class)->get($type);
     }
 
     protected function schema(): string

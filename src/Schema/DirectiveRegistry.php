@@ -10,6 +10,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -19,7 +20,6 @@ use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class DirectiveRegistry
 {
@@ -68,8 +68,8 @@ class DirectiveRegistry
 
         $namespace = $namespace ?: app()->getNamespace();
         $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-        ? realpath(__DIR__.'/../../src/')
-        : app_path();
+            ? realpath(__DIR__.'/../../src/')
+            : app_path();
 
         /** @var SplFileInfo $file */
         foreach ((new Finder())->in($paths)->files() as $file) {
@@ -95,7 +95,9 @@ class DirectiveRegistry
         $reflection = new \ReflectionClass($className);
 
         if ($reflection->isInstantiable() && $reflection->isSubclassOf(Directive::class)) {
-            $this->register(app($reflection->getName()));
+            $this->register(
+                resolve($reflection->getName())
+            );
         }
     }
 
@@ -120,13 +122,13 @@ class DirectiveRegistry
      */
     public function get($name)
     {
-        $handler = $this->directives->get($name);
+        $directive = $this->directives->get($name);
 
-        if (! $handler) {
+        if (! $directive) {
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
-        return app(get_class($handler));
+        return resolve(get_class($directive));
     }
 
     /**
@@ -203,6 +205,7 @@ class DirectiveRegistry
      * @param Node $node
      *
      * @return NodeResolver
+     * @deprecated in favour of nodeResolver()
      */
     public function forNode(Node $node)
     {

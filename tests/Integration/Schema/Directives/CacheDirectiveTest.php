@@ -40,7 +40,7 @@ class CacheDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', app('cache')->get('user:1:name'));
+        $this->assertEquals('foobar', resolve('cache')->get('user:1:name'));
     }
 
     /**
@@ -70,7 +70,7 @@ class CacheDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', app('cache')->get('user:foo@bar.com:name'));
+        $this->assertEquals('foobar', resolve('cache')->get('user:foo@bar.com:name'));
     }
 
     /**
@@ -103,7 +103,7 @@ class CacheDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', app('cache')->get($cacheKey));
+        $this->assertEquals('foobar', resolve('cache')->get($cacheKey));
     }
 
     /**
@@ -135,7 +135,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $this->execute($schema, $query);
 
-        $result = app('cache')->get('query:users:count:5');
+        $result = resolve('cache')->get('query:users:count:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
@@ -183,7 +183,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query)['data'];
 
-        $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
+        $posts = resolve('cache')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
@@ -214,7 +214,7 @@ class CacheDirectiveTest extends DBTestCase
     public function itCanUseCustomCacheValue()
     {
         /** @var ValueFactory $valueFactory */
-        $valueFactory = app(ValueFactory::class);
+        $valueFactory = resolve(ValueFactory::class);
         $valueFactory->cacheResolver(function ($arguments) {
             return new class($arguments) extends CacheValue
             {
@@ -245,7 +245,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $this->execute($schema, $query);
 
-        $this->assertEquals('foobar', app('cache')->get('foo'));
+        $this->assertEquals('foobar', resolve('cache')->get('foo'));
     }
 
     /**
@@ -291,7 +291,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query)['data'];
 
-        $posts = app('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
+        $posts = resolve('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 

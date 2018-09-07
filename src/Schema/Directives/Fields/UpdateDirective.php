@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class UpdateDirective extends BaseDirective implements FieldResolver
 {

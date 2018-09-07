@@ -69,7 +69,7 @@ class SearchDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
@@ -118,7 +118,7 @@ class SearchDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
         $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);

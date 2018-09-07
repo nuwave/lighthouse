@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Support\Traits;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 /**
  * @deprecated This trait will be removed in a future version of Lighthouse.

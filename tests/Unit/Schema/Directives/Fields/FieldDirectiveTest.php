@@ -3,7 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class FieldDirectiveTest extends TestCase
 {
@@ -12,17 +12,19 @@ class FieldDirectiveTest extends TestCase
      */
     public function itCanResolveFieldWithAssignedClass()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
+        $schema = '
+        type Query {
             bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
         }
-        ');
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $result = $this->execute($schema, $query);
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolve = array_get($fields, 'bar.resolve');
-
-        $this->assertEquals('foo.bar', $resolve(null, []));
+        $this->assertEquals('foo.bar', array_get($result, 'data.bar'));
     }
 
     /**
@@ -30,17 +32,19 @@ class FieldDirectiveTest extends TestCase
      */
     public function itAssignsResolverFromCombinedDefinition()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
+        $schema = '
+        type Query {
             bar: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
-        ');
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $result = $this->execute($schema, $query);
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolve = array_get($fields, 'bar.resolve');
-
-        $this->assertEquals('foo.bar', $resolve(null, []));
+        $this->assertEquals('foo.bar', array_get($result, 'data.bar'));
     }
 
     /**
@@ -48,17 +52,19 @@ class FieldDirectiveTest extends TestCase
      */
     public function itCanResolveFieldWithMergedArgs()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
+        $schema = '
+        type Query {
             bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
         }
-        ');
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $result = $this->execute($schema, $query);
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolve = array_get($fields, 'bar.resolve');
-
-        $this->assertEquals('foo.baz', $resolve(null, []));
+        $this->assertEquals('foo.baz', array_get($result, 'data.bar'));
     }
 
     /**
@@ -66,15 +72,18 @@ class FieldDirectiveTest extends TestCase
      */
     public function itThrowsAnErrorIfNoClassIsDefined()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
+        $this->expectException(DirectiveException::class);
+        $schema = '
+        type Query {
             bar: String! @field(method: "bar")
         }
-        ');
-
-        $this->expectException(DirectiveException::class);
-        $type = $schema->getType('Foo');
-        $type->config['fields']();
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $this->execute($schema, $query);
     }
 
     /**
@@ -82,14 +91,17 @@ class FieldDirectiveTest extends TestCase
      */
     public function itThrowsAnErrorIfNoMethodIsDefined()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
+        $this->expectException(DirectiveException::class);
+        $schema = '
+        type Query {
             bar: String! @field(class: "Foo\\\Bar")
         }
-        ');
-
-        $this->expectException(DirectiveException::class);
-        $type = $schema->getType('Foo');
-        $type->config['fields']();
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $this->execute($schema, $query);
     }
 }

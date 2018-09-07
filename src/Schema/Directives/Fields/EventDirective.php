@@ -24,7 +24,7 @@ class EventDirective extends BaseDirective implements FieldMiddleware
      * @param FieldValue $value
      * @param \Closure    $next
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return FieldValue
      */

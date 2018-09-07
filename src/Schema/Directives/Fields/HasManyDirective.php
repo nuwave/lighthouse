@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 
 class HasManyDirective extends PaginationManipulator implements FieldResolver, FieldManipulator

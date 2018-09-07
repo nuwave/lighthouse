@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\ObjectValueNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 
 /**
  * Trait HandlesDirectives
  * @package Nuwave\Lighthouse\Support\Traits
- * @deprecated Use the BaseDirective class instead
+ * @deprecated Use the BaseDirective class or the ASTHelper instead
  */
 trait HandlesDirectives
 {

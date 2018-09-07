@@ -6,6 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class InterfaceDirectiveTest extends DBTestCase
@@ -59,10 +60,11 @@ class InterfaceDirectiveTest extends DBTestCase
 
     public function resolveNameableInterface($value): \GraphQL\Type\Definition\ObjectType
     {
+        $typeRegistry = resolve(TypeRegistry::class);
         if ($value instanceof User) {
-            return graphql()->types()->get('User');
+            return $typeRegistry->get('User');
         } elseif($value instanceof Team){
-            return graphql()->types()->get('Team');
+            return $typeRegistry->get('Team');
         }
     }
 

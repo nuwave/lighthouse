@@ -46,7 +46,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
         $this->assertEquals(5, array_get($result->data, 'users.paginatorInfo.count'));
         $this->assertEquals(10, array_get($result->data, 'users.paginatorInfo.total'));
         $this->assertEquals(1, array_get($result->data, 'users.paginatorInfo.currentPage'));
@@ -117,7 +117,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
         $this->assertEquals(1, array_get($result->data, 'users.paginatorInfo.currentPage'));
         $this->assertEquals(2, array_get($result->data, 'users.data.0.posts.paginatorInfo.currentPage'));
         $this->assertEquals(3, array_get($result->data, 'users.data.0.posts.data.0.comments.paginatorInfo.currentPage'));
@@ -157,7 +157,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
         $this->assertTrue(array_get($result->data, 'users.pageInfo.hasNextPage'));
         $this->assertCount(5, array_get($result->data, 'users.edges'));
     }

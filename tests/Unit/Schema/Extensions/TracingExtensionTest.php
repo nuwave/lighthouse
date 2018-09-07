@@ -3,8 +3,10 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
+use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
-class TraceExtensionTest extends TestCase
+class TracingExtensionTest extends TestCase
 {
     /**
      * Define environment setup.
@@ -15,27 +17,26 @@ class TraceExtensionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('lighthouse.extensions', ['tracing']);
+        $app['config']->set('lighthouse.extensions', [TracingExtension::class]);
     }
+
+    protected $schema = <<<SCHEMA
+type Query {
+    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TracingExtensionTest@resolve")
+}
+SCHEMA;
 
     /**
      * @test
      */
-    public function itCanAddTraceExtensionMetaToResult()
+    public function itCanAddTracingExtensionMetaToResult()
     {
-        $resolver = addslashes(self::class).'@resolve';
-
-        $schema = "
-        type Query {
-            foo: String! @field(resolver: \"{$resolver}\")
-        }
-        ";
         $query = '
         {
             foo
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->postJson('graphql', ['query' => $query])->json();
 
         $this->assertArrayHasKey('tracing', array_get($result, 'extensions'));
         $this->assertArrayHasKey('resolvers', array_get($result, 'extensions.tracing.execution'));

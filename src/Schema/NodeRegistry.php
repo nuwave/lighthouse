@@ -5,9 +5,21 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
-class NodeContainer
+class NodeRegistry
 {
     use HandlesGlobalId;
+
+    /** @var TypeRegistry */
+    protected $typeRegistry;
+
+    /**
+     * NodeRegistry constructor.
+     * @param TypeRegistry $typeRegistry
+     */
+    public function __construct(TypeRegistry $typeRegistry)
+    {
+        $this->typeRegistry = $typeRegistry;
+    }
 
     /**
      * Registered nodes.
@@ -61,9 +73,11 @@ class NodeContainer
     }
 
     /**
-     * Resolve node.
+     * Get the appropriate resolver for the node and call it with the decoded id.
      *
      * @param string $globalId
+     *
+     * @throws Error
      *
      * @return mixed
      */
@@ -81,7 +95,7 @@ class NodeContainer
     }
 
     /**
-     * Resolve node type.
+     * Determine the GraphQL type of a given value.
      *
      * @param mixed $value
      *
@@ -89,8 +103,8 @@ class NodeContainer
      */
     public function resolveType($value)
     {
-        if (is_object($value) && isset($this->models[get_class($value)])) {
-            return graphql()->types()->get($this->models[get_class($value)]);
+        if (is_object($value) && $modelName = array_get($this->models, get_class($value))) {
+            return $this->typeRegistry->get($modelName);
         }
 
         return collect($this->types)
@@ -105,7 +119,9 @@ class NodeContainer
                 $resolver = $item['resolver'];
                 $type = $item['type'];
 
-                return $resolver($value) ? graphql()->types()->get($type) : $instance;
+                return $resolver($value)
+                    ? $this->typeRegistry->get($type)
+                    : $instance;
             });
     }
 }
