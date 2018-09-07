@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -217,7 +218,20 @@ class HasManyDirectiveTest extends DBTestCase
      */
     public function itCanQueryHasManySelfReferencingRelationships()
     {
-        factory(Post::class, 1)->create();
+        $post1 = factory(Post::class)->create([
+            'id' => 1,
+            'parent_id' => null,
+        ]);
+
+        $post2 = factory(Post::class)->create([
+            'id' => 2,
+            'parent_id' => $post1->getKey(),
+        ]);
+
+        $post3 = factory(Post::class)->create([
+            'id' => 3,
+            'parent_id' => $post2->getKey(),
+        ]);
 
         $schema = '
         type Post {
@@ -246,16 +260,15 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $posts = collect($result->data['posts'])
-            ->where('parent', '!=', null)
-            ->values();
+        $posts = $result->data['posts'];
 
-        $this->assertCount(1, $posts);
-        $this->assertNotNull($posts[0]['parent']);
+        $this->assertNull($posts[0]['parent']);
 
-        $parent = $posts[0]['parent'];
+        $this->assertNotNull($posts[1]['parent']);
+        $this->assertNull($posts[1]['parent']['parent']);
 
-        $this->assertNotNull($parent['parent']);
+        $this->assertNotNull($posts[2]['parent']);
+        $this->assertNotNull($posts[2]['parent']['parent']);
     }
 
     /**
