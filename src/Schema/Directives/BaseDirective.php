@@ -100,11 +100,11 @@ abstract class BaseDirective implements Directive
     {
         // The resolver is expected to contain a class and a method name, seperated by an @ symbol
         // e.g. App\My\Class@methodName
-        $resolverArgument = $this->directiveArgValue($argumentName);
+        $resolverArgumentFragments = explode('@', $this->directiveArgValue($argumentName));
 
         $baseClassName =
             $this->directiveArgValue('class')
-            ?? str_before($resolverArgument, '@');
+            ?? $resolverArgumentFragments[0];
 
         if (empty($baseClassName)) {
             // If a default is given, simply return it
@@ -119,7 +119,7 @@ abstract class BaseDirective implements Directive
         $resolverClass = $this->namespaceClassName($baseClassName);
         $resolverMethod =
             $this->directiveArgValue('method')
-            ?? str_after($resolverArgument, '@')
+            ?? $resolverArgumentFragments[1]
             ?? 'resolve';
 
         if (! method_exists($resolverClass, $resolverMethod)) {
