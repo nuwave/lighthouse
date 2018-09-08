@@ -3,8 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class UnionTest extends TestCase
 {
@@ -22,9 +20,12 @@ class UnionTest extends TestCase
             }
         }
         ';
-        $result = $this->executeQuery($this->schema(), $query);
 
-        $this->assertEquals('user.id', array_get($result->data, 'person.id'));
+        foreach ($this->schemas() as $schema) {
+            $result = $this->executeQuery($schema, $query);
+
+            $this->assertEquals('user.id', array_get($result->data, 'person.id'));
+        }
     }
 
     /**
@@ -41,9 +42,12 @@ class UnionTest extends TestCase
             }
         }
         ';
-        $result = $this->executeQuery($this->schema(), $query);
 
-        $this->assertEquals('employee.id', array_get($result->data, 'person.employeeId'));
+        foreach ($this->schemas() as $schema) {
+            $result = $this->executeQuery($schema, $query);
+
+            $this->assertEquals('employee.id', array_get($result->data, 'person.employeeId'));
+        }
     }
 
     public function resolve($root, array $args): array
@@ -53,16 +57,32 @@ class UnionTest extends TestCase
             : ['employeeId' => 'employee.id'];
     }
 
-    public function person(array $value): Type
+    protected function schemas(): array
     {
-        $type = isset($value['id']) ? 'User' : 'Employee';
-
-        return resolve(TypeRegistry::class)->get($type);
+        return [
+            $this->schema(),
+            $this->schemaWithOutUnionDirective()
+        ];
     }
 
-    protected function schema(): string
+    /**
+     * Giv the schema with out the `union` directive
+     * if the union directive is not specified
+     * fallback to the default resolver:
+     * `namespace/UnionTypeName::resolve`
+     *
+     * @return string
+     */
+    protected function schemaWithOutUnionDirective(): string
     {
-        return '
+        return $this->schema(false);
+    }
+
+    protected function schema($withUnionDirective = true): string
+    {
+        $unionDirective = $withUnionDirective ? '@union(resolver: "Tests\\\Utils\\\Unions\\\Person@resolve")' : '';
+
+        return <<< GRAPHQL
         type User {
             id: ID!
         }
@@ -71,12 +91,12 @@ class UnionTest extends TestCase
             employeeId: ID!
         }
         
-        union Person @union(resolver: "Tests\\\Unit\\\Schema\\\Directives\\\Nodes\\\UnionTest@person") = User | Employee
+        union Person $unionDirective = User | Employee
         
         type Query {
             person(type: String!): Person
                 @field(resolver: "Tests\\\Unit\\\Schema\\\Directives\\\Nodes\\\UnionTest@resolve")
         }
-        ';
+GRAPHQL;
     }
 }

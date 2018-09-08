@@ -4,6 +4,7 @@ namespace Tests;
 
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\GraphQL;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
@@ -21,6 +22,11 @@ class TestCase extends BaseTestCase
      * @var string
      */
     protected $schema = '';
+
+    /**
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
 
     /**
      * Get package providers.
@@ -45,6 +51,8 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $this->app = $app;
+
         $app->bind(
             SchemaSourceProvider::class,
             function () {
@@ -74,6 +82,11 @@ class TestCase extends BaseTestCase
             'lighthouse.namespaces.models',
             'Tests\\Utils\\Models'
         );
+
+        $app['config']->set(
+            'lighthouse.namespaces.unions',
+            'Tests\\Utils\\Unions'
+        );
     }
 
     /**
@@ -90,7 +103,21 @@ class TestCase extends BaseTestCase
         // The schema is injected into the runtime during execution of the query
         $this->schema = $schema;
 
+        // To use the new schema we should rebind the `graphql` singleton.
+        $this->rebind();
+
         return graphql()->executeQuery($query, null, $variables);
+    }
+
+    /**
+     * rebind the `graphql` singleton.
+     */
+    protected function rebind()
+    {
+        $this->app->singleton(GraphQL::class);
+        $this->app->alias(GraphQL::class, 'graphql');
+
+        return $this;
     }
 
     /**

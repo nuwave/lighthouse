@@ -42,6 +42,10 @@ class UnionDirective extends BaseDirective implements NodeResolver
                 })->filter()->toArray();
             },
             'resolveType' => $this->getResolver(function ($value, $context, ResolveInfo $info) {
+                // Note that the resolver of union type object has only 3 arguments,
+                // compares to other types which has 4 arguments.
+                // this is how the `webonyx/graphql-php` works.
+
                 $unionName = $this->definitionNode->name->value;
 
                 // Try to locate a fallback resolver corresponds to the config file.
@@ -53,7 +57,7 @@ class UnionDirective extends BaseDirective implements NodeResolver
                 }
 
                 return resolve(TypeRegistry::class)->get(
-                    str_after('\\', \get_class($value))
+                    str_after(\get_class($value), '\\')
                 );
             })
         ]);
