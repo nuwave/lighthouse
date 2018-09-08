@@ -4,8 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
@@ -27,17 +30,10 @@ class UnionDirective extends BaseDirective implements NodeResolver
      * @param NodeValue $value
      *
      * @return Type
+     * @throws DirectiveException
      */
     public function resolveNode(NodeValue $value)
     {
-        $resolver = $this->getResolver(
-            function() use ($value){
-                return graphql()->types()->get(
-                    str_after('\\', get_class($value))
-                );
-            }
-        );
-
         return new UnionType([
             'name' => $value->getNodeName(),
             'description' => $value->getNode()->description,
@@ -47,9 +43,29 @@ class UnionDirective extends BaseDirective implements NodeResolver
                 })->filter()->toArray();
             },
 
-            'resolveType' => function ($value) use ($resolver) {
-                return $resolver($value);
-            },
+            //'resolveType' => function ($value) use ($resolver) {
+            //    return $resolver($value);
+            //},
+            'resolveType' => $this->getResolver(function ($value, Context $context, ResolveInfo $info) {
+                $unionName = $this->definitionNode->name->value;
+
+                // Try to locate a fallback resolver corresponds to the config file.
+                $resolverClass = config('lighthouse.namespaces.unions') . '\\' . $unionName;
+
+                if (\class_exists($resolverClass)) {
+                    $resolver = resolve($resolverClass);
+
+                    if ( ! \method_exists($resolver, 'resolve')) {
+                        throw new DirectiveException("Class {$resolverClass} must have a `resolve` method.");
+                    }
+
+                    return $resolver->resolve($value, $context, $info);
+                }
+
+                return resolve(TypeRegistry::class)->get(
+                    str_after('\\', \get_class($value))
+                );
+            })
         ]);
     }
 }

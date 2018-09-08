@@ -4,22 +4,24 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
-use Nuwave\Lighthouse\Support\Pipeline;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\InputObjectType;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Support\Pipeline;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Support\Traits\HandlesTypes;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\EnumDirective;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\UnionDirective;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
 
 class NodeFactory
@@ -104,7 +106,7 @@ class NodeFactory
     {
         // We do not have to consider TypeExtensionNode since they
         // are merged before we get here
-        switch (get_class($value->getNode())) {
+        switch (\get_class($value->getNode())) {
             case EnumTypeDefinitionNode::class:
                 return $this->enum($value);
             case ScalarTypeDefinitionNode::class:
@@ -116,7 +118,7 @@ class NodeFactory
             case InputObjectTypeDefinitionNode::class:
                 return $this->inputObjectType($value);
             case UnionTypeDefinitionNode::class:
-                throw new \Exception('Union types need to have the @union directive defined to resolve them.');
+                return $this->union($value);
             default:
                 throw new \Exception("Unknown type for Node [{$value->getNodeName()}]");
         }
@@ -202,6 +204,20 @@ class NodeFactory
                 return $this->getFields($value);
             },
         ]);
+    }
+
+    /**
+     * Resolve union type definition to type.
+     *
+     * @param NodeValue $value
+     *
+     * @return UnionType
+     */
+    protected function union(NodeValue $value): UnionType
+    {
+        $unionDirective = (new UnionDirective())->hydrate($value->getNode());
+
+        return $unionDirective->resolveNode($value);
     }
 
     /**
