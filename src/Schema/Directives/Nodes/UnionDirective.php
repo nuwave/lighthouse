@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -42,7 +41,7 @@ class UnionDirective extends BaseDirective implements NodeResolver
                     return resolve(TypeRegistry::class)->get($type->name->value);
                 })->filter()->toArray();
             },
-            'resolveType' => $this->getResolver(function ($value, Context $context, ResolveInfo $info) {
+            'resolveType' => $this->getResolver(function ($value, $context, ResolveInfo $info) {
                 $unionName = $this->definitionNode->name->value;
 
                 // Try to locate a fallback resolver corresponds to the config file.
