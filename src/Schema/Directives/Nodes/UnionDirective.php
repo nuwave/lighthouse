@@ -42,10 +42,6 @@ class UnionDirective extends BaseDirective implements NodeResolver
                     return resolve(TypeRegistry::class)->get($type->name->value);
                 })->filter()->toArray();
             },
-
-            //'resolveType' => function ($value) use ($resolver) {
-            //    return $resolver($value);
-            //},
             'resolveType' => $this->getResolver(function ($value, Context $context, ResolveInfo $info) {
                 $unionName = $this->definitionNode->name->value;
 
