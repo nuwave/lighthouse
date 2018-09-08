@@ -93,6 +93,7 @@ return [
         'mutations' => 'App\\Http\\GraphQL\\Mutations',
         'queries' => 'App\\Http\\GraphQL\\Queries',
         'scalars' => 'App\\Http\\GraphQL\\Scalars',
+        'unions' => 'App\\Http\\GraphQL\\Unions',
     ],
 
     /*
