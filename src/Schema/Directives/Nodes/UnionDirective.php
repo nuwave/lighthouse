@@ -47,13 +47,8 @@ class UnionDirective extends BaseDirective implements NodeResolver
                 // Try to locate a fallback resolver corresponds to the config file.
                 $resolverClass = config('lighthouse.namespaces.unions') . '\\' . $unionName;
 
-                if (\class_exists($resolverClass)) {
+                if ( \method_exists($resolverClass, 'resolve')) {
                     $resolver = resolve($resolverClass);
-
-                    if ( ! \method_exists($resolver, 'resolve')) {
-                        throw new DirectiveException("Class {$resolverClass} must have a `resolve` method.");
-                    }
-
                     return $resolver->resolve($value, $context, $info);
                 }
 
