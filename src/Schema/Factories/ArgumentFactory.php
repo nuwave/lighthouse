@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class ArgumentFactory
 {
@@ -14,15 +14,20 @@ class ArgumentFactory
     protected $directiveRegistry;
     /** @var Pipeline */
     protected $pipeline;
+    /** @var DefinitionNodeConverter */
+    protected $definitionNodeConverter;
 
     /**
+     * ArgumentFactory constructor.
      * @param DirectiveRegistry $directiveRegistry
      * @param Pipeline $pipeline
+     * @param DefinitionNodeConverter $definitionNodeConverter
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
+    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline, DefinitionNodeConverter $definitionNodeConverter)
     {
         $this->directiveRegistry = $directiveRegistry;
         $this->pipeline = $pipeline;
+        $this->definitionNodeConverter = $definitionNodeConverter;
     }
 
     /**
@@ -34,7 +39,11 @@ class ArgumentFactory
      */
     public function handle(ArgumentValue $value): array
     {
-        $value->setType(NodeResolver::resolve($value->getArg()->type));
+        $value->setType(
+            $this->definitionNodeConverter->toType(
+                $value->getArg()->type
+            )
+        );
 
         return $this->applyMiddleware($value)->getValue();
     }

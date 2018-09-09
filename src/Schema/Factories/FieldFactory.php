@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldFactory
 {
@@ -21,19 +21,23 @@ class FieldFactory
     protected $argumentFactory;
     /** @var Pipeline */
     protected $pipeline;
+    /** @var DefinitionNodeConverter */
+    protected $definitionNodeConverter;
 
     /**
      * @param DirectiveRegistry $directiveRegistry
      * @param ValueFactory $valueFactory
      * @param ArgumentFactory $argumentFactory
      * @param Pipeline $pipeline
+     * @param DefinitionNodeConverter $definitionNodeConverter
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, ValueFactory $valueFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
+    public function __construct(DirectiveRegistry $directiveRegistry, ValueFactory $valueFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline, DefinitionNodeConverter $definitionNodeConverter)
     {
         $this->directiveRegistry = $directiveRegistry;
         $this->valueFactory = $valueFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
+        $this->definitionNodeConverter = $definitionNodeConverter;
     }
 
     /**
@@ -48,7 +52,9 @@ class FieldFactory
     public function handle(FieldValue $fieldValue): array
     {
         $fieldValue->setType(
-            NodeResolver::resolve($fieldValue->getField()->type)
+            $this->definitionNodeConverter->toType(
+                $fieldValue->getField()->type
+            )
         );
 
         $initialResolver = $this->hasResolverDirective($fieldValue)
