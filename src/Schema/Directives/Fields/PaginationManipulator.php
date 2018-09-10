@@ -2,15 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Types\ConnectionField;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
+use Nuwave\Lighthouse\Schema\Types\ConnectionField;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 abstract class PaginationManipulator extends BaseDirective
 {
@@ -49,13 +49,12 @@ abstract class PaginationManipulator extends BaseDirective
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $current
-     * @param DocumentAST              $original
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current)
     {
         $connectionTypeName = $this->connectionTypeName($fieldDefinition, $parentType);
         $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
@@ -98,13 +97,12 @@ abstract class PaginationManipulator extends BaseDirective
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $current
-     * @param DocumentAST              $original
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current)
     {
         $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType);
         $paginatorFieldClassName = addslashes(PaginatorField::class);
@@ -135,7 +133,7 @@ abstract class PaginationManipulator extends BaseDirective
     /**
      * Get paginator type name.
      *
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parent
      *
      * @return string
@@ -144,15 +142,15 @@ abstract class PaginationManipulator extends BaseDirective
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Paginator'
+            .$this->singularFieldName($fieldDefinition)
+            .'_Paginator'
         );
     }
 
     /**
      * Get connection type name.
      *
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parent
      *
      * @return string
@@ -161,15 +159,15 @@ abstract class PaginationManipulator extends BaseDirective
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Connection'
+            .$this->singularFieldName($fieldDefinition)
+            .'_Connection'
         );
     }
 
     /**
      * Get connection edge name.
      *
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parent
      *
      * @return string
@@ -178,8 +176,8 @@ abstract class PaginationManipulator extends BaseDirective
     {
         return studly_case(
             $this->parentTypeName($parent)
-            . $this->singularFieldName($fieldDefinition)
-            . '_Edge'
+            .$this->singularFieldName($fieldDefinition)
+            .'_Edge'
         );
     }
 
@@ -202,7 +200,7 @@ abstract class PaginationManipulator extends BaseDirective
     {
         $name = $objectType->name->value;
 
-        return 'Query' === $name ? '' : $name . '_';
+        return 'Query' === $name ? '' : $name.'_';
     }
 
     /**

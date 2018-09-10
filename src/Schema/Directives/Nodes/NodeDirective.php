@@ -30,7 +30,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      * Handle type construction.
      *
      * @param NodeValue $value
-     * @param \Closure $next
+     * @param \Closure  $next
      *
      * @return NodeValue
      */
@@ -65,15 +65,14 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     }
 
     /**
-     * @param Node $node
+     * @param Node        $node
      * @param DocumentAST $current
-     * @param DocumentAST $original
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $current)
     {
         return $this->attachNodeInterfaceToObjectType($node, $current);
     }
