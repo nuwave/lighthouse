@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -210,6 +211,61 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
         $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
         $this->assertCount(2, array_get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryHasManySelfReferencingRelationships()
+    {
+        $post1 = factory(Post::class)->create([
+            'id' => 1,
+        ]);
+
+        $post2 = factory(Post::class)->create([
+            'id' => 2,
+            'parent_id' => $post1->getKey(),
+        ]);
+
+        $post3 = factory(Post::class)->create([
+            'id' => 3,
+            'parent_id' => $post2->getKey(),
+        ]);
+
+        $schema = '
+        type Post {
+            id: Int!
+            parent: Post @belongsTo
+        }
+        
+        type Query {
+            posts: [Post!]! @all
+        }
+        ';
+
+        $result = $this->executeQuery($schema, '
+        { 
+            posts {
+                id
+                parent {
+                    id
+                    parent {
+                        id
+                    }
+                }
+            } 
+        }
+        ');
+
+        $posts = $result->data['posts'];
+
+        $this->assertNull($posts[0]['parent']);
+
+        $this->assertNotNull($posts[1]['parent']);
+        $this->assertNull($posts[1]['parent']['parent']);
+
+        $this->assertNotNull($posts[2]['parent']);
+        $this->assertNotNull($posts[2]['parent']['parent']);
     }
 
     /**

@@ -39,9 +39,9 @@ Just clone the project and run the following in the project root:
 We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
 at the Laravel coding style.
 
-Look through some of the code to get a feel for the naming conventi qons.
+Look through some of the code to get a feel for the naming conventions.
 
-Use type hints whenever possible and make sure to include proper **PHPDocs**
+Use type hints and return types whenever possible and make sure to include proper **PHPDocs**
 
 Prefer explicit naming and short functions over excessive comments.
 

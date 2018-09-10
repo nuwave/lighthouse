@@ -48,25 +48,18 @@ class ASTBuilder
      */
     protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
     {
-        $originalDocument = $document;
-
         return $document->typeExtensionDefinitions()
             // This is just temporarily merged together
             ->concat($document->typeDefinitions())
-            ->reduce(function (DocumentAST $document, Node $node) use (
-                $originalDocument
-            ) {
+            ->reduce(function (DocumentAST $document, Node $node) {
                 $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
 
-                return $nodeManipulators->reduce(function (DocumentAST $document, NodeManipulator $nodeManipulator) use (
-                    $originalDocument,
-                    $node
-                ) {
-                    return $nodeManipulator->manipulateSchema($node, $document, $originalDocument);
+                return $nodeManipulators->reduce(function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
+                    return $nodeManipulator->manipulateSchema($node, $document);
                 }, $document);
             }, $document);
     }
-  
+
     /**
      * @param DocumentAST $document
      *
@@ -102,24 +95,21 @@ class ASTBuilder
      */
     protected static function applyFieldManipulators(DocumentAST $document): DocumentAST
     {
-        $originalDocument = $document;
-
         return $document->objectTypeDefinitions()->reduce(function (
             DocumentAST $document,
             ObjectTypeDefinitionNode $objectType
-        ) use ($originalDocument) {
+        ) {
             return collect($objectType->fields)->reduce(function (
                 DocumentAST $document,
                 FieldDefinitionNode $fieldDefinition
-            ) use ($objectType, $originalDocument) {
+            ) use ($objectType) {
                 $fieldManipulators = resolve(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
 
                 return $fieldManipulators->reduce(function (
                     DocumentAST $document,
                     FieldManipulator $fieldManipulator
-                ) use ($fieldDefinition, $objectType, $originalDocument) {
-                    return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document,
-                        $originalDocument);
+                ) use ($fieldDefinition, $objectType) {
+                    return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document);
                 }, $document);
             }, $document);
         }, $document);
@@ -132,32 +122,22 @@ class ASTBuilder
      */
     protected static function applyArgManipulators(DocumentAST $document): DocumentAST
     {
-        $originalDocument = $document;
-
         return $document->objectTypeDefinitions()->reduce(
-            function (DocumentAST $document, ObjectTypeDefinitionNode $parentType) use ($originalDocument) {
+            function (DocumentAST $document, ObjectTypeDefinitionNode $parentType) {
                 return collect($parentType->fields)->reduce(
-                    function (DocumentAST $document, FieldDefinitionNode $parentField) use (
-                        $parentType,
-                        $originalDocument
-                    ) {
+                    function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType) {
                         return collect($parentField->arguments)->reduce(
-                            function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use (
-                                $parentType,
-                                $parentField,
-                                $originalDocument
-                            ) {
+                            function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField) {
                                 $argManipulators = resolve(DirectiveRegistry::class)->argManipulators($argDefinition);
 
                                 return $argManipulators->reduce(
                                     function (DocumentAST $document, ArgManipulator $argManipulator) use (
                                         $argDefinition,
                                         $parentField,
-                                        $parentType,
-                                        $originalDocument
+                                        $parentType
                                     ) {
                                         return $argManipulator->manipulateSchema($argDefinition, $parentField,
-                                            $parentType, $document, $originalDocument);
+                                            $parentType, $document);
                                     }, $document);
                             }, $document);
                     }, $document);
