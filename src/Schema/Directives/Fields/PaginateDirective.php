@@ -31,20 +31,19 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $current
-     * @param DocumentAST              $original
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current)
     {
         switch ($this->getPaginationType()) {
             case self::PAGINATION_TYPE_CONNECTION:
-                return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
+                return $this->registerConnection($fieldDefinition, $parentType, $current);
             case self::PAGINATION_TYPE_PAGINATOR:
             default:
-                return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
+                return $this->registerPaginator($fieldDefinition, $parentType, $current);
         }
     }
 
