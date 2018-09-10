@@ -182,7 +182,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->queryAndReturnResult($schema, '
         { 
             user { 
                 tasks(first: 2) { 
@@ -243,7 +243,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         { 
             posts {
                 id
