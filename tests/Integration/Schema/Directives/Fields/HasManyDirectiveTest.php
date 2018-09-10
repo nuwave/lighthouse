@@ -182,7 +182,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         { 
             user { 
                 tasks(first: 2) { 
