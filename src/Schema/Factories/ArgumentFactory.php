@@ -3,12 +3,28 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Nuwave\Lighthouse\Support\Pipeline;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
 class ArgumentFactory
 {
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+    /** @var Pipeline */
+    protected $pipeline;
+
+    /**
+     * @param DirectiveRegistry $directiveRegistry
+     * @param Pipeline $pipeline
+     */
+    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
+    {
+        $this->directiveRegistry = $directiveRegistry;
+        $this->pipeline = $pipeline;
+    }
+
     /**
      * Convert argument definition to type.
      *
@@ -32,9 +48,9 @@ class ArgumentFactory
      */
     protected function applyMiddleware(ArgumentValue $value): ArgumentValue
     {
-        return app(Pipeline::class)
+        return $this->pipeline
             ->send($value)
-            ->through(graphql()->directives()->argMiddleware($value->getArg()))
+            ->through($this->directiveRegistry->argMiddleware($value->getArg()))
             ->via('handleArgument')
             ->always(function (ArgumentValue $value, ArgMiddleware $middleware) {
                 return $value->setMiddlewareDirective($middleware->name());

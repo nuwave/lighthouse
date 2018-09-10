@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
-class TraceExtension extends GraphQLExtension
+class TracingExtension extends GraphQLExtension
 {
     /**
      * @var Carbon
@@ -37,34 +37,33 @@ class TraceExtension extends GraphQLExtension
      *
      * @return string
      */
-    public function name(): string
+    public static function name(): string
     {
         return 'tracing';
     }
 
     /**
-     * Manipulate the schema.
+     * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST $documentAST
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(DocumentAST $current, DocumentAST $original): DocumentAST
+    public function manipulateSchema(DocumentAST $documentAST): DocumentAST
     {
-        $trace = PartialParser::directive('@trace');
+        $tracingDirective = PartialParser::directive('@tracing');
 
-        return $current->objectTypeDefinitions()
-            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($trace) {
+        return $documentAST->objectTypeDefinitions()
+            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($tracingDirective) {
                 if (! data_get($objectType, 'name.value')) {
                     return $document;
                 }
 
                 $objectType->fields = new NodeList(collect($objectType->fields)
-                    ->map(function (FieldDefinitionNode $field) use ($trace) {
-                        $field->directives = $field->directives->merge([$trace]);
+                    ->map(function (FieldDefinitionNode $field) use ($tracingDirective) {
+                        $field->directives = $field->directives->merge([$tracingDirective]);
 
                         return $field;
                     })->all());
@@ -72,19 +71,21 @@ class TraceExtension extends GraphQLExtension
                 $document->setDefinition($objectType);
 
                 return $document;
-            }, $current);
+            }, $documentAST);
     }
 
     /**
      * Handle request start.
      *
      * @param ExtensionRequest $request
+     *
+     * @return TracingExtension
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function requestDidStart(ExtensionRequest $request): TracingExtension
     {
         $this->requestStart = now();
 
-        return;
+        return $this;
     }
 
     /**
@@ -114,7 +115,7 @@ class TraceExtension extends GraphQLExtension
      *
      * @return array
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         $end = now();
         $duration = abs(($end->micro - $this->requestStart->micro) * 1000);

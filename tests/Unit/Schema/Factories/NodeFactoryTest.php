@@ -28,7 +28,7 @@ class NodeFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = new NodeFactory();
+        $this->factory = resolve(NodeFactory::class);
     }
 
     /**

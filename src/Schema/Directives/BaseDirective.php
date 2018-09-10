@@ -2,18 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\ListValueNode;
-use GraphQL\Language\AST\ObjectFieldNode;
-use GraphQL\Language\AST\ObjectValueNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 abstract class BaseDirective implements Directive
@@ -54,9 +48,10 @@ abstract class BaseDirective implements Directive
         $name = $name ?? static::name();
         $definitionNode = $definitionNode ?? $this->definitionNode;
 
-        return collect($definitionNode->directives)->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
-            return $directiveDefinitionNode->name->value === $name;
-        });
+        return collect($definitionNode->directives)
+            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
+                return $directiveDefinitionNode->name->value === $name;
+            });
     }
 
     /**
@@ -77,13 +72,7 @@ abstract class BaseDirective implements Directive
             return $default;
         }
 
-        $arg = collect($directive->arguments)->first(function (ArgumentNode $argumentNode) use ($name) {
-            return $argumentNode->name->value === $name;
-        });
-
-        return $arg
-            ? $this->argValue($arg, $default)
-            : $default;
+        return ASTHelper::directiveArgValue($directive, $name, $default);
     }
     
     /**
@@ -98,9 +87,13 @@ abstract class BaseDirective implements Directive
      */
     protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
     {
+        // The resolver is expected to contain a class and a method name, seperated by an @ symbol
+        // e.g. App\My\Class@methodName
+        $resolverArgumentFragments = explode('@', $this->directiveArgValue($argumentName));
+
         $baseClassName =
             $this->directiveArgValue('class')
-            ?? str_before($this->directiveArgValue($argumentName), '@');
+            ?? $resolverArgumentFragments[0];
 
         if (empty($baseClassName)) {
             // If a default is given, simply return it
@@ -115,7 +108,7 @@ abstract class BaseDirective implements Directive
         $resolverClass = $this->namespaceClassName($baseClassName);
         $resolverMethod =
             $this->directiveArgValue('method')
-            ?? str_after($this->directiveArgValue($argumentName), '@')
+            ?? $resolverArgumentFragments[1]
             ?? 'resolve';
 
         if (! method_exists($resolverClass, $resolverMethod)) {
@@ -126,6 +119,8 @@ abstract class BaseDirective implements Directive
     }
 
     /**
+     * Get the model class from the `model` argument of the field.
+     *
      * @throws DirectiveException
      * @throws \Exception
      *
@@ -135,26 +130,25 @@ abstract class BaseDirective implements Directive
     {
         $model = $this->directiveArgValue('model');
 
-        // Fallback to using the return type of the field
+        // Fallback to using the return type of the field as the class name
         if(! $model && $this->definitionNode instanceof FieldDefinitionNode){
             $model = ASTHelper::getFieldTypeName($this->definitionNode);
         }
 
         if (! $model) {
-            throw new DirectiveException(
-                'A `model` argument must be assigned to the '
-                .$this->name().'directive on '.$this->definitionNode->name->value);
+            throw new DirectiveException("A `model` argument must be assigned to the {$this->name()} directive on {$this->definitionNode->name->value}");
         }
 
-        if (! class_exists($model)) {
-            $model = config('lighthouse.namespaces.models').'\\'.$model;
+        if(class_exists($model)){
+            return $model;
         }
 
-        if (! class_exists($model)) {
-            $model = $this->namespaceClassName($model);
+        $modelWithDefaultNamespace = config('lighthouse.namespaces.models').'\\'.$model;
+        if(class_exists($modelWithDefaultNamespace)){
+            return $modelWithDefaultNamespace;
         }
 
-        return $model;
+        return $this->namespaceClassName($model);
     }
 
     /**
@@ -186,7 +180,7 @@ abstract class BaseDirective implements Directive
     protected function associatedNamespace(): string
     {
         $namespaceDirective = $this->directiveDefinition(
-            (new NamespaceDirective())->name()
+            (new NamespaceDirective)->name()
         );
 
         return $namespaceDirective
@@ -195,36 +189,5 @@ abstract class BaseDirective implements Directive
             ? $this->directiveArgValue(static::name(), '', $namespaceDirective)
             // Default to an empty namespace if the namespace directive does not exist
             : '';
-    }
-
-    /**
-     * Get argument's value.
-     *
-     * @param Node  $arg
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    protected function argValue(Node $arg, $default = null)
-    {
-        $valueNode = $arg->value;
-
-        if (! $valueNode) {
-            return $default;
-        }
-
-        if ($valueNode instanceof ListValueNode) {
-            return collect($valueNode->values)->map(function (ValueNode $valueNode) {
-                return $valueNode->value;
-            })->toArray();
-        }
-
-        if ($valueNode instanceof ObjectValueNode) {
-            return collect($valueNode->fields)->mapWithKeys(function (ObjectFieldNode $field) {
-                return [$field->name->value => $this->argValue($field)];
-            })->toArray();
-        }
-
-        return $valueNode->value;
     }
 }

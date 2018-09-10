@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Schema\Directives\Nodes;
 
-use GraphQL\Type\Definition\ScalarType;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Tests\TestCase;
+use GraphQL\Type\Definition\ScalarType;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class ScalarDirectiveTest extends TestCase
 {

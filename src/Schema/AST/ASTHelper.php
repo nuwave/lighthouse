@@ -5,8 +5,14 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Utils\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\ObjectFieldNode;
+use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 
@@ -103,5 +109,56 @@ class ASTHelper
         }
         
         return self::getUnderlyingNamedTypeNode($type);
+    }
+
+    /**
+     * @param DirectiveNode $directive
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function directiveArgValue(DirectiveNode $directive, string $name, $default)
+    {
+        $arg = collect($directive->arguments)->first(function (ArgumentNode $argumentNode) use ($name) {
+            return $argumentNode->name->value === $name;
+        });
+
+        return $arg
+            ? self::argValue($arg, $default)
+            : $default;
+    }
+
+
+    /**
+     * Get argument's value.
+     *
+     * @param Node  $arg
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public static function argValue(Node $arg, $default = null)
+    {
+        $valueNode = $arg->value;
+
+        if (! $valueNode) {
+            return $default;
+        }
+
+        if ($valueNode instanceof ListValueNode) {
+            return collect($valueNode->values)->map(function (ValueNode $valueNode) {
+                return $valueNode->value;
+            })->toArray();
+        }
+
+        if ($valueNode instanceof ObjectValueNode) {
+            return collect($valueNode->fields)
+                ->mapWithKeys(function (ObjectFieldNode $field) {
+                    return [$field->name->value => self::argValue($field)];
+                })
+                ->toArray();
+        }
+
+        return $valueNode->value;
     }
 }

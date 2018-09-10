@@ -1,12 +1,10 @@
 <?php
 
-
 namespace Tests\Integration\Schema\Directives\Args;
 
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ValidateDirectiveTest extends DBTestCase
 {
@@ -17,7 +15,7 @@ class ValidateDirectiveTest extends DBTestCase
      */
     public function itCanThrowValidationExceptions()
     {
-        $users = factory(User::class, 10)->create();
+        $users = factory(User::class)->create();
 
         $schema = '
         type User {
@@ -25,19 +23,23 @@ class ValidateDirectiveTest extends DBTestCase
             name: String
             email: String
         }
+        
         type Query {
             users(id: ID @eq @validate(rules: ["digits:2", "min:1000"],)): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
-        }';
+        }
+        ';
 
-        $query = '{
+        $query = '
+        {
             users(count: 5 id: '.$users->first()->getKey().') {
                 data {
                     id
                 }
             }
-        }';
+        }
+        ';
 
-        $result = $this->execute($schema, $query);
-        $this->assertCount(2, $result['errors']);
+        $result = $this->executeWithoutDebug($schema, $query);
+        $this->assertCount(2, array_get($result, 'errors.0.extensions.validation.id'));
     }
 }

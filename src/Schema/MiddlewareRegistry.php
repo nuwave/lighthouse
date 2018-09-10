@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\OperationDefinitionNode;
 
-class MiddlewareManager
+class MiddlewareRegistry
 {
     /**
      * Registered query middleware.
@@ -29,7 +29,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function forRequest($request)
+    public function forRequest(string $request): array
     {
         $document = DocumentAST::fromSource($request);
         $fragments = $document->fragmentDefinitions();
@@ -68,11 +68,13 @@ class MiddlewareManager
      * @param string $name
      * @param array $middleware
      *
-     * @return void
+     * @return MiddlewareRegistry
      */
-    public function registerQuery($name, array $middleware)
+    public function registerQuery(string $name, array $middleware): MiddlewareRegistry
     {
         $this->queries = array_merge($this->queries, [$name => $middleware]);
+
+        return $this;
     }
 
     /**
@@ -81,11 +83,13 @@ class MiddlewareManager
      * @param string $name
      * @param array $middleware
      *
-     * @return void
+     * @return MiddlewareRegistry
      */
-    public function registerMutation($name, array $middleware)
+    public function registerMutation($name, array $middleware): MiddlewareRegistry
     {
         $this->mutations = array_merge($this->mutations, [$name => $middleware]);
+
+        return $this;
     }
 
     /**
@@ -96,7 +100,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function operation($operation, array $fields)
+    public function operation(string $operation, array $fields): array
     {
         if ('mutation' === $operation) {
             return array_collapse(array_map(function ($field) {
@@ -118,7 +122,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function query($name)
+    public function query(string $name): array
     {
         return array_get($this->queries, $name, []);
     }
@@ -130,7 +134,7 @@ class MiddlewareManager
      *
      * @return array
      */
-    public function mutation($name)
+    public function mutation(string $name): array
     {
         return array_get($this->mutations, $name, []);
     }

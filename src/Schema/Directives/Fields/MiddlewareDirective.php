@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -31,13 +32,15 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
         $checks = $this->getChecks($value);
 
         if ($checks) {
+            $middlewareRegistry = resolve(MiddlewareRegistry::class);
+
             if ('Query' === $value->getNodeName()) {
-                graphql()->middleware()->registerQuery(
+                $middlewareRegistry->registerQuery(
                     $value->getFieldName(),
                     $checks
                 );
             } elseif ('Mutation' === $value->getNodeName()) {
-                graphql()->middleware()->registerMutation(
+                $middlewareRegistry->registerMutation(
                     $value->getFieldName(),
                     $checks
                 );

@@ -2,33 +2,49 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\TypeDefinitionNode;
-use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 
 class SchemaBuilder
 {
-    /**
-     * Definition weights.
-     *
-     * @var array
-     */
-    protected $weights = [
+    /** @var TypeRegistry */
+    protected $typeRegistry;
+
+    /** @var ValueFactory */
+    protected $valueFactory;
+
+    /** @var NodeFactory */
+    protected $nodeFactory;
+
+    const DEFINITION_WEIGHTS = [
         \GraphQL\Language\AST\ScalarTypeDefinitionNode::class => 0,
         \GraphQL\Language\AST\InterfaceTypeDefinitionNode::class => 1,
         \GraphQL\Language\AST\UnionTypeDefinitionNode::class => 2,
     ];
+
+    /**
+     * @param TypeRegistry $typeRegistry
+     * @param ValueFactory $valueFactory
+     * @param NodeFactory $nodeFactory
+     */
+    public function __construct(TypeRegistry $typeRegistry, ValueFactory $valueFactory, NodeFactory $nodeFactory)
+    {
+        $this->typeRegistry = $typeRegistry;
+        $this->valueFactory = $valueFactory;
+        $this->nodeFactory = $nodeFactory;
+    }
 
     /**
      * Build an executable schema from AST.
@@ -48,7 +64,7 @@ class SchemaBuilder
             ->setTypes($types->reject($this->isOperationType())->toArray())
             ->setDirectives($this->convertDirectives($documentAST)->toArray())
             ->setTypeLoader(function ($name) {
-                return graphql()->types()->get($name);
+                return $this->typeRegistry->get($name);
             });
 
         // Those are optional so only add them if they are present in the schema
@@ -103,14 +119,14 @@ class SchemaBuilder
     {
         return $document->typeDefinitions()
             ->sortBy(function (TypeDefinitionNode $typeDefinition) {
-                return array_get($this->weights, get_class($typeDefinition), 9);
+                return array_get(self::DEFINITION_WEIGHTS, get_class($typeDefinition), 9);
             })->map(function (TypeDefinitionNode $typeDefinition) {
-                $nodeValue = app(ValueFactory::class)->node($typeDefinition);
+                $nodeValue = $this->valueFactory->node($typeDefinition);
 
-                return (new NodeFactory())->handle($nodeValue);
+                return $this->nodeFactory->handle($nodeValue);
             })->each(function (Type $type) {
                 // Register in global type registry
-                graphql()->types()->register($type);
+                $this->typeRegistry->register($type);
             });
     }
 

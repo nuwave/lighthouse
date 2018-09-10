@@ -1,5 +1,6 @@
 <?php
 
+use GraphQL\Error\Debug;
 use GraphQL\Validator\Rules\DisableIntrospection;
 
 return [
@@ -108,6 +109,43 @@ return [
         'max_query_complexity' => 0,
         'max_query_depth' => 0,
         'disable_introspection' => DisableIntrospection::DISABLED,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Debug
+    |--------------------------------------------------------------------------
+    |
+    | Control the debug level as described in http://webonyx.github.io/graphql-php/error-handling/
+    | Debugging is only applied if the global Laravel debug config is set to true.
+    |
+    */
+    'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Error Handlers
+    |--------------------------------------------------------------------------
+    |
+    | Register error handlers that receive the Errors that occur during execution and
+    | handle them. You may use this to log, filter or format the errors.
+    | The classes must implement Nuwave\Lighthouse\Execution\ErrorHandler
+    |
+    */
+    'error_handlers' => [
+        \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Extensions
+    |--------------------------------------------------------------------------
+    |
+    | Register extension classes that extend \Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension
+    |
+    */
+    'extensions' => [
+        #\Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class
     ],
 
      /*

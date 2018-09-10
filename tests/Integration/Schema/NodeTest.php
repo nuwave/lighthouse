@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class NodeTest extends DBTestCase
@@ -40,7 +41,7 @@ class NodeTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -72,7 +73,7 @@ class NodeTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($this->node['name'], array_get($result->data, 'node.name'));
     }
@@ -104,7 +105,7 @@ class NodeTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
         $this->assertEquals($user->name, array_get($result->data, 'node.name'));
     }
 
@@ -118,7 +119,7 @@ class NodeTest extends DBTestCase
     public function resolveNodeType($value)
     {
         if (is_array($value) && isset($value['name'])) {
-            return graphql()->types()->get('User');
+            return resolve(TypeRegistry::class)->get('User');
         }
     }
 }

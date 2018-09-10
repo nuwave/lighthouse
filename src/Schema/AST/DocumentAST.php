@@ -22,7 +22,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Exceptions\DocumentASTException;
+use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 
 class DocumentAST implements \Serializable
 {

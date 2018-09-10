@@ -2,9 +2,10 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use GraphQL\Error\Error;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class CanDirectiveTest extends TestCase
 {
@@ -13,9 +14,7 @@ class CanDirectiveTest extends TestCase
      */
     public function itThrowsWhenNotAuthenticated()
     {
-        $this->be(new User);
-
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: "adminOnly")
         }
@@ -23,13 +22,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
 
-        $this->expectException(Error::class);
-        $resolver();
+        $this->expectException(AuthenticationException::class);
+        $this->execute($schema, $query);
     }
 
     /**
@@ -39,7 +42,7 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: "adminOnly")
         }
@@ -47,13 +50,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
 
-        $this->expectException(Error::class);
-        $resolver();
+        $this->expectException(AuthorizationException::class);
+        $this->execute($schema, $query);
     }
 
     /**
@@ -65,7 +72,7 @@ class CanDirectiveTest extends TestCase
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: "adminOnly") @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
@@ -73,13 +80,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
-        $result = $resolver(null, []);
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', $result->name);
+        $this->assertSame('foo', array_get($result, 'data.user.name'));
     }
 
     /**
@@ -91,7 +102,7 @@ class CanDirectiveTest extends TestCase
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = '
         type Query {
             user: User! @can(if: ["adminOnly", "alwaysTrue"]) @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
@@ -99,13 +110,17 @@ class CanDirectiveTest extends TestCase
         type User {
             name: String
         }
-        ');
-        $type = $schema->getQueryType();
-        $fields = $type->config['fields']();
-        $resolver = array_get($fields, 'user.resolve');
-        $result = $resolver(null, []);
+        ';
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', $result->name);
+        $this->assertSame('foo', array_get($result, 'data.user.name'));
     }
 
     public function resolveUser()

@@ -24,7 +24,7 @@ class PrintSchemaCommand extends Command
      * @var string
      */
     protected $description = 'Print the resulting schema.';
-    
+
     /**
      * Execute the console command.
      */
@@ -38,8 +38,8 @@ class PrintSchemaCommand extends Command
         );
 
         if ($this->option('write')) {
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphqls".');
-            Storage::put('lighthouse-schema.graphqls', $schema);
+            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
+            Storage::put('lighthouse-schema.graphql', $schema);
         } else {
             $this->info($schema);
         }

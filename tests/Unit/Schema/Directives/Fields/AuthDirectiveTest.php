@@ -3,7 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tests\Utils\Models\User;
 
 class AuthDirectiveTest extends TestCase
 {
@@ -12,13 +12,11 @@ class AuthDirectiveTest extends TestCase
      */
     public function itCanResolveAuthenticatedUser()
     {
-        $user = new class() extends Authenticatable {
-            public $foo = 'bar';
-        };
+        $user = new User(['foo' => 'bar']);
 
         $this->be($user);
 
-        $schema = $this->buildSchemaFromString('
+        $schema = '
         type User {
             foo: String!
         }
@@ -26,10 +24,16 @@ class AuthDirectiveTest extends TestCase
         type Query {
             user: User! @auth
         }
-        ');
+        ';
+        $query = '
+        {
+            user {
+                foo
+            }
+        }           
+        ';
+        $result = $this->execute($schema, $query);
 
-        $query = $schema->getType('Query');
-        $resolver = array_get($query->config['fields'](), 'user.resolve');
-        $this->assertEquals('bar', data_get($resolver(null, []), 'foo'));
+        $this->assertEquals('bar', array_get($result, 'data.user.foo'));
     }
 }

@@ -3,9 +3,20 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 
 class MiddlewareDirectiveTest extends TestCase
 {
+    /** @var MiddlewareRegistry */
+    protected $middlewareRegistry;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->middlewareRegistry = resolve(MiddlewareRegistry::class);
+    }
+
     /**
      * @test
      */
@@ -27,7 +38,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $middleware = graphql()->middleware()->forRequest($query);
+        $middleware = $this->middlewareRegistry->forRequest($query);
         $this->assertCount(2, $middleware);
         $this->assertContains('auth:web', $middleware);
         $this->assertContains('auth:admin', $middleware);
@@ -37,7 +48,7 @@ class MiddlewareDirectiveTest extends TestCase
             foo(bar:"baz")
         }
         ';
-        $middleware = graphql()->middleware()->forRequest($mutation);
+        $middleware = $this->middlewareRegistry->forRequest($mutation);
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }
@@ -68,7 +79,7 @@ class MiddlewareDirectiveTest extends TestCase
             foo
         }
         ';
-        $middleware = graphql()->middleware()->forRequest($query);
+        $middleware = $this->middlewareRegistry->forRequest($query);
         $this->assertCount(2, $middleware);
         $this->assertContains('auth:web', $middleware);
         $this->assertContains('auth:admin', $middleware);
@@ -78,7 +89,7 @@ class MiddlewareDirectiveTest extends TestCase
             foo(bar:"baz")
         }
         ';
-        $middleware = graphql()->middleware()->forRequest($mutation);
+        $middleware = $this->middlewareRegistry->forRequest($mutation);
         $this->assertCount(1, $middleware);
         $this->assertContains('auth:api', $middleware);
     }

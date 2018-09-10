@@ -5,10 +5,10 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class CacheDirective extends BaseDirective implements FieldMiddleware
 {
@@ -26,7 +26,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure $next
      *
      * @return FieldValue
      */
@@ -41,9 +41,9 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
         return $value->setResolver(function ($root, $args, $context, $info) use ($value, $resolver, $maxAge, $privateCache) {
             /** @var \Illuminate\Support\Facades\Cache $cache */
-            $cache = app('cache');
+            $cache = resolve('cache');
             /** @var \Nuwave\Lighthouse\Schema\Values\CacheValue $cacheValue */
-            $cacheValue = call_user_func([app(ValueFactory::class), 'cache'], [
+            $cacheValue = resolve(ValueFactory::class)->cache([
                 'field_value' => $value,
                 'root' => $root,
                 'args' => $args,
@@ -64,15 +64,15 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                     : $cache->get($cacheKey);
             }
 
-            $value = call_user_func($resolver, $root, $args, $context, $info);
+            $resolvedValue = $resolver($root, $args, $context, $info);
 
-            ($value instanceof \GraphQL\Deferred)
-                ? $value->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags) {
+            ($resolvedValue instanceof \GraphQL\Deferred)
+                ? $resolvedValue->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags) {
                     $this->store($cache, $cacheKey, $result, $cacheExp, $cacheTags);
                 })
-                : $this->store($cache, $cacheKey, $value, $cacheExp, $cacheTags);
+                : $this->store($cache, $cacheKey, $resolvedValue, $cacheExp, $cacheTags);
 
-            return $value;
+            return $resolvedValue;
         });
     }
 
@@ -109,7 +109,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      */
     protected function useTags()
     {
-        return config('lighthouse.cache.tags', false) && method_exists(app('cache')->store(), 'tags');
+        return config('lighthouse.cache.tags', false) && method_exists(resolve('cache')->store(), 'tags');
     }
 
     /**
