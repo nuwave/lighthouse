@@ -220,7 +220,6 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $post1 = factory(Post::class)->create([
             'id' => 1,
-            'parent_id' => null,
         ]);
 
         $post2 = factory(Post::class)->create([
@@ -248,10 +247,8 @@ class HasManyDirectiveTest extends DBTestCase
         { 
             posts {
                 id
-                
                 parent {
                     id
-                    
                     parent {
                         id
                     }
