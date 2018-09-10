@@ -17,7 +17,14 @@ class CreateTestbenchPostsTable extends Migration
             $table->string('body');
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('task_id');
+            $table->unsignedInteger('parent_id')->nullable();
             $table->timestamps();
+        });
+
+        Schema::table('posts', function(Blueprint $table) {
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('posts');
         });
     }
 
