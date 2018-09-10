@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Exception;
 use GraphQL\Utils\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
@@ -73,12 +72,12 @@ class ASTHelper
     {
         return AST::fromArray($node->toArray(true));
     }
-    
+
     /**
      * @param FieldDefinitionNode $field
      *
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getFieldTypeName(FieldDefinitionNode $field): string
     {
@@ -95,7 +94,7 @@ class ASTHelper
      * @param Node $node
      *
      * @return NamedTypeNode
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
@@ -106,7 +105,7 @@ class ASTHelper
         $type = data_get($node, 'type');
         
         if(!$type){
-            throw new Exception("The node '$node->kind' does not have a type associated with it.");
+            throw new \Exception("The node '$node->kind' does not have a type associated with it.");
         }
         
         return self::getUnderlyingNamedTypeNode($type);
