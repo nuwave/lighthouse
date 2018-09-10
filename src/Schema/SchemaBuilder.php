@@ -15,7 +15,7 @@ use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class SchemaBuilder
 {
@@ -28,6 +28,9 @@ class SchemaBuilder
     /** @var NodeFactory */
     protected $nodeFactory;
 
+    /** @var DefinitionNodeConverter */
+    protected $definitionNodeConverter;
+
     const DEFINITION_WEIGHTS = [
         \GraphQL\Language\AST\ScalarTypeDefinitionNode::class => 0,
         \GraphQL\Language\AST\InterfaceTypeDefinitionNode::class => 1,
@@ -35,15 +38,18 @@ class SchemaBuilder
     ];
 
     /**
+     * SchemaBuilder constructor.
      * @param TypeRegistry $typeRegistry
      * @param ValueFactory $valueFactory
      * @param NodeFactory $nodeFactory
+     * @param DefinitionNodeConverter $definitionNodeConverter
      */
-    public function __construct(TypeRegistry $typeRegistry, ValueFactory $valueFactory, NodeFactory $nodeFactory)
+    public function __construct(TypeRegistry $typeRegistry, ValueFactory $valueFactory, NodeFactory $nodeFactory, DefinitionNodeConverter $definitionNodeConverter)
     {
         $this->typeRegistry = $typeRegistry;
         $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
+        $this->definitionNodeConverter = $definitionNodeConverter;
     }
 
     /**
@@ -150,7 +156,7 @@ class SchemaBuilder
                         'name' => $argument->name->value,
                         'defaultValue' => data_get($argument, 'defaultValue.value', null),
                         'description' => $argument->description,
-                        'type' => NodeResolver::resolve($argument->type),
+                        'type' => $this->definitionNodeConverter->toType($argument->type),
                     ]);
                 })->toArray(),
                 'astNode' => $directive,
