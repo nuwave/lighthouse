@@ -3,17 +3,15 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Type\Definition\IDType;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class DeleteDirective extends BaseDirective implements FieldResolver
 {
-    use HandlesGlobalId;
-
     /**
      * Name of the directive.
      *
@@ -45,7 +43,9 @@ class DeleteDirective extends BaseDirective implements FieldResolver
         }
 
         return $value->setResolver(function ($root, array $args) use ($idArg, $globalId) {
-            $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg))[1] : array_get($args, $idArg);
+            $id = $globalId ?
+                GlobalId::decodeId(array_get($args, $idArg))
+                : array_get($args, $idArg);
             $model = $this->getModelClass()::find($id);
 
             if ($model) {

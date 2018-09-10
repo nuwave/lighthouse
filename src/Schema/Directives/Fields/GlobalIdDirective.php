@@ -2,15 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware
 {
-    use HandlesGlobalId;
-
     /**
      * Name of the directive.
      *
@@ -25,7 +23,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure $next
      *
      * @return FieldValue
      */
@@ -33,15 +31,17 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware
     {
         $type = $value->getNodeName();
         $resolver = $value->getResolver();
-        $process = $this->directiveArgValue('process', 'encode');
 
-        return $next($value->setResolver(function () use ($resolver, $process, $type) {
-            $args = func_get_args();
-            $value = call_user_func_array($resolver, $args);
+        return $next(
+            $value->setResolver(
+                function () use ($resolver, $type) {
+                    $resolvedValue = call_user_func_array($resolver, func_get_args());
 
-            return 'encode' === $process
-            ? $this->encodeGlobalId($type, $value)
-            : $this->decodeRelayId($value);
-        }));
+                    return 'encode' === $this->directiveArgValue('process', 'encode')
+                        ? GlobalId::encode($type, $resolvedValue)
+                        : GlobalId::decode($resolvedValue);
+                }
+            )
+        );
     }
 }

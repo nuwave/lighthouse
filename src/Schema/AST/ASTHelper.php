@@ -115,10 +115,11 @@ class ASTHelper
     /**
      * @param DirectiveNode $directive
      * @param string $name
-     * @param mixed $default
-     * @return mixed
+     * @param mixed|null $default
+     *
+     * @return mixed|null
      */
-    public static function directiveArgValue(DirectiveNode $directive, string $name, $default)
+    public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
         $arg = collect($directive->arguments)->first(function (ArgumentNode $argumentNode) use ($name) {
             return $argumentNode->name->value === $name;
