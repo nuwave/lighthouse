@@ -197,6 +197,19 @@ class GraphQL
     }
 
     /**
+     * Clear the documentAST cache.
+     *
+     * @return GraphQL
+     */
+    public function clearCache(): self
+    {
+        $this->documentAST = null;
+        Cache::forget(config('lighthouse.cache.key'));
+
+        return $this;
+    }
+
+    /**
      * Return an instance of a BatchLoader for a specific field.
      *
      * @param string $loaderClass
