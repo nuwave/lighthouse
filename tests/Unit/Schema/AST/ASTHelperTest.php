@@ -40,4 +40,52 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(1, $firstNameField->directives);
     }
+
+    /**
+     * @test
+     */
+    public function itCanExtractStringArguments()
+    {
+        $directive = PartialParser::directive('@foo(bar: "baz")');
+        $this->assertEquals(
+            'baz',
+            ASTHelper::directiveArgValue($directive, 'bar')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCanExtractBooleanArguments()
+    {
+        $directive = PartialParser::directive('@foo(bar: true)');
+        $this->assertEquals(
+            true,
+            ASTHelper::directiveArgValue($directive, 'bar')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCanExtractArrayArguments()
+    {
+        $directive = PartialParser::directive('@foo(bar: ["one", "two"])');
+        $this->assertEquals(
+            ['one', 'two'],
+            ASTHelper::directiveArgValue($directive, 'bar')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCanExtractObjectArguments()
+    {
+        $directive = PartialParser::directive('@foo(bar: { baz: "foobar" })');
+        $this->assertEquals(
+            ['baz' => 'foobar'],
+            ASTHelper::directiveArgValue($directive, 'bar')
+        );
+    }
 }

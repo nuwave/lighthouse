@@ -5,17 +5,15 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Language\AST\NodeKind;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class DeleteDirective extends BaseDirective implements FieldResolver
 {
-    use HandlesGlobalId;
-
     /**
      * Name of the directive.
      *
@@ -30,8 +28,6 @@ class DeleteDirective extends BaseDirective implements FieldResolver
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     *
-     * @throws DirectiveException
      *
      * @return FieldValue
      */
@@ -50,9 +46,9 @@ class DeleteDirective extends BaseDirective implements FieldResolver
             if($this->directiveArgValue('globalId', false)){
                 // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
                 if(NodeKind::LIST_TYPE === $argumentDefinition->type->type->kind){
-                    $idOrIds = array_map([$this, 'decodeRelayId'], $idOrIds);
+                    $idOrIds = array_map([GlobalId::class, 'decodeId'], $idOrIds);
                 } else {
-                    $idOrIds = $this->decodeRelayId($idOrIds);
+                    $idOrIds = GlobalId::decodeId($idOrIds);
                 }
             }
 

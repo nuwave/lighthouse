@@ -2,16 +2,13 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class HasOneLoader extends BatchLoader
 {
-    use HandlesGlobalId;
-
     /**
      * @var string
      */

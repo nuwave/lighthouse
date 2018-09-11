@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use Nuwave\Lighthouse\Execution\Utils\Cursor;
+use Nuwave\Lighthouse\Execution\Utils\Pagination;
+
 trait IsRelayConnection
 {
-    use HandlesGlobalId;
-
     /**
      * Paginate connection w/ query args.
      *
@@ -16,10 +17,11 @@ trait IsRelayConnection
      */
     public function scopeRelayConnection($query, array $args)
     {
-        $first = data_get($args, 'first', 15);
-        $page = data_get($args, 'page', 1);
-        $after = $this->decodeCursor($args);
-        $currentPage = $first && $after ? floor(($first + $after) / $first) : $page;
+        $first = array_get($args, 'first', 15);
+        $page = array_get($args, 'page', 1);
+        $after = Cursor::decode($args);
+
+        $currentPage = Pagination::calculateCurrentPage($first, $after, $page);
 
         return $query->paginate($first, ['*'], 'page', $currentPage);
     }
@@ -34,8 +36,8 @@ trait IsRelayConnection
      */
     public function scopePaginatorConnection($query, array $args)
     {
-        $first = data_get($args, 'count', 15);
-        $page = data_get($args, 'page', 1);
+        $first = array_get($args, 'count', 15);
+        $page = array_get($args, 'page', 1);
 
         return $query->paginate($first, ['*'], 'page', $page);
     }
@@ -50,10 +52,11 @@ trait IsRelayConnection
      */
     public function scopeLoadConnection($query, array $args)
     {
-        $first = isset($args['first']) ? $args['first'] : 15;
-        $after = $this->decodeCursor($args);
-        $page = isset($args['page']) ? $args['page'] : 1;
-        $currentPage = $first && $after ? floor(($first + $after) / $first) : $page;
+        $first = array_get($args, 'first', 15);
+        $after = Cursor::decode($args);
+        $page = array_get($args, 'page', 1);
+
+        $currentPage = Pagination::calculateCurrentPage($first, $after, $page);
         $skip = $first * $currentPage;
 
         return $query->take($first)->skip($skip);
