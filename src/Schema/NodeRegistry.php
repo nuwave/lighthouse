@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class NodeRegistry
@@ -26,70 +27,77 @@ class NodeRegistry
      *
      * @var array
      */
-    protected $nodes = [];
-
-    /**
-     * Model to type map.
-     *
-     * @var array
-     */
-    protected $models = [];
+    protected $nodeResolver = [];
 
     /**
      * Value to type map.
      *
      * @var array
      */
-    protected $types = [];
-
+    protected $typeResolvers = [];
+    
+    /**
+     * Model to type map.
+     *
+     * @var array
+     */
+    protected $modelToTypeMap = [];
+    
     /**
      * Store resolver for node.
      *
-     * @param string  $type
-     * @param \Closure $resolver
+     * @param string $type
+     * @param \Closure $resolve
      * @param \Closure $resolveType
+     *
+     * @return NodeRegistry
      */
-    public function node($type, \Closure $resolver, \Closure $resolveType)
+    public function node(string $type, \Closure $resolve, \Closure $resolveType): NodeRegistry
     {
-        $this->types[$type] = $resolveType;
-        $this->nodes[$type] = $resolver;
+        $this->nodeResolver[$type] = $resolve;
+        $this->typeResolvers[$type] = $resolveType;
+        
+        return $this;
     }
 
     /**
      * Register model node.
      *
-     * @param string $type
-     * @param string $model
+     * @param string $typeName
+     * @param string $modelName
      *
-     * @return void
+     * @return NodeRegistry
      */
-    public function model($type, $model)
+    public function model(string $typeName, string $modelName): NodeRegistry
     {
-        $this->models[$model] = $type;
+        $this->modelToTypeMap[$modelName] = $typeName;
 
-        $this->nodes[$type] = function ($id) use ($model) {
-            return $model::find($id);
+        $this->nodeResolver[$typeName] = function ($id) use ($modelName) {
+            return $modelName::find($id);
         };
+        
+        return $this;
     }
 
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param string $globalId
+     * @param array $args
      *
      * @throws Error
      *
      * @return mixed
      */
-    public function resolve($globalId)
+    public function resolve($rootValue, $args)
     {
+        $globalId = $args['id'];
         $type = $this->decodeRelayType($globalId);
 
-        if (! isset($this->nodes[$type])) {
+        if (! isset($this->nodeResolver[$type])) {
             throw new Error('['.$type.'] is not a registered node and cannot be resolved.');
         }
 
-        $resolver = $this->nodes[$type];
+        $resolver = $this->nodeResolver[$type];
 
         return $resolver($this->decodeRelayId($globalId));
     }
@@ -99,15 +107,16 @@ class NodeRegistry
      *
      * @param mixed $value
      *
-     * @return \GraphQL\Type\Definition\Type
+     * @return Type
      */
-    public function resolveType($value)
+    public function resolveType($value): Type
     {
-        if (is_object($value) && $modelName = array_get($this->models, get_class($value))) {
+        // If the value is a class, check if it is in the registered models
+        if (is_object($value) && $modelName = array_get($this->modelToTypeMap, get_class($value))) {
             return $this->typeRegistry->get($modelName);
         }
 
-        return collect($this->types)
+        return collect($this->typeResolvers)
             ->map(function ($value, $key) {
                 return ['resolver' => $value, 'type' => $key];
             })
