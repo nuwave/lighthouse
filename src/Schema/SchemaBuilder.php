@@ -13,6 +13,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
@@ -58,11 +59,13 @@ class SchemaBuilder
         $this->nodeRegistry = $nodeRegistry;
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
-
+    
     /**
      * Build an executable schema from AST.
      *
      * @param DocumentAST $documentAST
+     *
+     * @throws ParseException
      *
      * @return Schema
      */
@@ -84,7 +87,7 @@ class SchemaBuilder
                 'name' => 'Node',
                 'description' => 'Interface for types that have a globally unique ID',
                 'fields' => [
-                    config('lighthouse.global_id_field', '_id') => [
+                    config('lighthouse.global_id_field') => [
                         'type' => Type::nonNull(Type::id()),
                         'description' => 'Global ID that can be used to resolve any type that implements the Node interface.'
                     ]

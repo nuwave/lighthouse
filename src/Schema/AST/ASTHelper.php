@@ -219,10 +219,11 @@ class ASTHelper
             $objectType->interfaces,
             [Parser::parseType('Node', ['noLocation' => true])]
         );
-        
-        $globalIdFieldName = config('lighthouse.global_id_field', '_id');
-        $globalIdFieldDefinition = PartialParser::fieldDefinition($globalIdFieldName.': ID!');
-        $objectType->fields->merge([$globalIdFieldDefinition]);
+    
+        $globalIdFieldDefinition = PartialParser::fieldDefinition(
+            config('lighthouse.global_id_field') .': ID! @field(resolver: "Nuwave\\\Lighthouse\\\Execution\\\Utils\\\GlobalId@resolveIdField")'
+        );
+        $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
         
         return $documentAST->setDefinition($objectType);
     }

@@ -22,25 +22,22 @@ class NodeRegistry
     }
 
     /**
-     * Registered nodes.
+     * A map from type names to resolver functions.
      *
-     * @var array
+     * @var \Closure[]
      */
     protected $nodeResolver = [];
     
     /**
      * The stashed current type.
      *
+     * Since PHP resolves the fields synchronously and one after another,
+     * we can safely stash just this one value. Should the need arise, this
+     * can probably be a map from the unique field path to the type.
+     *
      * @var string
      */
     protected $currentType;
-    
-    /**
-     * Model to type map.
-     *
-     * @var array
-     */
-    protected $modelToTypeMap = [];
     
     /**
      * @param string $typeName
@@ -76,8 +73,6 @@ class NodeRegistry
      */
     public function registerModel(string $typeName, string $modelName): NodeRegistry
     {
-        $this->modelToTypeMap[$modelName] = $typeName;
-
         $this->nodeResolver[$typeName] = function ($id) use ($modelName) {
             return $modelName::find($id);
         };
@@ -99,7 +94,8 @@ class NodeRegistry
      */
     public function resolve($rootValue, $args, $context, ResolveInfo $resolveInfo)
     {
-        list($decodedType, $decodedId) = GlobalId::decode($args['id']);
+        $globalID = $args['id'];
+        list($decodedType, $decodedId) = GlobalId::decode($globalID);
 
         // Check if we have a resolver registered for the given type
         if (! $resolver = array_get($this->nodeResolver, $decodedType)) {
@@ -108,7 +104,7 @@ class NodeRegistry
         
         // Stash the decoded type, as it will later be used to determine the correct return type of the node query
         $this->currentType = $decodedType;
-
+    
         return $resolver($decodedId, $context, $resolveInfo);
     }
     
