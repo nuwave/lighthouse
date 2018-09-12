@@ -11,6 +11,12 @@ use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 
+/**
+ * Trait HandlesTypes
+ * @package Nuwave\Lighthouse\Support\Traits
+ *
+ * @deprecated in favour of Utility functions. Will be removed in v3
+ */
 trait HandlesTypes
 {
     /**

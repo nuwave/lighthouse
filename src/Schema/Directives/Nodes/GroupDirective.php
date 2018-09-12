@@ -5,14 +5,16 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\DirectiveNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Exceptions\DocumentASTException;
+use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 /**
@@ -34,13 +36,14 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     {
         return 'group';
     }
-
+    
     /**
      * @param Node $node
      * @param DocumentAST $current
      * @param DocumentAST $original
      *
      * @throws DirectiveException
+     * @throws DocumentASTException
      *
      * @return DocumentAST
      */
@@ -111,7 +114,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $namespaceValue = addslashes($namespaceValue);
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
-            $previousNamespaces = $this->directiveDefinition((new NamespaceDirective())->name(), $fieldDefinition);
+            $previousNamespaces = ASTHelper::directiveDefinition((new NamespaceDirective)->name(), $fieldDefinition);
 
             $previousNamespaces = $previousNamespaces
                 ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)

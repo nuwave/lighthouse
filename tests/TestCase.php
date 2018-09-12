@@ -60,33 +60,15 @@ class TestCase extends BaseTestCase
             }
         );
 
-        $app['config']->set('lighthouse.directives', []);
-        $app['config']->set('lighthouse.global_id_field', '_id');
-
-        $app['config']->set(
-            'lighthouse.namespaces.scalars',
-            'Tests\\Utils\\Scalars'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.mutations',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.models',
-            'Tests\\Utils\\Models'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.unions',
-            'Tests\\Utils\\Unions'
-        );
+        $app['config']->set('lighthouse', [
+            'namespaces' => [
+                'scalars' => 'Tests\\Utils\\Scalars',
+                'unions' => 'Tests\\Utils\\Unions',
+                'queries' => 'Tests\\Utils\\Queries',
+                'mutations' => 'Tests\\Utils\\Mutations',
+                'models' => 'Tests\\Utils\\Models',
+            ]
+        ]);
     }
 
     /**
@@ -103,21 +85,7 @@ class TestCase extends BaseTestCase
         // The schema is injected into the runtime during execution of the query
         $this->schema = $schema;
 
-        // To use the new schema we should rebind the `graphql` singleton.
-        $this->rebind();
-
         return graphql()->executeQuery($query, null, $variables);
-    }
-
-    /**
-     * rebind the `graphql` singleton.
-     */
-    protected function rebind()
-    {
-        $this->app->singleton(GraphQL::class);
-        $this->app->alias(GraphQL::class, 'graphql');
-
-        return $this;
     }
 
     /**

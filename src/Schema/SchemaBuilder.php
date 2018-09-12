@@ -7,11 +7,15 @@ use GraphQL\Type\SchemaConfig;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\Directive;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
@@ -35,15 +39,20 @@ class SchemaBuilder
      * @param TypeRegistry $typeRegistry
      * @param ValueFactory $valueFactory
      * @param NodeFactory $nodeFactory
+     * @param NodeRegistry $nodeRegistry
      */
-    public function __construct(TypeRegistry $typeRegistry, ValueFactory $valueFactory, NodeFactory $nodeFactory)
-    {
+    public function __construct(
+        TypeRegistry $typeRegistry,
+        ValueFactory $valueFactory,
+        NodeFactory $nodeFactory,
+        NodeRegistry $nodeRegistry
+    ) {
         $this->typeRegistry = $typeRegistry;
         $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
         $this->nodeRegistry = $nodeRegistry;
     }
-
+    
     /**
      * Build an executable schema from AST.
      *
@@ -85,12 +94,15 @@ class SchemaBuilder
         });
         
         $this->loadRootOperationFields($types);
-
+        
         $config = SchemaConfig::create()
             // Always set Query since it is required
-            ->setQuery($types->firstWhere('name', 'Query'))
-            ->setTypes($types->reject($this->isOperationType())->toArray())
-            ->setDirectives($this->convertDirectives($documentAST)->toArray())
+            ->setQuery(
+                $types->firstWhere('name', 'Query')
+            )
+            ->setDirectives(
+                $this->convertDirectives($documentAST)->toArray()
+            )
             ->setTypeLoader(function ($name) {
                 return $this->typeRegistry->get($name);
             });
@@ -129,7 +141,7 @@ class SchemaBuilder
      *
      * @return \Closure
      */
-    protected function isOperationType()
+    protected function isOperationType(): \Closure
     {
         return function (Type $type) {
             return in_array($type->name, ['Query', 'Mutation', 'Subscription']);
@@ -143,18 +155,13 @@ class SchemaBuilder
      *
      * @return Collection
      */
-    public function convertTypes(DocumentAST $document)
+    public function convertTypes(DocumentAST $document): Collection
     {
         return $document->typeDefinitions()
-            ->sortBy(function (TypeDefinitionNode $typeDefinition) {
-                return array_get(self::DEFINITION_WEIGHTS, get_class($typeDefinition), 9);
-            })->map(function (TypeDefinitionNode $typeDefinition) {
+            ->map(function (TypeDefinitionNode $typeDefinition) {
                 $nodeValue = $this->valueFactory->node($typeDefinition);
 
                 return $this->nodeFactory->handle($nodeValue);
-            })->each(function (Type $type) {
-                // Register in global type registry
-                $this->typeRegistry->register($type);
             });
     }
 
@@ -165,24 +172,44 @@ class SchemaBuilder
      *
      * @return Collection
      */
-    protected function convertDirectives(DocumentAST $document)
+    protected function convertDirectives(DocumentAST $document): Collection
     {
-        return $document->directiveDefinitions()->map(function (DirectiveDefinitionNode $directive) {
-            return new Directive([
-                'name' => $directive->name->value,
-                'locations' => collect($directive->locations)->map(function ($location) {
-                    return $location->value;
-                })->toArray(),
-                'args' => collect($directive->arguments)->map(function (InputValueDefinitionNode $argument) {
-                    return new FieldArgument([
-                        'name' => $argument->name->value,
-                        'defaultValue' => data_get($argument, 'defaultValue.value', null),
-                        'description' => $argument->description,
-                        'type' => NodeResolver::resolve($argument->type),
-                    ]);
-                })->toArray(),
-                'astNode' => $directive,
-            ]);
-        });
+        return $document->directiveDefinitions()->map(
+            function (DirectiveDefinitionNode $directive) {
+                return new Directive([
+                    'name' => $directive->name->value,
+                    'locations' => collect($directive->locations)->map(function ($location) {
+                        return $location->value;
+                    })->toArray(),
+                    'args' => collect($directive->arguments)->map(function (InputValueDefinitionNode $argument) {
+                        return new FieldArgument([
+                            'name' => $argument->name->value,
+                            'defaultValue' => data_get($argument, 'defaultValue.value', null),
+                            'description' => $argument->description,
+                            'type' => NodeResolver::resolve($argument->type),
+                        ]);
+                    })->toArray(),
+                    'astNode' => $directive,
+                ]);
+            }
+        );
+    }
+    
+    /**
+     * Determine if the DocumentAST contains a type that implements the Node interface.
+     *
+     * @param DocumentAST $documentAST
+     *
+     * @return bool
+     */
+    protected function containsTypeThatImplementsNodeInterface(DocumentAST $documentAST): bool
+    {
+        return $documentAST->objectTypeDefinitions()
+            ->contains(function (ObjectTypeDefinitionNode $objectType) {
+                return collect($objectType->interfaces)
+                    ->contains(function (NamedTypeNode $interface) {
+                        return 'Node' === $interface->name->value;
+                    });
+            });
     }
 }

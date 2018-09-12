@@ -1,15 +1,14 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Types;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class InterfaceDirectiveTest extends DBTestCase
+class InterfaceTest extends DBTestCase
 {
     use RefreshDatabase;
 
@@ -22,7 +21,7 @@ class InterfaceDirectiveTest extends DBTestCase
         factory(User::class)->create();
 
         $schema = '
-        interface Nameable @interface(resolver: "' . addslashes(self::class) . '@resolveNameableInterface") {
+        interface Nameable {
             name: String!
         }
         
@@ -56,16 +55,6 @@ class InterfaceDirectiveTest extends DBTestCase
         $this->assertArrayHasKey('id', array_get($result, 'data.namedThings.0'));
         $this->assertArrayHasKey('name', array_get($result, 'data.namedThings.1'));
         $this->assertArrayNotHasKey('id', array_get($result, 'data.namedThings.1'));
-    }
-
-    public function resolveNameableInterface($value): \GraphQL\Type\Definition\ObjectType
-    {
-        $typeRegistry = resolve(TypeRegistry::class);
-        if ($value instanceof User) {
-            return $typeRegistry->get('User');
-        } elseif($value instanceof Team){
-            return $typeRegistry->get('Team');
-        }
     }
 
     public function fetchResults(): Collection

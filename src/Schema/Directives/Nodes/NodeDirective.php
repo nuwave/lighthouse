@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
@@ -25,43 +26,35 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     {
         return 'node';
     }
-
+    
     /**
      * Handle type construction.
      *
      * @param NodeValue $value
      * @param \Closure $next
      *
+     * @throws DirectiveException
+     *
      * @return NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next)
     {
+        $nodeName = $value->getNodeName();
+        
         resolve(NodeRegistry::class)->node(
-            $value->getNodeName(),
+            $nodeName,
             // Resolver for the node itself
             $this->getResolver(),
             // Interface type resolver
-            $this->getTypeResolver($value)
+            $this->getResolver(
+                function () use ($nodeName) {
+                    return resolve(TypeRegistry::class)->get($nodeName);
+                },
+                'typeResolver'
+            )
         );
 
         return $next($value);
-    }
-
-    /**
-     * @param NodeValue $value
-     *
-     * @return \Closure
-     */
-    protected function getTypeResolver(NodeValue $value): \Closure
-    {
-        $nodeName = $value->getNodeName();
-
-        return $this->getResolver(
-            function () use ($nodeName) {
-                return resolve(TypeRegistry::class)->get($nodeName);
-            },
-            'typeResolver'
-        );
     }
 
     /**
