@@ -2,18 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Type\Definition\IDType;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use GraphQL\Language\AST\NodeKind;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class DeleteDirective extends BaseDirective implements FieldResolver
 {
-    use HandlesGlobalId;
-
     /**
      * Name of the directive.
      *
@@ -33,45 +33,52 @@ class DeleteDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $idArg = $this->getIDField($value);
-        $globalId = $this->directiveArgValue('globalId', false);
+        return $value->setResolver(function ($root, array $args) {
+            $argumentDefinition = $this->getSingleArgumentDefinition();
 
+            if(NodeKind::NON_NULL_TYPE !== $argumentDefinition->type->kind){
+                throw new DirectiveException(
+                    "The @delete directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
+                );
+            }
 
-        if (!$idArg) {
-            new DirectiveException(sprintf(
-                'The `delete` requires that you have an `ID` field on %s',
-                $value->getNodeName()
-            ));
-        }
+            $idOrIds = reset($args);
+            if($this->directiveArgValue('globalId', false)){
+                // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
+                if(NodeKind::LIST_TYPE === $argumentDefinition->type->type->kind){
+                    $idOrIds = array_map([GlobalId::class, 'decodeId'], $idOrIds);
+                } else {
+                    $idOrIds = GlobalId::decodeId($idOrIds);
+                }
+            }
 
-        return $value->setResolver(function ($root, array $args) use ($idArg, $globalId) {
-            $id = $globalId ? $this->decodeGlobalId(array_get($args, $idArg))[1] : array_get($args, $idArg);
-            $model = $this->getModelClass()::find($id);
+            $modelClass = $this->getModelClass();
+            $model = $modelClass::find($idOrIds);
 
-            if ($model) {
+            if (!$model) {
+                return null;
+            }
+
+            if($model instanceof Model){
                 $model->delete();
+            }
+
+            if($model instanceof Collection){
+                $modelClass::destroy($idOrIds);
             }
 
             return $model;
         });
     }
 
-    /**
-     * Check if field has an ID argument.
-     *
-     * @param FieldValue $value
-     *
-     * @return bool
-     */
-    protected function getIDField(FieldValue $value)
+    protected function getSingleArgumentDefinition(): InputValueDefinitionNode
     {
-        return collect($value->getField()->arguments)->filter(function ($arg) {
-            $type = NodeResolver::resolve($arg->type);
-            $type = method_exists($type, 'getWrappedType') ? $type->getWrappedType() : $type;
+        if (1 !== count($this->definitionNode->arguments)) {
+            throw new DirectiveException(
+                "The @delete directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
+            );
+        }
 
-            return $type instanceof IDType;
-        })->map(function ($arg) {
-            return $arg->name->value;
-        })->first();
+        return $this->definitionNode->arguments[0];
     }
 }

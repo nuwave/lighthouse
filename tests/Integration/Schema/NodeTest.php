@@ -5,12 +5,10 @@ namespace Tests\Integration\Schema;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 
 class NodeTest extends DBTestCase
 {
-    use HandlesGlobalId;
-
     protected $node = ['id' => '1', 'name' => 'foobar'];
 
     /**
@@ -31,7 +29,7 @@ class NodeTest extends DBTestCase
         }
         ';
 
-        $globalId = $this->encodeGlobalId('User', $this->node['id']);
+        $globalId = GlobalId::encode('User', $this->node['id']);
         $query = '
         {
             node(id: "'.$globalId.'") {
@@ -63,7 +61,7 @@ class NodeTest extends DBTestCase
         }
         ';
 
-        $globalId = $this->encodeGlobalId('User', $this->node['id']);
+        $globalId = GlobalId::encode('User', $this->node['id']);
         $query = '
         {
             node(id: "'.$globalId.'") {
@@ -94,7 +92,7 @@ class NodeTest extends DBTestCase
         ';
 
         $user = factory(User::class)->create();
-        $globalId = $this->encodeGlobalId('User', $user->getKey());
+        $globalId = GlobalId::encode('User', $user->getKey());
         $query = '
         {
             node(id: "'.$globalId.'") {

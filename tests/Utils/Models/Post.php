@@ -22,4 +22,14 @@ class Post extends Model
     {
         return $this->belongsTo(Task::class);
     }
+
+    public function parent() : BelongsTo
+    {
+        return $this->belongsTo(Post::class);
+    }
+
+    public function children() : HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
 }

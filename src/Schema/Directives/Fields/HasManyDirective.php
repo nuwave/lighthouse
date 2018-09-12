@@ -8,9 +8,9 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\HasManyLoader;
 
 class HasManyDirective extends PaginationManipulator implements FieldResolver, FieldManipulator
@@ -26,25 +26,24 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
     }
 
     /**
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST              $current
      *
      * @throws DirectiveException
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current)
     {
         $paginationType = $this->getPaginationType();
 
         switch ($paginationType) {
             case self::PAGINATION_TYPE_PAGINATOR:
-                return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
+                return $this->registerPaginator($fieldDefinition, $parentType, $current);
             case self::PAGINATION_TYPE_CONNECTION:
-                return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
+                return $this->registerConnection($fieldDefinition, $parentType, $current);
             default:
                 // Leave the field as-is when no pagination is requested
                 return $current;
@@ -70,7 +69,7 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
                         'relation' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
                         'resolveArgs' => $resolveArgs,
                         'scopes' => $this->directiveArgValue('scopes', []),
-                        'paginationType' => $this->getPaginationType()
+                        'paginationType' => $this->getPaginationType(),
                     ]
                 );
 
@@ -94,7 +93,7 @@ class HasManyDirective extends PaginationManipulator implements FieldResolver, F
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
 
-        if (!$this->isValidPaginationType($paginationType)) {
+        if (! $this->isValidPaginationType($paginationType)) {
             $fieldName = $this->definitionNode->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");

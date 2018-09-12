@@ -3,13 +3,10 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Error\Error;
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 
 class NodeRegistry
 {
-    use HandlesGlobalId;
-
     /** @var TypeRegistry */
     protected $typeRegistry;
 
@@ -91,15 +88,17 @@ class NodeRegistry
     public function resolve($rootValue, $args)
     {
         $globalId = $args['id'];
-        $type = $this->decodeRelayType($globalId);
+        $type = GlobalId::decodeType($globalId);
 
         if (! isset($this->nodeResolver[$type])) {
-            throw new Error('['.$type.'] is not a registered node and cannot be resolved.');
+            throw new Error("[{$type}] is not a registered node and cannot be resolved.");
         }
 
         $resolver = $this->nodeResolver[$type];
 
-        return $resolver($this->decodeRelayId($globalId));
+        return $resolver(
+            GlobalId::decodeID($globalId)
+        );
     }
 
     /**

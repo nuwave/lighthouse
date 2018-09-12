@@ -74,9 +74,13 @@ abstract class BaseDirective implements Directive
      */
     protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
     {
+        // The resolver is expected to contain a class and a method name, seperated by an @ symbol
+        // e.g. App\My\Class@methodName
+        $resolverArgumentFragments = explode('@', $this->directiveArgValue($argumentName));
+
         $baseClassName =
             $this->directiveArgValue('class')
-            ?? str_before($this->directiveArgValue($argumentName), '@');
+            ?? $resolverArgumentFragments[0];
 
         if (empty($baseClassName)) {
             // If a default is given, simply return it
@@ -90,7 +94,7 @@ abstract class BaseDirective implements Directive
         $resolverClass = $this->namespaceClassName($baseClassName);
         $resolverMethod =
             $this->directiveArgValue('method')
-            ?? str_after($this->directiveArgValue($argumentName), '@')
+            ?? $resolverArgumentFragments[1]
             ?? 'resolve';
 
         if (! method_exists($resolverClass, $resolverMethod)) {
@@ -101,6 +105,8 @@ abstract class BaseDirective implements Directive
     }
 
     /**
+     * Get the model class from the `model` argument of the field.
+     *
      * @throws DirectiveException
      * @throws \Exception
      *
@@ -110,7 +116,7 @@ abstract class BaseDirective implements Directive
     {
         $model = $this->directiveArgValue('model');
 
-        // Fallback to using the return type of the field
+        // Fallback to using the return type of the field as the class name
         if(! $model && $this->definitionNode instanceof FieldDefinitionNode){
             $model = ASTHelper::getFieldTypeName($this->definitionNode);
         }

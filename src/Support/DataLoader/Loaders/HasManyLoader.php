@@ -4,15 +4,14 @@ namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\Utils\Cursor;
+use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 
 class HasManyLoader extends BatchLoader
 {
-    use HandlesGlobalId;
-
     /**
      * @var string
      */
@@ -64,15 +63,18 @@ class HasManyLoader extends BatchLoader
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
             case PaginationManipulator::PAGINATION_ALIAS_RELAY:
-                $first = data_get($this->resolveArgs, 'first', 15);
-                $after = $this->decodeCursor($this->resolveArgs);
-                $currentPage = $first && $after ? floor(($first + $after) / $first) : 1;
+                // first is an required argument
+                $first = $this->resolveArgs['first'];
+                $after = Cursor::decode($this->resolveArgs);
+                $currentPage = Pagination::calculateCurrentPage($first, $after);
+
                 $parents->fetchForPage($first, $currentPage, $eagerLoadRelationWithConstraints);
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-                // count must be set
+                // count must be set so we can safely get it like this
                 $count = $this->resolveArgs['count'];
-                $page = data_get($this->resolveArgs, 'page', 1);
+                $page = array_get($this->resolveArgs, 'page', 1);
+
                 $parents->fetchForPage($count, $page, $eagerLoadRelationWithConstraints);
                 break;
             default:

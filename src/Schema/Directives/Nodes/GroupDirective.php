@@ -36,22 +36,21 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     {
         return 'group';
     }
-    
+
     /**
      * @param Node $node
      * @param DocumentAST $current
-     * @param DocumentAST $original
      *
      * @throws DirectiveException
      * @throws DocumentASTException
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $current)
     {
         $nodeName = $node->name->value;
 
-        if (!in_array($nodeName, ['Query', 'Mutation'])) {
+        if (! in_array($nodeName, ['Query', 'Mutation'])) {
             $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
 
             throw new DirectiveException($message);
@@ -76,11 +75,11 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     {
         $middlewareValues = $this->directiveArgValue('middleware');
 
-        if (!$middlewareValues) {
+        if (! $middlewareValues) {
             return $objectType;
         }
 
-        $middlewareValues = '["' . implode('", "', $middlewareValues) . '"]';
+        $middlewareValues = '["'.implode('", "', $middlewareValues).'"]';
         $middlewareDirective = PartialParser::directive("@middleware(checks: $middlewareValues)");
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
@@ -103,11 +102,11 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     {
         $namespaceValue = $this->directiveArgValue('namespace');
 
-        if (!$namespaceValue) {
+        if (! $namespaceValue) {
             return $objectType;
         }
 
-        if (!is_string($namespaceValue)) {
+        if (! is_string($namespaceValue)) {
             throw new DirectiveException('The value of the namespace directive on has to be a string');
         }
 

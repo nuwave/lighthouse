@@ -19,7 +19,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class SchemaBuilder
 {
@@ -35,24 +35,29 @@ class SchemaBuilder
     /** @var NodeRegistry */
     protected $nodeRegistry;
     
+    /** @var DefinitionNodeConverter */
+    protected $definitionNodeConverter;
     /**
      * @param TypeRegistry $typeRegistry
      * @param ValueFactory $valueFactory
      * @param NodeFactory $nodeFactory
      * @param NodeRegistry $nodeRegistry
+     * @param DefinitionNodeConverter $definitionNodeConverter
      */
     public function __construct(
         TypeRegistry $typeRegistry,
         ValueFactory $valueFactory,
         NodeFactory $nodeFactory,
         NodeRegistry $nodeRegistry
+        DefinitionNodeConverter $definitionNodeConverter
     ) {
         $this->typeRegistry = $typeRegistry;
         $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
         $this->nodeRegistry = $nodeRegistry;
+        $this->definitionNodeConverter = $definitionNodeConverter;
     }
-    
+
     /**
      * Build an executable schema from AST.
      *
@@ -186,7 +191,7 @@ class SchemaBuilder
                             'name' => $argument->name->value,
                             'defaultValue' => data_get($argument, 'defaultValue.value', null),
                             'description' => $argument->description,
-                            'type' => NodeResolver::resolve($argument->type),
+                            'type' => $this->definitionNodeConverter->toType($argument->type),
                         ]);
                     })->toArray(),
                     'astNode' => $directive,

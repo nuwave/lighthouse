@@ -12,10 +12,10 @@ interface ErrorHandler
      * Always call $next($error) to keep the Pipeline going. Multiple such Handlers may be registered
      * as an array in the config.
      *
-     * @param Error $error
+     * @param Error    $error
      * @param \Closure $next
      *
      * @return array
      */
-    public static function handle(Error $error, \Closure $next) : array;
+    public static function handle(Error $error, \Closure $next);
 }
