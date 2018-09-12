@@ -48,7 +48,7 @@ class SchemaBuilder
         TypeRegistry $typeRegistry,
         ValueFactory $valueFactory,
         NodeFactory $nodeFactory,
-        NodeRegistry $nodeRegistry
+        NodeRegistry $nodeRegistry,
         DefinitionNodeConverter $definitionNodeConverter
     ) {
         $this->typeRegistry = $typeRegistry;
