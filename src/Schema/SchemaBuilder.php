@@ -27,13 +27,10 @@ class SchemaBuilder
 
     /** @var NodeFactory */
     protected $nodeFactory;
-
-    const DEFINITION_WEIGHTS = [
-        \GraphQL\Language\AST\ScalarTypeDefinitionNode::class => 0,
-        \GraphQL\Language\AST\InterfaceTypeDefinitionNode::class => 1,
-        \GraphQL\Language\AST\UnionTypeDefinitionNode::class => 2,
-    ];
-
+    
+    /** @var NodeRegistry */
+    protected $nodeRegistry;
+    
     /**
      * @param TypeRegistry $typeRegistry
      * @param ValueFactory $valueFactory
@@ -44,6 +41,7 @@ class SchemaBuilder
         $this->typeRegistry = $typeRegistry;
         $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
+        $this->nodeRegistry = $nodeRegistry;
     }
 
     /**
@@ -55,7 +53,37 @@ class SchemaBuilder
      */
     public function build($documentAST)
     {
+        $usesGlobalNodeInterface = $this->containsTypeThatImplementsNodeInterface($documentAST);
+        
+        if($usesGlobalNodeInterface){
+            $documentAST->unlock();
+            $nodeQuery = PartialParser::fieldDefinition(
+                'node(id: ID!): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
+            );
+            $documentAST->addFieldToQueryType($nodeQuery);
+        }
+        
         $types = $this->convertTypes($documentAST);
+        if($usesGlobalNodeInterface){
+            $types->push(new InterfaceType([
+                'name' => 'Node',
+                'description' => 'Interface for types that have a globally unique ID',
+                'fields' => [
+                    config('lighthouse.global_id_field', '_id') => [
+                        'type' => Type::nonNull(Type::id()),
+                        'description' => 'Global ID that can be used to resolve any type that implements the Node interface.'
+                    ]
+                ],
+                'resolveType' => function($value) {
+                    return $this->nodeRegistry->resolveType($value);
+                }
+            ]));
+        }
+        $types->each(function (Type $type) {
+            // Register in global type registry
+            $this->typeRegistry->register($type);
+        });
+        
         $this->loadRootOperationFields($types);
 
         $config = SchemaConfig::create()
