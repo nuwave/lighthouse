@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 
 class NodeRegistry
