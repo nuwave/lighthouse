@@ -94,3 +94,35 @@ if (! function_exists('resolve')) {
         return app($name);
     }
 }
+
+if (! function_exists('namespace_classname')) {
+    /**
+     * Attempt to find a given class in the given namespaces.
+     *
+     * If the class itself exists, it is simply returned as is.
+     * Else, the given namespaces are tried in order.
+     *
+     * @param string $classCandidate
+     * @param array $namespacesToTry
+     *
+     * @return string|false
+     */
+    function namespace_classname(string $classCandidate, array $namespacesToTry = [])
+    {
+        if(\class_exists($classCandidate)){
+            return $classCandidate;
+        }
+    
+        // Stop if the class is found or we are out of namespaces to try
+        while(!empty($namespacesToTry)){
+            // Pop off the first namespace and try it
+            $className = \array_shift($namespacesToTry) . '\\' . $classCandidate;
+        
+            if(\class_exists($className)){
+                return $className;
+            }
+        }
+        
+        return false;
+    }
+}
