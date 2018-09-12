@@ -165,9 +165,9 @@ return [
     | Global ID
     |--------------------------------------------------------------------------
     |
-    | When creating a GraphQL type that is Relay compliant, provide a named field
-    | for the Node identifier.
+    | The name that is used for the global id field on the Node interface.
+    | When creating a Relay compliant server, this must be named "id".
     |
     */
-    'global_id_field' => '_id',
+    'global_id_field' => 'id',
 ];
