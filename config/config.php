@@ -94,6 +94,7 @@ return [
         'queries' => 'App\\Http\\GraphQL\\Queries',
         'scalars' => 'App\\Http\\GraphQL\\Scalars',
         'unions' => 'App\\Http\\GraphQL\\Unions',
+        'interfaces' => 'App\\Http\\GraphQL\\Unions'
     ],
 
     /*
