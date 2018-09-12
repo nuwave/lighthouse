@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
@@ -103,22 +104,27 @@ abstract class BaseDirective implements Directive
 
         return \Closure::fromCallable([app($resolverClass), $resolverMethod]);
     }
-
+    
     /**
      * Get the model class from the `model` argument of the field.
      *
+     * @param string $argumentName
+     *
      * @throws DirectiveException
-     * @throws \Exception
      *
      * @return string
      */
-    protected function getModelClass(): string
+    protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue('model');
+        $model = $this->directiveArgValue($argumentName);
 
-        // Fallback to using the return type of the field as the class name
-        if(! $model && $this->definitionNode instanceof FieldDefinitionNode){
-            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+        // Fallback to using information from the schema definition as the model name
+        if(! $model){
+            if($this->definitionNode instanceof FieldDefinitionNode) {
+                $model = ASTHelper::getFieldTypeName($this->definitionNode);
+            } elseif($this->definitionNode instanceof ObjectTypeDefinitionNode) {
+                $model = $this->definitionNode->name->value;
+            }
         }
 
         if (! $model) {

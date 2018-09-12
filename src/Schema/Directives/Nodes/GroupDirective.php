@@ -39,14 +39,14 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
     /**
      * @param Node $node
-     * @param DocumentAST $current
+     * @param DocumentAST $documentAST
      *
      * @throws DirectiveException
      * @throws DocumentASTException
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST)
     {
         $nodeName = $node->name->value;
 
@@ -59,9 +59,9 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $node = $this->setMiddlewareDirectiveOnFields($node);
         $node = $this->setNamespaceDirectiveOnFields($node);
 
-        $current->setDefinition($node);
+        $documentAST->setDefinition($node);
 
-        return $current;
+        return $documentAST;
     }
 
     /**

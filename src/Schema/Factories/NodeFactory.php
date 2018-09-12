@@ -187,7 +187,7 @@ class NodeFactory
             'description' => $scalarNodeValue->getNode()->description,
         ]);
     }
-
+    
     /**
      * @param NodeValue $value
      *

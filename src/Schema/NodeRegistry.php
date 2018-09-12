@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 
 class NodeRegistry
@@ -26,13 +27,13 @@ class NodeRegistry
      * @var array
      */
     protected $nodeResolver = [];
-
+    
     /**
-     * Value to type map.
+     * The stashed current type.
      *
-     * @var array
+     * @var string
      */
-    protected $typeResolvers = [];
+    protected $currentType;
     
     /**
      * Model to type map.
@@ -42,31 +43,38 @@ class NodeRegistry
     protected $modelToTypeMap = [];
     
     /**
-     * Store resolver for node.
+     * @param string $typeName
      *
-     * @param string $type
+     * The name of the ObjectType that can be resolved with the Node interface
+     * e.g. "User"
+     *
      * @param \Closure $resolve
-     * @param \Closure $resolveType
+     *
+     * A function that returns the actual value by ID, e.g.
+     *
+     * function($id, $context, ResolveInfo $info)
+     * {
+     *   return $this->db->getUserById($id)
+     * }
      *
      * @return NodeRegistry
      */
-    public function node(string $type, \Closure $resolve, \Closure $resolveType): NodeRegistry
+    public function registerNode(string $typeName, \Closure $resolve): NodeRegistry
     {
-        $this->nodeResolver[$type] = $resolve;
-        $this->typeResolvers[$type] = $resolveType;
-        
+        $this->nodeResolver[$typeName] = $resolve;
+
         return $this;
     }
 
     /**
-     * Register model node.
+     * Register an Eloquent model that can be resolved as a Node.
      *
      * @param string $typeName
      * @param string $modelName
      *
      * @return NodeRegistry
      */
-    public function model(string $typeName, string $modelName): NodeRegistry
+    public function registerModel(string $typeName, string $modelName): NodeRegistry
     {
         $this->modelToTypeMap[$modelName] = $typeName;
 
@@ -76,61 +84,41 @@ class NodeRegistry
         
         return $this;
     }
-
+    
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
+     * @param $rootValue
      * @param array $args
+     * @param $context
+     * @param ResolveInfo $resolveInfo
      *
      * @throws Error
      *
      * @return mixed
      */
-    public function resolve($rootValue, $args)
+    public function resolve($rootValue, $args, $context, ResolveInfo $resolveInfo)
     {
-        $globalId = $args['id'];
-        $type = GlobalId::decodeType($globalId);
+        list($decodedType, $decodedId) = GlobalId::decode($args['id']);
 
-        if (! isset($this->nodeResolver[$type])) {
-            throw new Error("[{$type}] is not a registered node and cannot be resolved.");
+        // Check if we have a resolver registered for the given type
+        if (! $resolver = array_get($this->nodeResolver, $decodedType)) {
+            throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
         }
+        
+        // Stash the decoded type, as it will later be used to determine the correct return type of the node query
+        $this->currentType = $decodedType;
 
-        $resolver = $this->nodeResolver[$type];
-
-        return $resolver(
-            GlobalId::decodeID($globalId)
-        );
+        return $resolver($decodedId, $context, $resolveInfo);
     }
-
+    
     /**
-     * Determine the GraphQL type of a given value.
-     *
-     * @param mixed $value
+     * Get the Type for the stashed type.
      *
      * @return Type
      */
-    public function resolveType($value): Type
+    public function resolveType(): Type
     {
-        // If the value is a class, check if it is in the registered models
-        if (is_object($value) && $modelName = array_get($this->modelToTypeMap, get_class($value))) {
-            return $this->typeRegistry->get($modelName);
-        }
-
-        return collect($this->typeResolvers)
-            ->map(function ($value, $key) {
-                return ['resolver' => $value, 'type' => $key];
-            })
-            ->reduce(function ($instance, $item) use ($value) {
-                if ($instance) {
-                    return $instance;
-                }
-
-                $resolver = $item['resolver'];
-                $type = $item['type'];
-
-                return $resolver($value)
-                    ? $this->typeRegistry->get($type)
-                    : $instance;
-            });
+        return $this->typeRegistry->get($this->currentType);
     }
 }

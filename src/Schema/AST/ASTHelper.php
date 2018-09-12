@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
@@ -201,5 +203,27 @@ class ASTHelper
             ? static::directiveArgValue($namespaceDirective, $directiveName, '')
             // Default to an empty namespace if the namespace directive does not exist
             : '';
+    }
+    
+    /**
+     * @param ObjectTypeDefinitionNode $objectType
+     * @param DocumentAST $documentAST
+     *
+     * @throws \Exception
+     *
+     * @return DocumentAST
+     */
+    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
+    {
+        $objectType->interfaces = self::mergeNodeList(
+            $objectType->interfaces,
+            [Parser::parseType('Node', ['noLocation' => true])]
+        );
+        
+        $globalIdFieldName = config('lighthouse.global_id_field', '_id');
+        $globalIdFieldDefinition = PartialParser::fieldDefinition($globalIdFieldName.': ID!');
+        $objectType->fields->merge([$globalIdFieldDefinition]);
+        
+        return $documentAST->setDefinition($objectType);
     }
 }

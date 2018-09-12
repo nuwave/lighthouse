@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use GraphQL\Type\Definition\Type;
@@ -88,8 +89,8 @@ class SchemaBuilder
                         'description' => 'Global ID that can be used to resolve any type that implements the Node interface.'
                     ]
                 ],
-                'resolveType' => function($value) {
-                    return $this->nodeRegistry->resolveType($value);
+                'resolveType' => function() {
+                    return $this->nodeRegistry->resolveType();
                 }
             ]));
         }
