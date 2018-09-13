@@ -23,6 +23,8 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\UnionDirective;
+use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
 
 class NodeFactory
 {
@@ -222,32 +224,43 @@ class NodeFactory
             'fields' => $this->resolveFieldsFunction($value),
         ]);
     }
-
+    
     /**
      * @param NodeValue $interfaceNodeValue
+     *
+     * @throws DirectiveException
      *
      * @return InterfaceType
      */
     protected function resolveInterfaceType(NodeValue $interfaceNodeValue): InterfaceType
     {
         $nodeName = $interfaceNodeValue->getNodeName();
+    
+        $interfaceDefinition = $interfaceNodeValue->getNode();
+        if($directive = ASTHelper::directiveDefinition('interface', $interfaceDefinition)){
+            $typeResolver = (new InterfaceDirective)->hydrate($interfaceDefinition)->getResolver();
+        } else {
+            $interfaceClass = \namespace_classname($nodeName, [
+                config('lighthouse.namespaces.interfaces')
+            ]);
         
-        $interfaceClass = \namespace_classname($nodeName, [
-            config('lighthouse.namespaces.interfaces')
-        ]);
+            $typeResolver = \method_exists($interfaceClass, 'resolveType')
+                ? [resolve($interfaceClass), 'resolveType']
+                : static::typeResolverFallback();
+        }
     
         return new InterfaceType([
             'name' => $nodeName,
             'description' => $interfaceNodeValue->getNode()->description,
             'fields' => $this->resolveFieldsFunction($interfaceNodeValue),
-            'resolveType' => \method_exists($interfaceClass, 'resolveType')
-                ? [resolve($interfaceClass), 'resolveType']
-                : static::typeResolverFallback()
+            'resolveType' => $typeResolver,
         ]);
     }
-
+    
     /**
      * @param NodeValue $value
+     *
+     * @throws DirectiveException
      *
      * @return UnionType
      */
@@ -255,9 +268,18 @@ class NodeFactory
     {
         $nodeName = $value->getNodeName();
     
-        $unionClass = \namespace_classname($nodeName, [
-            config('lighthouse.namespaces.unions')
-        ]);
+        $unionDefinition = $value->getNode();
+        if($directive = ASTHelper::directiveDefinition('union', $unionDefinition)){
+            $typeResolver = (new UnionDirective)->hydrate($unionDefinition)->getResolver();
+        } else {
+            $unionClass = \namespace_classname($nodeName, [
+                config('lighthouse.namespaces.unions')
+            ]);
+            
+            $typeResolver = \method_exists($unionClass, 'resolveType')
+                ? [resolve($unionClass), 'resolveType']
+                : static::typeResolverFallback();
+        }
         
         return new UnionType([
             'name' => $nodeName,
@@ -270,9 +292,7 @@ class NodeFactory
                     ->filter()
                     ->toArray();
             },
-            'resolveType' => \method_exists($unionClass, 'resolveType')
-                ? [resolve($unionClass), 'resolveType']
-                : static::typeResolverFallback()
+            'resolveType' => $typeResolver,
         ]);
     }
     

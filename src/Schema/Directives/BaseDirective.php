@@ -73,7 +73,7 @@ abstract class BaseDirective implements Directive
      *
      * @return \Closure
      */
-    protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
+    public function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
     {
         // The resolver is expected to contain a class and a method name, seperated by an @ symbol
         // e.g. App\My\Class@methodName
