@@ -86,7 +86,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 \Nuwave\Lighthouse\Console\InterfaceCommand::class,
                 \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
                 \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
+                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
             ]);
         }
     }
