@@ -32,16 +32,17 @@ class DirectiveRegistry
 
     /**
      * Create new instance of the directive container.
+     * @throws \ReflectionException
      */
     public function __construct()
     {
         $this->directives = collect();
 
         // Load built-in directives from the default directory
-        $this->load(realpath(__DIR__.'/Directives/'), 'Nuwave\\Lighthouse\\');
+        $this->load(realpath(__DIR__ . '/Directives/'), 'Nuwave\\Lighthouse\\', \dirname(__DIR__));
 
         // Load custom directives
-        $this->load(config('lighthouse.directives', []));
+        $this->load(config('lighthouse.directives'), app()->getNamespace(), app_path());
     }
 
     /**
@@ -50,9 +51,12 @@ class DirectiveRegistry
      * Works similar to https://github.com/laravel/framework/blob/5.6/src/Illuminate/Foundation/Console/Kernel.php#L191-L225
      *
      * @param array|string $paths
-     * @param null         $namespace
+     * @param string $namespace
+     * @param string $projectRootPath
+     *
+     * @throws \ReflectionException
      */
-    public function load($paths, $namespace = null)
+    public function load($paths, string $namespace, string $projectRootPath)
     {
         $paths = collect($paths)
             ->unique()
@@ -66,18 +70,13 @@ class DirectiveRegistry
             return;
         }
 
-        $namespace = $namespace ?: app()->getNamespace();
-        $path = starts_with($namespace, 'Nuwave\\Lighthouse')
-            ? realpath(__DIR__.'/../../src/')
-            : app_path();
-
         /** @var SplFileInfo $file */
         foreach ((new Finder())->in($paths)->files() as $file) {
-            $className = $namespace.str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                str_after($file->getPathname(), $path.DIRECTORY_SEPARATOR)
-            );
+            $className = $namespace . str_replace(
+                    ['/', '.php'],
+                    ['\\', ''],
+                    str_after($file->getPathname(), rtrim($projectRootPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)
+                );
 
             $this->tryRegisterClassName($className);
         }
