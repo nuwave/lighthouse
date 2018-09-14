@@ -127,7 +127,8 @@ class DirectiveRegistry
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
-        return resolve(get_class($directive));
+        // Always return a new instance of the directive class to avoid side effects between them
+        return resolve(\get_class($directive));
     }
 
     /**
