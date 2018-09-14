@@ -72,7 +72,7 @@ class DirectiveRegistry
             : app_path();
 
         /** @var SplFileInfo $file */
-        foreach ((new Finder())->in($paths)->files() as $file) {
+        foreach ((new Finder)->in($paths)->files() as $file) {
             $className = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
@@ -128,6 +128,7 @@ class DirectiveRegistry
             throw new DirectiveException("No directive has been registered for [{$name}]");
         }
 
+        // Always return a new instance of the directive class to avoid side effects between them
         return resolve(get_class($directive));
     }
 
@@ -156,11 +157,12 @@ class DirectiveRegistry
      */
     protected function directives(Node $node)
     {
-        return collect(data_get($node, 'directives', []))->map(function (DirectiveNode $directive) {
-            return $this->get($directive->name->value);
-        })->map(function (Directive $directive) use ($node) {
-            return $this->hydrate($directive, $node);
-        });
+        return collect(data_get($node, 'directives', []))
+            ->map(function (DirectiveNode $directive) {
+                return $this->get($directive->name->value);
+            })->map(function (Directive $directive) use ($node) {
+                return $this->hydrate($directive, $node);
+            });
     }
 
     /**

@@ -1,15 +1,16 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Types;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class InterfaceDirectiveTest extends DBTestCase
+class InterfaceTest extends DBTestCase
 {
     use RefreshDatabase;
 
@@ -22,7 +23,7 @@ class InterfaceDirectiveTest extends DBTestCase
         factory(User::class)->create();
 
         $schema = '
-        interface Nameable @interface(resolver: "' . addslashes(self::class) . '@resolveNameableInterface") {
+        interface Nameable {
             name: String!
         }
         
@@ -57,15 +58,38 @@ class InterfaceDirectiveTest extends DBTestCase
         $this->assertArrayHasKey('name', array_get($result, 'data.namedThings.1'));
         $this->assertArrayNotHasKey('id', array_get($result, 'data.namedThings.1'));
     }
-
-    public function resolveNameableInterface($value): \GraphQL\Type\Definition\ObjectType
+    
+    /**
+     * @test
+     */
+    public function itCanUseCustomTypeResolver()
     {
-        $typeRegistry = resolve(TypeRegistry::class);
-        if ($value instanceof User) {
-            return $typeRegistry->get('User');
-        } elseif($value instanceof Team){
-            return $typeRegistry->get('Team');
+        $schema = '
+        interface Nameable @interface(resolver: "' . addslashes(self::class) . '@resolveType"){
+            name: String!
         }
+
+        type Guy implements Nameable {
+            name: String!
+        }
+
+        type Query {
+            namedThings: Nameable @field(resolver: "' . addslashes(self::class) . '@fetchGuy")
+        }
+        ';
+        $query = '
+        {
+            namedThings {
+                name
+                ... on Guy {
+                    id
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame($this->fetchGuy(), $result['data']['namedThings']);
     }
 
     public function fetchResults(): Collection
@@ -74,5 +98,15 @@ class InterfaceDirectiveTest extends DBTestCase
         $teams = Team::all();
 
         return $users->concat($teams);
+    }
+
+    public function resolveType(): Type
+    {
+        return resolve(TypeRegistry::class)->get('Guy');
+    }
+
+    public function fetchGuy(): array
+    {
+        return ['name' => 'bar'];
     }
 }

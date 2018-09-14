@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class ComplexityDirective extends BaseDirective implements FieldMiddleware
 {
@@ -18,18 +18,20 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
     {
         return 'complexity';
     }
-
+    
     /**
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure $next
+     *
+     * @throws DirectiveException
      *
      * @return FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next)
     {
-        $resolver = $this->getResolver(
+        $complexityResolver = $this->getResolver(
             function ($childrenComplexity, $args) {
                 $complexity = array_get($args, 'first', array_get($args, 'count', 1));
 
@@ -37,6 +39,8 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
             }
         );
         
-        return $next($value->setComplexity($resolver));
+        return $next(
+            $value->setComplexity($complexityResolver)
+        );
     }
 }

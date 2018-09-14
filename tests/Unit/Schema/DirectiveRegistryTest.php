@@ -7,11 +7,11 @@ use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\ScalarDirective;
+use Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective;
 
 class DirectiveRegistryTest extends TestCase
 {
@@ -31,22 +31,9 @@ class DirectiveRegistryTest extends TestCase
     public function itRegistersLighthouseDirectives()
     {
         $this->assertInstanceOf(
-            ScalarDirective::class,
-            $this->directiveRegistry->get((new ScalarDirective())->name())
+            FieldDirective::class,
+            $this->directiveRegistry->get((new FieldDirective)->name())
         );
-    }
-
-    /**
-     * @test
-     */
-    public function itGetsLighthouseHandlerForScalar()
-    {
-        $definition = PartialParser::scalarTypeDefinition('
-            scalar Email @scalar(class: "Email")
-        ');
-
-        $scalarResolver = $this->directiveRegistry->nodeResolver($definition);
-        $this->assertInstanceOf(ScalarDirective::class, $scalarResolver);
     }
 
     /**

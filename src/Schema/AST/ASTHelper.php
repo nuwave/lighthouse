@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
@@ -15,6 +17,7 @@ use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 class ASTHelper
 {
@@ -72,7 +75,7 @@ class ASTHelper
     {
         return AST::fromArray($node->toArray(true));
     }
-
+    
     /**
      * @param FieldDefinitionNode $field
      *
@@ -161,5 +164,67 @@ class ASTHelper
         }
 
         return $valueNode->value;
+    }
+    
+    /**
+     * This can be at most one directive, since directives can only be used once per location.
+     *
+     * @param string|null                   $name
+     * @param Node|null $definitionNode
+     *
+     * @return DirectiveNode|null
+     */
+    public static function directiveDefinition(string $name, Node $definitionNode)
+    {
+        return collect($definitionNode->directives)
+            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
+                return $directiveDefinitionNode->name->value === $name;
+            });
+    }
+    
+    /**
+     * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
+     *
+     * @param Node $definitionNode
+     * @param string $directiveName
+     *
+     * @return string
+     */
+    public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
+    {
+        $namespaceDirective = static::directiveDefinition(
+            (new NamespaceDirective)->name(),
+            $definitionNode
+        );
+    
+        return $namespaceDirective
+            // The namespace directive can contain an argument with the name of the
+            // current directive, in which case it applies here
+            ? static::directiveArgValue($namespaceDirective, $directiveName, '')
+            // Default to an empty namespace if the namespace directive does not exist
+            : '';
+    }
+    
+    /**
+     * @param ObjectTypeDefinitionNode $objectType
+     * @param DocumentAST $documentAST
+     *
+     * @throws \Exception
+     *
+     * @return DocumentAST
+     */
+    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
+    {
+        $objectType->interfaces = self::mergeNodeList(
+            $objectType->interfaces,
+            [Parser::parseType('Node', ['noLocation' => true])]
+        );
+    
+        $globalIdFieldDefinition = PartialParser::fieldDefinition(
+            config('lighthouse.global_id_field') .': ID! @field(resolver: "Nuwave\\\Lighthouse\\\Execution\\\Utils\\\GlobalId@resolveIdField")'
+        );
+        $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
+        
+        return $documentAST->setDefinition($objectType);
     }
 }

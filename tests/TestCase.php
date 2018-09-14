@@ -4,6 +4,7 @@ namespace Tests;
 
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\GraphQL;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
@@ -21,6 +22,11 @@ class TestCase extends BaseTestCase
      * @var string
      */
     protected $schema = '';
+
+    /**
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
 
     /**
      * Get package providers.
@@ -45,6 +51,8 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
+        $this->app = $app;
+
         $app->bind(
             SchemaSourceProvider::class,
             function () {
@@ -52,28 +60,15 @@ class TestCase extends BaseTestCase
             }
         );
 
-        $app['config']->set('lighthouse.directives', []);
-        $app['config']->set('lighthouse.global_id_field', '_id');
-
-        $app['config']->set(
-            'lighthouse.namespaces.scalars',
-            'Tests\\Utils\\Scalars'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.mutations',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.models',
-            'Tests\\Utils\\Models'
-        );
+        $app['config']->set('lighthouse', [
+            'namespaces' => [
+                'scalars' => 'Tests\\Utils\\Scalars',
+                'unions' => 'Tests\\Utils\\Unions',
+                'queries' => 'Tests\\Utils\\Queries',
+                'mutations' => 'Tests\\Utils\\Mutations',
+                'models' => 'Tests\\Utils\\Models',
+            ]
+        ]);
     }
 
     /**
