@@ -9,9 +9,9 @@ interface NodeManipulator extends Directive
 {
     /**
      * @param Node        $node
-     * @param DocumentAST $current
+     * @param DocumentAST $documentAST
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current);
+    public function manipulateSchema(Node $node, DocumentAST $documentAST);
 }

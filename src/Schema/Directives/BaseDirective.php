@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
@@ -36,39 +37,26 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * This can be at most one directive, since directives can only be used once per location.
+     * Get the directive definition associated with the current directive.
      *
-     * @param string|null                   $name
-     * @param TypeSystemDefinitionNode|null $definitionNode
-     *
-     * @return DirectiveNode|null
+     * @return DirectiveNode
      */
-    protected function directiveDefinition($name = null, $definitionNode = null)
+    protected function directiveDefinition(): DirectiveNode
     {
-        $name = $name ?? static::name();
-        $definitionNode = $definitionNode ?? $this->definitionNode;
-
-        return collect($definitionNode->directives)
-            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
-                return $directiveDefinitionNode->name->value === $name;
-            });
+        return ASTHelper::directiveDefinition(static::name(), $this->definitionNode);
     }
 
     /**
      * Get directive argument value.
      *
-     * @param string             $name
-     * @param mixed|null         $default
-     * @param DirectiveNode|null $directive
+     * @param string $name
+     * @param mixed|null $default
      *
-     * @return mixed
+     * @return mixed|null
      */
-    protected function directiveArgValue(string $name, $default = null, $directive = null)
+    protected function directiveArgValue(string $name, $default = null)
     {
-        // Get the definition associated with the class of the directive, unless explicitly given
-        $directive = $directive ?? $this->directiveDefinition();
-
-        if (! $directive) {
+        if (! $directive = $this->directiveDefinition()) {
             return $default;
         }
 
@@ -85,7 +73,7 @@ abstract class BaseDirective implements Directive
      *
      * @return \Closure
      */
-    protected function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
+    public function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
     {
         // The resolver is expected to contain a class and a method name, seperated by an @ symbol
         // e.g. App\My\Class@methodName
@@ -101,8 +89,7 @@ abstract class BaseDirective implements Directive
                 return $defaultResolver;
             }
             
-            $directiveName = $this->name();
-            throw new DirectiveException("Directive '{$directiveName}' must have a resolver class specified.");
+            throw new DirectiveException("Directive '{$this->name()}' must have a resolver class specified.");
         }
         
         $resolverClass = $this->namespaceClassName($baseClassName);
@@ -117,77 +104,58 @@ abstract class BaseDirective implements Directive
 
         return \Closure::fromCallable([app($resolverClass), $resolverMethod]);
     }
-
+    
     /**
      * Get the model class from the `model` argument of the field.
      *
+     * @param string $argumentName
+     *
      * @throws DirectiveException
-     * @throws \Exception
      *
      * @return string
      */
-    protected function getModelClass(): string
+    protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue('model');
+        $model = $this->directiveArgValue($argumentName);
 
-        // Fallback to using the return type of the field as the class name
-        if(! $model && $this->definitionNode instanceof FieldDefinitionNode){
-            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+        // Fallback to using information from the schema definition as the model name
+        if(! $model){
+            if($this->definitionNode instanceof FieldDefinitionNode) {
+                $model = ASTHelper::getFieldTypeName($this->definitionNode);
+            } elseif($this->definitionNode instanceof ObjectTypeDefinitionNode) {
+                $model = $this->definitionNode->name->value;
+            }
         }
 
         if (! $model) {
-            throw new DirectiveException("A `model` argument must be assigned to the {$this->name()} directive on {$this->definitionNode->name->value}");
+            throw new DirectiveException(
+                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+            );
         }
 
-        if(class_exists($model)){
-            return $model;
-        }
-
-        $modelWithDefaultNamespace = config('lighthouse.namespaces.models').'\\'.$model;
-        if(class_exists($modelWithDefaultNamespace)){
-            return $modelWithDefaultNamespace;
-        }
-
-        return $this->namespaceClassName($model);
+        return $this->namespaceClassName($model, [
+            config('lighthouse.namespaces.models')
+        ]);
     }
-
+    
     /**
-     * Add the namespace to a class name and check if it exists.
      *
-     * @param string $baseClassName
+     * @param string $classCandidate
+     * @param string[] $namespacesToTry
      *
      * @throws DirectiveException
      *
      * @return string
      */
-    protected function namespaceClassName(string $baseClassName): string
+    protected function namespaceClassName(string $classCandidate, array $namespacesToTry = []): string
     {
-        $className = $this->associatedNamespace().'\\'.$baseClassName;
-
-        if (! class_exists($className)) {
-            $directiveName = static::name();
-            throw new DirectiveException("No class '$className' was found for directive '$directiveName'");
-        }
-
+        // Always try the explicitly set namespace first
+        \array_unshift($namespacesToTry, ASTHelper::getNamespaceForDirective($this->definitionNode, static::name()));
+        
+        if(!$className = \namespace_classname($classCandidate, $namespacesToTry)){
+            throw new DirectiveException("No class '$classCandidate' was found for directive '{$this->name()}'");
+        };
+        
         return $className;
-    }
-
-    /**
-     * Get the namespace for the current directive, returns an empty string if its not set.
-     *
-     * @return string
-     */
-    protected function associatedNamespace(): string
-    {
-        $namespaceDirective = $this->directiveDefinition(
-            (new NamespaceDirective)->name()
-        );
-
-        return $namespaceDirective
-            // The namespace directive can contain an argument with the name of the
-            // current directive, in which case it applies here
-            ? $this->directiveArgValue(static::name(), '', $namespaceDirective)
-            // Default to an empty namespace if the namespace directive does not exist
-            : '';
     }
 }

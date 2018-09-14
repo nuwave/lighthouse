@@ -5,13 +5,15 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
@@ -36,14 +38,15 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param Node        $node
-     * @param DocumentAST $current
+     * @param Node $node
+     * @param DocumentAST $documentAST
      *
      * @throws DirectiveException
+     * @throws DocumentASTException
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST)
     {
         $nodeName = $node->name->value;
 
@@ -56,9 +59,9 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $node = $this->setMiddlewareDirectiveOnFields($node);
         $node = $this->setNamespaceDirectiveOnFields($node);
 
-        $current->setDefinition($node);
+        $documentAST->setDefinition($node);
 
-        return $current;
+        return $documentAST;
     }
 
     /**
@@ -110,7 +113,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $namespaceValue = addslashes($namespaceValue);
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
-            $previousNamespaces = $this->directiveDefinition((new NamespaceDirective())->name(), $fieldDefinition);
+            $previousNamespaces = ASTHelper::directiveDefinition((new NamespaceDirective)->name(), $fieldDefinition);
 
             $previousNamespaces = $previousNamespaces
                 ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)
@@ -124,7 +127,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param string        $namespaceValue
+     * @param string $namespaceValue
      * @param DirectiveNode $directive
      *
      * @return DirectiveNode

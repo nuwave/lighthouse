@@ -3,23 +3,46 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
 
+/**
+ * Store the executable types of our GraphQL schema.
+ *
+ * Class TypeRegistry
+ * @package Nuwave\Lighthouse\Schema
+ */
 class TypeRegistry
 {
     /**
-     * Collection of schema types.
+     * A map of executable schema types.
      *
-     * @var Collection
+     * @var Type[]
      */
     protected $types;
+    
+    /**
+     * Register type with registry.
+     *
+     * @param Type $type
+     *
+     * @return TypeRegistry
+     */
+    public function register(Type $type): TypeRegistry
+    {
+        $this->types[$type->name] = $type;
+        
+        return $this;
+    }
 
     /**
-     * TypeRegistry constructor.
+     * Resolve type instance by name.
+     *
+     * @param string $typeName
+     *
+     * @return Type|null
      */
-    public function __construct()
+    public function get(string $typeName)
     {
-        $this->types = collect();
+        return array_get($this->types, $typeName);
     }
 
     /**
@@ -28,7 +51,7 @@ class TypeRegistry
      * @param string $typeName
      *
      * @return Type
-     * @deprecated in favour of get
+     * @deprecated in favour of get, remove in v3
      */
     public function instance($typeName)
     {
@@ -36,35 +59,13 @@ class TypeRegistry
     }
 
     /**
-     * Resolve type instance by name.
-     *
-     * @param string $typeName
-     *
-     * @return Type
-     */
-    public function get($typeName)
-    {
-        return $this->types->get($typeName);
-    }
-
-    /**
      * Register type with registry.
      *
      * @param Type $type
-     * @deprecated in favour of register
+     * @deprecated in favour of register, remove in v3
      */
     public function type(Type $type)
     {
         $this->register($type);
-    }
-
-    /**
-     * Register type with registry.
-     *
-     * @param Type $type
-     */
-    public function register(Type $type)
-    {
-        $this->types->put($type->name, $type);
     }
 }

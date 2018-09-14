@@ -4,18 +4,27 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Support\Traits\AttachesNodeInterface;
 
 class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
-    use AttachesNodeInterface;
-
+    /** @var NodeRegistry */
+    protected $nodeRegistry;
+    
+    /**
+     * @param NodeRegistry $nodeRegistry
+     */
+    public function __construct(NodeRegistry $nodeRegistry)
+    {
+        $this->nodeRegistry = $nodeRegistry;
+    }
+    
     /**
      * Directive name.
      *
@@ -30,50 +39,34 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      * Handle type construction.
      *
      * @param NodeValue $value
-     * @param \Closure  $next
+     * @param \Closure $next
+     *
+     * @throws DirectiveException
      *
      * @return NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next)
     {
-        resolve(NodeRegistry::class)->node(
-            $value->getNodeName(),
-            // Resolver for the node itself
-            $this->getResolver(),
-            // Interface type resolver
-            $this->getTypeResolver($value)
+        $typeName = $value->getNodeName();
+        
+        $this->nodeRegistry->registerNode(
+            $typeName,
+            $this->getResolver()
         );
 
         return $next($value);
     }
-
+    
     /**
-     * @param NodeValue $value
-     *
-     * @return \Closure
-     */
-    protected function getTypeResolver(NodeValue $value): \Closure
-    {
-        $nodeName = $value->getNodeName();
-
-        return $this->getResolver(
-            function () use ($nodeName) {
-                return resolve(TypeRegistry::class)->get($nodeName);
-            },
-            'typeResolver'
-        );
-    }
-
-    /**
-     * @param Node        $node
-     * @param DocumentAST $current
+     * @param Node $node
+     * @param DocumentAST $documentAST
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST)
     {
-        return $this->attachNodeInterfaceToObjectType($node, $current);
+        return ASTHelper::attachNodeInterfaceToObjectType($node, $documentAST);
     }
 }
