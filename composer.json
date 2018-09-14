@@ -37,6 +37,9 @@
         "orchestra/testbench": "^3.6",
         "phpunit/phpunit": "^7.0"
     },
+    "suggest": {
+        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflows - integrated with Laravel"
+    },
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
