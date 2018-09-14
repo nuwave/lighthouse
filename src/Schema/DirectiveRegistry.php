@@ -52,7 +52,7 @@ class DirectiveRegistry
      * @param array|string $paths
      * @param null         $namespace
      */
-    protected function load($paths, $namespace = null)
+    public function load($paths, $namespace = null)
     {
         $paths = collect($paths)
             ->unique()
@@ -90,7 +90,7 @@ class DirectiveRegistry
      *
      * @throws \ReflectionException
      */
-    protected function tryRegisterClassName($className)
+    public function tryRegisterClassName($className)
     {
         $reflection = new \ReflectionClass($className);
 
