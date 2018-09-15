@@ -16,8 +16,8 @@ use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -38,13 +38,13 @@ class NodeFactory
     protected $valueFactory;
     /** @var FieldFactory */
     protected $fieldFactory;
-    
+
     /**
      * @param DirectiveRegistry $directiveRegistry
-     * @param TypeRegistry $typeRegistry
-     * @param Pipeline $pipeline
-     * @param ValueFactory $valueFactory
-     * @param FieldFactory $fieldFactory
+     * @param TypeRegistry      $typeRegistry
+     * @param Pipeline          $pipeline
+     * @param ValueFactory      $valueFactory
+     * @param FieldFactory      $fieldFactory
      */
     public function __construct(
         DirectiveRegistry $directiveRegistry,
@@ -59,7 +59,7 @@ class NodeFactory
         $this->valueFactory = $valueFactory;
         $this->fieldFactory = $fieldFactory;
     }
-    
+
     /**
      * Transform node to type.
      *
@@ -91,7 +91,7 @@ class NodeFactory
     {
         return $this->directiveRegistry->hasNodeResolver($value->getNode());
     }
-    
+
     /**
      * Use directive resolver to transform type.
      *
@@ -150,22 +150,22 @@ class NodeFactory
             'values' => collect($enumNodeValue->getNode()->values)
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     // Get the directive that is defined on the field itself
-                    $directive = ASTHelper::directiveDefinition( 'enum', $field);
-                
-                    if (!$directive) {
+                    $directive = ASTHelper::directiveDefinition('enum', $field);
+
+                    if (! $directive) {
                         return [];
                     }
-                
+
                     return [
                         $field->name->value => [
                             'value' => ASTHelper::directiveArgValue($directive, 'value'),
-                            'description' => $field->description
-                        ]
+                            'description' => $field->description,
+                        ],
                     ];
                 })->toArray(),
         ]);
     }
-    
+
     /**
      * @param NodeValue $scalarNodeValue
      *
@@ -175,21 +175,13 @@ class NodeFactory
      */
     protected function resolveScalarType(NodeValue $scalarNodeValue): ScalarType
     {
-        $nodeName = $scalarNodeValue->getNodeName();
-        $className = \namespace_classname($nodeName, [
-            config('lighthouse.namespaces.scalars')
+        $className = \namespace_classname($scalarNodeValue->getNodeName(), [
+            config('lighthouse.namespaces.scalars'),
         ]);
-        
-        if(!$className){
-            throw new \Exception("No class found for the scalar {$nodeName}");
-        }
-        
-        return new $className([
-            'name' => $nodeName,
-            'description' => $scalarNodeValue->getNode()->description,
-        ]);
+
+        return TypeFactory::resolveScalarType($scalarNodeValue, $className);
     }
-    
+
     /**
      * @param NodeValue $value
      *
@@ -224,7 +216,7 @@ class NodeFactory
             'fields' => $this->resolveFieldsFunction($value),
         ]);
     }
-    
+
     /**
      * @param NodeValue $interfaceNodeValue
      *
@@ -235,28 +227,27 @@ class NodeFactory
     protected function resolveInterfaceType(NodeValue $interfaceNodeValue): InterfaceType
     {
         $nodeName = $interfaceNodeValue->getNodeName();
-    
+
         $interfaceDefinition = $interfaceNodeValue->getNode();
-        if($directive = ASTHelper::directiveDefinition('interface', $interfaceDefinition)){
-            $typeResolver = (new InterfaceDirective)->hydrate($interfaceDefinition)->getResolver();
+        if ($directive = ASTHelper::directiveDefinition('interface', $interfaceDefinition)) {
+            $typeResolver = (new InterfaceDirective())->hydrate($interfaceDefinition)->getResolver();
         } else {
             $interfaceClass = \namespace_classname($nodeName, [
-                config('lighthouse.namespaces.interfaces')
+                config('lighthouse.namespaces.interfaces'),
             ]);
-        
+
             $typeResolver = \method_exists($interfaceClass, 'resolveType')
                 ? [resolve($interfaceClass), 'resolveType']
                 : static::typeResolverFallback();
         }
-    
-        return new InterfaceType([
-            'name' => $nodeName,
-            'description' => $interfaceNodeValue->getNode()->description,
-            'fields' => $this->resolveFieldsFunction($interfaceNodeValue),
-            'resolveType' => $typeResolver,
-        ]);
+
+        return TypeFactory::resolveInterfaceType(
+            $interfaceNodeValue,
+            $this->resolveFieldsFunction($interfaceNodeValue),
+            $typeResolver
+        );
     }
-    
+
     /**
      * @param NodeValue $value
      *
@@ -267,35 +258,25 @@ class NodeFactory
     protected function resolveUnionType(NodeValue $value): UnionType
     {
         $nodeName = $value->getNodeName();
-    
+
         $unionDefinition = $value->getNode();
-        if($directive = ASTHelper::directiveDefinition('union', $unionDefinition)){
-            $typeResolver = (new UnionDirective)->hydrate($unionDefinition)->getResolver();
+        if ($directive = ASTHelper::directiveDefinition('union', $unionDefinition)) {
+            $typeResolver = (new UnionDirective())->hydrate($unionDefinition)->getResolver();
         } else {
             $unionClass = \namespace_classname($nodeName, [
-                config('lighthouse.namespaces.unions')
+                config('lighthouse.namespaces.unions'),
             ]);
-            
+
             $typeResolver = \method_exists($unionClass, 'resolveType')
-                ? [resolve($unionClass), 'resolveType']
-                : static::typeResolverFallback();
+            ? function ($value) use ($unionClass) {
+                return resolve($unionClass)->resolveType($value);
+            }
+            : static::typeResolverFallback();
         }
-        
-        return new UnionType([
-            'name' => $nodeName,
-            'description' => $value->getNode()->description,
-            'types' => function () use ($value) {
-                return collect($value->getNode()->types)
-                    ->map(function ($type) {
-                        return $this->typeRegistry->get($type->name->value);
-                    })
-                    ->filter()
-                    ->toArray();
-            },
-            'resolveType' => $typeResolver,
-        ]);
+
+        return TypeFactory::resolveUnionType($value, $typeResolver);
     }
-    
+
     /**
      * If no type resolver is given, use this as a default.
      *
@@ -304,7 +285,7 @@ class NodeFactory
     public function typeResolverFallback(): \Closure
     {
         // The typeResolver receives only 3 arguments by `webonyx/graphql-php` instead of 4
-        return function ($rootValue, $context, ResolveInfo $info){
+        return function ($rootValue, $context, ResolveInfo $info) {
             // Default to getting a type with the same name as the passed in root value
             // which is usually an Eloquent model
             return $this->typeRegistry->get(class_basename($rootValue));
@@ -326,7 +307,7 @@ class NodeFactory
                 return $value;
             });
     }
-    
+
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
@@ -336,11 +317,11 @@ class NodeFactory
      */
     protected function resolveFieldsFunction(NodeValue $nodeValue): \Closure
     {
-        return function() use ($nodeValue){
+        return function () use ($nodeValue) {
             return collect($nodeValue->getNodeFields())
                 ->mapWithKeys(function ($field) use ($nodeValue) {
                     $fieldValue = $this->valueFactory->field($nodeValue, $field);
-                    
+
                     return [
                         $fieldValue->getFieldName() => $this->fieldFactory->handle($fieldValue),
                     ];

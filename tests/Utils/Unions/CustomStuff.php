@@ -10,7 +10,7 @@ class CustomStuff
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-    
+
     /**
      * @param TypeRegistry $typeRegistry
      */
@@ -18,21 +18,19 @@ class CustomStuff
     {
         $this->typeRegistry = $typeRegistry;
     }
-    
+
     /**
      * Decide which GraphQL type a resolved value has.
      *
      * @param $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param $context
-     * @param ResolveInfo $info
      *
      * @return Type
      */
-    public function resolveType($rootValue, $context, ResolveInfo $info): Type
+    public function resolveType($rootValue): Type
     {
         return $this->typeRegistry->get(
             // Add prefix
-            'Custom' . class_basename($rootValue)
+            'Custom'.class_basename($rootValue)
         );
     }
 }
