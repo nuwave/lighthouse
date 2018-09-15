@@ -12,9 +12,9 @@ class GraphQLValidator extends Validator
     /**
      * Run the validator's rules against its data.
      *
-     * @return array
-     *
      * @throws ValidationException
+     *
+     * @return array
      */
     public function validate()
     {
@@ -40,7 +40,7 @@ class GraphQLValidator extends Validator
     /**
      * @return Context
      */
-    public function getContext(): Context
+    public function getContext()
     {
         return array_get($this->customAttributes, 'context');
     }
