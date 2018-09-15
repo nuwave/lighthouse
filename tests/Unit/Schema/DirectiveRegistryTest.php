@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema;
 
 use Tests\TestCase;
+use Tests\Utils\Directives\FooDirective;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -33,6 +34,26 @@ class DirectiveRegistryTest extends TestCase
         $this->assertInstanceOf(
             FieldDirective::class,
             $this->directiveRegistry->get((new FieldDirective)->name())
+        );
+    }
+    
+    /**
+     * @test
+     */
+    public function itRegistersDirectiveFromProgrammaticallyGivenLocation()
+    {
+        $this->expectException(DirectiveException::class);
+        $this->directiveRegistry->get((new FooDirective)->name());
+        
+        $this->directiveRegistry->load(
+            __DIR__ . '../../Utils/Directives/Programmatically',
+            'Tests\Utils\Directives\Programmatically',
+            __DIR__ . '/../../'
+        );
+        
+        $this->assertInstanceOf(
+            FooDirective::class,
+            $this->directiveRegistry->get((new FooDirective)->name())
         );
     }
 
