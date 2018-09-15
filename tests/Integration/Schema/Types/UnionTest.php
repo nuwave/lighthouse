@@ -43,19 +43,24 @@ class UnionTest extends DBTestCase
     {
         return [
             // This uses the default type resolver
-            $this->schema(''),
+            $this->schema(false),
             // This scenario requires a custom resolver, since the types User and Post do not match
-            $this->schema('Custom'),
+            $this->schema(true),
         ];
     }
     
-    public function schema(string $prefix): array
+    public function schema(bool $withCustomTypeResolver): array
     {
         $fieldResolver = addslashes(self::class). '@fetchResults';
 
+        $prefix = $withCustomTypeResolver ? 'Custom' : '';
+        $customResolver = $withCustomTypeResolver
+            ? '@union(resolver: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
+            : '';
+
         return [
             "
-            union {$prefix}Stuff = {$prefix}User | {$prefix}Post
+            union Stuff {$customResolver} = {$prefix}User | {$prefix}Post
             
             type {$prefix}User {
                 name: String!
@@ -66,7 +71,7 @@ class UnionTest extends DBTestCase
             }
             
             type Query {
-                stuff: [{$prefix}Stuff!]! @field(resolver: \"$fieldResolver\")
+                stuff: [Stuff!]! @field(resolver: \"$fieldResolver\")
             }
             ",
             "
