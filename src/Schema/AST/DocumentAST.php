@@ -350,7 +350,6 @@ class DocumentAST implements \Serializable
 
                 if ($originalHashID === $newHashID) {
                     $found = true;
-                    $newDefinition->spl_object_hash = $originalHashID;
 
                     $originalDefinition = $newDefinition;
                 }
