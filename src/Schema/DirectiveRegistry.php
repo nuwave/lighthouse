@@ -71,14 +71,18 @@ class DirectiveRegistry
         }
 
         /** @var SplFileInfo $file */
-        foreach ((new Finder())->in($paths)->files() as $file) {
-            $className = $namespace . str_replace(
-                    ['/', '.php'],
-                    ['\\', ''],
-                    str_after($file->getPathname(), rtrim($projectRootPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)
-                );
+        foreach ((new Finder)->in($paths)->files() as $file) {
+            // Cut off the given root path to get the path that is equivalent to the namespace
+            $namespaceRelevantPath = str_after(
+                $file->getPathname(),
+                // Call realpath to resolve relative paths, e.g. /foo/../bar -> /bar
+                realpath($pathForRootNamespace) . DIRECTORY_SEPARATOR
+            );
+            
+            $withoutExtension = str_before($namespaceRelevantPath, '.php');
+            $fileNamespace = str_replace(DIRECTORY_SEPARATOR, '\\', $withoutExtension);
 
-            $this->tryRegisterClassName($className);
+            $this->tryRegisterClassName($rootNamespace . $fileNamespace);
         }
     }
 
