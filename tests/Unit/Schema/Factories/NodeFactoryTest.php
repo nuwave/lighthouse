@@ -69,6 +69,20 @@ class NodeFactoryTest extends TestCase
     /**
      * @test
      */
+    public function itCanPointToScalarClassThroughDirective()
+    {
+        $scalarNode = PartialParser::scalarTypeDefinition('
+        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
+        ');
+        $scalarType = $this->factory->handle(new NodeValue($scalarNode));
+
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
+        $this->assertSame('DateTime', $scalarType->name);
+    }
+
+    /**
+     * @test
+     */
     public function itCanTransformInterfaces()
     {
         $interfaceNode = PartialParser::interfaceTypeDefinition('

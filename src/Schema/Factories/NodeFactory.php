@@ -176,10 +176,15 @@ class NodeFactory
     protected function resolveScalarType(NodeValue $scalarNodeValue): ScalarType
     {
         $nodeName = $scalarNodeValue->getNodeName();
-        $className = \namespace_classname($nodeName, [
-            config('lighthouse.namespaces.scalars')
-        ]);
-        
+
+        if($directive = ASTHelper::directiveDefinition('scalar', $scalarNodeValue->getNode())){
+            $className = ASTHelper::directiveArgValue($directive, 'class');
+        } else {
+            $className = \namespace_classname($nodeName, [
+                config('lighthouse.namespaces.scalars')
+            ]);
+        }
+
         if(!$className){
             throw new \Exception("No class found for the scalar {$nodeName}");
         }
