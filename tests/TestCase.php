@@ -4,7 +4,6 @@ namespace Tests;
 
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\GraphQL;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
