@@ -78,7 +78,8 @@ class HasManyLoader extends BatchLoader
                 $parents->fetchForPage($count, $page, $eagerLoadRelationWithConstraints);
                 break;
             default:
-                $parents->fetch($eagerLoadRelationWithConstraints);
+                $parents = new \Illuminate\Database\Eloquent\Collection($parents);
+                $parents->load($eagerLoadRelationWithConstraints);
                 break;
         }
 

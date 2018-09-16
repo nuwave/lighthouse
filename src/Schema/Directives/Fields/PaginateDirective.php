@@ -139,10 +139,6 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
         $query = QueryUtils::applyFilters($query, $args);
         $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
 
-        Paginator::currentPageResolver(function () use ($page) {
-            return $page;
-        });
-
-        return $query->paginate($first);
+        return $query->paginate($first, ['*'], 'page', $page);
     }
 }

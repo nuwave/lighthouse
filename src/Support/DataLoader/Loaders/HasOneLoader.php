@@ -51,7 +51,8 @@ class HasOneLoader extends BatchLoader
 
         /** @var Collection $parents */
         $parents = collect($this->keys)->pluck('parent');
-        $parents->fetch($eagerLoadRelationWithConstraints);
+        $parents = new \Illuminate\Database\Eloquent\Collection($parents);
+        $parents->load($eagerLoadRelationWithConstraints);
 
         return $parents->mapWithKeys(function (Model $model) {
             return [$model->getKey() => $model->getRelation($this->relation)];
