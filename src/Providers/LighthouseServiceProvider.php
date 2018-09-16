@@ -8,8 +8,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Facades\Validator;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
@@ -26,15 +26,15 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../../config/config.php', 'lighthouse');
+        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
 
         $this->publishes([
-            __DIR__ . '/../../config/config.php' => config_path('lighthouse.php'),
-            __DIR__ . '/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
+            __DIR__.'/../../config/config.php' => config_path('lighthouse.php'),
+            __DIR__.'/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
         ]);
 
         if (config('lighthouse.controller')) {
-            $this->loadRoutesFrom(__DIR__ . '/../Support/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
 
         $this->registerCollectionMacros();
@@ -72,7 +72,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(MiddlewareRegistry::class);
         $this->app->singleton(TypeRegistry::class);
 
-        $this->app->bind(
+        $this->app->singleton(
             SchemaSourceProvider::class,
             function () {
                 return new SchemaStitcher(config('lighthouse.schema.register', ''));
@@ -171,7 +171,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 }
 
                 if (in_array($info->fieldName, $parameters)) {
-                    return !is_null($value);
+                    return ! is_null($value);
                 }
 
                 return true;
