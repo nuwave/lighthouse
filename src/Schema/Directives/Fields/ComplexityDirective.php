@@ -14,7 +14,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'complexity';
     }
@@ -29,18 +29,18 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
-        $complexityResolver = $this->getResolver(
-            function ($childrenComplexity, $args) {
-                $complexity = array_get($args, 'first', array_get($args, 'count', 1));
-
-                return $childrenComplexity * $complexity;
-            }
-        );
-        
         return $next(
-            $value->setComplexity($complexityResolver)
+            $value->setComplexity(
+                $this->directiveHasArgument('resolver')
+                ? $this->getMethodArgument('resolver')
+                : function ($childrenComplexity, $args) {
+                    $complexity = array_get($args, 'first', array_get($args, 'count', 1));
+
+                    return $childrenComplexity * $complexity;
+                }
+            )
         );
     }
 }

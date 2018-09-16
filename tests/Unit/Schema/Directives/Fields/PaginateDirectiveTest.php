@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use GraphQL\Type\Definition\FieldDefinition;
 
 class PaginateDirectiveTest extends TestCase
 {
@@ -17,16 +18,19 @@ class PaginateDirectiveTest extends TestCase
         $this->assertEquals($connection, $relay);
     }
 
-    protected function getConnectionQueryField($type)
+    protected function getConnectionQueryField(string $type): FieldDefinition
     {
-        return $this->buildSchemaFromString("
-        type Users {
-            name: String
-        }
-        
-        type Query {
-            users: [User!]! @paginate(type: \"$type\" model: \"User\")
-        }
-        ")->getQueryType()->getField('users');
+        return $this
+            ->buildSchemaFromString("
+            type Users {
+                name: String
+            }
+            
+            type Query {
+                users: [User!]! @paginate(type: \"$type\" model: \"User\")
+            }
+            ")
+            ->getQueryType()
+            ->getField('users');
     }
 }

@@ -115,6 +115,21 @@ class ASTHelper
     }
 
     /**
+     * Does the given directive have an argument of the given name?
+     *
+     * @param DirectiveNode $directiveDefinition
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
+    {
+        return collect($directiveDefinition->arguments)->contains(function(ArgumentNode $argumentNode) use ($name){
+            return $argumentNode->name->value === $name;
+        });
+    }
+
+    /**
      * @param DirectiveNode $directive
      * @param string $name
      * @param mixed|null $default
