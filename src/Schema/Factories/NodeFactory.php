@@ -85,6 +85,8 @@ class NodeFactory
      *
      * @param NodeValue $value
      *
+     * @throws DirectiveException
+     *
      * @return bool
      */
     protected function hasTypeResolver(NodeValue $value): bool
@@ -243,7 +245,16 @@ class NodeFactory
     
         $interfaceDefinition = $interfaceNodeValue->getNode();
         if($directive = ASTHelper::directiveDefinition('interface', $interfaceDefinition)){
-            $typeResolver = (new InterfaceDirective)->hydrate($interfaceDefinition)->getResolver();
+            $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
+
+            if($interfaceDirective->directiveHasArgument('resolveType')){
+                $typeResolver = $interfaceDirective->getMethodArgument('resolveType');
+            } else {
+                /**
+                 * @deprecated in v3 this will only be available as the argument resolveType
+                 */
+                $typeResolver = $interfaceDirective->getMethodArgument('resolver');
+            }
         } else {
             $interfaceClass = \namespace_classname($nodeName, [
                 config('lighthouse.namespaces.interfaces')
@@ -275,7 +286,16 @@ class NodeFactory
     
         $unionDefinition = $value->getNode();
         if($directive = ASTHelper::directiveDefinition('union', $unionDefinition)){
-            $typeResolver = (new UnionDirective)->hydrate($unionDefinition)->getResolver();
+            $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
+
+            if($unionDirective->directiveHasArgument('resolveType')){
+                $typeResolver = $unionDirective->getMethodArgument('resolveType');
+            } else {
+                /**
+                 * @deprecated in v3 this will only be available as the argument resolveType
+                 */
+                $typeResolver = $unionDirective->getMethodArgument('resolver');
+            }
         } else {
             $unionClass = \namespace_classname($nodeName, [
                 config('lighthouse.namespaces.unions')

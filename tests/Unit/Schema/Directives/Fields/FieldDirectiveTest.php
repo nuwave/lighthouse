@@ -9,6 +9,7 @@ class FieldDirectiveTest extends TestCase
 {
     /**
      * @test
+     * @deprecated this option of defining field resolvers will be removed in v3
      */
     public function itCanResolveFieldWithAssignedClass()
     {
@@ -54,7 +55,7 @@ class FieldDirectiveTest extends TestCase
     {
         $schema = '
         type Query {
-            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
+            bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args:["foo.baz"])
         }
         ';
         $query = '
@@ -70,12 +71,12 @@ class FieldDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsAnErrorIfNoClassIsDefined()
+    public function itThrowsAnErrorOnlyOnePartIsDefined()
     {
         $this->expectException(DirectiveException::class);
         $schema = '
         type Query {
-            bar: String! @field(method: "bar")
+            bar: String! @field(resolver: "bar")
         }
         ';
         $query = '
@@ -89,12 +90,12 @@ class FieldDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsAnErrorIfNoMethodIsDefined()
+    public function itThrowsAnErrorIfOnePartIsEmpty()
     {
         $this->expectException(DirectiveException::class);
         $schema = '
         type Query {
-            bar: String! @field(class: "Foo\\\Bar")
+            bar: String! @field(class: "Foo\\\Bar@")
         }
         ';
         $query = '

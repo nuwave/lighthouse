@@ -30,7 +30,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'node';
     }
@@ -45,13 +45,13 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value, \Closure $next)
+    public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {
         $typeName = $value->getNodeName();
         
         $this->nodeRegistry->registerNode(
             $typeName,
-            $this->getResolver()
+            $this->getMethodArgument('resolver')
         );
 
         return $next($value);
@@ -65,7 +65,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $documentAST)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
         return ASTHelper::attachNodeInterfaceToObjectType($node, $documentAST);
     }

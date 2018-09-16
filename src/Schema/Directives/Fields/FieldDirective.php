@@ -14,7 +14,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'field';
     }
@@ -28,9 +28,27 @@ class FieldDirective extends BaseDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
-        $resolver = $this->getResolver();
+        if($this->directiveHasArgument('resolver')){
+            $resolver = $this->getMethodArgument('resolver');
+        } else {
+            /**
+             * @deprecated This behaviour will be removed in v3
+             *
+             * The only way to define methods will be via the resolver: "Class@method" style
+             */
+            $className = $this->namespaceClassName(
+                $this->directiveArgValue('class')
+            );
+            $methodName = $this->directiveArgValue('method');
+            if (! method_exists($className, $methodName)) {
+                throw new DirectiveException("Method '{$methodName}' does not exist on class '{$className}'");
+            }
+
+            $resolver = \Closure::fromCallable([resolve($className), $methodName]);
+        }
+
         $additionalData = $this->directiveArgValue('args');
 
         return $value->setResolver(

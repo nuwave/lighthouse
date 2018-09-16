@@ -6,6 +6,8 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PaginateDirectiveTest extends DBTestCase
@@ -51,6 +53,43 @@ class PaginateDirectiveTest extends DBTestCase
         $this->assertEquals(10, array_get($result->data, 'users.paginatorInfo.total'));
         $this->assertEquals(1, array_get($result->data, 'users.paginatorInfo.currentPage'));
         $this->assertCount(5, array_get($result->data, 'users.data'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanSpecifyCustomBuilder()
+    {
+        factory(User::class, 2)->create();
+
+        $schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users: [User!]! @paginate(type: "paginator" builder: "Tests\\\Integration\\\Schema\\\Directives\\\Fields\\\PaginateDirectiveTest@builder")
+        }
+        ';
+
+        $query = '
+        {
+            users(count: 1) {
+                data {
+                    id
+                }
+            }
+        }
+        ';
+
+        $result = $this->execute($schema, $query);
+        $this->assertSame('2', array_get($result, 'data.users.data.0.id'), 'The custom builder did not change the sort order correctly.');
+    }
+
+    public function builder($root, array $args, $context, ResolveInfo $resolveInfo): Builder
+    {
+        return User::orderBy('id', 'DESC');
     }
 
     /**
