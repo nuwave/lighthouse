@@ -48,18 +48,22 @@ class HasManyLoader extends BatchLoader
      */
     public function resolve(): array
     {
-        $eagerLoadRelationWithConstraints = [$this->relation => function ($query) {
-            foreach ($this->scopes as $scope) {
-                call_user_func_array([$query, $scope], [$this->resolveArgs]);
-            }
+        $eagerLoadRelationWithConstraints = [$this->relation =>
+            function ($query) {
+                foreach ($this->scopes as $scope) {
+                    call_user_func_array([$query, $scope], [$this->resolveArgs]);
+                }
 
-            $query->when(isset($args['query.filter']), function ($q) {
-                return QueryFilter::build($q, $this->resolveArgs);
-            });
-        }];
+                $query->when(isset($args['query.filter']), function ($q) {
+                    return QueryFilter::build($q, $this->resolveArgs);
+                });
+            }
+        ];
 
         /** @var Collection $parents */
-        $parents = collect($this->keys)->pluck('parent');
+        $parents = collect($this->keys)
+            ->pluck('parent');
+
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
             case PaginationManipulator::PAGINATION_ALIAS_RELAY:
@@ -78,8 +82,8 @@ class HasManyLoader extends BatchLoader
                 $parents->fetchForPage($count, $page, $eagerLoadRelationWithConstraints);
                 break;
             default:
-                $parents = new \Illuminate\Database\Eloquent\Collection($parents);
-                $parents->load($eagerLoadRelationWithConstraints);
+                // Using our own Collection macro
+                $parents->fetch($eagerLoadRelationWithConstraints);
                 break;
         }
 
