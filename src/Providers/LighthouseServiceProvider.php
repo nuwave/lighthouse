@@ -96,6 +96,8 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     protected function registerCollectionMacros()
     {
+        // TODO remove and just use load() as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
+        // This fixes the behaviour of how eager loading queries are built
         Collection::macro('fetch', function ($eagerLoadRelations = null) {
             if (count($this->items) > 0) {
                 if (is_string($eagerLoadRelations)) {

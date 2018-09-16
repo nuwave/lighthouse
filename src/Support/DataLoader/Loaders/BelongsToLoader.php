@@ -28,16 +28,19 @@ class BelongsToLoader extends BatchLoader
      */
     public function resolve(): array
     {
-        $parents = \Illuminate\Database\Eloquent\Collection::make(
-            collect($this->keys)->pluck('parent')
-        );
-
-        return $parents->load([$this->relation => function ($query) {
-            $query->when(isset($args['query.filter']), function ($query) {
-                return QueryFilter::build($query, $this->resolveArgs);
-            });
-        }])->mapWithKeys(function (Model $model) {
-            return [$model->getKey() => $model->getRelation($this->relation)];
-        })->all();
+        return collect($this->keys)
+            ->pluck('parent')
+            // Using our own Collection macro
+            ->fetch([$this->relation =>
+                function ($query) {
+                    $query->when(isset($args['query.filter']), function ($query) {
+                        return QueryFilter::build($query, $this->resolveArgs);
+                    });
+                }
+            ])
+            ->mapWithKeys(function (Model $model) {
+                return [$model->getKey() => $model->getRelation($this->relation)];
+            })
+            ->all();
     }
 }
