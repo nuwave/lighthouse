@@ -34,6 +34,7 @@ class QueryBuilderTest extends DBTestCase
     public function itCanLoadRelationshipsWithLimitsOnCollection()
     {
         $users = User::all();
+        // TODO remove this as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
         $users->fetch(['tasks' => function ($query) {
             $query->take(3);
         }]);
