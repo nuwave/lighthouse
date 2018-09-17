@@ -2,22 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Language\AST\TypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
@@ -27,36 +21,28 @@ class SchemaBuilder
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-
     /** @var ValueFactory */
     protected $valueFactory;
-
     /** @var NodeFactory */
     protected $nodeFactory;
-    
-    /** @var NodeRegistry */
-    protected $nodeRegistry;
-    
     /** @var DefinitionNodeConverter */
     protected $definitionNodeConverter;
+
     /**
      * @param TypeRegistry $typeRegistry
      * @param ValueFactory $valueFactory
      * @param NodeFactory $nodeFactory
-     * @param NodeRegistry $nodeRegistry
      * @param DefinitionNodeConverter $definitionNodeConverter
      */
     public function __construct(
         TypeRegistry $typeRegistry,
         ValueFactory $valueFactory,
         NodeFactory $nodeFactory,
-        NodeRegistry $nodeRegistry,
         DefinitionNodeConverter $definitionNodeConverter
     ) {
         $this->typeRegistry = $typeRegistry;
         $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
-        $this->nodeRegistry = $nodeRegistry;
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
     
@@ -65,38 +51,11 @@ class SchemaBuilder
      *
      * @param DocumentAST $documentAST
      *
-     * @throws ParseException
-     *
      * @return Schema
      */
     public function build($documentAST)
     {
-        $usesGlobalNodeInterface = $this->containsTypeThatImplementsNodeInterface($documentAST);
-        
-        if($usesGlobalNodeInterface){
-            $documentAST->unlock();
-            $nodeQuery = PartialParser::fieldDefinition(
-                'node(id: ID!): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
-            );
-            $documentAST->addFieldToQueryType($nodeQuery);
-        }
-        
         $types = $this->convertTypes($documentAST);
-        if($usesGlobalNodeInterface){
-            $types->push(new InterfaceType([
-                'name' => 'Node',
-                'description' => 'Interface for types that have a globally unique ID',
-                'fields' => [
-                    config('lighthouse.global_id_field') => [
-                        'type' => Type::nonNull(Type::id()),
-                        'description' => 'Global ID that can be used to resolve any type that implements the Node interface.'
-                    ]
-                ],
-                'resolveType' => function() {
-                    return $this->nodeRegistry->resolveType();
-                }
-            ]));
-        }
         $types->each(function (Type $type) {
             // Register in global type registry
             $this->typeRegistry->register($type);
@@ -202,23 +161,5 @@ class SchemaBuilder
                 ]);
             }
         );
-    }
-    
-    /**
-     * Determine if the DocumentAST contains a type that implements the Node interface.
-     *
-     * @param DocumentAST $documentAST
-     *
-     * @return bool
-     */
-    protected function containsTypeThatImplementsNodeInterface(DocumentAST $documentAST): bool
-    {
-        return $documentAST->objectTypeDefinitions()
-            ->contains(function (ObjectTypeDefinitionNode $objectType) {
-                return collect($objectType->interfaces)
-                    ->contains(function (NamedTypeNode $interface) {
-                        return 'Node' === $interface->name->value;
-                    });
-            });
     }
 }

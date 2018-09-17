@@ -236,7 +236,7 @@ class ASTHelper
         );
     
         $globalIdFieldDefinition = PartialParser::fieldDefinition(
-            config('lighthouse.global_id_field') .': ID! @field(resolver: "Nuwave\\\Lighthouse\\\Execution\\\Utils\\\GlobalId@resolveIdField")'
+            config('lighthouse.global_id_field') .': ID! @globalId'
         );
         $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
         

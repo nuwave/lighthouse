@@ -2,19 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class GlobalIdDirective extends BaseDirective implements FieldMiddleware
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMiddleware
 {
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'globalId';
     }
@@ -27,19 +30,39 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $type = $value->getNodeName();
         $resolver = $value->getResolver();
 
         return $next(
             $value->setResolver(
-                function () use ($resolver, $type) {
+                function ($root, $args, $context, ResolveInfo $resolveInfo) use ($type, $resolver){
                     $resolvedValue = call_user_func_array($resolver, func_get_args());
 
-                    return 'encode' === $this->directiveArgValue('process', 'encode')
-                        ? GlobalId::encode($type, $resolvedValue)
-                        : GlobalId::decode($resolvedValue);
+                    return GlobalId::encode(
+                        $type,
+                        $resolvedValue
+                    );
+                }
+            )
+        );
+    }
+
+    /**
+     * Apply transformations on the ArgumentValue.
+     *
+     * @param ArgumentValue $argument
+     * @param \Closure $next
+     *
+     * @return ArgumentValue
+     */
+    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
+    {
+        return $next(
+            $argument->setResolver(
+                function ($globalId) {
+                    return GlobalId::decode($globalId);
                 }
             )
         );

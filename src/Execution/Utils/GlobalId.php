@@ -67,22 +67,4 @@ class GlobalId
         list($type, $id) = self::decode($globalID);
         return $type;
     }
-    
-    /**
-     * This function is the resolver for global id fields.
-     *
-     * @param $parentValue
-     * @param $args
-     * @param $context
-     * @param ResolveInfo $resolveInfo
-     *
-     * @return string
-     */
-    public static function resolveIdField($parentValue, $args, $context, ResolveInfo $resolveInfo): string
-    {
-        return self::encode(
-            $resolveInfo->parentType->name,
-            data_get($parentValue, config('lighthouse.global_id_field'))
-        );
-    }
 }
