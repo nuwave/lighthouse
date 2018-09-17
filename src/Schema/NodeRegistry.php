@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 
 class NodeRegistry
 {
@@ -94,8 +93,7 @@ class NodeRegistry
      */
     public function resolve($rootValue, $args, $context, ResolveInfo $resolveInfo)
     {
-        $globalID = $args['id'];
-        list($decodedType, $decodedId) = GlobalId::decode($globalID);
+        list($decodedType, $decodedId) = $args['id'];
 
         // Check if we have a resolver registered for the given type
         if (! $resolver = array_get($this->nodeResolver, $decodedType)) {

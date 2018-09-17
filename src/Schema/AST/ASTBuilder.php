@@ -4,11 +4,14 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -18,6 +21,9 @@ class ASTBuilder
 {
     /**
      * @param string $schema
+     *
+     * @throws DocumentASTException
+     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -34,6 +40,8 @@ class ASTBuilder
         $document = self::applyArgManipulators($document);
 
         $document = self::addPaginationInfoTypes($document);
+        $document = self::addNodeSupport($document);
+
         $document = resolve(ExtensionRegistry::class)->manipulate($document);
 
         return $document;
@@ -52,9 +60,12 @@ class ASTBuilder
             ->reduce(function (DocumentAST $document, Node $node) {
                 $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
 
-                return $nodeManipulators->reduce(function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
-                    return $nodeManipulator->manipulateSchema($node, $document);
-                }, $document);
+                return $nodeManipulators->reduce(
+                    function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
+                        return $nodeManipulator->manipulateSchema($node, $document);
+                    },
+                    $document
+                );
             }, $document);
     }
 
@@ -65,23 +76,25 @@ class ASTBuilder
      */
     protected static function mergeTypeExtensions(DocumentAST $document): DocumentAST
     {
-        $document->objectTypeDefinitions()->each(function (ObjectTypeDefinitionNode $objectType) use ($document) {
-            $name = $objectType->name->value;
+        $document->objectTypeDefinitions()->each(
+            function (ObjectTypeDefinitionNode $objectType) use ($document) {
+                $name = $objectType->name->value;
 
-            $document->typeExtensionDefinitions($name)->reduce(function (
-                ObjectTypeDefinitionNode $relatedObjectType,
-                TypeExtensionNode $typeExtension
-            ) {
-                /** @var NodeList $fields */
-                $fields = $relatedObjectType->fields;
-                $relatedObjectType->fields = $fields->merge($typeExtension->fields);
+                $document->typeExtensionDefinitions($name)->reduce(
+                    function (ObjectTypeDefinitionNode $relatedObjectType, TypeExtensionNode $typeExtension) {
+                        /** @var NodeList $fields */
+                        $fields = $relatedObjectType->fields;
+                        $relatedObjectType->fields = $fields->merge($typeExtension->fields);
 
-                return $relatedObjectType;
-            }, $objectType);
+                        return $relatedObjectType;
+                    },
+                    $objectType
+                );
 
-            // Modify the original document by overwriting the definition with the merged one
-            $document->setDefinition($objectType);
-        });
+                // Modify the original document by overwriting the definition with the merged one
+                $document->setDefinition($objectType);
+            }
+        );
 
         return $document;
     }
@@ -93,24 +106,23 @@ class ASTBuilder
      */
     protected static function applyFieldManipulators(DocumentAST $document): DocumentAST
     {
-        return $document->objectTypeDefinitions()->reduce(function (
-            DocumentAST $document,
-            ObjectTypeDefinitionNode $objectType
-        ) {
-            return collect($objectType->fields)->reduce(function (
-                DocumentAST $document,
-                FieldDefinitionNode $fieldDefinition
-            ) use ($objectType) {
-                $fieldManipulators = resolve(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
+        return $document->objectTypeDefinitions()->reduce(
+            function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) {
+                return collect($objectType->fields)->reduce(
+                    function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType) {
+                        $fieldManipulators = resolve(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
 
-                return $fieldManipulators->reduce(function (
-                    DocumentAST $document,
-                    FieldManipulator $fieldManipulator
-                ) use ($fieldDefinition, $objectType) {
-                    return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document);
-                }, $document);
-            }, $document);
-        }, $document);
+                        return $fieldManipulators->reduce(
+                            function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType) {
+                                return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document);
+                            },
+                            $document
+                        );
+                    },
+                    $document);
+            },
+            $document
+        );
     }
 
     /**
@@ -136,17 +148,25 @@ class ASTBuilder
                                     ) {
                                         return $argManipulator->manipulateSchema($argDefinition, $parentField,
                                             $parentType, $document);
-                                    }, $document);
-                            }, $document);
-                    }, $document);
-            }, $document);
+                                    },
+                                    $document
+                                );
+                            },
+                            $document
+                        );
+                    },
+                    $document
+                );
+            },
+            $document
+        );
     }
 
     /**
      * @param DocumentAST $document
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DocumentASTException
-     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
+     * @throws DocumentASTException
+     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -209,6 +229,52 @@ class ASTBuilder
         }
         ');
         $document->setDefinition($pageInfo);
+
+        return $document;
+    }
+
+    /**
+     * Inject the node type and a node field into Query.
+     *
+     * @param DocumentAST $document
+     *
+     * @throws ParseException
+     * @throws DocumentASTException
+     *
+     * @return DocumentAST
+     */
+    protected static function addNodeSupport(DocumentAST $document): DocumentAST
+    {
+        $hasTypeImplementingNode = $document->objectTypeDefinitions()
+            ->contains(function (ObjectTypeDefinitionNode $objectType) {
+                return collect($objectType->interfaces)
+                    ->contains(function (NamedTypeNode $interface) {
+                        return 'Node' === $interface->name->value;
+                    });
+            });
+
+        // Only add the node type and node field if a type actually implements them
+        // Otherwise, a validation error is thrown
+        if (! $hasTypeImplementingNode) {
+            return $document;
+        }
+
+        $globalId = config('lighthouse.global_id_field');
+        // Double slashes to escape the slashes in the namespace.
+        $interface = PartialParser::interfaceTypeDefinition(<<<GRAPHQL
+"Node global interface"	
+interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {	
+  "Global identifier that can be used to resolve any Node implementation."
+  $globalId: ID!	
+}	
+GRAPHQL
+);
+        $document->setDefinition($interface);
+
+        $nodeQuery = PartialParser::fieldDefinition(
+            'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
+        );
+        $document->addFieldToQueryType($nodeQuery);
 
         return $document;
     }
