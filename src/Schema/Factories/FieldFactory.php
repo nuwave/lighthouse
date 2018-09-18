@@ -83,7 +83,7 @@ class FieldFactory
             'type' => $fieldValue->getType(),
             'args' => $inputValueDefinitions->toArray(),
             'resolve' => $resolverWithMiddleware,
-            'description' => $fieldValue->getDescription(),
+            'description' => data_get($fieldValue->getDescription(), 'value'),
             'complexity' => $fieldValue->getComplexity(),
         ];
     }

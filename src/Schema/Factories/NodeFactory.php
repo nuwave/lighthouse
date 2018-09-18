@@ -161,7 +161,7 @@ class NodeFactory
                     return [
                         $field->name->value => [
                             'value' => ASTHelper::directiveArgValue($directive, 'value'),
-                            'description' => $field->description
+                            'description' => data_get($field, 'description.value'),
                         ]
                     ];
                 })->toArray(),
@@ -193,7 +193,7 @@ class NodeFactory
         
         return new $className([
             'name' => $nodeName,
-            'description' => $scalarNodeValue->getNode()->description,
+            'description' => data_get($scalarNodeValue->getNode(), 'description.value'),
         ]);
     }
     
@@ -206,7 +206,7 @@ class NodeFactory
     {
         return new ObjectType([
             'name' => $value->getNodeName(),
-            'description' => $value->getNode()->description,
+            'description' => data_get($value->getNode(), 'description.value'),
             'fields' => $this->resolveFieldsFunction($value),
             'interfaces' => function () use ($value) {
                 return $value->getInterfaceNames()
@@ -227,7 +227,7 @@ class NodeFactory
     {
         return new InputObjectType([
             'name' => $value->getNodeName(),
-            'description' => $value->getNode()->description,
+            'description' => data_get($value->getNode(), 'description.value'),
             'fields' => $this->resolveFieldsFunction($value),
         ]);
     }
@@ -267,7 +267,7 @@ class NodeFactory
     
         return new InterfaceType([
             'name' => $nodeName,
-            'description' => $interfaceNodeValue->getNode()->description,
+            'description' => data_get($interfaceNodeValue->getNode(), 'description.value'),
             'fields' => $this->resolveFieldsFunction($interfaceNodeValue),
             'resolveType' => $typeResolver,
         ]);
@@ -308,7 +308,7 @@ class NodeFactory
         
         return new UnionType([
             'name' => $nodeName,
-            'description' => $value->getNode()->description,
+            'description' => data_get($value->getNode(), 'description.value'),
             'types' => function () use ($value) {
                 return collect($value->getNode()->types)
                     ->map(function ($type) {

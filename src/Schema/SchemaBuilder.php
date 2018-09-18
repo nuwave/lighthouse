@@ -153,7 +153,7 @@ class SchemaBuilder
                         return new FieldArgument([
                             'name' => $argument->name->value,
                             'defaultValue' => data_get($argument, 'defaultValue.value', null),
-                            'description' => $argument->description,
+                            'description' => data_get($argument, 'description.value'),
                             'type' => $this->definitionNodeConverter->toType($argument->type),
                         ]);
                     })->toArray(),
