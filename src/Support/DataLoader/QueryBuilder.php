@@ -104,16 +104,16 @@ class QueryBuilder
         $relation = $builder->getRelation($options['name']);
         $relationQueries = $this->getRelationQueries($builder, $models, $options['name'], $constraints);
 
-        // Just get the first of the relations to have an instance available
-        $relatedModel = $relationQueries->first()->getModel();
-        $relatedTable = $relatedModel->getTable();
-        $relatedConnection = $relatedModel->getConnection();
-
-        $relationQueries = $relationQueries->map(function (Relation $relation) use ($options) {
-            return $relation->when($options['paginated'], function (Builder $query) use ($options) {
-                return $query->forPage($options['page'], $options['perPage']);
-            });
-        });
+        $relationQueries = $relationQueries->map(
+            function (Relation $relation) use ($options) {
+                return $relation->when(
+                    $options['paginated'],
+                    function (Builder $query) use ($options) {
+                        return $query->forPage($options['page'], $options['perPage']);
+                    }
+                );
+            }
+        );
 
         /** @var Builder $unitedRelations */
         $unitedRelations = $relationQueries->reduce(
@@ -125,22 +125,39 @@ class QueryBuilder
             $relationQueries->shift()->getQuery()
         );
 
+        // Just get the first of the relations to have an instance available
+        $relatedModel = $relationQueries->first()->getModel();
+        
         // Set the connection of the related model on the database manager and get a Builder instance
-        $baseQuery = $this->databaseManager->connection($relatedConnection->getName())->query();
+        $baseQuery = $this->databaseManager->connection(
+             $relatedModel->getConnection()->getName()
+        )->query();
 
-        $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($this->tableAlias($relatedTable));
-        $results = $baseQuery->select()
-            ->from($baseQuery->raw($fromExpression))
-            ->setBindings($unitedRelations->getBindings())
+        $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap(
+            $this->tableAlias($relatedModel->getTable())
+        );
+        
+        $results = $baseQuery
+            ->select()
+            ->from(
+                $baseQuery->raw($fromExpression)
+            )
+            ->setBindings(
+                $unitedRelations->getBindings()
+            )
             ->get();
 
         $hydrated = $this->hydrate($relatedModel, $relation, $results);
-        $collection = $this->loadDefaultWith($relatedModel->newCollection($hydrated));
+        $collection = $this->loadDefaultWith(
+            $relatedModel->newCollection($hydrated)
+        );
         $matched = $relation->match($models, $collection, $options['name']);
 
         if ($options['paginated']) {
             foreach ($matched as $model) {
-                $total = $model->getAttribute(snake_case($options['name']).'_count');
+                $total = $model->getAttribute(
+                    snake_case($options['name']).'_count'
+                );
                 $paginator = app()->makeWith(LengthAwarePaginator::class, [
                     'items' => $model->getRelation($options['name']),
                     'total' => $total,
