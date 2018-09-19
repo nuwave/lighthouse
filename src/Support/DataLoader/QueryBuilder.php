@@ -107,7 +107,7 @@ class QueryBuilder
         // Just get the first of the relations to have an instance available
         $relatedModel = $relationQueries->first()->getModel();
         
-        if($options['paginated']{
+        if($options['paginated']){
             $relationQueries = $relationQueries->map(
                 function (Relation $relation) use ($options) {
                     return $relation->forPage($options['page'], $options['perPage']);
