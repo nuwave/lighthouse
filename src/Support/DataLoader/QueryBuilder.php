@@ -107,6 +107,7 @@ class QueryBuilder
         // Just get the first of the relations to have an instance available
         $relatedModel = $relationQueries->first()->getModel();
         $relatedTable = $relatedModel->getTable();
+        $relatedConnection = $relatedModel->getConnection();
 
         $relationQueries = $relationQueries->map(function (Relation $relation) use ($options) {
             return $relation->when($options['paginated'], function (Builder $query) use ($options) {
@@ -124,7 +125,9 @@ class QueryBuilder
             $relationQueries->shift()->getQuery()
         );
 
-        $baseQuery = $this->databaseManager->query();
+        // Set the connection of the related model on the database manager and get a Builder instance
+        $baseQuery = $this->databaseManager->connection($relatedConnection->getName())->query();
+
         $fromExpression = '('.$unitedRelations->toSql().') as '.$baseQuery->grammar->wrap($this->tableAlias($relatedTable));
         $results = $baseQuery->select()
             ->from($baseQuery->raw($fromExpression))
