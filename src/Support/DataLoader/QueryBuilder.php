@@ -104,16 +104,16 @@ class QueryBuilder
         $relation = $builder->getRelation($options['name']);
         $relationQueries = $this->getRelationQueries($builder, $models, $options['name'], $constraints);
 
-        $relationQueries = $relationQueries->map(
-            function (Relation $relation) use ($options) {
-                return $relation->when(
-                    $options['paginated'],
-                    function (Builder $query) use ($options) {
-                        return $query->forPage($options['page'], $options['perPage']);
-                    }
-                );
-            }
-        );
+        // Just get the first of the relations to have an instance available
+        $relatedModel = $relationQueries->first()->getModel();
+        
+        if($options['paginated']{
+            $relationQueries = $relationQueries->map(
+                function (Relation $relation) use ($options) {
+                    return $relation->forPage($options['page'], $options['perPage']);
+                }
+            );
+        }
 
         /** @var Builder $unitedRelations */
         $unitedRelations = $relationQueries->reduce(
@@ -124,9 +124,6 @@ class QueryBuilder
             // Use the first query as the initial starting point
             $relationQueries->shift()->getQuery()
         );
-
-        // Just get the first of the relations to have an instance available
-        $relatedModel = $relationQueries->first()->getModel();
         
         // Set the connection of the related model on the database manager and get a Builder instance
         $baseQuery = $this->databaseManager->connection(
