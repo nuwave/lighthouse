@@ -71,9 +71,9 @@ class SchemaBuilder
             ->setDirectives(
                 $this->convertDirectives($documentAST)->toArray()
             )
-            ->setTypeLoader(function ($name) {
-                return $this->typeRegistry->get($name);
-            });
+            ->setTypeLoader(
+                [$this->typeRegistry, 'get']
+            );
 
         // Those are optional so only add them if they are present in the schema
         if ($mutation = $types->firstWhere('name', 'Mutation')) {
@@ -127,9 +127,7 @@ class SchemaBuilder
     {
         return $document->typeDefinitions()
             ->map(function (TypeDefinitionNode $typeDefinition) {
-                $nodeValue = $this->valueFactory->node($typeDefinition);
-
-                return $this->nodeFactory->handle($nodeValue);
+                return $this->nodeFactory->handle($typeDefinition);
             });
     }
 
@@ -146,14 +144,15 @@ class SchemaBuilder
             function (DirectiveDefinitionNode $directive) {
                 return new Directive([
                     'name' => $directive->name->value,
+                    'description' => data_get($directive->description, 'value'),
                     'locations' => collect($directive->locations)->map(function ($location) {
                         return $location->value;
                     })->toArray(),
                     'args' => collect($directive->arguments)->map(function (InputValueDefinitionNode $argument) {
                         return new FieldArgument([
                             'name' => $argument->name->value,
-                            'defaultValue' => data_get($argument, 'defaultValue.value', null),
-                            'description' => data_get($argument, 'description.value'),
+                            'defaultValue' => data_get($argument->defaultValue, 'value'),
+                            'description' => data_get($argument->description, 'value'),
                             'type' => $this->definitionNodeConverter->toType($argument->type),
                         ]);
                     })->toArray(),

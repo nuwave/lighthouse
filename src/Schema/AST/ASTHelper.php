@@ -184,12 +184,12 @@ class ASTHelper
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *
-     * @param string|null                   $name
-     * @param Node|null $definitionNode
+     * @param Node $definitionNode
+     * @param string $name
      *
      * @return DirectiveNode|null
      */
-    public static function directiveDefinition(string $name, Node $definitionNode)
+    public static function directiveDefinition(Node $definitionNode, string $name)
     {
         return collect($definitionNode->directives)
             ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
@@ -208,8 +208,8 @@ class ASTHelper
     public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
     {
         $namespaceDirective = static::directiveDefinition(
-            (new NamespaceDirective)->name(),
-            $definitionNode
+            $definitionNode,
+            (new NamespaceDirective)->name()
         );
     
         return $namespaceDirective

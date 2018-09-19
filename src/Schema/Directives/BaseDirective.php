@@ -42,7 +42,10 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveDefinition(): DirectiveNode
     {
-        return ASTHelper::directiveDefinition(static::name(), $this->definitionNode);
+        return ASTHelper::directiveDefinition(
+            $this->definitionNode,
+            static::name()
+        );
     }
 
     /**
@@ -55,7 +58,11 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, $default = null)
     {
-        return ASTHelper::directiveArgValue($this->directiveDefinition(), $name, $default);
+        return ASTHelper::directiveArgValue(
+            $this->directiveDefinition(),
+            $name,
+            $default
+        );
     }
 
     /**
@@ -67,7 +74,10 @@ abstract class BaseDirective implements Directive
      */
     public function directiveHasArgument(string $name): bool
     {
-        return ASTHelper::directiveHasArgument($this->directiveDefinition(), $name);
+        return ASTHelper::directiveHasArgument(
+            $this->directiveDefinition(),
+            $name
+        );
     }
 
     /**
@@ -148,7 +158,13 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(string $classCandidate, array $namespacesToTry = []): string
     {
         // Always try the explicitly set namespace first
-        \array_unshift($namespacesToTry, ASTHelper::getNamespaceForDirective($this->definitionNode, static::name()));
+        \array_unshift(
+            $namespacesToTry,
+            ASTHelper::getNamespaceForDirective(
+                $this->definitionNode,
+                static::name()
+            )
+        );
 
         if(!$className = \namespace_classname($classCandidate, $namespacesToTry)){
             throw new DirectiveException("No class '$classCandidate' was found for directive '{$this->name()}'");

@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldFactory
@@ -45,19 +46,20 @@ class FieldFactory
      *
      * @param FieldValue $fieldValue
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws DirectiveException
      *
      * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
-        $fieldValue->setType(
-            $this->definitionNodeConverter->toType(
-                $fieldValue->getField()->type
-            )
+        $fieldDefinition = $fieldValue->getField();
+    
+        $fieldType = $this->definitionNodeConverter->toType(
+            $fieldDefinition->type
         );
+        $fieldValue->setType($fieldType);
 
-        $initialResolver = $this->hasResolverDirective($fieldValue)
+        $initialResolver = $this->directiveRegistry->hasFieldResolver($fieldDefinition)
             ? $this->useResolverDirective($fieldValue)
             : $this->defaultResolver($fieldValue);
 
@@ -69,7 +71,9 @@ class FieldFactory
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through($this->directiveRegistry->fieldMiddleware($fieldValue->getField()))
+            ->through(
+                $this->directiveRegistry->fieldMiddleware($fieldDefinition)
+            )
             ->via('handleField')
             ->then(function (FieldValue $fieldValue) {
                 return $fieldValue;
@@ -79,25 +83,13 @@ class FieldFactory
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
-            'name' => $fieldValue->getFieldName(),
-            'type' => $fieldValue->getType(),
+            'name' => $fieldDefinition->name->value,
+            'type' => $fieldType,
             'args' => $inputValueDefinitions->toArray(),
             'resolve' => $resolverWithMiddleware,
-            'description' => data_get($fieldValue->getDescription(), 'value'),
+            'description' => data_get($fieldDefinition->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
         ];
-    }
-
-    /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return bool
-     */
-    protected function hasResolverDirective(FieldValue $value): bool
-    {
-        return $this->directiveRegistry->hasResolver($value->getField());
     }
 
     /**
@@ -105,7 +97,7 @@ class FieldFactory
      *
      * @param FieldValue $value
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws DirectiveException
      *
      * @return \Closure
      */
@@ -128,11 +120,19 @@ class FieldFactory
     {
         switch ($fieldValue->getNodeName()) {
             case 'Mutation':
-                return $this->rootOperationResolver($fieldValue->getFieldName(), 'mutations');
+                return $this->rootOperationResolver(
+                    $fieldValue->getFieldName(),
+                    'mutations'
+                );
             case 'Query':
-                return $this->rootOperationResolver($fieldValue->getFieldName(), 'queries');
+                return $this->rootOperationResolver(
+                    $fieldValue->getFieldName(),
+                    'queries'
+                );
             default:
-                return \Closure::fromCallable([\GraphQL\Executor\Executor::class, 'defaultFieldResolver']);
+                return \Closure::fromCallable(
+                    [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
+                );
         }
     }
 
