@@ -35,7 +35,8 @@
         "laravel/scout": "^4.0",
         "mockery/mockery": "dev-master",
         "orchestra/testbench": "^3.6",
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^7.0",
+        "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
         "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflows - integrated with Laravel"

@@ -18,6 +18,7 @@ use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -39,6 +40,8 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->registerCollectionMacros();
         $this->registerValidator();
+
+        SubscriptionProvider::boot();
     }
 
     /**
@@ -89,6 +92,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
             ]);
         }
+
+        SubscriptionProvider::register($this->app);
     }
 
     /**
