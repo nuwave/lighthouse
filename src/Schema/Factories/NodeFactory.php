@@ -166,7 +166,7 @@ class NodeFactory
     {
         return new EnumType([
             'name' => $enumDefinition->name->value,
-            'description' => $enumDefinition->description->value,
+            'description' => data_get($enumDefinition->description, 'value'),
             'values' => collect($enumDefinition->values)
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     // Get the directive that is defined on the field itself

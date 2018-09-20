@@ -31,12 +31,12 @@ class NotEqualsFilterDirective extends BaseDirective implements ArgMiddleware
      */
     public function handleArgument(ArgumentValue $argument, \Closure $next)
     {
-        $arg = $argument->getArgName();
-        $argument = $this->injectFilter($argument, [
-            'resolve' => function ($query, $key, array $args) use ($arg) {
-                return $query->where($key, '<>', array_get($args, $arg));
-            },
-        ]);
+        $argument = $this->injectFilter(
+            $argument,
+            function ($query, string $columnName, $value) {
+                return $query->where($columnName, '<>', $value);
+            }
+        );
 
         return $next($argument);
     }

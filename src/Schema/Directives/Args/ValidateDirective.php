@@ -6,10 +6,10 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMiddleware
 {
@@ -33,7 +33,7 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $resolver = $value->getResolver();
 
@@ -68,23 +68,33 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
     }
 
     /**
-     * Resolve the field directive.
+     * Apply transformations on the ArgumentValue.
      *
-     * @param ArgumentValue $value
+     * @param ArgumentValue $argumentValue
      * @param \Closure $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value, \Closure $next)
+    public function handleArgument(ArgumentValue $argumentValue, \Closure $next): ArgumentValue
     {
-        $rules = $this->directiveArgValue('rules', []);
-
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
-            $rules
+        $argumentValue->rules = array_merge(
+            data_get($argumentValue, 'rules', []),
+            $this->directiveArgValue('rules', [])
         );
-
-        return $next($value->setValue($current));
+    
+        $argumentValue->messages = array_merge(
+            data_get($argumentValue, 'messages', []),
+            collect($this->directiveArgValue('messages', []))
+                ->mapWithKeys(
+                    function (string $message, string $path) use ($argumentValue) {
+                        return [
+                            "{$argumentValue->getName()}.{$path}" => $message
+                        ];
+                    }
+                )
+                ->toArray()
+        );
+    
+        return $next($argumentValue);
     }
 }

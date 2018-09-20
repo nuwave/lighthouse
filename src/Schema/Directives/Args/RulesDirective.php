@@ -3,11 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
-class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
+class RulesDirective extends BaseDirective implements ArgMiddleware
 {
     /**
      * Name of the directive.
@@ -22,30 +21,31 @@ class RulesDirective extends BaseDirective implements Directive, ArgMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param ArgumentValue $value
-     * @param \Closure       $next
+     * @param ArgumentValue $argumentValue
+     * @param \Closure $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value, \Closure $next)
+    public function handleArgument(ArgumentValue $argumentValue, \Closure $next)
     {
-        if (in_array($value->getField()->getNodeName(), ['Query', 'Mutation'])) {
-            return $value;
-        }
-
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
+        $argumentValue->rules = array_merge(
+            data_get($argumentValue, 'rules', []),
             $this->directiveArgValue('apply', [])
         );
-        $current['messages'] = array_merge(
-            array_get($value->getArg(), 'messages', []),
+        
+        $argumentValue->messages = array_merge(
+            data_get($argumentValue, 'messages', []),
             collect($this->directiveArgValue('messages', []))
-                ->mapWithKeys(function (string $message, string $path) use ($value) {
-                    return [$value->getArgName().".{$path}" => $message];
-                })->toArray()
+                ->mapWithKeys(
+                    function (string $message, string $path) use ($argumentValue) {
+                        return [
+                            "{$argumentValue->getAstNode()->name->value}.{$path}" => $message
+                        ];
+                    }
+                )
+                ->toArray()
         );
 
-        return $next($value->setValue($current));
+        return $next($argumentValue);
     }
 }

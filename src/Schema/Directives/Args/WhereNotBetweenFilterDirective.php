@@ -16,7 +16,7 @@ class WhereNotBetweenFilterDirective extends BaseDirective implements ArgMiddlew
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'whereNotBetween';
     }
@@ -29,17 +29,16 @@ class WhereNotBetweenFilterDirective extends BaseDirective implements ArgMiddlew
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next)
+    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
     {
-        $argument = $this->injectKeyedFilter($argument, [
-            'resolve' => function ($query, $key, array $args) {
-                $between = collect($args['resolveArgs'])->map(function ($arg) use ($args) {
-                    return array_get($args, $arg);
-                })->filter()->toArray();
-
-                return $query->whereNotBetween($key, $between);
+        $this->injectMultiArgumentFilter(
+            $argument,
+            function ($query, string $columnName, array $values) {
+            
+                return $query->whereNotBetween($columnName, $values);
             },
-        ]);
+            self::name()
+        );
 
         return $next($argument);
     }

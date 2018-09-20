@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Support\Database\QueryFilter;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 
 class HasOneLoader extends BatchLoader

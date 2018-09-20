@@ -17,7 +17,7 @@ class SearchDirective extends BaseDirective implements ArgMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'search';
     }
@@ -30,27 +30,27 @@ class SearchDirective extends BaseDirective implements ArgMiddleware
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next)
+    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
     {
-        $arg = $argument->getArgName();
-
         // Adds within method to specify custom index.
         $within = $this->directiveArgValue('within');
 
         $argument = $this->injectFilter(
-            $argument, [
-                'resolve' => function (Builder $query, $key, array $args) use ($arg, $within) {
-                    $class = get_class($query->getModel());
-                    /** @var \Laravel\Scout\Builder $query */
-                    $query = $class::search(array_get($args, $arg));
+            $argument,
+            function (Builder $query, string $columnName, $value) use ($within) {
+                $modelClass = get_class(
+                    $query->getModel()
+                );
+                
+                /** @var \Laravel\Scout\Builder $query */
+                $query = $modelClass::search($value);
 
-                    if (! is_null($within)) {
-                        $query->within($within);
-                    }
+                if (! is_null($within)) {
+                    $query->within($within);
+                }
 
-                    return $query;
-                },
-            ]
+                return $query;
+            }
         );
 
         return $next($argument);

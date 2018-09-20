@@ -181,11 +181,15 @@ class FieldFactory
      */
     protected function getInputValueDefinitions(FieldValue $fieldValue): Collection
     {
-        return collect(data_get($fieldValue->getField(), 'arguments', []))
+        return
+            collect(
+                // TODO remove this wrapping call once Fields are always FieldDefinitions
+                data_get($fieldValue->getField(), 'arguments')
+            )
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
                 $argValue = $this->valueFactory->arg($fieldValue, $inputValueDefinition);
 
-                return [$argValue->getArgName() => $this->argumentFactory->handle($argValue)];
+                return [$inputValueDefinition->name->value => $this->argumentFactory->handle($argValue)];
             });
     }
 
@@ -203,7 +207,7 @@ class FieldFactory
     protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
         return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
-            $inputArgs = $this->resolveArgs($inputArgs, $inputValueDefinitions);
+            $inputArgs = $this->transformArgs($inputArgs, $inputValueDefinitions);
 
             list($rules, $messages) = $this->getRulesAndMessages(
                 $rootValue,
@@ -235,30 +239,28 @@ class FieldFactory
     }
 
     /**
-     * Arguments may have resolves defined upon them.
+     * Arguments may have transformers defined upon them.
      *
      * This iterates through them and ensures they are called.
      *
-     * @param array      $inputArguments
+     * @param array $inputArguments
      * @param Collection<array> $argumentValues
      *
      * @return array
      */
-    protected function resolveArgs(array $inputArguments, Collection $inputValueDefinitions): array
+    protected function transformArgs(array $inputArguments, Collection $inputValueDefinitions): array
     {
-        $resolvers = $inputValueDefinitions->filter(function (array $inputValueDefinition) {
-            return array_has($inputValueDefinition, 'resolve');
-        });
-
-        if ($resolvers->isEmpty()) {
-            return $inputArguments;
-        }
-
         return collect($inputArguments)
-            ->map(function ($value, string $key) use ($resolvers) {
-                return $resolvers->has($key)
-                    ? $resolvers->get($key)['resolve']($value)
-                    : $value;
+            ->map(function($value, $key) use ($inputValueDefinitions){
+                $definition = $inputValueDefinitions->get($key);
+                
+                return collect($definition['transformers'])
+                    ->reduce(
+                        function($value, \Closure $transformer){
+                            return $transformer($value);
+                        },
+                        $value
+                    );
             })
             ->toArray();
     }
