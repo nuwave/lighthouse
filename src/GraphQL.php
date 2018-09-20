@@ -5,16 +5,16 @@ namespace Nuwave\Lighthouse;
 use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
-use Illuminate\Support\Facades\Cache;
 use GraphQL\Executor\ExecutionResult;
+use Illuminate\Support\Facades\Cache;
+use GraphQL\Validator\Rules\QueryDepth;
 use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Validator\Rules\QueryDepth;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Execution\HandlesErrors;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
@@ -45,10 +45,10 @@ class GraphQL
     protected $pipeline;
 
     /**
-     * @param ExtensionRegistry $extensionRegistry
-     * @param SchemaBuilder $schemaBuilder
+     * @param ExtensionRegistry    $extensionRegistry
+     * @param SchemaBuilder        $schemaBuilder
      * @param SchemaSourceProvider $schemaSourceProvider
-     * @param Pipeline $pipeline
+     * @param Pipeline             $pipeline
      */
     public function __construct(ExtensionRegistry $extensionRegistry, SchemaBuilder $schemaBuilder, SchemaSourceProvider $schemaSourceProvider, Pipeline $pipeline)
     {
@@ -65,9 +65,9 @@ class GraphQL
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
      * @param string $query
-     * @param null $context
-     * @param array $variables
-     * @param null $rootValue
+     * @param null   $context
+     * @param array  $variables
+     * @param null   $rootValue
      *
      * @return ExecutionResult
      */
@@ -105,7 +105,7 @@ class GraphQL
                     return $this->pipeline
                         ->send($error)
                         ->through($handlers)
-                        ->then(function (Error $error) use ($formatter){
+                        ->then(function (Error $error) use ($formatter) {
                             return $formatter($error);
                         });
                 },
@@ -128,11 +128,12 @@ class GraphQL
 
     /**
      * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
      *
      * @return array
+     *
      * @deprecated use executeQuery()->toArray() instead. This allows to control the debug settings.
      */
     public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
@@ -142,11 +143,12 @@ class GraphQL
 
     /**
      * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
+     * @param mixed  $context
+     * @param array  $variables
+     * @param mixed  $rootValue
      *
      * @return \GraphQL\Executor\ExecutionResult
+     *
      * @deprecated renamed to executeQuery to match webonyx/graphql-php
      */
     public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
@@ -163,7 +165,9 @@ class GraphQL
     {
         $documentAST = $this->documentAST();
 
-        return $this->schemaBuilder->build($documentAST);
+        $this->executableSchema = $this->schemaBuilder->build($documentAST);
+
+        return $this->executableSchema;
     }
 
     /**
@@ -173,7 +177,7 @@ class GraphQL
      */
     public function documentAST(): DocumentAST
     {
-        if (!$this->documentAST) {
+        if (! $this->documentAST) {
             $this->documentAST = config('lighthouse.cache.enable')
                 ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
                     return $this->buildAST();
@@ -200,8 +204,8 @@ class GraphQL
      * Return an instance of a BatchLoader for a specific field.
      *
      * @param string $loaderClass
-     * @param array $pathToField
-     * @param array $constructorArgs Those arguments are passed to the constructor of the instance
+     * @param array  $pathToField
+     * @param array  $constructorArgs Those arguments are passed to the constructor of the instance
      *
      * @throws \Exception
      *
@@ -217,7 +221,7 @@ class GraphQL
             ? resolve($instanceName)
             : app()->instance($instanceName, app()->makeWith($loaderClass, $constructorArgs));
 
-        if (!$instance instanceof BatchLoader) {
+        if (! $instance instanceof BatchLoader) {
             throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Support\DataLoader\BatchLoader");
         }
 
@@ -226,6 +230,7 @@ class GraphQL
 
     /**
      * @return DirectiveRegistry
+     *
      * @deprecated Use resolve() instead, will be removed in v3
      */
     public function directives(): DirectiveRegistry
@@ -235,6 +240,7 @@ class GraphQL
 
     /**
      * @return TypeRegistry
+     *
      * @deprecated Use resolve() instead, will be removed in v3
      */
     public function types(): TypeRegistry
@@ -244,6 +250,7 @@ class GraphQL
 
     /**
      * @return TypeRegistry
+     *
      * @deprecated Use resolve() instead, will be removed in v3
      */
     public function schema(): TypeRegistry
@@ -253,6 +260,7 @@ class GraphQL
 
     /**
      * @return MiddlewareRegistry
+     *
      * @deprecated Use resolve() instead, will be removed in v3
      */
     public function middleware(): MiddlewareRegistry
@@ -262,6 +270,7 @@ class GraphQL
 
     /**
      * @return NodeRegistry
+     *
      * @deprecated Use resolve() instead, will be removed in v3
      */
     public function nodes(): NodeRegistry
@@ -271,6 +280,7 @@ class GraphQL
 
     /**
      * @return ExtensionRegistry
+     *
      * @deprecated Use resolve() instead, will be removed in v3
      */
     public function extensions(): ExtensionRegistry
