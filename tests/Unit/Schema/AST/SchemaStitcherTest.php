@@ -172,4 +172,37 @@ EOT
 EOT
         );
     }
+
+    /**
+     * @test
+     */
+    public function itImportsViaGlob()
+    {
+        $this->putRootSchema(<<<EOT
+foo
+#import subdir/*.graphql
+
+EOT
+        );
+
+        $this->filesystem->createDir('subdir');
+        $this->filesystem->put('subdir/bar.graphql', <<<EOT
+bar
+
+EOT
+        );
+        $this->filesystem->put('subdir/other.graphql', <<<EOT
+other
+
+EOT
+        );
+
+        $this->assertSchemaResultIsSame(<<<EOT
+foo
+bar
+other
+
+EOT
+        );
+    }
 }
