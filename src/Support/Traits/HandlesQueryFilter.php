@@ -21,7 +21,7 @@ trait HandlesQueryFilter
      *
      * @return ArgumentValue
      */
-    protected function injectFilter(ArgumentValue $argument, \Closure $filter): ArgumentValue
+    protected function injectFilter(ArgumentValue &$argument, \Closure $filter): ArgumentValue
     {
         $parentField = $argument->getParentField();
         $query = QueryFilter::getInstance(
@@ -59,7 +59,7 @@ trait HandlesQueryFilter
      *
      * @return ArgumentValue
      */
-    protected function injectMultiArgumentFilter(ArgumentValue $argument, \Closure $filter, string $filterType): ArgumentValue
+    protected function injectMultiArgumentFilter(ArgumentValue &$argument, \Closure $filter, string $filterType): ArgumentValue
     {
         $parentField = $argument->getParentField();
         $query = QueryFilter::getInstance(

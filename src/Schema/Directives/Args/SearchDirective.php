@@ -35,7 +35,7 @@ class SearchDirective extends BaseDirective implements ArgMiddleware
         // Adds within method to specify custom index.
         $within = $this->directiveArgValue('within');
 
-        $argument = $this->injectFilter(
+        $this->injectFilter(
             $argument,
             function (Builder $query, string $columnName, $value) use ($within) {
                 $modelClass = get_class(

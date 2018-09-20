@@ -31,7 +31,7 @@ class NotInFilterDirective extends BaseDirective implements ArgMiddleware
      */
     public function handleArgument(ArgumentValue $argument, \Closure $next)
     {
-        $argument = $this->injectFilter(
+        $this->injectFilter(
             $argument,
             function ($query, string $columnName, array $values) {
                 return $query->whereNotIn($columnName, $values);

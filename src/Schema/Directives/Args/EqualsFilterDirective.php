@@ -31,7 +31,7 @@ class EqualsFilterDirective extends BaseDirective implements ArgMiddleware
      */
     public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
     {
-        $argument = $this->injectFilter(
+        $this->injectFilter(
             $argument,
             function ($query, string $columnName, $value) {
                 return $query->where($columnName, $value);
