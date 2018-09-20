@@ -53,7 +53,9 @@ class ArgumentFactory
         ];
         
         if($defaultValue = $definition->defaultValue){
-            $fieldArgument += compact($defaultValue);
+            $fieldArgument += [
+                'defaultValue' => $defaultValue
+            ];
         }
         
         // Add any dynamically declared public properties of the FieldArgument
