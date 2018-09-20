@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Schema\Subscriptions\Exceptions\UnauthorizedSubscriber;
 

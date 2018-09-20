@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Subscriptions;
 
 use Illuminate\Contracts\Foundation\Application;
+use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
 use Nuwave\Lighthouse\Schema\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Schema\Subscriptions\Storage\DatabaseStorage;
-use Nuwave\Lighthouse\Schema\Directives\Fields\SubscriptionExtension;
 use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Schema\Subscriptions\Directives\BroadcastDirective;

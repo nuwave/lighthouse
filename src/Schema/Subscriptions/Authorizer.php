@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Subscriptions;
 
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionRegistry as Registry;
 use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions as Storage;
 use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
