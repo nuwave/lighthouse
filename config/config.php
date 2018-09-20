@@ -170,4 +170,29 @@ return [
     |
     */
     'global_id_field' => 'id',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subscriptions
+    |--------------------------------------------------------------------------
+    |
+    | TODO: Add description
+    |
+    */
+    'subscriptions' => [
+        'auth' => [
+            'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@authorize',
+            'route_name' => 'graphql/subscriptions/auth',
+            'route' => [
+                'prefix' => '',
+            ],
+        ],
+        'webhook' => [
+            'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@webhook',
+            'route_name' => 'graphql/subscriptions/webhook',
+            'route' => [
+                'prefix' => '',
+            ],
+        ],
+    ],
 ];

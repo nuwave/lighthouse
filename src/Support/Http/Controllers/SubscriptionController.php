@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions as Storage;
 use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\BroadcastsSubscriptions as Broadcaster;
 
-class GraphQLController extends Controller
+class SubscriptionController extends Controller
 {
     /**
      * @var Storage
@@ -30,6 +30,26 @@ class GraphQLController extends Controller
     }
 
     /**
+     * Authenticate subscriber.
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function authorize(Request $request)
+    {
+        $data = $this->broadcaster->authorize(
+            $request->input('channel_name'),
+            $request->input('socket_id'),
+            $request
+        );
+
+        $status = isset($data['error']) ? 403 : 200;
+
+        return response()->json($data, $status);
+    }
+
+    /**
      * Handle pusher webook.
      *
      * @param Request $request
@@ -46,25 +66,5 @@ class GraphQLController extends Controller
             });
 
         return response()->json(['message' => 'okay']);
-    }
-
-    /**
-     * Authenticate subscriber.
-     *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function subscription(Request $request)
-    {
-        $data = $this->broadcaster->authorize(
-            $request->input('channel_name'),
-            $request->input('socket_id'),
-            $request
-        );
-
-        $status = isset($data['error']) ? 403 : 200;
-
-        return response()->json($data, $status);
     }
 }
