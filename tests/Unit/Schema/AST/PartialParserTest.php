@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\AST;
 
+use GraphQL\Language\AST\ArgumentNode;
 use Tests\TestCase;
 use GraphQL\Error\SyntaxError;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -57,15 +58,18 @@ class PartialParserTest extends TestCase
 
     public function testParsesObjectTypesArray()
     {
-        $objectTypes = PartialParser::objectTypeDefinitions(['
+        $objectTypes = PartialParser::objectTypeDefinitions([
+            '
         type Foo {
             foo: String
         }
-        ', '
+        ',
+            '
         type Bar {
             bar: Int
         }
-        ']);
+        '
+        ]);
 
         $this->assertCount(2, $objectTypes);
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $objectTypes[0]);
@@ -75,21 +79,25 @@ class PartialParserTest extends TestCase
     public function testThrowsOnInvalidTypeInObjectTypesArray()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectTypeDefinitions(['
+        PartialParser::objectTypeDefinitions([
+            '
         type Foo {
             foo: String
         }
-        ', '
+        ',
+            '
         interface Bar {
             bar: Int
         }
-        ']);
+        '
+        ]);
     }
 
     public function testThrowsOnMultipleDefinitionsInArrayItem()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectTypeDefinitions(['
+        PartialParser::objectTypeDefinitions([
+            '
         type Foo {
             foo: String
         }
@@ -97,7 +105,8 @@ class PartialParserTest extends TestCase
         type Bar {
             bar: Int
         }
-        ']);
+        '
+        ]);
     }
 
     public function testParseOperationDefinition()
@@ -110,5 +119,18 @@ class PartialParserTest extends TestCase
             }
         ')
         );
+    }
+
+    public function testParseArgument()
+    {
+        $argumentNode = PartialParser::argument('key: "value"');
+
+        $this->assertInstanceOf(
+            ArgumentNode::class,
+            $argumentNode
+        );
+        
+        $this->assertEquals('key', $argumentNode->name->value);
+        $this->assertEquals('value', $argumentNode->value->value);
     }
 }
