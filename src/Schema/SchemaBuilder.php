@@ -29,9 +29,9 @@ class SchemaBuilder
     protected $definitionNodeConverter;
 
     /**
-     * @param TypeRegistry $typeRegistry
-     * @param ValueFactory $valueFactory
-     * @param NodeFactory $nodeFactory
+     * @param TypeRegistry            $typeRegistry
+     * @param ValueFactory            $valueFactory
+     * @param NodeFactory             $nodeFactory
      * @param DefinitionNodeConverter $definitionNodeConverter
      */
     public function __construct(
@@ -45,7 +45,7 @@ class SchemaBuilder
         $this->nodeFactory = $nodeFactory;
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
-    
+
     /**
      * Build an executable schema from AST.
      *
@@ -60,9 +60,9 @@ class SchemaBuilder
             // Register in global type registry
             $this->typeRegistry->register($type);
         });
-        
+
         $this->loadRootOperationFields($types);
-        
+
         $config = SchemaConfig::create()
             // Always set Query since it is required
             ->setQuery(
@@ -71,9 +71,7 @@ class SchemaBuilder
             ->setDirectives(
                 $this->convertDirectives($documentAST)->toArray()
             )
-            ->setTypeLoader(function ($name) {
-                return $this->typeRegistry->get($name);
-            });
+            ->setTypes($types->reject($this->isOperationType())->toArray());
 
         // Those are optional so only add them if they are present in the schema
         if ($mutation = $types->firstWhere('name', 'Mutation')) {
