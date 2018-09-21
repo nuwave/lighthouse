@@ -22,7 +22,7 @@ class PaginateDirectiveTest extends TestCase
     {
         return $this
             ->buildSchemaFromString("
-            type Users {
+            type User {
                 name: String
             }
             
