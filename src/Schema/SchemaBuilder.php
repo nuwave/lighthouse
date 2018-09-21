@@ -29,9 +29,9 @@ class SchemaBuilder
     protected $definitionNodeConverter;
 
     /**
-     * @param TypeRegistry $typeRegistry
-     * @param ValueFactory $valueFactory
-     * @param NodeFactory $nodeFactory
+     * @param TypeRegistry            $typeRegistry
+     * @param ValueFactory            $valueFactory
+     * @param NodeFactory             $nodeFactory
      * @param DefinitionNodeConverter $definitionNodeConverter
      */
     public function __construct(
@@ -45,7 +45,7 @@ class SchemaBuilder
         $this->nodeFactory = $nodeFactory;
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
-    
+
     /**
      * Build an executable schema from AST.
      *
@@ -60,9 +60,9 @@ class SchemaBuilder
             // Register in global type registry
             $this->typeRegistry->register($type);
         });
-        
+
         $this->loadRootOperationFields($types);
-        
+
         $config = SchemaConfig::create()
             // Always set Query since it is required
             ->setQuery(
@@ -71,9 +71,7 @@ class SchemaBuilder
             ->setDirectives(
                 $this->convertDirectives($documentAST)->toArray()
             )
-            ->setTypeLoader(function ($name) {
-                return $this->typeRegistry->get($name);
-            });
+            ->setTypes($types->reject($this->isOperationType())->toArray());
 
         // Those are optional so only add them if they are present in the schema
         if ($mutation = $types->firstWhere('name', 'Mutation')) {
@@ -127,9 +125,7 @@ class SchemaBuilder
     {
         return $document->typeDefinitions()
             ->map(function (TypeDefinitionNode $typeDefinition) {
-                $nodeValue = $this->valueFactory->node($typeDefinition);
-
-                return $this->nodeFactory->handle($nodeValue);
+                return $this->nodeFactory->handle($typeDefinition);
             });
     }
 
@@ -146,17 +142,27 @@ class SchemaBuilder
             function (DirectiveDefinitionNode $directive) {
                 return new Directive([
                     'name' => $directive->name->value,
+                    'description' => data_get($directive->description, 'value'),
                     'locations' => collect($directive->locations)->map(function ($location) {
                         return $location->value;
                     })->toArray(),
-                    'args' => collect($directive->arguments)->map(function (InputValueDefinitionNode $argument) {
-                        return new FieldArgument([
-                            'name' => $argument->name->value,
-                            'defaultValue' => data_get($argument, 'defaultValue.value', null),
-                            'description' => $argument->description,
-                            'type' => $this->definitionNodeConverter->toType($argument->type),
-                        ]);
-                    })->toArray(),
+                    'args' => collect($directive->arguments)
+                        ->map(function (InputValueDefinitionNode $argument) {
+                            $fieldArgumentConfig = [
+                                'name' => $argument->name->value,
+                                'description' => data_get($argument->description, 'value'),
+                                'type' => $this->definitionNodeConverter->toType($argument->type),
+                            ];
+
+                            if ($defaultValue = $argument->defaultValue) {
+                                $fieldArgumentConfig += [
+                                    'defaultValue' => $defaultValue,
+                                ];
+                            }
+
+                            return new FieldArgument($fieldArgumentConfig);
+                        })
+                        ->toArray(),
                     'astNode' => $directive,
                 ]);
             }

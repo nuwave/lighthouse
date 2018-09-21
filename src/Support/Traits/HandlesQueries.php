@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Database\QueryFilter;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 /**

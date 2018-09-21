@@ -4,10 +4,11 @@ namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
 use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\ArgumentNode;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 
 class PartialParserTest extends TestCase
 {
@@ -110,5 +111,18 @@ class PartialParserTest extends TestCase
             }
         ')
         );
+    }
+
+    public function testParseArgument()
+    {
+        $argumentNode = PartialParser::argument('key: "value"');
+
+        $this->assertInstanceOf(
+            ArgumentNode::class,
+            $argumentNode
+        );
+
+        $this->assertEquals('key', $argumentNode->name->value);
+        $this->assertEquals('value', $argumentNode->value->value);
     }
 }

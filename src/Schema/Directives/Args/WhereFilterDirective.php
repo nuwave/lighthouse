@@ -31,21 +31,18 @@ class WhereFilterDirective extends BaseDirective implements ArgMiddleware
      */
     public function handleArgument(ArgumentValue $argument, \Closure $next)
     {
-        $arg = $argument->getArgName();
-
         $operator = $this->directiveArgValue('operator', '=');
         $clause = $this->directiveArgValue('clause');
 
-        $argument = $this->injectFilter($argument, [
-            'resolve' => function ($query, $key, array $args) use ($arg, $operator, $clause) {
-                $value = array_get($args, $arg);
-
+        $this->injectFilter(
+            $argument,
+            function ($query, string $columnName, $value) use ($operator, $clause){
                 return $clause
-                    ? call_user_func_array([$query, $clause], [$key, $operator, $value])
-                    : $query->where($key, $operator, $value);
-            },
-        ]);
-
+                    ? call_user_func_array([$query, $clause], [$columnName, $operator, $value])
+                    : $query->where($columnName, $operator, $value);
+            }
+        );
+        
         return $next($argument);
     }
 }

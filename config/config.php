@@ -93,7 +93,7 @@ return [
         'queries' => 'App\\Http\\GraphQL\\Queries',
         'scalars' => 'App\\Http\\GraphQL\\Scalars',
         'unions' => 'App\\Http\\GraphQL\\Unions',
-        'interfaces' => 'App\\Http\\GraphQL\\Unions',
+        'interfaces' => 'App\\Http\\GraphQL\\Interfaces',
     ],
 
     /*
@@ -146,8 +146,8 @@ return [
     |
     */
     'extensions' => [
-        //\Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
-        \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
+        // \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
     ],
 
      /*

@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
-use Nuwave\Lighthouse\Support\Database\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 

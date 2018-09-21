@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldFactory
@@ -45,19 +46,20 @@ class FieldFactory
      *
      * @param FieldValue $fieldValue
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws DirectiveException
      *
      * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
-        $fieldValue->setType(
-            $this->definitionNodeConverter->toType(
-                $fieldValue->getField()->type
-            )
+        $fieldDefinition = $fieldValue->getField();
+    
+        $fieldType = $this->definitionNodeConverter->toType(
+            $fieldDefinition->type
         );
+        $fieldValue->setType($fieldType);
 
-        $initialResolver = $this->hasResolverDirective($fieldValue)
+        $initialResolver = $this->directiveRegistry->hasFieldResolver($fieldDefinition)
             ? $this->useResolverDirective($fieldValue)
             : $this->defaultResolver($fieldValue);
 
@@ -69,7 +71,9 @@ class FieldFactory
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through($this->directiveRegistry->fieldMiddleware($fieldValue->getField()))
+            ->through(
+                $this->directiveRegistry->fieldMiddleware($fieldDefinition)
+            )
             ->via('handleField')
             ->then(function (FieldValue $fieldValue) {
                 return $fieldValue;
@@ -79,25 +83,13 @@ class FieldFactory
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
-            'name' => $fieldValue->getFieldName(),
-            'type' => $fieldValue->getType(),
+            'name' => $fieldDefinition->name->value,
+            'type' => $fieldType,
             'args' => $inputValueDefinitions->toArray(),
             'resolve' => $resolverWithMiddleware,
-            'description' => $fieldValue->getDescription(),
+            'description' => data_get($fieldDefinition->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
         ];
-    }
-
-    /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return bool
-     */
-    protected function hasResolverDirective(FieldValue $value): bool
-    {
-        return $this->directiveRegistry->hasResolver($value->getField());
     }
 
     /**
@@ -105,7 +97,7 @@ class FieldFactory
      *
      * @param FieldValue $value
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws DirectiveException
      *
      * @return \Closure
      */
@@ -128,11 +120,19 @@ class FieldFactory
     {
         switch ($fieldValue->getNodeName()) {
             case 'Mutation':
-                return $this->rootOperationResolver($fieldValue->getFieldName(), 'mutations');
+                return $this->rootOperationResolver(
+                    $fieldValue->getFieldName(),
+                    'mutations'
+                );
             case 'Query':
-                return $this->rootOperationResolver($fieldValue->getFieldName(), 'queries');
+                return $this->rootOperationResolver(
+                    $fieldValue->getFieldName(),
+                    'queries'
+                );
             default:
-                return \Closure::fromCallable([\GraphQL\Executor\Executor::class, 'defaultFieldResolver']);
+                return \Closure::fromCallable(
+                    [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
+                );
         }
     }
 
@@ -181,11 +181,15 @@ class FieldFactory
      */
     protected function getInputValueDefinitions(FieldValue $fieldValue): Collection
     {
-        return collect(data_get($fieldValue->getField(), 'arguments', []))
+        return
+            collect(
+                // TODO remove this wrapping call once Fields are always FieldDefinitions
+                data_get($fieldValue->getField(), 'arguments')
+            )
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
                 $argValue = $this->valueFactory->arg($fieldValue, $inputValueDefinition);
 
-                return [$argValue->getArgName() => $this->argumentFactory->handle($argValue)];
+                return [$inputValueDefinition->name->value => $this->argumentFactory->handle($argValue)];
             });
     }
 
@@ -203,7 +207,7 @@ class FieldFactory
     protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
         return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
-            $inputArgs = $this->resolveArgs($inputArgs, $inputValueDefinitions);
+            $inputArgs = $this->transformArgs($inputArgs, $inputValueDefinitions);
 
             list($rules, $messages) = $this->getRulesAndMessages(
                 $rootValue,
@@ -235,30 +239,28 @@ class FieldFactory
     }
 
     /**
-     * Arguments may have resolves defined upon them.
+     * Arguments may have transformers defined upon them.
      *
      * This iterates through them and ensures they are called.
      *
-     * @param array      $inputArguments
+     * @param array $inputArguments
      * @param Collection<array> $argumentValues
      *
      * @return array
      */
-    protected function resolveArgs(array $inputArguments, Collection $inputValueDefinitions): array
+    protected function transformArgs(array $inputArguments, Collection $inputValueDefinitions): array
     {
-        $resolvers = $inputValueDefinitions->filter(function (array $inputValueDefinition) {
-            return array_has($inputValueDefinition, 'resolve');
-        });
-
-        if ($resolvers->isEmpty()) {
-            return $inputArguments;
-        }
-
         return collect($inputArguments)
-            ->map(function ($value, string $key) use ($resolvers) {
-                return $resolvers->has($key)
-                    ? $resolvers->get($key)['resolve']($value)
-                    : $value;
+            ->map(function($value, $key) use ($inputValueDefinitions){
+                $definition = $inputValueDefinitions->get($key);
+                
+                return collect($definition['transformers'])
+                    ->reduce(
+                        function($value, \Closure $transformer){
+                            return $transformer($value);
+                        },
+                        $value
+                    );
             })
             ->toArray();
     }

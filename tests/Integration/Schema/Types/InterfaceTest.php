@@ -37,7 +37,7 @@ class InterfaceTest extends DBTestCase
         }
         
         type Query {
-            namedThings: [Nameable!]! @field(resolver: "' . addslashes(self::class) . '@fetchResults")
+            namedThings: [Nameable!]! @field(resolver: "'.addslashes(self::class).'@fetchResults")
         }
         ';
         $query = '
@@ -58,14 +58,14 @@ class InterfaceTest extends DBTestCase
         $this->assertArrayHasKey('name', array_get($result, 'data.namedThings.1'));
         $this->assertArrayNotHasKey('id', array_get($result, 'data.namedThings.1'));
     }
-    
+
     /**
      * @test
      */
     public function itCanUseCustomTypeResolver()
     {
         $schema = '
-        interface Nameable @interface(resolver: "' . addslashes(self::class) . '@resolveType"){
+        interface Nameable @interface(resolver: "'.addslashes(self::class).'@resolveType"){
             name: String!
         }
 
@@ -74,7 +74,7 @@ class InterfaceTest extends DBTestCase
         }
 
         type Query {
-            namedThings: Nameable @field(resolver: "' . addslashes(self::class) . '@fetchGuy")
+            namedThings: Nameable @field(resolver: "'.addslashes(self::class).'@fetchGuy")
         }
         ';
         $query = '
@@ -90,6 +90,50 @@ class InterfaceTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertSame($this->fetchGuy(), $result['data']['namedThings']);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanListPossibleTypes()
+    {
+        // This creates one team with it
+        factory(User::class)->create();
+
+        $schema = '
+        interface Nameable {
+            name: String!
+        }
+        
+        type User implements Nameable {
+            id: ID!
+            name: String!
+        }
+        
+        type Team implements Nameable {
+            name: String!
+        }
+        
+        type Query {
+            namedThings: [Nameable!]! @field(resolver: "'.addslashes(self::class).'@fetchResults")
+        }
+        ';
+        $query = '{
+            __schema {
+                types {
+                    kind
+                    name
+                    possibleTypes {
+                        name
+                    }
+                }
+            }
+        }';
+
+        $result = $this->execute($schema, $query);
+        $interface = collect(array_get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
+
+        $this->assertCount(2, $interface['possibleTypes']);
     }
 
     public function fetchResults(): Collection

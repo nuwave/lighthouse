@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryUtils;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -100,7 +101,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
                 $first = $args['count'];
                 $page = array_get($args, 'page', 1);
 
-                return $this->getPaginatatedResults(func_get_args(), $page, $first);
+                return $this->getPaginatedResults(func_get_args(), $page, $first);
             }
         );
     }
@@ -122,7 +123,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
                     Cursor::decode($args)
                 );
 
-                return $this->getPaginatatedResults(func_get_args(), $page, $first);
+                return $this->getPaginatedResults(func_get_args(), $page, $first);
             }
         );
     }
@@ -137,7 +138,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      *
      * @return LengthAwarePaginator
      */
-    protected function getPaginatatedResults(array $resolveArgs, int $page, int $first): LengthAwarePaginator
+    protected function getPaginatedResults(array $resolveArgs, int $page, int $first): LengthAwarePaginator
     {
         if($this->directiveHasArgument('builder')){
             $query = call_user_func_array(
@@ -146,14 +147,49 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
             );
         } else {
             /** @var Model $model */
-            $model = $this->getModelClass();
+            $model = $this->getPaginatorModel();
             $query = $model::query();
         }
 
         $args = $resolveArgs[1];
+        
         $query = QueryUtils::applyFilters($query, $args);
         $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
 
         return $query->paginate($first, ['*'], 'page', $page);
+    }
+    
+    
+    /**
+     * Get the model class from the `model` argument of the field.
+     *
+     * This works differently as in other directives, so we define a seperate function for it.
+     *
+     * @throws DirectiveException
+     *
+     * @return string
+     */
+    protected function getPaginatorModel(): string
+    {
+        $model = $this->directiveArgValue('model');
+        
+        // Fallback to using information from the schema definition as the model name
+        if(! $model){
+            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+            
+            // Cut the added type suffix to get the base model class name
+            $model = str_before($model, 'Paginator');
+            $model = str_before($model, 'Connection');
+        }
+        
+        if (! $model) {
+            throw new DirectiveException(
+                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+            );
+        }
+        
+        return $this->namespaceClassName($model, [
+            config('lighthouse.namespaces.models')
+        ]);
     }
 }

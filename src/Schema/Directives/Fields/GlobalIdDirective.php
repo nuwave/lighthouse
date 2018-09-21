@@ -60,7 +60,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMid
     public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
     {
         return $next(
-            $argument->setResolver(
+            $argument->addTransformer(
                 function ($globalId) {
                     return GlobalId::decode($globalId);
                 }

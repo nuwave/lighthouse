@@ -60,9 +60,20 @@ class SchemaStitcher implements SchemaSourceProvider
                 }
 
                 $importFileName = trim(str_after($line, '#import '));
-                $importFilePath = realpath(dirname($path).'/'.$importFileName);
 
-                return self::gatherSchemaImportsRecursively($importFilePath);
-            })->implode('');
+                if (! str_contains($importFileName, '*')) {
+                    $importFilePath = realpath(dirname($path).'/'.$importFileName);
+
+                    return self::gatherSchemaImportsRecursively($importFilePath);
+                }
+
+                $importFilePaths = glob(dirname($path) . '/' . $importFileName);
+                return collect($importFilePaths)
+                    ->map(function ($file) {
+                        return self::gatherSchemaImportsRecursively($file);
+                    })
+                    ->implode('');
+            })
+            ->implode('');
     }
 }

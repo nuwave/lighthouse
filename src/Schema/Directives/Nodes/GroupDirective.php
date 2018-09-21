@@ -113,7 +113,10 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $namespaceValue = addslashes($namespaceValue);
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
-            $previousNamespaces = ASTHelper::directiveDefinition((new NamespaceDirective)->name(), $fieldDefinition);
+            $previousNamespaces = ASTHelper::directiveDefinition(
+                $fieldDefinition,
+                (new NamespaceDirective)->name()
+            );
 
             $previousNamespaces = $previousNamespaces
                 ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)
