@@ -5,8 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class ArgumentFactory
 {
@@ -14,20 +12,15 @@ class ArgumentFactory
     protected $directiveRegistry;
     /** @var Pipeline */
     protected $pipeline;
-    /** @var DefinitionNodeConverter */
-    protected $definitionNodeConverter;
 
     /**
-     * ArgumentFactory constructor.
      * @param DirectiveRegistry $directiveRegistry
      * @param Pipeline $pipeline
-     * @param DefinitionNodeConverter $definitionNodeConverter
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline, DefinitionNodeConverter $definitionNodeConverter)
+    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
     {
         $this->directiveRegistry = $directiveRegistry;
         $this->pipeline = $pipeline;
-        $this->definitionNodeConverter = $definitionNodeConverter;
     }
 
     /**
@@ -39,33 +32,36 @@ class ArgumentFactory
      */
     public function handle(ArgumentValue $value): array
     {
-        $value->setType(
-            $this->definitionNodeConverter->toType(
-                $value->getArg()->type
-            )
-        );
-
-        return $this->applyMiddleware($value)->getValue();
-    }
-
-    /**
-     * Apply argument middleware.
-     *
-     * @param ArgumentValue $value
-     *
-     * @return ArgumentValue
-     */
-    protected function applyMiddleware(ArgumentValue $value): ArgumentValue
-    {
-        return $this->pipeline
+        $definition = $value->getAstNode();
+        /** @var ArgumentValue $value */
+        $value = $this->pipeline
             ->send($value)
-            ->through($this->directiveRegistry->argMiddleware($value->getArg()))
+            ->through(
+                $this->directiveRegistry->argMiddleware($definition)
+            )
             ->via('handleArgument')
-            ->always(function (ArgumentValue $value, ArgMiddleware $middleware) {
-                return $value->setMiddlewareDirective($middleware->name());
-            })
             ->then(function (ArgumentValue $value) {
                 return $value;
             });
+        
+        $fieldArgument = [
+            'name' => $definition->name->value,
+            'description' => data_get($definition->description, 'value'),
+            'type' => $value->getType(),
+            'astNode' => $definition,
+            'transformers' => $value->getTransformers()
+        ];
+        
+        if($defaultValue = $definition->defaultValue){
+            $fieldArgument += [
+                'defaultValue' => $defaultValue
+            ];
+        }
+        
+        // Add any dynamically declared public properties of the FieldArgument
+        $fieldArgument += get_object_vars($value);
+        
+        // Used to construct a FieldArgument class
+        return $fieldArgument;
     }
 }

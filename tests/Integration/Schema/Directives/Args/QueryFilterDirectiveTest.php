@@ -2,14 +2,16 @@
 
 namespace Tests\Integration\Schema\Directives\Args;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class QueryFilterDirectiveTest extends DBTestCase
 {
     use RefreshDatabase;
 
+    /** @var Collection|User[] */
     protected $users;
 
     /**
@@ -47,9 +49,9 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->execute($schema, $query);
 
-        $this->assertCount(1, array_get($result->data, 'users.data'));
+        $this->assertCount(1, array_get($result, 'data.users.data'));
     }
 
     /**
@@ -196,8 +198,10 @@ class QueryFilterDirectiveTest extends DBTestCase
         }
         
         type Query {
-            users(start: Int @where(key: "id", operator: ">"), end: Int @where(key: "id", operator: "<")): [User!]!
-                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(
+                start: Int @where(key: "id", operator: ">")
+                end: Int @where(key: "id", operator: "<")
+            ): [User!]! @paginate
         }
         ';
 
@@ -213,8 +217,8 @@ class QueryFilterDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, $query);
-        $this->assertCount(3, array_get($result->data, 'users.data'));
+        $result = $this->execute($schema, $query);
+        $this->assertCount(3, array_get($result, 'data.users.data'));
     }
 
     /**
