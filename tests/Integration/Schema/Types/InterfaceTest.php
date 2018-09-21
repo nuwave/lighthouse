@@ -131,8 +131,7 @@ class InterfaceTest extends DBTestCase
         }';
 
         $result = $this->execute($schema, $query);
-        $types = array_get($result, 'data.__schema.types');
-        $interface = collect($types)->firstWhere('name', 'Nameable');
+        $interface = collect(array_get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);
     }
