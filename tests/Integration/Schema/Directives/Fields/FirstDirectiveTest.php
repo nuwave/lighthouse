@@ -13,7 +13,7 @@ class FirstDirectiveTest extends DBTestCase
     use RefreshDatabase;
 
     /** @test */
-    public function can_return_single_user()
+    public function itReturnsASingleUser()
     {
         $schema = '
         type User {
@@ -28,10 +28,16 @@ class FirstDirectiveTest extends DBTestCase
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
-
-
-        $result = $this->executeQuery($schema, "{ user(id:{$userB->id}) { name } }");
-        $this->assertEquals('B', $result->data['user']['name']);
+    
+        $query = "
+        {
+            user(id: {$userB->id}){
+                name
+            }
+        }
+        ";
+        $result = $this->execute($schema, $query);
+        $this->assertSame('B', array_get($result, 'data.user.name'));
     }
 
     /** @test */

@@ -2,207 +2,81 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class ArgumentValue
 {
-    /**
-     * Current input argument.
-     *
-     * @var InputValueDefinitionNode
-     */
-    protected $arg;
+    /** @var InputValueDefinitionNode */
+    protected $astNode;
+    
+    /** @var FieldValue */
+    protected $parentField;
 
-    /**
-     * Current directive.
-     *
-     * @var DirectiveNode
-     */
-    protected $directive;
-
-    /**
-     * Current field.
-     *
-     * @var FieldValue
-     */
-    protected $field;
-
-    /**
-     * Current value.
-     *
-     * @var array
-     */
-    protected $value;
-
-    /**
-     * Set current arg type.
-     *
-     * @var Type
-     */
+    /** @var Type */
     protected $type;
-
+    
+    /** @var \Closure[] */
+    protected $transformers = [];
+    
     /**
-     * Create a new argument value instance.
+     * ArgumentValue constructor.
      *
-     * @param FieldValue $field
-     * @param InputValueDefinitionNode   $arg
+     * @param FieldValue $parentField
+     * @param InputValueDefinitionNode $astNode
      */
-    public function __construct(FieldValue $field, InputValueDefinitionNode $arg)
+    public function __construct(FieldValue $parentField, InputValueDefinitionNode $astNode)
     {
-        $this->field = $field;
-        $this->arg = $arg;
+        $this->parentField = $parentField;
+        $this->astNode = $astNode;
     }
-
+    
     /**
-     * Set current directive.
-     *
-     * @param DirectiveNode $directive
-     *
-     * @return self
-     */
-    public function setDirective(DirectiveNode $directive)
-    {
-        $this->directive = $directive;
-
-        return $this;
-    }
-
-    /**
-     * Set current argument.
-     *
-     * @param InputValueDefinitionNode $arg
-     *
-     * @return self
-     */
-    public function setArg(InputValueDefinitionNode $arg)
-    {
-        $this->arg = $arg;
-
-        return $this;
-    }
-
-    /**
-     * Get current argument type.
-     *
-     * @param Type $type
-     *
-     * @return self
-     */
-    public function setType(Type $type)
-    {
-        $this->type = $type;
-
-        $value = $this->getValue();
-        $value['type'] = $type;
-
-        return $this->setValue($value);
-    }
-
-    /**
-     * Set the current value.
-     *
-     * @param array $value
-     *
-     * @return self
-     */
-    public function setValue(array $value)
-    {
-        $this->value = $value;
-
-        return $this;
-    }
-
-    /**
-     * Set directive for middleware.
-     *
-     * @param string $middleware
-     *
-     * @return self
-     */
-    public function setMiddlewareDirective($middleware)
-    {
-        $this->directive = collect($this->arg->directives)
-            ->first(function (DirectiveNode $directive) use ($middleware) {
-                return $directive->name->value === $middleware;
-            });
-
-        return $this;
-    }
-
-    /**
-     * Set a argument resolver.
-     *
-     * @param \Closure $resolver
-     *
-     * @return self
-     */
-    public function setResolver(\Closure $resolver)
-    {
-        $current = $this->getValue();
-        $current['resolve'] = $resolver;
-
-        return $this->setValue($current);
-    }
-
-    /**
-     * Get current argument.
-     *
      * @return InputValueDefinitionNode
      */
-    public function getArg()
+    public function getAstNode(): InputValueDefinitionNode
     {
-        return $this->arg;
+        return $this->astNode;
     }
-
+    
     /**
-     * Get current field.
-     *
      * @return FieldValue
      */
-    public function getField()
+    public function getParentField(): FieldValue
     {
-        return $this->field;
+        return $this->parentField;
     }
-
+    
     /**
-     * Get current directive.
-     *
-     * @return DirectiveNode
-     */
-    public function getDirective()
-    {
-        return $this->directive;
-    }
-
-    /**
-     * Get the current argument type.
-     *
      * @return Type
      */
-    public function getType()
+    public function getType(): Type
     {
+        if(!$this->type){
+            $this->type = resolve(DefinitionNodeConverter::class)->toType($this->astNode->type);
+        }
+        
         return $this->type;
     }
-
+    
     /**
-     * Get the current value.
-     *
-     * @return array
+     * @return \Closure[]
      */
-    public function getValue()
+    public function getTransformers(): array
     {
-        return $this->value;
+        return $this->transformers;
     }
-
+    
     /**
-     * Get argument name.
+     * @param \Closure $transformer
      *
-     * @return string
+     * @return ArgumentValue
      */
-    public function getArgName()
+    public function addTransformer(\Closure $transformer): ArgumentValue
     {
-        return $this->getArg()->name->value;
+        $this->transformers[] = $transformer;
+        
+        return $this;
     }
 }

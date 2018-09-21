@@ -16,7 +16,7 @@ class EqualsFilterDirective extends BaseDirective implements ArgMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'eq';
     }
@@ -29,14 +29,14 @@ class EqualsFilterDirective extends BaseDirective implements ArgMiddleware
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next)
+    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
     {
-        $arg = $argument->getArgName();
-        $argument = $this->injectFilter($argument, [
-            'resolve' => function ($query, $key, array $args) use ($arg) {
-                return $query->where($key, array_get($args, $arg));
-            },
-        ]);
+        $this->injectFilter(
+            $argument,
+            function ($query, string $columnName, $value) {
+                return $query->where($columnName, $value);
+            }
+        );
 
         return $next($argument);
     }

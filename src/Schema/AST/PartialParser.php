@@ -83,12 +83,12 @@ class PartialParser
      *
      * @throws ParseException
      *
-     * @return NodeList
+     * @return ArgumentNode
      */
-    public static function argument(string $argumentDefinition): NodeList
+    public static function argument(string $argumentDefinition): ArgumentNode
     {
         return self::getFirstAndValidateType(
-            self::field("field($argumentDefinition): String")->arguments,
+            self::field("field($argumentDefinition)")->arguments,
             ArgumentNode::class
         );
     }

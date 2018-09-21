@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Nuwave\Lighthouse\Support\Database\QueryFilter;
-
 class QueryUtils
 {
     /**
@@ -14,9 +12,12 @@ class QueryUtils
      */
     public static function applyFilters($query, array $args)
     {
-        return $query->when(isset($args['query.filter']), function ($builder) use ($args) {
-            return QueryFilter::build($builder, $args);
-        });
+        return $query->when(
+            isset($args[QueryFilter::QUERY_FILTER_KEY]),
+            function ($builder) use ($args) {
+                return QueryFilter::build($builder, $args);
+            }
+        );
     }
 
     /**

@@ -125,9 +125,7 @@ class SchemaBuilder
     {
         return $document->typeDefinitions()
             ->map(function (TypeDefinitionNode $typeDefinition) {
-                $nodeValue = $this->valueFactory->node($typeDefinition);
-
-                return $this->nodeFactory->handle($nodeValue);
+                return $this->nodeFactory->handle($typeDefinition);
             });
     }
 
@@ -144,17 +142,27 @@ class SchemaBuilder
             function (DirectiveDefinitionNode $directive) {
                 return new Directive([
                     'name' => $directive->name->value,
+                    'description' => data_get($directive->description, 'value'),
                     'locations' => collect($directive->locations)->map(function ($location) {
                         return $location->value;
                     })->toArray(),
-                    'args' => collect($directive->arguments)->map(function (InputValueDefinitionNode $argument) {
-                        return new FieldArgument([
-                            'name' => $argument->name->value,
-                            'defaultValue' => data_get($argument, 'defaultValue.value', null),
-                            'description' => $argument->description,
-                            'type' => $this->definitionNodeConverter->toType($argument->type),
-                        ]);
-                    })->toArray(),
+                    'args' => collect($directive->arguments)
+                        ->map(function (InputValueDefinitionNode $argument) {
+                            $fieldArgumentConfig = [
+                                'name' => $argument->name->value,
+                                'description' => data_get($argument->description, 'value'),
+                                'type' => $this->definitionNodeConverter->toType($argument->type),
+                            ];
+
+                            if ($defaultValue = $argument->defaultValue) {
+                                $fieldArgumentConfig += [
+                                    'defaultValue' => $defaultValue,
+                                ];
+                            }
+
+                            return new FieldArgument($fieldArgumentConfig);
+                        })
+                        ->toArray(),
                     'astNode' => $directive,
                 ]);
             }

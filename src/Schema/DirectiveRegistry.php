@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
 use GraphQL\Language\AST\DirectiveNode;
 use Symfony\Component\Finder\SplFileInfo;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
@@ -212,13 +213,13 @@ class DirectiveRegistry
     /**
      * Get the node resolver directive for the given type definition.
      *
-     * @param Node $node
+     * @param TypeDefinitionNode $node
      *
      * @throws DirectiveException
      *
      * @return NodeResolver|null
      */
-    public function nodeResolver(Node $node)
+    public function nodeResolver(TypeDefinitionNode $node)
     {
         $resolvers = $this->associatedDirectivesOfType($node, NodeResolver::class);
 
@@ -234,13 +235,13 @@ class DirectiveRegistry
     /**
      * Check if the given node has a type resolver directive handler assigned to it.
      *
-     * @param Node $typeDefinition
+     * @param TypeDefinitionNode $typeDefinition
      *
      * @throws DirectiveException
      *
      * @return bool
      */
-    public function hasNodeResolver(Node $typeDefinition): bool
+    public function hasNodeResolver(TypeDefinitionNode $typeDefinition): bool
     {
         return $this->nodeResolver($typeDefinition) instanceof NodeResolver;
     }
