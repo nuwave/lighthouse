@@ -44,7 +44,7 @@ class DefinitionNodeConverter
     {
         // Recursively unwrap the type and save the wrappers
         if (NodeKind::NON_NULL_TYPE === $node->kind || NodeKind::LIST_TYPE === $node->kind) {
-            $wrappers []= $node->kind;
+            $wrappers[] = $node->kind;
 
             return $this->convertWrappedDefinitionNode(
                 $node->type,
