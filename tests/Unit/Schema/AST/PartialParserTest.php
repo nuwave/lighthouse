@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use GraphQL\Language\AST\ArgumentNode;
 use Tests\TestCase;
 use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\ArgumentNode;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 
 class PartialParserTest extends TestCase
 {
@@ -58,18 +58,15 @@ class PartialParserTest extends TestCase
 
     public function testParsesObjectTypesArray()
     {
-        $objectTypes = PartialParser::objectTypeDefinitions([
-            '
+        $objectTypes = PartialParser::objectTypeDefinitions(['
         type Foo {
             foo: String
         }
-        ',
-            '
+        ', '
         type Bar {
             bar: Int
         }
-        '
-        ]);
+        ']);
 
         $this->assertCount(2, $objectTypes);
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $objectTypes[0]);
@@ -79,25 +76,21 @@ class PartialParserTest extends TestCase
     public function testThrowsOnInvalidTypeInObjectTypesArray()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectTypeDefinitions([
-            '
+        PartialParser::objectTypeDefinitions(['
         type Foo {
             foo: String
         }
-        ',
-            '
+        ', '
         interface Bar {
             bar: Int
         }
-        '
-        ]);
+        ']);
     }
 
     public function testThrowsOnMultipleDefinitionsInArrayItem()
     {
         $this->expectException(ParseException::class);
-        PartialParser::objectTypeDefinitions([
-            '
+        PartialParser::objectTypeDefinitions(['
         type Foo {
             foo: String
         }
@@ -105,8 +98,7 @@ class PartialParserTest extends TestCase
         type Bar {
             bar: Int
         }
-        '
-        ]);
+        ']);
     }
 
     public function testParseOperationDefinition()
@@ -129,7 +121,7 @@ class PartialParserTest extends TestCase
             ArgumentNode::class,
             $argumentNode
         );
-        
+
         $this->assertEquals('key', $argumentNode->name->value);
         $this->assertEquals('value', $argumentNode->value->value);
     }
