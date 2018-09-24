@@ -68,12 +68,14 @@ class GraphQL
      * @param null   $context
      * @param array  $variables
      * @param null   $rootValue
+     * @param string $operationName
      *
      * @return ExecutionResult
      */
-    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null, $operationName = null): ExecutionResult
     {
         $schema = $this->executableSchema ?: $this->buildSchema();
+        $operationName = $operationName ?: Request::input('operationName');
 
         $result = GraphQLBase::executeQuery(
             $schema,
@@ -81,7 +83,7 @@ class GraphQL
             $rootValue,
             $context,
             $variables,
-            Request::input('operationName'),
+            $operationName,
             null,
             $this->getValidationRules()
         );
@@ -131,14 +133,15 @@ class GraphQL
      * @param mixed  $context
      * @param array  $variables
      * @param mixed  $rootValue
+     * @param string $operationName
      *
      * @return array
      *
      * @deprecated use executeQuery()->toArray() instead. This allows to control the debug settings.
      */
-    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
+    public function execute(string $query, $context = null, $variables = [], $rootValue = null, $operationName = null): array
     {
-        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
+        return $this->queryAndReturnResult($query, $context, $variables, $rootValue, $operationName)->toArray();
     }
 
     /**
@@ -146,14 +149,15 @@ class GraphQL
      * @param mixed  $context
      * @param array  $variables
      * @param mixed  $rootValue
+     * @param string $operationName
      *
      * @return \GraphQL\Executor\ExecutionResult
      *
      * @deprecated renamed to executeQuery to match webonyx/graphql-php
      */
-    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null, $operationName = null): ExecutionResult
     {
-        return $this->executeQuery($query, $context, $variables, $rootValue);
+        return $this->executeQuery($query, $context, $variables, $rootValue, $operationName);
     }
 
     /**

@@ -34,6 +34,10 @@ class DatabaseStorage implements StoresSubscriptions
     {
         $topic = Topic::with(['subscriptions'])->where('key', $topic)->first();
 
+        if (! $topic) {
+            return collect([]);
+        }
+
         return $topic->subscriptions->map(function (Subscription $subscription) {
             return $subscription->toSubscriber();
         });
