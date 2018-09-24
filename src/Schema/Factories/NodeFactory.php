@@ -332,7 +332,6 @@ class NodeFactory
                             $type->name->value
                         );
                     })
-                    ->filter()
                     ->toArray();
             },
             'resolveType' => $typeResolver,
