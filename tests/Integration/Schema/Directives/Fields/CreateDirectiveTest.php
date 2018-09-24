@@ -24,6 +24,10 @@ class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
+        
+        type Query {
+            foo: Int
+        }
         ';
         $query = '
         mutation {
@@ -56,6 +60,10 @@ class CreateDirectiveTest extends DBTestCase
         
         input CreateCompanyInput {
             name: String
+        }
+        
+        type Query {
+            foo: Int
         }
         ';
         $query = '
@@ -99,6 +107,10 @@ class CreateDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
             user: ID
+        }
+        
+        type Query {
+            foo: Int
         }
         ';
         $query = '

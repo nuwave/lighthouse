@@ -30,6 +30,10 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
+        
+        type Query {
+            foo: Int
+        }
         ';
         $query = '
         mutation {
@@ -69,6 +73,10 @@ class UpdateDirectiveTest extends DBTestCase
         input UpdateCompanyInput {
             id: ID!
             name: String
+        }
+        
+        type Query {
+            foo: Int
         }
         ';
         $query = '
@@ -119,6 +127,10 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
             user: ID
+        }
+        
+        type Query {
+            foo: Int
         }
         ';
         $query = '
