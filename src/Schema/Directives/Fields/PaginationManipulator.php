@@ -48,16 +48,17 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
+     * @param DocumentAST              $documentAST
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current)
+    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
-        $connectionTypeName = $this->connectionTypeName($fieldDefinition, $parentType);
-        $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType);
+        $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
+        $connectionTypeName = "{$fieldTypeName}Connection";
+        $connectionEdgeName = "{$fieldTypeName}Edge";
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = PartialParser::objectTypeDefinition("
@@ -67,10 +68,9 @@ abstract class PaginationManipulator extends BaseDirective
             }
         ");
 
-        $nodeName = $this->unpackNodeToString($fieldDefinition);
         $connectionEdge = PartialParser::objectTypeDefinition("
             type $connectionEdgeName {
-                node: $nodeName
+                node: $fieldTypeName
                 cursor: String!
             }
         ");
@@ -84,11 +84,11 @@ abstract class PaginationManipulator extends BaseDirective
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
 
-        $current->setDefinition($connectionType);
-        $current->setDefinition($connectionEdge);
-        $current->setDefinition($parentType);
+        $documentAST->setDefinition($connectionType);
+        $documentAST->setDefinition($connectionEdge);
+        $documentAST->setDefinition($parentType);
 
-        return $current;
+        return $documentAST;
     }
 
     /**
@@ -96,17 +96,17 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
+     * @param DocumentAST              $documentAST
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current)
+    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
-        $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType);
+        $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
+        $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
-        $fieldTypeName = $this->unpackNodeToString($fieldDefinition);
 
         $paginatorType = PartialParser::objectTypeDefinition("
             type $paginatorTypeName {
@@ -124,98 +124,9 @@ abstract class PaginationManipulator extends BaseDirective
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
 
-        $current->setDefinition($paginatorType);
-        $current->setDefinition($parentType);
+        $documentAST->setDefinition($paginatorType);
+        $documentAST->setDefinition($parentType);
 
-        return $current;
-    }
-
-    /**
-     * Get paginator type name.
-     *
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parent
-     *
-     * @return string
-     */
-    protected function paginatorTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent)
-    {
-        return studly_case(
-            $this->parentTypeName($parent)
-            .$this->singularFieldName($fieldDefinition)
-            .'_Paginator'
-        );
-    }
-
-    /**
-     * Get connection type name.
-     *
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parent
-     *
-     * @return string
-     */
-    protected function connectionTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent)
-    {
-        return studly_case(
-            $this->parentTypeName($parent)
-            .$this->singularFieldName($fieldDefinition)
-            .'_Connection'
-        );
-    }
-
-    /**
-     * Get connection edge name.
-     *
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parent
-     *
-     * @return string
-     */
-    protected function connectionEdgeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent)
-    {
-        return studly_case(
-            $this->parentTypeName($parent)
-            .$this->singularFieldName($fieldDefinition)
-            .'_Edge'
-        );
-    }
-
-    /**
-     * @param FieldDefinitionNode $fieldDefinition
-     *
-     * @return string
-     */
-    protected function singularFieldName(FieldDefinitionNode $fieldDefinition)
-    {
-        return str_singular($fieldDefinition->name->value);
-    }
-
-    /**
-     * @param ObjectTypeDefinitionNode $objectType
-     *
-     * @return string
-     */
-    protected function parentTypeName(ObjectTypeDefinitionNode $objectType)
-    {
-        $name = $objectType->name->value;
-
-        return 'Query' === $name ? '' : $name.'_';
-    }
-
-    /**
-     * Unpack field definition type.
-     *
-     * @param Node $node
-     *
-     * @return string
-     */
-    protected function unpackNodeToString(Node $node)
-    {
-        if (in_array($node->kind, ['ListType', 'NonNullType', 'FieldDefinition'])) {
-            return $this->unpackNodeToString($node->type);
-        }
-
-        return $node->name->value;
+        return $documentAST;
     }
 }
