@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -23,10 +22,10 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return bool
      */
-    protected function isValidPaginationType($paginationType)
+    protected function isValidPaginationType(string $paginationType): bool
     {
-        return self::PAGINATION_TYPE_PAGINATOR === $paginationType ||
-        self::PAGINATION_TYPE_CONNECTION === $paginationType;
+        return self::PAGINATION_TYPE_PAGINATOR === $paginationType
+            || self::PAGINATION_TYPE_CONNECTION === $paginationType;
     }
 
     /**
@@ -34,7 +33,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function convertAliasToPaginationType($paginationType)
+    protected function convertAliasToPaginationType(string $paginationType): string
     {
         if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
             return self::PAGINATION_TYPE_CONNECTION;

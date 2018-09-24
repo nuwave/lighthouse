@@ -23,11 +23,6 @@ class TestCase extends BaseTestCase
     protected $schema = '';
 
     /**
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * Get package providers.
      *
      * @param \Illuminate\Foundation\Application $app
@@ -50,8 +45,6 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $this->app = $app;
-
         $app->bind(
             SchemaSourceProvider::class,
             function () {
