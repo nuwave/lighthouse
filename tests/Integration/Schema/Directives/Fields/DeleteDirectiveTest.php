@@ -122,7 +122,7 @@ class DeleteDirectiveTest extends DBTestCase
         ';
         $query = "
         mutation {
-            deleteUser(id: 1) {
+            deleteUser {
                 name
             }
         }
@@ -150,7 +150,7 @@ class DeleteDirectiveTest extends DBTestCase
         ';
         $query = "
         mutation {
-            deleteUser(id: 1) {
+            deleteUser {
                 name
             }
         }

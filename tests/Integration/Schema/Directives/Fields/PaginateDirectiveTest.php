@@ -125,7 +125,6 @@ class PaginateDirectiveTest extends DBTestCase
             users: [User!]! @paginate
         }
         ';
-
         $query = '
         {
             users(count:3 page: 1) {

@@ -70,6 +70,7 @@ class InterfaceTest extends DBTestCase
         }
 
         type Guy implements Nameable {
+            id: ID!
             name: String!
         }
 
@@ -151,6 +152,9 @@ class InterfaceTest extends DBTestCase
 
     public function fetchGuy(): array
     {
-        return ['name' => 'bar'];
+        return [
+            'name' => 'bar',
+            'id' => '1',
+        ];
     }
 }

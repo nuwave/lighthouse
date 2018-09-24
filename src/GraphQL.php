@@ -10,6 +10,7 @@ use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
+use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -83,7 +84,7 @@ class GraphQL
             $variables,
             Request::input('operationName'),
             null,
-            $this->getValidationRules()
+            $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
         $result->extensions = $this->extensionRegistry->jsonSerialize();
