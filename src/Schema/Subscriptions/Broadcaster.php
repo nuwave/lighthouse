@@ -53,7 +53,7 @@ class Broadcaster implements BroadcastsSubscriptions
     }
 
     /**
-     * Broadcast subscription data.
+     * Push subscription data to subscribers.
      *
      * @param GraphQLSubscription $subscription
      * @param string              $fieldName
@@ -61,22 +61,16 @@ class Broadcaster implements BroadcastsSubscriptions
      */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root)
     {
-        $this->push(
-            $subscription->decodeTopic($fieldName, $root),
-            $root
-        );
-    }
+        $topic = $subscription->decodeTopic($fieldName, $root);
 
-    /**
-     * Push subscription data to subscribers.
-     *
-     * @param string $topic
-     * @param mixed  $root
-     */
-    public function push(string $topic, $root)
-    {
+        $subscribers = $this->storage
+            ->subscribersByTopic($topic)
+            ->filter(function (Subscriber $subscriber) use ($subscription, $root) {
+                return $subscription->filter($subscriber, $root);
+            });
+
         $this->iterator->process(
-            $this->storage->subscribersByTopic($topic),
+            $subscribers,
             function (Subscriber $subscriber) use ($root) {
                 $data = graphql()->execute(
                     $subscriber->queryString,

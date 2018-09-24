@@ -8,21 +8,13 @@ use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 interface BroadcastsSubscriptions
 {
     /**
-     * Broadcast subscription data.
+     * Push subscription data to subscribers.
      *
      * @param GraphQLSubscription $subscription
      * @param string              $fieldName
-     * @param mixed|null          $root
+     * @param mixed               $root
      */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root);
-
-    /**
-     * Push subscription data to subscribers.
-     *
-     * @param string $topic
-     * @param mixed  $root
-     */
-    public function push(string $topic, $root);
 
     /**
      * Authorize the subscription.
