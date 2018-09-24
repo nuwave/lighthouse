@@ -133,6 +133,6 @@ class TestCase extends BaseTestCase
     {
         $this->schema = $schema;
 
-        return graphql()->buildSchema();
+        return graphql()->prepSchema();
     }
 }

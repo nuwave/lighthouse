@@ -25,7 +25,7 @@ class GraphQLTest extends TestCase
      */
     public function itCanBuildGraphQLSchema()
     {
-        $schema = graphql()->buildSchema();
+        $schema = graphql()->prepSchema();
 
         $this->assertInstanceOf(Schema::class, $schema);
     }
