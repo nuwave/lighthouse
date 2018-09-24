@@ -82,7 +82,8 @@ class Broadcaster implements BroadcastsSubscriptions
                     $subscriber->queryString,
                     $subscriber->context,
                     $subscriber->args,
-                    $subscriber->setRoot($root)
+                    $subscriber->setRoot($root),
+                    $subscriber->operationName
                 );
 
                 $this->pusher->trigger($subscriber->channel, self::EVENT_NAME, [
