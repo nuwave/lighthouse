@@ -43,7 +43,7 @@ before_install:
   "illuminate/support:${LARAVEL}"
   "illuminate/validation:${LARAVEL}"
   "orchestra/testbench:${LARAVEL/5\./3\.}"
-  "orchestra/database:${LARAVEL/5\./3\.}"
+  "orchestra/database:${LARAVEL/5\./3\.}@dev"
   "phpunit/phpunit:${PHPUNIT}"
   --no-interaction --no-update
 
