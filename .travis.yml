@@ -13,7 +13,6 @@ php:
 
 env:
   matrix:
-  - LARAVEL='5.4.*' PHPUNIT='~5.7'
   - LARAVEL='5.5.*' PHPUNIT='~6.0'
   - LARAVEL='5.6.*' PHPUNIT='^7.0'
   - LARAVEL='5.7.*' PHPUNIT='^7.0'
