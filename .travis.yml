@@ -34,7 +34,7 @@ matrix:
 
 before_install:
 - phpenv config-rm xdebug.ini
-- phpenv config-add .travis.php.ini
+- echo "memory_limit=2G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 - composer global require hirak/prestissimo --update-no-dev
 - composer require
   "illuminate/contracts:${LARAVEL}"
