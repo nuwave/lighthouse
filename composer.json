@@ -57,7 +57,6 @@
         "test" : "phpunit --colors=always",
         "test:unit" : "phpunit --colors=always --testsuite Unit",
         "test:integration" : "phpunit --colors=always --testsuite Integration",
-        "test:ci": "phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml",
         "style": "php-cs-fixer fix"
     },
     "extra": {
