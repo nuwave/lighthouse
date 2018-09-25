@@ -17,7 +17,7 @@ env:
   - LARAVEL='5.6.*' PHPUNIT='^7.0'
   - LARAVEL='5.7.*' PHPUNIT='^7.0'
   global:
-  - COVERAGE=1
+  - COVERAGE=0
 
 matrix:
   exclude:
