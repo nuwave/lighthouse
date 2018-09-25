@@ -8,7 +8,7 @@ language: php
 
 env:
   global:
-  - COVERAGE=0 DB_DATABASE="lighthouse" DB_USERNAME="root"
+  - COVERAGE=0
 
 matrix:
   include:
