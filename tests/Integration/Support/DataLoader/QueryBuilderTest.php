@@ -18,6 +18,7 @@ class QueryBuilderTest extends DBTestCase
     public function setUp()
     {
         parent::setUp();
+        
         $count = 4;
         $users = factory(User::class, 3)->create();
         $users->each(function ($user) use (&$count) {

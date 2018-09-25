@@ -28,7 +28,6 @@ class ValidateDirectiveTest extends DBTestCase
             users(id: ID @eq @validate(rules: ["digits:2", "min:1000"],)): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
         }
         ';
-
         $query = '
         {
             users(count: 5 id: '.$users->first()->getKey().') {
@@ -38,8 +37,8 @@ class ValidateDirectiveTest extends DBTestCase
             }
         }
         ';
-
         $result = $this->executeWithoutDebug($schema, $query);
+
         $this->assertCount(2, array_get($result, 'errors.0.extensions.validation.id'));
     }
 }
