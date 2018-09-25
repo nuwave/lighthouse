@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Subscriptions;
 
 use GraphQL\Language\Parser;
+use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
@@ -106,7 +107,9 @@ class SubscriptionRegistry
             'noLocation' => true,
         ]);
 
-        return collect($documentNode->definitions)->filter(function (OperationDefinitionNode $node) {
+        return collect($documentNode->definitions)->filter(function (Node $node) {
+            return $node instanceof OperationDefinitionNode;
+        })->filter(function (OperationDefinitionNode $node) {
             return 'subscription' === $node->operation;
         })->flatMap(function (OperationDefinitionNode $node) {
             return collect($node->selectionSet->selections)->map(function (FieldNode $field) {
