@@ -4,12 +4,9 @@ namespace Tests\Integration\Schema\Directives\Args;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ValidateDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */

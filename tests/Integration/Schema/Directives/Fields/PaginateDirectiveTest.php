@@ -8,12 +8,9 @@ use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PaginateDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */

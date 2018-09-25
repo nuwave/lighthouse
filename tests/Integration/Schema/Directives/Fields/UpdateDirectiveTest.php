@@ -6,12 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UpdateDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */

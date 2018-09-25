@@ -4,12 +4,9 @@ namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CreateDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */

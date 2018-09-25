@@ -8,12 +8,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SearchDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /** @var Mockery\MockInterface */
     protected $engineManager;
 

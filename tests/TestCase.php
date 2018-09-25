@@ -22,7 +22,21 @@ class TestCase extends BaseTestCase
      * @var string
      */
     protected $schema = '';
-
+    
+    /**
+     * Override application aliases.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     *
+     * @return array
+     */
+    protected function overrideApplicationProviders($app)
+    {
+        return [
+            ConsoleServiceProvider::class,
+        ];
+    }
+    
     /**
      * Get package providers.
      *
@@ -33,10 +47,9 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            LighthouseServiceProvider::class,
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
-            ConsoleServiceProvider::class,
+            LighthouseServiceProvider::class,
         ];
     }
 

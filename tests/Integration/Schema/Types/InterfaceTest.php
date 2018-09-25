@@ -8,12 +8,9 @@ use Tests\Utils\Models\User;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class InterfaceTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */
