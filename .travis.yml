@@ -24,17 +24,25 @@ matrix:
 
 before_install:
 - phpenv config-rm xdebug.ini
-- travis_retry composer global require hirak/prestissimo --update-no-dev
-- travis_retry composer require "illuminate/contracts:${LARAVEL}" "illuminate/http:${LARAVEL}" "illuminate/pagination:${LARAVEL}" "illuminate/routing:${LARAVEL}" "illuminate/support:${LARAVEL}" "illuminate/validation:${LARAVEL}" --no-interaction --no-update
+- composer global require hirak/prestissimo --update-no-dev
+- composer require
+  "illuminate/contracts:${LARAVEL}"
+  "illuminate/http:${LARAVEL}"
+  "illuminate/pagination:${LARAVEL}"
+  "illuminate/routing:${LARAVEL}"
+  "illuminate/support:${LARAVEL}"
+  "illuminate/validation:${LARAVEL}"
+  "orchestra/testbench:${LARAVEL/5\./3\.}"
+  --no-interaction --no-update
 
 install:
-- travis_retry composer install --prefer-dist --no-interaction --no-suggest
+- composer install --prefer-dist --no-interaction --no-suggest
 
 script:
 - if [[ $COVERAGE = 1 ]]; then
-    phpdbg -qrr phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml
+    phpdbg -qrr phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml;
   else
-    phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml
+    phpunit --colors=always --verbose;
   fi
 
 after_success:
