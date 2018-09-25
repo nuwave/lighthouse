@@ -46,6 +46,7 @@ before_install:
   "orchestra/testbench:${LARAVEL/5\./3\.}"
   "phpunit/phpunit:${PHPUNIT}"
   --no-interaction --no-update
+- if [[ $LARAVEL = '5.4.*' ]]; then composer require "orchestra/database:3.4.*" --no-interaction --no-update; fi
 - if [[ $LARAVEL = '5.5.*' ]]; then composer require "orchestra/database:3.5.*" --no-interaction --no-update; fi
 
 install:
