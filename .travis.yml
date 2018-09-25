@@ -13,19 +13,19 @@ env:
 matrix:
   include:
   - php: 7.1
-    env: LARAVEL='^5.4''
+    env: LARAVEL='5.4.*''
   - php: 7.1
-    env: LARAVEL='^5.5'
+    env: LARAVEL='5.5.*'
   - php: 7.1
-    env: LARAVEL='^5.6'
+    env: LARAVEL='5.6.*'
   - php: 7.1
-    env: COVERAGE=1 LARAVEL='^5.7'
+    env: COVERAGE=1 LARAVEL='5.7.*'
   fast_finish: true
 
 before_install:
 - if [[ $COVERAGE = 0 ]]; then phpenv config-rm xdebug.ini; fi
 - travis_retry composer global require hirak/prestissimo --update-no-dev
-- travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
+- travis_retry composer require "illuminate/contracts:${LARAVEL}" "illuminate/http:${LARAVEL}" "illuminate/pagination:${LARAVEL}" "illuminate/routing:${LARAVEL}" "illuminate/support:${LARAVEL}" "illuminate/validation:${LARAVEL}" --no-interaction --no-update
 
 install:
 - travis_retry composer install --prefer-dist --no-interaction --no-suggest
