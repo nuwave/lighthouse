@@ -34,6 +34,7 @@ matrix:
 
 before_install:
 - phpenv config-rm xdebug.ini
+- phpenv config-add .travis.php.ini
 - composer global require hirak/prestissimo --update-no-dev
 - composer require
   "illuminate/contracts:${LARAVEL}"
