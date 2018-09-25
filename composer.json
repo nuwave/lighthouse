@@ -35,6 +35,7 @@
         "laravel/scout": "^4.0",
         "mockery/mockery": "dev-master",
         "orchestra/testbench": "3.4.*|3.5.*|3.6.*|3.7.*",
+        "orchestra/database": "3.4.*|3.5.*|3.6.*|3.7.*",
         "phpunit/phpunit": "~5.7|~6.0|~7.0"
     },
     "suggest": {

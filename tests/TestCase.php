@@ -7,6 +7,7 @@ use GraphQL\Type\Schema;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
+use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
@@ -35,6 +36,7 @@ class TestCase extends BaseTestCase
             LighthouseServiceProvider::class,
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
+            ConsoleServiceProvider::class,
         ];
     }
 
