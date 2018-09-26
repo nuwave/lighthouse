@@ -131,11 +131,13 @@ class GraphQL
      */
     public function prepSchema(): Schema
     {
-        return $this->executableSchema =
-            $this->executableSchema
-            ?: $this->schemaBuilder->build(
+        if(empty($this->executableSchema)){
+            $this->executableSchema = $this->schemaBuilder->build(
                 $this->documentAST()
             );
+        }
+        
+        return $this->executableSchema;
     }
 
     /**
@@ -162,11 +164,15 @@ class GraphQL
      */
     public function documentAST(): DocumentAST
     {
-        return config('lighthouse.cache.enable')
-            ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
-                return $this->buildAST();
-            })
-            : $this->buildAST();
+        if(empty($this->documentAST)){
+            $this->documentAST = config('lighthouse.cache.enable')
+                ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+                    return $this->buildAST();
+                })
+                : $this->buildAST();
+        }
+        
+        return $this->documentAST;
     }
 
     /**
