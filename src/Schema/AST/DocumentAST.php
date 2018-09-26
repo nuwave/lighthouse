@@ -122,11 +122,13 @@ class DocumentAST implements \Serializable
     {
         $definitions = collect($this->documentNode->definitions);
 
-        return $this->locked ? $definitions : $definitions->map(function (Node $node) {
-            $clone = ASTHelper::cloneNode($node);
+        return $this->locked
+            ? $definitions
+            : $definitions->map(function (Node $node) {
+                $clone = ASTHelper::cloneNode($node);
 
-            return $this->assignDefinitionNodeHash($clone, $node);
-        });
+                return $this->assignDefinitionNodeHash($clone, $node);
+            });
     }
 
     /**
@@ -136,14 +138,15 @@ class DocumentAST implements \Serializable
      */
     public function typeDefinitions(): Collection
     {
-        return $this->definitions()->filter(function (DefinitionNode $node) {
-            return $node instanceof ScalarTypeDefinitionNode
-                || $node instanceof ObjectTypeDefinitionNode
-                || $node instanceof InterfaceTypeDefinitionNode
-                || $node instanceof UnionTypeDefinitionNode
-                || $node instanceof EnumTypeDefinitionNode
-                || $node instanceof InputObjectTypeDefinitionNode;
-        });
+        return $this->definitions()
+            ->filter(function (DefinitionNode $node) {
+                return $node instanceof ScalarTypeDefinitionNode
+                    || $node instanceof ObjectTypeDefinitionNode
+                    || $node instanceof InterfaceTypeDefinitionNode
+                    || $node instanceof UnionTypeDefinitionNode
+                    || $node instanceof EnumTypeDefinitionNode
+                    || $node instanceof InputObjectTypeDefinitionNode;
+            });
     }
 
     /**
@@ -214,9 +217,10 @@ class DocumentAST implements \Serializable
      */
     public function objectTypeDefinition(string $name)
     {
-        return $this->objectTypeDefinitions()->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
-            return $objectType->name->value === $name;
-        });
+        return $this->objectTypeDefinitions()
+            ->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
+                return $objectType->name->value === $name;
+            });
     }
 
     /**
@@ -234,9 +238,10 @@ class DocumentAST implements \Serializable
      */
     public function inputObjectTypeDefinition(string $name)
     {
-        return $this->inputObjectTypeDefinitions()->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
-            return $inputType->name->value === $name;
-        });
+        return $this->inputObjectTypeDefinitions()
+            ->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
+                return $inputType->name->value === $name;
+            });
     }
 
     /**
@@ -301,9 +306,10 @@ class DocumentAST implements \Serializable
      */
     protected function definitionsByType(string $typeClassName): Collection
     {
-        return $this->definitions()->filter(function (Node $node) use ($typeClassName) {
-            return $node instanceof $typeClassName;
-        });
+        return $this->definitions()
+            ->filter(function (Node $node) use ($typeClassName) {
+                return $node instanceof $typeClassName;
+            });
     }
 
     /**
