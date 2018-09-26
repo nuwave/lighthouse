@@ -21,13 +21,13 @@ use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DocumentASTException;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
 class DocumentAST implements \Serializable
 {
     /**
-     * Check if documentAST is currently locked.
+     * If the DocumentAST is locked, it can not be mutated.
      *
      * @var bool
      */
@@ -39,8 +39,6 @@ class DocumentAST implements \Serializable
     protected $documentNode;
 
     /**
-     * DocumentAST constructor.
-     *
      * @param DocumentNode $documentNode
      */
     public function __construct(DocumentNode $documentNode)
@@ -57,14 +55,19 @@ class DocumentAST implements \Serializable
      */
     public static function fromSource(string $schema): DocumentAST
     {
-        // Ignore location since it only bloats the AST
-        return new static(Parser::parse($schema, ['noLocation' => true]));
+        return new static(
+            Parser::parse(
+                $schema,
+                // Ignore location since it only bloats the AST
+                ['noLocation' => true]
+            )
+        );
     }
 
     /**
      * Strip out irrelevant information to make serialization more efficient.
      */
-    public function serialize()
+    public function serialize(): string
     {
         return serialize([
             'ast' => AST::toArray($this->documentNode),
@@ -302,7 +305,7 @@ class DocumentAST implements \Serializable
     protected function objectTypeOrDefault(string $name): ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition($name)
-            ?? PartialParser::objectTypeDefinition('type '.$name.'{}');
+            ?? PartialParser::objectTypeDefinition("type $name{}");
     }
 
     /**
@@ -397,7 +400,11 @@ class DocumentAST implements \Serializable
      */
     protected function getDefinitionNodeHash(DefinitionNode $node): string
     {
-        return data_get($node, 'spl_object_hash', spl_object_hash($node));
+        return data_get(
+            $node,
+            'spl_object_hash',
+            spl_object_hash($node)
+        );
     }
 
     /**

@@ -20,6 +20,8 @@ use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 class ASTBuilder
 {
     /**
+     * Convert the base schema string into an AST by applying different manipulations.
+     *
      * @param string $schema
      *
      * @throws DocumentASTException
@@ -57,16 +59,19 @@ class ASTBuilder
         return $document->typeExtensionDefinitions()
             // This is just temporarily merged together
             ->concat($document->typeDefinitions())
-            ->reduce(function (DocumentAST $document, Node $node) {
-                $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
+            ->reduce(
+                function (DocumentAST $document, Node $node) {
+                    $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
 
-                return $nodeManipulators->reduce(
-                    function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
-                        return $nodeManipulator->manipulateSchema($node, $document);
-                    },
-                    $document
-                );
-            }, $document);
+                    return $nodeManipulators->reduce(
+                        function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
+                            return $nodeManipulator->manipulateSchema($node, $document);
+                        },
+                        $document
+                    );
+                },
+                $document
+            );
     }
 
     /**
@@ -119,7 +124,8 @@ class ASTBuilder
                             $document
                         );
                     },
-                    $document);
+                    $document
+                );
             },
             $document
         );
