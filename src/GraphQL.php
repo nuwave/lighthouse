@@ -171,8 +171,8 @@ class GraphQL
                 })
                 : $this->buildAST();
         }
-        
-        return $this->documentAST->lock();
+
+        return $this->documentAST;
     }
 
     /**
@@ -187,7 +187,7 @@ class GraphQL
     {
         return ASTBuilder::generate(
             $this->schemaSourceProvider->getSchemaString()
-        );
+        )->lock();
     }
 
     /**

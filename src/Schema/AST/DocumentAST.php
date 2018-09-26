@@ -66,7 +66,10 @@ class DocumentAST implements \Serializable
      */
     public function serialize()
     {
-        return serialize(AST::toArray($this->documentNode));
+        return serialize([
+            'ast' => AST::toArray($this->documentNode),
+            'locked' => $this->locked,
+        ]);
     }
 
     /**
@@ -76,7 +79,12 @@ class DocumentAST implements \Serializable
      */
     public function unserialize($serialized)
     {
-        $this->documentNode = AST::fromArray(unserialize($serialized));
+        $unserialized = unserialize($serialized);
+
+        $this->documentNode = AST::fromArray(
+            $unserialized['ast']
+        );
+        $this->locked = $unserialized['locked'];
     }
 
     /**
