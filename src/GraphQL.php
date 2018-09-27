@@ -188,8 +188,9 @@ class GraphQL
     /**
      * Get the schema string and build an AST out of it.
      *
-     * @return DocumentAST
      * @throws \Exception
+     *
+     * @return DocumentAST
      */
     protected function buildAST(): DocumentAST
     {
