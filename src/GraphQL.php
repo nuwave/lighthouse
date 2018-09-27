@@ -194,7 +194,15 @@ class GraphQL
     protected function buildAST(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
-        $additionalSchemas = implode("\n", (array)event(new BuildingAST($this)));
+        
+        // Allow to register listeners that add in additional schema definitions.
+        // This can be used by plugins to hook into the schema building process
+        // while still allowing the user to add in their schema as usual.
+        $additionalSchemas = collect(
+            event(
+                new BuildingAST($this)
+            )
+        )->implode("\n");
 
         return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas);
     }
