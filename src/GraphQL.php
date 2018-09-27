@@ -10,6 +10,7 @@ use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
+use Nuwave\Lighthouse\Events\BuildingAST;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -188,12 +189,14 @@ class GraphQL
      * Get the schema string and build an AST out of it.
      *
      * @return DocumentAST
+     * @throws \Exception
      */
     protected function buildAST(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
+        $additionalSchemas = implode("\n", (array)event(new BuildingAST($this)));
 
-        return ASTBuilder::generate($schemaString);
+        return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas);
     }
 
     /**
