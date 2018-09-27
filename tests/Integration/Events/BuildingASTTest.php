@@ -13,8 +13,8 @@ class BuildingASTTest extends TestCase
     
         resolve('events')->listen(
             BuildingAST::class,
-            function (string $schemaSource) {
-                $this->assertSame('foo', $schemaSource);
+            function (BuildingAST $buildingAST) {
+                $this->assertSame('foo', $buildingAST->userSchema);
             }
         );
     }
@@ -26,7 +26,7 @@ class BuildingASTTest extends TestCase
     {
         resolve('events')->listen(
             BuildingAST::class,
-            function (string $schemaSource) {
+            function (BuildingAST $buildingAST) {
                 $resolver = $this->getResolver('resolveSayHello');
             
                 return "
