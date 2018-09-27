@@ -7,16 +7,25 @@ use Nuwave\Lighthouse\Events\BuildingAST;
 
 class BuildingASTTest extends TestCase
 {
+    /**
+     * @test
+     */
     public function itInjectsSourceSchemaIntoEvent()
     {
-        $this->schema = 'foo';
-    
+        $schema = '
+        type Query {
+            foo: Int
+        }
+        ';
+        
         resolve('events')->listen(
             BuildingAST::class,
-            function (BuildingAST $buildingAST) {
-                $this->assertSame('foo', $buildingAST->userSchema);
+            function (BuildingAST $buildingAST) use ($schema){
+                $this->assertSame($schema, $buildingAST->userSchema);
             }
         );
+    
+        $this->buildSchemaFromString($schema);
     }
     
     /**
