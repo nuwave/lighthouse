@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions;
+namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
 class Subscriber
 {

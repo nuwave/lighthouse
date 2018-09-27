@@ -1,15 +1,15 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Directives;
+namespace Nuwave\Lighthouse\Subscriptions\Directives;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionRegistry;
-use Nuwave\Lighthouse\Schema\Subscriptions\Exceptions\UnauthorizedSubscriber;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
+use Nuwave\Lighthouse\Subscriptions\Exceptions\UnauthorizedSubscriber;
 
 class SubscriptionDirective extends BaseDirective implements FieldResolver
 {

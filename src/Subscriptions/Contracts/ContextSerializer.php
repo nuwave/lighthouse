@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Contracts;
+namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
 interface ContextSerializer
 {

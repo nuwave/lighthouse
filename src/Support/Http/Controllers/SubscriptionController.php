@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions as Storage;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\BroadcastsSubscriptions as Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
+use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions as Broadcaster;
 
 class SubscriptionController extends Controller
 {

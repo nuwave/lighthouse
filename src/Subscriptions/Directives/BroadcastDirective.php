@@ -1,13 +1,13 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Directives;
+namespace Nuwave\Lighthouse\Subscriptions\Directives;
 
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionRegistry as Registry;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
+use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class BroadcastDirective extends BaseDirective implements FieldMiddleware
 {

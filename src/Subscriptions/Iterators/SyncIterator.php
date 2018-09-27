@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Iterators;
+namespace Nuwave\Lighthouse\Subscriptions\Iterators;
 
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\SubscriptionIterator;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 
 class SyncIterator implements SubscriptionIterator
 {

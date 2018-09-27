@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Storage;
+namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Schema\Subscriptions\Models\Topic;
-use Nuwave\Lighthouse\Schema\Subscriptions\Models\Subscription;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\Models\Topic;
+use Nuwave\Lighthouse\Subscriptions\Models\Subscription;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class DatabaseStorage implements StoresSubscriptions
 {

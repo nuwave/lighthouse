@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions;
+namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Context;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
 class Serializer implements ContextSerializer
 {

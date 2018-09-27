@@ -1,18 +1,18 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions;
+namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Contracts\Foundation\Application;
+use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
+use Nuwave\Lighthouse\Subscriptions\Storage\DatabaseStorage;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
-use Nuwave\Lighthouse\Schema\Subscriptions\Iterators\SyncIterator;
-use Nuwave\Lighthouse\Schema\Subscriptions\Storage\DatabaseStorage;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\ContextSerializer;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions;
-use Nuwave\Lighthouse\Schema\Subscriptions\Directives\BroadcastDirective;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\SubscriptionIterator;
-use Nuwave\Lighthouse\Schema\Subscriptions\Directives\SubscriptionDirective;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\AuthorizesSubscriptions;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Directives\BroadcastDirective;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
+use Nuwave\Lighthouse\Subscriptions\Directives\SubscriptionDirective;
+use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionProvider
 {

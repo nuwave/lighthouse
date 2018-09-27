@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Storage;
+namespace Nuwave\Lighthouse\Subscriptions\Storage;
 
 use Illuminate\Support\Facades\Redis;
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class RedisStorage implements StoresSubscriptions
 {

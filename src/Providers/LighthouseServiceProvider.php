@@ -17,8 +17,8 @@ use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionProvider;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -90,6 +90,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
                 \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
                 \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
+                \Nuwave\Lighthouse\Console\CreateMigrationsCommand::class,
             ]);
         }
 

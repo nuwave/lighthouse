@@ -1,8 +1,8 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Contracts;
+namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface StoresSubscriptions
 {

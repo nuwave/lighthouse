@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Exceptions;
+namespace Nuwave\Lighthouse\Subscriptions\Exceptions;
 
 use GraphQL\Error\Error;
 

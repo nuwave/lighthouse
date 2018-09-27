@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions;
+namespace Nuwave\Lighthouse\Subscriptions;
 
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
@@ -9,8 +9,8 @@ use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\ContextSerializer;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class SubscriptionRegistry
 {

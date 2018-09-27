@@ -1,8 +1,8 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Models;
+namespace Nuwave\Lighthouse\Subscriptions\Models;
 
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Illuminate\Database\Eloquent\Model;
 
 /**

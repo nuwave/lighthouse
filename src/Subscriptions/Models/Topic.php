@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions\Models;
+namespace Nuwave\Lighthouse\Subscriptions\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

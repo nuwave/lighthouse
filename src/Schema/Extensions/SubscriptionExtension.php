@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
-use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionRegistry;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
 class SubscriptionExtension extends GraphQLExtension
 {

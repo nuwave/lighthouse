@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Subscriptions;
+namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Nuwave\Lighthouse\Schema\Subscriptions\SubscriptionRegistry as Registry;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\StoresSubscriptions as Storage;
-use Nuwave\Lighthouse\Schema\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
+use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
 
 class Authorizer implements Auth
 {
