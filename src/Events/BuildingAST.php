@@ -2,23 +2,22 @@
 
 namespace Nuwave\Lighthouse\Events;
 
-use Nuwave\Lighthouse\GraphQL;
-
 class BuildingAST
 {
     /**
-     * The GraphQL instance.
-     * @var GraphQL
+     * The root schema that was defined by the user.
+     *
+     * @var string
      */
-    public $graphql;
-
+    public $userSchema;
+    
     /**
      * BuildingAST constructor.
      *
-     * @param GraphQL $graphql
+     * @param string $userSchema
      */
-    public function __construct(GraphQL $graphql)
+    public function __construct(string $userSchema)
     {
-        $this->graphql = $graphql;
+        $this->userSchema = $userSchema;
     }
 }

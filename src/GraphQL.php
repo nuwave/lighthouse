@@ -201,7 +201,7 @@ class GraphQL
         // while still allowing the user to add in their schema as usual.
         $additionalSchemas = collect(
             event(
-                new BuildingAST($this)
+                new BuildingAST($schemaString)
             )
         )->implode("\n");
 
