@@ -50,7 +50,7 @@ class BuildingASTTest extends TestCase
             foo
         }
         ';
-        $resultForFoo = $this->execute(schema, $queryForBaseSchema);
+        $resultForFoo = $this->execute($schema, $queryForBaseSchema);
         $this->assertSame('foo', array_get($resultForFoo, 'data.foo'));
         
         $queryForAdditionalSchema = '
