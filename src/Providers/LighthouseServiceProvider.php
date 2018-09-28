@@ -40,8 +40,6 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->registerCollectionMacros();
         $this->registerValidator();
-
-        SubscriptionProvider::boot();
     }
 
     /**

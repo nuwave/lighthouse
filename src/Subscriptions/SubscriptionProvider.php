@@ -17,19 +17,6 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 class SubscriptionProvider
 {
     /**
-     * Bootstrap subscription services.
-     */
-    public static function boot()
-    {
-        if (! self::enabled()) {
-            return;
-        }
-
-        graphql()->directives()->register(app(SubscriptionDirective::class));
-        graphql()->directives()->register(app(BroadcastDirective::class));
-    }
-
-    /**
      * Register subscription services.
      *
      * @param Application
