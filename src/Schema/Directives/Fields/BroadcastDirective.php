@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Subscriptions\Directives;
+namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
