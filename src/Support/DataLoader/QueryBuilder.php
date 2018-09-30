@@ -110,15 +110,26 @@ class QueryBuilder
         $unitedRelations = $relationQueries
             ->reduce(
                 // Chain together the unions
-                function ($builder, Relation $relation) {
-                    return $builder->unionAll($relation->getQuery());
+                function (Builder $builder, Relation $relation) {
+                    return $builder->unionAll(
+                        $relation->getQuery()
+                    );
                 },
                 // Use the first query as the initial starting point
                 $relationQueries->shift()->getQuery()
             )
             ->get();
-        
-        $matched = $relation->match($models, $unitedRelations, $options['name']);
+
+        // Ensure the pivot relation is hydrated too, if it exists
+        if ($unitedRelations->isNotEmpty() && method_exists($relation, 'hydratePivotRelation')) {
+            $hydrationMethod = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
+            $hydrationMethod->setAccessible(true);
+            $hydrationMethod->invoke($relation, $unitedRelations->all());
+        }
+
+        $allRelations = $this->loadDefaultWith($unitedRelations);
+
+        $matched = $relation->match($models, $allRelations, $options['name']);
 
         if ($options['paginated']) {
             foreach ($matched as $model) {
@@ -202,11 +213,13 @@ class QueryBuilder
             $reflection = new ReflectionClass($model);
             $withProperty = $reflection->getProperty('with');
             $withProperty->setAccessible(true);
-            
-            $with = collect($withProperty->getValue())
-                ->filter(function ($relation) use ($model) {
+
+            $with = array_filter(
+                $withProperty->getValue($model),
+                function ($relation) use ($model) {
                     return ! $model->relationLoaded($relation);
-                });
+                }
+            );
 
             if (! empty($with)) {
                 $collection->load($with);
