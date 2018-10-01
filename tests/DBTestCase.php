@@ -13,7 +13,9 @@ class DBTestCase extends TestCase
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
         $this->withFactories(__DIR__.'/database/factories');
-        $this->artisan('migrate', ['--database' => env('DB_DATABASE', 'lighthouse')]);
+        // This takes care of refreshing the database between tests
+        // as we are using the in-memory SQLite db we do not need RefreshDatabase
+        $this->artisan('migrate');
     }
 
     /**
@@ -26,16 +28,12 @@ class DBTestCase extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $connection = [
-            'driver' => 'mysql',
-            'database' => env('DB_DATABASE', 'lighthouse'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
+            'driver' => 'sqlite',
+            'database' => ':memory:',
             'prefix' => '',
-            'username' => env('DB_USERNAME', 'testing'),
-            'password' => env('DB_PASSWORD', ''),
         ];
 
-        $app['config']->set('database.default', env('DB_DATABASE', 'lighthouse'));
-        $app['config']->set('database.connections.'.env('DB_DATABASE', 'lighthouse'), $connection);
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite', $connection);
     }
 }

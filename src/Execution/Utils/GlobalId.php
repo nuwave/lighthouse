@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
-use GraphQL\Type\Definition\ResolveInfo;
-
 /**
  * Encode and decode globally unique IDs.
  *

@@ -78,8 +78,9 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
         $paginationType = $this->directiveArgValue('type', self::PAGINATION_TYPE_PAGINATOR);
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
+
         if (!$this->isValidPaginationType($paginationType)) {
-            $fieldName = $this->fieldDefinition->name->value;
+            $fieldName = $this->definitionNode->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
         }
@@ -158,14 +159,15 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
 
         return $query->paginate($first, ['*'], 'page', $page);
     }
-    
-    
+
+
     /**
      * Get the model class from the `model` argument of the field.
      *
      * This works differently as in other directives, so we define a seperate function for it.
      *
      * @throws DirectiveException
+     * @throws \Exception
      *
      * @return string
      */
@@ -176,7 +178,7 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
         // Fallback to using information from the schema definition as the model name
         if(! $model){
             $model = ASTHelper::getFieldTypeName($this->definitionNode);
-            
+
             // Cut the added type suffix to get the base model class name
             $model = str_before($model, 'Paginator');
             $model = str_before($model, 'Connection');

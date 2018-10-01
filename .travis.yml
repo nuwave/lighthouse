@@ -1,39 +1,62 @@
 sudo: false
 
-services:
-  - mysql
-
 cache:
   directories:
-    - $HOME/.composer/cache
+  - $HOME/.composer/cache
 
 language: php
 
+php:
+- 7.0
+- 7.1
+- 7.2
+
 env:
+  matrix:
+  - LARAVEL='5.5.*' PHPUNIT='~6.0'
+  - LARAVEL='5.6.*' PHPUNIT='^7.0'
+  - LARAVEL='5.7.*' PHPUNIT='^7.0'
   global:
-    - COVERAGE=0 DB_DATABASE="lighthouse" DB_USERNAME="root"
+  - COVERAGE=0
 
 matrix:
+  exclude:
+  - php: 7.0
+    env: LARAVEL='5.6.*' PHPUNIT='^7.0'
+  - php: 7.0
+    env: LARAVEL='5.7.*' PHPUNIT='^7.0'
+  - php: 7.2
+    env: LARAVEL='5.7.*' PHPUNIT='^7.0'
   include:
-    - php: 7.1
-      env: LARAVEL='^5.4''
-    - php: 7.1
-      env: LARAVEL='^5.5'
-    - php: 7.1
-      env: COVERAGE=1 LARAVEL='^5.6'
+  - php: 7.2
+    env: LARAVEL='5.7.*' PHPUNIT='^7.0' COVERAGE=1
   fast_finish: true
 
 before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS lighthouse;'
-  - if [[ $COVERAGE = 0 ]]; then phpenv config-rm xdebug.ini; fi
-  - travis_retry composer self-update
-  - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
+- phpenv config-rm xdebug.ini
+- echo "memory_limit=2G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+- composer global require hirak/prestissimo --update-no-dev
+- composer require
+  "illuminate/contracts:${LARAVEL}"
+  "illuminate/http:${LARAVEL}"
+  "illuminate/pagination:${LARAVEL}"
+  "illuminate/routing:${LARAVEL}"
+  "illuminate/support:${LARAVEL}"
+  "illuminate/validation:${LARAVEL}"
+  "orchestra/testbench:${LARAVEL/5\./3\.}"
+  "orchestra/database:${LARAVEL/5\./3\.}@dev"
+  "phpunit/phpunit:${PHPUNIT}"
+  --no-interaction --no-update
 
 install:
-  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
+- composer install --prefer-dist --no-interaction --no-suggest
 
 script:
-  - composer run test:ci
+- if [[ $COVERAGE = 1 ]]; then
+    phpdbg -qrr vendor/bin/phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml;
+  else
+    phpunit --colors=always --verbose;
+  fi
 
 after_success:
-  - if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
+- if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi

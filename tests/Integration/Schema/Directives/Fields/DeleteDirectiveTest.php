@@ -4,13 +4,10 @@ namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class DeleteDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /** @test */
     public function itDeletesUserAndReturnsIt()
     {
@@ -122,7 +119,7 @@ class DeleteDirectiveTest extends DBTestCase
         ';
         $query = "
         mutation {
-            deleteUser(id: 1) {
+            deleteUser {
                 name
             }
         }
@@ -150,7 +147,7 @@ class DeleteDirectiveTest extends DBTestCase
         ';
         $query = "
         mutation {
-            deleteUser(id: 1) {
+            deleteUser {
                 name
             }
         }

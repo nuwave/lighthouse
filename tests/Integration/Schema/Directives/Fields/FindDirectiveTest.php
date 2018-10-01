@@ -5,12 +5,9 @@ namespace Tests\Integration\Schema\Directives\Fields;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class FindDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /** @test */
     public function itReturnsSingleUser()
     {

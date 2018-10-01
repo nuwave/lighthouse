@@ -2,14 +2,11 @@
 
 namespace Tests\Integration\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
 class UserTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */

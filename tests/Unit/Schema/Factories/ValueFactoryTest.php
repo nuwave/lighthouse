@@ -2,21 +2,31 @@
 
 namespace Tests\Unit\Schema\Factories;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Tests\TestCase;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ObjectType;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 
 class ValueFactoryTest extends TestCase
 {
+    /** @var ValueFactory */
+    protected $valueFactory;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->valueFactory = resolve(ValueFactory::class);
+    }
+
     /**
      * @test
      */
     public function itCanSetNodeValueResolver()
     {
-        $this->app->get(ValueFactory::class)->nodeResolver(function ($node) {
+        $this->valueFactory->nodeResolver(function ($node) {
             return new class($node) extends NodeValue {
                 public function getType()
                 {
@@ -55,7 +65,7 @@ class ValueFactoryTest extends TestCase
      */
     public function itCanSetFieldValueResolver()
     {
-        $this->app->get(ValueFactory::class)->fieldResolver(function ($nodeValue, $fieldDefinition) {
+        $this->valueFactory->fieldResolver(function ($nodeValue, $fieldDefinition) {
             return new class($nodeValue, $fieldDefinition) extends FieldValue {
                 public function getResolver(): \Closure
                 {

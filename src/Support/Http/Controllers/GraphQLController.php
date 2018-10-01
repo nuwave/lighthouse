@@ -57,19 +57,23 @@ class GraphQLController extends Controller
      */
     public function query(Request $request)
     {
-        $debug = config('app.debug')
+        $debugSettings = config('app.debug')
             ? config('lighthouse.debug')
             : false;
 
         return response(
-
             $this->graphQL
                 ->executeQuery(
                     $this->query,
-                    new Context($request, app()->bound('auth') ? auth()->user() : null),
+                    new Context(
+                        $request,
+                        app()->bound('auth')
+                            ? auth()->user()
+                            : null
+                    ),
                     $this->variables
                 )
-                ->toArray($debug)
+                ->toArray($debugSettings)
         );
     }
 }

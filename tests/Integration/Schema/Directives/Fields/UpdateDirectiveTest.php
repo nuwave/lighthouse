@@ -6,18 +6,16 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UpdateDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */
     public function itCanUpdateFromFieldArguments()
     {
         factory(Company::class)->create(['name' => 'foo']);
+        
         $schema = '
         type Company {
             id: ID!
@@ -29,6 +27,10 @@ class UpdateDirectiveTest extends DBTestCase
                 id: ID!
                 name: String
             ): Company @update
+        }
+        
+        type Query {
+            foo: Int
         }
         ';
         $query = '
@@ -54,6 +56,7 @@ class UpdateDirectiveTest extends DBTestCase
     public function itCanUpdateFromInputObject()
     {
         factory(Company::class)->create(['name' => 'foo']);
+        
         $schema = '
         type Company {
             id: ID!
@@ -69,6 +72,10 @@ class UpdateDirectiveTest extends DBTestCase
         input UpdateCompanyInput {
             id: ID!
             name: String
+        }
+        
+        type Query {
+            foo: Int
         }
         ';
         $query = '
@@ -120,6 +127,10 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
+        
+        type Query {
+            foo: Int
+        }
         ';
         $query = '
         mutation {
@@ -143,7 +154,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('2', array_get($result, 'data.updateTask.user.id'));
 
         $task = Task::first();
-        $this->assertSame(2, $task->user_id);
+        $this->assertSame('2', $task->user_id);
         $this->assertSame('foo', $task->name);
     }
 }

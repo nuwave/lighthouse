@@ -45,8 +45,12 @@ class FieldDirective extends BaseDirective implements FieldResolver
             if (! method_exists($className, $methodName)) {
                 throw new DirectiveException("Method '{$methodName}' does not exist on class '{$className}'");
             }
-
-            $resolver = \Closure::fromCallable([resolve($className), $methodName]);
+    
+            // TODO convert this back once we require PHP 7.1
+            // $resolver = \Closure::fromCallable([resolve($className), $methodName]);
+            $resolver = function() use ($className, $methodName){
+                return resolve($className)->{$methodName}(...func_get_args());
+            };
         }
 
         $additionalData = $this->directiveArgValue('args');
