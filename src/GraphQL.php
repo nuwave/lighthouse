@@ -5,9 +5,7 @@ namespace Nuwave\Lighthouse;
 use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
-use Illuminate\Support\Facades\Cache;
 use GraphQL\Executor\ExecutionResult;
-use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
@@ -81,7 +79,7 @@ class GraphQL
             $rootValue,
             $context,
             $variables,
-            Request::input('operationName'),
+            app('request')->input('operationName'),
             null,
             $this->getValidationRules()
         );
@@ -175,7 +173,7 @@ class GraphQL
     {
         if (!$this->documentAST) {
             $this->documentAST = config('lighthouse.cache.enable')
-                ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+                ? app('cache')->rememberForever(config('lighthouse.cache.key'), function () {
                     return $this->buildAST();
                 })
                 : $this->buildAST();
