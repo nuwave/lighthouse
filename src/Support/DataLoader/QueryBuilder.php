@@ -214,12 +214,9 @@ class QueryBuilder
             $withProperty = $reflection->getProperty('with');
             $withProperty->setAccessible(true);
 
-            $with = array_filter(
-                $withProperty->getValue($model),
-                function ($relation) use ($model) {
-                    return ! $model->relationLoaded($relation);
-                }
-            );
+            $with = array_filter((array) $withProperty->getValue($model), function ($relation) use ($model) {
+                return ! $model->relationLoaded($relation);
+            });
 
             if (! empty($with)) {
                 $collection->load($with);
