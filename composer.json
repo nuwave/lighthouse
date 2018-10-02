@@ -5,36 +5,36 @@
     "keywords": [
         "api",
         "graphql",
-        "laravel"
+        "laravel",
+        "laravel-graphql"
     ],
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Christopher Moore",
-            "email": "chris@nuwavecommerce.com"
-        }
-    ],
+    "authors": [{
+        "name": "Christopher Moore",
+        "email": "chris@nuwavecommerce.com"
+    }],
     "support": {
         "issues": "https://github.com/nuwave/lighthouse/issues",
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
-        "php" : ">= 7.0",
+        "php": ">= 7.0",
         "ext-json": "*",
-        "illuminate/contracts": "^5.4",
-        "illuminate/http": "^5.4",
-        "illuminate/pagination": "^5.4",
-        "illuminate/routing": "^5.4",
-        "illuminate/support": "^5.4",
+        "illuminate/contracts": "5.5.*|5.6.*|5.7.*",
+        "illuminate/http": "5.5.*|5.6.*|5.7.*",
+        "illuminate/pagination": "5.5.*|5.6.*|5.7.*",
+        "illuminate/routing": "5.5.*|5.6.*|5.7.*",
+        "illuminate/support": "5.5.*|5.6.*|5.7.*",
+        "illuminate/validation": "5.5.*|5.6.*|5.7.*",
         "opis/closure": "^3.0",
         "webonyx/graphql-php": "^0.12"
     },
     "require-dev": {
+        "orchestra/testbench": "3.5.*|3.6.*|3.7.*",
+        "orchestra/database": "3.5.*|3.6.*|3.7.*@dev",
         "friendsofphp/php-cs-fixer": "^2.10",
-        "illuminate/validation": "^5.4",
         "laravel/scout": "^4.0",
         "mockery/mockery": "dev-master",
-        "orchestra/testbench": "^3.6",
         "phpunit/phpunit": "^7.0",
         "pusher/pusher-php-server": "^3.2"
     },
@@ -55,19 +55,18 @@
         }
     },
     "scripts": {
-        "test" : "phpunit --colors=always",
-        "test:unit" : "phpunit --colors=always --testsuite Unit",
-        "test:integration" : "phpunit --colors=always --testsuite Integration",
-        "test:ci": "phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml",
+        "test": "phpunit --colors=always",
+        "test:unit": "phpunit --colors=always --testsuite Unit",
+        "test:integration": "phpunit --colors=always --testsuite Integration",
         "style": "php-cs-fixer fix"
     },
     "extra": {
-      "laravel": {
-          "providers": ["Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"],
-          "aliases": {
-            "graphql": "Nuwave\\Lighthouse\\GraphQL"
+        "laravel": {
+            "providers": ["Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"],
+            "aliases": {
+                "graphql": "Nuwave\\Lighthouse\\GraphQL"
+            }
         }
-      }
     },
     "config": {
         "sort-packages": true

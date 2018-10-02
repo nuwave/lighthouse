@@ -1,17 +1,12 @@
 <?php
 
-
 namespace Tests\Integration\Schema\Directives\Fields;
 
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
 class FirstDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /** @test */
     public function itReturnsASingleUser()
     {

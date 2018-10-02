@@ -22,8 +22,8 @@ class CustomStuff
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param $context
+     * @param mixed $rootValue The value that was resolved by the field. Usually an Eloquent model.
+     * @param mixed $context
      * @param ResolveInfo $info
      *
      * @return Type

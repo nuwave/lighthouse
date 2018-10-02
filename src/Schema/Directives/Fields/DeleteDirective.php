@@ -19,7 +19,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'delete';
     }
@@ -31,7 +31,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         return $value->setResolver(function ($root, array $args) {
             $argumentDefinition = $this->getSingleArgumentDefinition();

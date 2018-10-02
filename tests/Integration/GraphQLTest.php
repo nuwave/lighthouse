@@ -5,12 +5,9 @@ namespace Tests\Integration;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class GraphQLTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     protected $schema = '
     type User {
         id: ID!

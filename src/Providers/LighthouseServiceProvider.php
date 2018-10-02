@@ -7,7 +7,6 @@ use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Facades\Validator;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
@@ -165,7 +164,7 @@ class LighthouseServiceProvider extends ServiceProvider
             }
         );
 
-        Validator::extendImplicit(
+        $this->app['validator']->extendImplicit(
             'required_with_mutation',
             function (string $attribute, $value, array $parameters, GraphQLValidator $validator): bool {
                 $info = $validator->getResolveInfo();
