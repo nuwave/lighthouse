@@ -55,7 +55,7 @@ class BuildingASTTest extends TestCase
         ";
 
         $queryForBaseSchema = '
-        query {
+        {
             foo
         }
         ';
@@ -63,7 +63,7 @@ class BuildingASTTest extends TestCase
         $this->assertSame('foo', array_get($resultForFoo, 'data.foo'));
         
         $queryForAdditionalSchema = '
-        query {
+        {
             sayHello
         }
         ';
