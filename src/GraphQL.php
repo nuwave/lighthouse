@@ -9,6 +9,7 @@ use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
 use GraphQL\Validator\DocumentValidator;
+use Nuwave\Lighthouse\Events\BuildingAST;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -183,9 +184,19 @@ class GraphQL
      */
     protected function buildAST(): DocumentAST
     {
-        return ASTBuilder::generate(
-            $this->schemaSourceProvider->getSchemaString()
-        )->lock();
+        $schemaString = $this->schemaSourceProvider->getSchemaString();
+    
+        // Allow to register listeners that add in additional schema definitions.
+        // This can be used by plugins to hook into the schema building process
+        // while still allowing the user to add in their schema as usual.
+        $additionalSchemas = collect(
+            event(
+                new BuildingAST($schemaString)
+            )
+        )->implode("\n");
+    
+        return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas)
+            ->lock();
     }
 
     /**
