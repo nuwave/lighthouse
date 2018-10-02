@@ -90,6 +90,7 @@ class HasManyDirectiveTest extends DBTestCase
         type User {
             tasks: [Task!]! @hasMany(type: "paginator")
             posts: [Post!]! @hasMany(type: "paginator")
+            posts2: [Post!]! @hasMany(type: "paginator")
         }
         
         type Task {

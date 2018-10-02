@@ -26,6 +26,7 @@ class PaginateDirectiveTest extends DBTestCase
         
         type Query {
             users: [User!]! @paginate
+            users2: [User!]! @paginate
         }
         ';
 
