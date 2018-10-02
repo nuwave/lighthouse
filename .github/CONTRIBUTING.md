@@ -34,6 +34,10 @@ Just clone the project and run the following in the project root:
 1. Run tests until they pass. Yay!
 1. Open a PR detailing your changes
 
+## Code guidelines
+
+Do not use Facades and utilize dependency injection instead. Not every application has them enabled.
+
 ## Code style
 
 We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
