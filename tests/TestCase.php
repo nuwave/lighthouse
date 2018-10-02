@@ -4,10 +4,10 @@ namespace Tests;
 
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use Nuwave\Lighthouse\GraphQL;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
+use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
@@ -22,12 +22,7 @@ class TestCase extends BaseTestCase
      * @var string
      */
     protected $schema = '';
-
-    /**
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
+    
     /**
      * Get package providers.
      *
@@ -38,9 +33,10 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            LighthouseServiceProvider::class,
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
+            LighthouseServiceProvider::class,
+            ConsoleServiceProvider::class,
         ];
     }
 
@@ -51,8 +47,6 @@ class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $this->app = $app;
-
         $app->bind(
             SchemaSourceProvider::class,
             function () {
@@ -141,6 +135,6 @@ class TestCase extends BaseTestCase
     {
         $this->schema = $schema;
 
-        return graphql()->buildSchema();
+        return graphql()->prepSchema();
     }
 }

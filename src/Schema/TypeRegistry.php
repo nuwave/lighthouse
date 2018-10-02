@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Type\Definition\Type;
+use GraphQL\Error\InvariantViolation;
 
 /**
  * Store the executable types of our GraphQL schema.
@@ -13,7 +14,9 @@ use GraphQL\Type\Definition\Type;
 class TypeRegistry
 {
     /**
-     * A map of executable schema types.
+     * A map of executable schema types by name.
+     *
+     * [$typeName => Type]
      *
      * @var Type[]
      */
@@ -38,11 +41,17 @@ class TypeRegistry
      *
      * @param string $typeName
      *
-     * @return Type|null
+     * @throws InvariantViolation
+     *
+     * @return Type
      */
-    public function get(string $typeName)
+    public function get(string $typeName): Type
     {
-        return array_get($this->types, $typeName);
+        if(!isset($this->types[$typeName])){
+            throw new InvariantViolation("No type {$typeName} was registered.");
+        }
+
+        return $this->types[$typeName];
     }
 
     /**

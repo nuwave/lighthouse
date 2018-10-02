@@ -46,11 +46,11 @@ class DummyClass extends ScalarType
      * }
      *
      * @param Node $valueNode
-     * @param array $variables
+     * @param array|null $variables
      *
      * @return mixed
      */
-    public function parseLiteral($valueNode, array $variables = [])
+    public function parseLiteral($valueNode, array $variables = null)
     {
         // TODO implement validation
         

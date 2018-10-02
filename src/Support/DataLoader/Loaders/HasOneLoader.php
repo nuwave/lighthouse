@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Support\Database\QueryFilter;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 
 class HasOneLoader extends BatchLoader
@@ -39,22 +38,23 @@ class HasOneLoader extends BatchLoader
      */
     public function resolve(): array
     {
-        $eagerLoadRelationWithConstraints = [$this->relation => function ($query) {
-            foreach ($this->scopes as $scope) {
-                call_user_func_array([$query, $scope], [$this->resolveArgs]);
-            }
+        return collect($this->keys)
+            ->pluck('parent')
+            // Using our own Collection macro
+            ->fetch([$this->relation =>
+                function ($query) {
+                    foreach ($this->scopes as $scope) {
+                        call_user_func_array([$query, $scope], [$this->resolveArgs]);
+                    }
 
-            $query->when(isset($args['query.filter']), function ($q) {
-                return QueryFilter::build($q, $this->resolveArgs);
-            });
-        }];
-
-        /** @var Collection $parents */
-        $parents = collect($this->keys)->pluck('parent');
-        $parents->fetch($eagerLoadRelationWithConstraints);
-
-        return $parents->mapWithKeys(function (Model $model) {
-            return [$model->getKey() => $model->getRelation($this->relation)];
-        })->all();
+                    $query->when(isset($args['query.filter']), function ($q) {
+                        return QueryFilter::build($q, $this->resolveArgs);
+                    });
+                }
+            ])
+            ->mapWithKeys(function (Model $model) {
+                return [$model->getKey() => $model->getRelation($this->relation)];
+            })
+            ->all();
     }
 }

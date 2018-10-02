@@ -4,6 +4,10 @@ about: Report a bug to help us improve Lighthouse
 
 ---
 
+Before posting this issue, please ask yourself:
+- Is your issue actually a question? -> Ask in Slack
+- Is it about the docs? -> https://github.com/nuwave/lighthouse-docs/issues/
+
 **Describe the bug**
 
 /* A clear and concise description of what the bug is. */

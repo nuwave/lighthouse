@@ -3,13 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 abstract class BaseDirective implements Directive
 {
@@ -43,7 +42,10 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveDefinition(): DirectiveNode
     {
-        return ASTHelper::directiveDefinition(static::name(), $this->definitionNode);
+        return ASTHelper::directiveDefinition(
+            $this->definitionNode,
+            static::name()
+        );
     }
 
     /**
@@ -56,55 +58,65 @@ abstract class BaseDirective implements Directive
      */
     protected function directiveArgValue(string $name, $default = null)
     {
-        if (! $directive = $this->directiveDefinition()) {
-            return $default;
-        }
-
-        return ASTHelper::directiveArgValue($directive, $name, $default);
+        return ASTHelper::directiveArgValue(
+            $this->directiveDefinition(),
+            $name,
+            $default
+        );
     }
-    
+
     /**
-     * Get the resolver that is specified in the current directive.
+     * Does the current directive have an argument with the given name?
      *
-     * @param \Closure $defaultResolver Add in a default resolver to return if no resolver class is given.
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function directiveHasArgument(string $name): bool
+    {
+        return ASTHelper::directiveHasArgument(
+            $this->directiveDefinition(),
+            $name
+        );
+    }
+
+    /**
+     * Get a Closure that is defined through an argument on the directive.
+     *
      * @param string $argumentName If the name of the directive argument is not "resolver" you may overwrite it.
      *
      * @throws DirectiveException
      *
      * @return \Closure
      */
-    public function getResolver(\Closure $defaultResolver = null, string $argumentName = 'resolver'): \Closure
+    public function getMethodArgument(string $argumentName): \Closure
     {
-        // The resolver is expected to contain a class and a method name, seperated by an @ symbol
+        // A method argument is expected to contain a class and a method name, seperated by an @ symbol
         // e.g. App\My\Class@methodName
-        $resolverArgumentFragments = explode('@', $this->directiveArgValue($argumentName));
+        $argumentParts = explode('@', $this->directiveArgValue($argumentName));
 
-        $baseClassName =
-            $this->directiveArgValue('class')
-            ?? $resolverArgumentFragments[0];
-
-        if (empty($baseClassName)) {
-            // If a default is given, simply return it
-            if($defaultResolver){
-                return $defaultResolver;
-            }
-            
-            throw new DirectiveException("Directive '{$this->name()}' must have a resolver class specified.");
-        }
-        
-        $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod =
-            $this->directiveArgValue('method')
-            ?? $resolverArgumentFragments[1]
-            ?? 'resolve';
-
-        if (! method_exists($resolverClass, $resolverMethod)) {
-            throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
+        if (
+            count($argumentParts) !== 2
+            || empty($argumentParts[0])
+            || empty($argumentParts[1])
+        ){
+            throw new DirectiveException("Directive '{$this->name()}' must have an argument '{$argumentName}' with 'ClassName@methodName'");
         }
 
-        return \Closure::fromCallable([app($resolverClass), $resolverMethod]);
+        $className = $this->namespaceClassName($argumentParts[0]);
+        $methodName = $argumentParts[1];
+
+        if (! method_exists($className, $methodName)) {
+            throw new DirectiveException("Method '{$methodName}' does not exist on class '{$className}'");
+        }
+
+        // TODO convert this back once we require PHP 7.1
+        // return \Closure::fromCallable([resolve($className), $methodName]);
+        return function() use ($className, $methodName){
+            return resolve($className)->{$methodName}(...func_get_args());
+        };
     }
-    
+
     /**
      * Get the model class from the `model` argument of the field.
      *
@@ -137,7 +149,7 @@ abstract class BaseDirective implements Directive
             config('lighthouse.namespaces.models')
         ]);
     }
-    
+
     /**
      *
      * @param string $classCandidate
@@ -150,12 +162,18 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(string $classCandidate, array $namespacesToTry = []): string
     {
         // Always try the explicitly set namespace first
-        \array_unshift($namespacesToTry, ASTHelper::getNamespaceForDirective($this->definitionNode, static::name()));
-        
+        \array_unshift(
+            $namespacesToTry,
+            ASTHelper::getNamespaceForDirective(
+                $this->definitionNode,
+                static::name()
+            )
+        );
+
         if(!$className = \namespace_classname($classCandidate, $namespacesToTry)){
             throw new DirectiveException("No class '$classCandidate' was found for directive '{$this->name()}'");
         };
-        
+
         return $className;
     }
 }

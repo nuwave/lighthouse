@@ -115,6 +115,21 @@ class ASTHelper
     }
 
     /**
+     * Does the given directive have an argument of the given name?
+     *
+     * @param DirectiveNode $directiveDefinition
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
+    {
+        return collect($directiveDefinition->arguments)->contains(function(ArgumentNode $argumentNode) use ($name){
+            return $argumentNode->name->value === $name;
+        });
+    }
+
+    /**
      * @param DirectiveNode $directive
      * @param string $name
      * @param mixed|null $default
@@ -169,12 +184,12 @@ class ASTHelper
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *
-     * @param string|null                   $name
-     * @param Node|null $definitionNode
+     * @param Node $definitionNode
+     * @param string $name
      *
      * @return DirectiveNode|null
      */
-    public static function directiveDefinition(string $name, Node $definitionNode)
+    public static function directiveDefinition(Node $definitionNode, string $name)
     {
         return collect($definitionNode->directives)
             ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
@@ -193,8 +208,8 @@ class ASTHelper
     public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
     {
         $namespaceDirective = static::directiveDefinition(
-            (new NamespaceDirective)->name(),
-            $definitionNode
+            $definitionNode,
+            (new NamespaceDirective)->name()
         );
     
         return $namespaceDirective
@@ -221,7 +236,7 @@ class ASTHelper
         );
     
         $globalIdFieldDefinition = PartialParser::fieldDefinition(
-            config('lighthouse.global_id_field') .': ID! @field(resolver: "Nuwave\\\Lighthouse\\\Execution\\\Utils\\\GlobalId@resolveIdField")'
+            config('lighthouse.global_id_field') .': ID! @globalId'
         );
         $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
         

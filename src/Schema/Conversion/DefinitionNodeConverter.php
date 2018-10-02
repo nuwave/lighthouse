@@ -44,7 +44,7 @@ class DefinitionNodeConverter
     {
         // Recursively unwrap the type and save the wrappers
         if (NodeKind::NON_NULL_TYPE === $node->kind || NodeKind::LIST_TYPE === $node->kind) {
-            $wrappers []= $node->kind;
+            $wrappers[] = $node->kind;
 
             return $this->convertWrappedDefinitionNode(
                 $node->type,
@@ -55,15 +55,18 @@ class DefinitionNodeConverter
         // Re-wrap the type by applying the wrappers in the reversed order
         return collect($wrappers)
             ->reverse()
-            ->reduce(function (Type $type, string $kind) {
-                if (NodeKind::NON_NULL_TYPE === $kind) {
-                    return Type::nonNull($type);
-                } elseif (NodeKind::LIST_TYPE === $kind) {
-                    return Type::listOf($type);
-                }
+            ->reduce(
+                function (Type $type, string $kind) {
+                    if (NodeKind::NON_NULL_TYPE === $kind) {
+                        return Type::nonNull($type);
+                    } elseif (NodeKind::LIST_TYPE === $kind) {
+                        return Type::listOf($type);
+                    }
 
-                return $type;
-            }, $this->convertNamedTypeNode($node));
+                    return $type;
+                },
+                $this->convertNamedTypeNode($node)
+            );
     }
 
     /**
@@ -75,7 +78,8 @@ class DefinitionNodeConverter
      */
     protected function convertNamedTypeNode(NamedTypeNode $node): Type
     {
-        switch ($node->name->value) {
+        $nodeName = $node->name->value;
+        switch ($nodeName) {
             case 'ID':
                 return Type::id();
             case 'Int':
@@ -87,7 +91,7 @@ class DefinitionNodeConverter
             case 'String':
                 return Type::string();
             default:
-                return $this->typeRegistry->get($node->name->value);
+                return $this->typeRegistry->get($nodeName);
         }
     }
 }

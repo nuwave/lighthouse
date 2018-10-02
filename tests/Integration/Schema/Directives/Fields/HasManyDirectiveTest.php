@@ -6,13 +6,10 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class HasManyDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * Auth user.
      *
@@ -37,6 +34,11 @@ class HasManyDirectiveTest extends DBTestCase
         $this->user = factory(User::class)->create();
         $this->tasks = factory(Task::class, 3)->create([
             'user_id' => $this->user->getKey(),
+        ]);
+        factory(Task::class)->create([
+            'user_id' => $this->user->getKey(),
+            // This task should be ignored via global scope on the Task model
+            'name' => 'cleaning'
         ]);
 
         $this->be($this->user);
@@ -72,6 +74,10 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
+        $tasksWithoutGlobalScope = auth()->user()->tasks()->withoutGlobalScope('no_cleaning')->count();
+        $this->assertSame(4, $tasksWithoutGlobalScope);
+
+        // Ensure global scopes are respected here
         $this->assertCount(3, array_get($result->data, 'user.tasks'));
     }
 
@@ -82,8 +88,8 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks: [Task!]! @hasMany(type:"paginator")
-            posts: [Post!]! @hasMany(type:"paginator")
+            tasks: [Task!]! @hasMany(type: "paginator")
+            posts: [Post!]! @hasMany(type: "paginator")
         }
         
         type Task {
@@ -129,7 +135,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks: [Task!]! @hasMany(type:"relay")
+            tasks: [Task!]! @hasMany(type: "relay")
         }
         
         type Task {
@@ -169,7 +175,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks: [Task!]! @hasMany(type:"relay")
+            tasks: [Task!]! @hasMany(type: "relay")
         }
         
         type Task {

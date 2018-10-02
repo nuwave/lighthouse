@@ -10,7 +10,7 @@ class TestSchemaProvider implements SchemaSourceProvider
      * @var string
      */
     protected $schema = '';
-    
+
     /**
      * TestSchemaProvider constructor.
      *
@@ -20,12 +20,24 @@ class TestSchemaProvider implements SchemaSourceProvider
     {
         $this->schema = $schema;
     }
-    
+
     /**
      * @return string
      */
     public function getSchemaString(): string
     {
         return $this->schema;
+    }
+
+    /**
+     * Set schema root path.
+     *
+     * @param string $path
+     *
+     * @return SchemaSourceProvider
+     */
+    public function setRootPath(string $path)
+    {
+        return $this;
     }
 }

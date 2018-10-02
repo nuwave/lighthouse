@@ -46,7 +46,7 @@ class NodeFactoryTest extends TestCase
             EMPLOYEE @enum(value:"employee")
         }
         ');
-        $type = $this->factory->handle(new NodeValue($enumNode));
+        $type = $this->factory->handle($enumNode);
 
         $this->assertInstanceOf(EnumType::class, $type);
         $this->assertSame('Role', $type->name);
@@ -60,10 +60,24 @@ class NodeFactoryTest extends TestCase
         $scalarNode = PartialParser::scalarTypeDefinition('
         scalar Email
         ');
-        $scalarType = $this->factory->handle(new NodeValue($scalarNode));
+        $scalarType = $this->factory->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
         $this->assertSame('Email', $scalarType->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanPointToScalarClassThroughDirective()
+    {
+        $scalarNode = PartialParser::scalarTypeDefinition('
+        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
+        ');
+        $scalarType = $this->factory->handle($scalarNode);
+
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
+        $this->assertSame('DateTime', $scalarType->name);
     }
 
     /**
@@ -76,7 +90,7 @@ class NodeFactoryTest extends TestCase
             bar: String
         }
         ');
-        $interfaceType = $this->factory->handle(new NodeValue($interfaceNode));
+        $interfaceType = $this->factory->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
         $this->assertSame('Foo', $interfaceType->name);
@@ -91,7 +105,7 @@ class NodeFactoryTest extends TestCase
         $unionNode = PartialParser::unionTypeDefinition('
         union Foo = Bar
         ');
-        $unionType = $this->factory->handle(new NodeValue($unionNode));
+        $unionType = $this->factory->handle($unionNode);
 
         $this->assertInstanceOf(UnionType::class, $unionType);
         $this->assertSame('Foo', $unionType->name);
@@ -108,7 +122,7 @@ class NodeFactoryTest extends TestCase
             foo(bar: String! @bcrypt): String!
         }
         ');
-        $objectType = $this->factory->handle(new NodeValue($objectTypeNode));
+        $objectType = $this->factory->handle($objectTypeNode);
 
         $this->assertInstanceOf(ObjectType::class, $objectType);
         $this->assertSame('User', $objectType->name);
@@ -125,7 +139,7 @@ class NodeFactoryTest extends TestCase
             foo: String!
         }
         ');
-        $inputType = $this->factory->handle(new NodeValue($inputNode));
+        $inputType = $this->factory->handle($inputNode);
 
         $this->assertInstanceOf(InputObjectType::class, $inputType);
         $this->assertSame('UserInput', $inputType->name);

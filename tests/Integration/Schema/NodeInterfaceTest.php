@@ -55,7 +55,7 @@ class NodeInterfaceTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->execute($schema, $query);
         
         $this->assertSame([
             'first' => [
@@ -66,7 +66,7 @@ class NodeInterfaceTest extends DBTestCase
                 'id' => $secondGlobalId,
                 'name' => $this->testTuples[2]['name'],
             ],
-        ], $result->data);
+        ], $result['data']);
     }
 
     public function resolveNode($id)
@@ -103,13 +103,13 @@ class NodeInterfaceTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->execute($schema, $query);
     
         $this->assertSame([
             'node' => [
                 'id' => $globalId,
                 'name' => 'Sepp',
             ],
-        ], $result->data);
+        ], $result['data']);
     }
 }
