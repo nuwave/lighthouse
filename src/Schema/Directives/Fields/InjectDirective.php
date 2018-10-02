@@ -53,8 +53,8 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
             $args = func_get_args();
             $context = $args[2];
             $args[1] = array_merge($args[1], [$name => data_get($context, $attr)]);
-
-            return call_user_func_array($resolver, $args);
+            $newArgs = [$args[0], $args[1]];
+            return call_user_func_array($resolver, $newArgs);
         }));
     }
 }
