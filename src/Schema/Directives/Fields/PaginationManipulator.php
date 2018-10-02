@@ -56,8 +56,8 @@ abstract class PaginationManipulator extends BaseDirective
     protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
-        $connectionTypeName = "{$fieldTypeName}Connection";
-        $connectionEdgeName = "{$fieldTypeName}Edge";
+        $connectionTypeName = $this->connectionTypeName($fieldDefinition, $parentType, $documentAST);
+        $connectionEdgeName = $this->connectionEdgeName($fieldDefinition, $parentType, $documentAST);
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = PartialParser::objectTypeDefinition("
@@ -104,7 +104,7 @@ abstract class PaginationManipulator extends BaseDirective
     protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
-        $paginatorTypeName = "{$fieldTypeName}Paginator";
+        $paginatorTypeName = $this->paginatorTypeName($fieldDefinition, $parentType, $documentAST);
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = PartialParser::objectTypeDefinition("
@@ -127,5 +127,124 @@ abstract class PaginationManipulator extends BaseDirective
         $documentAST->setDefinition($parentType);
 
         return $documentAST;
+    }
+
+    /**
+     * Get paginator type name.
+     *
+     * @param FieldDefinitionNode      $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parent
+     * @param DocumentAST              $documentAST
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function paginatorTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent, DocumentAST $documentAST)
+    {
+        $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
+
+        $paginatorTypeName = "{$fieldTypeName}Paginator";
+
+        if ($this->typeAlreadyDefined($paginatorTypeName, $documentAST)) {
+            $paginatorTypeName = studly_case(
+                $this->parentTypeName($parent)
+                .$this->singularFieldName($fieldDefinition)
+                .'_Paginator'
+            );
+        }
+
+        return $paginatorTypeName;
+    }
+
+    /**
+     * Get connection type name.
+     *
+     * @param FieldDefinitionNode      $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parent
+     * @param DocumentAST              $documentAST
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function connectionTypeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent, DocumentAST $documentAST)
+    {
+        $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
+
+        $connectionTypeName = "{$fieldTypeName}Connection";
+
+        if ($this->typeAlreadyDefined($connectionTypeName, $documentAST)) {
+            $connectionTypeName = studly_case(
+                $this->parentTypeName($parent)
+                .$this->singularFieldName($fieldDefinition)
+                .'_Connection'
+            );
+        }
+
+        return $connectionTypeName;
+    }
+
+    /**
+     * Get connection edge name.
+     *
+     * @param FieldDefinitionNode      $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parent
+     * @param DocumentAST              $documentAST
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function connectionEdgeName(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parent, DocumentAST $documentAST)
+    {
+        $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
+
+        $connectionEdgeTypeName = "{$fieldTypeName}Edge";
+
+        if ($this->typeAlreadyDefined($connectionEdgeTypeName, $documentAST)) {
+            $connectionEdgeTypeName = studly_case(
+                $this->parentTypeName($parent)
+                .$this->singularFieldName($fieldDefinition)
+                .'_Edge'
+            );
+        }
+
+        return $connectionEdgeTypeName;
+    }
+
+    /**
+     * @param FieldDefinitionNode $fieldDefinition
+     *
+     * @return string
+     */
+    protected function singularFieldName(FieldDefinitionNode $fieldDefinition)
+    {
+        return str_singular($fieldDefinition->name->value);
+    }
+
+    /**
+     * @param ObjectTypeDefinitionNode $objectType
+     *
+     * @return string
+     */
+    protected function parentTypeName(ObjectTypeDefinitionNode $objectType)
+    {
+        $name = $objectType->name->value;
+
+        return 'Query' === $name ? '' : $name.'_';
+    }
+
+    /**
+     * Determines if the type name is already defined in the DocumentAST.
+     * @param string      $typeName
+     * @param DocumentAST $documentAST
+     *
+     * @return bool
+     */
+    protected function typeAlreadyDefined(string $typeName, DocumentAST $documentAST): bool
+    {
+        return $documentAST->definitions()
+            ->filter(function (ObjectTypeDefinitionNode $definition) use ($typeName) {
+                return $definition->name->value == $typeName;
+            })
+            ->count() > 0;
     }
 }
