@@ -362,19 +362,22 @@ class DocumentAST implements \Serializable
         } else {
             $found = false;
 
-            $newDefinitions = $originalDefinitions->map(function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
-                $originalHashID = $this->getDefinitionNodeHash($originalDefinition);
-
-                if ($originalHashID === $newHashID) {
-                    $found = true;
-                    $newDefinition->spl_object_hash = $originalHashID;
-
-                    $originalDefinition = $newDefinition;
+            // See if we can replace an existing definition, if the hash matches
+            $newDefinitions = $originalDefinitions->map(
+                function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
+                    $originalHashID = $this->getDefinitionNodeHash($originalDefinition);
+    
+                    if ($originalHashID === $newHashID) {
+                        $found = true;
+                        
+                        return $newDefinition;
+                    }
+    
+                    return $originalDefinition;
                 }
+            );
 
-                return $originalDefinition;
-            });
-
+            // If no match is found, we just add the new definition in after all
             if (! $found) {
                 $newDefinitions = $newDefinitions->push($newDefinition);
             }
