@@ -7,13 +7,10 @@ use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 
 class CacheDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */

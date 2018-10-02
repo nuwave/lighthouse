@@ -27,7 +27,7 @@ class PaginateDirectiveTest extends TestCase
             }
             
             type Query {
-                users: [User!]! @paginate(type: \"$type\" model: \"User\")
+                users: [User!]! @paginate(type: \"$type\")
             }
             ")
             ->getQueryType()

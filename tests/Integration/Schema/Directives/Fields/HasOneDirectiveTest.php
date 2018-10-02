@@ -5,12 +5,9 @@ namespace Tests\Integration\Schema\Directives\Fields;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class HasOneDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */

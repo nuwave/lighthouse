@@ -5,12 +5,9 @@ namespace Tests\Integration\Schema\Directives\Args;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class QueryFilterDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /** @var Collection|User[] */
     protected $users;
 

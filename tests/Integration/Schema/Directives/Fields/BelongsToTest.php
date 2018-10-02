@@ -6,12 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\Company;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BelongsToTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * Auth user.
      *

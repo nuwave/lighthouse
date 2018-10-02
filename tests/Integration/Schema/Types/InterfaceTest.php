@@ -8,12 +8,9 @@ use Tests\Utils\Models\User;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class InterfaceTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * @test
      */
@@ -70,6 +67,7 @@ class InterfaceTest extends DBTestCase
         }
 
         type Guy implements Nameable {
+            id: ID!
             name: String!
         }
 
@@ -151,6 +149,9 @@ class InterfaceTest extends DBTestCase
 
     public function fetchGuy(): array
     {
-        return ['name' => 'bar'];
+        return [
+            'name' => 'bar',
+            'id' => '1',
+        ];
     }
 }
