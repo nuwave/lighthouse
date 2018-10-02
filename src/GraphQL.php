@@ -124,6 +124,10 @@ class GraphQL
     /**
      * Ensure an executable GraphQL schema is present.
      *
+     * @throws Exceptions\DirectiveException
+     * @throws Exceptions\DocumentASTException
+     * @throws Exceptions\ParseException
+     *
      * @return Schema
      */
     public function prepSchema(): Schema
