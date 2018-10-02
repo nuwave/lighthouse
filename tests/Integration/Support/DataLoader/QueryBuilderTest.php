@@ -5,19 +5,17 @@ namespace Tests\Integration\Support\DataLoader;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class QueryBuilderTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * Setup test environment.
      */
     public function setUp()
     {
         parent::setUp();
+        
         $count = 4;
         $users = factory(User::class, 3)->create();
         $users->each(function ($user) use (&$count) {

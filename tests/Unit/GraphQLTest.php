@@ -25,7 +25,7 @@ class GraphQLTest extends TestCase
      */
     public function itCanBuildGraphQLSchema()
     {
-        $schema = graphql()->buildSchema();
+        $schema = graphql()->prepSchema();
 
         $this->assertInstanceOf(Schema::class, $schema);
     }
@@ -92,7 +92,22 @@ class GraphQLTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function user($root, array $args, $context, $info)
+    /**
+     * @test
+     */
+    public function itRejectsInvalidQuery()
+    {
+        $query = '
+        {
+            nonExistingField
+        }
+        ';
+        $result = graphql()->executeQuery($query)->toArray();
+
+        $this->assertContains('nonExistingField', array_get($result, 'errors.0.message'));
+    }
+
+    public function user($root, array $args, $context, $info): array
     {
         return [
             'id' => 1,

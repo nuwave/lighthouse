@@ -8,13 +8,10 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 class ExtensionRegistry implements \JsonSerializable
 {
     /**
-     * @var Collection
+     * @var Collection|GraphQLExtension[]
      */
     protected $extensions;
 
-    /**
-     * Create instance of extension registry.
-     */
     public function __construct()
     {
         $this->extensions = collect(
@@ -45,7 +42,7 @@ class ExtensionRegistry implements \JsonSerializable
     }
 
     /**
-     * Handle request start.
+     * Notify all registered extensions that a request did start.
      *
      * @param ExtensionRequest $request
      *
@@ -60,15 +57,28 @@ class ExtensionRegistry implements \JsonSerializable
         return $this;
     }
 
-    public function manipulate(DocumentAST $documentAST)
+    /**
+     * Allow Extensions to manipulate the Schema.
+     *
+     * @param DocumentAST $documentAST
+     *
+     * @return DocumentAST
+     */
+    public function manipulate(DocumentAST $documentAST): DocumentAST
     {
-        return $this->extensions->reduce(function(DocumentAST $documentAST, GraphQLExtension $extension){
-            return $extension->manipulateSchema($documentAST);
-        }, $documentAST);
+        return $this->extensions
+            ->reduce(
+                function(DocumentAST $documentAST, GraphQLExtension $extension){
+                    return $extension->manipulateSchema($documentAST);
+                },
+                $documentAST
+            );
     }
 
     /**
-     * Render the result of the
+     * Render the result of the extensions to an array that is put in the response.
+     *
+     * @return array
      */
     public function jsonSerialize(): array
     {

@@ -6,12 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Support\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UnionTest extends DBTestCase
 {
-    use RefreshDatabase;
-    
     /**
      * @test
      * @dataProvider withAndWithoutCustomTypeResolver

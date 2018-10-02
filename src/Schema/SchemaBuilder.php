@@ -4,16 +4,16 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
+use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
@@ -51,82 +51,73 @@ class SchemaBuilder
      *
      * @param DocumentAST $documentAST
      *
+     * @throws DirectiveException
      * @return Schema
      */
     public function build($documentAST)
     {
-        $types = $this->convertTypes($documentAST);
-        $types->each(function (Type $type) {
-            // Register in global type registry
+        foreach($documentAST->typeDefinitions() as $typeDefinition){
+            $type = $this->nodeFactory->handle($typeDefinition);
             $this->typeRegistry->register($type);
-        });
 
-        $this->loadRootOperationFields($types);
+            switch($type->name){
+                case 'Query':
+                    /** @var ObjectType $queryType */
+                    $queryType = $type;
+                    continue 2;
+                case 'Mutation':
+                    /** @var ObjectType $mutationType */
+                    $mutationType = $type;
+                    continue 2;
+                case 'Subscription':
+                    /** @var ObjectType $subscriptionType */
+                    $subscriptionType = $type;
+                    continue 2;
+                default:
+                    $types []= $type;
+            }
+        }
+
+        /**
+         * The fields for the root operations have to be loaded in advance.
+         *
+         * This is because they might have to register middleware.
+         * Other fields can be lazy-loaded to improve performance.
+         *
+         * Calling getFields() causes the fields MiddlewareDirective to run
+         * and thus registers the (Laravel)-Middleware for the fields.
+         */
+        if(empty($queryType)){
+            throw new InvariantViolation("The root Query type must be present in the schema.");
+        }
+        $queryType->getFields();
 
         $config = SchemaConfig::create()
             // Always set Query since it is required
             ->setQuery(
-                $types->firstWhere('name', 'Query')
+                $queryType
+            )
+            // Not using lazy loading, as we do not have a way of discovering
+            // orphaned types at the moment
+            ->setTypes(
+                $types
             )
             ->setDirectives(
-                $this->convertDirectives($documentAST)->toArray()
-            )
-            ->setTypes($types->reject($this->isOperationType())->toArray());
+                $this->convertDirectives($documentAST)
+                    ->toArray()
+            );
 
         // Those are optional so only add them if they are present in the schema
-        if ($mutation = $types->firstWhere('name', 'Mutation')) {
-            $config->setMutation($mutation);
+        if (isset($mutationType)) {
+            $mutationType->getFields();
+            $config->setMutation($mutationType);
         }
-        if ($subscription = $types->firstWhere('name', 'Subscription')) {
-            $config->setSubscription($subscription);
+        if (isset($subscriptionType)) {
+            $subscriptionType->getFields();
+            $config->setSubscription($subscriptionType);
         }
 
         return new Schema($config);
-    }
-
-    /**
-     * The fields for the root operations have to be loaded in advance.
-     *
-     * This is because they might have to register middleware.
-     * Other fields can be lazy-loaded to improve performance.
-     *
-     * @param Collection $types
-     */
-    protected function loadRootOperationFields(Collection $types)
-    {
-        $types->filter($this->isOperationType())
-            ->each(function (ObjectType $type) {
-                // This resolves the fields which causes the fields MiddlewareDirective to run
-                // and thus register the (Laravel)-Middleware for the fields.
-                $type->getFields();
-            });
-    }
-
-    /**
-     * Callback to determine whether a type is one of the three root operation types.
-     *
-     * @return \Closure
-     */
-    protected function isOperationType(): \Closure
-    {
-        return function (Type $type) {
-            return in_array($type->name, ['Query', 'Mutation', 'Subscription']);
-        };
-    }
-
-    /**
-     * Convert definitions to types.
-     *
-     * @param DocumentAST $document
-     *
-     * @return Collection
-     */
-    public function convertTypes(DocumentAST $document): Collection
-    {
-        return $document->typeDefinitions()
-            ->map(function (TypeDefinitionNode $typeDefinition) {
-                return $this->nodeFactory->handle($typeDefinition);
-            });
     }
 
     /**
@@ -134,18 +125,20 @@ class SchemaBuilder
      *
      * @param DocumentAST $document
      *
-     * @return Collection
+     * @return Collection|Directive[]
      */
     protected function convertDirectives(DocumentAST $document): Collection
     {
-        return $document->directiveDefinitions()->map(
-            function (DirectiveDefinitionNode $directive) {
+        return $document->directiveDefinitions()
+            ->map(function (DirectiveDefinitionNode $directive) {
                 return new Directive([
                     'name' => $directive->name->value,
                     'description' => data_get($directive->description, 'value'),
-                    'locations' => collect($directive->locations)->map(function ($location) {
-                        return $location->value;
-                    })->toArray(),
+                    'locations' => collect($directive->locations)
+                        ->map(function ($location) {
+                            return $location->value;
+                        })
+                        ->toArray(),
                     'args' => collect($directive->arguments)
                         ->map(function (InputValueDefinitionNode $argument) {
                             $fieldArgumentConfig = [
@@ -165,7 +158,6 @@ class SchemaBuilder
                         ->toArray(),
                     'astNode' => $directive,
                 ]);
-            }
-        );
+            });
     }
 }

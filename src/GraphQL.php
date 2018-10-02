@@ -10,6 +10,7 @@ use GraphQL\Executor\ExecutionResult;
 use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
+use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
@@ -17,7 +18,6 @@ use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Execution\HandlesErrors;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
@@ -70,49 +70,53 @@ class GraphQL
      * @param array $variables
      * @param null $rootValue
      *
+     * @throws Exceptions\DirectiveException
+     * @throws Exceptions\DocumentASTException
+     * @throws Exceptions\ParseException
+     *
      * @return ExecutionResult
      */
     public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
-        $schema = $this->executableSchema ?: $this->buildSchema();
-
         $result = GraphQLBase::executeQuery(
-            $schema,
+            $this->prepSchema(),
             $query,
             $rootValue,
             $context,
             $variables,
             Request::input('operationName'),
             null,
-            $this->getValidationRules()
+            $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
         $result->extensions = $this->extensionRegistry->jsonSerialize();
 
-        $result->setErrorsHandler(function (array $errors, callable $formatter): array {
-            // Do report: Errors that are not client safe, schema definition errors
-            // Do not report: Validation, Errors that are meant for the final user
-            // Misformed Queries: Log if you are dog-fooding your app
+        $result->setErrorsHandler(
+            function (array $errors, callable $formatter): array {
+                // Do report: Errors that are not client safe, schema definition errors
+                // Do not report: Validation, Errors that are meant for the final user
+                // Misformed Queries: Log if you are dog-fooding your app
 
-            /**
-             * Handlers are defined as classes in the config.
-             * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
-             * This allows the user to register multiple handlers and pipe the errors through.
-             */
-            $handlers = config('lighthouse.error_handlers', []);
+                /**
+                 * Handlers are defined as classes in the config.
+                 * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
+                 * This allows the user to register multiple handlers and pipe the errors through.
+                 */
+                $handlers = config('lighthouse.error_handlers', []);
 
-            return array_map(
-                function (Error $error) use ($handlers, $formatter) {
-                    return $this->pipeline
-                        ->send($error)
-                        ->through($handlers)
-                        ->then(function (Error $error) use ($formatter){
-                            return $formatter($error);
-                        });
-                },
-                $errors
-            );
-        });
+                return array_map(
+                    function (Error $error) use ($handlers, $formatter) {
+                        return $this->pipeline
+                            ->send($error)
+                            ->through($handlers)
+                            ->then(function (Error $error) use ($formatter){
+                                return $formatter($error);
+                            });
+                    },
+                    $errors
+                );
+            }
+        );
 
         return $result;
     }
@@ -124,57 +128,40 @@ class GraphQL
      */
     public function prepSchema(): Schema
     {
-        return $this->executableSchema = $this->executableSchema ?: $this->buildSchema();
+        if(empty($this->executableSchema)){
+            $this->executableSchema = $this->schemaBuilder->build(
+                $this->documentAST()
+            );
+        }
+        
+        return $this->executableSchema;
     }
 
     /**
-     * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
+     * Construct the validation rules from the config.
      *
      * @return array
-     * @deprecated use executeQuery()->toArray() instead. This allows to control the debug settings.
      */
-    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
+    protected function getValidationRules(): array
     {
-        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
-    }
-
-    /**
-     * @param string $query
-     * @param mixed $context
-     * @param array $variables
-     * @param mixed $rootValue
-     *
-     * @return \GraphQL\Executor\ExecutionResult
-     * @deprecated renamed to executeQuery to match webonyx/graphql-php
-     */
-    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
-    {
-        return $this->executeQuery($query, $context, $variables, $rootValue);
-    }
-
-    /**
-     * Build a new executable schema.
-     *
-     * @return Schema
-     */
-    public function buildSchema(): Schema
-    {
-        $documentAST = $this->documentAST();
-
-        return $this->schemaBuilder->build($documentAST);
+        return [
+            new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
+            new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
+            new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
+        ];
     }
 
     /**
      * Get instance of DocumentAST.
      *
+     * @throws Exceptions\DocumentASTException
+     * @throws Exceptions\ParseException
+     *
      * @return DocumentAST
      */
     public function documentAST(): DocumentAST
     {
-        if (!$this->documentAST) {
+        if(empty($this->documentAST)){
             $this->documentAST = config('lighthouse.cache.enable')
                 ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
                     return $this->buildAST();
@@ -182,20 +169,21 @@ class GraphQL
                 : $this->buildAST();
         }
 
-        return $this->documentAST->lock();
+        return $this->documentAST;
     }
 
     /**
      * Get the schema string and build an AST out of it.
      *
-     * @throws \Exception
+     * @throws Exceptions\DocumentASTException
+     * @throws Exceptions\ParseException
      *
      * @return DocumentAST
      */
     protected function buildAST(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
-        
+    
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
@@ -204,8 +192,9 @@ class GraphQL
                 new BuildingAST($schemaString)
             )
         )->implode("\n");
-
-        return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas);
+    
+        return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas)
+            ->lock();
     }
 
     /**
@@ -234,6 +223,50 @@ class GraphQL
         }
 
         return $instance;
+    }
+
+    /**
+     * @throws Exceptions\DirectiveException
+     *
+     * @return Schema
+     *
+     * @deprecated in v3 in favour of prepSchema
+     */
+    public function buildSchema(): Schema
+    {
+        return $this->prepSchema();
+    }
+
+    /**
+     * @param string $query
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
+     *
+     * @throws Exceptions\DirectiveException
+     *
+     * @return array
+     * @deprecated use executeQuery()->toArray() instead. This allows to control the debug settings.
+     */
+    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
+    {
+        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
+    }
+
+    /**
+     * @param string $query
+     * @param mixed $context
+     * @param array $variables
+     * @param mixed $rootValue
+     *
+     * @throws Exceptions\DirectiveException
+     *
+     * @return \GraphQL\Executor\ExecutionResult
+     * @deprecated renamed to executeQuery to match webonyx/graphql-php
+     */
+    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    {
+        return $this->executeQuery($query, $context, $variables, $rootValue);
     }
 
     /**
@@ -288,19 +321,5 @@ class GraphQL
     public function extensions(): ExtensionRegistry
     {
         return resolve(ExtensionRegistry::class);
-    }
-
-    /**
-     * Construct the validation rules from the config.
-     *
-     * @return array
-     */
-    protected function getValidationRules(): array
-    {
-        return [
-            new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
-            new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
-            new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
-        ];
     }
 }
