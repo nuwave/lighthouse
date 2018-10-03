@@ -19,21 +19,31 @@ class QueryBuilder
      * https://github.com/laravel/framework/issues/17845#issuecomment-313701089
      *
      * @param Builder $builder
-     * @param array   $models
+     * @param Model[] $models
      *
      * @return array
      */
     public function eagerLoadCount(Builder $builder, array $models): array
     {
-        $ids = \array_map(function (Model $model) {
-            return $model->getKey();
-        }, $models);
+        $ids = \array_map(
+            function (Model $model) {
+                return $model->getKey();
+            },
+            $models
+        );
 
-        $results = $builder->whereKey($ids)->get();
+        $results = $builder
+            ->whereKey($ids)
+            ->get();
 
-        return $results->filter(function (Model $model) use ($ids) {
-            return \in_array($model->getKey(), $ids, true);
-        })->all();
+        return $results
+            ->filter(function (Model $model) use ($ids) {
+                return \in_array(
+                    $model->getKey(),
+                    $ids,
+                    true
+                );
+            })->all();
     }
 
     /**
