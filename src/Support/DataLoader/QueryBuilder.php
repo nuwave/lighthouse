@@ -25,29 +25,15 @@ class QueryBuilder
      */
     public function eagerLoadCount(Builder $builder, array $models): array
     {
-        $ids = [];
-        $key = $models[0]->getKeyName();
-        foreach ($models as $model) {
-            $ids[] = $model->{$key};
-        }
-        
-        $results = $builder
-            ->whereIn($key, $ids)
-            ->get();
+        $ids = \array_map(function (Model $model) {
+            return $model->getKey();
+        }, $models);
 
-        $dictionary = [];
-        foreach ($results as $result) {
-            $dictionary[$result->{$key}] = $result;
-        }
+        $results = $builder->whereKey($ids)->get();
 
-        foreach ($models as $model) {
-            if (isset($dictionary[$model->{$key}])) {
-                $model->forceFill($dictionary[$model->{$key}]
-                    ->toArray());
-            }
-        }
-
-        return $models;
+        return $results->filter(function (Model $model) use ($ids) {
+            return \in_array($model->getKey(), $ids, true);
+        })->all();
     }
 
     /**
