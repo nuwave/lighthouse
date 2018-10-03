@@ -57,6 +57,12 @@ abstract class PaginationManipulator extends BaseDirective
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
         $connectionTypeName = "{$fieldTypeName}Connection";
+
+        // The connection type has been registered from another place already
+        if($documentAST->objectTypeDefinition($connectionTypeName)){
+            return $documentAST;
+        }
+
         $connectionEdgeName = "{$fieldTypeName}Edge";
         $connectionFieldName = addslashes(ConnectionField::class);
 
@@ -105,6 +111,12 @@ abstract class PaginationManipulator extends BaseDirective
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";
+
+        // The paginator type has been registered from another place already
+        if($documentAST->objectTypeDefinition($paginatorTypeName)){
+            return $documentAST;
+        }
+
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = PartialParser::objectTypeDefinition("
