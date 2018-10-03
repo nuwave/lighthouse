@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Providers;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
@@ -115,8 +116,9 @@ class LighthouseServiceProvider extends ServiceProvider
                     $eagerLoadRelations = [$eagerLoadRelations];
                 }
 
-                $query = $this->first()::withCount($eagerLoadRelations);
-                $this->items = resolve(QueryBuilder::class)->eagerLoadCount($query, $this->items);
+                $queryWithCount = $this->first()::withCount($eagerLoadRelations);
+
+                $this->items = resolve(QueryBuilder::class)->reloadWithBuilder($queryWithCount, $this->items);
             }
 
             return $this;
@@ -127,7 +129,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 if (is_string($eagerLoadRelations)) {
                     $eagerLoadRelations = [$eagerLoadRelations];
                 }
-
+//
                 $this->items = $this->fetchCount($eagerLoadRelations)->items;
                 $query = $this->first()::with($eagerLoadRelations);
                 $this->items = resolve(QueryBuilder::class)

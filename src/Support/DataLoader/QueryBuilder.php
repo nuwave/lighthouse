@@ -13,7 +13,10 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 class QueryBuilder
 {
     /**
-     * Eager load count on collection of models.
+     * Reload a collection of models, using a given builder instance.
+     *
+     * This can be used to eagerly load the relations with an additional
+     * clause, such as a count subselect.
      *
      * Thanks to marcus13371337
      * https://github.com/laravel/framework/issues/17845#issuecomment-313701089
@@ -23,7 +26,7 @@ class QueryBuilder
      *
      * @return array
      */
-    public function eagerLoadCount(Builder $builder, array $models): array
+    public function reloadWithBuilder(Builder $builder, array $models): array
     {
         $ids = \array_map(
             function (Model $model) {
