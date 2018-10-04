@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class InjectDirective extends BaseDirective implements FieldMiddleware
 {
@@ -15,7 +15,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'inject';
     }
@@ -30,37 +30,33 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
-        $resolver = $value->getResolver();
-        $attr = $this->directiveArgValue('context');
-        $name = $this->directiveArgValue('name');
-
-        if (!$attr) {
-            throw new DirectiveException(sprintf(
-                'The `inject` directive on %s [%s] must have a `context` argument',
-                $value->getNodeName(),
-                $value->getFieldName()
-            ));
+        $contextAttributeName = $this->directiveArgValue('context');
+        if (!$contextAttributeName) {
+            throw new DirectiveException(
+                "The `inject` directive on {$value->getNodeName()} [{$value->getFieldName()}] must have a `context` argument"
+            );
         }
 
-        if (!$name) {
-            throw new DirectiveException(sprintf(
-                'The `inject` directive on %s [%s] must have a `name` argument',
-                $value->getNodeName(),
-                $value->getFieldName()
-            ));
+        $argumentName = $this->directiveArgValue('name');
+        if (!$argumentName) {
+            throw new DirectiveException(
+                "The `inject` directive on {$value->getNodeName()} [{$value->getFieldName()}] must have a `name` argument"
+            );
         }
 
+        $previousResolvers = $value->getResolver();
         return $next(
             $value->setResolver(
-                function ($rootValue, $args, $context, ResolveInfo $resolveInfo) use ($attr, $name, $resolver) {
-                    return call_user_func_array($resolver, [
+                function ($rootValue, array $args, $context, ResolveInfo $resolveInfo)
+                use ($contextAttributeName, $argumentName, $previousResolvers) {
+                    return $previousResolvers(
                         $rootValue,
-                        array_merge($args, [$name => data_get($context, $attr)]),
+                        $args + [$argumentName => data_get($context, $contextAttributeName)],
                         $context,
                         $resolveInfo
-                    ]);
+                    );
                 }
             )
         );
