@@ -4,23 +4,48 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Schema\Context;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQLController extends Controller
 {
+    /** @var string */
+    private $query;
+    /** @var array */
+    private $variables;
+    /** @var GraphQL */
+    private $graphQL;
+
     /**
      * Inject middleware into request.
      *
      * @param Request $request
+     * @param ExtensionRegistry $extensionRegistry
+     * @param MiddlewareRegistry $middlewareRegistry
+     * @param GraphQL $graphQL
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, ExtensionRegistry $extensionRegistry, MiddlewareRegistry $middlewareRegistry, GraphQL $graphQL)
     {
-        graphql()->prepSchema();
+        $this->graphQL = $graphQL;
 
-        $this->middleware(graphql()->middleware()->forRequest(
-            $request->input('query', '{ empty }')
-        ));
+        $this->query = $request->input('query');
+        $this->variables = is_string($variables = $request->input('variables'))
+            ? json_decode($variables, true)
+            : $variables;
+
+        $extensionRegistry->requestDidStart(
+            new ExtensionRequest($request, $this->query, $this->variables)
+        );
+
+        $this->graphQL->prepSchema();
+
+        $this->middleware(
+            $middlewareRegistry->forRequest($this->query)
+        );
     }
 
     /**
@@ -32,19 +57,23 @@ class GraphQLController extends Controller
      */
     public function query(Request $request)
     {
-        $query = $request->input('query');
-        $variables = $request->input('variables');
-
-        if (is_string($variables)) {
-            $variables = json_decode($variables, true);
-        }
+        $debugSettings = config('app.debug')
+            ? config('lighthouse.debug')
+            : false;
 
         return response(
-            graphql()->execute(
-                $query,
-                new Context($request, app('auth')->user()),
-                $variables
-            )
+            $this->graphQL
+                ->executeQuery(
+                    $this->query,
+                    new Context(
+                        $request,
+                        app()->bound('auth')
+                            ? auth()->user()
+                            : null
+                    ),
+                    $this->variables
+                )
+                ->toArray($debugSettings)
         );
     }
 }

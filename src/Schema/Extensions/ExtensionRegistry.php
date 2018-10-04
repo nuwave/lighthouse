@@ -3,82 +3,46 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-class ExtensionRegistry
+class ExtensionRegistry implements \JsonSerializable
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection|GraphQLExtension[]
      */
     protected $extensions;
 
-    /**
-     * Create instance of extension registry.
-     */
     public function __construct()
     {
-        $this->extensions = collect();
+        $this->extensions = collect(
+            config('lighthouse.extensions', [])
+        )->mapWithKeys(function(string $extension){
+            $extensionInstance = resolve($extension);
+
+            if(!$extensionInstance instanceof GraphQLExtension){
+                throw new \Exception("The class [$extension] was registered as an extensions but is not an instanceof \Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension");
+            }
+
+            return [$extensionInstance::name() => $extensionInstance];
+        });
     }
 
     /**
-     * Register a single GraphQL extension.
+     * Get registered extension by its short name.
      *
-     * @param GraphQLExtension $extension
+     * For example, retrieve the TracingExtension by calling $this->get('tracing')
      *
-     * @return ExtensionRegistry
-     */
-    public function register(GraphQLExtension $extension): ExtensionRegistry
-    {
-        $this->extensions->put($extension->name(), $extension);
-
-        return $this;
-    }
-
-    /**
-     * Register multiple GraphQL extensions.
-     *
-     * @param array $extensions
-     *
-     * @return ExtensionRegistry
-     */
-    public function registerMany(array $extensions): ExtensionRegistry
-    {
-        foreach ($extensions as $extension) {
-            $this->register($extension);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get extension by name.
-     *
-     * @param string $name
+     * @param string $shortName
      *
      * @return GraphQLExtension|null
      */
-    public function get(string $name)
+    public function get(string $shortName)
     {
-        return $this->extensions->get($name);
+        return $this->extensions->get($shortName);
     }
 
     /**
-     * Get active extensions.
-     *
-     * @return Collection
-     */
-    public function active(): Collection
-    {
-        $extensions = config('lighthouse.extensions', []);
-
-        if (is_string($extensions)) {
-            $extensions = explode(',', $extensions);
-        }
-
-        return $this->extensions->only($extensions);
-    }
-
-    /**
-     * Handle request start.
+     * Notify all registered extensions that a request did start.
      *
      * @param ExtensionRequest $request
      *
@@ -86,7 +50,7 @@ class ExtensionRegistry
      */
     public function requestDidStart(ExtensionRequest $request): ExtensionRegistry
     {
-        $this->active()->each(function (GraphQLExtension $extension) use ($request) {
+        $this->extensions->each(function (GraphQLExtension $extension) use ($request) {
             $extension->requestDidStart($request);
         });
 
@@ -94,16 +58,30 @@ class ExtensionRegistry
     }
 
     /**
-     * Get output for all extensions.
+     * Allow Extensions to manipulate the Schema.
+     *
+     * @param DocumentAST $documentAST
+     *
+     * @return DocumentAST
+     */
+    public function manipulate(DocumentAST $documentAST): DocumentAST
+    {
+        return $this->extensions
+            ->reduce(
+                function(DocumentAST $documentAST, GraphQLExtension $extension){
+                    return $extension->manipulateSchema($documentAST);
+                },
+                $documentAST
+            );
+    }
+
+    /**
+     * Render the result of the extensions to an array that is put in the response.
      *
      * @return array
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
-        return $this->active()
-            ->mapWithKeys(function (GraphQLExtension $extension) {
-                return [$extension->name() => $extension->toArray()];
-            })
-            ->toArray();
+        return $this->extensions->jsonSerialize();
     }
 }

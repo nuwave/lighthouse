@@ -25,7 +25,7 @@ class ClientDirectiveTest extends TestCase
             foo @filter(key: "baz")
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals(['foo' => 'baz'], $result->data);
     }

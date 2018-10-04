@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use GraphQL\Type\Schema;
+use GraphQL\Error\Debug;
 
 class GraphQLTest extends TestCase
 {
@@ -13,6 +14,7 @@ class GraphQLTest extends TestCase
         created_at: String!
         updated_at: String!
     }
+    
     type Query {
         user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
     }
@@ -23,7 +25,7 @@ class GraphQLTest extends TestCase
      */
     public function itCanBuildGraphQLSchema()
     {
-        $schema = graphql()->buildSchema();
+        $schema = graphql()->prepSchema();
 
         $this->assertInstanceOf(Schema::class, $schema);
     }
@@ -34,7 +36,7 @@ class GraphQLTest extends TestCase
     public function itCanExecuteQuery()
     {
         $query = '
-        query User {
+        {
             user {
                 id
                 created_at
@@ -42,6 +44,7 @@ class GraphQLTest extends TestCase
             }
         }
         ';
+        $result = graphql()->executeQuery($query)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
 
         $expected = [
             'data' => [
@@ -51,10 +54,8 @@ class GraphQLTest extends TestCase
                     'updated_at' => now()->format('Y-m-d'),
                 ],
             ],
-            'extensions' => [],
         ];
-
-        $this->assertEquals($expected, graphql()->execute($query));
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -70,6 +71,7 @@ class GraphQLTest extends TestCase
                 updated_at
             }
         }
+        
         query userOnlyId {
             user {
                 id
@@ -77,6 +79,7 @@ class GraphQLTest extends TestCase
         }
         ';
         request()->merge(['operationName' => 'userOnlyId']);
+        $result = graphql()->executeQuery($query)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
 
         $expected = [
             'data' => [
@@ -84,13 +87,27 @@ class GraphQLTest extends TestCase
                     'id' => 1,
                 ],
             ],
-            'extensions' => [],
         ];
 
-        $this->assertEquals($expected, graphql()->execute($query));
+        $this->assertEquals($expected, $result);
     }
 
-    public function user($root, array $args, $context, $info)
+    /**
+     * @test
+     */
+    public function itRejectsInvalidQuery()
+    {
+        $query = '
+        {
+            nonExistingField
+        }
+        ';
+        $result = graphql()->executeQuery($query)->toArray();
+
+        $this->assertContains('nonExistingField', array_get($result, 'errors.0.message'));
+    }
+
+    public function user($root, array $args, $context, $info): array
     {
         return [
             'id' => 1,

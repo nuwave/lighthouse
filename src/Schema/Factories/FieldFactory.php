@@ -6,68 +6,90 @@ use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Resolvers\NodeResolver;
-use Nuwave\Lighthouse\Support\Exceptions\ValidationError;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldFactory
 {
+    /** @var DirectiveRegistry */
+    protected $directiveRegistry;
+    /** @var ValueFactory */
+    protected $valueFactory;
+    /** @var ArgumentFactory */
+    protected $argumentFactory;
+    /** @var Pipeline */
+    protected $pipeline;
+    /** @var DefinitionNodeConverter */
+    protected $definitionNodeConverter;
+
+    /**
+     * @param DirectiveRegistry $directiveRegistry
+     * @param ValueFactory $valueFactory
+     * @param ArgumentFactory $argumentFactory
+     * @param Pipeline $pipeline
+     * @param DefinitionNodeConverter $definitionNodeConverter
+     */
+    public function __construct(DirectiveRegistry $directiveRegistry, ValueFactory $valueFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline, DefinitionNodeConverter $definitionNodeConverter)
+    {
+        $this->directiveRegistry = $directiveRegistry;
+        $this->valueFactory = $valueFactory;
+        $this->argumentFactory = $argumentFactory;
+        $this->pipeline = $pipeline;
+        $this->definitionNodeConverter = $definitionNodeConverter;
+    }
+
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
      * @param FieldValue $fieldValue
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     * @throws DirectiveException
      *
      * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
     {
-        $fieldValue->setType(
-            NodeResolver::resolve($fieldValue->getField()->type)
+        $fieldDefinition = $fieldValue->getField();
+    
+        $fieldType = $this->definitionNodeConverter->toType(
+            $fieldDefinition->type
         );
+        $fieldValue->setType($fieldType);
 
-        $initialResolver = $this->hasResolverDirective($fieldValue)
+        $initialResolver = $this->directiveRegistry->hasFieldResolver($fieldDefinition)
             ? $this->useResolverDirective($fieldValue)
             : $this->defaultResolver($fieldValue);
 
-        $args = $this->getArgDefinitions($fieldValue);
+        $inputValueDefinitions = $this->getInputValueDefinitions($fieldValue);
         $resolverWithAdditionalArgs = $this->injectAdditionalArgs($initialResolver, $fieldValue->getAdditionalArgs());
-        $resolverWithValidation = $this->wrapResolverWithValidation($resolverWithAdditionalArgs, $args);
+        $resolverWithValidation = $this->wrapResolverWithValidation($resolverWithAdditionalArgs, $inputValueDefinitions);
 
         $fieldValue->setResolver($resolverWithValidation);
 
-        $resolverWithMiddleware = app(Pipeline::class)
+        $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
-            ->through(graphql()->directives()->fieldMiddleware($fieldValue->getField()))
+            ->through(
+                $this->directiveRegistry->fieldMiddleware($fieldDefinition)
+            )
             ->via('handleField')
             ->then(function (FieldValue $fieldValue) {
                 return $fieldValue;
-            })->getResolver();
+            })
+            ->getResolver();
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
-            'name' => $fieldValue->getFieldName(),
-            'type' => $fieldValue->getType(),
-            'args' => $args->toArray(),
+            'name' => $fieldDefinition->name->value,
+            'type' => $fieldType,
+            'args' => $inputValueDefinitions->toArray(),
             'resolve' => $resolverWithMiddleware,
-            'description' => $fieldValue->getDescription(),
+            'description' => data_get($fieldDefinition->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
         ];
-    }
-
-    /**
-     * Check if field has a resolver directive.
-     *
-     * @param FieldValue $value
-     *
-     * @return bool
-     */
-    protected function hasResolverDirective(FieldValue $value): bool
-    {
-        return graphql()->directives()
-            ->hasResolver($value->getField());
     }
 
     /**
@@ -75,13 +97,13 @@ class FieldFactory
      *
      * @param FieldValue $value
      *
-     * @throws \Nuwave\Lighthouse\Support\Exceptions\DirectiveException
+     * @throws DirectiveException
      *
      * @return \Closure
      */
     protected function useResolverDirective(FieldValue $value): \Closure
     {
-        return graphql()->directives()
+        return $this->directiveRegistry
             ->fieldResolver($value->getField())
             ->resolveField($value)
             ->getResolver();
@@ -98,11 +120,23 @@ class FieldFactory
     {
         switch ($fieldValue->getNodeName()) {
             case 'Mutation':
-                return $this->rootOperationResolver($fieldValue->getFieldName(), 'mutations');
+                return $this->rootOperationResolver(
+                    $fieldValue->getFieldName(),
+                    'mutations'
+                );
             case 'Query':
-                return $this->rootOperationResolver($fieldValue->getFieldName(), 'queries');
+                return $this->rootOperationResolver(
+                    $fieldValue->getFieldName(),
+                    'queries'
+                );
             default:
-                return \Closure::fromCallable([\GraphQL\Executor\Executor::class, 'defaultFieldResolver']);
+                // TODO convert this back once we require PHP 7.1
+//                return \Closure::fromCallable(
+//                    [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
+//                );
+                return function() {
+                    return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
+                };
         }
     }
 
@@ -110,7 +144,7 @@ class FieldFactory
      * Get the default resolver for a field of the root operation types.
      *
      * @param string $fieldName
-     * @param string $rootOperationType One of queries|mutations
+     * @param string $rootOperationType One of [queries|mutations]
      *
      * @return \Closure
      */
@@ -118,8 +152,8 @@ class FieldFactory
     {
         return function ($obj, array $args, $context = null, $info = null) use ($fieldName, $rootOperationType) {
             $class = config("lighthouse.namespaces.{$rootOperationType}").'\\'.studly_case($fieldName);
-
-            return (new $class($obj, $args, $context, $info))->resolve();
+    
+            return resolve($class)->resolve($obj, $args, $context, $info);
         };
     }
 
@@ -147,31 +181,39 @@ class FieldFactory
      *
      * @param FieldValue $fieldValue
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    protected function getArgDefinitions(FieldValue $fieldValue): Collection
+    protected function getInputValueDefinitions(FieldValue $fieldValue): Collection
     {
-        return collect(data_get($fieldValue->getField(), 'arguments', []))
+        return
+            collect(
+                // TODO remove this wrapping call once Fields are always FieldDefinitions
+                data_get($fieldValue->getField(), 'arguments')
+            )
             ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
-                $argValue = app(ValueFactory::class)->arg($fieldValue, $inputValueDefinition);
+                $argValue = $this->valueFactory->arg($fieldValue, $inputValueDefinition);
 
-                return [$argValue->getArgName() => (new ArgumentFactory())->handle($argValue)];
+                return [$inputValueDefinition->name->value => $this->argumentFactory->handle($argValue)];
             });
     }
 
     /**
-     * Wrap field resolver function w/ validation logic.
+     * Wrap field resolver function with validation logic.
      *
-     * @param \Closure                       $resolver
-     * @param \Illuminate\Support\Collection $inputValueDefinitions
+     * This has to happen as part of the field resolution, because we might have
+     * deeply nested input values and we can not generate the rules upfront.
+     *
+     * @param \Closure $resolver
+     * @param Collection $inputValueDefinitions
      *
      * @return \Closure
      */
     protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
-        return function ($rootValue, $inputArgs, $context = null, $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
-            $inputArgs = $this->resolveArgs($inputArgs, $inputValueDefinitions);
-            $rules = $this->getRules(
+        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
+            $inputArgs = $this->transformArgs($inputArgs, $inputValueDefinitions);
+
+            list($rules, $messages) = $this->getRulesAndMessages(
                 $rootValue,
                 $inputArgs,
                 $context,
@@ -179,14 +221,16 @@ class FieldFactory
                 $inputValueDefinitions
             );
 
-            if (sizeof(array_get($rules, 'rules', []))) {
+            if (count($rules) > 0) {
+                /** @var GraphQLValidator $validator */
                 $validator = validator(
                     $inputArgs,
-                    array_get($rules, 'rules'),
-                    array_get($rules, 'messages', []),
+                    $rules,
+                    $messages,
                     [
                         'root' => $rootValue,
                         'context' => $context,
+                        // This makes it so that we get an instance of our own Validator class
                         'resolveInfo' => $resolveInfo,
                     ]
                 );
@@ -194,33 +238,33 @@ class FieldFactory
                 $validator->validate();
             }
 
-            return call_user_func_array($resolver, [$rootValue, $inputArgs, $context, $resolveInfo]);
+            return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
         };
     }
 
     /**
-     * Resolve argument(s).
+     * Arguments may have transformers defined upon them.
      *
-     * @param array      $inputArguments
-     * @param Collection $argumentValues
+     * This iterates through them and ensures they are called.
+     *
+     * @param array $inputArguments
+     * @param Collection<array> $argumentValues
      *
      * @return array
      */
-    protected function resolveArgs(array $inputArguments, Collection $argumentValues): array
+    protected function transformArgs(array $inputArguments, Collection $inputValueDefinitions): array
     {
-        $resolvers = $argumentValues->filter(function ($arg) {
-            return array_has($arg, 'resolve');
-        });
-
-        if ($resolvers->isEmpty()) {
-            return $inputArguments;
-        }
-
         return collect($inputArguments)
-            ->map(function ($arg, $key) use ($resolvers) {
-                return $resolvers->has($key)
-                    ? $resolvers->get($key)['resolve']($arg)
-                    : $arg;
+            ->map(function($value, $key) use ($inputValueDefinitions){
+                $definition = $inputValueDefinitions->get($key);
+                
+                return collect($definition['transformers'])
+                    ->reduce(
+                        function($value, \Closure $transformer){
+                            return $transformer($value);
+                        },
+                        $value
+                    );
             })
             ->toArray();
     }
@@ -234,9 +278,9 @@ class FieldFactory
      * @param ResolveInfo|null $resolveInfo
      * @param Collection       $inputValueDefinitions
      *
-     * @return array
+     * @return array [$rules, $messages]
      */
-    public function getRules(
+    public function getRulesAndMessages(
         $rootValue,
         $inputArgs,
         $context,
@@ -245,8 +289,8 @@ class FieldFactory
     ): array {
         $resolveArgs = [$rootValue, $inputArgs, $context, $resolveInfo];
 
-        $validation = $inputValueDefinitions
-            ->map(function ($inputValueDefinition, $key) use ($resolveArgs) {
+        $rules = $inputValueDefinitions
+            ->map(function (array $inputValueDefinition, $key) use ($resolveArgs) {
                 $rules = data_get($inputValueDefinition, 'rules');
 
                 if (! $rules) {
@@ -257,40 +301,22 @@ class FieldFactory
                     ? call_user_func_array($inputValueDefinition['rules'], $resolveArgs)
                     : $rules;
 
-                return [
-                    'rules' => [$key => $rules],
-                    'messages' => data_get($inputValueDefinition, 'messages', []),
-                ];
+                return $rules;
             })
-            ->filter()
-            ->values();
+            ->filter();
 
-        $rules = $validation->flatMap(function ($validation) {
-            return $validation['rules'];
-        });
-        $messages = $validation->flatMap(function ($validation) {
-            return $validation['messages'];
-        });
+        $messages = $inputValueDefinitions->pluck('messages')->collapse();
 
-        // Rules are applied to the fields which are on one of the root operation types.
-        // Nested fields are excluded because they are validated as part of the root field.
-        $parentOperationType = data_get($resolveInfo, 'parentType.name');
-        if ('Mutation' === $parentOperationType || 'Query' === $parentOperationType) {
-            $documentAST = graphql()->documentAST();
-            $nestedValidation = (new RuleFactory())->build(
-                $documentAST,
-                $documentAST->objectTypeDefinition($parentOperationType),
-                $inputArgs,
-                $resolveInfo->fieldName
-            );
+        list($nestedRules, $nestedMessages) = RuleFactory::build(
+            $resolveInfo->fieldName,
+            $resolveInfo->parentType->name,
+            $inputArgs,
+            graphql()->documentAST()
+        );
 
-            $rules = $rules->merge(array_get($nestedValidation, 'rules', []));
-            $messages = $messages->merge(array_get($nestedValidation, 'messages', []));
-        }
+        $rules = $rules->merge($nestedRules);
+        $messages = $messages->merge($nestedMessages);
 
-        return [
-            'rules' => $rules->toArray(),
-            'messages' => $messages->toArray(),
-        ];
+        return [ $rules->toArray(), $messages->toArray(), ];
     }
 }

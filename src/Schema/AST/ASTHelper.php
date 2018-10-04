@@ -2,14 +2,22 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use Exception;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\ValueNode;
 use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\ObjectFieldNode;
+use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 class ASTHelper
 {
@@ -72,7 +80,7 @@ class ASTHelper
      * @param FieldDefinitionNode $field
      *
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getFieldTypeName(FieldDefinitionNode $field): string
     {
@@ -89,7 +97,7 @@ class ASTHelper
      * @param Node $node
      *
      * @return NamedTypeNode
-     * @throws Exception
+     * @throws \Exception
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
@@ -100,9 +108,138 @@ class ASTHelper
         $type = data_get($node, 'type');
         
         if(!$type){
-            throw new Exception("The node '$node->kind' does not have a type associated with it.");
+            throw new \Exception("The node '$node->kind' does not have a type associated with it.");
         }
         
         return self::getUnderlyingNamedTypeNode($type);
+    }
+
+    /**
+     * Does the given directive have an argument of the given name?
+     *
+     * @param DirectiveNode $directiveDefinition
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
+    {
+        return collect($directiveDefinition->arguments)->contains(function(ArgumentNode $argumentNode) use ($name){
+            return $argumentNode->name->value === $name;
+        });
+    }
+
+    /**
+     * @param DirectiveNode $directive
+     * @param string $name
+     * @param mixed|null $default
+     *
+     * @return mixed|null
+     */
+    public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
+    {
+        $arg = collect($directive->arguments)->first(function (ArgumentNode $argumentNode) use ($name) {
+            return $argumentNode->name->value === $name;
+        });
+
+        return $arg
+            ? self::argValue($arg, $default)
+            : $default;
+    }
+
+
+    /**
+     * Get argument's value.
+     *
+     * @param Node  $arg
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public static function argValue(Node $arg, $default = null)
+    {
+        $valueNode = $arg->value;
+
+        if (! $valueNode) {
+            return $default;
+        }
+
+        if ($valueNode instanceof ListValueNode) {
+            return collect($valueNode->values)->map(function (ValueNode $valueNode) {
+                return $valueNode->value;
+            })->toArray();
+        }
+
+        if ($valueNode instanceof ObjectValueNode) {
+            return collect($valueNode->fields)
+                ->mapWithKeys(function (ObjectFieldNode $field) {
+                    return [$field->name->value => self::argValue($field)];
+                })
+                ->toArray();
+        }
+
+        return $valueNode->value;
+    }
+    
+    /**
+     * This can be at most one directive, since directives can only be used once per location.
+     *
+     * @param Node $definitionNode
+     * @param string $name
+     *
+     * @return DirectiveNode|null
+     */
+    public static function directiveDefinition(Node $definitionNode, string $name)
+    {
+        return collect($definitionNode->directives)
+            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
+                return $directiveDefinitionNode->name->value === $name;
+            });
+    }
+    
+    /**
+     * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
+     *
+     * @param Node $definitionNode
+     * @param string $directiveName
+     *
+     * @return string
+     */
+    public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
+    {
+        $namespaceDirective = static::directiveDefinition(
+            $definitionNode,
+            (new NamespaceDirective)->name()
+        );
+    
+        return $namespaceDirective
+            // The namespace directive can contain an argument with the name of the
+            // current directive, in which case it applies here
+            ? static::directiveArgValue($namespaceDirective, $directiveName, '')
+            // Default to an empty namespace if the namespace directive does not exist
+            : '';
+    }
+    
+    /**
+     * @param ObjectTypeDefinitionNode $objectType
+     * @param DocumentAST $documentAST
+     *
+     * @throws \Exception
+     *
+     * @return DocumentAST
+     */
+    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
+    {
+        $objectType->interfaces = self::mergeNodeList(
+            $objectType->interfaces,
+            [Parser::parseType('Node', ['noLocation' => true])]
+        );
+    
+        $globalIdFieldDefinition = PartialParser::fieldDefinition(
+            config('lighthouse.global_id_field') .': ID! @globalId'
+        );
+        $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
+        
+        return $documentAST->setDefinition($objectType);
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+
 if (! function_exists('graphql')) {
     /**
      * Get instance of graphql container.
@@ -8,7 +11,7 @@ if (! function_exists('graphql')) {
      */
     function graphql()
     {
-        return app('graphql');
+        return resolve('graphql');
     }
 }
 
@@ -20,7 +23,7 @@ if (! function_exists('auth')) {
      */
     function auth()
     {
-        return app('auth');
+        return resolve('auth');
     }
 }
 
@@ -29,11 +32,11 @@ if (! function_exists('schema')) {
      * Get instance of schema container.
      *
      * @return \Nuwave\Lighthouse\Schema\TypeRegistry
-     * @deprecated Use graphql()->types() directly in the future
+     * @deprecated Use resolve(TypeRegistry::class) directly in the future
      */
     function schema()
     {
-        return graphql()->types();
+        return resolve(TypeRegistry::class);
     }
 }
 
@@ -42,11 +45,11 @@ if (! function_exists('directives')) {
      * Get instance of directives container.
      *
      * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
-     * @deprecated Use graphql()->directives() directly in the future
+     * @deprecated Use resolve(DirectiveRegistry::class) directly in the future
      */
     function directives()
     {
-        return graphql()->directives();
+        return resolve(DirectiveRegistry::class);
     }
 }
 
@@ -89,5 +92,37 @@ if (! function_exists('resolve')) {
     function resolve($name)
     {
         return app($name);
+    }
+}
+
+if (! function_exists('namespace_classname')) {
+    /**
+     * Attempt to find a given class in the given namespaces.
+     *
+     * If the class itself exists, it is simply returned as is.
+     * Else, the given namespaces are tried in order.
+     *
+     * @param string $classCandidate
+     * @param array $namespacesToTry
+     *
+     * @return string|false
+     */
+    function namespace_classname(string $classCandidate, array $namespacesToTry = [])
+    {
+        if(\class_exists($classCandidate)){
+            return $classCandidate;
+        }
+    
+        // Stop if the class is found or we are out of namespaces to try
+        while(!empty($namespacesToTry)){
+            // Pop off the first namespace and try it
+            $className = \array_shift($namespacesToTry) . '\\' . $classCandidate;
+        
+            if(\class_exists($className)){
+                return $className;
+            }
+        }
+        
+        return false;
     }
 }

@@ -3,23 +3,55 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
+use GraphQL\Error\InvariantViolation;
 
+/**
+ * Store the executable types of our GraphQL schema.
+ *
+ * Class TypeRegistry
+ * @package Nuwave\Lighthouse\Schema
+ */
 class TypeRegistry
 {
     /**
-     * Collection of schema types.
+     * A map of executable schema types by name.
      *
-     * @var Collection
+     * [$typeName => Type]
+     *
+     * @var Type[]
      */
     protected $types;
+    
+    /**
+     * Register type with registry.
+     *
+     * @param Type $type
+     *
+     * @return TypeRegistry
+     */
+    public function register(Type $type): TypeRegistry
+    {
+        $this->types[$type->name] = $type;
+        
+        return $this;
+    }
 
     /**
-     * TypeRegistry constructor.
+     * Resolve type instance by name.
+     *
+     * @param string $typeName
+     *
+     * @throws InvariantViolation
+     *
+     * @return Type
      */
-    public function __construct()
+    public function get(string $typeName): Type
     {
-        $this->types = collect();
+        if(!isset($this->types[$typeName])){
+            throw new InvariantViolation("No type {$typeName} was registered.");
+        }
+
+        return $this->types[$typeName];
     }
 
     /**
@@ -28,7 +60,7 @@ class TypeRegistry
      * @param string $typeName
      *
      * @return Type
-     * @deprecated in favour of get
+     * @deprecated in favour of get, remove in v3
      */
     public function instance($typeName)
     {
@@ -36,35 +68,13 @@ class TypeRegistry
     }
 
     /**
-     * Resolve type instance by name.
-     *
-     * @param string $typeName
-     *
-     * @return Type
-     */
-    public function get($typeName)
-    {
-        return $this->types->get($typeName);
-    }
-
-    /**
      * Register type with registry.
      *
      * @param Type $type
-     * @deprecated in favour of register
+     * @deprecated in favour of register, remove in v3
      */
     public function type(Type $type)
     {
         $this->register($type);
-    }
-
-    /**
-     * Register type with registry.
-     *
-     * @param Type $type
-     */
-    public function register(Type $type)
-    {
-        $this->types->put($type->name, $type);
     }
 }

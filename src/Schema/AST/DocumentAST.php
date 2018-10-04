@@ -21,13 +21,13 @@ use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Exceptions\DocumentASTException;
 
 class DocumentAST implements \Serializable
 {
     /**
-     * Check if documentAST is currently locked.
+     * If the DocumentAST is locked, it can not be mutated.
      *
      * @var bool
      */
@@ -39,8 +39,6 @@ class DocumentAST implements \Serializable
     protected $documentNode;
 
     /**
-     * DocumentAST constructor.
-     *
      * @param DocumentNode $documentNode
      */
     public function __construct(DocumentNode $documentNode)
@@ -57,16 +55,24 @@ class DocumentAST implements \Serializable
      */
     public static function fromSource(string $schema): DocumentAST
     {
-        // Ignore location since it only bloats the AST
-        return new static(Parser::parse($schema, ['noLocation' => true]));
+        return new static(
+            Parser::parse(
+                $schema,
+                // Ignore location since it only bloats the AST
+                ['noLocation' => true]
+            )
+        );
     }
 
     /**
      * Strip out irrelevant information to make serialization more efficient.
      */
-    public function serialize()
+    public function serialize(): string
     {
-        return serialize(AST::toArray($this->documentNode));
+        return serialize([
+            'ast' => AST::toArray($this->documentNode),
+            'locked' => $this->locked,
+        ]);
     }
 
     /**
@@ -76,7 +82,12 @@ class DocumentAST implements \Serializable
      */
     public function unserialize($serialized)
     {
-        $this->documentNode = AST::fromArray(unserialize($serialized));
+        $unserialized = unserialize($serialized);
+
+        $this->documentNode = AST::fromArray(
+            $unserialized['ast']
+        );
+        $this->locked = $unserialized['locked'];
     }
 
     /**
@@ -122,11 +133,13 @@ class DocumentAST implements \Serializable
     {
         $definitions = collect($this->documentNode->definitions);
 
-        return $this->locked ? $definitions : $definitions->map(function (Node $node) {
-            $clone = ASTHelper::cloneNode($node);
+        return $this->locked
+            ? $definitions
+            : $definitions->map(function (Node $node) {
+                $clone = ASTHelper::cloneNode($node);
 
-            return $this->assignDefinitionNodeHash($clone, $node);
-        });
+                return $this->assignDefinitionNodeHash($clone, $node);
+            });
     }
 
     /**
@@ -136,14 +149,15 @@ class DocumentAST implements \Serializable
      */
     public function typeDefinitions(): Collection
     {
-        return $this->definitions()->filter(function (DefinitionNode $node) {
-            return $node instanceof ScalarTypeDefinitionNode
-                || $node instanceof ObjectTypeDefinitionNode
-                || $node instanceof InterfaceTypeDefinitionNode
-                || $node instanceof UnionTypeDefinitionNode
-                || $node instanceof EnumTypeDefinitionNode
-                || $node instanceof InputObjectTypeDefinitionNode;
-        });
+        return $this->definitions()
+            ->filter(function (DefinitionNode $node) {
+                return $node instanceof ScalarTypeDefinitionNode
+                    || $node instanceof ObjectTypeDefinitionNode
+                    || $node instanceof InterfaceTypeDefinitionNode
+                    || $node instanceof UnionTypeDefinitionNode
+                    || $node instanceof EnumTypeDefinitionNode
+                    || $node instanceof InputObjectTypeDefinitionNode;
+            });
     }
 
     /**
@@ -214,9 +228,10 @@ class DocumentAST implements \Serializable
      */
     public function objectTypeDefinition(string $name)
     {
-        return $this->objectTypeDefinitions()->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
-            return $objectType->name->value === $name;
-        });
+        return $this->objectTypeDefinitions()
+            ->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
+                return $objectType->name->value === $name;
+            });
     }
 
     /**
@@ -234,9 +249,10 @@ class DocumentAST implements \Serializable
      */
     public function inputObjectTypeDefinition(string $name)
     {
-        return $this->inputObjectTypeDefinitions()->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
-            return $inputType->name->value === $name;
-        });
+        return $this->inputObjectTypeDefinitions()
+            ->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
+                return $inputType->name->value === $name;
+            });
     }
 
     /**
@@ -289,7 +305,7 @@ class DocumentAST implements \Serializable
     protected function objectTypeOrDefault(string $name): ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition($name)
-            ?? PartialParser::objectTypeDefinition('type '.$name.'{}');
+            ?? PartialParser::objectTypeDefinition("type $name{}");
     }
 
     /**
@@ -301,9 +317,10 @@ class DocumentAST implements \Serializable
      */
     protected function definitionsByType(string $typeClassName): Collection
     {
-        return $this->definitions()->filter(function (Node $node) use ($typeClassName) {
-            return $node instanceof $typeClassName;
-        });
+        return $this->definitions()
+            ->filter(function (Node $node) use ($typeClassName) {
+                return $node instanceof $typeClassName;
+            });
     }
 
     /**
@@ -345,19 +362,22 @@ class DocumentAST implements \Serializable
         } else {
             $found = false;
 
-            $newDefinitions = $originalDefinitions->map(function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
-                $originalHashID = $this->getDefinitionNodeHash($originalDefinition);
-
-                if ($originalHashID === $newHashID) {
-                    $found = true;
-                    $newDefinition->spl_object_hash = $originalHashID;
-
-                    $originalDefinition = $newDefinition;
+            // See if we can replace an existing definition, if the hash matches
+            $newDefinitions = $originalDefinitions->map(
+                function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
+                    $originalHashID = $this->getDefinitionNodeHash($originalDefinition);
+    
+                    if ($originalHashID === $newHashID) {
+                        $found = true;
+                        
+                        return $newDefinition;
+                    }
+    
+                    return $originalDefinition;
                 }
+            );
 
-                return $originalDefinition;
-            });
-
+            // If no match is found, we just add the new definition in after all
             if (! $found) {
                 $newDefinitions = $newDefinitions->push($newDefinition);
             }
@@ -383,7 +403,11 @@ class DocumentAST implements \Serializable
      */
     protected function getDefinitionNodeHash(DefinitionNode $node): string
     {
-        return data_get($node, 'spl_object_hash', spl_object_hash($node));
+        return data_get(
+            $node,
+            'spl_object_hash',
+            spl_object_hash($node)
+        );
     }
 
     /**

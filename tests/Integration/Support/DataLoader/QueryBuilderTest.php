@@ -5,19 +5,17 @@ namespace Tests\Integration\Support\DataLoader;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class QueryBuilderTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * Setup test environment.
      */
     public function setUp()
     {
         parent::setUp();
+        
         $count = 4;
         $users = factory(User::class, 3)->create();
         $users->each(function ($user) use (&$count) {
@@ -34,6 +32,7 @@ class QueryBuilderTest extends DBTestCase
     public function itCanLoadRelationshipsWithLimitsOnCollection()
     {
         $users = User::all();
+        // TODO remove this as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
         $users->fetch(['tasks' => function ($query) {
             $query->take(3);
         }]);

@@ -1,19 +1,14 @@
 <?php
 
-
 namespace Tests\Integration\Schema\Directives\Fields;
 
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
 class FirstDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /** @test */
-    public function can_return_single_user()
+    public function itReturnsASingleUser()
     {
         $schema = '
         type User {
@@ -28,10 +23,16 @@ class FirstDirectiveTest extends DBTestCase
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
-
-
-        $result = $this->queryAndReturnResult($schema, "{ user(id:{$userB->id}) { name } }");
-        $this->assertEquals('B', $result->data['user']['name']);
+    
+        $query = "
+        {
+            user(id: {$userB->id}){
+                name
+            }
+        }
+        ";
+        $result = $this->execute($schema, $query);
+        $this->assertSame('B', array_get($result, 'data.user.name'));
     }
 
     /** @test */
@@ -52,7 +53,7 @@ class FirstDirectiveTest extends DBTestCase
         $userC = factory(User::class)->create(['name' => 'B']);
 
 
-        $result = $this->queryAndReturnResult($schema, "{ user(name: \"A\") { id } }");
+        $result = $this->executeQuery($schema, "{ user(name: \"A\") { id } }");
         $this->assertEquals($userA->id, $result->data['user']['id']);
     }
 }

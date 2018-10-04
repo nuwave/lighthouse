@@ -2,27 +2,28 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Model;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryUtils;
+use Nuwave\Lighthouse\Execution\Utils\Cursor;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Execution\Utils\Pagination;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PaginateDirective extends PaginationManipulator implements FieldResolver, FieldManipulator
 {
-    use HandlesGlobalId;
-
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'paginate';
     }
@@ -31,21 +32,19 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $current
-     * @param DocumentAST              $original
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
         switch ($this->getPaginationType()) {
             case self::PAGINATION_TYPE_CONNECTION:
-                return $this->registerConnection($fieldDefinition, $parentType, $current, $original);
+                return $this->registerConnection($fieldDefinition, $parentType, $current);
             case self::PAGINATION_TYPE_PAGINATOR:
-                return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
             default:
-                return $this->registerPaginator($fieldDefinition, $parentType, $current, $original);
+                return $this->registerPaginator($fieldDefinition, $parentType, $current);
         }
     }
 
@@ -58,33 +57,30 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
-        $paginationType = $this->getPaginationType();
-
-        $model = $this->getModelClass();
-
-        switch ($paginationType) {
+        switch ($this->getPaginationType()) {
             case self::PAGINATION_TYPE_CONNECTION:
-                return $this->connectionTypeResolver($value, $model);
+                return $this->connectionTypeResolver($value);
             case self::PAGINATION_TYPE_PAGINATOR:
-                return $this->paginatorTypeResolver($value, $model);
             default:
-                return $this->paginatorTypeResolver($value, $model);
+                return $this->paginatorTypeResolver($value);
         }
     }
 
     /**
-     * @return string
      * @throws DirectiveException
+     *
+     * @return string
      */
-    protected function getPaginationType()
+    protected function getPaginationType(): string
     {
         $paginationType = $this->directiveArgValue('type', self::PAGINATION_TYPE_PAGINATOR);
 
         $paginationType = $this->convertAliasToPaginationType($paginationType);
+
         if (!$this->isValidPaginationType($paginationType)) {
-            $fieldName = $this->fieldDefinition->name->value;
+            $fieldName = $this->definitionNode->name->value;
             $directiveName = self::name();
             throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
         }
@@ -96,50 +92,106 @@ class PaginateDirective extends PaginationManipulator implements FieldResolver, 
      * Create a paginator resolver.
      *
      * @param FieldValue $value
-     * @param string $model
      *
      * @return FieldValue
      */
-    protected function paginatorTypeResolver(FieldValue $value, $model)
+    protected function paginatorTypeResolver(FieldValue $value): FieldValue
     {
-        return $value->setResolver(function ($root, array $args) use ($model) {
-            $first = data_get($args, 'count', 15);
-            $page = data_get($args, 'page', 1);
+        return $value->setResolver(
+            function ($root, array $args){
+                $first = $args['count'];
+                $page = array_get($args, 'page', 1);
 
-            $query = QueryUtils::applyFilters($model::query(), $args);
-            $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
-
-            Paginator::currentPageResolver(function () use ($page) {
-                return $page;
-            });
-
-            return $query->paginate($first);
-        });
+                return $this->getPaginatedResults(func_get_args(), $page, $first);
+            }
+        );
     }
 
     /**
      * Create a connection resolver.
      *
      * @param FieldValue $value
-     * @param string     $model
      *
      * @return FieldValue
      */
-    protected function connectionTypeResolver(FieldValue $value, $model)
+    protected function connectionTypeResolver(FieldValue $value): FieldValue
     {
-        return $value->setResolver(function ($root, array $args) use ($model, $value) {
-            $first = data_get($args, 'first', 15);
-            $after = $this->decodeCursor($args);
-            $page = $first && $after ? floor(($first + $after) / $first) : 1;
+        return $value->setResolver(
+            function ($root, array $args) {
+                $first = $args['first'];
+                $page = Pagination::calculateCurrentPage(
+                    $first,
+                    Cursor::decode($args)
+                );
 
-            $query = QueryUtils::applyFilters($model::query(), $args);
-            $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
+                return $this->getPaginatedResults(func_get_args(), $page, $first);
+            }
+        );
+    }
 
-            Paginator::currentPageResolver(function () use ($page) {
-                return $page;
-            });
 
-            return $query->paginate($first);
-        });
+    /**
+     * @param array $resolveArgs
+     * @param int $page
+     * @param int $first
+     *
+     * @throws DirectiveException
+     *
+     * @return LengthAwarePaginator
+     */
+    protected function getPaginatedResults(array $resolveArgs, int $page, int $first): LengthAwarePaginator
+    {
+        if($this->directiveHasArgument('builder')){
+            $query = call_user_func_array(
+                $this->getMethodArgument('builder'),
+                $resolveArgs
+            );
+        } else {
+            /** @var Model $model */
+            $model = $this->getPaginatorModel();
+            $query = $model::query();
+        }
+
+        $args = $resolveArgs[1];
+        
+        $query = QueryUtils::applyFilters($query, $args);
+        $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
+
+        return $query->paginate($first, ['*'], 'page', $page);
+    }
+
+
+    /**
+     * Get the model class from the `model` argument of the field.
+     *
+     * This works differently as in other directives, so we define a seperate function for it.
+     *
+     * @throws DirectiveException
+     * @throws \Exception
+     *
+     * @return string
+     */
+    protected function getPaginatorModel(): string
+    {
+        $model = $this->directiveArgValue('model');
+        
+        // Fallback to using information from the schema definition as the model name
+        if(! $model){
+            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+
+            // Cut the added type suffix to get the base model class name
+            $model = str_before($model, 'Paginator');
+            $model = str_before($model, 'Connection');
+        }
+        
+        if (! $model) {
+            throw new DirectiveException(
+                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+            );
+        }
+        
+        return $this->namespaceClassName($model, [
+            config('lighthouse.namespaces.models')
+        ]);
     }
 }

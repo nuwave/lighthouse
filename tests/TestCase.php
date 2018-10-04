@@ -2,17 +2,18 @@
 
 namespace Tests;
 
+use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
+use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
 
 class TestCase extends BaseTestCase
 {
-
     /**
      * This variable is injected the main GraphQL class
      * during execution of each test. It may be set either
@@ -21,7 +22,7 @@ class TestCase extends BaseTestCase
      * @var string
      */
     protected $schema = '';
-
+    
     /**
      * Get package providers.
      *
@@ -32,9 +33,10 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            LighthouseServiceProvider::class,
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
+            LighthouseServiceProvider::class,
+            ConsoleServiceProvider::class,
         ];
     }
 
@@ -52,28 +54,15 @@ class TestCase extends BaseTestCase
             }
         );
 
-        $app['config']->set('lighthouse.directives', []);
-        $app['config']->set('lighthouse.global_id_field', '_id');
-
-        $app['config']->set(
-            'lighthouse.namespaces.scalars',
-            'Tests\\Utils\\Scalars'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.mutations',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.models',
-            'Tests\\Utils\\Models'
-        );
+        $app['config']->set('lighthouse', [
+            'namespaces' => [
+                'scalars' => 'Tests\\Utils\\Scalars',
+                'unions' => 'Tests\\Utils\\Unions',
+                'queries' => 'Tests\\Utils\\Queries',
+                'mutations' => 'Tests\\Utils\\Mutations',
+                'models' => 'Tests\\Utils\\Models',
+            ]
+        ]);
     }
 
     /**
@@ -85,12 +74,24 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Executor\ExecutionResult
      */
-    protected function queryAndReturnResult(string $schema, string $query, array $variables = []): ExecutionResult
+    protected function executeQuery(string $schema, string $query, array $variables = []): ExecutionResult
     {
         // The schema is injected into the runtime during execution of the query
         $this->schema = $schema;
 
-        return graphql()->queryAndReturnResult($query, null, $variables);
+        return graphql()->executeQuery($query, null, $variables);
+    }
+
+    /**
+     * @param string $schema
+     * @param string $query
+     * @param array $variables
+     *
+     * @return array
+     */
+    protected function executeWithoutDebug(string $schema, string $query, array $variables = []): array
+    {
+        return $this->executeQuery($schema, $query, $variables)->toArray();
     }
 
     /**
@@ -104,9 +105,8 @@ class TestCase extends BaseTestCase
      */
     protected function execute(string $schema, string $query, array $variables = []): array
     {
-        $this->schema = $schema;
-
-        return graphql()->execute($query, null, $variables);
+        // For test execution, it is more convenient to throw Exceptions so they show up in the PHPUnit command line
+        return $this->executeQuery($schema, $query, $variables)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
     }
 
     /**
@@ -117,12 +117,12 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaWithDefaultQuery($schema): Schema
+    protected function buildSchemaWithDefaultQuery(string $schema): Schema
     {
         return $this->buildSchemaFromString($schema.'
-            type Query {
-                dummy: String
-            }
+        type Query {
+            dummy: String
+        }
         ');
     }
 
@@ -135,6 +135,6 @@ class TestCase extends BaseTestCase
     {
         $this->schema = $schema;
 
-        return graphql()->buildSchema();
+        return graphql()->prepSchema();
     }
 }

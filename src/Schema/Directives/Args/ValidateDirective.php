@@ -2,12 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 
 class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMiddleware
 {
@@ -25,56 +27,74 @@ class ValidateDirective extends BaseDirective implements ArgMiddleware, FieldMid
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure $next
      *
      * @throws DirectiveException
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
-        $validator = $this->directiveArgValue('validator');
-
-        if (! $validator) {
-            $fieldName = $value->getFieldName();
-            $message = "A `validator` argument must be supplied on the @validate directive on field {$fieldName}";
-
-            throw new DirectiveException($message);
-        }
-
         $resolver = $value->getResolver();
 
-        return $next($value->setResolver(function () use ($validator, $resolver) {
-            $funcArgs = func_get_args();
-            $root = array_get($funcArgs, '0');
-            $args = array_get($funcArgs, '1');
-            $context = array_get($funcArgs, '2');
-            $info = array_get($funcArgs, '3');
+        return $next(
+            $value->setResolver(
+                function ($root, $args, $context, ResolveInfo $resolveInfo) use ($resolver) {
+                    $validatorName = $this->directiveArgValue('validator');
+                    $fieldName = $resolveInfo->fieldName;
 
-            app($validator, compact('root', 'args', 'context', 'info'))->validate();
+                    if (!$validatorName) {
+                        throw new DirectiveException("A `validator` argument must be supplied on the @validate directive on field {$fieldName}");
+                    }
 
-            return call_user_func_array($resolver, $funcArgs);
-        }));
+                    $validator = app($validatorName, [
+                        'data' => $args,
+                        'rules' => [],
+                        'customAttributes' => [
+                            'root' => $root,
+                            'context' => $context,
+                            'resolveInfo' => $resolveInfo
+                        ]
+                    ]);
+
+                    if (!$validator instanceof GraphQLValidator) {
+                        throw new DirectiveException("The validator on field {$fieldName} must extend the GraphQLValidator class.");
+                    }
+
+                    return call_user_func_array($resolver, func_get_args());
+                }
+            )
+        );
     }
 
     /**
-     * Resolve the field directive.
+     * Apply transformations on the ArgumentValue.
      *
-     * @param ArgumentValue $value
-     * @param \Closure       $next
+     * @param ArgumentValue $argumentValue
+     * @param \Closure $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value, \Closure $next)
+    public function handleArgument(ArgumentValue $argumentValue, \Closure $next): ArgumentValue
     {
-        $rules = $this->directiveArgValue('rules', []);
-
-        $current = $value->getValue();
-        $current['rules'] = array_merge(
-            array_get($value->getArg(), 'rules', []),
-            $rules
+        $argumentValue->rules = array_merge(
+            data_get($argumentValue, 'rules', []),
+            $this->directiveArgValue('rules', [])
         );
-
-        return $next($value->setValue($current));
+    
+        $argumentValue->messages = array_merge(
+            data_get($argumentValue, 'messages', []),
+            collect($this->directiveArgValue('messages', []))
+                ->mapWithKeys(
+                    function (string $message, string $path) use ($argumentValue) {
+                        return [
+                            "{$argumentValue->getName()}.{$path}" => $message
+                        ];
+                    }
+                )
+                ->toArray()
+        );
+    
+        return $next($argumentValue);
     }
 }

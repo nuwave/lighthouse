@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class FieldDirective extends BaseDirective implements FieldResolver
 {
@@ -14,7 +14,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'field';
     }
@@ -28,32 +28,40 @@ class FieldDirective extends BaseDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
-        $baseClassName = $this->directiveArgValue('class')
-            ?? str_before($this->directiveArgValue('resolver'), '@');
-
-
-        if (empty($baseClassName)) {
-            $directiveName = $this->name();
-            throw new DirectiveException("Directive '{$directiveName}' must have a `class` argument.");
-        }
-
-        $resolverClass = $this->namespaceClassName($baseClassName);
-        $resolverMethod = $this->directiveArgValue('method')
-            ?? str_after($this->directiveArgValue('resolver'), '@');
-
-        if (! method_exists($resolverClass, $resolverMethod)) {
-            throw new DirectiveException("Method '{$resolverMethod}' does not exist on class '{$resolverClass}'");
+        if($this->directiveHasArgument('resolver')){
+            $resolver = $this->getMethodArgument('resolver');
+        } else {
+            /**
+             * @deprecated This behaviour will be removed in v3
+             *
+             * The only way to define methods will be via the resolver: "Class@method" style
+             */
+            $className = $this->namespaceClassName(
+                $this->directiveArgValue('class')
+            );
+            $methodName = $this->directiveArgValue('method');
+            if (! method_exists($className, $methodName)) {
+                throw new DirectiveException("Method '{$methodName}' does not exist on class '{$className}'");
+            }
+    
+            // TODO convert this back once we require PHP 7.1
+            // $resolver = \Closure::fromCallable([resolve($className), $methodName]);
+            $resolver = function() use ($className, $methodName){
+                return resolve($className)->{$methodName}(...func_get_args());
+            };
         }
 
         $additionalData = $this->directiveArgValue('args');
 
         return $value->setResolver(
-            function ($root, array $args, $context = null, $info = null) use ($resolverClass, $resolverMethod, $additionalData) {
-                return call_user_func_array(
-                    [app($resolverClass), $resolverMethod],
-                    [$root, array_merge($args, ['directive' => $additionalData]), $context, $info]
+            function ($root, array $args, $context = null, $info = null) use ($resolver, $additionalData) {
+                return $resolver(
+                    $root,
+                    array_merge($args, ['directive' => $additionalData]),
+                    $context,
+                    $info
                 );
             }
         );

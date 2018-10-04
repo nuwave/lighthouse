@@ -11,7 +11,9 @@ use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -19,7 +21,6 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\Exceptions\ParseException;
 
 class PartialParser
 {
@@ -82,12 +83,12 @@ class PartialParser
      *
      * @throws ParseException
      *
-     * @return NodeList
+     * @return ArgumentNode
      */
-    public static function argument(string $argumentDefinition): NodeList
+    public static function argument(string $argumentDefinition): ArgumentNode
     {
         return self::getFirstAndValidateType(
-            self::field("field($argumentDefinition): String")->arguments,
+            self::field("field($argumentDefinition)")->arguments,
             ArgumentNode::class
         );
     }
@@ -219,6 +220,21 @@ class PartialParser
         return self::getFirstAndValidateType(
             self::parse($interfaceDefinition)->definitions,
             InterfaceTypeDefinitionNode::class
+        );
+    }
+
+    /**
+     * @param string $unionDefinition
+     *
+     * @throws ParseException
+     *
+     * @return UnionTypeDefinitionNode
+     */
+    public static function unionTypeDefinition(string $unionDefinition): UnionTypeDefinitionNode
+    {
+        return self::getFirstAndValidateType(
+            self::parse($unionDefinition)->definitions,
+            UnionTypeDefinitionNode::class
         );
     }
 

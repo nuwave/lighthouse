@@ -3,26 +3,29 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class FieldDirectiveTest extends TestCase
 {
     /**
      * @test
+     * @deprecated this option of defining field resolvers will be removed in v3
      */
     public function itCanResolveFieldWithAssignedClass()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
+        $schema = '
+        type Query {
             bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "bar")
         }
-        ');
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $result = $this->execute($schema, $query);
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolve = array_get($fields, 'bar.resolve');
-
-        $this->assertEquals('foo.bar', $resolve(null, []));
+        $this->assertEquals('foo.bar', array_get($result, 'data.bar'));
     }
 
     /**
@@ -30,17 +33,19 @@ class FieldDirectiveTest extends TestCase
      */
     public function itAssignsResolverFromCombinedDefinition()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
+        $schema = '
+        type Query {
             bar: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
-        ');
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $result = $this->execute($schema, $query);
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolve = array_get($fields, 'bar.resolve');
-
-        $this->assertEquals('foo.bar', $resolve(null, []));
+        $this->assertEquals('foo.bar', array_get($result, 'data.bar'));
     }
 
     /**
@@ -48,48 +53,56 @@ class FieldDirectiveTest extends TestCase
      */
     public function itCanResolveFieldWithMergedArgs()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
-            bar: String! @field(class:"Tests\\\Utils\\\Resolvers\\\Foo" method: "baz" args:["foo.baz"])
+        $schema = '
+        type Query {
+            bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args:["foo.baz"])
         }
-        ');
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $result = $this->execute($schema, $query);
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
-        $resolve = array_get($fields, 'bar.resolve');
-
-        $this->assertEquals('foo.baz', $resolve(null, []));
+        $this->assertEquals('foo.baz', array_get($result, 'data.bar'));
     }
 
     /**
      * @test
      */
-    public function itThrowsAnErrorIfNoClassIsDefined()
+    public function itThrowsAnErrorOnlyOnePartIsDefined()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
-            bar: String! @field(method: "bar")
-        }
-        ');
-
         $this->expectException(DirectiveException::class);
-        $type = $schema->getType('Foo');
-        $type->config['fields']();
+        $schema = '
+        type Query {
+            bar: String! @field(resolver: "bar")
+        }
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $this->execute($schema, $query);
     }
 
     /**
      * @test
      */
-    public function itThrowsAnErrorIfNoMethodIsDefined()
+    public function itThrowsAnErrorIfOnePartIsEmpty()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
-        type Foo {
-            bar: String! @field(class: "Foo\\\Bar")
-        }
-        ');
-
         $this->expectException(DirectiveException::class);
-        $type = $schema->getType('Foo');
-        $type->config['fields']();
+        $schema = '
+        type Query {
+            bar: String! @field(class: "Foo\\\Bar@")
+        }
+        ';
+        $query = '
+        {
+            bar
+        }        
+        ';
+        $this->execute($schema, $query);
     }
 }

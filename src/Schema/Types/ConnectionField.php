@@ -3,17 +3,15 @@
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Support\Traits\HandlesGlobalId;
 
 class ConnectionField
 {
-    use HandlesGlobalId;
-
     /**
      * Resolve page info for connection.
      *
-     * @param LengthAwarePaginator $root
+     * @param LengthAwarePaginator $paginator
      * @param array                $args
      * @param mixed                $context
      * @param ResolveInfo|null     $info
@@ -21,42 +19,27 @@ class ConnectionField
      * @return array
      */
     public function pageInfoResolver(
-        LengthAwarePaginator $root,
+        LengthAwarePaginator $paginator,
         array $args,
         $context = null,
         ResolveInfo $info = null
     ) {
-        $total = $root->total();
-        $count = $root->count();
-        $currentPage = $root->currentPage();
-        $lastPage = $root->lastPage();
-        $hasNextPage = $root->hasMorePages();
-        $hasPreviousPage = $root->currentPage() > 1;
-        $startCursor = $this->encodeGlobalId(
-            'arrayconnection',
-            $root->firstItem()
-        );
-        $endCursor = $this->encodeGlobalId(
-            'arrayconnection',
-            $root->lastItem()
-        );
-
-        return compact(
-            'total',
-            'count',
-            'currentPage',
-            'lastPage',
-            'hasNextPage',
-            'hasPreviousPage',
-            'startCursor',
-            'endCursor'
-        );
+        return [
+            'total' => $paginator->total(),
+            'count' => $paginator->count(),
+            'currentPage' => $paginator->currentPage(),
+            'lastPage' => $paginator->lastPage(),
+            'hasNextPage' => $paginator->hasMorePages(),
+            'hasPreviousPage' => $paginator->currentPage() > 1,
+            'startCursor' => Cursor::encode($paginator->firstItem()),
+            'endCursor' => Cursor::encode($paginator->lastItem()),
+        ];
     }
 
     /**
      * Resolve edges for connection.
      *
-     * @param LengthAwarePaginator $root
+     * @param LengthAwarePaginator $paginator
      * @param array                $args
      * @param mixed                $context
      * @param ResolveInfo|null     $info
@@ -64,18 +47,18 @@ class ConnectionField
      * @return \Illuminate\Support\Collection
      */
     public function edgeResolver(
-        LengthAwarePaginator $root,
+        LengthAwarePaginator $paginator,
         array $args,
         $context = null,
         ResolveInfo $info = null
     ) {
-        $first = $root->firstItem();
+        $firstItem = $paginator->firstItem();
 
-        return $root->values()->map(function ($item, $x) use ($first) {
-            $cursor = $first + $x;
-            $encodedCursor = $this->encodeGlobalId('arrayconnection', $cursor);
-
-            return ['cursor' => $encodedCursor, 'node' => $item];
+        return $paginator->values()->map(function ($item, $index) use ($firstItem) {
+            return [
+                'cursor' => Cursor::encode($firstItem + $index),
+                'node' => $item
+            ];
         });
     }
 }

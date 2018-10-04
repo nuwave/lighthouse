@@ -3,15 +3,13 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class HasManyDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /**
      * Auth user.
      *
@@ -37,6 +35,11 @@ class HasManyDirectiveTest extends DBTestCase
         $this->tasks = factory(Task::class, 3)->create([
             'user_id' => $this->user->getKey(),
         ]);
+        factory(Task::class)->create([
+            'user_id' => $this->user->getKey(),
+            // This task should be ignored via global scope on the Task model
+            'name' => 'cleaning'
+        ]);
 
         $this->be($this->user);
     }
@@ -61,7 +64,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         {
             user {
                 tasks {
@@ -71,6 +74,10 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
+        $tasksWithoutGlobalScope = auth()->user()->tasks()->withoutGlobalScope('no_cleaning')->count();
+        $this->assertSame(4, $tasksWithoutGlobalScope);
+
+        // Ensure global scopes are respected here
         $this->assertCount(3, array_get($result->data, 'user.tasks'));
     }
 
@@ -81,8 +88,8 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks: [Task!]! @hasMany(type:"paginator")
-            posts: [Post!]! @hasMany(type:"paginator")
+            tasks: [Task!]! @hasMany(type: "paginator")
+            posts: [Post!]! @hasMany(type: "paginator")
         }
         
         type Task {
@@ -98,7 +105,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         {
             user {
                 tasks(count: 2) {
@@ -128,7 +135,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks: [Task!]! @hasMany(type:"relay")
+            tasks: [Task!]! @hasMany(type: "relay")
         }
         
         type Task {
@@ -140,7 +147,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         {
             user {
                 tasks(first: 2) {
@@ -168,7 +175,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            tasks: [Task!]! @hasMany(type:"relay")
+            tasks: [Task!]! @hasMany(type: "relay")
         }
         
         type Task {
@@ -181,7 +188,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryAndReturnResult($schema, '
+        $result = $this->executeQuery($schema, '
         { 
             user { 
                 tasks(first: 2) { 
@@ -210,6 +217,61 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
         $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
         $this->assertCount(2, array_get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryHasManySelfReferencingRelationships()
+    {
+        $post1 = factory(Post::class)->create([
+            'id' => 1,
+        ]);
+
+        $post2 = factory(Post::class)->create([
+            'id' => 2,
+            'parent_id' => $post1->getKey(),
+        ]);
+
+        $post3 = factory(Post::class)->create([
+            'id' => 3,
+            'parent_id' => $post2->getKey(),
+        ]);
+
+        $schema = '
+        type Post {
+            id: Int!
+            parent: Post @belongsTo
+        }
+        
+        type Query {
+            posts: [Post!]! @all
+        }
+        ';
+
+        $result = $this->executeQuery($schema, '
+        { 
+            posts {
+                id
+                parent {
+                    id
+                    parent {
+                        id
+                    }
+                }
+            } 
+        }
+        ');
+
+        $posts = $result->data['posts'];
+
+        $this->assertNull($posts[0]['parent']);
+
+        $this->assertNotNull($posts[1]['parent']);
+        $this->assertNull($posts[1]['parent']['parent']);
+
+        $this->assertNotNull($posts[2]['parent']);
+        $this->assertNotNull($posts[2]['parent']['parent']);
     }
 
     /**

@@ -13,23 +13,27 @@ class BcryptDirective extends BaseDirective implements ArgMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'bcrypt';
     }
 
     /**
-     * Resolve the field directive.
+     * Apply transformations on the ArgumentValue.
      *
-     * @param ArgumentValue $value
+     * @param ArgumentValue $argumentValue
      * @param \Closure       $next
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $value, \Closure $next)
+    public function handleArgument(ArgumentValue $argumentValue, \Closure $next): ArgumentValue
     {
-        return $next($value->setResolver(function ($password) {
-            return bcrypt($password);
-        }));
+        $argumentValue->addTransformer(
+            function ($password) {
+                return bcrypt($password);
+            }
+        );
+        
+        return $next($argumentValue);
     }
 }

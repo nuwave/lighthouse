@@ -6,37 +6,22 @@ use Illuminate\Http\Request;
 
 class ExtensionRequest
 {
-    /**
-     * @var \Illuminate\Http\Request
-     */
+    /** @var Request */
     protected $request;
-
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $queryString;
-
-    /**
-     * @var string
-     */
-    protected $operationName;
-
-    /**
-     * @var array
-     */
+    /** @var array|null */
     protected $variables;
-
     /**
-     * Create instance of extension request.
-     *
-     * @param array $options
+     * @param Request $request
+     * @param string $queryString
+     * @param array $variables
      */
-    public function __construct(array $options)
+    public function __construct(Request $request, string $queryString, array $variables = null)
     {
-        $this->request = array_get($options, 'request');
-        $this->queryString = array_get($options, 'queryString');
-        $this->operationName = array_get($options, 'operationName');
-        $this->variables = array_get($options, 'variables');
+        $this->request = $request;
+        $this->queryString = $queryString;
+        $this->variables = $variables;
     }
 
     /**
@@ -60,21 +45,11 @@ class ExtensionRequest
     }
 
     /**
-     * Get request operation name.
-     *
-     * @return string
-     */
-    public function operationName(): string
-    {
-        return $this->operationName;
-    }
-
-    /**
      * Get request variables.
      *
-     * @return array
+     * @return array|null
      */
-    public function variables(): array
+    public function variables()
     {
         return $this->variables;
     }

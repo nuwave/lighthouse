@@ -5,12 +5,9 @@ namespace Tests\Integration\Schema\Directives\Fields;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class FindDirectiveTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     /** @test */
     public function itReturnsSingleUser()
     {
@@ -35,7 +32,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ";
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals('B', $result->data['user']['name']);
     }
@@ -64,7 +61,7 @@ class FindDirectiveTest extends DBTestCase
         }
         ";
  
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals('A', $result->data['user']['name']);
     }
@@ -93,7 +90,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertCount(1, $result->errors);
     }
@@ -129,7 +126,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->queryAndReturnResult($schema, $query);
+        $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($userA->id, $result->data['user']['id']);
         $this->assertEquals('A', $result->data['user']['name']);

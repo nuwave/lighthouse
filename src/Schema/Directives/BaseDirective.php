@@ -2,19 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\ListValueNode;
-use GraphQL\Language\AST\ObjectFieldNode;
-use GraphQL\Language\AST\ObjectValueNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 abstract class BaseDirective implements Directive
 {
@@ -42,150 +36,144 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * This can be at most one directive, since directives can only be used once per location.
+     * Get the directive definition associated with the current directive.
      *
-     * @param string|null                   $name
-     * @param TypeSystemDefinitionNode|null $definitionNode
-     *
-     * @return DirectiveNode|null
+     * @return DirectiveNode
      */
-    protected function directiveDefinition($name = null, $definitionNode = null)
+    protected function directiveDefinition(): DirectiveNode
     {
-        $name = $name ?? static::name();
-        $definitionNode = $definitionNode ?? $this->definitionNode;
-
-        return collect($definitionNode->directives)->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
-            return $directiveDefinitionNode->name->value === $name;
-        });
+        return ASTHelper::directiveDefinition(
+            $this->definitionNode,
+            static::name()
+        );
     }
 
     /**
      * Get directive argument value.
      *
-     * @param string             $name
-     * @param mixed|null         $default
-     * @param DirectiveNode|null $directive
+     * @param string $name
+     * @param mixed|null $default
      *
-     * @return mixed
+     * @return mixed|null
      */
-    protected function directiveArgValue(string $name, $default = null, $directive = null)
+    protected function directiveArgValue(string $name, $default = null)
     {
-        // Get the definition associated with the class of the directive, unless explicitly given
-        $directive = $directive ?? $this->directiveDefinition();
-
-        if (! $directive) {
-            return $default;
-        }
-
-        $arg = collect($directive->arguments)->first(function (ArgumentNode $argumentNode) use ($name) {
-            return $argumentNode->name->value === $name;
-        });
-
-        return $arg
-            ? $this->argValue($arg, $default)
-            : $default;
+        return ASTHelper::directiveArgValue(
+            $this->directiveDefinition(),
+            $name,
+            $default
+        );
     }
 
     /**
+     * Does the current directive have an argument with the given name?
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function directiveHasArgument(string $name): bool
+    {
+        return ASTHelper::directiveHasArgument(
+            $this->directiveDefinition(),
+            $name
+        );
+    }
+
+    /**
+     * Get a Closure that is defined through an argument on the directive.
+     *
+     * @param string $argumentName If the name of the directive argument is not "resolver" you may overwrite it.
+     *
      * @throws DirectiveException
-     * @throws \Exception
+     *
+     * @return \Closure
+     */
+    public function getMethodArgument(string $argumentName): \Closure
+    {
+        // A method argument is expected to contain a class and a method name, seperated by an @ symbol
+        // e.g. App\My\Class@methodName
+        $argumentParts = explode('@', $this->directiveArgValue($argumentName));
+
+        if (
+            count($argumentParts) !== 2
+            || empty($argumentParts[0])
+            || empty($argumentParts[1])
+        ){
+            throw new DirectiveException("Directive '{$this->name()}' must have an argument '{$argumentName}' with 'ClassName@methodName'");
+        }
+
+        $className = $this->namespaceClassName($argumentParts[0]);
+        $methodName = $argumentParts[1];
+
+        if (! method_exists($className, $methodName)) {
+            throw new DirectiveException("Method '{$methodName}' does not exist on class '{$className}'");
+        }
+
+        // TODO convert this back once we require PHP 7.1
+        // return \Closure::fromCallable([resolve($className), $methodName]);
+        return function() use ($className, $methodName){
+            return resolve($className)->{$methodName}(...func_get_args());
+        };
+    }
+
+    /**
+     * Get the model class from the `model` argument of the field.
+     *
+     * @param string $argumentName
+     *
+     * @throws DirectiveException
      *
      * @return string
      */
-    protected function getModelClass(): string
+    protected function getModelClass(string $argumentName = 'model'): string
     {
-        $model = $this->directiveArgValue('model');
+        $model = $this->directiveArgValue($argumentName);
 
-        // Fallback to using the return type of the field
-        if(! $model && $this->definitionNode instanceof FieldDefinitionNode){
-            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+        // Fallback to using information from the schema definition as the model name
+        if(! $model){
+            if($this->definitionNode instanceof FieldDefinitionNode) {
+                $model = ASTHelper::getFieldTypeName($this->definitionNode);
+            } elseif($this->definitionNode instanceof ObjectTypeDefinitionNode) {
+                $model = $this->definitionNode->name->value;
+            }
         }
 
         if (! $model) {
             throw new DirectiveException(
-                'A `model` argument must be assigned to the '
-                .$this->name().'directive on '.$this->definitionNode->name->value);
+                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+            );
         }
 
-        if (! class_exists($model)) {
-            $model = config('lighthouse.namespaces.models').'\\'.$model;
-        }
-
-        if (! class_exists($model)) {
-            $model = $this->namespaceClassName($model);
-        }
-
-        return $model;
+        return $this->namespaceClassName($model, [
+            config('lighthouse.namespaces.models')
+        ]);
     }
 
     /**
-     * Add the namespace to a class name and check if it exists.
      *
-     * @param string $baseClassName
+     * @param string $classCandidate
+     * @param string[] $namespacesToTry
      *
      * @throws DirectiveException
      *
      * @return string
      */
-    protected function namespaceClassName(string $baseClassName): string
+    protected function namespaceClassName(string $classCandidate, array $namespacesToTry = []): string
     {
-        $className = $this->associatedNamespace().'\\'.$baseClassName;
-
-        if (! class_exists($className)) {
-            $directiveName = static::name();
-            throw new DirectiveException("No class '$className' was found for directive '$directiveName'");
-        }
-
-        return $className;
-    }
-
-    /**
-     * Get the namespace for the current directive, returns an empty string if its not set.
-     *
-     * @return string
-     */
-    protected function associatedNamespace(): string
-    {
-        $namespaceDirective = $this->directiveDefinition(
-            (new NamespaceDirective())->name()
+        // Always try the explicitly set namespace first
+        \array_unshift(
+            $namespacesToTry,
+            ASTHelper::getNamespaceForDirective(
+                $this->definitionNode,
+                static::name()
+            )
         );
 
-        return $namespaceDirective
-            // The namespace directive can contain an argument with the name of the
-            // current directive, in which case it applies here
-            ? $this->directiveArgValue(static::name(), '', $namespaceDirective)
-            // Default to an empty namespace if the namespace directive does not exist
-            : '';
-    }
+        if(!$className = \namespace_classname($classCandidate, $namespacesToTry)){
+            throw new DirectiveException("No class '$classCandidate' was found for directive '{$this->name()}'");
+        };
 
-    /**
-     * Get argument's value.
-     *
-     * @param Node  $arg
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    protected function argValue(Node $arg, $default = null)
-    {
-        $valueNode = $arg->value;
-
-        if (! $valueNode) {
-            return $default;
-        }
-
-        if ($valueNode instanceof ListValueNode) {
-            return collect($valueNode->values)->map(function (ValueNode $valueNode) {
-                return $valueNode->value;
-            })->toArray();
-        }
-
-        if ($valueNode instanceof ObjectValueNode) {
-            return collect($valueNode->fields)->mapWithKeys(function (ObjectFieldNode $field) {
-                return [$field->name->value => $this->argValue($field)];
-            })->toArray();
-        }
-
-        return $valueNode->value;
+        return $className;
     }
 }

@@ -5,14 +5,16 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\DirectiveNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Support\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 /**
@@ -37,18 +39,18 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
     /**
      * @param Node $node
-     * @param DocumentAST $current
-     * @param DocumentAST $original
+     * @param DocumentAST $documentAST
      *
      * @throws DirectiveException
+     * @throws DocumentASTException
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $current, DocumentAST $original)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST)
     {
         $nodeName = $node->name->value;
 
-        if (!in_array($nodeName, ['Query', 'Mutation'])) {
+        if (! in_array($nodeName, ['Query', 'Mutation'])) {
             $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
 
             throw new DirectiveException($message);
@@ -57,9 +59,9 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $node = $this->setMiddlewareDirectiveOnFields($node);
         $node = $this->setNamespaceDirectiveOnFields($node);
 
-        $current->setDefinition($node);
+        $documentAST->setDefinition($node);
 
-        return $current;
+        return $documentAST;
     }
 
     /**
@@ -73,11 +75,11 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     {
         $middlewareValues = $this->directiveArgValue('middleware');
 
-        if (!$middlewareValues) {
+        if (! $middlewareValues) {
             return $objectType;
         }
 
-        $middlewareValues = '["' . implode('", "', $middlewareValues) . '"]';
+        $middlewareValues = '["'.implode('", "', $middlewareValues).'"]';
         $middlewareDirective = PartialParser::directive("@middleware(checks: $middlewareValues)");
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
@@ -100,18 +102,21 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     {
         $namespaceValue = $this->directiveArgValue('namespace');
 
-        if (!$namespaceValue) {
+        if (! $namespaceValue) {
             return $objectType;
         }
 
-        if (!is_string($namespaceValue)) {
+        if (! is_string($namespaceValue)) {
             throw new DirectiveException('The value of the namespace directive on has to be a string');
         }
 
         $namespaceValue = addslashes($namespaceValue);
 
         $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
-            $previousNamespaces = $this->directiveDefinition((new NamespaceDirective())->name(), $fieldDefinition);
+            $previousNamespaces = ASTHelper::directiveDefinition(
+                $fieldDefinition,
+                (new NamespaceDirective)->name()
+            );
 
             $previousNamespaces = $previousNamespaces
                 ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)

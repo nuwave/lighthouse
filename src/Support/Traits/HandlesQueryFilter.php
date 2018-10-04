@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Support\Database\QueryFilter;
 
 trait HandlesQueryFilter
 {
@@ -11,85 +11,74 @@ trait HandlesQueryFilter
      * Inject query filter into field.
      *
      * @param ArgumentValue $argument
-     * @param array         $filter
+     * @param \Closure $filter
+     *
+     * The filter Closure receives three positional arguments:
+     *
+     * mixed $builder An instance of the query builder
+     * string $columnName
+     * mixed $value An array of values
      *
      * @return ArgumentValue
      */
-    protected function injectFilter(ArgumentValue $argument, array $filter)
+    protected function injectFilter(ArgumentValue &$argument, \Closure $filter): ArgumentValue
     {
-        $argName = $argument->getArgName();
-        $query = QueryFilter::getInstance($argument);
+        $parentField = $argument->getParentField();
+        $query = QueryFilter::getInstance(
+            $parentField
+        );
+    
+        $argumentName = $this->definitionNode->name->value;
+        $query->addSingleArgumentFilter(
+            $argumentName,
+            $filter,
+            $this->directiveArgValue('key', $argumentName)
+        );
 
-        // Here we create a composed key made up of argument name and key.
-        $key = $argName.'.'.$this->queryFilterKey($argument);
-
-        $query->setFilter($key, array_merge([
-            'key' => $argName,
-        ], $filter));
-
-        $argument->getField()->injectArg(
-            'query.filter',
+        $parentField->injectArg(
+            QueryFilter::QUERY_FILTER_KEY,
             $query
         );
 
         return $argument;
     }
-
+    
     /**
-     * Inject query filter into field.
+     * Inject a query filter that takes an array of values into the field.
      *
      * @param ArgumentValue $argument
-     * @param array         $filter
+     * @param \Closure $filter
+     *
+     * The filter Closure receives three positional arguments:
+     *
+     * mixed $builder An instance of the query builder
+     * string $columnName
+     * mixed $value A single value
+     *
+     * @param string $filterType You have to specify a filter type so that the filters can be matched together
      *
      * @return ArgumentValue
      */
-    protected function injectKeyedFilter(ArgumentValue $argument, array $filter)
+    protected function injectMultiArgumentFilter(ArgumentValue &$argument, \Closure $filter, string $filterType): ArgumentValue
     {
-        $key = $this->queryFilterKey($argument);
-        $query = QueryFilter::getInstance($argument);
-        $matchedFilter = $query->getFilter($key, ['resolveArgs' => []]);
-        $matchedFilter['resolveArgs'] = array_merge(
-            $matchedFilter['resolveArgs'],
-            [$argument->getArgName()]
+        $parentField = $argument->getParentField();
+        $query = QueryFilter::getInstance(
+            $parentField
+        );
+    
+        $argumentName = $this->definitionNode->name->value;
+        $query->addMultiArgumentFilter(
+            $argumentName,
+            $filter,
+            $this->directiveArgValue('key', $argumentName),
+            $filterType
         );
 
-        $query->setFilter($key, array_merge($matchedFilter, $filter));
-
-        $argument->getField()->injectArg(
-            'query.filter',
+        $parentField->injectArg(
+            QueryFilter::QUERY_FILTER_KEY,
             $query
         );
 
         return $argument;
-    }
-
-    /**
-     * Get key for query filter.
-     *
-     * @param ArgumentValue $argument
-     *
-     * @return string
-     */
-    protected function queryFilterKey(ArgumentValue $argument)
-    {
-        return $this->directiveArgValue(
-            'key',
-            $argument->getArgName()
-        );
-    }
-
-    /**
-     * Get directive for query filter.
-     *
-     * @param ArgumentValue $argument
-     *
-     * @return mixed
-     * @deprecated
-     */
-    protected function queryFilterDirective(ArgumentValue $argument)
-    {
-        return collect($argument->getArg()->directives)->first(function ($arg) {
-            return $arg->name->value == $this->name();
-        });
     }
 }

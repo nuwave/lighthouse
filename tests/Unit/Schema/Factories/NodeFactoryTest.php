@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\Factories;
 
 use Tests\TestCase;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -28,19 +29,7 @@ class NodeFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = new NodeFactory();
-    }
-
-    /**
-     * Set up application environment.
-     *
-     * @param \Illuminate\Support\Facades\App $app
-     */
-    protected function getEnvironmentSetup($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('lighthouse.namespaces.scalars', 'Nuwave\Lighthouse\Schema\Types\Scalars');
+        $this->factory = resolve(NodeFactory::class);
     }
 
     /**
@@ -57,10 +46,10 @@ class NodeFactoryTest extends TestCase
             EMPLOYEE @enum(value:"employee")
         }
         ');
-        $type = $this->factory->handle(new NodeValue($enumNode));
+        $type = $this->factory->handle($enumNode);
 
         $this->assertInstanceOf(EnumType::class, $type);
-        $this->assertEquals('Role', $type->name);
+        $this->assertSame('Role', $type->name);
     }
 
     /**
@@ -69,12 +58,26 @@ class NodeFactoryTest extends TestCase
     public function itCanTransformScalars()
     {
         $scalarNode = PartialParser::scalarTypeDefinition('
-        scalar DateTime @scalar
+        scalar Email
         ');
-        $scalarType = $this->factory->handle(new NodeValue($scalarNode));
+        $scalarType = $this->factory->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
-        $this->assertEquals('DateTime', $scalarType->name);
+        $this->assertSame('Email', $scalarType->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanPointToScalarClassThroughDirective()
+    {
+        $scalarNode = PartialParser::scalarTypeDefinition('
+        scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
+        ');
+        $scalarType = $this->factory->handle($scalarNode);
+
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
+        $this->assertSame('DateTime', $scalarType->name);
     }
 
     /**
@@ -83,15 +86,30 @@ class NodeFactoryTest extends TestCase
     public function itCanTransformInterfaces()
     {
         $interfaceNode = PartialParser::interfaceTypeDefinition('
-        interface Node {
-            _id: ID!
+        interface Foo {
+            bar: String
         }
         ');
-        $interfaceType = $this->factory->handle(new NodeValue($interfaceNode));
+        $interfaceType = $this->factory->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
-        $this->assertEquals('Node', $interfaceType->name);
-        $this->assertArrayHasKey('_id', $interfaceType->config['fields']);
+        $this->assertSame('Foo', $interfaceType->name);
+        $this->assertArrayHasKey('bar', $interfaceType->getFields());
+    }
+    
+    /**
+     * @test
+     */
+    public function itCanTransformUnions()
+    {
+        $unionNode = PartialParser::unionTypeDefinition('
+        union Foo = Bar
+        ');
+        $unionType = $this->factory->handle($unionNode);
+
+        $this->assertInstanceOf(UnionType::class, $unionType);
+        $this->assertSame('Foo', $unionType->name);
+        $this->assertInstanceOf(\Closure::class, $unionType->config['resolveType']);
     }
 
     /**
@@ -104,11 +122,11 @@ class NodeFactoryTest extends TestCase
             foo(bar: String! @bcrypt): String!
         }
         ');
-        $objectType = $this->factory->handle(new NodeValue($objectTypeNode));
+        $objectType = $this->factory->handle($objectTypeNode);
 
         $this->assertInstanceOf(ObjectType::class, $objectType);
-        $this->assertEquals('User', $objectType->name);
-        $this->assertArrayHasKey('foo', $objectType->config['fields']());
+        $this->assertSame('User', $objectType->name);
+        $this->assertArrayHasKey('foo', $objectType->getFields());
     }
 
     /**
@@ -121,10 +139,10 @@ class NodeFactoryTest extends TestCase
             foo: String!
         }
         ');
-        $inputType = $this->factory->handle(new NodeValue($inputNode));
+        $inputType = $this->factory->handle($inputNode);
 
         $this->assertInstanceOf(InputObjectType::class, $inputType);
-        $this->assertEquals('UserInput', $inputType->name);
-        $this->assertArrayHasKey('foo', $inputType->config['fields']());
+        $this->assertSame('UserInput', $inputType->name);
+        $this->assertArrayHasKey('foo', $inputType->getFields());
     }
 }
