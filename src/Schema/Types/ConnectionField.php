@@ -31,8 +31,12 @@ class ConnectionField
             'lastPage' => $paginator->lastPage(),
             'hasNextPage' => $paginator->hasMorePages(),
             'hasPreviousPage' => $paginator->currentPage() > 1,
-            'startCursor' => $paginator->firstItem() ? Cursor::encode($paginator->firstItem()) : null,
-            'endCursor' => $paginator->lastItem() ? Cursor::encode($paginator->lastItem()) : null,
+            'startCursor' => $paginator->firstItem()
+                ? Cursor::encode($paginator->firstItem())
+                : null,
+            'endCursor' => $paginator->lastItem()
+                ? Cursor::encode($paginator->lastItem())
+                : null,
         ];
     }
 
