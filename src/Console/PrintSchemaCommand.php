@@ -8,7 +8,6 @@ use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 
 class PrintSchemaCommand extends Command
 {
@@ -35,7 +34,6 @@ class PrintSchemaCommand extends Command
      * @param Filesystem $storage
      *
      * @throws DirectiveException
-     * @throws DocumentASTException
      * @throws ParseException
      */
     public function handle(Repository $cache, Filesystem $storage)

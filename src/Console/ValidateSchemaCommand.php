@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 
 class ValidateSchemaCommand extends Command
 {
@@ -31,7 +30,6 @@ class ValidateSchemaCommand extends Command
      * @param GraphQL $graphQL
      *
      * @throws DirectiveException
-     * @throws DocumentASTException
      * @throws ParseException
      */
     public function handle(Repository $cache, GraphQL $graphQL)

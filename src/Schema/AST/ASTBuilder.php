@@ -11,7 +11,6 @@ use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -24,7 +23,6 @@ class ASTBuilder
      *
      * @param string $schema
      *
-     * @throws DocumentASTException
      * @throws ParseException
      *
      * @return DocumentAST
@@ -56,7 +54,8 @@ class ASTBuilder
      */
     protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
     {
-        return $document->typeExtensionDefinitions()
+        return $document
+            ->typeExtensionDefinitions()
             // This is just temporarily merged together
             ->concat($document->typeDefinitions())
             ->reduce(
@@ -85,16 +84,18 @@ class ASTBuilder
             function (ObjectTypeDefinitionNode $objectType) use ($document) {
                 $name = $objectType->name->value;
 
-                $document->typeExtensionDefinitions($name)->reduce(
-                    function (ObjectTypeDefinitionNode $relatedObjectType, TypeExtensionNode $typeExtension) {
-                        /** @var NodeList $fields */
-                        $fields = $relatedObjectType->fields;
-                        $relatedObjectType->fields = $fields->merge($typeExtension->fields);
-
-                        return $relatedObjectType;
-                    },
-                    $objectType
-                );
+                $objectType = $document
+                    ->typeExtensionDefinitions($name)
+                    ->reduce(
+                        function (ObjectTypeDefinitionNode $relatedObjectType, TypeExtensionNode $typeExtension) {
+                            /** @var NodeList $fields */
+                            $fields = $relatedObjectType->fields;
+                            $relatedObjectType->fields = $fields->merge($typeExtension->fields);
+    
+                            return $relatedObjectType;
+                        },
+                        $objectType
+                    );
 
                 // Modify the original document by overwriting the definition with the merged one
                 $document->setDefinition($objectType);
@@ -171,7 +172,6 @@ class ASTBuilder
     /**
      * @param DocumentAST $document
      *
-     * @throws DocumentASTException
      * @throws ParseException
      *
      * @return DocumentAST
@@ -245,7 +245,6 @@ class ASTBuilder
      * @param DocumentAST $document
      *
      * @throws ParseException
-     * @throws DocumentASTException
      *
      * @return DocumentAST
      */
