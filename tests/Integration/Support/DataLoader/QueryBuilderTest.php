@@ -75,5 +75,8 @@ class QueryBuilderTest extends DBTestCase
         $this->assertEquals($users[0]->getKey(), $users[0]->tasks[0]->user_id);
         $this->assertEquals($users[1]->getKey(), $users[1]->tasks[0]->user_id);
         $this->assertEquals($users[2]->getKey(), $users[2]->tasks[0]->user_id);
+        $this->assertEquals(4, $users[0]->tasks->total());
+        $this->assertEquals(5, $users[1]->tasks->total());
+        $this->assertEquals(6, $users[2]->tasks->total());
     }
 }
