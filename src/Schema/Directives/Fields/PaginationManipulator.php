@@ -9,9 +9,8 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
-abstract class PaginationManipulator extends BaseDirective
+class PaginationManipulator
 {
     const PAGINATION_TYPE_PAGINATOR = 'paginator';
     const PAGINATION_TYPE_CONNECTION = 'connection';
@@ -22,10 +21,10 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return bool
      */
-    protected function isValidPaginationType(string $paginationType): bool
+    public static function isValidPaginationType(string $paginationType): bool
     {
         return self::PAGINATION_TYPE_PAGINATOR === $paginationType
-            || self::PAGINATION_TYPE_CONNECTION === $paginationType;
+               || self::PAGINATION_TYPE_CONNECTION === $paginationType;
     }
 
     /**
@@ -33,7 +32,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return string
      */
-    protected function convertAliasToPaginationType(string $paginationType): string
+    public static function convertAliasToPaginationType(string $paginationType): string
     {
         if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
             return self::PAGINATION_TYPE_CONNECTION;
@@ -53,7 +52,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return DocumentAST
      */
-    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
+    public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
         $connectionTypeName = "{$fieldTypeName}Connection";
@@ -101,7 +100,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return DocumentAST
      */
-    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
+    public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";

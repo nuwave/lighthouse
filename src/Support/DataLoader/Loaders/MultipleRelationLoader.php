@@ -2,20 +2,19 @@
 
 namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
 
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
+use Nuwave\Lighthouse\Support\DataLoader\ModelRelationLoader;
 
-class HasManyLoader extends BatchLoader
+class MultipleRelationLoader extends BatchLoader
 {
     /**
      * @var string
      */
-    protected $relation;
+    protected $relationName;
     /**
      * @var array
      */
@@ -30,39 +29,28 @@ class HasManyLoader extends BatchLoader
     protected $paginationType;
 
     /**
-     * @param string $relation
+     * @param string $relationName
      * @param array $resolveArgs
      * @param array $scopes
      * @param string $paginationType
      */
-    public function __construct(string $relation, array $resolveArgs, array $scopes, string $paginationType)
+    public function __construct(string $relationName, array $resolveArgs, array $scopes, string $paginationType)
     {
-        $this->relation = $relation;
+        $this->relationName = $relationName;
         $this->resolveArgs = $resolveArgs;
         $this->scopes = $scopes;
         $this->paginationType = $paginationType;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
+     * @throws \Exception
      */
     public function resolve(): array
     {
-        $eagerLoadRelationWithConstraints = [$this->relation =>
-            function ($query) {
-                foreach ($this->scopes as $scope) {
-                    call_user_func_array([$query, $scope], [$this->resolveArgs]);
-                }
-
-                $query->when(isset($args['query.filter']), function ($q) {
-                    return QueryFilter::build($q, $this->resolveArgs);
-                });
-            }
-        ];
-
-        /** @var Collection $parents */
-        $parents = collect($this->keys)
-            ->pluck('parent');
+        $parentModels = $this->getParentModels();
+        $relations = [$this->relationName => $this->getRelationConstraints()];
+        $modelRelationLoader = new ModelRelationLoader($parentModels, $relations);
 
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
@@ -72,23 +60,37 @@ class HasManyLoader extends BatchLoader
                 $after = Cursor::decode($this->resolveArgs);
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
 
-                $parents->fetchForPage($first, $currentPage, $eagerLoadRelationWithConstraints);
+                $modelRelationLoader->loadRelationsForPage($first, $currentPage);
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                 // count must be set so we can safely get it like this
                 $count = $this->resolveArgs['count'];
                 $page = array_get($this->resolveArgs, 'page', 1);
 
-                $parents->fetchForPage($count, $page, $eagerLoadRelationWithConstraints);
+                $modelRelationLoader->loadRelationsForPage($count, $page);
                 break;
             default:
-                // Using our own Collection macro
-                $parents->fetch($eagerLoadRelationWithConstraints);
+                $modelRelationLoader->loadRelations();
                 break;
         }
 
-        return $parents->mapWithKeys(function (Model $model) {
-            return [$model->getKey() => $model->getRelation($this->relation)];
-        })->all();
+        return $modelRelationLoader->getRelationDictionary($this->relationName);
+    }
+
+    /**
+     *
+     * @return \Closure
+     */
+    protected function getRelationConstraints(): \Closure
+    {
+        return function ($query) {
+            foreach ($this->scopes as $scope) {
+                $query->$scope();
+            }
+
+            $query->when(isset($args[QueryFilter::QUERY_FILTER_KEY]), function ($query) {
+                return QueryFilter::build($query, $this->resolveArgs);
+            });
+        };
     }
 }
