@@ -187,13 +187,13 @@ class ASTBuilder
           currentPage: Int!
         
           "Index of first item in the current page."
-          firstItem: Int!
+          firstItem: Int
         
           "If collection has more pages."
           hasMorePages: Boolean!
         
           "Index of last item in the current page."
-          lastItem: Int!
+          lastItem: Int
         
           "Last page number of the collection."
           lastPage: Int!
