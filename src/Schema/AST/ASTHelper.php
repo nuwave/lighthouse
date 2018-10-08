@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\Parser;
 use GraphQL\Utils\AST;
+use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\ValueNode;
@@ -17,6 +16,7 @@ use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 class ASTHelper
@@ -56,10 +56,20 @@ class ASTHelper
      */
     public static function mergeUniqueNodeList($original, $addition): NodeList
     {
-        $newFields = collect($addition)->pluck('name.value')->filter()->all();
-        $filteredList = collect($original)->filter(function ($field) use ($newFields) {
-            return ! in_array(data_get($field, 'name.value'), $newFields);
-        })->values()->all();
+        $newFields = collect($addition)
+            ->pluck('name.value')
+            ->filter()
+            ->all();
+        
+        $filteredList = collect($original)
+            ->filter(function ($field) use ($newFields) {
+                return ! in_array(
+                    data_get($field, 'name.value'),
+                    $newFields
+                );
+            })
+            ->values()
+            ->all();
 
         return self::mergeNodeList($filteredList, $addition);
     }
@@ -73,7 +83,9 @@ class ASTHelper
      */
     public static function cloneNode(Node $node): Node
     {
-        return AST::fromArray($node->toArray(true));
+        return AST::fromArray(
+            $node->toArray(true)
+        );
     }
     
     /**
@@ -124,9 +136,10 @@ class ASTHelper
      */
     public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
     {
-        return collect($directiveDefinition->arguments)->contains(function(ArgumentNode $argumentNode) use ($name){
-            return $argumentNode->name->value === $name;
-        });
+        return collect($directiveDefinition->arguments)
+            ->contains(function(ArgumentNode $argumentNode) use ($name){
+                return $argumentNode->name->value === $name;
+            });
     }
 
     /**
@@ -138,9 +151,10 @@ class ASTHelper
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
-        $arg = collect($directive->arguments)->first(function (ArgumentNode $argumentNode) use ($name) {
-            return $argumentNode->name->value === $name;
-        });
+        $arg = collect($directive->arguments)
+            ->first(function (ArgumentNode $argumentNode) use ($name) {
+                return $argumentNode->name->value === $name;
+            });
 
         return $arg
             ? self::argValue($arg, $default)
@@ -165,9 +179,11 @@ class ASTHelper
         }
 
         if ($valueNode instanceof ListValueNode) {
-            return collect($valueNode->values)->map(function (ValueNode $valueNode) {
-                return $valueNode->value;
-            })->toArray();
+            return collect($valueNode->values)
+                ->map(function (ValueNode $valueNode) {
+                    return $valueNode->value;
+                })
+                ->toArray();
         }
 
         if ($valueNode instanceof ObjectValueNode) {
@@ -221,6 +237,8 @@ class ASTHelper
     }
     
     /**
+     * This adds an Interface called "Node" to an ObjectType definition.
+     *
      * @param ObjectTypeDefinitionNode $objectType
      * @param DocumentAST $documentAST
      *
@@ -228,11 +246,16 @@ class ASTHelper
      *
      * @return DocumentAST
      */
-    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST)
+    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST): DocumentAST
     {
         $objectType->interfaces = self::mergeNodeList(
             $objectType->interfaces,
-            [Parser::parseType('Node', ['noLocation' => true])]
+            [
+                Parser::parseType(
+                    'Node',
+                    ['noLocation' => true]
+                )
+            ]
         );
     
         $globalIdFieldDefinition = PartialParser::fieldDefinition(

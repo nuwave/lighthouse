@@ -4,8 +4,10 @@ namespace Nuwave\Lighthouse\Console;
 
 use Illuminate\Console\Command;
 use GraphQL\Utils\SchemaPrinter;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class PrintSchemaCommand extends Command
 {
@@ -24,14 +26,20 @@ class PrintSchemaCommand extends Command
      * @var string
      */
     protected $description = 'Print the resulting schema.';
-
+    
     /**
      * Execute the console command.
+     *
+     * @param Repository $cache
+     * @param Filesystem $storage
+     *
+     * @throws DirectiveException
+     * @throws ParseException
      */
-    public function handle()
+    public function handle(Repository $cache, Filesystem $storage)
     {
         // Clear the cache so this always gets the current schema
-        Cache::forget(config('lighthouse.cache.key'));
+        $cache->forget(config('lighthouse.cache.key'));
 
         $schema = SchemaPrinter::doPrint(
             graphql()->prepSchema()
@@ -39,7 +47,7 @@ class PrintSchemaCommand extends Command
 
         if ($this->option('write')) {
             $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
-            Storage::put('lighthouse-schema.graphql', $schema);
+            $storage->put('lighthouse-schema.graphql', $schema);
         } else {
             $this->info($schema);
         }

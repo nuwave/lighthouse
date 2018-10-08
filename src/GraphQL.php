@@ -5,12 +5,11 @@ namespace Nuwave\Lighthouse;
 use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
-use Illuminate\Support\Facades\Cache;
 use GraphQL\Executor\ExecutionResult;
-use Illuminate\Support\Facades\Request;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\Rules\QueryDepth;
 use GraphQL\Validator\DocumentValidator;
+use Nuwave\Lighthouse\Events\BuildingAST;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
@@ -70,7 +69,6 @@ class GraphQL
      * @param null $rootValue
      *
      * @throws Exceptions\DirectiveException
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return ExecutionResult
@@ -83,7 +81,7 @@ class GraphQL
             $rootValue,
             $context,
             $variables,
-            Request::input('operationName'),
+            app('request')->input('operationName'),
             null,
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
@@ -124,7 +122,6 @@ class GraphQL
      * Ensure an executable GraphQL schema is present.
      *
      * @throws Exceptions\DirectiveException
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return Schema
@@ -157,7 +154,6 @@ class GraphQL
     /**
      * Get instance of DocumentAST.
      *
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return DocumentAST
@@ -166,7 +162,7 @@ class GraphQL
     {
         if(empty($this->documentAST)){
             $this->documentAST = config('lighthouse.cache.enable')
-                ? Cache::rememberForever(config('lighthouse.cache.key'), function () {
+                ? app('cache')->rememberForever(config('lighthouse.cache.key'), function () {
                     return $this->buildAST();
                 })
                 : $this->buildAST();
@@ -178,16 +174,24 @@ class GraphQL
     /**
      * Get the schema string and build an AST out of it.
      *
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return DocumentAST
      */
     protected function buildAST(): DocumentAST
     {
-        return ASTBuilder::generate(
-            $this->schemaSourceProvider->getSchemaString()
-        )->lock();
+        $schemaString = $this->schemaSourceProvider->getSchemaString();
+    
+        // Allow to register listeners that add in additional schema definitions.
+        // This can be used by plugins to hook into the schema building process
+        // while still allowing the user to add in their schema as usual.
+        $additionalSchemas = collect(
+            event(
+                new BuildingAST($schemaString)
+            )
+        )->implode("\n");
+    
+        return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas);
     }
 
     /**

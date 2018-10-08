@@ -198,4 +198,112 @@ class PaginateDirectiveTest extends DBTestCase
         $this->assertTrue(array_get($result->data, 'users.pageInfo.hasNextPage'));
         $this->assertCount(5, array_get($result->data, 'users.edges'));
     }
+
+    /**
+     * @test
+     */
+    public function itQueriesConnectionWithNoData()
+    {
+        $schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users: [User!]! @paginate(type: "relay")
+        }
+        ';
+
+        $query = '
+        {
+            users(first: 5) {
+                pageInfo {
+                    total
+                    count
+                    currentPage
+                    lastPage
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                }
+                edges {
+                    node {
+                        id
+                        name
+                    }
+                }
+            }
+        }
+        ';
+
+        $result = $this->executeQuery($schema, $query);
+        $this->assertSame(
+            [
+                'total' => 0,
+                'count' => 0,
+                'currentPage' => 1 ,
+                'lastPage' => 1,
+                'hasNextPage' => false,
+                'hasPreviousPage' =>false,
+                'startCursor' => null,
+                'endCursor' => null,
+            ],
+            array_get($result->data, 'users.pageInfo')
+        );
+        $this->assertCount(0, array_get($result->data, 'users.edges'));
+    }
+
+    /**
+     * @test
+     */
+    public function itQueriesPaginationWithNoData()
+    {
+        $schema = '
+        type User {
+            id: ID!
+        }
+        
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        $query = '
+        {
+            users(count: 5) {
+                paginatorInfo {
+                    count
+                    currentPage
+                    firstItem
+                    hasMorePages
+                    lastItem
+                    lastPage
+                    perPage
+                    total
+                }
+                data {
+                    id
+                }
+            }
+        }
+        ';
+
+        $result = $this->executeQuery($schema, $query);
+        $this->assertSame(
+            [
+                'count' => 0,
+                'currentPage' => 1,
+                'firstItem' => null,
+                'hasMorePages' => false,
+                'lastItem' => null,
+                'lastPage' => 1,
+                'perPage' => 5,
+                'total' => 0,
+            ],
+            array_get($result->data, 'users.paginatorInfo')
+        );
+        $this->assertCount(0, array_get($result->data, 'users.data'));
+    }
 }
