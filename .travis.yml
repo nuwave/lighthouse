@@ -28,11 +28,12 @@ matrix:
   - php: 7.2
     env: LARAVEL='5.7.*' PHPUNIT='^7.0'
   include:
-  - php: 7.2
+  - php: 7.1
     env: LARAVEL='5.7.*' PHPUNIT='^7.0' COVERAGE=1
   fast_finish: true
 
 before_install:
+- phpenv config-rm xdebug.ini
 - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 - composer global require hirak/prestissimo --update-no-dev
 - composer require
@@ -52,7 +53,7 @@ install:
 
 script:
 - if [[ $COVERAGE = 1 ]]; then
-    phpunit --coverage-clover=coverage.xml;
+    phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml;
   else
     phpunit --colors=always --verbose;
   fi
