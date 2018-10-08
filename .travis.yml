@@ -53,7 +53,7 @@ install:
 
 script:
 - if [[ $COVERAGE = 1 ]]; then
-    vendor/bin/phpunit --coverage-clover=coverage.xml;
+    phpunit --coverage-clover=coverage.xml;
   else
     phpunit --colors=always --verbose;
   fi
