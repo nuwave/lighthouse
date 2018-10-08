@@ -21,14 +21,17 @@ env:
 
 matrix:
   exclude:
+  # Laravel > 5.6 requires PHP 7.1
   - php: 7.0
     env: LARAVEL='5.6.*' PHPUNIT='^7.0'
   - php: 7.0
     env: LARAVEL='5.7.*' PHPUNIT='^7.0'
-  - php: 7.2
+  # This is run with coverage instead
+  - php: 7.1
     env: LARAVEL='5.7.*' PHPUNIT='^7.0'
   include:
-  - php: 7.2
+  # Generating coverage on 7.1, as 7.2 does segfault, switch back eventually
+  - php: 7.1
     env: LARAVEL='5.7.*' PHPUNIT='^7.0' COVERAGE=1
   fast_finish: true
 
@@ -53,7 +56,7 @@ install:
 
 script:
 - if [[ $COVERAGE = 1 ]]; then
-    phpdbg -qrr vendor/bin/phpunit --colors=always --verbose --coverage-text --coverage-clover=coverage.xml;
+    phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml;
   else
     phpunit --colors=always --verbose;
   fi
