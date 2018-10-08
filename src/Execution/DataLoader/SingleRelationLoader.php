@@ -1,10 +1,8 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
+namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Nuwave\Lighthouse\Execution\QueryFilter;
-use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\DataLoader\ModelRelationLoader;
 
 class SingleRelationLoader extends BatchLoader
 {
@@ -32,7 +30,7 @@ class SingleRelationLoader extends BatchLoader
     {
         $parentModels = $this->getParentModels();
         $relations = [$this->relationName => $this->getRelationConstraints()];
-        $modelRelationLoader = new ModelRelationLoader($parentModels, $relations);
+        $modelRelationLoader = new ModelRelationFetcher($parentModels, $relations);
 
         return $modelRelationLoader
             ->loadRelations()

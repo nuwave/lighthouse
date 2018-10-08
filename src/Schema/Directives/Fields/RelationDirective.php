@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 abstract class RelationDirective extends BaseDirective

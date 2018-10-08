@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
 use Tests\Utils\Models\Task;
 use Illuminate\Support\Facades\DB;
-use Nuwave\Lighthouse\Support\DataLoader\ModelRelationLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderPolymorphicTest extends DBTestCase
 {
@@ -39,7 +39,7 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
         $task = Task::first();
         $this->assertCount(3, $task->tags);
 
-        $tasks = (new ModelRelationLoader(Task::all(), ['tags']))
+        $tasks = (new ModelRelationFetcher(Task::all(), ['tags']))
             ->loadRelationsForPage(2)
             ->models();
 

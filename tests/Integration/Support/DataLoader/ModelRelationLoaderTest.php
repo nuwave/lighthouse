@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Support\DataLoader\ModelRelationLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderTest extends DBTestCase
 {
@@ -35,7 +35,7 @@ class ModelRelationLoaderTest extends DBTestCase
     {
         // TODO refactor this as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
 
-        $users = (new ModelRelationLoader(User::all(), ['tasks']))
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage(3)
             ->models();
 
@@ -52,7 +52,7 @@ class ModelRelationLoaderTest extends DBTestCase
      */
     public function itCanLoadCountOnCollection()
     {
-        $users = (new ModelRelationLoader(User::all(), ['tasks']))
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->reloadModelsWithRelationCount()
             ->models();
 
@@ -67,7 +67,7 @@ class ModelRelationLoaderTest extends DBTestCase
      */
     public function itCanPaginateRelationshipOnCollection()
     {
-        $users = (new ModelRelationLoader(User::all(), ['tasks']))
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage(2)
             ->models();
 
@@ -93,7 +93,7 @@ class ModelRelationLoaderTest extends DBTestCase
         $task = $user->tasks()->get()->last();
         $task->delete();
 
-        $users = (new ModelRelationLoader(User::all(), ['tasks']))
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage($count)
             ->models();
 

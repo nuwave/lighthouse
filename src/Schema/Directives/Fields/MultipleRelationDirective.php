@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Support\DataLoader\Loaders\MultipleRelationLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\MultipleRelationLoader;
 
 abstract class MultipleRelationDirective extends RelationDirective
 {

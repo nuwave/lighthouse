@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\DataLoader\Loaders\SingleRelationLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\SingleRelationLoader;
 
 abstract class SingleRelationDirective extends RelationDirective
 {

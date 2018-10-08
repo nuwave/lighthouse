@@ -1,12 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\DataLoader\Loaders;
+namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
-use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Support\DataLoader\ModelRelationLoader;
 use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 
 class MultipleRelationLoader extends BatchLoader
@@ -55,7 +53,7 @@ class MultipleRelationLoader extends BatchLoader
     {
         $parentModels = $this->getParentModels();
         $relations = [$this->relationName => $this->getRelationConstraints()];
-        $modelRelationLoader = new ModelRelationLoader($parentModels, $relations);
+        $modelRelationLoader = new ModelRelationFetcher($parentModels, $relations);
 
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:

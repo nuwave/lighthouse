@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\DataLoader;
+namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use ReflectionClass;
 use ReflectionMethod;
@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
-class ModelRelationLoader
+class ModelRelationFetcher
 {
     /**
      * The parent models that relations should be loaded for.
@@ -114,7 +114,7 @@ class ModelRelationLoader
      *
      * @throws \Exception
      *
-     * @return ModelRelationLoader
+     * @return ModelRelationFetcher
      */
     public function loadRelationsForPage(int $perPage, int $page = 1): self
     {

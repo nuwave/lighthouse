@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\DataLoader;
+namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
 use Illuminate\Support\Collection;
@@ -55,7 +55,7 @@ abstract class BatchLoader
             );
         
         if (!$instance instanceof self) {
-            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Support\DataLoader\BatchLoader");
+            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
         }
         
         return $instance;
