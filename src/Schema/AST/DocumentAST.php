@@ -7,71 +7,97 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\NodeList;
+use GraphQL\Error\SyntaxError;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
 class DocumentAST implements \Serializable
 {
     /**
-     * If the DocumentAST is locked, it can not be mutated.
+     * A map from definition name to the definition node.
      *
-     * @var bool
+     * @var Collection
      */
-    protected $locked = false;
-
+    protected $definitionMap;
     /**
-     * @var DocumentNode
+     * A collection of type extensions.
+     *
+     * @var Collection
      */
-    protected $documentNode;
-
+    protected $typeExtensions;
+    
     /**
      * @param DocumentNode $documentNode
      */
     public function __construct(DocumentNode $documentNode)
     {
-        $this->documentNode = $documentNode;
+        // We can not store type extensions in the map, since they do not have unique names
+        list($this->typeExtensions, $definitionNodes) = collect($documentNode->definitions)
+            ->partition(function(DefinitionNode $definitionNode){
+                return $definitionNode instanceof TypeExtensionNode;
+            });
+        
+        $this->definitionMap = $definitionNodes
+            ->mapWithKeys(function(DefinitionNode $node){
+               return [$node->name->value => $node];
+            });
     }
-
+    
     /**
      * Create a new DocumentAST instance from a schema.
      *
      * @param string $schema
      *
+     * @throws ParseException
+     *
      * @return DocumentAST
      */
     public static function fromSource(string $schema): DocumentAST
     {
-        return new static(
-            Parser::parse(
-                $schema,
-                // Ignore location since it only bloats the AST
-                ['noLocation' => true]
-            )
-        );
+        try{
+            return new static(
+                Parser::parse(
+                    $schema,
+                    // Ignore location since it only bloats the AST
+                    ['noLocation' => true]
+                )
+            );
+        } catch (SyntaxError $syntaxError){
+            // Throw our own error class instead, since otherwise a schema definition
+            // error would get rendered to the Client.
+            throw new ParseException(
+                $syntaxError->getMessage()
+            );
+        }
     }
 
     /**
      * Strip out irrelevant information to make serialization more efficient.
+     *
+     * @return string
      */
     public function serialize(): string
     {
-        return serialize([
-            'ast' => AST::toArray($this->documentNode),
-            'locked' => $this->locked,
+        return \serialize([
+            'definitionMap' => $this->definitionMap
+                ->mapWithKeys(function(DefinitionNode $node, string $key){
+                    return [$key => AST::toArray($node)];
+                }),
+            'typeExtensions' => $this->typeExtensions
+                ->map(function(TypeExtensionNode $node){
+                    return AST::toArray($node);
+                })
         ]);
     }
 
@@ -79,66 +105,20 @@ class DocumentAST implements \Serializable
      * Construct from the string representation.
      *
      * @param $serialized
+     *
+     * @return void
      */
     public function unserialize($serialized)
     {
-        $unserialized = unserialize($serialized);
-
-        $this->documentNode = AST::fromArray(
-            $unserialized['ast']
-        );
-        $this->locked = $unserialized['locked'];
-    }
-
-    /**
-     * Mark the AST as locked.
-     *
-     * @return DocumentAST
-     */
-    public function lock(): DocumentAST
-    {
-        $this->locked = true;
-
-        return $this;
-    }
-
-    /**
-     * Mark the AST as unlocked.
-     *
-     * @return DocumentAST
-     */
-    public function unlock(): DocumentAST
-    {
-        $this->locked = false;
-
-        return $this;
-    }
-
-    /**
-     * Get an instance of the underlying document node.
-     *
-     * @return DocumentNode
-     */
-    public function document(): DocumentNode
-    {
-        return ASTHelper::cloneNode($this->documentNode);
-    }
-
-    /**
-     * Get a collection of the contained definitions.
-     *
-     * @return Collection
-     */
-    public function definitions(): Collection
-    {
-        $definitions = collect($this->documentNode->definitions);
-
-        return $this->locked
-            ? $definitions
-            : $definitions->map(function (Node $node) {
-                $clone = ASTHelper::cloneNode($node);
-
-                return $this->assignDefinitionNodeHash($clone, $node);
+        $unserialize = \unserialize($serialized);
+        
+        $this->definitionMap = $unserialize['definitionMap']
+            ->mapWithKeys(function(array $node, string $key){
+                return [$key => AST::fromArray($node)];
+            });
+        $this->typeExtensions = $unserialize['typeExtensions']
+            ->map(function(array $node){
+                return AST::fromArray($node);
             });
     }
 
@@ -149,7 +129,7 @@ class DocumentAST implements \Serializable
      */
     public function typeDefinitions(): Collection
     {
-        return $this->definitions()
+        return $this->definitionMap
             ->filter(function (DefinitionNode $node) {
                 return $node instanceof ScalarTypeDefinitionNode
                     || $node instanceof ObjectTypeDefinitionNode
@@ -183,30 +163,14 @@ class DocumentAST implements \Serializable
      */
     public function typeExtensionDefinitions(string $extendedTypeName = null): Collection
     {
-        return $this->definitionsByType(TypeExtensionNode::class)
-            ->filter(function (TypeExtensionNode $typeExtension) use ($extendedTypeName) {
-                return is_null($extendedTypeName) || $extendedTypeName === $typeExtension->name->value;
+        if(is_null($extendedTypeName)){
+            return $this->typeExtensions;
+        }
+        
+        return $this->typeExtensions
+            ->filter(function (TypeExtensionNode $typeExtension) use ($extendedTypeName): bool {
+                return $extendedTypeName === $typeExtension->name->value;
             });
-    }
-
-    /**
-     * Get all definitions for operations.
-     *
-     * @return Collection
-     */
-    public function operationDefinitions(): Collection
-    {
-        return $this->definitionsByType(OperationDefinitionNode::class);
-    }
-
-    /**
-     * Get all fragment definitions.
-     *
-     * @return Collection
-     */
-    public function fragmentDefinitions(): Collection
-    {
-        return $this->definitionsByType(FragmentDefinitionNode::class);
     }
 
     /**
@@ -272,44 +236,31 @@ class DocumentAST implements \Serializable
      */
     public function queryTypeDefinition(): ObjectTypeDefinitionNode
     {
-        return $this->objectTypeOrDefault('Query');
+        return $this->objectTypeDefinition('Query');
     }
 
     /**
      * Get the root mutation type definition.
      *
-     * @return ObjectTypeDefinitionNode
+     * @return ObjectTypeDefinitionNode|null
      */
-    public function mutationTypeDefinition(): ObjectTypeDefinitionNode
+    public function mutationTypeDefinition()
     {
-        return $this->objectTypeOrDefault('Mutation');
+        return $this->objectTypeDefinition('Mutation');
     }
 
     /**
      * Get the root subscription type definition.
      *
-     * @return ObjectTypeDefinitionNode
+     * @return ObjectTypeDefinitionNode|null
      */
-    public function subscriptionTypeDefinition(): ObjectTypeDefinitionNode
+    public function subscriptionTypeDefinition()
     {
-        return $this->objectTypeOrDefault('Subscription');
+        return $this->objectTypeDefinition('Subscription');
     }
 
     /**
-     * Either get an existing definition or an empty type definition.
-     *
-     * @param string $name
-     *
-     * @return ObjectTypeDefinitionNode
-     */
-    protected function objectTypeOrDefault(string $name): ObjectTypeDefinitionNode
-    {
-        return $this->objectTypeDefinition($name)
-            ?? PartialParser::objectTypeDefinition("type $name{}");
-    }
-
-    /**
-     * Get all definitions of a.
+     * Get all definitions of a given type.
      *
      * @param string $typeClassName
      *
@@ -317,7 +268,7 @@ class DocumentAST implements \Serializable
      */
     protected function definitionsByType(string $typeClassName): Collection
     {
-        return $this->definitions()
+        return $this->definitionMap
             ->filter(function (Node $node) use ($typeClassName) {
                 return $node instanceof $typeClassName;
             });
@@ -339,7 +290,7 @@ class DocumentAST implements \Serializable
 
         return $this;
     }
-
+    
     /**
      * @param DefinitionNode $newDefinition
      *
@@ -347,87 +298,15 @@ class DocumentAST implements \Serializable
      */
     public function setDefinition(DefinitionNode $newDefinition): DocumentAST
     {
-        if ($this->locked) {
-            $nodeName = data_get($newDefinition, 'name.value', 'Node');
-            $message = "{$nodeName} cannot be added to the DocumentAST while it is locked.";
-            throw new DocumentASTException($message);
-        }
-
-        $originalDefinitions = collect($this->documentNode->definitions);
-
-        if (! $newHashID = data_get($newDefinition, 'spl_object_hash')) {
-            // This means the new definition is not a clone, so we do
-            // not have to look for an existing definition to replace
-            $newDefinitions = $originalDefinitions->push($newDefinition);
+        if($newDefinition instanceof TypeExtensionNode){
+            $this->typeExtensions->push($newDefinition);
         } else {
-            $found = false;
-
-            // See if we can replace an existing definition, if the hash matches
-            $newDefinitions = $originalDefinitions->map(
-                function (DefinitionNode $originalDefinition) use ($newDefinition, $newHashID, &$found) {
-                    $originalHashID = $this->getDefinitionNodeHash($originalDefinition);
-    
-                    if ($originalHashID === $newHashID) {
-                        $found = true;
-                        
-                        return $newDefinition;
-                    }
-    
-                    return $originalDefinition;
-                }
+            $this->definitionMap->put(
+                $newDefinition->name->value,
+                $newDefinition
             );
-
-            // If no match is found, we just add the new definition in after all
-            if (! $found) {
-                $newDefinitions = $newDefinitions->push($newDefinition);
-            }
         }
-
-        $newDefinitions = $newDefinitions
-            // Reindex, otherwise offset errors might happen in subsequent runs
-            ->values()
-            ->all();
-
-        // This was a NodeList before, so put it back as it was
-        $this->documentNode->definitions = new NodeList($newDefinitions);
-
+        
         return $this;
-    }
-
-    /**
-     * Get node's original/current hash.
-     *
-     * @param DefinitionNode $node
-     *
-     * @return string
-     */
-    protected function getDefinitionNodeHash(DefinitionNode $node): string
-    {
-        return data_get(
-            $node,
-            'spl_object_hash',
-            spl_object_hash($node)
-        );
-    }
-
-    /**
-     * Assign definition node(s) a hash.
-     *
-     * @param DefinitionNode $newDefinition
-     * @param DefinitionNode $currentDefinition
-     *
-     * @return DefinitionNode
-     */
-    protected function assignDefinitionNodeHash(
-        DefinitionNode $newDefinition,
-        DefinitionNode $currentDefinition = null
-    ): DefinitionNode {
-        $newDefinition->spl_object_hash = data_get(
-            $currentDefinition,
-            'spl_object_hash',
-            spl_object_hash($currentDefinition)
-        );
-
-        return $newDefinition;
     }
 }

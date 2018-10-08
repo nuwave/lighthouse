@@ -13,7 +13,6 @@ use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Exceptions\DocumentASTException;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
@@ -42,7 +41,6 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      * @param DocumentAST $documentAST
      *
      * @throws DirectiveException
-     * @throws DocumentASTException
      *
      * @return DocumentAST
      */
