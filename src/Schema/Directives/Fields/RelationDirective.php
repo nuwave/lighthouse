@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -21,38 +20,30 @@ abstract class RelationDirective extends BaseDirective
      */
     public function resolveField(FieldValue $value): FieldValue
     {
-        return $value->setResolver(function (Model $parent, array $args, $context = null, ResolveInfo $resolveInfo) {
-            return $this->getBatchLoader($parent, $args, $context, $resolveInfo)->load(
-                $parent->getKey(),
-                ['parent' => $parent]
-            );
-        });
-    }
-
-    /**
-     * @param Model $parent
-     * @param array $resolveArgs
-     * @param $context
-     * @param ResolveInfo $resolveInfo
-     *
-     * @return BatchLoader
-     * @throws \Exception
-     */
-    protected function getBatchLoader(Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo): BatchLoader
-    {
-        return graphql()->batchLoader(
-            $this->getLoaderClassName(),
-            $resolveInfo->path,
-            $this->getLoaderConstructorArguments($parent, $resolveArgs, $context, $resolveInfo)
+        return $value->setResolver(
+            function (Model $parent, array $args, $context, ResolveInfo $resolveInfo) {
+                return BatchLoader::instance(
+                    $this->getLoaderClassName(),
+                    $resolveInfo->path,
+                    $this->getLoaderConstructorArguments($parent, $args, $context, $resolveInfo)
+                )->load(
+                    $parent->getKey(),
+                    ['parent' => $parent]
+                );
+            }
         );
     }
 
     /**
+     * The class name of the concrete BatchLoader to instantiate.
+     *
      * @return string
      */
     abstract protected function getLoaderClassName(): string;
 
     /**
+     * Those arguments are passed to the constructor of the new BatchLoader instance.
+     *
      * @param Model $parent
      * @param array $resolveArgs
      * @param $context

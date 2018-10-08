@@ -6,8 +6,8 @@ use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
-use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 use Nuwave\Lighthouse\Support\DataLoader\ModelRelationLoader;
+use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 
 class MultipleRelationLoader extends BatchLoader
 {
@@ -24,7 +24,9 @@ class MultipleRelationLoader extends BatchLoader
      */
     protected $scopes;
     /**
-     * @var string
+     * The pagination type can either be "connection", "paginator" or null, in which case there is no pagination.
+     *
+     * @var string|null
      */
     protected $paginationType;
 
@@ -32,9 +34,9 @@ class MultipleRelationLoader extends BatchLoader
      * @param string $relationName
      * @param array $resolveArgs
      * @param array $scopes
-     * @param string $paginationType
+     * @param string|null $paginationType
      */
-    public function __construct(string $relationName, array $resolveArgs, array $scopes, string $paginationType)
+    public function __construct(string $relationName, array $resolveArgs, array $scopes, string $paginationType = null)
     {
         $this->relationName = $relationName;
         $this->resolveArgs = $resolveArgs;
@@ -43,8 +45,11 @@ class MultipleRelationLoader extends BatchLoader
     }
 
     /**
-     * @return array
+     * Resolve the keys.
+     *
      * @throws \Exception
+     *
+     * @return array
      */
     public function resolve(): array
     {
@@ -54,7 +59,6 @@ class MultipleRelationLoader extends BatchLoader
 
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-            case PaginationManipulator::PAGINATION_ALIAS_RELAY:
                 // first is an required argument
                 $first = $this->resolveArgs['first'];
                 $after = Cursor::decode($this->resolveArgs);
@@ -78,6 +82,7 @@ class MultipleRelationLoader extends BatchLoader
     }
 
     /**
+     * Returns a closure that adds the scopes and the filters to the query.
      *
      * @return \Closure
      */
@@ -88,9 +93,12 @@ class MultipleRelationLoader extends BatchLoader
                 $query->$scope();
             }
 
-            $query->when(isset($args[QueryFilter::QUERY_FILTER_KEY]), function ($query) {
-                return QueryFilter::build($query, $this->resolveArgs);
-            });
+            $query->when(
+                isset($args[QueryFilter::QUERY_FILTER_KEY]),
+                function ($query) {
+                    return QueryFilter::build($query, $this->resolveArgs);
+                }
+            );
         };
     }
 }

@@ -8,28 +8,25 @@ use Nuwave\Lighthouse\Support\DataLoader\Loaders\SingleRelationLoader;
 
 abstract class SingleRelationDirective extends RelationDirective
 {
-    use Concerns\RegisterPaginationType;
-
     /**
-     * Name of the directive.
+     * The class name of the concrete BatchLoader to instantiate.
      *
      * @return string
      */
-    abstract public function name(): string;
-
     protected function getLoaderClassName(): string
     {
         return SingleRelationLoader::class;
     }
 
     /**
+     * Those arguments are passed to the constructor of the new BatchLoader instance.
+     *
      * @param Model $parent
      * @param array $resolveArgs
      * @param null $context
      * @param ResolveInfo|null $resolveInfo
      *
      * @return array
-     * @throws \Exception
      */
     protected function getLoaderConstructorArguments(Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo): array
     {

@@ -12,7 +12,7 @@ class BelongsToManyDirective extends MultipleRelationDirective implements FieldR
      *
      * @return string
      */
-    public function name():string
+    public function name(): string
     {
         return 'belongsToMany';
     }

@@ -40,13 +40,12 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
-        switch ($this->getPaginationType()) {
-            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                return PaginationManipulator::registerConnection($fieldDefinition, $parentType, $current);
-            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-            default:
-                return PaginationManipulator::registerPaginator($fieldDefinition, $parentType, $current);
-        }
+        return PaginationManipulator::transformToPaginatedField(
+            $this->getPaginationType(),
+            $fieldDefinition,
+            $parentType,
+            $current
+        );
     }
 
     /**
@@ -55,7 +54,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * @param FieldValue $value
      *
      * @throws \Exception
-     * @throws DirectiveException
      *
      * @return FieldValue
      */
@@ -71,24 +69,15 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
-     * @throws \Exception
      * @throws DirectiveException
      *
      * @return string
      */
     protected function getPaginationType(): string
     {
-        $paginationType = $this->directiveArgValue('type', PaginationManipulator::PAGINATION_TYPE_PAGINATOR);
-
-        $paginationType = PaginationManipulator::convertAliasToPaginationType($paginationType);
-
-        if ( ! PaginationManipulator::isValidPaginationType($paginationType)) {
-            $fieldName = $this->definitionNode->name->value;
-            $directiveName = $this->name();
-            throw new DirectiveException("'$paginationType' is not a valid pagination type. Field: '$fieldName', Directive: '$directiveName'");
-        }
-
-        return $paginationType;
+        return PaginationManipulator::assertValidPaginationType(
+            $this->directiveArgValue('type', PaginationManipulator::PAGINATION_TYPE_PAGINATOR)
+        );
     }
 
     /**

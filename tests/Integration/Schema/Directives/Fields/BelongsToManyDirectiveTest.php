@@ -38,7 +38,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->user = factory(User::class)->create();
         $this->roles = factory(Role::class, $this->rolesCount)->create();
 
-        $this->user->roles()->attach($this->roles);
+        $this->user
+            ->roles()
+            ->attach($this->roles);
 
         $this->be($this->user);
     }
@@ -73,8 +75,12 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $roles = auth()->user()->roles()->count();
-        $this->assertSame($this->rolesCount, $roles);
+        $rolesCount = auth()
+            ->user()
+            ->roles()
+            ->count();
+
+        $this->assertSame($this->rolesCount, $rolesCount);
         $this->assertCount($this->rolesCount, array_get($result->data, 'user.roles'));
     }
 
@@ -115,8 +121,8 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertEquals(2, array_get($result->data, 'user.roles.paginatorInfo.count'));
-        $this->assertEquals($this->rolesCount, array_get($result->data, 'user.roles.paginatorInfo.total'));
+        $this->assertSame(2, array_get($result->data, 'user.roles.paginatorInfo.count'));
+        $this->assertSame($this->rolesCount, array_get($result->data, 'user.roles.paginatorInfo.total'));
         $this->assertTrue(array_get($result->data, 'user.roles.paginatorInfo.hasMorePages'));
         $this->assertCount(2, array_get($result->data, 'user.roles.data'));
     }
@@ -232,8 +238,8 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->assertTrue(array_get($result->data, 'user.roles.pageInfo.hasNextPage'));
         $this->assertCount(2, $userRolesEdges);
         $this->assertCount(2, $nestedUserRolesEdges);
-        $this->assertEquals(array_get($userRolesEdges,'node.0.acl.id'), array_get($nestedUserRolesEdges,'node.0.acl.id'));
-        $this->assertEquals(array_get($userRolesEdges,'node.1.acl.id'), array_get($nestedUserRolesEdges,'node.1.acl.id'));
+        $this->assertSame(array_get($userRolesEdges,'node.0.acl.id'), array_get($nestedUserRolesEdges,'node.0.acl.id'));
+        $this->assertSame(array_get($userRolesEdges,'node.1.acl.id'), array_get($nestedUserRolesEdges,'node.1.acl.id'));
     }
 
     /**

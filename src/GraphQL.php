@@ -193,6 +193,16 @@ class GraphQL
     
         return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas);
     }
+    
+    /**
+     * ATTENTION
+     * ONLY DEPRECATED METHODS FROM THIS POINT ON
+     *
+     * Do not use the functions below, they will be removed in v3
+     *
+     * ONLY DEPRECATED METHODS FROM THIS POINT ON
+     * ATTENTION
+     */
 
     /**
      * Return an instance of a BatchLoader for a specific field.
@@ -204,22 +214,11 @@ class GraphQL
      * @throws \Exception
      *
      * @return BatchLoader
+     * @deprecated in favour of BatchLoader::instance()
      */
     public function batchLoader(string $loaderClass, array $pathToField, array $constructorArgs = []): BatchLoader
     {
-        // The path to the field serves as the unique key for the instance
-        $instanceName = BatchLoader::instanceKey($pathToField);
-
-        // Only register a new instance if it is not already bound
-        $instance = app()->bound($instanceName)
-            ? resolve($instanceName)
-            : app()->instance($instanceName, app()->makeWith($loaderClass, $constructorArgs));
-
-        if (!$instance instanceof BatchLoader) {
-            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Support\DataLoader\BatchLoader");
-        }
-
-        return $instance;
+        return BatchLoader::instance($loaderClass, $pathToField, $constructorArgs);
     }
 
     /**

@@ -4,18 +4,34 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\DataLoader\Loaders\MultipleRelationLoader;
 
 abstract class MultipleRelationDirective extends RelationDirective
 {
-    use Concerns\RegisterPaginationType;
-
     /**
-     * Name of the directive.
+     * @param FieldDefinitionNode $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parentType
+     * @param DocumentAST $current
      *
-     * @return string
+     * @throws \Exception
+     *
+     * @return DocumentAST
      */
-    abstract public function name(): string;
+    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
+    {
+        $paginationType = $this->directiveArgValue('type');
+        
+        // We default to not changing the field if no pagination type is set explicitly.
+        // This makes sense for relations, as there should not be too many entries.
+        if(! $paginationType) {
+            return $current;
+        }
+        
+        return PaginationManipulator::transformToPaginatedField($paginationType, $fieldDefinition, $parentType, $current);
+    }
 
     protected function getLoaderClassName(): string
     {
@@ -26,22 +42,24 @@ abstract class MultipleRelationDirective extends RelationDirective
      * @param Model $parent
      * @param array $resolveArgs
      * @param null $context
-     * @param ResolveInfo|null $resolveInfo
+     * @param ResolveInfo $resolveInfo
+     *
+     * @throws \Exception
      *
      * @return array
-     * @throws \Exception
      */
     protected function getLoaderConstructorArguments(Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo): array
     {
-        $relationName = $this->directiveArgValue('relation', $this->definitionNode->name->value);
-
-        $scopes = $this->directiveArgValue('scopes', []);
-
-        return [
-            'scopes'         => $scopes,
-            'resolveArgs'    => $resolveArgs,
-            'relationName'   => $relationName,
-            'paginationType' => $this->getPaginationType(),
+        $constructorArgs =  [
+            'scopes' => $this->directiveArgValue('scopes', []),
+            'resolveArgs' => $resolveArgs,
+            'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
         ];
+        
+        if($paginationType = $this->directiveArgValue('type')){
+            $constructorArgs += ['paginationType' => PaginationManipulator::assertValidPaginationType($paginationType)];
+        }
+        
+        return $constructorArgs;
     }
 }

@@ -22,9 +22,11 @@ class SingleRelationLoader extends BatchLoader
         $this->relationName = $relationName;
         $this->resolveArgs = $resolveArgs;
     }
-
+    
     /**
-     * Resolve keys.
+     * Resolve the keys.
+     *
+     * @return array
      */
     public function resolve(): array
     {
@@ -32,19 +34,25 @@ class SingleRelationLoader extends BatchLoader
         $relations = [$this->relationName => $this->getRelationConstraints()];
         $modelRelationLoader = new ModelRelationLoader($parentModels, $relations);
 
-        return $modelRelationLoader->loadRelations()->getRelationDictionary($this->relationName);
+        return $modelRelationLoader
+            ->loadRelations()
+            ->getRelationDictionary($this->relationName);
     }
-
+    
     /**
+     * Returns a closure that adds the filters to the query.
      *
      * @return \Closure
      */
     protected function getRelationConstraints(): \Closure
     {
         return function ($query) {
-            $query->when(isset($args[QueryFilter::QUERY_FILTER_KEY]), function ($query) {
-                return QueryFilter::build($query, $this->resolveArgs);
-            });
+            $query->when(
+                isset($args[QueryFilter::QUERY_FILTER_KEY]),
+                function ($query) {
+                    return QueryFilter::build($query, $this->resolveArgs);
+                }
+            );
         };
     }
 }

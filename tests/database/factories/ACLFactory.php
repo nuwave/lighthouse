@@ -1,7 +1,7 @@
 <?php
 
-use Faker\Generator as Faker;
 use Tests\Utils\Models\ACL;
+use Faker\Generator as Faker;
 
 $factory->define(ACL::class, function (Faker $faker) {
     return [
