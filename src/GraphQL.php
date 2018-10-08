@@ -69,7 +69,6 @@ class GraphQL
      * @param null $rootValue
      *
      * @throws Exceptions\DirectiveException
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return ExecutionResult
@@ -123,7 +122,6 @@ class GraphQL
      * Ensure an executable GraphQL schema is present.
      *
      * @throws Exceptions\DirectiveException
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return Schema
@@ -156,7 +154,6 @@ class GraphQL
     /**
      * Get instance of DocumentAST.
      *
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return DocumentAST
@@ -177,7 +174,6 @@ class GraphQL
     /**
      * Get the schema string and build an AST out of it.
      *
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return DocumentAST
@@ -195,8 +191,7 @@ class GraphQL
             )
         )->implode("\n");
     
-        return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas)
-            ->lock();
+        return ASTBuilder::generate($schemaString . "\n" . $additionalSchemas);
     }
 
     /**
