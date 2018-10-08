@@ -11,6 +11,8 @@ class Post extends Model
 {
     use Searchable;
 
+    protected $visible = ['id'];
+
     public function comments() {
         return $this->hasMany(Comment::class);
     }

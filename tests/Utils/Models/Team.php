@@ -6,4 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Team extends Model
 {
+    protected $visible = ['id'];
 }

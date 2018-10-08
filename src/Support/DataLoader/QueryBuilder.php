@@ -40,7 +40,7 @@ class QueryBuilder
 
         foreach ($models as $model) {
             if (isset($dictionary[$model->{ $key }])) {
-                $model->forceFill($dictionary[$model->{ $key }]->toArray());
+                $model->forceFill($dictionary[$model->{ $key }]->getAttributes());
             }
         }
 

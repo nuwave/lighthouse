@@ -9,6 +9,8 @@ class User extends Authenticatable
 {
     use IsRelayConnection;
 
+    protected $visible = ['id'];
+
     public function company()
     {
         return $this->belongsTo(Company::class);
