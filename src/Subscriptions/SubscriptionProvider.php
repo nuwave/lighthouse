@@ -13,6 +13,8 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Directives\SubscriptionDirective;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
+use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionListener;
 
 class SubscriptionProvider
 {
@@ -46,6 +48,11 @@ class SubscriptionProvider
 
             return new Broadcaster($auth, $pusher, $storage, $iterator);
         });
+
+        $app->get('events')->listen(
+            BroadcastSubscriptionEvent::class,
+            BroadcastSubscriptionListener::class
+        );
     }
 
     /**

@@ -180,6 +180,7 @@ return [
     |
     */
     'subscriptions' => [
+        'queue' => true,
         'auth' => [
             'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@authorize',
             'route_name' => 'graphql/subscriptions/auth',

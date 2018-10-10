@@ -54,23 +54,34 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
         $value = $next($value);
         $resolver = $value->getResolver();
         $subscriptionField = $this->directiveArgValue('subscription');
+        $queueBroadcast = $this->directiveArgValue('queue', config('lighthouse.subscriptions.queue', false));
+        $broadcastMethod = $queueBroadcast ? 'queueBroadcast' : 'broadcast';
 
-        return $value->setResolver(function () use ($resolver, $subscriptionField) {
+        return $value->setResolver(function () use ($resolver, $subscriptionField, $broadcastMethod) {
             $resolved = call_user_func_array($resolver, func_get_args());
 
             try {
                 $subscription = $this->registry->subscription($subscriptionField);
 
                 if ($resolved instanceof Deferred) {
-                    $resolved->then(function ($root) use ($subscription) {
-                        $this->broadcaster->broadcast($subscription, $subscriptionField, $root);
+                    $resolved->then(function ($root) use ($subscription, $broadcastMethod) {
+                        call_user_func(
+                            [$this->broadcaster, $broadcastMethod],
+                            $subscription,
+                            $subscriptionField,
+                            $root
+                        );
                     });
                 } else {
-                    $this->broadcaster->broadcast($subscription, $subscriptionField, $resolved);
+                    call_user_func(
+                        [$this->broadcaster, $broadcastMethod],
+                        $subscription,
+                        $subscriptionField,
+                        $resolved
+                    );
                 }
             } catch (\Exception $e) {
-                // There was anIssue w/ broadcasting to subscribers but
-                // we should not block this resolver.
+                // TODO: Create a BroadcastExceptionHandler so the implementation can be switched out.
                 info('broadcast.exception', [
                     'message' => $e->getMessage(),
                     'stack' => $e->getTrace(),

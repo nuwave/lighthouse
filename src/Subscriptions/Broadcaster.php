@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator as Iterator;
+use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent as Event;
 
 class Broadcaster implements BroadcastsSubscriptions
 {
@@ -50,6 +51,18 @@ class Broadcaster implements BroadcastsSubscriptions
         $this->pusher = $pusher;
         $this->storage = $storage;
         $this->iterator = $iterator;
+    }
+
+    /**
+     * Push subscription data to subscribers.
+     *
+     * @param GraphQLSubscription $subscription
+     * @param string              $fieldName
+     * @param mixed               $root
+     */
+    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root)
+    {
+        event(new Event($subscription, $fieldName, $root));
     }
 
     /**
