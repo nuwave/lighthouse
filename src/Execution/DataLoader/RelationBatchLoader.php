@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 
-class MultipleRelationLoader extends BatchLoader
+class RelationBatchLoader extends BatchLoader
 {
     /**
      * @var string
@@ -27,7 +28,7 @@ class MultipleRelationLoader extends BatchLoader
      * @var string|null
      */
     protected $paginationType;
-
+    
     /**
      * @param string $relationName
      * @param array $resolveArgs
@@ -41,7 +42,7 @@ class MultipleRelationLoader extends BatchLoader
         $this->scopes = $scopes;
         $this->paginationType = $paginationType;
     }
-
+    
     /**
      * Resolve the keys.
      *
@@ -51,34 +52,53 @@ class MultipleRelationLoader extends BatchLoader
      */
     public function resolve(): array
     {
-        $parentModels = $this->getParentModels();
-        $relations = [$this->relationName => $this->getRelationConstraints()];
-        $modelRelationLoader = new ModelRelationFetcher($parentModels, $relations);
-
+        $modelRelationFetcher = $this->getRelationFetcher();
+    
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
                 // first is an required argument
                 $first = $this->resolveArgs['first'];
                 $after = Cursor::decode($this->resolveArgs);
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
-
-                $modelRelationLoader->loadRelationsForPage($first, $currentPage);
+            
+                $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                 // count must be set so we can safely get it like this
                 $count = $this->resolveArgs['count'];
                 $page = array_get($this->resolveArgs, 'page', 1);
-
-                $modelRelationLoader->loadRelationsForPage($count, $page);
+            
+                $modelRelationFetcher->loadRelationsForPage($count, $page);
                 break;
             default:
-                $modelRelationLoader->loadRelations();
+                $modelRelationFetcher->loadRelations();
                 break;
         }
-
-        return $modelRelationLoader->getRelationDictionary($this->relationName);
+    
+        return $modelRelationFetcher->getRelationDictionary($this->relationName);
     }
-
+    
+    /**
+     * @return ModelRelationFetcher
+     */
+    protected function getRelationFetcher(): ModelRelationFetcher
+    {
+        return new ModelRelationFetcher(
+            $this->getParentModels(),
+            [$this->relationName => $this->getRelationConstraints()]
+        );
+    }
+    
+    /**
+     * Get the parents from the keys that are present on the BatchLoader.
+     *
+     * @return Collection
+     */
+    protected function getParentModels(): Collection
+    {
+        return collect($this->keys)->pluck('parent');
+    }
+    
     /**
      * Returns a closure that adds the scopes and the filters to the query.
      *
@@ -90,7 +110,7 @@ class MultipleRelationLoader extends BatchLoader
             foreach ($this->scopes as $scope) {
                 $query->$scope();
             }
-
+            
             $query->when(
                 isset($args[QueryFilter::QUERY_FILTER_KEY]),
                 function ($query) {

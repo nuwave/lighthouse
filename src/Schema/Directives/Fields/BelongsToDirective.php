@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class BelongsToDirective extends SingleRelationDirective implements FieldResolver
+class BelongsToDirective extends RelationDirective implements FieldResolver
 {
     /**
      * Name of the directive.
@@ -15,5 +15,4 @@ class BelongsToDirective extends SingleRelationDirective implements FieldResolve
     {
         return 'belongsTo';
     }
-
 }

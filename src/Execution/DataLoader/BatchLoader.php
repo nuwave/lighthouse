@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
-use Illuminate\Support\Collection;
 
 abstract class BatchLoader
 {
@@ -99,16 +98,6 @@ abstract class BatchLoader
 
             return $this->results[$key];
         });
-    }
-
-    /**
-     * Get the parents from the keys that are present on the BatchLoader.
-     *
-     * @return Collection
-     */
-    protected function getParentModels(): Collection
-    {
-        return collect($this->keys)->pluck('parent');
     }
 
     /**

@@ -4,9 +4,13 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 
 abstract class RelationDirective extends BaseDirective
 {
@@ -23,7 +27,7 @@ abstract class RelationDirective extends BaseDirective
         return $value->setResolver(
             function (Model $parent, array $args, $context, ResolveInfo $resolveInfo) {
                 return BatchLoader::instance(
-                    $this->getLoaderClassName(),
+                    RelationBatchLoader::class,
                     $resolveInfo->path,
                     $this->getLoaderConstructorArguments($parent, $args, $context, $resolveInfo)
                 )->load(
@@ -33,23 +37,51 @@ abstract class RelationDirective extends BaseDirective
             }
         );
     }
-
+    
     /**
-     * The class name of the concrete BatchLoader to instantiate.
+     * @param FieldDefinitionNode $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parentType
+     * @param DocumentAST $current
      *
-     * @return string
+     * @throws \Exception
+     *
+     * @return DocumentAST
      */
-    abstract protected function getLoaderClassName(): string;
-
+    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
+    {
+        $paginationType = $this->directiveArgValue('type');
+        
+        // We default to not changing the field if no pagination type is set explicitly.
+        // This makes sense for relations, as there should not be too many entries.
+        if(! $paginationType) {
+            return $current;
+        }
+        
+        return PaginationManipulator::transformToPaginatedField($paginationType, $fieldDefinition, $parentType, $current);
+    }
+    
     /**
-     * Those arguments are passed to the constructor of the new BatchLoader instance.
-     *
      * @param Model $parent
      * @param array $resolveArgs
-     * @param $context
+     * @param null $context
      * @param ResolveInfo $resolveInfo
+     *
+     * @throws \Exception
      *
      * @return array
      */
-    abstract protected function getLoaderConstructorArguments(Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo): array;
+    protected function getLoaderConstructorArguments(Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo): array
+    {
+        $constructorArgs =  [
+            'scopes' => $this->directiveArgValue('scopes', []),
+            'resolveArgs' => $resolveArgs,
+            'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
+        ];
+        
+        if($paginationType = $this->directiveArgValue('type')){
+            $constructorArgs += ['paginationType' => PaginationManipulator::assertValidPaginationType($paginationType)];
+        }
+        
+        return $constructorArgs;
+    }
 }
