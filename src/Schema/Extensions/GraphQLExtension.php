@@ -29,6 +29,26 @@ abstract class GraphQLExtension implements \JsonSerializable
     }
 
     /**
+     * Handle batch request start.
+     *
+     * @param int index
+     */
+    public function batchedQueryDidStart($index)
+    {
+        return;
+    }
+
+    /**
+     * Handle batch request end.
+     *
+     * @param int $index
+     */
+    public function batchedQueryDidEnd($index)
+    {
+        return;
+    }
+
+    /**
      * The extension name controls under which key the extensions shows up in the result.
      *
      * @return string

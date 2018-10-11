@@ -89,6 +89,16 @@ class TracingExtension extends GraphQLExtension
     }
 
     /**
+     * Handle batch request start.
+     *
+     * @param int index
+     */
+    public function batchedQueryDidStart($index)
+    {
+        $this->resolvers = collect();
+    }
+
+    /**
      * Record resolver execution time.
      *
      * @param ResolveInfo $info

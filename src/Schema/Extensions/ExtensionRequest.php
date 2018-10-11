@@ -8,20 +8,15 @@ class ExtensionRequest
 {
     /** @var Request */
     protected $request;
-    /** @var string */
-    protected $queryString;
-    /** @var array|null */
-    protected $variables;
+
     /**
      * @param Request $request
-     * @param string $queryString
-     * @param array $variables
+     * @param string  $queryString
+     * @param array   $variables
      */
-    public function __construct(Request $request, string $queryString, array $variables = null)
+    public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->queryString = $queryString;
-        $this->variables = $variables;
     }
 
     /**
@@ -37,20 +32,30 @@ class ExtensionRequest
     /**
      * Get GraphQL query string.
      *
+     * @param int|null $index
+     *
      * @return string
      */
-    public function queryString(): string
+    public function queryString($index = null): string
     {
-        return $this->queryString;
+        return is_null($index)
+            ? $this->request->input('query', '')
+            : array_get($this->request, "{$index}.query");
     }
 
     /**
      * Get request variables.
      *
+     * @param int|null $index
+     *
      * @return array|null
      */
-    public function variables()
+    public function variables($index = null)
     {
-        return $this->variables;
+        $variables = is_null($index)
+            ? $this->request->input('variables')
+            : array_get($this->request, "{$index}.variables");
+
+        return is_string($variables) ? json_decode($variables, true) : $variables;
     }
 }
