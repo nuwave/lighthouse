@@ -62,7 +62,7 @@ abstract class RelationDirective extends BaseDirective
     
     /**
      * @param Model $parent
-     * @param array $resolveArgs
+     * @param array $args
      * @param null $context
      * @param ResolveInfo $resolveInfo
      *
@@ -70,11 +70,11 @@ abstract class RelationDirective extends BaseDirective
      *
      * @return array
      */
-    protected function getLoaderConstructorArguments(Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo): array
+    protected function getLoaderConstructorArguments(Model $parent, array $args, $context, ResolveInfo $resolveInfo): array
     {
         $constructorArgs =  [
             'scopes' => $this->directiveArgValue('scopes', []),
-            'resolveArgs' => $resolveArgs,
+            'args' => $args,
             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
         ];
         

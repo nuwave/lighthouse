@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\QueryFilter;
+use Nuwave\Lighthouse\Execution\QueryUtils;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
@@ -11,15 +11,21 @@ use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 class RelationBatchLoader extends BatchLoader
 {
     /**
+     * The name of the Eloquent relation to load.
+     *
      * @var string
      */
     protected $relationName;
     /**
+     * The arguments that were passed to the field.
+     *
      * @var array
      */
-    protected $resolveArgs;
+    protected $args;
     /**
-     * @var array
+     * Names of the scopes that have to be called for the query.
+     *
+     * @var string[]
      */
     protected $scopes;
     /**
@@ -31,14 +37,14 @@ class RelationBatchLoader extends BatchLoader
     
     /**
      * @param string $relationName
-     * @param array $resolveArgs
+     * @param array $args
      * @param array $scopes
      * @param string|null $paginationType
      */
-    public function __construct(string $relationName, array $resolveArgs, array $scopes, string $paginationType = null)
+    public function __construct(string $relationName, array $args, array $scopes, string $paginationType = null)
     {
         $this->relationName = $relationName;
-        $this->resolveArgs = $resolveArgs;
+        $this->args = $args;
         $this->scopes = $scopes;
         $this->paginationType = $paginationType;
     }
@@ -57,16 +63,16 @@ class RelationBatchLoader extends BatchLoader
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
                 // first is an required argument
-                $first = $this->resolveArgs['first'];
-                $after = Cursor::decode($this->resolveArgs);
+                $first = $this->args['first'];
+                $after = Cursor::decode($this->args);
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
             
                 $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                 // count must be set so we can safely get it like this
-                $count = $this->resolveArgs['count'];
-                $page = array_get($this->resolveArgs, 'page', 1);
+                $count = $this->args['count'];
+                $page = array_get($this->args, 'page', 1);
             
                 $modelRelationFetcher->loadRelationsForPage($count, $page);
                 break;
@@ -85,7 +91,10 @@ class RelationBatchLoader extends BatchLoader
     {
         return new ModelRelationFetcher(
             $this->getParentModels(),
-            [$this->relationName => $this->getRelationConstraints()]
+            [$this->relationName => function ($query) {
+                $query = QueryUtils::applyScopes($query, $this->args, $this->scopes);
+                return QueryUtils::applyFilters($query, $this->args);
+            }]
         );
     }
     
@@ -97,26 +106,5 @@ class RelationBatchLoader extends BatchLoader
     protected function getParentModels(): Collection
     {
         return collect($this->keys)->pluck('parent');
-    }
-    
-    /**
-     * Returns a closure that adds the scopes and the filters to the query.
-     *
-     * @return \Closure
-     */
-    protected function getRelationConstraints(): \Closure
-    {
-        return function ($query) {
-            foreach ($this->scopes as $scope) {
-                $query->$scope();
-            }
-            
-            $query->when(
-                isset($args[QueryFilter::QUERY_FILTER_KEY]),
-                function ($query) {
-                    return QueryFilter::build($query, $this->resolveArgs);
-                }
-            );
-        };
     }
 }

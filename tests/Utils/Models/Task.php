@@ -40,4 +40,9 @@ class Task extends Model
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
+
+    public function scopeFoo(Builder $query, $args): Builder
+    {
+        return $query->limit($args['foo']);
+    }
 }
