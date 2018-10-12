@@ -2,15 +2,15 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
+use GraphQL\Executor\ExecutionResult;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
-use GraphQL\Executor\ExecutionResult;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\Context;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
+use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 
 class GraphQLController extends Controller
 {
@@ -18,7 +18,7 @@ class GraphQLController extends Controller
     protected $graphQL;
 
     /** @var bool */
-    protected $batched;
+    protected $batched = false;
 
     /**
      * Inject middleware into request.
@@ -35,30 +35,32 @@ class GraphQLController extends Controller
         GraphQL $graphQL
     ) {
         $this->graphQL = $graphQL;
-        $this->batched = isset($request[0]) && config('lighthouse.batched_queries', true);
 
-        $extensionRegistry->requestDidStart(
-            new ExtensionRequest($request, $this->batched)
-        );
+        if ($request->route()) {
+            $this->batched = isset($request[0]) && config('lighthouse.batched_queries', true);
 
-        $graphQL->prepSchema();
-
-        $middleware = ! $this->batched
-            ? $middlewareRegistry->forRequest($request->input('query'))
-            : array_reduce(
-                $request->toArray(),
-                function ($middleware, $req) use ($middlewareRegistry) {
-                    $query = array_get($req, 'query', '');
-
-                    return array_merge(
-                        $middleware,
-                        $middlewareRegistry->forRequest($query)
-                    );
-                },
-                []
+            $extensionRegistry->requestDidStart(
+                new ExtensionRequest($request, $this->batched)
             );
 
-        $this->middleware($middleware);
+            $graphQL->prepSchema();
+            $middleware = ! $this->batched
+                ? $middlewareRegistry->forRequest($request->input('query'))
+                : array_reduce(
+                    $request->toArray(),
+                    function ($middleware, $req) use ($middlewareRegistry) {
+                        $query = array_get($req, 'query', '');
+
+                        return array_merge(
+                            $middleware,
+                            $middlewareRegistry->forRequest($query)
+                        );
+                    },
+                    []
+                );
+
+            $this->middleware($middleware);
+        }
     }
 
     /**
