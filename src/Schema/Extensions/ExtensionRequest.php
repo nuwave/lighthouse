@@ -9,14 +9,17 @@ class ExtensionRequest
     /** @var Request */
     protected $request;
 
+    /** @var bool */
+    protected $batched;
+
     /**
      * @param Request $request
-     * @param string  $queryString
-     * @param array   $variables
+     * @param bool    $batched
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, $batched = false)
     {
         $this->request = $request;
+        $this->batched = $batched;
     }
 
     /**
@@ -57,5 +60,15 @@ class ExtensionRequest
             : array_get($this->request, "{$index}.variables");
 
         return is_string($variables) ? json_decode($variables, true) : $variables;
+    }
+
+    /**
+     * Check if request is batched.
+     *
+     * @return bool
+     */
+    public function isBatchedRequest(): bool
+    {
+        return $this->batched;
     }
 }
