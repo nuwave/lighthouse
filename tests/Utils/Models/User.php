@@ -15,6 +15,11 @@ class User extends Authenticatable
 
     protected $guarded = [];
 
+    public function getTaskCountAsString(): string
+    {
+        return "User has {$this->tasks->count()} tasks.";
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
