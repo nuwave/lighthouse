@@ -21,7 +21,7 @@ class MutationExecutor
     {
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
 
-        $model = self::saveModelWithBelongsTo($model, $parentRelation, $remaining);
+        $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
         $hasMany->each(function ($nestedOperations, $relationName) use ($model) {
             /** @var HasMany $relation */
@@ -95,7 +95,7 @@ class MutationExecutor
 
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
 
-        $model = self::saveModelWithBelongsTo($model, $parentRelation, $remaining);
+        $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
         $hasMany->each(function ($nestedOperations, $relationName) use ($model) {
             /** @var HasMany $relation */
