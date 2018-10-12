@@ -29,7 +29,7 @@ class QueryUtils
     public static function applyScopes($query, array $args, array $scopes)
     {
         foreach ($scopes as $scope) {
-            call_user_func_array([$query, $scope], [$args]);
+            call_user_func([$query, $scope], $args);
         }
 
         return $query;

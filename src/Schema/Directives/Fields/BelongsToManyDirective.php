@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class HasManyDirective extends RelationDirective implements FieldResolver, FieldManipulator
+class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator
 {
     /**
      * Name of the directive.
@@ -14,6 +14,6 @@ class HasManyDirective extends RelationDirective implements FieldResolver, Field
      */
     public function name(): string
     {
-        return 'hasMany';
+        return 'belongsToMany';
     }
 }

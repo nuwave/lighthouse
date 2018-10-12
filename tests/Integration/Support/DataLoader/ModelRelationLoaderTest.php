@@ -6,8 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
-class QueryBuilderTest extends DBTestCase
+class ModelRelationLoaderTest extends DBTestCase
 {
     /**
      * Setup test environment.
@@ -15,7 +16,7 @@ class QueryBuilderTest extends DBTestCase
     public function setUp()
     {
         parent::setUp();
-        
+
         $count = 4;
         $users = factory(User::class, 3)->create();
         $users->each(function ($user) use (&$count) {
@@ -28,21 +29,22 @@ class QueryBuilderTest extends DBTestCase
 
     /**
      * @test
+     * @throws \Exception
      */
     public function itCanLoadRelationshipsWithLimitsOnCollection()
     {
-        $users = User::all();
-        // TODO remove this as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
-        $users->fetch(['tasks' => function ($query) {
-            $query->take(3);
-        }]);
+        // TODO refactor this as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
 
-        $this->assertCount(3, $users[0]->tasks);
-        $this->assertCount(3, $users[1]->tasks);
-        $this->assertCount(3, $users[2]->tasks);
-        $this->assertEquals($users[0]->getKey(), $users[0]->tasks->first()->user_id);
-        $this->assertEquals($users[1]->getKey(), $users[1]->tasks->first()->user_id);
-        $this->assertEquals($users[2]->getKey(), $users[2]->tasks->first()->user_id);
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
+            ->loadRelationsForPage(3)
+            ->models();
+
+        $this->assertCount(3, $users[0]->tasks->getCollection());
+        $this->assertCount(3, $users[1]->tasks->getCollection());
+        $this->assertCount(3, $users[2]->tasks->getCollection());
+        $this->assertEquals($users[0]->getKey(), $users[0]->tasks[0]->user_id);
+        $this->assertEquals($users[1]->getKey(), $users[1]->tasks[0]->user_id);
+        $this->assertEquals($users[2]->getKey(), $users[2]->tasks[0]->user_id);
     }
 
     /**
@@ -50,8 +52,9 @@ class QueryBuilderTest extends DBTestCase
      */
     public function itCanLoadCountOnCollection()
     {
-        $users = User::all();
-        $users->fetchCount(['tasks']);
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
+            ->reloadModelsWithRelationCount()
+            ->models();
 
         $this->assertEquals($users[0]->tasks_count, 4);
         $this->assertEquals($users[1]->tasks_count, 5);
@@ -60,11 +63,13 @@ class QueryBuilderTest extends DBTestCase
 
     /**
      * @test
+     * @throws \Exception
      */
     public function itCanPaginateRelationshipOnCollection()
     {
-        $users = User::all();
-        $users->fetchForPage(2, 1, ['tasks']);
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
+            ->loadRelationsForPage(2)
+            ->models();
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $users[0]->tasks);
         $this->assertInstanceOf(LengthAwarePaginator::class, $users[1]->tasks);
@@ -79,6 +84,7 @@ class QueryBuilderTest extends DBTestCase
 
     /**
      * @test
+     * @throws \Exception
      */
     public function itCanHandleSoftDeletes()
     {
@@ -87,10 +93,9 @@ class QueryBuilderTest extends DBTestCase
         $task = $user->tasks()->get()->last();
         $task->delete();
 
-        $users = User::all();
-        $users->fetch(['tasks' => function ($query) use ($count) {
-            $query->take($count);
-        }]);
+        $users = (new ModelRelationFetcher(User::all(), ['tasks']))
+            ->loadRelationsForPage($count)
+            ->models();
 
         $expectedCount = $count - 1;
         $this->assertCount($expectedCount, $users[0]->tasks);
