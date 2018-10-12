@@ -84,6 +84,42 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCallsScopeWithResolverArgs()
+    {
+        $this->assertCount(3, $this->user->tasks);
+
+        $schema = '
+        type User {
+            tasks(foo: Int): [Task!]! @hasMany(scopes: ["foo"])
+        }
+        
+        type Task {
+            id: Int
+            foo: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->executeQuery($schema, '
+        {
+            user {
+                tasks(foo: 2) {
+                    id
+                }
+            }
+        }
+        ');
+
+
+        $this->assertCount(2, array_get($result->data, 'user.tasks'));
+    }
+
+    /**
+     * @test
+     */
     public function itCanQueryHasManyPaginator()
     {
         $schema = '

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\DataLoader;
+namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
 
@@ -28,6 +28,37 @@ abstract class BatchLoader
      * @var bool
      */
     private $hasLoaded = false;
+
+    /**
+     * Return an instance of a BatchLoader for a specific field.
+     *
+     * @param string $loaderClass The class name of the concrete BatchLoader to instantiate.
+     * @param array $pathToField Path to the GraphQL field from the root, is used as a key for BatchLoader instances.
+     * @param array $constructorArgs Those arguments are passed to the constructor of the new BatchLoader instance.
+     *
+     * @throws \Exception
+     *
+     * @return BatchLoader
+     */
+    public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): self
+    {
+        // The path to the field serves as the unique key for the instance
+        $instanceName = static::instanceKey($pathToField);
+        
+        // Only register a new instance if it is not already bound
+        $instance = app()->bound($instanceName)
+            ? resolve($instanceName)
+            : app()->instance(
+                $instanceName,
+                app()->makeWith($loaderClass, $constructorArgs)
+            );
+        
+        if (!$instance instanceof self) {
+            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
+        }
+        
+        return $instance;
+    }
 
     /**
      * Generate a unique key for the instance, using the path in the query.

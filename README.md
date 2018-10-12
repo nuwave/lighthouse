@@ -15,6 +15,10 @@ Laravel application. It greatly reduces the boilerplate required to create a sch
 it integrates well with any Laravel project, and it's highly customizable
 giving you full control over your data.
 
+## [Documentation](https://lighthouse-php.netlify.com/)
+
+The documentation for Lighthouse is maintained in a seperate repository: https://github.com/nuwave/lighthouse-docs
+
 ## Get started
 
 If you have an existing Laravel project, all you really need is two steps:
@@ -22,8 +26,6 @@ If you have an existing Laravel project, all you really need is two steps:
 1. Install via `composer require nuwave/lighthouse`
 
 2. Define your schema in `routes/graphql/schema.graphql`
-
-Learn about Lighthouse in the **[Documentation](https://lighthouse-php.netlify.com/)**
 
 ## Get involved
 
