@@ -40,17 +40,19 @@ class MutationExecutor
 
     /**
      * @param Model $model
+     * @param Collection $remaining
      * @param HasMany $parentRelation
-     * @param $remaining
      *
      * @return Model
      */
-    protected static function saveModelWithBelongsTo(Model $model, HasMany $parentRelation, $remaining): Model
+    protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, HasMany $parentRelation = null): Model
     {
         list($belongsTo, $remaining) = self::extractBelongsToArgs($model, $remaining);
 
         // Use all the remaining attributes and fill the model
-        $model->fill($remaining->all());
+        $model->fill(
+            $remaining->all()
+        );
 
         $belongsTo->each(function ($relatedId, string $relationName) use ($model) {
             /** @var BelongsTo $belongsTo */
