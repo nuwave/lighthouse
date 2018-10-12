@@ -35,9 +35,11 @@ class GraphQLController extends Controller
         GraphQL $graphQL
     ) {
         $this->graphQL = $graphQL;
-        $this->batched = isset($request[0]);
+        $this->batched = isset($request[0]) && config('lighthouse.batched_queries', true);
 
-        $extensionRegistry->requestDidStart(new ExtensionRequest($request));
+        $extensionRegistry->requestDidStart(
+            new ExtensionRequest($request, $this->batched)
+        );
 
         $graphQL->prepSchema();
 
