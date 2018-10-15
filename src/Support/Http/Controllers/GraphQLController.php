@@ -2,20 +2,23 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use GraphQL\Executor\ExecutionResult;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\Context;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
+use Illuminate\Routing\Controller;
+use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQLController extends Controller
 {
     /** @var GraphQL */
     protected $graphQL;
+
+    /** @var CreatesContext */
+    protected $createsContext;
 
     /** @var bool */
     protected $batched = false;
@@ -27,14 +30,17 @@ class GraphQLController extends Controller
      * @param ExtensionRegistry  $extensionRegistry
      * @param MiddlewareRegistry $middlewareRegistry
      * @param GraphQL            $graphQL
+     * @param CreatesContext     $createsContext
      */
     public function __construct(
         Request $request,
         ExtensionRegistry $extensionRegistry,
         MiddlewareRegistry $middlewareRegistry,
-        GraphQL $graphQL
+        GraphQL $graphQL,
+        CreatesContext $createsContext
     ) {
         $this->graphQL = $graphQL;
+        $this->createsContext = $createsContext;
 
         if ($request->route()) {
             $this->batched = isset($request[0]) && config('lighthouse.batched_queries', true);
@@ -73,13 +79,11 @@ class GraphQLController extends Controller
     public function query(Request $request)
     {
         $debug = config('app.debug') ? config('lighthouse.debug') : false;
-        $user = app()->bound('auth') ? auth()->user() : null;
-        $context = new Context($request, $user);
 
         if ($this->batched) {
             $data = $this->graphQL->executeBatchedQueries(
                 $request->toArray(),
-                $context
+                $this->createsContext->generate($request)
             );
 
             return response(
@@ -97,27 +101,9 @@ class GraphQLController extends Controller
         return response(
             $this->graphQL->executeQuery(
                 $query,
-                new Context($request, $user),
+                $this->createsContext->generate($request),
                 $variables
             )->toArray($debug)
-        );
-    }
-
-    /**
-     * @param Request $request
-     * @param string  $query
-     * @param array   $variables
-     *
-     * @return ExecutionResult
-     */
-    protected function execute(Request $request, string $query, array $variables): ExecutionResult
-    {
-        $user = app()->bound('auth') ? auth()->user() : null;
-
-        return $this->graphQL->executeQuery(
-            $query,
-            new Context($request, $user),
-            $variables
         );
     }
 
