@@ -83,6 +83,20 @@ class NodeFactoryTest extends TestCase
     /**
      * @test
      */
+    public function itCanPointToScalarClassThroughDirectiveWithoutNamespace()
+    {
+        $scalarNode = PartialParser::scalarTypeDefinition('
+        scalar SomeEmail @scalar(class: "Email")
+        ');
+        $scalarType = $this->factory->handle($scalarNode);
+
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
+        $this->assertSame('SomeEmail', $scalarType->name);
+    }
+
+    /**
+     * @test
+     */
     public function itCanTransformInterfaces()
     {
         $interfaceNode = PartialParser::interfaceTypeDefinition('
