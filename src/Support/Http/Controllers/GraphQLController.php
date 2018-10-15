@@ -8,17 +8,17 @@ use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Support\Contracts\CreatesContext as Context;
 
 class GraphQLController extends Controller
 {
     /** @var GraphQL */
     protected $graphQL;
 
-    /** @var Context $context */
-    protected $context;
+    /** @var CreatesContext */
+    protected $createsContext;
 
     /** @var bool */
     protected $batched = false;
@@ -30,17 +30,17 @@ class GraphQLController extends Controller
      * @param ExtensionRegistry  $extensionRegistry
      * @param MiddlewareRegistry $middlewareRegistry
      * @param GraphQL            $graphQL
-     * @param Context            $context
+     * @param CreatesContext     $createsContext
      */
     public function __construct(
         Request $request,
         ExtensionRegistry $extensionRegistry,
         MiddlewareRegistry $middlewareRegistry,
         GraphQL $graphQL,
-        Context $context
+        CreatesContext $createsContext
     ) {
         $this->graphQL = $graphQL;
-        $this->context = $context;
+        $this->createsContext = $createsContext;
 
         if ($request->route()) {
             $this->batched = isset($request[0]) && config('lighthouse.batched_queries', true);
@@ -83,7 +83,7 @@ class GraphQLController extends Controller
         if ($this->batched) {
             $data = $this->graphQL->executeBatchedQueries(
                 $request->toArray(),
-                $this->context->generate($request)
+                $this->createsContext->generate($request)
             );
 
             return response(
@@ -101,7 +101,7 @@ class GraphQLController extends Controller
         return response(
             $this->graphQL->executeQuery(
                 $query,
-                $this->context->generate($request),
+                $this->createsContext->generate($request),
                 $variables
             )->toArray($debug)
         );

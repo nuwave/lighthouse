@@ -41,7 +41,7 @@ class Context implements GraphQLContext
      *
      * @return User|null
      */
-    public function user(): User
+    public function user()
     {
         return $this->user;
     }
