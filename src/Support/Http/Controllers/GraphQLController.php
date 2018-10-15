@@ -20,6 +20,9 @@ class GraphQLController extends Controller
     /** @var CreatesContext */
     protected $createsContext;
 
+    /** @var ExtensionRegistry */
+    protected $extensionRegistry;
+
     /** @var bool */
     protected $batched = false;
 
@@ -40,6 +43,7 @@ class GraphQLController extends Controller
         CreatesContext $createsContext
     ) {
         $this->graphQL = $graphQL;
+        $this->extensionRegistry = $extensionRegistry;
         $this->createsContext = $createsContext;
 
         if ($request->route()) {
@@ -51,7 +55,7 @@ class GraphQLController extends Controller
 
             $graphQL->prepSchema();
             $middleware = ! $this->batched
-                ? $middlewareRegistry->forRequest($request->input('query'))
+                ? $middlewareRegistry->forRequest($request->input('query', ''))
                 : array_reduce(
                     $request->toArray(),
                     function ($middleware, $req) use ($middlewareRegistry) {
@@ -78,33 +82,49 @@ class GraphQLController extends Controller
      */
     public function query(Request $request)
     {
-        $debug = config('app.debug') ? config('lighthouse.debug') : false;
+        $response = $this->batched
+            ? $this->executeBatched($request)
+            : $this->execute($request);
 
-        if ($this->batched) {
-            $data = $this->graphQL->executeBatchedQueries(
-                $request->toArray(),
-                $this->createsContext->generate($request)
-            );
+        return response(
+            $this->extensionRegistry->willSendResponse($response)
+        );
+    }
 
-            return response(
-                array_map(function (ExecutionResult $result) use ($debug) {
-                    return $result->toArray($debug);
-                }, $data)
-            );
-        }
-
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    protected function execute(Request $request)
+    {
         $query = $request->input('query', '');
         $variables = is_string($vars = $request->input('variables', []))
             ? json_decode($vars, true)
             : $vars;
 
-        return response(
-            $this->graphQL->executeQuery(
-                $query,
-                $this->createsContext->generate($request),
-                $variables
-            )->toArray($debug)
+        return $this->graphQL->executeQuery(
+            $query,
+            $this->createsContext->generate($request),
+            $variables
+        )->toArray($this->getDebug());
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    protected function executeBatched(Request $request)
+    {
+        $data = $this->graphQL->executeBatchedQueries(
+            $request->toArray(),
+            $this->createsContext->generate($request)
         );
+
+        return array_map(function (ExecutionResult $result) {
+            return $result->toArray($this->getDebug());
+        }, $data);
     }
 
     /**
@@ -115,5 +135,13 @@ class GraphQLController extends Controller
     protected function getVariables($variables): array
     {
         return is_string($variables) ? json_decode($variables, true) : $variables;
+    }
+
+    /**
+     * @return int|bool
+     */
+    protected function getDebug()
+    {
+        return config('app.debug') ? config('lighthouse.debug') : false;
     }
 }
