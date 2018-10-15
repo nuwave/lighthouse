@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Language\AST\OperationDefinitionNode;
 use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Execution\QueryAST;
-use GraphQL\Language\AST\OperationDefinitionNode;
 
 class MiddlewareRegistry
 {
@@ -21,7 +21,7 @@ class MiddlewareRegistry
      * @var array
      */
     protected $mutations = [];
-    
+
     /**
      * Handle request.
      *
@@ -33,6 +33,10 @@ class MiddlewareRegistry
      */
     public function forRequest(string $request): array
     {
+        if (empty($request)) {
+            return [];
+        }
+
         $queryAST = QueryAST::fromSource($request);
         $fragments = $queryAST->fragmentDefinitions();
 
@@ -68,7 +72,7 @@ class MiddlewareRegistry
      * Register query middleware.
      *
      * @param string $name
-     * @param array $middleware
+     * @param array  $middleware
      *
      * @return MiddlewareRegistry
      */
@@ -83,7 +87,7 @@ class MiddlewareRegistry
      * Register mutation middleware.
      *
      * @param string $name
-     * @param array $middleware
+     * @param array  $middleware
      *
      * @return MiddlewareRegistry
      */
