@@ -72,16 +72,16 @@ class GraphQL
         return collect($requests)->map(function ($request, $index) use ($context, $rootValue) {
             $this->extensionRegistry->batchedQueryDidStart($index);
 
-            $data = $this->executeQuery(
+            $result = $this->executeQuery(
                 array_get($request, 'query', ''),
                 $context,
                 array_get($request, 'variables', []),
                 $rootValue
             );
 
-            $this->extensionRegistry->batchedQueryDidEnd($index);
+            $this->extensionRegistry->batchedQueryDidEnd($result, $index);
 
-            return $data;
+            return $result;
         })->all();
     }
 
