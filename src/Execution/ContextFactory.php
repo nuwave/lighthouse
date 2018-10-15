@@ -18,8 +18,6 @@ class ContextFactory implements CreatesContext
      */
     public function generate(Request $request): GraphQLContext
     {
-        $user = app()->bound('auth') ? auth()->user() : null;
-
-        return new Context($request, $user);
+        return new Context($request, $request->user());
     }
 }
