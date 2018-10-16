@@ -3,94 +3,77 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Schema\Context;
+use Tests\Utils\Middleware\Authenticate;
+use Tests\Utils\Middleware\AddFooProperty;
 
 class MiddlewareDirectiveTest extends TestCase
 {
-    /** @var MiddlewareRegistry */
-    protected $middlewareRegistry;
-
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->middlewareRegistry = resolve(MiddlewareRegistry::class);
-    }
-
     /**
      * @test
+     * @dataProvider fooMiddlewareQueries
+     *
+     * @param string $query
      */
-    public function itCanRegisterMiddleware()
+    public function itCallsFooMiddleware(string $query)
     {
-        $this->buildSchemaFromString('
-            type Query {
-                foo: String! @middleware(checks: ["auth:web", "auth:admin"])
-                bar: String!
-            }
-            type Mutation {
-                foo(bar: String!): String! @middleware(checks: ["auth:api"])
-                bar(baz: String!): String!
-            }
-        ');
-        $query = '
-        query FooQuery {
-            foo
-        }
-        ';
-
-        $middleware = $this->middlewareRegistry->forRequest($query);
-        $this->assertCount(2, $middleware);
-        $this->assertContains('auth:web', $middleware);
-        $this->assertContains('auth:admin', $middleware);
-
-        $mutation = '
-        mutation CreateFoo {
-            foo(bar:"baz")
-        }
-        ';
-        $middleware = $this->middlewareRegistry->forRequest($mutation);
-        $this->assertCount(1, $middleware);
-        $this->assertContains('auth:api', $middleware);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanRegisterMiddlewareWithFragments()
-    {
-        $this->buildSchemaFromString('
+        $this->schema = '
         type Query {
-            foo: String! @middleware(checks: ["auth:web", "auth:admin"])
-            bar: String!
+            foo: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"])
+                @field(resolver: "'. addslashes(self::class).'@resolveFooMiddleware")
         }
-        
-        type Mutation {
-            foo(bar: String!): String! @middleware(checks: ["auth:api"])
-            bar(baz: String!): String!
+        ';
+
+        $result = $this->queryViaHttp($query);
+
+        $this->assertSame(42, array_get($result, 'data.foo'));
+    }
+
+    public function fooMiddlewareQueries()
+    {
+        return [
+            ['
+            {
+                foo
+            }
+            '],
+            ['
+            query FooQuery {
+                ...Foo_Fragment
+            }
+            
+            fragment Foo_Fragment on Query {
+                foo
+            }
+            ']
+        ];
+    }
+
+    public function resolveFooMiddleware($root, $args, Context $context): int
+    {
+        $this->assertSame(AddFooProperty::VALUE, $context->request->foo);
+
+        return 42;
+    }
+
+    /**
+     * @test
+     */
+    public function itWrapsExceptionFromMiddlewareInResponse()
+    {
+        $this->schema = '
+        type Query {
+            foo: Int @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
+        }
+        ';
+
+        $result = $this->queryViaHttp('
+        {
+            foo
         }
         ');
 
-        $query = '
-        query FooQuery {
-            ...Foo_Fragment
-        }
-        
-        fragment Foo_Fragment on Query {
-            foo
-        }
-        ';
-        $middleware = $this->middlewareRegistry->forRequest($query);
-        $this->assertCount(2, $middleware);
-        $this->assertContains('auth:web', $middleware);
-        $this->assertContains('auth:admin', $middleware);
-
-        $mutation = '
-        mutation CreateFoo {
-            foo(bar:"baz")
-        }
-        ';
-        $middleware = $this->middlewareRegistry->forRequest($mutation);
-        $this->assertCount(1, $middleware);
-        $this->assertContains('auth:api', $middleware);
+        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
     }
 }

@@ -91,7 +91,8 @@ class TestCase extends BaseTestCase
      */
     protected function executeWithoutDebug(string $schema, string $query, array $variables = []): array
     {
-        return $this->executeQuery($schema, $query, $variables)->toArray();
+        return $this->executeQuery($schema, $query, $variables)
+            ->toArray();
     }
 
     /**
@@ -106,7 +107,8 @@ class TestCase extends BaseTestCase
     protected function execute(string $schema, string $query, array $variables = []): array
     {
         // For test execution, it is more convenient to throw Exceptions so they show up in the PHPUnit command line
-        return $this->executeQuery($schema, $query, $variables)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
+        return $this->executeQuery($schema, $query, $variables)
+            ->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
     }
 
     /**
@@ -136,5 +138,20 @@ class TestCase extends BaseTestCase
         $this->schema = $schema;
 
         return graphql()->prepSchema();
+    }
+
+    /**
+     * Execute a query as if it was sent as a request to the server.
+     *
+     * @param string $query
+     *
+     * @return array
+     */
+    protected function queryViaHttp(string $query): array
+    {
+        return $this->postJson(
+            'graphql',
+            ['query' => $query]
+        )->json();
     }
 }

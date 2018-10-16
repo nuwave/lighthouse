@@ -16,34 +16,25 @@ class Context implements GraphQLContext
     public $request;
 
     /**
-     * Authenticated user.
-     *
-     * May be null since some fields may be accessible without authentication.
-     *
-     * @var User|null
-     */
-    public $user;
-
-    /**
      * Create new context.
      *
      * @param Request   $request
-     * @param User|null $user
      */
-    public function __construct(Request $request, User $user = null)
+    public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->user = $user;
     }
 
     /**
-     * Get instance of authorized user.
+     * Get instance of authenticated user.
+     *
+     * May be null since some fields may be accessible without authentication.
      *
      * @return User|null
      */
     public function user()
     {
-        return $this->user;
+        return $this->request->user();
     }
 
     /**

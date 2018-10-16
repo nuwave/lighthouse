@@ -17,7 +17,6 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
@@ -324,16 +323,6 @@ class GraphQL
     public function schema(): TypeRegistry
     {
         return $this->types();
-    }
-
-    /**
-     * @return MiddlewareRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function middleware(): MiddlewareRegistry
-    {
-        return resolve(MiddlewareRegistry::class);
     }
 
     /**

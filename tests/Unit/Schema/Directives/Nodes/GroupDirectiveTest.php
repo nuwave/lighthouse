@@ -3,7 +3,8 @@
 namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Schema\Context;
+use Tests\Utils\Middleware\AddFooProperty;
 
 class GroupDirectiveTest extends TestCase
 {
@@ -49,13 +50,13 @@ class GroupDirectiveTest extends TestCase
      */
     public function itCanSetMiddleware()
     {
-        $schema = '
+        $this->schema = '
         type Query {
             dummy: Int
         }
         
-        extend type Query @group(middleware: ["foo", "bar"]) {
-            me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
+        extend type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"]) {
+            me: String @field(resolver: "'. addslashes(self::class).'@resolve")
         }
         ';
         $query = '
@@ -63,11 +64,16 @@ class GroupDirectiveTest extends TestCase
             me
         }
         ';
-        $this->executeQuery($schema, $query);
+        $result = $this->queryViaHttp($query);
+        # TODO this throws because of the escape slashes
 
-        $middleware = resolve(MiddlewareRegistry::class)->query('me');
-        $this->assertCount(2, $middleware);
-        $this->assertEquals('foo', $middleware[0]);
-        $this->assertEquals('bar', $middleware[1]);
+        $this->assertSame('Mario', array_get($result, 'data.me'));
+    }
+
+    public function resolve($root, $args, Context $context): string
+    {
+        $this->assertSame(AddFooProperty::VALUE, $context->request->foo);
+
+        return 'Mario';
     }
 }

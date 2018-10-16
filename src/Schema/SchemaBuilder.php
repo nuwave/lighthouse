@@ -78,19 +78,9 @@ class SchemaBuilder
             }
         }
 
-        /**
-         * The fields for the root operations have to be loaded in advance.
-         *
-         * This is because they might have to register middleware.
-         * Other fields can be lazy-loaded to improve performance.
-         *
-         * Calling getFields() causes the fields MiddlewareDirective to run
-         * and thus registers the (Laravel)-Middleware for the fields.
-         */
         if(empty($queryType)){
             throw new InvariantViolation("The root Query type must be present in the schema.");
         }
-        $queryType->getFields();
 
         $config = SchemaConfig::create()
             // Always set Query since it is required
@@ -109,11 +99,9 @@ class SchemaBuilder
 
         // Those are optional so only add them if they are present in the schema
         if (isset($mutationType)) {
-            $mutationType->getFields();
             $config->setMutation($mutationType);
         }
         if (isset($subscriptionType)) {
-            $subscriptionType->getFields();
             $config->setSubscription($subscriptionType);
         }
 
