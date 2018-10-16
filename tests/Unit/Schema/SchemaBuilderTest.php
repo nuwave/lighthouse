@@ -22,7 +22,7 @@ class SchemaBuilderTest extends TestCase
 
         $app['config']->set(
             'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
+            'Tests\\Utils\\Queries'
         );
 
         $app['config']->set(

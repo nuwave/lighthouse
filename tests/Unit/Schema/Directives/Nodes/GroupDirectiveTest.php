@@ -70,4 +70,63 @@ class GroupDirectiveTest extends TestCase
         $this->assertEquals('foo', $middleware[0]);
         $this->assertEquals('bar', $middleware[1]);
     }
+
+    /**
+     * @test
+     */
+    public function itHandlesDefaultNamespacesForMutations()
+    {
+        $schema = '
+        type Query {
+            dummy: Int
+        }
+
+        type Mutation {
+            dummy: Int
+        }
+        
+        extend type Mutation {
+            foo: String @field(resolver: "FooMutation@bar")
+        }
+        ';
+
+        $mutation = '        
+        mutation{
+            foo
+        }        
+        ';
+        
+        $result = $this->executeQuery($schema, $mutation);
+        $this->assertEquals('bar', $result->data['foo']);
+    }
+
+    /**
+     * @test
+     */
+    public function itHandlesDefaultNamespacesForQueries()
+    {
+        $schema = '
+        type Query {
+            dummy: Int
+        }
+
+        type Mutation {
+            dummy: Int
+        }
+        
+        extend type Query {
+            foo: String @field(resolver: "FooQuery@bar")
+        }
+        ';
+
+        $query = '                
+        query{
+            foo
+        }        
+        ';
+        
+        $result = $this->executeQuery($schema, $query);
+
+        $this->assertEquals('bar', $result->data['foo']);
+    }
 }

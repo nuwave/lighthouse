@@ -103,7 +103,12 @@ abstract class BaseDirective implements Directive
             throw new DirectiveException("Directive '{$this->name()}' must have an argument '{$argumentName}' with 'ClassName@methodName'");
         }
 
-        $className = $this->namespaceClassName($argumentParts[0]);
+        $className = $this->namespaceClassName($argumentParts[0], [
+            config('lighthouse.namespaces.models'),
+            config('lighthouse.namespaces.mutations'),
+            config('lighthouse.namespaces.queries')
+        ]);
+
         $methodName = $argumentParts[1];
 
         if (! method_exists($className, $methodName)) {
