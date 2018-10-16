@@ -79,6 +79,7 @@ class LighthouseServiceProvider extends ServiceProvider
             $this->commands([
                 \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
                 \Nuwave\Lighthouse\Console\InterfaceCommand::class,
+                \Nuwave\Lighthouse\Console\MutationCommand::class,
                 \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
                 \Nuwave\Lighthouse\Console\QueryCommand::class,
                 \Nuwave\Lighthouse\Console\UnionCommand::class,
