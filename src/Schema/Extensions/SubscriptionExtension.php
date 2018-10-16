@@ -31,6 +31,16 @@ class SubscriptionExtension extends GraphQLExtension
     }
 
     /**
+     * Handle batch request start.
+     *
+     * @param int index
+     */
+    public function batchedQueryDidStart($index)
+    {
+        $this->registry->reset();
+    }
+
+    /**
      * Format extension output.
      *
      * @return array

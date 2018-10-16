@@ -131,4 +131,12 @@ class SubscriptionRegistry
     {
         return $this->subscribers;
     }
+
+    /**
+     * Reset collection of subscribers.
+     */
+    public function reset()
+    {
+        $this->subscribers = [];
+    }
 }
