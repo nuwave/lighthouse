@@ -10,6 +10,8 @@ interface StoresSubscriptions
      * Find subscriber by channel.
      *
      * @param string $channel
+     *
+     * @return Subscriber|null
      */
     public function subscriberByChannel($channel);
 

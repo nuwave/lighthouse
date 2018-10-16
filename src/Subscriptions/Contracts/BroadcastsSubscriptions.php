@@ -17,6 +17,15 @@ interface BroadcastsSubscriptions
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root);
 
     /**
+     * Queue pushing subscription data to subscribers.
+     *
+     * @param GraphQLSubscription $subscription
+     * @param string              $fieldName
+     * @param mixed               $root
+     */
+    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root);
+
+    /**
      * Authorize the subscription.
      *
      * @param string  $channel

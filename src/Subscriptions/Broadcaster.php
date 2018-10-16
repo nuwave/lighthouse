@@ -54,7 +54,7 @@ class Broadcaster implements BroadcastsSubscriptions
     }
 
     /**
-     * Push subscription data to subscribers.
+     * Queue pushing subscription data to subscribers.
      *
      * @param GraphQLSubscription $subscription
      * @param string              $fieldName
