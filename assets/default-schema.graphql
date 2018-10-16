@@ -1,5 +1,8 @@
-"A date string with format 'Y-m-d H:i:s', e.g. '2018-01-01 13:00:00'"
+"A datetime string with format 'Y-m-d H:i:s', e.g. '2018-01-01 13:00:00'."
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A date string with format 'Y-m-d', e.g. '2011-05-23'."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
 
 type Query {
     users: [User!]! @paginate(type: "paginator" model: "App\\User")

@@ -230,6 +230,13 @@ class RuleFactory
         bool $traverseOne
     )
     {
+        // Bail if the path is an empty string.
+        // This can happen when arguments are injected from the context,
+        // because they do not have a definition associated with them.
+        if(strlen($path) === 0) {
+            return null;
+        }
+        
         $inputPath = explode('.', $path);
         $pathKey = implode('.', $inputPath);
 

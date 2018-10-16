@@ -9,51 +9,86 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
-abstract class PaginationManipulator extends BaseDirective
+class PaginationManipulator
 {
+    // The default is offset-based pagination
     const PAGINATION_TYPE_PAGINATOR = 'paginator';
+    const PAGINATION_ALIAS_DEFAULT = 'default';
+    
+    // Those are both aliases for a Connection style pagination
     const PAGINATION_TYPE_CONNECTION = 'connection';
     const PAGINATION_ALIAS_RELAY = 'relay';
-
+    
     /**
+     * Apply possible aliases and throw if the given pagination type is invalid.
+     *
      * @param string $paginationType
      *
-     * @return bool
-     */
-    protected function isValidPaginationType(string $paginationType): bool
-    {
-        return self::PAGINATION_TYPE_PAGINATOR === $paginationType
-            || self::PAGINATION_TYPE_CONNECTION === $paginationType;
-    }
-
-    /**
-     * @param string $paginationType
+     * @throws DirectiveException
      *
      * @return string
      */
-    protected function convertAliasToPaginationType(string $paginationType): string
+    public static function assertValidPaginationType(string $paginationType): string
     {
         if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
             return self::PAGINATION_TYPE_CONNECTION;
         }
-
-        return $paginationType;
+        
+        if (self::PAGINATION_ALIAS_DEFAULT === $paginationType) {
+            return self::PAGINATION_TYPE_PAGINATOR;
+        }
+        
+        if(in_array($paginationType, [
+            self::PAGINATION_TYPE_PAGINATOR,
+            self::PAGINATION_TYPE_CONNECTION
+        ])){
+            return $paginationType;
+        }
+        
+        throw new DirectiveException("Found invalid pagination type: {$paginationType}");
     }
-
+    
+    /**
+     * Transform the definition for a field to a field with pagination.
+     *
+     * This makes either an offset-based Paginator or a cursor-based Connection.
+     * The inbetween types are automatically generated and applied to the schema.
+     *
+     * @param string $paginationType
+     * @param FieldDefinitionNode $fieldDefinition
+     * @param ObjectTypeDefinitionNode $parentType
+     * @param DocumentAST $current
+     *
+     * @throws DirectiveException
+     * @throws \Exception
+     *
+     * @return DocumentAST
+     */
+    public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
+    {
+        switch (self::assertValidPaginationType($paginationType)) {
+            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
+                return PaginationManipulator::registerConnection($fieldDefinition, $parentType, $current);
+            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
+            default:
+                return PaginationManipulator::registerPaginator($fieldDefinition, $parentType, $current);
+        }
+    }
+    
     /**
      * Register connection w/ schema.
      *
-     * @param FieldDefinitionNode      $fieldDefinition
+     * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $documentAST
+     * @param DocumentAST $documentAST
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    protected function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
+    public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
         $connectionTypeName = "{$fieldTypeName}Connection";
@@ -101,7 +136,7 @@ abstract class PaginationManipulator extends BaseDirective
      *
      * @return DocumentAST
      */
-    protected function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
+    public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";

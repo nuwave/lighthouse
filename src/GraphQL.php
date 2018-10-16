@@ -19,7 +19,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Support\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -58,6 +58,34 @@ class GraphQL
     }
 
     /**
+     * Execute a set of batched queries on the lighthouse schema and return a
+     * collection of ExecutionResults.
+     *
+     * @param array      $requests
+     * @param mixed|null $context
+     * @param mixed|null $rootValue
+     *
+     * @return ExecutionResult[]
+     */
+    public function executeBatchedQueries(array $requests, $context = null, $rootValue = null): array
+    {
+        return collect($requests)->map(function ($request, $index) use ($context, $rootValue) {
+            $this->extensionRegistry->batchedQueryDidStart($index);
+
+            $result = $this->executeQuery(
+                array_get($request, 'query', ''),
+                $context,
+                array_get($request, 'variables', []),
+                $rootValue
+            );
+
+            $this->extensionRegistry->batchedQueryDidEnd($result, $index);
+
+            return $result;
+        })->all();
+    }
+
+    /**
      * Execute a GraphQL query on the Lighthouse schema and return the raw ExecutionResult.
      *
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
@@ -70,7 +98,6 @@ class GraphQL
      * @param string $operationName
      *
      * @throws Exceptions\DirectiveException
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return ExecutionResult
@@ -126,7 +153,6 @@ class GraphQL
      * Ensure an executable GraphQL schema is present.
      *
      * @throws Exceptions\DirectiveException
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return Schema
@@ -159,7 +185,6 @@ class GraphQL
     /**
      * Get instance of DocumentAST.
      *
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return DocumentAST
@@ -180,7 +205,6 @@ class GraphQL
     /**
      * Get the schema string and build an AST out of it.
      *
-     * @throws Exceptions\DocumentASTException
      * @throws Exceptions\ParseException
      *
      * @return DocumentAST
@@ -198,9 +222,18 @@ class GraphQL
             )
         )->implode("\n");
 
-        return ASTBuilder::generate($schemaString."\n".$additionalSchemas)
-            ->lock();
+        return ASTBuilder::generate($schemaString."\n".$additionalSchemas);
     }
+
+    /**
+     * ATTENTION
+     * ONLY DEPRECATED METHODS FROM THIS POINT ON.
+     *
+     * Do not use the functions below, they will be removed in v3
+     *
+     * ONLY DEPRECATED METHODS FROM THIS POINT ON
+     * ATTENTION
+     */
 
     /**
      * Return an instance of a BatchLoader for a specific field.
@@ -212,22 +245,12 @@ class GraphQL
      * @throws \Exception
      *
      * @return BatchLoader
+     *
+     * @deprecated in favour of BatchLoader::instance()
      */
     public function batchLoader(string $loaderClass, array $pathToField, array $constructorArgs = []): BatchLoader
     {
-        // The path to the field serves as the unique key for the instance
-        $instanceName = BatchLoader::instanceKey($pathToField);
-
-        // Only register a new instance if it is not already bound
-        $instance = app()->bound($instanceName)
-            ? resolve($instanceName)
-            : app()->instance($instanceName, app()->makeWith($loaderClass, $constructorArgs));
-
-        if (! $instance instanceof BatchLoader) {
-            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Support\DataLoader\BatchLoader");
-        }
-
-        return $instance;
+        return BatchLoader::instance($loaderClass, $pathToField, $constructorArgs);
     }
 
     /**

@@ -200,10 +200,12 @@ class NodeFactory
         if($directive = ASTHelper::directiveDefinition($scalarDefinition, 'scalar')){
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
-            $className = \namespace_classname($scalarName, [
-                config('lighthouse.namespaces.scalars')
-            ]);
+            $className = $scalarName;
         }
+
+        $className = \namespace_classname($className, [
+            config('lighthouse.namespaces.scalars')
+        ]);
 
         if(!$className){
             throw new \Exception("No class found for the scalar {$scalarName}");

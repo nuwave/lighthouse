@@ -33,4 +33,36 @@ class PaginateDirectiveTest extends TestCase
             ->getQueryType()
             ->getField('users');
     }
+
+    /**
+     * @test
+     */
+    public function itOnlyRegistersOneTypeForMultiplePaginators()
+    {
+        $schema = $this->buildSchemaFromString('
+        type User {
+            name: String
+            users: [User!]! @paginate
+            users2: [User!]! @paginate(type: "relay")
+            users3: [User!]! @paginate(type: "connection")
+        }
+        
+        type Query {
+            users: [User!]! @paginate
+            users2: [User!]! @paginate(type: "relay")
+            users3: [User!]! @paginate(type: "connection")
+        }
+        ');
+        $typeMap = $schema->getTypeMap();
+
+        $this->assertArrayHasKey(
+            'UserPaginator',
+            $typeMap
+        );
+
+        $this->assertArrayHasKey(
+            'UserConnection',
+            $typeMap
+        );
+    }
 }

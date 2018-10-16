@@ -4,17 +4,17 @@ namespace Nuwave\Lighthouse\Providers;
 
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
-use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
-use Nuwave\Lighthouse\Support\DataLoader\QueryBuilder;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
@@ -37,7 +37,6 @@ class LighthouseServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
 
-        $this->registerCollectionMacros();
         $this->registerValidator();
     }
 
@@ -71,6 +70,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(NodeRegistry::class);
         $this->app->singleton(MiddlewareRegistry::class);
         $this->app->singleton(TypeRegistry::class);
+        $this->app->singleton(CreatesContext::class, ContextFactory::class);
 
         $this->app->singleton(
             SchemaSourceProvider::class,
@@ -92,54 +92,6 @@ class LighthouseServiceProvider extends ServiceProvider
         }
 
         SubscriptionProvider::register($this->app);
-    }
-
-    /**
-     * Register lighthouse macros.
-     */
-    protected function registerCollectionMacros()
-    {
-        // TODO remove and just use load() as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
-        // This fixes the behaviour of how eager loading queries are built
-        Collection::macro('fetch', function ($eagerLoadRelations = null) {
-            if (count($this->items) > 0) {
-                if (is_string($eagerLoadRelations)) {
-                    $eagerLoadRelations = [$eagerLoadRelations];
-                }
-                $query = $this->first()::with($eagerLoadRelations);
-                $this->items = resolve(QueryBuilder::class)->eagerLoadRelations($query, $this->items);
-            }
-
-            return $this;
-        });
-
-        Collection::macro('fetchCount', function ($eagerLoadRelations = null) {
-            if (count($this->items) > 0) {
-                if (is_string($eagerLoadRelations)) {
-                    $eagerLoadRelations = [$eagerLoadRelations];
-                }
-
-                $query = $this->first()::withCount($eagerLoadRelations);
-                $this->items = resolve(QueryBuilder::class)->eagerLoadCount($query, $this->items);
-            }
-
-            return $this;
-        });
-
-        Collection::macro('fetchForPage', function ($perPage, $page, $eagerLoadRelations) {
-            if (count($this->items) > 0) {
-                if (is_string($eagerLoadRelations)) {
-                    $eagerLoadRelations = [$eagerLoadRelations];
-                }
-
-                $this->items = $this->fetchCount($eagerLoadRelations)->items;
-                $query = $this->first()::with($eagerLoadRelations);
-                $this->items = resolve(QueryBuilder::class)
-                    ->eagerLoadRelations($query, $this->items, $perPage, $page);
-            }
-
-            return $this;
-        });
     }
 
     /**
