@@ -65,7 +65,6 @@ class GroupDirectiveTest extends TestCase
         }
         ';
         $result = $this->queryViaHttp($query);
-        # TODO this throws because of the escape slashes
 
         $this->assertSame('Mario', array_get($result, 'data.me'));
     }
