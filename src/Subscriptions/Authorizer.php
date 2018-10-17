@@ -54,6 +54,7 @@ class Authorizer implements Auth
                 }
             );
         } catch (\Exception $e) {
+            // TODO: Add handler interface to optionally log this exception
             return false;
         }
     }

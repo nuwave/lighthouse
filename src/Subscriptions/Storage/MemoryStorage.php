@@ -48,7 +48,8 @@ class MemoryStorage implements StoresSubscriptions
         return collect($this->subscribers)
             ->filter(function (Subscriber $subscriber) use ($topic) {
                 return in_array($subscriber->channel, $topic);
-            });
+            })
+            ->values();
     }
 
     /**
@@ -86,7 +87,7 @@ class MemoryStorage implements StoresSubscriptions
         $this->subscribers = collect($this->subscribers)
             ->filter(function (Subscriber $subscriber) use ($channel) {
                 return $channel != $subscriber->channel;
-            });
+            })->values();
 
         return $subscriber;
     }

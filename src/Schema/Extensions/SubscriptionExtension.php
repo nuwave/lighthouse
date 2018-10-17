@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
@@ -11,6 +12,16 @@ class SubscriptionExtension extends GraphQLExtension
      * @var SubscriptionRegistry
      */
     protected $registry;
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * @var string
+     */
+    protected $currentQuery = '';
 
     /**
      * @param SubscriptionRegistry $registry
@@ -31,6 +42,19 @@ class SubscriptionExtension extends GraphQLExtension
     }
 
     /**
+     * Handle request start.
+     *
+     * @param ExtensionRequest $request
+     */
+    public function requestDidStart(ExtensionRequest $request)
+    {
+        $this->request = $request->request();
+        $this->currentQuery = $request->isBatchedRequest()
+            ? array_get($this->request->toArray(), '0.query', '')
+            : $this->request->input('query', '');
+    }
+
+    /**
      * Handle batch request start.
      *
      * @param int index
@@ -38,6 +62,7 @@ class SubscriptionExtension extends GraphQLExtension
     public function batchedQueryDidStart($index)
     {
         $this->registry->reset();
+        $this->currentQuery = array_get($this->request->toArray(), "{$index}.query", '');
     }
 
     /**
@@ -51,5 +76,15 @@ class SubscriptionExtension extends GraphQLExtension
             'version' => 1,
             'channels' => $this->registry->toArray(),
         ];
+    }
+
+    /**
+     * Get the current query.
+     *
+     * @return string
+     */
+    public function currentQuery(): string
+    {
+        return $this->currentQuery;
     }
 }

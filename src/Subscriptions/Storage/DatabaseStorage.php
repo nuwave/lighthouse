@@ -46,15 +46,15 @@ class DatabaseStorage implements StoresSubscriptions
     /**
      * Store subscription.
      *
-     * @param Subscriber $subscription
+     * @param Subscriber $subscriber
      * @param string     $topic
      */
-    public function storeSubscriber(Subscriber $subscription, $topic)
+    public function storeSubscriber(Subscriber $subscriber, $topic)
     {
         $topic = $this->topic($topic);
 
         $topic->subscriptions()->save(
-            $this->subscription($subscription)
+            $this->subscription($subscriber)
         );
     }
 

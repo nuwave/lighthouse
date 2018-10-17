@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension as Extension;
 
 class Subscriber
 {
@@ -45,17 +46,18 @@ class Subscriber
      * @param array       $args
      * @param mixed       $context
      * @param ResolveInfo $info
+     * @param Extension   $extension
      *
      * @return Subscription
      */
-    public static function initialize($root, $args, $context, ResolveInfo $info)
+    public static function initialize($root, $args, $context, ResolveInfo $info, $queryString)
     {
         $instance = new static();
         $instance->channel = 'private-'.(string) Str::uuid();
         $instance->context = $context;
         $instance->args = $args;
         $instance->operationName = $info->operation->name->value;
-        $instance->queryString = $context->request->input('query');
+        $instance->queryString = $queryString;
 
         return $instance;
     }
