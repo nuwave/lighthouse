@@ -32,7 +32,7 @@ class CreateSubscriptionTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lighthouse_channels');
+        Schema::dropIfExists('lighthouse_topics');
         Schema::dropIfExists('lighthouse_subscriptions');
     }
 }
