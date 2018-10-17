@@ -15,6 +15,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware
 {
+    /** @var string todo remove as soon as name() is static itself */
+    const NAME = 'middleware';
+
     /** @var Pipeline */
     protected $pipeline;
     /** @var CreatesContext */
@@ -66,14 +69,22 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
         return $next(
             $value->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $middleware) {
+                    dump($resolveInfo->fieldName, $middleware);
                     return $this->pipeline
                         ->send(
-                            $context->request()
+                            Request::createFrom(
+                                $context->request()
+                            )
+                            // Duplicate the request so we have independent lifecycles for the fields
+//                            $context->request()
+//                                ->instance()
+//                                ->duplicate()
                         )
                         ->through(
                             $middleware
                         )
                         ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo){
+                            dump(data_get($request,'foo'));
                             return $resolver(
                                 $root,
                                 $args,

@@ -21,15 +21,15 @@ class MiddlewareDirectiveTest extends TestCase
     {
         $this->schema = '
         type Query {
-            foo: Int
+            foo: String
                 @middleware(checks: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"])
-                @field(resolver: "'. addslashes(self::class).'@resolveFooMiddleware")
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
         }
         ';
 
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(42, array_get($result, 'data.foo'));
+        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.foo'));
     }
 
     public function fooMiddlewareQueries()
@@ -50,13 +50,6 @@ class MiddlewareDirectiveTest extends TestCase
             }
             ']
         ];
-    }
-
-    public function resolveFooMiddleware($root, $args, Context $context): int
-    {
-        $this->assertSame(AddFooProperty::VALUE, $context->request->foo);
-
-        return 42;
     }
 
     /**
@@ -90,9 +83,9 @@ class MiddlewareDirectiveTest extends TestCase
 
         $this->schema = '
         type Query {
-            foo: Int
+            foo: String
                 @middleware(checks: ["foo"])
-                @field(resolver: "'. addslashes(self::class).'@resolveFooMiddleware")
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
         }
         ';
 
@@ -102,7 +95,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(42, array_get($result, 'data.foo'));
+        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.foo'));
     }
 
     /**
@@ -138,9 +131,9 @@ class MiddlewareDirectiveTest extends TestCase
         $this->schema = '
         type Query {
             fail: Int @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
-            pass: Int
+            pass: String
                 @middleware(checks: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"])
-                @field(resolver: "'. addslashes(self::class).'@resolveFooMiddleware")
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
         }
         ';
 
@@ -151,7 +144,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(42, array_get($result, 'data.pass'));
+        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.pass'));
         $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
         $this->assertSame('fail', array_get($result, 'errors.0.path.0'));
         $this->assertNull(array_get($result, 'data.fail'));

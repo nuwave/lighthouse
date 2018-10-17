@@ -77,6 +77,12 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $objectType->fields = new NodeList(
             collect($objectType->fields)
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
+                    // If the field already has middleware defined, skip over it
+                    // Field middleware are more specific then those defined by @group
+//                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
+//                       return $fieldDefinition;
+//                    }
+
                     $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
 
                     return $fieldDefinition;
@@ -113,7 +119,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
                     $existingNamespaces = ASTHelper::directiveDefinition(
                         $fieldDefinition,
-                        (new NamespaceDirective)->name()
+                        NamespaceDirective::NAME
                     );
 
                     $newNamespaceDirective = $existingNamespaces
