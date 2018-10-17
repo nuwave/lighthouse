@@ -33,7 +33,7 @@ class InjectDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->postJson('graphql',['query' => $query]);
+        $this->queryViaHttp($query);
     }
 
     public function resolveUser($root, $args)
