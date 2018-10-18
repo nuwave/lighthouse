@@ -40,4 +40,14 @@ class TestSchemaProvider implements SchemaSourceProvider
     {
         return $this;
     }
+
+    /**
+     * Get schema root path.
+     *
+     * @return string
+     */
+    public function getRootPath()
+    {
+        return '';
+    }
 }
