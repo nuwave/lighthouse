@@ -12,6 +12,8 @@ class InjectDirectiveTest extends DBTestCase
      */
     public function itCanInjectDataFromContextIntoArgs()
     {
+        $user = factory(User::class)->create();
+        $this->be($user);
 
         $schema = $this->buildSchemaFromString('
         type User {
