@@ -15,69 +15,34 @@ class InjectDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $schema = $this->buildSchemaFromString('
+        $this->schema = '
         type User {
-            foo: String!
+            id: Int!
         }
         
         type Query {
-            user: User! @inject(context: "user.id", name: "user_id") @field(resolver: "' . addslashes(self::class) . '@resolveUser")
+            me: User!
+                @inject(context: "user.id", name: "user_id")
+                @field(resolver: "' . addslashes(self::class) . '@resolveUser")
         }
-        ');
-
+        ';
         $query = '
         {
-            user {
-                foo
+            me {
+                id
             }
         }
         ';
 
-        $this->postJson('graphql',['query' => $query]);
+        $result = $this->postJson('graphql',['query' => $query])->json();
+
+        $this->assertSame(1, array_get($result, 'data.me.id'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateQueryPaginatorsInGroup()
+    public function resolveUser($root, array $args): array
     {
-        factory(User::class, 2)->create();
-
-        $schema = '
-        type User {
-            id: ID!
-            name: String!
-        }
-
-        type Query {
-            dummy: Int
-        }
-
-        extend type Query @group {
-            users: [User!]! @paginate(model: "User")
-        }
-        ';
-
-        $query = '
-        {
-            users(count: 1) {
-                data {
-                    id
-                    name
-                }
-            }
-        }
-        ';
-
-        $result = $this->executeQuery($schema, $query);
-
-
-        $this->assertCount(1, array_get($result->data, 'users.data'));
+        return [
+            'id' => $args['user_id']
+        ];
     }
-
-    public function resolveUser($root, $args)
-    {
-        $this->assertSame(1, $args['user_id']);
-    }
-
 }
