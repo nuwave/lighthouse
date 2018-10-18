@@ -5,13 +5,39 @@ namespace Tests\Unit\Schema\AST;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class ASTHelperTest extends TestCase
 {
     /**
      * @test
      */
-    public function itCanMergeUniqueNodeLists()
+    public function itThrowsWhenMergingUniqueNodeListWithCollision()
+    {
+        $objectType1 = PartialParser::objectTypeDefinition('
+        type User {
+            email: String
+        }
+        ');
+
+        $objectType2 = PartialParser::objectTypeDefinition('
+        type User {
+            email(bar: String): Int
+        }
+        ');
+
+        $this->expectException(DefinitionException::class);
+
+        $objectType1->fields = ASTHelper::mergeUniqueNodeList(
+            $objectType1->fields,
+            $objectType2->fields
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itMergesUniqueNodeListsWithOverwrite()
     {
         $objectType1 = PartialParser::objectTypeDefinition('
         type User {
@@ -29,7 +55,8 @@ class ASTHelperTest extends TestCase
 
         $objectType1->fields = ASTHelper::mergeUniqueNodeList(
             $objectType1->fields,
-            $objectType2->fields
+            $objectType2->fields,
+            true
         );
 
         $this->assertCount(3, $objectType1->fields);
