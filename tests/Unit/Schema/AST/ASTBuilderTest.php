@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class ASTBuilderTest extends TestCase
 {
@@ -32,5 +33,22 @@ class ASTBuilderTest extends TestCase
                 ->queryTypeDefinition()
                 ->fields
         );
+    }
+
+    /**
+     * @test
+     */
+    public function itDoesNotAllowDuplicateFieldsOnTypeExtensions()
+    {
+        $this->expectException(DefinitionException::class);
+        ASTBuilder::generate('
+        type Query {
+            foo: String
+        }
+        
+        extend type Query {
+            foo: Int
+        }
+        ');
     }
 }

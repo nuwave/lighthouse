@@ -65,4 +65,37 @@ class PaginateDirectiveTest extends TestCase
             $typeMap
         );
     }
+
+    /**
+     * @test
+     */
+    public function itRegistersPaginatorFromTypeExtensionField()
+    {
+        $schema = $this->buildSchemaFromString('
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        type Query {
+            dummy: Int
+        }
+
+        extend type Query @group {
+            users: [User!]! @paginate
+        }
+        ');
+        $typeMap = $schema->getTypeMap();
+
+        $this->assertArrayHasKey(
+            'UserPaginator',
+            $typeMap
+        );
+
+        // See https://github.com/nuwave/lighthouse/issues/387
+        $this->assertArrayNotHasKey(
+            'UserPaginatorPaginator',
+            $typeMap
+        );
+    }
 }
