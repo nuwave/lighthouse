@@ -3,12 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\Node;
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Exceptions\ParseException;
+use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
@@ -74,6 +73,8 @@ class ASTBuilder
     }
 
     /**
+     * The final schema must not contain type extensions, so we merge them here.
+     *
      * @param DocumentAST $document
      *
      * @return DocumentAST
@@ -87,11 +88,12 @@ class ASTBuilder
                 $objectType = $document
                     ->typeExtensionDefinitions($name)
                     ->reduce(
-                        function (ObjectTypeDefinitionNode $relatedObjectType, TypeExtensionNode $typeExtension) {
-                            /** @var NodeList $fields */
-                            $fields = $relatedObjectType->fields;
-                            $relatedObjectType->fields = $fields->merge($typeExtension->fields);
-    
+                        function (ObjectTypeDefinitionNode $relatedObjectType, ObjectTypeExtensionNode $typeExtension) {
+                            $relatedObjectType->fields = ASTHelper::mergeUniqueNodeList(
+                                $relatedObjectType->fields,
+                                $typeExtension->fields
+                            );
+
                             return $relatedObjectType;
                         },
                         $objectType
@@ -153,8 +155,12 @@ class ASTBuilder
                                         $parentField,
                                         $parentType
                                     ) {
-                                        return $argManipulator->manipulateSchema($argDefinition, $parentField,
-                                            $parentType, $document);
+                                        return $argManipulator->manipulateSchema(
+                                            $argDefinition,
+                                            $parentField,
+                                            $parentType,
+                                            $document
+                                        );
                                     },
                                     $document
                                 );
