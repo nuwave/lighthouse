@@ -59,4 +59,12 @@ class SchemaSourceProviderTest extends TestCase
 
         $this->assertEquals('bar', app(SchemaSourceProvider::class)->getSchemaString());
     }
+
+    /**
+     * @test
+     */
+    public function itCanGetRootPath()
+    {
+        $this->assertEquals('/var/www/vendor/orchestra/testbench-core/src/Concerns/../../laravel/routes/graphql/schema.graphql', app(SchemaSourceProvider::class)->getRootPath());
+    }
 }

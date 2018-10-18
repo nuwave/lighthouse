@@ -17,6 +17,13 @@ interface SchemaSourceProvider
     public function setRootPath(string $path);
 
     /**
+     * Get schema root path.
+     *
+     * @return string
+     */
+    public function getRootPath();
+
+    /**
      * Provide the schema definition.
      *
      * @return string

@@ -34,6 +34,14 @@ class SchemaStitcher implements SchemaSourceProvider
     }
 
     /**
+     * @return string
+     */
+    public function getRootPath(): string
+    {
+        return $this->rootSchemaPath;
+    }
+
+    /**
      * Stitch together schema documents and return the result as a string.
      *
      * @return string
