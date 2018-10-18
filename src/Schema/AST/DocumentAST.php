@@ -299,7 +299,7 @@ class DocumentAST implements \Serializable
     public function setDefinition(DefinitionNode $newDefinition): DocumentAST
     {
         if($newDefinition instanceof TypeExtensionNode){
-            if(!$this->typeExtensions->search($newDefinition, true)) {
+            if(! $this->typeExtensions->search($newDefinition, true)) {
                 $this->typeExtensions->push($newDefinition);
             }
         } else {
