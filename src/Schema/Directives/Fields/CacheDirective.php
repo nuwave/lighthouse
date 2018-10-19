@@ -17,7 +17,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'cache';
     }
@@ -28,11 +28,15 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      * @param FieldValue $value
      * @param \Closure $next
      *
+     * @throws DirectiveException
+     *
      * @return FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next)
     {
-        $this->setNodeKey($value->getNode());
+        $this->setNodeKey(
+            $value->getParent()
+        );
 
         $value = $next($value);
         $resolver = $value->getResolver();
@@ -53,10 +57,14 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             ]);
 
             $useTags = $this->useTags();
-            $cacheExp = $maxAge ? now()->addSeconds($maxAge) : null;
+            $cacheExp = $maxAge
+                ? now()->addSeconds($maxAge)
+                : null;
             $cacheKey = $cacheValue->getKey();
             $cacheTags = $cacheValue->getTags();
-            $cacheHas = $useTags ? $cache->tags($cacheTags)->has($cacheKey) : $cache->has($cacheKey);
+            $cacheHas = $useTags
+                ? $cache->tags($cacheTags)->has($cacheKey)
+                : $cache->has($cacheKey);
 
             if ($cacheHas) {
                 return $useTags
@@ -107,15 +115,18 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      *
      * @return bool
      */
-    protected function useTags()
+    protected function useTags(): bool
     {
-        return config('lighthouse.cache.tags', false) && method_exists(resolve('cache')->store(), 'tags');
+        return config('lighthouse.cache.tags', false)
+            && method_exists(resolve('cache')->store(), 'tags');
     }
 
     /**
      * Set node's cache key.
      *
      * @param NodeValue $nodeValue
+     *
+     * @throws DirectiveException
      */
     protected function setNodeKey(NodeValue $nodeValue)
     {

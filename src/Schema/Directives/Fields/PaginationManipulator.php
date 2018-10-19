@@ -6,10 +6,12 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginationManipulator
 {
@@ -49,20 +51,21 @@ class PaginationManipulator
         
         throw new DirectiveException("Found invalid pagination type: {$paginationType}");
     }
-    
+
     /**
      * Transform the definition for a field to a field with pagination.
      *
      * This makes either an offset-based Paginator or a cursor-based Connection.
-     * The inbetween types are automatically generated and applied to the schema.
+     * The types in between are automatically generated and applied to the schema.
      *
      * @param string $paginationType
      * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST $current
      *
+     * @throws DefinitionException
      * @throws DirectiveException
-     * @throws \Exception
+     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -76,7 +79,7 @@ class PaginationManipulator
                 return PaginationManipulator::registerPaginator($fieldDefinition, $parentType, $current);
         }
     }
-    
+
     /**
      * Register connection w/ schema.
      *
@@ -84,7 +87,8 @@ class PaginationManipulator
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST $documentAST
      *
-     * @throws \Exception
+     * @throws DefinitionException
+     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -128,11 +132,12 @@ class PaginationManipulator
     /**
      * Register paginator w/ schema.
      *
-     * @param FieldDefinitionNode      $fieldDefinition
+     * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $documentAST
+     * @param DocumentAST $documentAST
      *
-     * @throws \Exception
+     * @throws DefinitionException
+     * @throws ParseException
      *
      * @return DocumentAST
      */

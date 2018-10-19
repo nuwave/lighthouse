@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -51,7 +52,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
      *
      * @throws \Exception
      *
@@ -61,10 +62,10 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         switch ($this->getPaginationType()) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                return $this->connectionTypeResolver($value);
+                return $this->connectionTypeResolver($fieldValue);
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
             default:
-                return $this->paginatorTypeResolver($value);
+                return $this->paginatorTypeResolver($fieldValue);
         }
     }
 
@@ -129,7 +130,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * @param int $page
      * @param int $first
      *
-     * @throws \Exception
+     * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return LengthAwarePaginator
      */
@@ -154,14 +156,13 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $query->paginate($first, ['*'], 'page', $page);
     }
 
-
     /**
      * Get the model class from the `model` argument of the field.
      *
      * This works differently as in other directives, so we define a seperate function for it.
      *
      * @throws DirectiveException
-     * @throws \Exception
+     * @throws DefinitionException
      *
      * @return string
      */

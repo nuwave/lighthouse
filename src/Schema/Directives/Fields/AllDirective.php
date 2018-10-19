@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\QueryUtils;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -14,7 +15,7 @@ class AllDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'all';
     }
@@ -22,18 +23,22 @@ class AllDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $fieldValue): string
     {
-        return $value->setResolver(function ($root, $args){
-            $modelClass = $this->getModelClass();
-            $query = QueryUtils::applyFilters($modelClass::query(), $args);
-            $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
+        return $fieldValue->setResolver(
+            function ($root, $args){
+                /** @var Model $modelClass */
+                $modelClass = $this->getModelClass();
 
-            return $query->get();
-        });
+                $query = QueryUtils::applyFilters($modelClass::query(), $args);
+                $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
+
+                return $query->get();
+            }
+        );
     }
 }
