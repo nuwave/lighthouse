@@ -27,7 +27,7 @@ class AllDirective extends BaseDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $fieldValue): string
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
             function ($root, $args){
