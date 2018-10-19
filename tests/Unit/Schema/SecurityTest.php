@@ -52,7 +52,7 @@ class SecurityTest extends TestCase
     {
         $this->assertIntrospectionIsDisabled('
         type Query @security(introspection: false) {
-            foo: String
+            foo: Int
         }
         ');
     }
@@ -101,11 +101,9 @@ class SecurityTest extends TestCase
     {
         config(['lighthouse.security.disable_introspection' => true]);
 
-        $this->assertIntrospectionIsDisabled('
-        type Query {
-            foo: String
-        }
-        ');
+        $this->assertIntrospectionIsDisabled(
+            $this->placeholderQuery()
+        );
     }
 
     protected function assertMaxQueryComplexityIs1(string $schema)

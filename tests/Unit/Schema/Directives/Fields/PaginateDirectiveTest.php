@@ -21,7 +21,7 @@ class PaginateDirectiveTest extends TestCase
     protected function getConnectionQueryField(string $type): FieldDefinition
     {
         return $this
-            ->buildSchemaFromString("
+            ->buildSchema("
             type User {
                 name: String
             }
@@ -39,7 +39,7 @@ class PaginateDirectiveTest extends TestCase
      */
     public function itOnlyRegistersOneTypeForMultiplePaginators()
     {
-        $schema = $this->buildSchemaFromString('
+        $schema = $this->buildSchema('
         type User {
             name: String
             users: [User!]! @paginate
@@ -71,14 +71,10 @@ class PaginateDirectiveTest extends TestCase
      */
     public function itRegistersPaginatorFromTypeExtensionField()
     {
-        $schema = $this->buildSchemaFromString('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             id: ID!
             name: String!
-        }
-
-        type Query {
-            dummy: Int
         }
 
         extend type Query @group {

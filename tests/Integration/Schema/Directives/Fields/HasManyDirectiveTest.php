@@ -317,7 +317,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
         }

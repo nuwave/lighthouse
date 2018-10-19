@@ -11,7 +11,7 @@ class ComplexityDirectiveTest extends TestCase
      */
     public function itCanSetDefaultComplexityOnField()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             posts: [Post!]! @complexity @hasMany
         }
@@ -35,7 +35,7 @@ class ComplexityDirectiveTest extends TestCase
     {
         $resolver = addslashes(self::class);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             posts: [Post!]!
                 @complexity(resolver: "'.$resolver.'@complexity")

@@ -138,7 +138,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         if ($this->directiveHasArgument('builder')) {
             $query = \call_user_func_array(
-                $this->getMethodArgument('builder'),
+                $this->getResolverFromArgument('builder'),
                 $resolveArgs
             );
         } else {

@@ -22,14 +22,12 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itCanRegisterMiddleware()
     {
-        $this->buildSchemaFromString('
+        $this->buildSchema('
             type Query {
                 foo: String! @middleware(checks: ["auth:web", "auth:admin"])
-                bar: String!
             }
             type Mutation {
                 foo(bar: String!): String! @middleware(checks: ["auth:api"])
-                bar(baz: String!): String!
             }
         ');
         $query = '
@@ -58,15 +56,13 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itCanRegisterMiddlewareWithFragments()
     {
-        $this->buildSchemaFromString('
+        $this->buildSchema('
         type Query {
             foo: String! @middleware(checks: ["auth:web", "auth:admin"])
-            bar: String!
         }
         
         type Mutation {
             foo(bar: String!): String! @middleware(checks: ["auth:api"])
-            bar(baz: String!): String!
         }
         ');
 

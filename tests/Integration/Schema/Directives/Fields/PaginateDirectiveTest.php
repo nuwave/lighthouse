@@ -320,14 +320,10 @@ class PaginateDirectiveTest extends DBTestCase
             name: String!
         }
 
-        type Query {
-            dummy: Int
-        }
-
         extend type Query @group {
             users: [User!]! @paginate(model: "User")
         }
-        ';
+        ' . $this->placeholderQuery();
 
         $query = '
         {

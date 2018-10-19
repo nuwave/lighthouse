@@ -36,12 +36,12 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
         return $next(
             $value->setComplexity(
                 $this->directiveHasArgument('resolver')
-                ? $this->getMethodArgument('resolver')
-                : function ($childrenComplexity, $args) {
-                    $complexity = array_get($args, 'first', array_get($args, 'count', 1));
+                    ? $this->getResolverFromArgument('resolver')
+                    : function ($childrenComplexity, $args) {
+                        $complexity = array_get($args, 'first', array_get($args, 'count', 1));
 
-                    return $childrenComplexity * $complexity;
-                }
+                        return $childrenComplexity * $complexity;
+                    }
             )
         );
     }

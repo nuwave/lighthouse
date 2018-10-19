@@ -14,10 +14,6 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetNamespaces()
     {
         $schema = '
-        type Query {
-            dummy: Int        
-        }
-        
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             me: String @field(resolver: "Foo@bar")
         }
@@ -25,7 +21,7 @@ class GroupDirectiveTest extends TestCase
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             you: String @field(resolver: "Foo@bar")
         }
-        ';
+        ' . $this->placeholderQuery();
 
         $query = '
         {
@@ -50,14 +46,10 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetMiddleware()
     {
         $schema = '
-        type Query {
-            dummy: Int
-        }
-        
         extend type Query @group(middleware: ["foo", "bar"]) {
             me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
-        ';
+        ' . $this->placeholderQuery();
         $query = '
         {
             me

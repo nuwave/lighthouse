@@ -34,12 +34,12 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
         if ($checks) {
             $middlewareRegistry = resolve(MiddlewareRegistry::class);
 
-            if ('Query' === $value->getNodeName()) {
+            if ('Query' === $value->getParentName()) {
                 $middlewareRegistry->registerQuery(
                     $value->getFieldName(),
                     $checks
                 );
-            } elseif ('Mutation' === $value->getNodeName()) {
+            } elseif ('Mutation' === $value->getParentName()) {
                 $middlewareRegistry->registerMutation(
                     $value->getFieldName(),
                     $checks
@@ -59,7 +59,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
      */
     protected function getChecks(FieldValue $value)
     {
-        if (! in_array($value->getNodeName(), ['Mutation', 'Query'])) {
+        if (! in_array($value->getParentName(), ['Mutation', 'Query'])) {
             return null;
         }
 
