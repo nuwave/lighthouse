@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
+use Nuwave\Lighthouse\Schema\Directives\Fields\MiddlewareDirective;
 
 /**
  * Class GroupDirective.
@@ -79,9 +80,9 @@ class GroupDirective extends BaseDirective implements NodeManipulator
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
                     // If the field already has middleware defined, skip over it
                     // Field middleware are more specific then those defined by @group
-//                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
-//                       return $fieldDefinition;
-//                    }
+                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
+                       return $fieldDefinition;
+                    }
 
                     $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
 

@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
 use Tests\Utils\Middleware\Authenticate;
-use Tests\Utils\Middleware\AddFooProperty;
 
 class GroupDirectiveTest extends TestCase
 {
@@ -51,8 +50,8 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetMiddleware()
     {
         $this->schema = '
-        type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"]) {
-            me: String @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
+        type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\CountRuns"]) {
+            me: Int @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
         ';
         $query = '
@@ -62,7 +61,7 @@ class GroupDirectiveTest extends TestCase
         ';
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.me'));
+        $this->assertSame(1, array_get($result, 'data.me'));
     }
 
     /**
@@ -72,12 +71,12 @@ class GroupDirectiveTest extends TestCase
     {
         $this->schema = '
         type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\Authenticate"]) {
-            withFoo: String
-                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"])
-                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
-            withNothing: String
+            withFoo: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
+            withNothing: Int
                 @middleware(checks: [])
-                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
             fail: Int
         }
         ';
@@ -90,9 +89,8 @@ class GroupDirectiveTest extends TestCase
         ';
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.withFoo'));
-        # TODO make sure the request is cleared between middlewares
-        $this->assertSame(AddFooProperty::DID_NOT_RUN, array_get($result, 'data.withNothing'));
+        $this->assertSame(1, array_get($result, 'data.withFoo'));
+        $this->assertSame(1, array_get($result, 'data.withNothing'));
         $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
         $this->assertSame('fail', array_get($result, 'errors.0.path.0'));
         $this->assertNull(array_get($result, 'data.fail'));

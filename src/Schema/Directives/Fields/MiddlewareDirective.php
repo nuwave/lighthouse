@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Pipeline;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -69,22 +69,10 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
         return $next(
             $value->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $middleware) {
-                    dump($resolveInfo->fieldName, $middleware);
                     return $this->pipeline
-                        ->send(
-                            Request::createFrom(
-                                $context->request()
-                            )
-                            // Duplicate the request so we have independent lifecycles for the fields
-//                            $context->request()
-//                                ->instance()
-//                                ->duplicate()
-                        )
-                        ->through(
-                            $middleware
-                        )
+                        ->send($context->request())
+                        ->through($middleware)
                         ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo){
-                            dump(data_get($request,'foo'));
                             return $resolver(
                                 $root,
                                 $args,

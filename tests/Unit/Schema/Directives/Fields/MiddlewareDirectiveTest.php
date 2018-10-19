@@ -2,12 +2,10 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use Illuminate\Routing\Router;
-use Orchestra\Testbench\Http\Kernel;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\Context;
+use Illuminate\Routing\Router;
+use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Middleware\Authenticate;
-use Tests\Utils\Middleware\AddFooProperty;
 
 class MiddlewareDirectiveTest extends TestCase
 {
@@ -21,15 +19,15 @@ class MiddlewareDirectiveTest extends TestCase
     {
         $this->schema = '
         type Query {
-            foo: String
-                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"])
-                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
+            foo: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
         ';
 
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.foo'));
+        $this->assertSame(1, array_get($result, 'data.foo'));
     }
 
     public function fooMiddlewareQueries()
@@ -79,13 +77,13 @@ class MiddlewareDirectiveTest extends TestCase
     {
         /** @var Router $router */
         $router = $this->app['router'];
-        $router->aliasMiddleware('foo', AddFooProperty::class);
+        $router->aliasMiddleware('foo', CountRuns::class);
 
         $this->schema = '
         type Query {
-            foo: String
+            foo: Int
                 @middleware(checks: ["foo"])
-                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
         ';
 
@@ -95,7 +93,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.foo'));
+        $this->assertSame(1, array_get($result, 'data.foo'));
     }
 
     /**
@@ -131,9 +129,9 @@ class MiddlewareDirectiveTest extends TestCase
         $this->schema = '
         type Query {
             fail: Int @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
-            pass: String
-                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\AddFooProperty"])
-                @field(resolver: "Tests\\\Utils\\\Middleware\\\AddFooProperty@resolve")
+            pass: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
         ';
 
@@ -144,7 +142,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(AddFooProperty::DID_RUN, array_get($result, 'data.pass'));
+        $this->assertSame(1, array_get($result, 'data.pass'));
         $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
         $this->assertSame('fail', array_get($result, 'errors.0.path.0'));
         $this->assertNull(array_get($result, 'data.fail'));

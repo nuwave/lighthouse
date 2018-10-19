@@ -6,6 +6,7 @@ use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
+use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -63,6 +64,12 @@ class TestCase extends BaseTestCase
                 'models' => 'Tests\\Utils\\Models',
             ]
         ]);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        CountRuns::$runCounter = 0;
     }
 
     /**
