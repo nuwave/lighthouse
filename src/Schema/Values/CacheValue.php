@@ -135,7 +135,7 @@ class CacheValue
         }
 
         $cacheFieldKey = $this->fieldValue
-            ->getParent()
+            ->getNode()
             ->getCacheKey();
 
         if ($cacheFieldKey) {
