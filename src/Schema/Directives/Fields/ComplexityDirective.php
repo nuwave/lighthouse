@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -18,7 +19,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
     {
         return 'complexity';
     }
-    
+
     /**
      * Resolve the field directive.
      *
@@ -26,6 +27,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
      * @param \Closure $next
      *
      * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return FieldValue
      */

@@ -9,6 +9,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 abstract class BaseDirective implements Directive
 {
@@ -83,8 +84,9 @@ abstract class BaseDirective implements Directive
     /**
      * Get a Closure that is defined through an argument on the directive.
      *
-     * @param string $argumentName If the name of the directive argument is not "resolver" you may overwrite it.
+     * @param string $argumentName
      *
+     * @throws DefinitionException
      * @throws DirectiveException
      *
      * @return \Closure
@@ -120,9 +122,10 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param string $argumentName
+     * @param string $argumentName The default argument name "model" may be overwritten.
      *
      * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return string
      */
@@ -171,7 +174,9 @@ abstract class BaseDirective implements Directive
         );
 
         if(!$className = \namespace_classname($classCandidate, $namespacesToTry)){
-            throw new DirectiveException("No class '$classCandidate' was found for directive '{$this->name()}'");
+            throw new DirectiveException(
+                "No class '$classCandidate' was found for directive '{$this->name()}'"
+            );
         };
 
         return $className;

@@ -98,12 +98,13 @@ class ASTHelper
             $node->toArray(true)
         );
     }
-    
+
     /**
      * @param FieldDefinitionNode $field
      *
+     * @throws DefinitionException
+     *
      * @return string
-     * @throws \Exception
      */
     public static function getFieldTypeName(FieldDefinitionNode $field): string
     {
@@ -115,12 +116,13 @@ class ASTHelper
         /** @var NamedTypeNode $type */
         return $type->name->value;
     }
-    
+
     /**
      * @param Node $node
      *
+     * @throws DefinitionException
+     *
      * @return NamedTypeNode
-     * @throws \Exception
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
@@ -129,9 +131,9 @@ class ASTHelper
         }
         
         $type = data_get($node, 'type');
-        
+
         if(!$type){
-            throw new \Exception("The node '$node->kind' does not have a type associated with it.");
+            throw new DefinitionException("The node '$node->kind' does not have a type associated with it.");
         }
         
         return self::getUnderlyingNamedTypeNode($type);

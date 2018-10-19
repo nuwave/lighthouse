@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class RenameDirective extends BaseDirective implements FieldResolver
 {
@@ -14,7 +14,7 @@ class RenameDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'rename';
     }
@@ -22,24 +22,25 @@ class RenameDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
      *
      * @return FieldValue
      * @throws DirectiveException
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $attribute = $this->directiveArgValue('attribute');
 
         if (!$attribute) {
-            throw new DirectiveException(sprintf(
-                'The [%s] directive requires an `attribute` argument.',
-                $this->name()
-            ));
+            throw new DirectiveException(
+                "The [{$this->name()}] directive requires an `attribute` argument."
+            );
         }
 
-        return $value->setResolver(function ($parent, array $args) use ($attribute) {
-            return data_get($parent, $attribute);
-        });
+        return $fieldValue->setResolver(
+            function ($rootValue, array $args) use ($attribute) {
+                return data_get($rootValue, $attribute);
+            }
+        );
     }
 }

@@ -2,11 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 
 class ValueFactory
 {
@@ -112,7 +114,8 @@ class ValueFactory
      * Get value for field.
      *
      * @param NodeValue $nodeValue
-     * @param mixed     $field
+     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * @param FieldDefinitionNode|InputValueDefinitionNode     $field
      *
      * @return FieldValue
      */

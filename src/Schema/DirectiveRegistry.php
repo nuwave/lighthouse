@@ -83,8 +83,12 @@ class DirectiveRegistry
             return $this;
         }
 
+        $fileIterator = (new Finder)
+            ->in($paths)
+            ->files();
+
         /** @var SplFileInfo $file */
-        foreach ((new Finder)->in($paths)->files() as $file) {
+        foreach ($fileIterator as $file) {
             // Cut off the given root path to get the path that is equivalent to the namespace
             $namespaceRelevantPath = str_after(
                 $file->getPathname(),
@@ -157,7 +161,7 @@ class DirectiveRegistry
         // Always return a new instance of the directive class to avoid side effects between them
         return resolve(\get_class($directive));
     }
-    
+
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
@@ -333,6 +337,8 @@ class DirectiveRegistry
     }
 
     /**
+     * Set the given definition on the directive.
+     *
      * @param Directive                $directive
      * @param TypeSystemDefinitionNode $definitionNode
      *

@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -248,7 +249,7 @@ class FieldFactory
      * This iterates through them and ensures they are called.
      *
      * @param array $inputArguments
-     * @param Collection<array> $argumentValues
+     * @param Collection<array> $inputValueDefinitions
      *
      * @return array
      */
@@ -272,17 +273,19 @@ class FieldFactory
     /**
      * Get rules for field.
      *
-     * @param mixed            $rootValue
-     * @param array            $inputArgs
-     * @param mixed            $context
+     * @param mixed $rootValue
+     * @param array $inputArgs
+     * @param mixed $context
      * @param ResolveInfo|null $resolveInfo
-     * @param Collection       $inputValueDefinitions
+     * @param Collection $inputValueDefinitions
      *
-     * @return array [$rules, $messages]
+     * @throws ParseException
+     *
+     * @return array[] [array $rules, array $messages]
      */
     public function getRulesAndMessages(
         $rootValue,
-        $inputArgs,
+        array $inputArgs,
         $context,
         ResolveInfo $resolveInfo = null,
         Collection $inputValueDefinitions
@@ -290,7 +293,7 @@ class FieldFactory
         $resolveArgs = [$rootValue, $inputArgs, $context, $resolveInfo];
 
         $rules = $inputValueDefinitions
-            ->map(function (array $inputValueDefinition, $key) use ($resolveArgs) {
+            ->map(function (array $inputValueDefinition) use ($resolveArgs) {
                 $rules = data_get($inputValueDefinition, 'rules');
 
                 if (! $rules) {
@@ -305,7 +308,9 @@ class FieldFactory
             })
             ->filter();
 
-        $messages = $inputValueDefinitions->pluck('messages')->collapse();
+        $messages = $inputValueDefinitions
+            ->pluck('messages')
+            ->collapse();
 
         list($nestedRules, $nestedMessages) = RuleFactory::build(
             $resolveInfo->fieldName,
@@ -317,6 +322,9 @@ class FieldFactory
         $rules = $rules->merge($nestedRules);
         $messages = $messages->merge($nestedMessages);
 
-        return [ $rules->toArray(), $messages->toArray(), ];
+        return [
+            $rules->toArray(),
+            $messages->toArray(),
+        ];
     }
 }

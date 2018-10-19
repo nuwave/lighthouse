@@ -7,11 +7,14 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 interface FieldResolver extends Directive
 {
     /**
-     * Resolve the field directive.
+     * Set a field resolver on the FieldValue.
      *
-     * @param FieldValue $value
+     * This must call $fieldValue->setResolver() before returning
+     * the FieldValue.
+     *
+     * @param FieldValue $fieldValue
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value);
+    public function resolveField(FieldValue $fieldValue);
 }
