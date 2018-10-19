@@ -58,7 +58,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value): FieldValue
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
         switch ($this->getPaginationType()) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
@@ -123,7 +123,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             }
         );
     }
-
 
     /**
      * @param array $resolveArgs
