@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use Illuminate\Console\GeneratorCommand;
-
-class QueryCommand extends GeneratorCommand
+class QueryCommand extends LighthouseGeneratorCommand
 {
     /**
      * The name of the console command.
