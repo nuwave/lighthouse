@@ -6,6 +6,9 @@ use Tests\TestCase;
 use Illuminate\Routing\Router;
 use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Middleware\Authenticate;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class MiddlewareDirectiveTest extends TestCase
 {
@@ -146,5 +149,42 @@ class MiddlewareDirectiveTest extends TestCase
         $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
         $this->assertSame('fail', array_get($result, 'errors.0.path.0'));
         $this->assertNull(array_get($result, 'data.fail'));
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsWhenDefiningMiddlewareOnInvalidTypes()
+    {
+        $this->expectException(DirectiveException::class);
+        $this->buildSchemaWithDefaultQuery('
+        scalar Foo @middleware
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itAddsMiddlewareDirectiveToFields()
+    {
+        $document = ASTBuilder::generate('
+        type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {
+            foo: Int
+        } 
+        ');
+
+        $queryType = $document->queryTypeDefinition();
+
+        $middlewareOnFooArguments = $queryType->fields[0]->directives[0];
+        $fieldMiddlewares = ASTHelper::directiveArgValue($middlewareOnFooArguments, 'checks');
+
+        $this->assertSame(
+            [
+                'auth',
+                'Tests\\Utils\\Middleware\\Authenticate',
+                'api'
+            ],
+            $fieldMiddlewares
+        );
     }
 }

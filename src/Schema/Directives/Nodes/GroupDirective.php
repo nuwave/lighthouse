@@ -47,51 +47,15 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
-        $node = $this->setMiddlewareDirectiveOnFields($node);
+        if($middlewareValues = $this->directiveArgValue('middleware')){
+            $node = MiddlewareDirective::addMiddlewareDirectiveToFields($node, $middlewareValues);
+        }
+
         $node = $this->setNamespaceDirectiveOnFields($node);
 
         $documentAST->setDefinition($node);
 
         return $documentAST;
-    }
-
-    /**
-     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
-     *
-     * @throws \Exception
-     *
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
-     */
-    protected function setMiddlewareDirectiveOnFields($objectType)
-    {
-        $middlewareValues = $this->directiveArgValue('middleware');
-
-        if (! $middlewareValues) {
-            return $objectType;
-        }
-
-        $middlewareValues = addslashes(
-            implode('", "', $middlewareValues)
-        );
-        $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareValues\"])");
-
-        $objectType->fields = new NodeList(
-            collect($objectType->fields)
-                ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
-                    // If the field already has middleware defined, skip over it
-                    // Field middleware are more specific then those defined by @group
-                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
-                       return $fieldDefinition;
-                    }
-
-                    $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
-
-                    return $fieldDefinition;
-                })
-                ->toArray()
-        );
-
-        return $objectType;
     }
 
     /**
