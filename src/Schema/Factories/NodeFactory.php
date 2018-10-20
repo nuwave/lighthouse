@@ -28,6 +28,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\UnionDirective;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
@@ -251,11 +252,12 @@ class NodeFactory
             'fields' => $this->resolveInputFieldsFunction($inputDefinition),
         ]);
     }
-    
+
     /**
      * @param InterfaceTypeDefinitionNode $interfaceDefinition
      *
      * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return InterfaceType
      */
@@ -291,11 +293,12 @@ class NodeFactory
             'resolveType' => $typeResolver,
         ]);
     }
-    
+
     /**
      * @param UnionTypeDefinitionNode $unionDefinition
      *
      * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return UnionType
      */

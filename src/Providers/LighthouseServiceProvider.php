@@ -78,12 +78,14 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
+                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
+                \Nuwave\Lighthouse\Console\MutationCommand::class,
+                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
+                \Nuwave\Lighthouse\Console\QueryCommand::class,
                 \Nuwave\Lighthouse\Console\UnionCommand::class,
                 \Nuwave\Lighthouse\Console\ScalarCommand::class,
-                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
                 \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
             ]);
         }
     }

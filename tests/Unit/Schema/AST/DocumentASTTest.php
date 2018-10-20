@@ -63,6 +63,32 @@ class DocumentASTTest extends TestCase
             $documentAST->mutationTypeDefinition()
         );
     }
+
+    /**
+     * @test
+     */
+    public function itOverwritesDefinitionWithSameName()
+    {
+        $documentAST = DocumentAST::fromSource('
+        type Query {
+            foo: Int
+        }
+        ');
+
+        $objectType = PartialParser::objectTypeDefinition('
+        type Query {
+            bar: Int
+        }
+        ');
+
+        $documentAST->setDefinition($objectType);
+
+        $this->assertSame(
+            'bar',
+            $documentAST->queryTypeDefinition()->fields[0]->name->value
+        );
+    }
+
     /**
      * @test
      */

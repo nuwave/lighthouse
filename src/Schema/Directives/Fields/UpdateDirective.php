@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
@@ -15,7 +16,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'update';
     }
@@ -23,26 +24,29 @@ class UpdateDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $value->setResolver(function ($root, $args) {
-            $modelClassName = $this->getModelClass();
-            $model = new $modelClassName;
+        return $fieldValue->setResolver(
+            function ($root, array $args) {
+                $modelClassName = $this->getModelClass();
+                /** @var Model $model */
+                $model = new $modelClassName;
 
-            $flatten = $this->directiveArgValue('flatten', false);
-            $args = $flatten
-                ? reset($args)
-                : $args;
+                $flatten = $this->directiveArgValue('flatten', false);
+                $args = $flatten
+                    ? reset($args)
+                    : $args;
 
-            if($this->directiveArgValue('globalId', false)){
-                $args['id'] = GlobalId::decodeId($args['id']);
+                if($this->directiveArgValue('globalId', false)){
+                    $args['id'] = GlobalId::decodeId($args['id']);
+                }
+
+                return MutationExecutor::executeUpdate($model, collect($args));
             }
-
-            return MutationExecutor::executeUpdate($model, collect($args));
-        });
+        );
     }
 }

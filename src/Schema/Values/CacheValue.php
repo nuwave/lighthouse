@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class CacheValue
@@ -86,7 +87,7 @@ class CacheValue
      *
      * @return array
      */
-    public function getTags()
+    public function getTags(): array
     {
         $typeTag = $this->implode([
             'graphql',
@@ -107,16 +108,18 @@ class CacheValue
     /**
      * Convert input arguments to keys.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    protected function argKeys()
+    protected function argKeys(): Collection
     {
         $args = $this->args;
 
         ksort($args);
 
         return collect($args)->map(function ($value, $key) {
-            $keyValue = is_array($value) ? json_encode($value, true) : $value;
+            $keyValue = is_array($value)
+                ? json_encode($value, true)
+                : $value;
 
             return "{$key}:{$keyValue}";
         });
@@ -131,7 +134,9 @@ class CacheValue
             return null;
         }
 
-        $cacheFieldKey = $this->fieldValue->getNode()->getCacheKey();
+        $cacheFieldKey = $this->fieldValue
+            ->getNode()
+            ->getCacheKey();
 
         if ($cacheFieldKey) {
             $this->fieldKey = data_get($this->rootValue, $cacheFieldKey);
@@ -145,9 +150,10 @@ class CacheValue
      *
      * @return string
      */
-    protected function implode($items)
+    protected function implode(array $items): string
     {
-        return collect($items)->filter()
+        return collect($items)
+            ->filter()
             ->values()
             ->implode(':');
     }

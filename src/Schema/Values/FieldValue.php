@@ -5,6 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldValue
 {
@@ -16,28 +19,28 @@ class FieldValue
     protected $type;
 
     /**
-     * Current field.
+     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
      *
-     * @var FieldDefinitionNode
+     * @var FieldDefinitionNode|InputValueDefinitionNode
      */
     protected $field;
 
     /**
-     * Current node (type).
+     * The parent type of the field.
      *
      * @var NodeValue
      */
     protected $node;
 
     /**
-     * Field resolver closure.
+     * The actual field resolver.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected $resolver;
 
     /**
-     * Field complexity.
+     * A closure that determines the complexity of executing the field.
      *
      * @var \Closure
      */
@@ -60,8 +63,9 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param NodeValue           $node
-     * @param FieldDefinitionNode $field
+     * @param NodeValue           $parent
+     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * @param FieldDefinitionNode|InputValueDefinitionNode $field
      */
     public function __construct(NodeValue $node, $field)
     {
@@ -98,7 +102,7 @@ class FieldValue
     }
 
     /**
-     * Set current complexity.
+     * Define a closure that is used to determine the complexity of the field.
      *
      * @param \Closure $complexity
      *
@@ -121,9 +125,10 @@ class FieldValue
      */
     public function injectArg(string $key, $value): FieldValue
     {
-        $this->additionalArgs = array_merge($this->additionalArgs, [
-            $key => $value,
-        ]);
+        $this->additionalArgs = array_merge(
+            $this->additionalArgs,
+            [$key => $value]
+        );
 
         return $this;
     }
@@ -157,9 +162,9 @@ class FieldValue
     }
 
     /**
-     * Get current field.
+     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
      *
-     * @return FieldDefinitionNode
+     * @return FieldDefinitionNode|InputValueDefinitionNode
      */
     public function getField()
     {

@@ -15,29 +15,34 @@ class InjectDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $schema = $this->buildSchemaFromString('
+        $this->schema = '
         type User {
-            foo: String!
+            id: Int!
         }
         
         type Query {
-            user: User! @inject(context: "user.id", name: "user_id") @field(resolver: "' . addslashes(self::class) . '@resolveUser")
+            me: User!
+                @inject(context: "user.id", name: "user_id")
+                @field(resolver: "' . addslashes(self::class) . '@resolveUser")
         }
-        ');
-
+        ';
         $query = '
         {
-            user {
-                foo
+            me {
+                id
             }
         }
         ';
 
-        $this->queryViaHttp($query);
+        $result = $this->queryViaHttp($query)->json();
+
+        $this->assertSame(1, array_get($result, 'data.me.id'));
     }
 
-    public function resolveUser($root, $args)
+    public function resolveUser($root, array $args): array
     {
-        $this->assertSame(1, $args['user_id']);
+        return [
+            'id' => $args['user_id']
+        ];
     }
 }

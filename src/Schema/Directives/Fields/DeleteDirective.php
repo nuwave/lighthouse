@@ -27,50 +27,59 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value): FieldValue
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $value->setResolver(function ($root, array $args) {
-            $argumentDefinition = $this->getSingleArgumentDefinition();
+        return $fieldValue->setResolver(
+            function ($root, array $args) {
+                $argumentDefinition = $this->getSingleArgumentDefinition();
 
-            if(NodeKind::NON_NULL_TYPE !== $argumentDefinition->type->kind){
-                throw new DirectiveException(
-                    "The @delete directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
-                );
-            }
-
-            $idOrIds = reset($args);
-            if($this->directiveArgValue('globalId', false)){
-                // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-                if(NodeKind::LIST_TYPE === $argumentDefinition->type->type->kind){
-                    $idOrIds = array_map([GlobalId::class, 'decodeId'], $idOrIds);
-                } else {
-                    $idOrIds = GlobalId::decodeId($idOrIds);
+                if(NodeKind::NON_NULL_TYPE !== $argumentDefinition->type->kind){
+                    throw new DirectiveException(
+                        "The @delete directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
+                    );
                 }
+
+                $idOrIds = reset($args);
+                if($this->directiveArgValue('globalId', false)){
+                    // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
+                    if(NodeKind::LIST_TYPE === $argumentDefinition->type->type->kind){
+                        $idOrIds = array_map([GlobalId::class, 'decodeId'], $idOrIds);
+                    } else {
+                        $idOrIds = GlobalId::decodeId($idOrIds);
+                    }
+                }
+
+                $modelClass = $this->getModelClass();
+                $model = $modelClass::find($idOrIds);
+
+                if (!$model) {
+                    return null;
+                }
+
+                if($model instanceof Model){
+                    $model->delete();
+                }
+
+                if($model instanceof Collection){
+                    $modelClass::destroy($idOrIds);
+                }
+
+                return $model;
             }
-
-            $modelClass = $this->getModelClass();
-            $model = $modelClass::find($idOrIds);
-
-            if (!$model) {
-                return null;
-            }
-
-            if($model instanceof Model){
-                $model->delete();
-            }
-
-            if($model instanceof Collection){
-                $modelClass::destroy($idOrIds);
-            }
-
-            return $model;
-        });
+        );
     }
 
+    /**
+     * Ensure there is only a single argument defined on the field.
+     *
+     * @throws DirectiveException
+     *
+     * @return InputValueDefinitionNode
+     */
     protected function getSingleArgumentDefinition(): InputValueDefinitionNode
     {
         if (1 !== count($this->definitionNode->arguments)) {

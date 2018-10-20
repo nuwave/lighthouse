@@ -13,7 +13,7 @@ class AuthDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'auth';
     }
@@ -21,14 +21,16 @@ class AuthDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        return $value->setResolver(function (){
-            return auth()->user();
-        });
+        return $fieldValue->setResolver(
+            function (){
+                return auth()->user();
+            }
+        );
     }
 }
