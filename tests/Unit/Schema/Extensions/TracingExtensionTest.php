@@ -31,13 +31,11 @@ SCHEMA;
      */
     public function itCanAddTracingExtensionMetaToResult()
     {
-        $query = '
+        $result = $this->queryViaHttp('
         {
             foo
         }
-        ';
-
-        $result = $this->postJson('graphql', ['query' => $query])->json();
+        ');
 
         $this->assertArrayHasKey('tracing', array_get($result, 'extensions'));
         $this->assertArrayHasKey('resolvers', array_get($result, 'extensions.tracing.execution'));

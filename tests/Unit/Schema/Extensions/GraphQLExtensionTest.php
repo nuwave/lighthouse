@@ -39,8 +39,11 @@ class GraphQLExtensionTest extends TestCase
             foo: String
         }';
 
-        $json = ['query' => '{ foo }'];
-        $data = $this->postJson('/graphql', $json)->json();
+        $data = $this->queryViaHttp('
+        {
+            foo
+        }
+        ');
 
         $this->assertArrayHasKey('meta', $data);
         $this->assertEquals('data', $data['meta']);
