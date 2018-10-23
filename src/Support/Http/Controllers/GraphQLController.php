@@ -27,9 +27,9 @@ class GraphQLController extends Controller
     /**
      * Inject middleware into request.
      *
-     * @param ExtensionRegistry  $extensionRegistry
-     * @param GraphQL            $graphQL
-     * @param CreatesContext     $createsContext
+     * @param ExtensionRegistry $extensionRegistry
+     * @param GraphQL           $graphQL
+     * @param CreatesContext    $createsContext
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,
@@ -117,7 +117,7 @@ class GraphQLController extends Controller
     {
         return is_string($variables)
             ? json_decode($variables, true)
-            : $variables;
+            : is_null($variables) ? [] : $variables;
     }
 
     /**
