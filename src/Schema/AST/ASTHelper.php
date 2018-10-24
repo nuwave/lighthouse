@@ -174,16 +174,15 @@ class ASTHelper
             : $default;
     }
 
-
     /**
      * Get argument's value.
      *
-     * @param Node  $arg
+     * @param ArgumentNode $arg
      * @param mixed $default
      *
      * @return mixed
      */
-    public static function argValue(Node $arg, $default = null)
+    public static function argValue(ArgumentNode $arg, $default = null)
     {
         $valueNode = $arg->value;
 
@@ -191,25 +190,9 @@ class ASTHelper
             return $default;
         }
 
-        if ($valueNode instanceof ListValueNode) {
-            return collect($valueNode->values)
-                ->map(function (ValueNode $valueNode) {
-                    return $valueNode->value;
-                })
-                ->toArray();
-        }
-
-        if ($valueNode instanceof ObjectValueNode) {
-            return collect($valueNode->fields)
-                ->mapWithKeys(function (ObjectFieldNode $field) {
-                    return [$field->name->value => self::argValue($field)];
-                })
-                ->toArray();
-        }
-
-        return $valueNode->value;
+        return AST::valueFromASTUntyped($valueNode);
     }
-    
+
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *
