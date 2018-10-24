@@ -32,10 +32,10 @@ class SchemaBuilderTest extends TestCase
         "Role description"
         enum Role {
             "Company administrator."
-            admin @enum(value:"admin")
+            ADMIN @enum(value:"admin")
 
             "Company employee."
-            employee @enum(value:"employee")
+            EMPLOYEE @enum(value:"employee")
         }
         ');
     
@@ -46,7 +46,7 @@ class SchemaBuilderTest extends TestCase
     
         $enumValues = $enum->getValues();
         $this->assertCount(2, $enumValues);
-        $this->assertSame('Company administrator.', $enum->getValue('admin')->description);
+        $this->assertSame('Company administrator.', $enum->getValue('ADMIN')->description);
     }
 
     /**

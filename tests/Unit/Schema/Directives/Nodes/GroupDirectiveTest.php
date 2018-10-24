@@ -3,7 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Tests\Utils\Middleware\Authenticate;
 
 class GroupDirectiveTest extends TestCase
 {
@@ -45,21 +45,50 @@ class GroupDirectiveTest extends TestCase
      */
     public function itCanSetMiddleware()
     {
-        $schema = '
-        extend type Query @group(middleware: ["foo", "bar"]) {
-            me: String @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@bar")
+        $this->schema = '
+        type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\CountRuns"]) {
+            me: Int @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
-        ' . $this->placeholderQuery();
+        ';
         $query = '
         {
             me
         }
         ';
-        $this->executeQuery($schema, $query);
+        $result = $this->queryViaHttp($query);
 
-        $middleware = resolve(MiddlewareRegistry::class)->query('me');
-        $this->assertCount(2, $middleware);
-        $this->assertEquals('foo', $middleware[0]);
-        $this->assertEquals('bar', $middleware[1]);
+        $this->assertSame(1, array_get($result, 'data.me'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanOverrideGroupMiddlewareInField()
+    {
+        $this->schema = '
+        type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\Authenticate"]) {
+            withFoo: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
+            withNothing: Int
+                @middleware(checks: [])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
+            foo: Int
+        }
+        ';
+        $query = '
+        {
+            withFoo
+            withNothing
+            foo
+        }
+        ';
+        $result = $this->queryViaHttp($query);
+
+        $this->assertSame(1, array_get($result, 'data.withFoo'));
+        $this->assertSame(1, array_get($result, 'data.withNothing'));
+        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
+        $this->assertNull(array_get($result, 'data.foo'));
     }
 }

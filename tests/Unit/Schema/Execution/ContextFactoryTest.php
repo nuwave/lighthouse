@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Execution;
 
 use Tests\TestCase;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Application;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -58,20 +57,26 @@ class ContextFactoryTest extends TestCase
         $this->schema = "
         type Query {
             context: String @field(resolver:\"{$resolver}\")
-        }";
-        $json = ['query' => '{ context }'];
+        }
+        ";
+        $query = '
+        {
+            context
+        }
+        ';
+        $result = $this->queryViaHttp($query);
 
-        $result = $this->postJson('graphql', $json)->json();
-        $execution = [
-            'data' => [
-                'context' => 'custom.context',
+        $this->assertSame(
+            [
+                'data' => [
+                    'context' => 'custom.context',
+                ],
             ],
-        ];
-
-        $this->assertEquals($execution, $result);
+            $result
+        );
     }
 
-    public function resolve($root, array $args, $context)
+    public function resolve($root, array $args, GraphQLContext $context): string
     {
         return $context->foo();
     }
