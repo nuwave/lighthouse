@@ -172,14 +172,13 @@ class NodeFactory
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     // Get the directive that is defined on the field itself
                     $directive = ASTHelper::directiveDefinition( $field, 'enum');
-                
-                    if (!$directive) {
-                        return [];
-                    }
-                
+
                     return [
                         $field->name->value => [
-                            'value' => ASTHelper::directiveArgValue($directive, 'value'),
+                            // If no explicit value is given, we default to the field name
+                            'value' => $directive
+                                ? ASTHelper::directiveArgValue($directive, 'value')
+                                : $field->name->value,
                             'description' => data_get($field->description, 'value'),
                         ]
                     ];
