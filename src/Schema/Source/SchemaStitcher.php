@@ -72,8 +72,8 @@ class SchemaStitcher implements SchemaSourceProvider
                     ->map(function ($file) {
                         return self::gatherSchemaImportsRecursively($file);
                     })
-                    ->implode('');
+                    ->implode('') . "\n";
             })
-            ->implode('');
+            ->implode('') . "\n";
     }
 }
