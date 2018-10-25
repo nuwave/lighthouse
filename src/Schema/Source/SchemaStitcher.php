@@ -56,7 +56,7 @@ class SchemaStitcher implements SchemaSourceProvider
         return collect(file($path))
             ->map(function (string $line) use ($path) {
                 if (! starts_with(trim($line), '#import ')) {
-                    return $line;
+                    return trim($line, PHP_EOL) . PHP_EOL;
                 }
 
                 $importFileName = trim(str_after($line, '#import '));
@@ -72,8 +72,8 @@ class SchemaStitcher implements SchemaSourceProvider
                     ->map(function ($file) {
                         return self::gatherSchemaImportsRecursively($file);
                     })
-                    ->implode('') . "\n";
+                    ->implode('');
             })
-            ->implode('') . "\n";
+            ->implode('');
     }
 }
