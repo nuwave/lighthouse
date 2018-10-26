@@ -6,16 +6,18 @@ use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
-use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
@@ -51,8 +53,8 @@ class ASTHelper
      *
      * @param NodeList|array $original
      * @param NodeList|array $addition
-     * @param bool $overwriteDuplicates By default this throws if a collision occurs. If
-     * this is set to true, the fields of the original list will be overwritten.
+     * @param bool           $overwriteDuplicates By default this throws if a collision occurs. If
+     *                                            this is set to true, the fields of the original list will be overwritten.
      *
      * @throws DefinitionException
      *
@@ -64,7 +66,7 @@ class ASTHelper
             ->pluck('name.value')
             ->filter()
             ->all();
-        
+
         $remainingDefinitions = collect($original)
             ->reject(function ($definition) use ($newNames, $overwriteDuplicates) {
                 $oldName = $definition->name->value;
@@ -73,7 +75,7 @@ class ASTHelper
                     $newNames
                 );
 
-                if($collisionOccured && ! $overwriteDuplicates){
+                if ($collisionOccured && ! $overwriteDuplicates) {
                     throw new DefinitionException("Duplicate definition {$oldName} found when merging.");
                 }
 
@@ -109,11 +111,11 @@ class ASTHelper
     public static function getFieldTypeName(FieldDefinitionNode $field): string
     {
         $type = $field->type;
-        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode){
+        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode) {
             $type = self::getUnderlyingNamedTypeNode($type);
         }
-        
-        /** @var NamedTypeNode $type */
+
+        /* @var NamedTypeNode $type */
         return $type->name->value;
     }
 
@@ -126,39 +128,59 @@ class ASTHelper
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
-        if($node instanceof NamedTypeNode){
+        if ($node instanceof NamedTypeNode) {
             return $node;
         }
-        
+
         $type = data_get($node, 'type');
 
-        if(!$type){
+        if (! $type) {
             throw new DefinitionException("The node '$node->kind' does not have a type associated with it.");
         }
-        
+
         return self::getUnderlyingNamedTypeNode($type);
+    }
+
+    /**
+     * Check to see if a field contains a directive.
+     *
+     * @param FieldNode $field
+     * @param string    $directiveName
+     *
+     * @return bool
+     */
+    public static function fieldHasDirective(FieldNode $field, string $directiveName)
+    {
+        // TODO: Ensure field is not non-nullable, if so bail and return false
+        foreach ($field->directives as $directive) {
+            if ($directive->name->value === $directiveName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Does the given directive have an argument of the given name?
      *
      * @param DirectiveNode $directiveDefinition
-     * @param string $name
+     * @param string        $name
      *
      * @return bool
      */
     public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
     {
         return collect($directiveDefinition->arguments)
-            ->contains(function(ArgumentNode $argumentNode) use ($name){
+            ->contains(function (ArgumentNode $argumentNode) use ($name) {
                 return $argumentNode->name->value === $name;
             });
     }
 
     /**
      * @param DirectiveNode $directive
-     * @param string $name
-     * @param mixed|null $default
+     * @param string        $name
+     * @param mixed|null    $default
      *
      * @return mixed|null
      */
@@ -178,7 +200,7 @@ class ASTHelper
      * Get argument's value.
      *
      * @param ArgumentNode $arg
-     * @param mixed $default
+     * @param mixed        $default
      *
      * @return mixed
      */
@@ -196,7 +218,7 @@ class ASTHelper
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *
-     * @param Node $definitionNode
+     * @param Node   $definitionNode
      * @param string $name
      *
      * @return DirectiveNode|null
@@ -208,11 +230,11 @@ class ASTHelper
                 return $directiveDefinitionNode->name->value === $name;
             });
     }
-    
+
     /**
      * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
      *
-     * @param Node $definitionNode
+     * @param Node   $definitionNode
      * @param string $directiveName
      *
      * @return string
@@ -221,9 +243,9 @@ class ASTHelper
     {
         $namespaceDirective = static::directiveDefinition(
             $definitionNode,
-            (new NamespaceDirective)->name()
+            (new NamespaceDirective())->name()
         );
-    
+
         return $namespaceDirective
             // The namespace directive can contain an argument with the name of the
             // current directive, in which case it applies here
@@ -231,12 +253,41 @@ class ASTHelper
             // Default to an empty namespace if the namespace directive does not exist
             : '';
     }
-    
+
+    /**
+     * Attach directive to all registered object type fields.
+     *
+     * @param DocumentAST   $documentAST
+     * @param DirectiveNode $directive
+     *
+     * @return DocumentAST
+     */
+    public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): DocumentAST
+    {
+        return $documentAST->objectTypeDefinitions()
+            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive) {
+                if (! data_get($objectType, 'name.value')) {
+                    return $document;
+                }
+
+                $objectType->fields = new NodeList(collect($objectType->fields)
+                    ->map(function (FieldDefinitionNode $field) use ($directive) {
+                        $field->directives = $field->directives->merge([$directive]);
+
+                        return $field;
+                    })->all());
+
+                $document->setDefinition($objectType);
+
+                return $document;
+            }, $documentAST);
+    }
+
     /**
      * This adds an Interface called "Node" to an ObjectType definition.
      *
      * @param ObjectTypeDefinitionNode $objectType
-     * @param DocumentAST $documentAST
+     * @param DocumentAST              $documentAST
      *
      * @throws \Exception
      *
@@ -250,15 +301,15 @@ class ASTHelper
                 Parser::parseType(
                     'Node',
                     ['noLocation' => true]
-                )
+                ),
             ]
         );
-    
+
         $globalIdFieldDefinition = PartialParser::fieldDefinition(
-            config('lighthouse.global_id_field') .': ID! @globalId'
+            config('lighthouse.global_id_field').': ID! @globalId'
         );
         $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
-        
+
         return $documentAST->setDefinition($objectType);
     }
 }

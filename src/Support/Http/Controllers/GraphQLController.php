@@ -9,7 +9,9 @@ use Illuminate\Routing\Controller;
 use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -51,14 +53,21 @@ class GraphQLController extends Controller
     public function query(Request $request)
     {
         $batched = isset($request[0]) && config('lighthouse.batched_queries', true);
+        $context = $this->createsContext->generate($request);
 
         $this->extensionRegistry->requestDidStart(
-            new ExtensionRequest($request, $batched)
+            new ExtensionRequest($request, $context, $batched)
         );
 
         $response = $batched
-            ? $this->executeBatched($request)
-            : $this->execute($request);
+            ? $this->executeBatched($request, $context)
+            : $this->execute($request, $context);
+
+        return $this->extensionRegistry
+            ->get(DeferExtension::name())
+            ->response(
+                $this->extensionRegistry->willSendResponse($response)
+            );
 
         return response(
             $this->extensionRegistry->willSendResponse($response)
@@ -66,18 +75,19 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param Request        $request
+     * @param GraphQLContext $context
      *
      * @throws DirectiveException
      * @throws ParseException
      *
      * @return array
      */
-    protected function execute(Request $request)
+    protected function execute(Request $request, GraphQLContext $context)
     {
         return $this->graphQL->executeQuery(
             $request->input('query', ''),
-            $this->createsContext->generate($request),
+            $context,
             $this->ensureVariablesAreArray(
                 $request->input('variables', [])
             )
@@ -87,15 +97,16 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param Request        $request
+     * @param GraphQLContext $context
      *
      * @return array
      */
-    protected function executeBatched(Request $request)
+    protected function executeBatched(Request $request, GraphQLContext $context)
     {
         $data = $this->graphQL->executeBatchedQueries(
             $request->toArray(),
-            $this->createsContext->generate($request)
+            $context
         );
 
         return array_map(
