@@ -9,8 +9,9 @@ interface CanSendResponse
      *
      * @param array $data
      * @param array $paths
+     * @param bool  $final
      *
      * @return mixed
      */
-    public function send(array $data, array $paths = []);
+    public function send(array $data, array $paths = [], bool $final);
 }

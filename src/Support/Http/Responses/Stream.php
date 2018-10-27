@@ -4,48 +4,76 @@ namespace Nuwave\Lighthouse\Support\Http\Responses;
 
 class Stream implements CanSendResponse
 {
-    /** @var bool */
-    protected $sent = false;
+    const EOL = "\r\n";
+
+    protected $appendLength = 2;
 
     /**
      * Send response.
      *
      * @param array $data
      * @param array $paths
+     * @param bool  $final
      */
-    public function send(array $data, array $paths = [])
+    public function send(array $data, array $paths = [], bool $final)
     {
-        $stream = $this->chunk($data);
-
-        if (! $this->sent) {
-            $stream = $this->boundary().$stream;
+        if ($final) {
+            $this->appendLength += 2;
         }
 
-        $this->stream($stream);
+        if (! empty($paths)) {
+            $paths = collect($paths);
+            $lastKey = $paths->count() - 1;
+            $paths->map(function ($path, $i) use ($data, $final, $lastKey) {
+                $terminating = $final && ($i == $lastKey);
 
-        $this->sent = true;
+                return $this->chunk([
+                    'path' => collect(explode('.', $path))->map(function ($partial) {
+                        return is_numeric($partial) ? intval($partial) : $partial;
+                    })->toArray(),
+                    'data' => array_get($data, "data.{$path}"),
+                ], $terminating);
+            })->each(function ($chunk) {
+                $this->emit($chunk);
+            });
+        } else {
+            $this->emit($this->chunk($data, $final));
+        }
+
+        if ($final) {
+            $this->emit($this->terminatingBoundary());
+        }
     }
 
     protected function boundary(): string
     {
-        return "---\n";
+        return self::EOL.'---'.self::EOL;
     }
 
-    protected function chunk(array $data): string
+    protected function terminatingBoundary(): string
     {
-        $json = json_encode($data);
+        return self::EOL.'-----'.self::EOL;
+    }
 
-        return implode("\n", [
+    protected function chunk(array $data, $terminating = false): string
+    {
+        $json = json_encode($data, 0);
+        $length = $terminating ? strlen($json) : strlen($json.self::EOL);
+
+        $chunk = implode(self::EOL, [
             'Content-Type: application/json',
-            'Content-Length: '.strlen($json),
+            'Content-Length: '.$length,
+            null,
             $json,
-            $this->boundary(),
+            null,
         ]);
+
+        return $this->boundary().$chunk;
     }
 
-    protected function stream(string $response)
+    protected function emit(string $chunk)
     {
-        echo $response;
+        echo $chunk;
         ob_flush();
         flush();
     }

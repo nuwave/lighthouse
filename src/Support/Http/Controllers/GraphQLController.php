@@ -63,15 +63,13 @@ class GraphQLController extends Controller
             ? $this->executeBatched($request, $context)
             : $this->execute($request, $context);
 
-        return $this->extensionRegistry
-            ->get(DeferExtension::name())
-            ->response(
-                $this->extensionRegistry->willSendResponse($response)
-            );
+        $data = $this->extensionRegistry->willSendResponse($response);
 
-        return response(
-            $this->extensionRegistry->willSendResponse($response)
-        );
+        if ($deferExtension = $this->extensionRegistry->get(DeferExtension::name())) {
+            return $deferExtension->response($data);
+        }
+
+        return response($data);
     }
 
     /**

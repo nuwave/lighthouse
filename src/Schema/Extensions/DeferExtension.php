@@ -188,10 +188,14 @@ class DeferExtension extends GraphQLExtension
      */
     public function response(array $data)
     {
+        if (empty($this->deferred)) {
+            return response($data);
+        }
+
         return response()->stream(function () use ($data) {
             $this->data = $data;
             $this->streaming = true;
-            $this->stream->send($data);
+            $this->stream->send($data, [], empty($this->deferred));
 
             while (count($this->deferred)) {
                 // TODO: Properly parse variables array
@@ -202,12 +206,19 @@ class DeferExtension extends GraphQLExtension
                     $this->request->request()->input('variables', [])
                 )->toArray(config('lighthouse.debug'));
 
-                $this->stream->send($this->data, $this->resolved);
+                $this->stream->send(
+                    $this->data,
+                    $this->resolved,
+                    empty($this->deferred)
+                );
+
                 $this->resolved = [];
             }
         }, 200, [
             'X-Accel-Buffering' => 'no',
             'Content-Type' => 'multipart/mixed; boundary="-"',
+            // 'Connection' => 'keep-alive',
+            // 'Transfer-Encoding' => 'chunked',
         ]);
     }
 }

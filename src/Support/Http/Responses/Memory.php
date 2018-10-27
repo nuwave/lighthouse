@@ -12,10 +12,11 @@ class Memory implements CanSendResponse
      *
      * @param array $data
      * @param array $paths
+     * @param bool  $final
      *
      * @return mixed
      */
-    public function send(array $data, array $paths = [])
+    public function send(array $data, array $paths = [], bool $final)
     {
         if (! empty($paths)) {
             $data = collect($paths)->mapWithKeys(function ($path) use ($data) {
