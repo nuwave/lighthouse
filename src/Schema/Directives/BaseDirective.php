@@ -91,32 +91,13 @@ abstract class BaseDirective implements Directive
      *
      * @return \Closure
      */
-    public function getMethodArgument(string $argumentName): \Closure
+    public function getResolverFromArgument(string $argumentName): \Closure
     {
-        // A method argument is expected to contain a class and a method name, seperated by an @ symbol
-        // e.g. App\My\Class@methodName
-        $argumentParts = explode('@', $this->directiveArgValue($argumentName));
+        list($className, $methodName) = $this->getMethodArgumentParts($argumentName);
 
-        if (
-            count($argumentParts) !== 2
-            || empty($argumentParts[0])
-            || empty($argumentParts[1])
-        ){
-            throw new DirectiveException("Directive '{$this->name()}' must have an argument '{$argumentName}' with 'ClassName@methodName'");
-        }
+        $namespacedClassName = $this->namespaceClassName($className);
 
-        $className = $this->namespaceClassName($argumentParts[0]);
-        $methodName = $argumentParts[1];
-
-        if (! method_exists($className, $methodName)) {
-            throw new DirectiveException("Method '{$methodName}' does not exist on class '{$className}'");
-        }
-
-        // TODO convert this back once we require PHP 7.1
-        // return \Closure::fromCallable([resolve($className), $methodName]);
-        return function() use ($className, $methodName){
-            return resolve($className)->{$methodName}(...func_get_args());
-        };
+        return \construct_resolver($namespacedClassName, $methodName);
     }
 
     /**
@@ -180,5 +161,38 @@ abstract class BaseDirective implements Directive
         };
 
         return $className;
+    }
+
+    /**
+     * Split a single method argument into its parts.
+     *
+     * A method argument is expected to contain a class and a method name, separated by an @ symbol.
+     * e.g. "App\My\Class@methodName"
+     * This validates that exactly two parts are given and are not empty.
+     *
+     * @param string $argumentName
+     *
+     * @throws DirectiveException
+     *
+     * @return array [string $className, string $methodName]
+     */
+    protected function getMethodArgumentParts(string $argumentName): array
+    {
+        $argumentParts = explode(
+            '@',
+            $this->directiveArgValue($argumentName)
+        );
+
+        if (
+            count($argumentParts) !== 2
+            || empty($argumentParts[0])
+            || empty($argumentParts[1])
+        ){
+            throw new DirectiveException(
+                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName'"
+            );
+        }
+
+        return $argumentParts;
     }
 }

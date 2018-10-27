@@ -249,7 +249,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             roles(first: Int! after: Int): [Role!]! @belongsToMany(type:"foo")
         }

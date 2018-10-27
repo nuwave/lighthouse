@@ -35,14 +35,14 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
         $contextAttributeName = $this->directiveArgValue('context');
         if (!$contextAttributeName) {
             throw new DirectiveException(
-                "The `inject` directive on {$value->getNodeName()} [{$value->getFieldName()}] must have a `context` argument"
+                "The `inject` directive on {$value->getParentName()} [{$value->getFieldName()}] must have a `context` argument"
             );
         }
 
         $argumentName = $this->directiveArgValue('name');
         if (!$argumentName) {
             throw new DirectiveException(
-                "The `inject` directive on {$value->getNodeName()} [{$value->getFieldName()}] must have a `name` argument"
+                "The `inject` directive on {$value->getParentName()} [{$value->getFieldName()}] must have a `name` argument"
             );
         }
 

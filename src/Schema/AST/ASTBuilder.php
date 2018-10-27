@@ -54,9 +54,11 @@ class ASTBuilder
     protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
     {
         return $document
-            ->typeExtensionDefinitions()
-            // This is just temporarily merged together
-            ->concat($document->typeDefinitions())
+            ->typeDefinitions()
+            // Iterate over both of those at once, as it does not matter at this point
+            ->concat(
+                $document->typeExtensions()
+            )
             ->reduce(
                 function (DocumentAST $document, Node $node) {
                     $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
@@ -86,7 +88,7 @@ class ASTBuilder
                 $name = $objectType->name->value;
 
                 $objectType = $document
-                    ->typeExtensionDefinitions($name)
+                    ->extensionsForType($name)
                     ->reduce(
                         function (ObjectTypeDefinitionNode $relatedObjectType, ObjectTypeExtensionNode $typeExtension) {
                             $relatedObjectType->fields = ASTHelper::mergeUniqueNodeList(

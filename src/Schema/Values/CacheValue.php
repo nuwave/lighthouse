@@ -91,13 +91,13 @@ class CacheValue
     {
         $typeTag = $this->implode([
             'graphql',
-            strtolower($this->fieldValue->getNodeName()),
+            strtolower($this->fieldValue->getParentName()),
             $this->fieldKey,
         ]);
 
         $fieldTag = $this->implode([
             'graphql',
-            strtolower($this->fieldValue->getNodeName()),
+            strtolower($this->fieldValue->getParentName()),
             $this->fieldKey,
             $this->resolveInfo->fieldName,
         ]);
@@ -135,7 +135,7 @@ class CacheValue
         }
 
         $cacheFieldKey = $this->fieldValue
-            ->getNode()
+            ->getParent()
             ->getCacheKey();
 
         if ($cacheFieldKey) {

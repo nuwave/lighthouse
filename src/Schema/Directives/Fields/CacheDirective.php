@@ -35,7 +35,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     public function handleField(FieldValue $value, \Closure $next)
     {
         $this->setNodeKey(
-            $value->getNode()
+            $value->getParent()
         );
 
         $value = $next($value);

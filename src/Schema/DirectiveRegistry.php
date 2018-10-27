@@ -185,6 +185,34 @@ class DirectiveRegistry
     }
 
     /**
+     * Get a single directive of a type that belongs to an AST node.
+     *
+     * Use this for directives types that can only occur once, such as field resolvers.
+     * This throws if more than one such directive is found.
+     *
+     * @param Node $node
+     * @param string $directiveClass
+     *
+     * @throws DirectiveException
+     *
+     * @return Directive|null
+     */
+    protected function singleDirectiveOfType(Node $node, string $directiveClass)
+    {
+        $directives = $this->associatedDirectivesOfType($node, $directiveClass);
+
+        if ($directives->count() > 1) {
+            $directiveNames = $directives->implode(', ');
+
+            throw new DirectiveException(
+                "Node [{$node->name->value}] can only have one directive of type [{$directiveClass}] but found [{$directiveNames}]"
+            );
+        }
+
+        return $directives->first();
+    }
+
+    /**
      * @param Node $node
      *
      * @return Collection
@@ -225,17 +253,10 @@ class DirectiveRegistry
      */
     public function nodeResolver(TypeDefinitionNode $node)
     {
-        $resolvers = $this->associatedDirectivesOfType($node, NodeResolver::class);
-
-        if ($resolvers->count() > 1) {
-            $resolverNames = $resolvers->implode(', ');
-    
-            throw new DirectiveException("Type [{$node->name->value}] has more then one resolver directive: [{$resolverNames}]");
-        }
-
-        return $resolvers->first();
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->singleDirectiveOfType($node, NodeResolver::class);
     }
-    
+
     /**
      * Check if the given node has a type resolver directive handler assigned to it.
      *
@@ -287,17 +308,7 @@ class DirectiveRegistry
      */
     public function fieldResolver($field)
     {
-        $resolvers = $this->associatedDirectivesOfType($field, FieldResolver::class);
-
-        if ($resolvers->count() > 1) {
-            $resolverNames = $resolvers->implode(', ');
-            
-            throw new DirectiveException(
-                "Field [{$field->name->value}] has more then one resolver directive: [{$resolverNames}]"
-            );
-        }
-
-        return $resolvers->first();
+        return $this->singleDirectiveOfType($field, FieldResolver::class);
     }
 
     /**

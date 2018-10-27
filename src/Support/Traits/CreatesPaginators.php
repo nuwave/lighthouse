@@ -107,7 +107,7 @@ trait CreatesPaginators
      */
     protected function paginatorTypeName(FieldValue $value)
     {
-        $parent = $value->getNodeName();
+        $parent = $value->getParentName();
         $child = str_singular($value->getField()->name->value);
 
         return studly_case($parent . '_' . $child . '_Paginator');
@@ -122,7 +122,7 @@ trait CreatesPaginators
      */
     protected function connectionTypeName(FieldValue $value)
     {
-        $parent = $value->getNodeName();
+        $parent = $value->getParentName();
         $child = str_singular($value->getField()->name->value);
 
         return studly_case($parent . '_' . $child . '_Connection');
@@ -137,7 +137,7 @@ trait CreatesPaginators
      */
     protected function connectionEdgeName(FieldValue $value)
     {
-        $parent = $value->getNodeName();
+        $parent = $value->getParentName();
         $child = str_singular($value->getField()->name->value);
 
         return studly_case($parent . '_' . $child . '_Edge');
