@@ -104,6 +104,8 @@ class DeferExtension extends GraphQLExtension
      *
      * @param \Closure $resolver
      * @param string   $path
+     *
+     * @return mixed
      */
     public function defer(\Closure $resolver, string $path)
     {
@@ -111,7 +113,7 @@ class DeferExtension extends GraphQLExtension
             return $data;
         }
 
-        if ($this->hasResolver($path)) {
+        if ($this->isDeferred($path)) {
             return $this->resolve($resolver, $path);
         }
 
@@ -149,10 +151,10 @@ class DeferExtension extends GraphQLExtension
      */
     public function resolve(\Closure $originalResolver, string $path)
     {
-        $hasResolver = $this->hasResolver($path);
-        $resolver = $hasResolver ? $this->deferred[$path] : $originalResolver;
+        $isDeferred = $this->isDeferred($path);
+        $resolver = $isDeferred ? $this->deferred[$path] : $originalResolver;
 
-        if ($hasResolver) {
+        if ($isDeferred) {
             $this->resolved[] = $path;
 
             unset($this->deferred[$path]);
@@ -166,7 +168,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @return bool
      */
-    public function hasResolver(string $path)
+    public function isDeferred(string $path): bool
     {
         return isset($this->deferred[$path]);
     }
@@ -176,7 +178,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @return bool
      */
-    public function hasData(string $path)
+    public function hasData(string $path): bool
     {
         return isset($this->data[$path]);
     }
@@ -197,6 +199,8 @@ class DeferExtension extends GraphQLExtension
             $this->streaming = true;
             $this->stream->stream($data, [], empty($this->deferred));
 
+            // TODO: Allow max_execution time and nested_levels to be set in config
+            // to break out of loop early.
             while (count($this->deferred)) {
                 // TODO: Properly parse variables array
                 // TODO: Get debug setting
@@ -215,10 +219,9 @@ class DeferExtension extends GraphQLExtension
                 $this->resolved = [];
             }
         }, 200, [
+            // TODO: Allow headers to be set in config
             'X-Accel-Buffering' => 'no',
             'Content-Type' => 'multipart/mixed; boundary="-"',
-            // 'Connection' => 'keep-alive',
-            // 'Transfer-Encoding' => 'chunked',
         ]);
     }
 }

@@ -50,20 +50,16 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
             function ($root, $args, $context, ResolveInfo $info) use ($resolver) {
                 $path = implode('.', $info->path);
                 $extension = $this->getDeferExtension();
+                $wrappedResolver = function () use ($resolver, $root, $args, $context, $info) {
+                    return $resolver($root, $args, $context, $info);
+                };
 
                 if (ASTHelper::fieldHasDirective($info->fieldNodes[0], 'defer')) {
-                    return $extension->defer(
-                        function () use ($resolver, $root, $args, $context, $info) {
-                            return $resolver($root, $args, $context, $info);
-                        },
-                        $path
-                    );
+                    return $extension->defer($wrappedResolver, $path);
                 }
 
                 return $extension->isStreaming()
-                    ? $extension->findOrResolve(function () use ($resolver, $root, $args, $context, $info) {
-                        return $resolver($root, $args, $context, $info);
-                    }, $path)
+                    ? $extension->findOrResolve($wrappedResolver, $path)
                     : $resolver($root, $args, $context, $info);
             }
         );
