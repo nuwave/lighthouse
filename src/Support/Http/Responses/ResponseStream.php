@@ -2,25 +2,24 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
-class Stream implements CanSendResponse
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+
+class ResponseStream implements CanStreamResponse
 {
+    /** @var string */
     const EOL = "\r\n";
 
-    protected $appendLength = 2;
-
     /**
-     * Send response.
+     * Stream graphql response.
      *
      * @param array $data
      * @param array $paths
      * @param bool  $final
+     *
+     * @return mixed
      */
-    public function send(array $data, array $paths = [], bool $final)
+    public function stream(array $data, array $paths = [], bool $final)
     {
-        if ($final) {
-            $this->appendLength += 2;
-        }
-
         if (! empty($paths)) {
             $paths = collect($paths);
             $lastKey = $paths->count() - 1;
@@ -45,17 +44,31 @@ class Stream implements CanSendResponse
         }
     }
 
+    /**
+     * @return string
+     */
     protected function boundary(): string
     {
         return self::EOL.'---'.self::EOL;
     }
 
+    /**
+     * @return string
+     */
     protected function terminatingBoundary(): string
     {
         return self::EOL.'-----'.self::EOL;
     }
 
-    protected function chunk(array $data, $terminating = false): string
+    /**
+     * Format chunked data.
+     *
+     * @param array $data
+     * @param bool  $terminating
+     *
+     * @return string
+     */
+    protected function chunk(array $data, bool $terminating): string
     {
         $json = json_encode($data, 0);
         $length = $terminating ? strlen($json) : strlen($json.self::EOL);
@@ -71,6 +84,11 @@ class Stream implements CanSendResponse
         return $this->boundary().$chunk;
     }
 
+    /**
+     * Stream chunked data to client.
+     *
+     * @param string $chunk
+     */
     protected function emit(string $chunk)
     {
         echo $chunk;

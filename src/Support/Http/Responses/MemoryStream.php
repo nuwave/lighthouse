@@ -2,13 +2,15 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
-class Memory implements CanSendResponse
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+
+class MemoryStream implements CanStreamResponse
 {
     /** @var bool */
     public $chunks = [];
 
     /**
-     * Send response.
+     * Stream graphql response.
      *
      * @param array $data
      * @param array $paths
@@ -16,7 +18,7 @@ class Memory implements CanSendResponse
      *
      * @return mixed
      */
-    public function send(array $data, array $paths = [], bool $final)
+    public function stream(array $data, array $paths = [], bool $final)
     {
         if (! empty($paths)) {
             $data = collect($paths)->mapWithKeys(function ($path) use ($data) {

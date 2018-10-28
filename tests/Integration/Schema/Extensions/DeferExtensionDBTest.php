@@ -5,9 +5,9 @@ namespace Tests\Integration\Schema\Extensions;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
-use Nuwave\Lighthouse\Support\Http\Responses\Memory;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
-use Nuwave\Lighthouse\Support\Http\Responses\CanSendResponse;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
 class DeferExtensionDBTest extends DBTestCase
 {
@@ -23,9 +23,9 @@ class DeferExtensionDBTest extends DBTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->stream = new Memory();
+        $this->stream = new MemoryStream();
 
-        $app->singleton(CanSendResponse::class, function () {
+        $app->singleton(CanStreamResponse::class, function () {
             return $this->stream;
         });
 

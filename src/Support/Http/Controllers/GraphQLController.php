@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -26,21 +27,27 @@ class GraphQLController extends Controller
     /** @var ExtensionRegistry */
     protected $extensionRegistry;
 
+    /** @var GraphQLResponse */
+    protected $graphQLResponse;
+
     /**
      * Inject middleware into request.
      *
      * @param ExtensionRegistry $extensionRegistry
      * @param GraphQL           $graphQL
      * @param CreatesContext    $createsContext
+     * @param GraphQLResponse   $graphQLResponse
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,
         GraphQL $graphQL,
-        CreatesContext $createsContext
+        CreatesContext $createsContext,
+        GraphQLResponse $graphQLResponse
     ) {
         $this->graphQL = $graphQL;
         $this->extensionRegistry = $extensionRegistry;
         $this->createsContext = $createsContext;
+        $this->graphQLResponse = $graphQLResponse;
     }
 
     /**
@@ -63,13 +70,9 @@ class GraphQLController extends Controller
             ? $this->executeBatched($request, $context)
             : $this->execute($request, $context);
 
-        $data = $this->extensionRegistry->willSendResponse($response);
-
-        if ($deferExtension = $this->extensionRegistry->get(DeferExtension::name())) {
-            return $deferExtension->response($data);
-        }
-
-        return response($data);
+        return $this->graphQLResponse->create(
+            $this->extensionRegistry->willSendResponse($response)
+        );
     }
 
     /**

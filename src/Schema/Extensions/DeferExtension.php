@@ -7,11 +7,11 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Http\Responses\CanSendResponse;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class DeferExtension extends GraphQLExtension
 {
-    /** @var CanSendResponse */
+    /** @var CanStreamResponse */
     protected $stream;
 
     /** @var ExtensionRequest */
@@ -30,9 +30,9 @@ class DeferExtension extends GraphQLExtension
     protected $streaming = false;
 
     /**
-     * @param CanSendResponse $stream
+     * @param CanStreamResponse $stream
      */
-    public function __construct(CanSendResponse $stream)
+    public function __construct(CanStreamResponse $stream)
     {
         $this->stream = $stream;
     }
@@ -195,7 +195,7 @@ class DeferExtension extends GraphQLExtension
         return response()->stream(function () use ($data) {
             $this->data = $data;
             $this->streaming = true;
-            $this->stream->send($data, [], empty($this->deferred));
+            $this->stream->stream($data, [], empty($this->deferred));
 
             while (count($this->deferred)) {
                 // TODO: Properly parse variables array
@@ -206,7 +206,7 @@ class DeferExtension extends GraphQLExtension
                     $this->request->request()->input('variables', [])
                 )->toArray(config('lighthouse.debug'));
 
-                $this->stream->send(
+                $this->stream->stream(
                     $this->data,
                     $this->resolved,
                     empty($this->deferred)
