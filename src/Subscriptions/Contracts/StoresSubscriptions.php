@@ -27,10 +27,10 @@ interface StoresSubscriptions
     /**
      * Store subscription.
      *
-     * @param Subscriber $subscription
+     * @param Subscriber $subscriber
      * @param string     $topic
      */
-    public function storeSubscriber(Subscriber $subscription, $topic);
+    public function storeSubscriber(Subscriber $subscriber, $topic);
 
     /**
      * Delete subscriber.

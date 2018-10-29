@@ -55,16 +55,16 @@ class MemoryStorage implements StoresSubscriptions
     /**
      * Store subscription.
      *
-     * @param Subscriber $subscription
+     * @param Subscriber $subscriber
      * @param string     $topic
      */
-    public function storeSubscriber(Subscriber $subscription, $topic)
+    public function storeSubscriber(Subscriber $subscriber, $topic)
     {
         $channels = array_get($this->topics, $topic, []);
-        $channels[] = $subscription->channel;
+        $channels[] = $subscriber->channel;
 
         $this->topics[$topic] = $channels;
-        $this->subscribers[] = $subscription;
+        $this->subscribers[] = $subscriber;
     }
 
     /**
