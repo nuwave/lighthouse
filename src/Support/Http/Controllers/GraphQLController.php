@@ -50,7 +50,7 @@ class GraphQLController extends Controller
      */
     public function query(Request $request)
     {
-        $batched = isset($request[0]) && config('lighthouse.batched_queries', true);
+        $batched = isset($request->toArray()[0]) && config('lighthouse.batched_queries', true);
 
         $this->extensionRegistry->requestDidStart(
             new ExtensionRequest($request, $batched)
