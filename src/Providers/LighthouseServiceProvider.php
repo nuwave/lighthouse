@@ -18,8 +18,8 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Support\Http\Responses\CanStreamResponse;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
