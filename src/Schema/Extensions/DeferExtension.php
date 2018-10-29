@@ -138,7 +138,7 @@ class DeferExtension extends GraphQLExtension
             return $this->resolve($originalResolver, $path);
         }
 
-        return $this->data[$path];
+        return array_get($this->data, "data.{$path}");
     }
 
     /**
@@ -180,7 +180,7 @@ class DeferExtension extends GraphQLExtension
      */
     public function hasData(string $path): bool
     {
-        return isset($this->data[$path]);
+        return array_has($this->data, "data.{$path}");
     }
 
     /**
