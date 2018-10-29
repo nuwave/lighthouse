@@ -8,27 +8,32 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
 
 class BroadcastDirective extends BaseDirective implements FieldMiddleware
 {
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     protected $registry;
 
-    /**
-     * @var BroadcastsSubscriptions
-     */
+    /** @var BroadcastsSubscriptions */
     protected $broadcaster;
+
+    /** @var ExceptionHandler */
+    protected $exceptionHandler;
 
     /**
      * @param Registry                $registry
      * @param BroadcastsSubscriptions $broadcaster
+     * @param ExceptionHandler        $exceptionHandler
      */
-    public function __construct(Registry $registry, BroadcastsSubscriptions $broadcaster)
-    {
+    public function __construct(
+        Registry $registry,
+        BroadcastsSubscriptions $broadcaster,
+        ExceptionHandler $exceptionHandler
+    ) {
         $this->registry = $registry;
         $this->broadcaster = $broadcaster;
+        $this->exceptionHandler = $exceptionHandler;
     }
 
     /**
@@ -81,11 +86,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
                     );
                 }
             } catch (\Exception $e) {
-                // TODO: Create a BroadcastExceptionHandler so the implementation can be switched out.
-                info('broadcast.exception', [
-                    'message' => $e->getMessage(),
-                    'stack' => $e->getTrace(),
-                ]);
+                $this->exceptionHandler->handleBroadcastError($e);
             }
 
             return $resolved;

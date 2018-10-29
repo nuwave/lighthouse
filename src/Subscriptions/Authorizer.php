@@ -7,27 +7,29 @@ use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
+use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
 
 class Authorizer implements Auth
 {
-    /**
-     * @var Storage
-     */
+    /** @var Storage */
     protected $storage;
 
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     protected $registry;
 
+    /** @var ExceptionHandler */
+    protected $exceptionHandler;
+
     /**
-     * @param Storage  $storage
-     * @param Registry $registry
+     * @param Storage          $storage
+     * @param Registry         $registry
+     * @param ExceptionHandler $exceptionHandler
      */
-    public function __construct(Storage $storage, Registry $registry)
+    public function __construct(Storage $storage, Registry $registry, ExceptionHandler $exceptionHandler)
     {
         $this->storage = $storage;
         $this->registry = $registry;
+        $this->exceptionHandler = $exceptionHandler;
     }
 
     /**
@@ -54,7 +56,8 @@ class Authorizer implements Auth
                 }
             );
         } catch (\Exception $e) {
-            // TODO: Add handler interface to optionally log this exception
+            $this->exceptionHandler->handleAuthError($e);
+
             return false;
         }
     }

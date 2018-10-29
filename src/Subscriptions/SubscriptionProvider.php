@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Directives\BroadcastDirective;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Directives\SubscriptionDirective;
+use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
@@ -29,6 +30,7 @@ class SubscriptionProvider
         $app->bind(StoresSubscriptions::class, DatabaseStorage::class);
         $app->bind(AuthorizesSubscriptions::class, Authorizer::class);
         $app->bind(SubscriptionIterator::class, SyncIterator::class);
+        $app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
 
         $app->singleton(SubscriptionRegistry::class);
         $app->singleton(BroadcastsSubscriptions::class, function ($app) {
