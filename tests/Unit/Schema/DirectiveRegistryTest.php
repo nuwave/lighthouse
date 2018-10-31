@@ -64,7 +64,7 @@ class DirectiveRegistryTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->buildSchemaWithDefaultQuery('
+        $this->buildSchemaWithPlaceholderQuery('
             scalar DateTime @scalar @foo
         ');
     }

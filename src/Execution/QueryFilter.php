@@ -41,7 +41,7 @@ class QueryFilter
     public static function getInstance(FieldValue $value): QueryFilter
     {
         $handler = static::QUERY_FILTER_KEY
-            . '.' . strtolower($value->getNodeName())
+            . '.' . strtolower($value->getParentName())
             . '.' . strtolower($value->getFieldName());
 
         // Get an existing instance or register a new one

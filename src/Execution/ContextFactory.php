@@ -18,6 +18,6 @@ class ContextFactory implements CreatesContext
      */
     public function generate(Request $request): GraphQLContext
     {
-        return new Context($request, $request->user());
+        return new Context($request);
     }
 }

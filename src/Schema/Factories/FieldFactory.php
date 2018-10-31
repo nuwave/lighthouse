@@ -7,10 +7,10 @@ use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldFactory
 {
@@ -22,23 +22,19 @@ class FieldFactory
     protected $argumentFactory;
     /** @var Pipeline */
     protected $pipeline;
-    /** @var DefinitionNodeConverter */
-    protected $definitionNodeConverter;
 
     /**
      * @param DirectiveRegistry $directiveRegistry
      * @param ValueFactory $valueFactory
      * @param ArgumentFactory $argumentFactory
      * @param Pipeline $pipeline
-     * @param DefinitionNodeConverter $definitionNodeConverter
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, ValueFactory $valueFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline, DefinitionNodeConverter $definitionNodeConverter)
+    public function __construct(DirectiveRegistry $directiveRegistry, ValueFactory $valueFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {
         $this->directiveRegistry = $directiveRegistry;
         $this->valueFactory = $valueFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
-        $this->definitionNodeConverter = $definitionNodeConverter;
     }
 
     /**
@@ -53,18 +49,18 @@ class FieldFactory
     public function handle(FieldValue $fieldValue): array
     {
         $fieldDefinition = $fieldValue->getField();
-    
-        $fieldType = $this->definitionNodeConverter->toType(
-            $fieldDefinition->type
-        );
-        $fieldValue->setType($fieldType);
 
-        $initialResolver = $this->directiveRegistry->hasFieldResolver($fieldDefinition)
-            ? $this->useResolverDirective($fieldValue)
-            : $this->defaultResolver($fieldValue);
+        if($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinition)){
+            $fieldValue = $fieldResolver->resolveField($fieldValue);
+        }
+
+        $initialResolver = $fieldValue->getResolver();
 
         $inputValueDefinitions = $this->getInputValueDefinitions($fieldValue);
-        $resolverWithAdditionalArgs = $this->injectAdditionalArgs($initialResolver, $fieldValue->getAdditionalArgs());
+        $resolverWithAdditionalArgs = $this->injectAdditionalArgs(
+            $initialResolver,
+            $fieldValue->getAdditionalArgs()
+        );
         $resolverWithValidation = $this->wrapResolverWithValidation($resolverWithAdditionalArgs, $inputValueDefinitions);
 
         $fieldValue->setResolver($resolverWithValidation);
@@ -75,86 +71,23 @@ class FieldFactory
                 $this->directiveRegistry->fieldMiddleware($fieldDefinition)
             )
             ->via('handleField')
-            ->then(function (FieldValue $fieldValue) {
-                return $fieldValue;
-            })
+            ->then(
+                function (FieldValue $fieldValue): FieldValue {
+                    return $fieldValue;
+                }
+            )
             ->getResolver();
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
             'name' => $fieldDefinition->name->value,
-            'type' => $fieldType,
+            'type' => $fieldValue->getReturnType(),
             'args' => $inputValueDefinitions->toArray(),
             'resolve' => $resolverWithMiddleware,
             'description' => data_get($fieldDefinition->description, 'value'),
             'complexity' => $fieldValue->getComplexity(),
         ];
-    }
-
-    /**
-     * Use directive resolver to transform field.
-     *
-     * @param FieldValue $value
-     *
-     * @throws DirectiveException
-     *
-     * @return \Closure
-     */
-    protected function useResolverDirective(FieldValue $value): \Closure
-    {
-        return $this->directiveRegistry
-            ->fieldResolver($value->getField())
-            ->resolveField($value)
-            ->getResolver();
-    }
-
-    /**
-     * Get default field resolver.
-     *
-     * @param FieldValue $fieldValue
-     *
-     * @return \Closure
-     */
-    protected function defaultResolver(FieldValue $fieldValue): \Closure
-    {
-        switch ($fieldValue->getNodeName()) {
-            case 'Mutation':
-                return $this->rootOperationResolver(
-                    $fieldValue->getFieldName(),
-                    'mutations'
-                );
-            case 'Query':
-                return $this->rootOperationResolver(
-                    $fieldValue->getFieldName(),
-                    'queries'
-                );
-            default:
-                // TODO convert this back once we require PHP 7.1
-//                return \Closure::fromCallable(
-//                    [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
-//                );
-                return function() {
-                    return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
-                };
-        }
-    }
-
-    /**
-     * Get the default resolver for a field of the root operation types.
-     *
-     * @param string $fieldName
-     * @param string $rootOperationType One of [queries|mutations]
-     *
-     * @return \Closure
-     */
-    protected function rootOperationResolver(string $fieldName, string $rootOperationType): \Closure
-    {
-        return function ($obj, array $args, $context = null, $info = null) use ($fieldName, $rootOperationType) {
-            $class = config("lighthouse.namespaces.{$rootOperationType}").'\\'.studly_case($fieldName);
-    
-            return resolve($class)->resolve($obj, $args, $context, $info);
-        };
     }
 
     /**
@@ -248,7 +181,7 @@ class FieldFactory
      * This iterates through them and ensures they are called.
      *
      * @param array $inputArguments
-     * @param Collection<array> $argumentValues
+     * @param Collection<array> $inputValueDefinitions
      *
      * @return array
      */
@@ -272,17 +205,19 @@ class FieldFactory
     /**
      * Get rules for field.
      *
-     * @param mixed            $rootValue
-     * @param array            $inputArgs
-     * @param mixed            $context
+     * @param mixed $rootValue
+     * @param array $inputArgs
+     * @param mixed $context
      * @param ResolveInfo|null $resolveInfo
-     * @param Collection       $inputValueDefinitions
+     * @param Collection $inputValueDefinitions
      *
-     * @return array [$rules, $messages]
+     * @throws ParseException
+     *
+     * @return array[] [array $rules, array $messages]
      */
     public function getRulesAndMessages(
         $rootValue,
-        $inputArgs,
+        array $inputArgs,
         $context,
         ResolveInfo $resolveInfo = null,
         Collection $inputValueDefinitions
@@ -290,7 +225,7 @@ class FieldFactory
         $resolveArgs = [$rootValue, $inputArgs, $context, $resolveInfo];
 
         $rules = $inputValueDefinitions
-            ->map(function (array $inputValueDefinition, $key) use ($resolveArgs) {
+            ->map(function (array $inputValueDefinition) use ($resolveArgs) {
                 $rules = data_get($inputValueDefinition, 'rules');
 
                 if (! $rules) {
@@ -305,7 +240,9 @@ class FieldFactory
             })
             ->filter();
 
-        $messages = $inputValueDefinitions->pluck('messages')->collapse();
+        $messages = $inputValueDefinitions
+            ->pluck('messages')
+            ->collapse();
 
         list($nestedRules, $nestedMessages) = RuleFactory::build(
             $resolveInfo->fieldName,
@@ -317,6 +254,9 @@ class FieldFactory
         $rules = $rules->merge($nestedRules);
         $messages = $messages->merge($nestedMessages);
 
-        return [ $rules->toArray(), $messages->toArray(), ];
+        return [
+            $rules->toArray(),
+            $messages->toArray(),
+        ];
     }
 }

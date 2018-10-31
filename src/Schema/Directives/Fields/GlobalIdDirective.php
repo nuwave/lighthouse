@@ -32,7 +32,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMid
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
-        $type = $value->getNodeName();
+        $type = $value->getParentName();
         $resolver = $value->getResolver();
 
         return $next(

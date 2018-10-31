@@ -306,4 +306,38 @@ class PaginateDirectiveTest extends DBTestCase
         );
         $this->assertCount(0, array_get($result->data, 'users.data'));
     }
+
+    /**
+     * @test
+     */
+    public function itPaginatesWhenDefinedInTypeExtension()
+    {
+        factory(User::class, 2)->create();
+
+        $schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+
+        extend type Query @group {
+            users: [User!]! @paginate(model: "User")
+        }
+        ' . $this->placeholderQuery();
+
+        $query = '
+        {
+            users(count: 1) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ';
+
+        $result = $this->executeQuery($schema, $query);
+
+        $this->assertCount(1, array_get($result->data, 'users.data'));
+    }
 }

@@ -12,11 +12,7 @@ class BuildingASTTest extends TestCase
      */
     public function itInjectsSourceSchemaIntoEvent()
     {
-        $schema = '
-        type Query {
-            foo: Int
-        }
-        ';
+        $schema = $this->placeholderQuery();
         
         resolve('events')->listen(
             BuildingAST::class,
@@ -25,7 +21,7 @@ class BuildingASTTest extends TestCase
             }
         );
     
-        $this->buildSchemaFromString($schema);
+        $this->buildSchema($schema);
     }
     
     /**

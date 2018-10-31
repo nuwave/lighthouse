@@ -32,9 +32,11 @@ trait CanParseResolvers
             return $namespace ? $namespace . '\\' . $className : $className;
         }
 
-        return $value->getNode()->getNamespace(
-            $this->getResolverClassName($directive, $throw)
-        );
+        return $value
+            ->getParent()
+            ->getNamespace(
+                $this->getResolverClassName($directive, $throw)
+            );
     }
 
     /**

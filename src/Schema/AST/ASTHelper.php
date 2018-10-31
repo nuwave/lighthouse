@@ -17,6 +17,7 @@ use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 class ASTHelper
@@ -32,7 +33,7 @@ class ASTHelper
      * Remove this method (and possibly the entire class) once it is resolved.
      *
      * @param NodeList|array $original
-     * @param array          $addition
+     * @param NodeList|array $addition
      *
      * @return NodeList
      */
@@ -46,32 +47,42 @@ class ASTHelper
     }
 
     /**
-     * This function will merge two lists uniquely by name. Fields will
-     * be removed from the original list if the name exists in both lists.
+     * This function will merge two lists uniquely by name.
      *
      * @param NodeList|array $original
-     * @param array          $addition
+     * @param NodeList|array $addition
+     * @param bool $overwriteDuplicates By default this throws if a collision occurs. If
+     * this is set to true, the fields of the original list will be overwritten.
+     *
+     * @throws DefinitionException
      *
      * @return NodeList
      */
-    public static function mergeUniqueNodeList($original, $addition): NodeList
+    public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
     {
-        $newFields = collect($addition)
+        $newNames = collect($addition)
             ->pluck('name.value')
             ->filter()
             ->all();
         
-        $filteredList = collect($original)
-            ->filter(function ($field) use ($newFields) {
-                return ! in_array(
-                    data_get($field, 'name.value'),
-                    $newFields
+        $remainingDefinitions = collect($original)
+            ->reject(function ($definition) use ($newNames, $overwriteDuplicates) {
+                $oldName = $definition->name->value;
+                $collisionOccured = in_array(
+                    $oldName,
+                    $newNames
                 );
+
+                if($collisionOccured && ! $overwriteDuplicates){
+                    throw new DefinitionException("Duplicate definition {$oldName} found when merging.");
+                }
+
+                return $collisionOccured;
             })
             ->values()
             ->all();
 
-        return self::mergeNodeList($filteredList, $addition);
+        return self::mergeNodeList($remainingDefinitions, $addition);
     }
 
     /**
@@ -87,12 +98,13 @@ class ASTHelper
             $node->toArray(true)
         );
     }
-    
+
     /**
      * @param FieldDefinitionNode $field
      *
+     * @throws DefinitionException
+     *
      * @return string
-     * @throws \Exception
      */
     public static function getFieldTypeName(FieldDefinitionNode $field): string
     {
@@ -104,12 +116,13 @@ class ASTHelper
         /** @var NamedTypeNode $type */
         return $type->name->value;
     }
-    
+
     /**
      * @param Node $node
      *
+     * @throws DefinitionException
+     *
      * @return NamedTypeNode
-     * @throws \Exception
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
@@ -118,9 +131,9 @@ class ASTHelper
         }
         
         $type = data_get($node, 'type');
-        
+
         if(!$type){
-            throw new \Exception("The node '$node->kind' does not have a type associated with it.");
+            throw new DefinitionException("The node '$node->kind' does not have a type associated with it.");
         }
         
         return self::getUnderlyingNamedTypeNode($type);
@@ -161,16 +174,15 @@ class ASTHelper
             : $default;
     }
 
-
     /**
      * Get argument's value.
      *
-     * @param Node  $arg
+     * @param ArgumentNode $arg
      * @param mixed $default
      *
      * @return mixed
      */
-    public static function argValue(Node $arg, $default = null)
+    public static function argValue(ArgumentNode $arg, $default = null)
     {
         $valueNode = $arg->value;
 
@@ -178,25 +190,9 @@ class ASTHelper
             return $default;
         }
 
-        if ($valueNode instanceof ListValueNode) {
-            return collect($valueNode->values)
-                ->map(function (ValueNode $valueNode) {
-                    return $valueNode->value;
-                })
-                ->toArray();
-        }
-
-        if ($valueNode instanceof ObjectValueNode) {
-            return collect($valueNode->fields)
-                ->mapWithKeys(function (ObjectFieldNode $field) {
-                    return [$field->name->value => self::argValue($field)];
-                })
-                ->toArray();
-        }
-
-        return $valueNode->value;
+        return AST::valueFromASTUntyped($valueNode);
     }
-    
+
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *

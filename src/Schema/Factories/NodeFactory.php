@@ -28,6 +28,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\UnionDirective;
 use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
@@ -171,14 +172,13 @@ class NodeFactory
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     // Get the directive that is defined on the field itself
                     $directive = ASTHelper::directiveDefinition( $field, 'enum');
-                
-                    if (!$directive) {
-                        return [];
-                    }
-                
+
                     return [
                         $field->name->value => [
-                            'value' => ASTHelper::directiveArgValue($directive, 'value'),
+                            // If no explicit value is given, we default to the field name
+                            'value' => $directive
+                                ? ASTHelper::directiveArgValue($directive, 'value')
+                                : $field->name->value,
                             'description' => data_get($field->description, 'value'),
                         ]
                     ];
@@ -251,11 +251,12 @@ class NodeFactory
             'fields' => $this->resolveInputFieldsFunction($inputDefinition),
         ]);
     }
-    
+
     /**
      * @param InterfaceTypeDefinitionNode $interfaceDefinition
      *
      * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return InterfaceType
      */
@@ -267,12 +268,12 @@ class NodeFactory
             $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
 
             if($interfaceDirective->directiveHasArgument('resolveType')){
-                $typeResolver = $interfaceDirective->getMethodArgument('resolveType');
+                $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
             } else {
                 /**
                  * @deprecated in v3 this will only be available as the argument resolveType
                  */
-                $typeResolver = $interfaceDirective->getMethodArgument('resolver');
+                $typeResolver = $interfaceDirective->getResolverFromArgument('resolver');
             }
         } else {
             $interfaceClass = \namespace_classname($nodeName, [
@@ -291,11 +292,12 @@ class NodeFactory
             'resolveType' => $typeResolver,
         ]);
     }
-    
+
     /**
      * @param UnionTypeDefinitionNode $unionDefinition
      *
      * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return UnionType
      */
@@ -307,12 +309,12 @@ class NodeFactory
             $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
 
             if($unionDirective->directiveHasArgument('resolveType')){
-                $typeResolver = $unionDirective->getMethodArgument('resolveType');
+                $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
             } else {
                 /**
                  * @deprecated in v3 this will only be available as the argument resolveType
                  */
-                $typeResolver = $unionDirective->getMethodArgument('resolver');
+                $typeResolver = $unionDirective->getResolverFromArgument('resolver');
             }
         } else {
             $unionClass = \namespace_classname($nodeName, [

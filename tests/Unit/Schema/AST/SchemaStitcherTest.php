@@ -205,4 +205,35 @@ other
 EOT
         );
     }
+
+    /**
+     * @test
+     */
+    public function itAddsNewlineToTheEndOfImportedFile()
+    {
+        $this->putRootSchema(<<<EOT
+foo
+#import bar
+#import foobar
+EOT
+        );
+
+        $this->filesystem->put('bar', <<<EOT
+bar
+EOT
+        );
+
+        $this->filesystem->put('foobar', <<<EOT
+foobar
+EOT
+        );
+
+        $this->assertSchemaResultIsSame(<<<EOT
+foo
+bar
+foobar
+
+EOT
+        );
+    }
 }

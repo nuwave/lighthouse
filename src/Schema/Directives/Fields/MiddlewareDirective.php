@@ -2,19 +2,55 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
+use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\NodeList;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Pipeline;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Illuminate\Routing\MiddlewareNameResolver;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Exceptions\ParseException;
+use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class MiddlewareDirective extends BaseDirective implements FieldMiddleware
+class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
 {
+    /** @var string todo remove as soon as name() is static itself */
+    const NAME = 'middleware';
+
+    /** @var Pipeline */
+    protected $pipeline;
+    /** @var CreatesContext */
+    protected $createsContext;
+
+    /**
+     * @param Pipeline $pipeline
+     * @param CreatesContext $createsContext
+     */
+    public function __construct(Pipeline $pipeline, CreatesContext $createsContext)
+    {
+        $this->pipeline = $pipeline;
+        $this->createsContext = $createsContext;
+    }
+
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'middleware';
     }
@@ -27,52 +63,114 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
-        $checks = $this->getChecks($value);
+        $middleware = $this->getQualifiedMiddlewareNames(
+            $this->directiveArgValue('checks')
+        );
+        $resolver = $value->getResolver();
 
-        if ($checks) {
-            $middlewareRegistry = resolve(MiddlewareRegistry::class);
-
-            if ('Query' === $value->getNodeName()) {
-                $middlewareRegistry->registerQuery(
-                    $value->getFieldName(),
-                    $checks
-                );
-            } elseif ('Mutation' === $value->getNodeName()) {
-                $middlewareRegistry->registerMutation(
-                    $value->getFieldName(),
-                    $checks
-                );
-            }
-        }
-
-        return $next($value);
+        return $next(
+            $value->setResolver(
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $middleware) {
+                    return $this->pipeline
+                        ->send($context->request())
+                        ->through($middleware)
+                        ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo){
+                            return $resolver(
+                                $root,
+                                $args,
+                                $this->createsContext->generate($request),
+                                $resolveInfo
+                            );
+                        });
+                }
+            )
+        );
     }
 
     /**
-     * Get middleware checks.
+     * @param Node $node
+     * @param DocumentAST $documentAST
      *
-     * @param FieldValue $value
+     * @throws ParseException
+     * @throws DirectiveException
      *
-     * @return array|null
+     * @return DocumentAST
      */
-    protected function getChecks(FieldValue $value)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
-        if (! in_array($value->getNodeName(), ['Mutation', 'Query'])) {
-            return null;
+        return $documentAST->setDefinition(
+            self::addMiddlewareDirectiveToFields(
+                $node,
+                $this->directiveArgValue('checks')
+            )
+        );
+    }
+
+    /**
+     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
+     * @param array $middlewareArgValue
+     *
+     * @throws ParseException
+     * @throws DirectiveException
+     *
+     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
+     */
+    public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
+    {
+        if ( ! $objectType instanceof ObjectTypeDefinitionNode
+            && ! $objectType instanceof ObjectTypeExtensionNode
+        ) {
+            throw new DirectiveException(
+                'The ' . self::NAME . ' directive may only be placed on fields or object types.'
+            );
         }
 
-        $checks = $this->directiveArgValue('checks');
+        $middlewareArgValue = collect($middlewareArgValue)
+            ->map(function(string $middleware){
+                // Add slashes, as re-parsing of the values removes a level of slashes
+                return addslashes($middleware);
+            })
+            ->implode('", "');
 
-        if (! $checks) {
-            return null;
-        }
+        $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
 
-        if (is_string($checks)) {
-            $checks = [$checks];
-        }
+        $objectType->fields = new NodeList(
+            collect($objectType->fields)
+                ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
+                    // If the field already has middleware defined, skip over it
+                    // Field middleware are more specific then those defined on a type
+                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
+                        return $fieldDefinition;
+                    }
 
-        return $checks;
+                    $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
+
+                    return $fieldDefinition;
+                })
+                ->toArray()
+        );
+
+        return $objectType;
+    }
+
+    /**
+     * @param $middlewareArgValue
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
+    {
+        /** @var Router $router */
+        $router = resolve('router');
+        $middleware = $router->getMiddleware();
+        $middlewareGroups = $router->getMiddlewareGroups();
+
+        return collect($middlewareArgValue)
+            ->map(function (string $name) use ($middleware, $middlewareGroups) {
+                return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
+            })
+            ->flatten();
     }
 }

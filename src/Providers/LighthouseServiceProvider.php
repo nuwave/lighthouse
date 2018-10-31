@@ -10,7 +10,6 @@ use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
@@ -68,7 +67,6 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(DirectiveRegistry::class);
         $this->app->singleton(ExtensionRegistry::class);
         $this->app->singleton(NodeRegistry::class);
-        $this->app->singleton(MiddlewareRegistry::class);
         $this->app->singleton(TypeRegistry::class);
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
 
@@ -81,13 +79,15 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Nuwave\Lighthouse\Console\UnionCommand::class,
-                \Nuwave\Lighthouse\Console\ScalarCommand::class,
-                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
-                \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
                 \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
                 \Nuwave\Lighthouse\Console\CreateMigrationsCommand::class,
+                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
+                \Nuwave\Lighthouse\Console\MutationCommand::class,
+                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
+                \Nuwave\Lighthouse\Console\QueryCommand::class,
+                \Nuwave\Lighthouse\Console\UnionCommand::class,
+                \Nuwave\Lighthouse\Console\ScalarCommand::class,
+                \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
             ]);
         }
 

@@ -83,8 +83,12 @@ class DirectiveRegistry
             return $this;
         }
 
+        $fileIterator = (new Finder)
+            ->in($paths)
+            ->files();
+
         /** @var SplFileInfo $file */
-        foreach ((new Finder)->in($paths)->files() as $file) {
+        foreach ($fileIterator as $file) {
             // Cut off the given root path to get the path that is equivalent to the namespace
             $namespaceRelevantPath = str_after(
                 $file->getPathname(),
@@ -157,7 +161,7 @@ class DirectiveRegistry
         // Always return a new instance of the directive class to avoid side effects between them
         return resolve(\get_class($directive));
     }
-    
+
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
@@ -178,6 +182,34 @@ class DirectiveRegistry
             ->map(function (Directive $directive) use ($node) {
                 return $this->hydrate($directive, $node);
             });
+    }
+
+    /**
+     * Get a single directive of a type that belongs to an AST node.
+     *
+     * Use this for directives types that can only occur once, such as field resolvers.
+     * This throws if more than one such directive is found.
+     *
+     * @param Node $node
+     * @param string $directiveClass
+     *
+     * @throws DirectiveException
+     *
+     * @return Directive|null
+     */
+    protected function singleDirectiveOfType(Node $node, string $directiveClass)
+    {
+        $directives = $this->associatedDirectivesOfType($node, $directiveClass);
+
+        if ($directives->count() > 1) {
+            $directiveNames = $directives->implode(', ');
+
+            throw new DirectiveException(
+                "Node [{$node->name->value}] can only have one directive of type [{$directiveClass}] but found [{$directiveNames}]"
+            );
+        }
+
+        return $directives->first();
     }
 
     /**
@@ -221,17 +253,10 @@ class DirectiveRegistry
      */
     public function nodeResolver(TypeDefinitionNode $node)
     {
-        $resolvers = $this->associatedDirectivesOfType($node, NodeResolver::class);
-
-        if ($resolvers->count() > 1) {
-            $resolverNames = $resolvers->implode(', ');
-    
-            throw new DirectiveException("Type [{$node->name->value}] has more then one resolver directive: [{$resolverNames}]");
-        }
-
-        return $resolvers->first();
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->singleDirectiveOfType($node, NodeResolver::class);
     }
-    
+
     /**
      * Check if the given node has a type resolver directive handler assigned to it.
      *
@@ -283,17 +308,7 @@ class DirectiveRegistry
      */
     public function fieldResolver($field)
     {
-        $resolvers = $this->associatedDirectivesOfType($field, FieldResolver::class);
-
-        if ($resolvers->count() > 1) {
-            $resolverNames = $resolvers->implode(', ');
-            
-            throw new DirectiveException(
-                "Field [{$field->name->value}] has more then one resolver directive: [{$resolverNames}]"
-            );
-        }
-
-        return $resolvers->first();
+        return $this->singleDirectiveOfType($field, FieldResolver::class);
     }
 
     /**
@@ -333,6 +348,8 @@ class DirectiveRegistry
     }
 
     /**
+     * Set the given definition on the directive.
+     *
      * @param Directive                $directive
      * @param TypeSystemDefinitionNode $definitionNode
      *

@@ -5,39 +5,42 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldValue
 {
     /**
-     * Current type.
+     * An instance of the type that this field returns.
      *
-     * @var \Closure|Type
+     * @var Type|null
      */
-    protected $type;
+    protected $returnType;
 
     /**
-     * Current field.
+     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
      *
-     * @var FieldDefinitionNode
+     * @var FieldDefinitionNode|InputValueDefinitionNode
      */
     protected $field;
 
     /**
-     * Current node (type).
+     * The parent type of the field.
      *
      * @var NodeValue
      */
-    protected $node;
+    protected $parent;
 
     /**
-     * Field resolver closure.
+     * The actual field resolver.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected $resolver;
 
     /**
-     * Field complexity.
+     * A closure that determines the complexity of executing the field.
      *
      * @var \Closure
      */
@@ -60,37 +63,24 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param NodeValue           $node
-     * @param FieldDefinitionNode $field
+     * @param NodeValue           $parent
+     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * @param FieldDefinitionNode|InputValueDefinitionNode $field
      */
-    public function __construct(NodeValue $node, $field)
+    public function __construct(NodeValue $parent, $field)
     {
-        $this->node = $node;
+        $this->parent = $parent;
         $this->field = $field;
     }
 
     /**
-     * Set current type.
+     * Overwrite the current/default resolver.
      *
-     * @param \Closure|Type $type
-     *
-     * @return FieldValue
-     */
-    public function setType($type): FieldValue
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Set current resolver.
-     *
-     * @param \Closure|null $resolver
+     * @param \Closure $resolver
      *
      * @return FieldValue
      */
-    public function setResolver(\Closure $resolver = null): FieldValue
+    public function setResolver(\Closure $resolver): FieldValue
     {
         $this->resolver = $resolver;
 
@@ -98,7 +88,7 @@ class FieldValue
     }
 
     /**
-     * Set current complexity.
+     * Define a closure that is used to determine the complexity of the field.
      *
      * @param \Closure $complexity
      *
@@ -121,9 +111,10 @@ class FieldValue
      */
     public function injectArg(string $key, $value): FieldValue
     {
-        $this->additionalArgs = array_merge($this->additionalArgs, [
-            $key => $value,
-        ]);
+        $this->additionalArgs = array_merge(
+            $this->additionalArgs,
+            [$key => $value]
+        );
 
         return $this;
     }
@@ -137,29 +128,41 @@ class FieldValue
     }
 
     /**
-     * Get current type.
+     * Get an instance of the return type of the field.
      *
-     * @return \Closure|Type
+     * @return Type
      */
-    public function getType()
+    public function getReturnType(): Type
     {
-        return $this->type;
+        if(! isset($this->returnType)){
+            $this->returnType = resolve(DefinitionNodeConverter::class)->toType(
+                $this->field->type
+            );
+        }
+
+        return $this->returnType;
     }
 
     /**
-     * Get current node.
-     *
      * @return NodeValue
      */
-    public function getNode(): NodeValue
+    public function getParent(): NodeValue
     {
-        return $this->node;
+        return $this->parent;
     }
 
     /**
-     * Get current field.
+     * @return string
+     */
+    public function getParentName(): string
+    {
+        return $this->getParent()->getNodeName();
+    }
+
+    /**
+     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
      *
-     * @return FieldDefinitionNode
+     * @return FieldDefinitionNode|InputValueDefinitionNode
      */
     public function getField()
     {
@@ -173,12 +176,56 @@ class FieldValue
      */
     public function getResolver(): \Closure
     {
+        if(!isset($this->resolver)){
+            $this->resolver = $this->defaultResolver();
+        }
+
         return $this->resolver;
     }
 
     /**
-     * Get current description.
+     * Get default field resolver.
      *
+     * @throws DefinitionException
+     *
+     * @return \Closure
+     */
+    protected function defaultResolver(): \Closure
+    {
+        if($namespace = $this->getDefaultNamespaceForParent()){
+            return construct_resolver(
+                $namespace . '\\' . studly_case($this->getFieldName()),
+                'resolve'
+            );
+        }
+
+        // TODO convert this back once we require PHP 7.1
+        // return \Closure::fromCallable(
+        //     [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
+        // );
+        return function() {
+            return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
+        };
+    }
+
+    /**
+     * If a default namespace exists for the parent type, return it.
+     *
+     * @return string|null
+     */
+    public function getDefaultNamespaceForParent()
+    {
+        switch ($this->getParentName()) {
+            case 'Mutation':
+                return config('lighthouse.namespaces.mutations');
+            case 'Query':
+                return config('lighthouse.namespaces.queries');
+            default:
+                return null;
+        }
+    }
+
+    /**
      * @return StringValueNode|null
      */
     public function getDescription()
@@ -196,28 +243,7 @@ class FieldValue
         return $this->complexity;
     }
 
-
     /**
-     * Get private cache flag.
-     *
-     * @param null $flag
-     *
-     * @return FieldValue|bool
-     */
-    public function isPrivateCache($flag = null)
-    {
-        if (null === $flag) {
-            return $this->privateCache;
-        }
-
-        $this->privateCache = $flag;
-
-        return $this;
-    }
-
-    /**
-     * Get field name.
-     *
      * @return string
      */
     public function getFieldName(): string
@@ -226,12 +252,37 @@ class FieldValue
     }
 
     /**
+     * @return NodeValue
+     * @deprecated
+     */
+    public function getNode(): NodeValue
+    {
+        return $this->getParent();
+    }
+
+    /**
      * Get field's node name.
      *
      * @return string
+     * @deprecated
      */
     public function getNodeName(): string
     {
-        return $this->getNode()->getNodeName();
+        return $this->getParentName();
+    }
+
+    /**
+     * Set current type.
+     *
+     * @param \Closure|Type $type
+     *
+     * @return FieldValue
+     * @deprecated Do this sort of manipulation in the DocumentAST in the future.
+     */
+    public function setType($type): FieldValue
+    {
+        $this->returnType = $type;
+
+        return $this;
     }
 }
