@@ -4,17 +4,17 @@ about: Report a bug to help us improve Lighthouse
 
 ---
 
-Before posting this issue, please ask yourself:
+<!-- Before posting this issue, please ask yourself:
 - Is your issue actually a question? -> Ask in Slack
-- Is it about the docs? -> https://github.com/nuwave/lighthouse-docs/issues/
+- Is it about the docs? -> https://github.com/nuwave/lighthouse-docs/issues/ -->
 
 **Describe the bug**
 
-/* A clear and concise description of what the bug is. */
+<!-- A clear and concise description of what the bug is. -->
 
 **Expected behavior**
 
-/* A clear and concise description of what you expected to happen. */
+<!-- A clear and concise description of what you expected to happen. -->
 
 **Schema**
 
@@ -36,4 +36,4 @@ PHP Version:
 
 **Additional context**
 
-/* Add any other context about the problem here. */
+<!-- Add any other context about the problem here. -->
