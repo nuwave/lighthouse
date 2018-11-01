@@ -3,17 +3,19 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
+use Nuwave\Lighthouse\Exceptions\ParseClientException;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
 class DeferExtensionTest extends TestCase
 {
-    /** @var array */
-    public static $data = [];
-
     /** @var MemoryStream */
     protected $stream;
+
+    /** @var array */
+    public static $data = [];
 
     /**
      * Define environment setup.
@@ -278,6 +280,170 @@ class DeferExtensionTest extends TestCase
         $deferredComment2 = $chunks[1]['posts.1.comments'];
         $this->assertCount(1, $deferredComment2);
         $this->assertEquals(self::$data[1]['comments'][0]['message'], array_get($deferredComment2[0], 'message'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCancelsDefermentAfterMaxExecutionTime()
+    {
+        /** @var DeferExtension $deferExtension */
+        $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
+        // Set max execution time to now so we immediately resolve deferred fields
+        $deferExtension->setMaxExecutionTime(microtime(true));
+
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+                'parent' => [
+                    'name' => 'Mr. Smith',
+                ],
+            ],
+        ];
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        type User {
+            name: String!
+            parent: User
+        }
+
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $query = '
+        { 
+            user {
+                name
+                parent @defer {
+                    name
+                    parent @defer {
+                        name
+                    }
+                }
+            }
+        }';
+
+        $this->postJson('/graphql', compact('query'))
+            ->baseResponse
+            ->send();
+
+        $chunks = $this->stream->chunks;
+        // If we didn't hit the max execution time we would have 3 items in the array
+        $this->assertCount(2, $chunks);
+
+        $this->assertEquals(self::$data['name'], array_get($chunks[0], 'data.user.name'));
+        $this->assertNull(array_get($chunks[0], 'data.user.parent'));
+
+        $deferred = array_get($chunks[1], 'user.parent');
+        $this->assertArrayHasKey('name', $deferred);
+        $this->assertEquals(self::$data['parent']['name'], $deferred['name']);
+        $this->assertArrayHasKey('parent', $deferred);
+        $this->assertEquals(self::$data['parent']['parent']['name'], $deferred['parent']['name']);
+    }
+
+    /**
+     * @test
+     */
+    public function itCancelsDefermentAfterMaxNestedFields()
+    {
+        config(['lighthouse.defer.max_nested_fields' => 1]);
+
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+                'parent' => [
+                    'name' => 'Mr. Smith',
+                ],
+            ],
+        ];
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        type User {
+            name: String!
+            parent: User
+        }
+
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $query = '
+        { 
+            user {
+                name
+                parent @defer {
+                    name
+                    parent @defer {
+                        name
+                    }
+                }
+            }
+        }';
+
+        $this->postJson('/graphql', compact('query'))
+            ->baseResponse
+            ->send();
+
+        $chunks = $this->stream->chunks;
+        $this->assertCount(2, $chunks);
+
+        $this->assertEquals(self::$data['name'], array_get($chunks[0], 'data.user.name'));
+        $this->assertNull(array_get($chunks[0], 'data.user.parent'));
+
+        $deferred = array_get($chunks[1], 'user.parent');
+        $this->assertArrayHasKey('name', $deferred);
+        $this->assertEquals(self::$data['parent']['name'], $deferred['name']);
+        $this->assertArrayHasKey('parent', $deferred);
+        $this->assertEquals(self::$data['parent']['parent']['name'], $deferred['parent']['name']);
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsExceptionOnNunNullableFields()
+    {
+        config([
+            'lighthouse.defer.max_nested_fields' => 1,
+            'app.debug' => false,
+        ]);
+
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+            ],
+        ];
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        type User {
+            name: String!
+            parent: User!
+        }
+
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $query = '
+        { 
+            user {
+                name
+                parent @defer {
+                    name
+                }
+            }
+        }';
+
+        $response = $this->postJson('/graphql', compact('query'))->json();
+
+        $this->assertArrayHasKey('errors', $response);
+        $this->assertEquals('schema', $response['errors'][0]['category']);
     }
 
     public function resolve()
