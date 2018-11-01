@@ -23,26 +23,40 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure $next
+     * @param FieldValue $fieldValue
+     * @param \Closure   $next
      *
      * @throws DirectiveException
      * @throws DefinitionException
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
-        return $next(
-            $value->setComplexity(
-                $this->directiveHasArgument('resolver')
-                    ? $this->getResolverFromArgument('resolver')
-                    : function ($childrenComplexity, $args) {
-                        $complexity = array_get($args, 'first', array_get($args, 'count', 1));
+        if ($this->directiveHasArgument('resolver')) {
+            list($className, $methodName) = $this->getMethodArgumentParts('resolver');
 
-                        return $childrenComplexity * $complexity;
-                    }
-            )
+            if ($parentNamespace = $fieldValue->getDefaultNamespaceForParent()) {
+                $namespacedClassName = $this->namespaceClassName($className, [$parentNamespace]);
+            } else {
+                $namespacedClassName = $this->namespaceClassName($className);
+            }
+
+            $resolver = construct_resolver($namespacedClassName, $methodName);
+        } else {
+            $resolver = function (int $childrenComplexity, array $args): int {
+                $complexity = array_get(
+                    $args,
+                    'first',
+                    array_get($args, 'count', 1)
+                );
+
+                return $childrenComplexity * $complexity;
+            };
+        }
+
+        return $next(
+            $fieldValue->setComplexity($resolver)
         );
     }
 }
