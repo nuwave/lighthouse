@@ -2,11 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\NonNullTypeNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Exceptions\ParseClientException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -46,15 +49,17 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     public function handleField(FieldValue $value, \Closure $next)
     {
         $resolver = $value->getResolver();
+        $fieldType = $value->getField()->type;
+
         $value->setResolver(
-            function ($root, $args, $context, ResolveInfo $info) use ($resolver) {
+            function ($root, $args, $context, ResolveInfo $info) use ($resolver, $fieldType) {
                 $path = implode('.', $info->path);
                 $extension = $this->getDeferExtension();
                 $wrappedResolver = function () use ($resolver, $root, $args, $context, $info) {
                     return $resolver($root, $args, $context, $info);
                 };
 
-                if (ASTHelper::fieldHasDirective($info->fieldNodes[0], 'defer')) {
+                if ($this->shouldDefer($fieldType, $info)) {
                     return $extension->defer($wrappedResolver, $path);
                 }
 
@@ -65,6 +70,28 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
         );
 
         return $next($value);
+    }
+
+    /**
+     * Determine of field should be deferred.
+     *
+     * @param TypeNode    $fieldType
+     * @param ResolveInfo $info
+     *
+     * @throws ParseClientException
+     *
+     * @return bool
+     */
+    protected function shouldDefer(TypeNode $fieldType, ResolveInfo $info): bool
+    {
+        $hasDirective = ASTHelper::fieldHasDirective($info->fieldNodes[0], 'defer') &&
+            ASTHelper::fieldDoesNotHaveDirective($info->fieldNodes[0], ['include', 'skip']);
+
+        if ($hasDirective && $fieldType instanceof NonNullTypeNode) {
+            throw new ParseClientException('The @defer directive cannot be placed on a Non-Nullable field.');
+        }
+
+        return $hasDirective;
     }
 
     /**

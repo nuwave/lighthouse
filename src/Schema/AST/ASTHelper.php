@@ -144,21 +144,35 @@ class ASTHelper
     /**
      * Check to see if a field contains a directive.
      *
-     * @param FieldNode $field
-     * @param string    $directiveName
+     * @param FieldNode    $field
+     * @param string|array $directives
      *
      * @return bool
      */
-    public static function fieldHasDirective(FieldNode $field, string $directiveName)
+    public static function fieldHasDirective(FieldNode $field, $directives)
     {
-        // TODO: Ensure field is not non-nullable, if so bail and return false
+        $directives = is_string($directives) ? [$directives] : $directives;
+
         foreach ($field->directives as $directive) {
-            if ($directive->name->value === $directiveName) {
+            if (in_array($directive->name->value, $directives)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Check to see if a field doesn't contain a directive.
+     *
+     * @param FieldNode    $field
+     * @param string|array $directives
+     *
+     * @return bool
+     */
+    public static function fieldDoesNotHaveDirective(FieldNode $field, $directives)
+    {
+        return ! self::fieldHasDirective($field, $directives);
     }
 
     /**
