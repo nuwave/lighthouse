@@ -20,12 +20,12 @@ class ComplexityDirectiveTest extends TestCase
             title: String
         }
         ');
-        $type = $schema->getType('User');
-        $fields = $type->config['fields']();
-        $complexity = $fields['posts']['complexity'];
+        $complexityFn = $schema->getType('User')
+            ->getField('posts')
+            ->getComplexityFn();
 
-        $this->assertEquals(100, $complexity(10, ['first' => 10]));
-        $this->assertEquals(100, $complexity(10, ['count' => 10]));
+        $this->assertSame(100, $complexityFn(10, ['first' => 10]));
+        $this->assertSame(100, $complexityFn(10, ['count' => 10]));
     }
 
     /**
@@ -46,15 +46,33 @@ class ComplexityDirectiveTest extends TestCase
             title: String
         }
         ');
-        $type = $schema->getType('User');
-        $fields = $type->config['fields']();
-        $complexity = $fields['posts']['complexity'];
+        $complexityFn = $schema->getType('User')
+            ->getField('posts')
+            ->getComplexityFn();
 
-        $this->assertEquals(100, $complexity(10, ['foo' => 10]));
+        $this->assertSame(100, $complexityFn(10, ['foo' => 10]));
     }
 
-    public function complexity($children, array $args)
+    /**
+     * @test
+     */
+    public function itResolvesComplexityResolverThroughDefaultNamespace()
     {
-        return $children * array_get($args, 'foo', 0);
+        $schema = $this->buildSchema('
+        type Query {
+            foo: Int
+                @complexity(resolver: "Foo@complexity")
+        }
+        ');
+        $complexityFn = $schema->getQueryType()
+            ->getField('foo')
+            ->getComplexityFn();
+
+        $this->assertSame(42, $complexityFn());
+    }
+
+    public function complexity(int $childrenComplexity, array $args): int
+    {
+        return $childrenComplexity * array_get($args, 'foo', 0);
     }
 }
