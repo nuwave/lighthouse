@@ -4,10 +4,24 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Context;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
 class Serializer implements ContextSerializer
 {
+    /**
+     * @var
+     */
+    protected $createsContext;
+
+    /**
+     * @param CreatesContext $createsContext
+     */
+    public function __construct(CreatesContext $createsContext)
+    {
+        $this->createsContext = $createsContext;
+    }
+
     /**
      * Serialize the context.
      *
@@ -40,19 +54,15 @@ class Serializer implements ContextSerializer
      */
     public function unserialize($context)
     {
-        $user = null;
-        $request = null;
         $data = json_decode($context, true);
 
-        if ($user = array_get($data, 'user')) {
-            $user = unserialize($user);
+        if (! $serializedRequest = array_get($data, 'request')) {
+            return null;
         }
 
-        if ($request = array_get($data, 'request')) {
-            $request = $this->unserializeRequest($request);
-        }
-
-        return new Context($request, $user);
+        return $this->createsContext->generate(
+            $this->unserializeRequest($serializedRequest)
+        );
     }
 
     /**
@@ -72,6 +82,7 @@ class Serializer implements ContextSerializer
             'files' => [],
             'server' => array_except($request->server->all(), ['HTTP_AUTHORIZATION']),
             'content' => $request->getContent(),
+            'user' => serialize($request->user()),
         ]);
     }
 
@@ -85,8 +96,7 @@ class Serializer implements ContextSerializer
     protected function unserializeRequest($request): Request
     {
         $data = json_decode($request, true);
-
-        return new Request(
+        $request = new Request(
             array_get($data, 'query'),
             array_get($data, 'request'),
             array_get($data, 'attributes'),
@@ -95,5 +105,13 @@ class Serializer implements ContextSerializer
             array_get($data, 'server'),
             array_get($data, 'content')
         );
+
+        $request->setUserResolver(function () use ($data) {
+            $user = array_get($data, 'user');
+
+            return ! empty($user) ? unserialize($user) : null;
+        });
+
+        return $request;
     }
 }
