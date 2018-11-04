@@ -2,10 +2,12 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Nuwave\Lighthouse\Subscriptions\Routes;
 use Illuminate\Contracts\Foundation\Application;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Storage\DatabaseStorage;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
+use Nuwave\Lighthouse\Subscriptions\Contracts\RegistersRoutes;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Directives\BroadcastDirective;
@@ -31,6 +33,7 @@ class SubscriptionProvider
         $app->bind(AuthorizesSubscriptions::class, Authorizer::class);
         $app->bind(SubscriptionIterator::class, SyncIterator::class);
         $app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
+        $app->bind(RegistersRoutes::class, Routes::class);
 
         $app->singleton(SubscriptionRegistry::class);
         $app->singleton(BroadcastsSubscriptions::class, function ($app) {

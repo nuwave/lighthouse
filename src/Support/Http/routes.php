@@ -17,24 +17,29 @@ resolve('router')->group(config('lighthouse.route', []), function () {
     ]);
 });
 
-if ($authController = config('lighthouse.subscriptions.auth.controller')) {
-    resolve('router')->group(config('lighthouse.subscriptions.auth.route', []), function () use ($authController) {
-        $routeName = config('lighthouse.subscriptions.auth.route_name');
+/** @var \Nuwave\Lighthouse\Subscriptions\Contracts\RegistersRoutes $subscriptionRoutes */
+$subscriptionRoutes = app(\Nuwave\Lighthouse\Subscriptions\Contracts\RegistersRoutes::class);
 
-        resolve('router')->post($routeName, [
-            'as' => 'lighthouse.subscriptions.auth',
-            'uses' => $authController,
-        ]);
-    });
+if ($subscriptionRoutes->authController()) {
+    resolve('router')->group(
+        $subscriptionRoutes->authGroup(),
+        function () use ($subscriptionRoutes) {
+            resolve('router')->post($subscriptionRoutes->authRoute(), [
+                'as' => 'lighthouse.subscriptions.auth',
+                'uses' => $subscriptionRoutes->authController(),
+            ]);
+        }
+    );
 }
 
-if ($webhookController = config('lighthouse.subscriptions.webhook.controller')) {
-    resolve('router')->group(config('lighthouse.subscriptions.auth.route', []), function () use ($webhookController) {
-        $routeName = config('lighthouse.subscriptions.webhook.route_name');
-
-        resolve('router')->post($routeName, [
-            'as' => 'lighthouse.subscriptions.auth',
-            'uses' => $webhookController,
-        ]);
-    });
+if ($subscriptionRoutes->webhookController()) {
+    resolve('router')->group(
+        $subscriptionRoutes->webhookGroup(),
+        function () use ($subscriptionRoutes) {
+            resolve('router')->post($subscriptionRoutes->webhookRoute(), [
+                'as' => 'lighthouse.subscriptions.auth',
+                'uses' => $subscriptionRoutes->webhookController(),
+            ]);
+        }
+    );
 }
