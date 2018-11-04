@@ -89,9 +89,13 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
         }
 
         foreach ($info->fieldNodes as $fieldNode) {
-            $hasDirective = ASTHelper::fieldHasDirective($fieldNode, 'defer');
+            $deferDirective = ASTHelper::directiveDefinition($fieldNode, 'defer');
 
-            if (! $hasDirective) {
+            if (! $deferDirective) {
+                return false;
+            }
+
+            if (! ASTHelper::directiveArgValue($deferDirective, 'if', true)) {
                 return false;
             }
 

@@ -590,6 +590,42 @@ class DeferExtensionTest extends TestCase
         $this->assertEquals(self::$data, $response->json('data.updateUser'));
     }
 
+    /**
+     * @test
+     */
+    public function itDoesNotDeferFieldsIfFalse()
+    {
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+            ],
+        ];
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        type User {
+            name: String!
+            parent: User
+        }
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $query = '
+        {
+            user {
+                name
+                parent @defer(if: false) {
+                    name
+                }
+            }
+        }';
+
+        $response = $this->postJson('/graphql', compact('query'));
+        $this->assertEquals(self::$data, $response->json('data.user'));
+    }
+
     public function resolve()
     {
         return self::$data;

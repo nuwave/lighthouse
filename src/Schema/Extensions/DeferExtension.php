@@ -85,7 +85,7 @@ class DeferExtension extends GraphQLExtension
         );
 
         $documentAST->setDefinition(
-            PartialParser::directiveDefinition('directive @defer on FIELD')
+            PartialParser::directiveDefinition('directive @defer(if: Boolean) on FIELD')
         );
 
         return $documentAST;
