@@ -84,14 +84,33 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $info): bool
     {
-        $hasDirective = ASTHelper::fieldHasDirective($info->fieldNodes[0], 'defer') &&
-            ASTHelper::fieldDoesNotHaveDirective($info->fieldNodes[0], ['include', 'skip']);
+        if ('mutation' === strtolower($info->operation->operation)) {
+            return false;
+        }
 
-        if ($hasDirective && $fieldType instanceof NonNullTypeNode) {
+        foreach ($info->fieldNodes as $fieldNode) {
+            $hasDirective = ASTHelper::fieldHasDirective($fieldNode, 'defer');
+
+            if (! $hasDirective) {
+                return false;
+            }
+
+            $skipDirective = ASTHelper::directiveDefinition($fieldNode, 'skip');
+            $includeDirective = ASTHelper::directiveDefinition($fieldNode, 'include');
+
+            $shouldSkip = $skipDirective ? ASTHelper::directiveArgValue($skipDirective, 'if', false) : false;
+            $shouldInclude = $includeDirective ? ASTHelper::directiveArgValue($includeDirective, 'if', false) : false;
+
+            if ($shouldSkip || $shouldInclude) {
+                return false;
+            }
+        }
+
+        if ($fieldType instanceof NonNullTypeNode) {
             throw new ParseClientException('The @defer directive cannot be placed on a Non-Nullable field.');
         }
 
-        return $hasDirective;
+        return true;
     }
 
     /**

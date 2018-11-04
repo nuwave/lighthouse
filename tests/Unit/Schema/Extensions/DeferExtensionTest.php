@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\TestResponse;
 use Nuwave\Lighthouse\Exceptions\ParseClientException;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
@@ -444,6 +445,149 @@ class DeferExtensionTest extends TestCase
 
         $this->assertArrayHasKey('errors', $response);
         $this->assertEquals('schema', $response['errors'][0]['category']);
+    }
+
+    /**
+     * @test
+     */
+    public function itSkipsDeferWithIncludeAndSkipDirectives()
+    {
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+                'parent' => [
+                    'name' => 'Mr. Smith',
+                ],
+            ],
+        ];
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        directive @include(if: Boolean!) on FIELD
+        directive @skip(if: Boolean!) on FIELD
+
+        type User {
+            name: String!
+            parent: User
+        }
+
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $query = '
+        { 
+            user {
+                name
+                parent @defer @include(if: true) {
+                    name
+                    parent @defer @skip(if: true) {
+                        name
+                    }
+                }
+            }
+        }';
+
+        $response = $this->postJson('/graphql', compact('query'));
+
+        $this->assertEquals(
+            [
+                'name' => 'John Doe',
+                'parent' => ['name' => 'Jane Doe'],
+            ],
+            $response->json('data.user')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itRequiresDeferDirectiveOnAllFieldDeclarations()
+    {
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+            ],
+        ];
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        type User {
+            name: String!
+            parent: User
+        }
+
+        type Query {
+            user: User @field(resolver: \"{$resolver}\")
+        }";
+
+        $query = '
+        fragment UserWithParent on User {
+            name
+            parent {
+                name
+            }
+        }
+        { 
+            user {
+                ...UserWithParent
+                parent @defer {
+                    name
+                }
+            }
+        }';
+
+        $response = $this->postJson('/graphql', compact('query'));
+
+        $this->assertEquals(self::$data, $response->json('data.user'));
+    }
+
+    /**
+     * @test
+     *
+     * @todo Ensure that this functions the same way as Apollo Server.
+     * Currently in the documentation it just says "Not Supported" instead
+     * of specifying if it throws an error or not.
+     *
+     * https://www.apollographql.com/docs/react/features/defer-support.html#defer-usage
+     */
+    public function itSkipsDeferredFieldsOnMutations()
+    {
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+            ],
+        ];
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        type User {
+            name: String!
+            parent: User
+        }
+        type Query {
+            user: User
+        }
+        type Mutation {
+            updateUser(name: String!): User
+                @field(resolver: \"{$resolver}\")
+        }";
+
+        $query = '
+        mutation UpdateUser {
+            updateUser(name: "John Doe") {
+                name 
+                parent @defer {
+                    name
+                }
+            }
+        }';
+
+        $response = $this->postJson('/graphql', compact('query'));
+        $this->assertEquals(self::$data, $response->json('data.updateUser'));
     }
 
     public function resolve()
