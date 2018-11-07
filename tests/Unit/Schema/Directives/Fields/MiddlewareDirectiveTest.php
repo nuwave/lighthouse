@@ -131,7 +131,8 @@ class MiddlewareDirectiveTest extends TestCase
     {
         $this->schema = '
         type Query {
-            fail: Int @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
+            foo: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
             pass: Int
                 @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
                 @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
@@ -140,15 +141,15 @@ class MiddlewareDirectiveTest extends TestCase
 
         $result = $this->queryViaHttp('
         {
-            fail
+            foo
             pass
         }
         ');
 
         $this->assertSame(1, array_get($result, 'data.pass'));
         $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
-        $this->assertSame('fail', array_get($result, 'errors.0.path.0'));
-        $this->assertNull(array_get($result, 'data.fail'));
+        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
+        $this->assertNull(array_get($result, 'data.foo'));
     }
 
     /**
@@ -157,7 +158,7 @@ class MiddlewareDirectiveTest extends TestCase
     public function itThrowsWhenDefiningMiddlewareOnInvalidTypes()
     {
         $this->expectException(DirectiveException::class);
-        $this->buildSchemaWithDefaultQuery('
+        $this->buildSchemaWithPlaceholderQuery('
         scalar Foo @middleware
         ');
     }

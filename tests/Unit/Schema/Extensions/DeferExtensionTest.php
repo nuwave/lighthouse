@@ -569,7 +569,7 @@ class DeferExtensionTest extends TestCase
             parent: User
         }
         type Query {
-            user: User
+            user: User @field(resolver: \"{$resolver}\")
         }
         type Mutation {
             updateUser(name: String!): User

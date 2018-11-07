@@ -126,13 +126,27 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaWithDefaultQuery(string $schema): Schema
+    protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
-        return $this->buildSchemaFromString($schema.'
+        return $this->buildSchema(
+            $schema
+            . $this->placeholderQuery()
+        );
+    }
+
+    /**
+     * Convenience method to get a default Query, sometimes needed
+     * because the Schema is invalid without it.
+     *
+     * @return \GraphQL\Type\Schema
+     */
+    protected function placeholderQuery(): string
+    {
+        return '
         type Query {
-            dummy: String
+            foo: Int
         }
-        ');
+        ';
     }
 
     /**
@@ -140,7 +154,7 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaFromString(string $schema): Schema
+    protected function buildSchema(string $schema): Schema
     {
         $this->schema = $schema;
 

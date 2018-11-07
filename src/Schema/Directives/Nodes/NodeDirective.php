@@ -53,7 +53,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
         
         $this->nodeRegistry->registerNode(
             $typeName,
-            $this->getMethodArgument('resolver')
+            $this->getResolverFromArgument('resolver')
         );
 
         return $next($value);

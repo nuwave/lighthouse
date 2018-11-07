@@ -268,12 +268,12 @@ class NodeFactory
             $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
 
             if($interfaceDirective->directiveHasArgument('resolveType')){
-                $typeResolver = $interfaceDirective->getMethodArgument('resolveType');
+                $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
             } else {
                 /**
                  * @deprecated in v3 this will only be available as the argument resolveType
                  */
-                $typeResolver = $interfaceDirective->getMethodArgument('resolver');
+                $typeResolver = $interfaceDirective->getResolverFromArgument('resolver');
             }
         } else {
             $interfaceClass = \namespace_classname($nodeName, [
@@ -309,12 +309,12 @@ class NodeFactory
             $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
 
             if($unionDirective->directiveHasArgument('resolveType')){
-                $typeResolver = $unionDirective->getMethodArgument('resolveType');
+                $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
             } else {
                 /**
                  * @deprecated in v3 this will only be available as the argument resolveType
                  */
-                $typeResolver = $unionDirective->getMethodArgument('resolver');
+                $typeResolver = $unionDirective->getResolverFromArgument('resolver');
             }
         } else {
             $unionClass = \namespace_classname($nodeName, [

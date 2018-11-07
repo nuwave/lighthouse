@@ -21,11 +21,7 @@ class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
-        
-        type Query {
-            foo: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createCompany(name: "foo") {
@@ -58,11 +54,7 @@ class CreateDirectiveTest extends DBTestCase
         input CreateCompanyInput {
             name: String
         }
-        
-        type Query {
-            foo: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createCompany(input: {
@@ -105,11 +97,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        
-        type Query {
-            foo: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createTask(input: {

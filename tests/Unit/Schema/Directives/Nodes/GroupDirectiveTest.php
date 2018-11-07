@@ -14,10 +14,6 @@ class GroupDirectiveTest extends TestCase
     public function itCanSetNamespaces()
     {
         $schema = '
-        type Query {
-            dummy: Int        
-        }
-        
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             me: String @field(resolver: "Foo@bar")
         }
@@ -25,7 +21,7 @@ class GroupDirectiveTest extends TestCase
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             you: String @field(resolver: "Foo@bar")
         }
-        ';
+        ' . $this->placeholderQuery();
 
         $query = '
         {
@@ -77,14 +73,14 @@ class GroupDirectiveTest extends TestCase
             withNothing: Int
                 @middleware(checks: [])
                 @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
-            fail: Int
+            foo: Int
         }
         ';
         $query = '
         {
             withFoo
             withNothing
-            fail
+            foo
         }
         ';
         $result = $this->queryViaHttp($query);
@@ -92,7 +88,7 @@ class GroupDirectiveTest extends TestCase
         $this->assertSame(1, array_get($result, 'data.withFoo'));
         $this->assertSame(1, array_get($result, 'data.withNothing'));
         $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
-        $this->assertSame('fail', array_get($result, 'errors.0.path.0'));
-        $this->assertNull(array_get($result, 'data.fail'));
+        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
+        $this->assertNull(array_get($result, 'data.foo'));
     }
 }

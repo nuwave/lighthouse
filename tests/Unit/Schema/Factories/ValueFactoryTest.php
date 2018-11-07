@@ -26,36 +26,33 @@ class ValueFactoryTest extends TestCase
      */
     public function itCanSetNodeValueResolver()
     {
-        $this->valueFactory->nodeResolver(function ($node) {
-            return new class($node) extends NodeValue {
-                public function getType()
-                {
-                    return new ObjectType([
-                        'name' => $this->getNodeName(),
-                        'fields' => [
-                            'foo' => [
-                                'type' => Type::string(),
-                                'resolve' => function () {
-                                    return 'bar';
-                                },
+        $this->valueFactory->nodeResolver(
+            function ($node) {
+                return new class($node) extends NodeValue {
+                    public function getType()
+                    {
+                        return new ObjectType([
+                            'name' => $this->getNodeName(),
+                            'fields' => [
+                                'foo' => [
+                                    'type' => Type::string(),
+                                    'resolve' => function () {
+                                        return 'bar';
+                                    },
+                                ],
                             ],
-                        ],
-                    ]);
-                }
-            };
-        });
+                        ]);
+                    }
+                };
+            }
+        );
 
-        $schema = '
-        type Query {
-            foo: String
-        }
-        ';
         $query = '
         {
             foo
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->execute($this->placeholderQuery(), $query);
 
         $this->assertEquals(['foo' => 'bar'], $result['data']);
     }

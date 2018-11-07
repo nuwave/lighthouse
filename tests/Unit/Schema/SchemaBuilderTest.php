@@ -12,40 +12,12 @@ use GraphQL\Type\Definition\InputObjectType;
 class SchemaBuilderTest extends TestCase
 {
     /**
-     * Get test environment setup.
-     *
-     * @param mixed $app
-     */
-    public function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set(
-            'lighthouse.namespaces.queries',
-            'Tests\\Utils\\Mutations'
-        );
-
-        $app['config']->set(
-            'lighthouse.namespaces.mutations',
-            'Tests\\Utils\\Mutations'
-        );
-    }
-    
-    /**
      * @test
      */
     public function itGeneratesValidSchema()
     {
-        $schema = $this->buildSchemaFromString('
-        type Query {
-            foo: String!
-        }
+        $schema = $this->buildSchemaWithPlaceholderQuery('');
 
-        type Mutation {
-            foo: String!
-        }
-        ');
-        
         $this->assertInstanceOf(Schema::class, $schema);
         // This would throw if the schema were invalid
         $schema->assertValid();
@@ -56,7 +28,7 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveEnumTypes()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         "Role description"
         enum Role {
             "Company administrator."
@@ -82,7 +54,7 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveInterfaceTypes()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         """
         int
         """
@@ -105,7 +77,7 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveObjectTypes()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         "asdf"
         type Foo {
             "bar attribute of Foo"
@@ -132,7 +104,7 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveInputObjectTypes()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         "bla"
         input CreateFoo {
             "xyz"
@@ -155,7 +127,7 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveMutations()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type Mutation {
             foo(bar: String! baz: String): String
         }
@@ -173,17 +145,13 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanResolveQueries()
     {
-        $schema = $this->buildSchemaFromString('
-        type Query {
-            foo(bar: String! baz: String): String
-        }
-        ');
+        $schema = $this->buildSchemaWithPlaceholderQuery('');
 
         /** @var ObjectType $type */
         $type = $schema->getType('Query');
-        $foo = $type->getField('foo');
+        $field = $type->getField('foo');
 
-        $this->assertSame('foo', $foo->name);
+        $this->assertSame('foo', $field->name);
     }
 
     /**
@@ -191,7 +159,7 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendObjectTypes()
     {
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type Foo {
             bar: String!
         }
@@ -211,19 +179,19 @@ class SchemaBuilderTest extends TestCase
      */
     public function itCanExtendTypes()
     {
-        $schema = $this->buildSchemaFromString('
-        type Query {
+        $schema = $this->buildSchemaWithPlaceholderQuery('
+        type Foo {
             foo: String!
         }
         
-        extend type Query {
+        extend type Foo {
             "yo?"
             bar: String!
         }
         ');
 
         /** @var ObjectType $type */
-        $type = $schema->getType('Query');
+        $type = $schema->getType('Foo');
         
         $this->assertSame('yo?', $type->getField('bar')->description);
     }

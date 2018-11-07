@@ -33,7 +33,7 @@ trait HandlesQueries
             $message = sprintf(
                 'A `model` argument must be assigned to the %s directive on the %s field [%s]',
                 $this->name(),
-                $value->getNodeName(),
+                $value->getParentName(),
                 $value->getFieldName()
             );
 
