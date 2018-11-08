@@ -32,4 +32,9 @@ class Foo
     {
         return self::THE_ANSWER;
     }
+
+    public function complexity(): int
+    {
+        return self::THE_ANSWER;
+    }
 }

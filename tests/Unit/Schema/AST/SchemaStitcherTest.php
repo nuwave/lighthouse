@@ -6,10 +6,11 @@ use PHPUnit\Framework\TestCase;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class SchemaStitcherTest extends TestCase
 {
-    const SCHEMA_PATH = __DIR__ . '/schema/';
+    const SCHEMA_PATH = __DIR__.'/schema/';
     const ROOT_SCHEMA_FILENAME = 'root-schema';
 
     /**
@@ -39,13 +40,38 @@ class SchemaStitcherTest extends TestCase
 
     protected function assertSchemaResultIsSame(string $expected)
     {
-        $schema = (new SchemaStitcher(self::SCHEMA_PATH . self::ROOT_SCHEMA_FILENAME))->getSchemaString();
+        $schema = (new SchemaStitcher(self::SCHEMA_PATH.self::ROOT_SCHEMA_FILENAME))->getSchemaString();
         $this->assertSame($expected, $schema);
     }
 
     protected function putRootSchema(string $schema)
     {
         $this->filesystem->put(self::ROOT_SCHEMA_FILENAME, $schema);
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsIfRootSchemaIsNotFound()
+    {
+        $this->expectException(FileNotFoundException::class);
+        $this->expectExceptionMessageRegExp('/'.self::ROOT_SCHEMA_FILENAME.'/');
+        $this->assertSchemaResultIsSame('');
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsIfSchemaImportIsNotFound()
+    {
+        $this->expectException(FileNotFoundException::class);
+        $this->expectExceptionMessageRegExp('/does-not-exist.graphql/');
+        $foo = <<<EOT
+#import does-not-exist.graphql
+
+EOT;
+        $this->putRootSchema($foo);
+        $this->assertSchemaResultIsSame($foo);
     }
 
     /**
