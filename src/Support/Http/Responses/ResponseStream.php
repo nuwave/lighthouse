@@ -92,7 +92,14 @@ class ResponseStream implements CanStreamResponse
     protected function emit(string $chunk)
     {
         echo $chunk;
-        ob_flush();
-        flush();
+
+        try {
+            ob_flush();
+            flush();
+        } catch (\Exception $e) {
+            // buffer error, do nothing...
+        } catch (\Error $e) {
+            // buffer error, do nothing...
+        }
     }
 }
