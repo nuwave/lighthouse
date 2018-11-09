@@ -93,9 +93,21 @@ class ResponseStream implements CanStreamResponse
     {
         echo $chunk;
 
+        $this->flush(\Closure::fromCallable('ob_flush'));
+        $this->flush(\Closure::fromCallable('flush'));
+    }
+
+    /**
+     * Flush buffer cache.
+     * Note: We can run into exceptions when flushing the buffer,
+     * these should be safe to ignore.
+     *
+     * @todo Investigate exceptions that occur on Apache
+     */
+    protected function flush(\Closure $flush)
+    {
         try {
-            ob_flush();
-            flush();
+            $flush();
         } catch (\Exception $e) {
             // buffer error, do nothing...
         } catch (\Error $e) {
