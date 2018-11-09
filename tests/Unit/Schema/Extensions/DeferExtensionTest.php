@@ -489,14 +489,14 @@ class DeferExtensionTest extends TestCase
             }
         }';
 
-        $response = $this->postJson('/graphql', compact('query'));
+        $response = $this->postJson('/graphql', compact('query'))->json();
 
         $this->assertEquals(
             [
                 'name' => 'John Doe',
                 'parent' => ['name' => 'Jane Doe'],
             ],
-            $response->json('data.user')
+            array_get($response, 'data.user')
         );
     }
 
@@ -539,9 +539,9 @@ class DeferExtensionTest extends TestCase
             }
         }';
 
-        $response = $this->postJson('/graphql', compact('query'));
+        $response = $this->postJson('/graphql', compact('query'))->json();
 
-        $this->assertEquals(self::$data, $response->json('data.user'));
+        $this->assertEquals(self::$data, array_get($response, 'data.user'));
     }
 
     /**
@@ -586,8 +586,8 @@ class DeferExtensionTest extends TestCase
             }
         }';
 
-        $response = $this->postJson('/graphql', compact('query'));
-        $this->assertEquals(self::$data, $response->json('data.updateUser'));
+        $response = $this->postJson('/graphql', compact('query'))->json();
+        $this->assertEquals(self::$data, array_get($response, 'data.updateUser'));
     }
 
     /**
@@ -622,8 +622,8 @@ class DeferExtensionTest extends TestCase
             }
         }';
 
-        $response = $this->postJson('/graphql', compact('query'));
-        $this->assertEquals(self::$data, $response->json('data.user'));
+        $response = $this->postJson('/graphql', compact('query'))->json();
+        $this->assertEquals(self::$data, array_get($response, 'data.user'));
     }
 
     public function resolve()
