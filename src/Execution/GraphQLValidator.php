@@ -24,9 +24,18 @@ class GraphQLValidator extends Validator
 
         $data = collect($this->getData());
 
-        return $data->only(collect($this->getRules())->keys()->map(function ($rule) {
-            return explode('.', $rule)[0];
-        })->unique())->toArray();
+        return $data
+            ->only(
+                collect($this->getRules())
+                    ->keys()
+                    ->map(
+                        function (string $rule) {
+                            return explode('.', $rule)[0];
+                        }
+                    )
+                    ->unique()
+            )
+            ->toArray();
     }
 
     /**
@@ -53,8 +62,16 @@ class GraphQLValidator extends Validator
         return array_get($this->customAttributes, 'resolveInfo');
     }
 
+    /**
+     * Return the dot separated path of the field that is being validated.
+     *
+     * @return string
+     */
     public function getFieldPath(): string
     {
-        return implode('.', $this->getResolveInfo()->path);
+        return implode(
+            '.',
+            $this->getResolveInfo()->path
+        );
     }
 }

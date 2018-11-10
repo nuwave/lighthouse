@@ -86,8 +86,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
      * @throws \Exception
+     *
+     * @return FieldValue
      */
     protected function paginatorTypeResolver(FieldValue $value): FieldValue
     {
@@ -106,8 +107,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
      * @throws \Exception
+     *
+     * @return FieldValue
      */
     protected function connectionTypeResolver(FieldValue $value): FieldValue
     {
@@ -126,8 +128,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
 
     /**
      * @param array $resolveArgs
-     * @param int $page
-     * @param int $first
+     * @param int   $page
+     * @param int   $first
      *
      * @throws DirectiveException
      * @throws DefinitionException
@@ -178,14 +180,14 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $model = str_before($model, 'Connection');
         }
 
-        if ( ! $model) {
+        if (! $model) {
             throw new DirectiveException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
             );
         }
 
         return $this->namespaceClassName($model, [
-            config('lighthouse.namespaces.models')
+            config('lighthouse.namespaces.models'),
         ]);
     }
 }
