@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
@@ -19,9 +18,9 @@ class FieldValue
     protected $returnType;
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * The underlying AST definition of the Field.
      *
-     * @var FieldDefinitionNode|InputValueDefinitionNode
+     * @var FieldDefinitionNode
      */
     protected $field;
 
@@ -64,10 +63,9 @@ class FieldValue
      * Create new field value instance.
      *
      * @param NodeValue           $parent
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
-     * @param FieldDefinitionNode|InputValueDefinitionNode $field
+     * @param FieldDefinitionNode $field
      */
-    public function __construct(NodeValue $parent, $field)
+    public function __construct(NodeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
         $this->field = $field;
@@ -156,15 +154,15 @@ class FieldValue
      */
     public function getParentName(): string
     {
-        return $this->getParent()->getNodeName();
+        return $this->getParent()->getTypeDefinitionName();
     }
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * Get the underlying AST definition for the field.
      *
-     * @return FieldDefinitionNode|InputValueDefinitionNode
+     * @return FieldDefinitionNode
      */
-    public function getField()
+    public function getField(): FieldDefinitionNode
     {
         return $this->field;
     }

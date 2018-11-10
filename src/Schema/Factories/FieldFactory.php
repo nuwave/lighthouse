@@ -5,19 +5,17 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class FieldFactory
 {
     /** @var DirectiveRegistry */
     protected $directiveRegistry;
-    /** @var ValueFactory */
-    protected $valueFactory;
     /** @var ArgumentFactory */
     protected $argumentFactory;
     /** @var Pipeline */
@@ -25,14 +23,12 @@ class FieldFactory
 
     /**
      * @param DirectiveRegistry $directiveRegistry
-     * @param ValueFactory $valueFactory
-     * @param ArgumentFactory $argumentFactory
-     * @param Pipeline $pipeline
+     * @param ArgumentFactory   $argumentFactory
+     * @param Pipeline          $pipeline
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, ValueFactory $valueFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
+    public function __construct(DirectiveRegistry $directiveRegistry, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {
         $this->directiveRegistry = $directiveRegistry;
-        $this->valueFactory = $valueFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
     }
@@ -57,13 +53,20 @@ class FieldFactory
         $initialResolver = $fieldValue->getResolver();
 
         $inputValueDefinitions = $this->getInputValueDefinitions($fieldValue);
-        $resolverWithAdditionalArgs = $this->injectAdditionalArgs(
+        $resolver = $this->injectAdditionalArgs(
             $initialResolver,
             $fieldValue->getAdditionalArgs()
         );
-        $resolverWithValidation = $this->wrapResolverWithValidation($resolverWithAdditionalArgs, $inputValueDefinitions);
 
-        $fieldValue->setResolver($resolverWithValidation);
+
+        // No need to do transformation/validation of the arguments
+        // if there are no arguments defined for the field
+        if ($inputValueDefinitions->isNotEmpty()) {
+            $resolver = $this->wrapResolverByTransformingArgs($resolver, $inputValueDefinitions);
+            $resolver = $this->wrapResolverWithValidation($resolver, $inputValueDefinitions);
+        }
+
+        $fieldValue->setResolver($resolver);
 
         $resolverWithMiddleware = $this->pipeline
             ->send($fieldValue)
@@ -91,6 +94,25 @@ class FieldFactory
     }
 
     /**
+     * Get collection of field arguments.
+     *
+     * @param FieldValue $fieldValue
+     *
+     * @return Collection
+     */
+    protected function getInputValueDefinitions(FieldValue $fieldValue): Collection
+    {
+        return collect($fieldValue->getField()->arguments)
+            ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
+                $argValue = new ArgumentValue($inputValueDefinition, $fieldValue);
+
+                return [
+                    $inputValueDefinition->name->value => $this->argumentFactory->handle($argValue),
+                ];
+            });
+    }
+
+    /**
      * Wrap the resolver by injecting additional arg values.
      *
      * @param \Closure $resolver
@@ -110,24 +132,34 @@ class FieldFactory
     }
 
     /**
-     * Get collection of field arguments.
+     * Perform transformations on the arguments given to the field.
      *
-     * @param FieldValue $fieldValue
+     * For example, an argument may be encrypted before reaching the final resolver.
      *
-     * @return Collection
+     * @param \Closure          $resolver
+     * @param Collection<array> $inputValueDefinitions
+     *
+     * @return \Closure
      */
-    protected function getInputValueDefinitions(FieldValue $fieldValue): Collection
+    protected function wrapResolverByTransformingArgs(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
-        return
-            collect(
-                // TODO remove this wrapping call once Fields are always FieldDefinitions
-                data_get($fieldValue->getField(), 'arguments')
-            )
-            ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
-                $argValue = $this->valueFactory->arg($fieldValue, $inputValueDefinition);
+        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
+            $inputArgs = collect($inputArgs)
+                ->map(function ($value, string $key) use ($inputValueDefinitions) {
+                    $definition = $inputValueDefinitions->get($key);
 
-                return [$inputValueDefinition->name->value => $this->argumentFactory->handle($argValue)];
-            });
+                    return collect($definition['transformers'])
+                        ->reduce(
+                            function ($value, \Closure $transformer) {
+                                return $transformer($value);
+                            },
+                            $value
+                        );
+                })
+                ->toArray();
+
+            return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
+        };
     }
 
     /**
@@ -136,22 +168,19 @@ class FieldFactory
      * This has to happen as part of the field resolution, because we might have
      * deeply nested input values and we can not generate the rules upfront.
      *
-     * @param \Closure $resolver
-     * @param Collection $inputValueDefinitions
+     * @param \Closure          $resolver
+     * @param Collection<array> $inputValueDefinitions
      *
      * @return \Closure
      */
     protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
-        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo = null) use ($resolver, $inputValueDefinitions) {
-            $inputArgs = $this->transformArgs($inputArgs, $inputValueDefinitions);
-
-            list($rules, $messages) = $this->getRulesAndMessages(
-                $rootValue,
+        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
+            list($rules, $messages) = RuleFactory::build(
+                $resolveInfo->fieldName,
+                $resolveInfo->parentType->name,
                 $inputArgs,
-                $context,
-                $resolveInfo,
-                $inputValueDefinitions
+                graphql()->documentAST()
             );
 
             if (count($rules) > 0) {
@@ -173,90 +202,5 @@ class FieldFactory
 
             return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
         };
-    }
-
-    /**
-     * Arguments may have transformers defined upon them.
-     *
-     * This iterates through them and ensures they are called.
-     *
-     * @param array $inputArguments
-     * @param Collection<array> $inputValueDefinitions
-     *
-     * @return array
-     */
-    protected function transformArgs(array $inputArguments, Collection $inputValueDefinitions): array
-    {
-        return collect($inputArguments)
-            ->map(function($value, $key) use ($inputValueDefinitions){
-                $definition = $inputValueDefinitions->get($key);
-                
-                return collect($definition['transformers'])
-                    ->reduce(
-                        function($value, \Closure $transformer){
-                            return $transformer($value);
-                        },
-                        $value
-                    );
-            })
-            ->toArray();
-    }
-
-    /**
-     * Get rules for field.
-     *
-     * @param mixed $rootValue
-     * @param array $inputArgs
-     * @param mixed $context
-     * @param ResolveInfo|null $resolveInfo
-     * @param Collection $inputValueDefinitions
-     *
-     * @throws ParseException
-     *
-     * @return array[] [array $rules, array $messages]
-     */
-    public function getRulesAndMessages(
-        $rootValue,
-        array $inputArgs,
-        $context,
-        ResolveInfo $resolveInfo = null,
-        Collection $inputValueDefinitions
-    ): array {
-        $resolveArgs = [$rootValue, $inputArgs, $context, $resolveInfo];
-
-        $rules = $inputValueDefinitions
-            ->map(function (array $inputValueDefinition) use ($resolveArgs) {
-                $rules = data_get($inputValueDefinition, 'rules');
-
-                if (! $rules) {
-                    return null;
-                }
-
-                $rules = is_callable($rules)
-                    ? call_user_func_array($inputValueDefinition['rules'], $resolveArgs)
-                    : $rules;
-
-                return $rules;
-            })
-            ->filter();
-
-        $messages = $inputValueDefinitions
-            ->pluck('messages')
-            ->collapse();
-
-        list($nestedRules, $nestedMessages) = RuleFactory::build(
-            $resolveInfo->fieldName,
-            $resolveInfo->parentType->name,
-            $inputArgs,
-            graphql()->documentAST()
-        );
-
-        $rules = $rules->merge($nestedRules);
-        $messages = $messages->merge($nestedMessages);
-
-        return [
-            $rules->toArray(),
-            $messages->toArray(),
-        ];
     }
 }

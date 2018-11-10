@@ -6,16 +6,11 @@ use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\ObjectFieldNode;
-use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\NonNullTypeNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
@@ -102,16 +97,16 @@ class ASTHelper
     }
 
     /**
-     * @param FieldDefinitionNode $field
+     * @param Node $definition
      *
      * @throws DefinitionException
      *
      * @return string
      */
-    public static function getFieldTypeName(FieldDefinitionNode $field): string
+    public static function getUnderlyingTypeName(Node $definition): string
     {
-        $type = $field->type;
-        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode){
+        $type = $definition->type;
+        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode) {
             $type = self::getUnderlyingNamedTypeNode($type);
         }
 
@@ -212,7 +207,23 @@ class ASTHelper
                 return $directiveDefinitionNode->name->value === $name;
             });
     }
-    
+
+    /**
+     * Check if a node has a particular directive defined upon it.
+     *
+     * @param Node   $definitionNode
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function hasDirectiveDefinition(Node $definitionNode, string $name): bool
+    {
+        return collect($definitionNode->directives)
+            ->contains(function (DirectiveNode $directiveDefinitionNode) use ($name) {
+                return $directiveDefinitionNode->name->value === $name;
+            });
+    }
+
     /**
      * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
      *

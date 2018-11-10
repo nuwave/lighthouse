@@ -115,4 +115,15 @@ class ASTHelperTest extends TestCase
             ASTHelper::directiveArgValue($directive, 'bar')
         );
     }
+
+    /**
+     * @test
+     */
+    public function itReturnsNullForNonexistingArgumentOnDirective()
+    {
+        $directive = PartialParser::directive('@foo');
+        $this->assertNull(
+            ASTHelper::directiveArgValue($directive, 'bar')
+        );
+    }
 }

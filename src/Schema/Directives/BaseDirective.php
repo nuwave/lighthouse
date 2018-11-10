@@ -115,10 +115,10 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if(! $model){
-            if($this->definitionNode instanceof FieldDefinitionNode) {
-                $model = ASTHelper::getFieldTypeName($this->definitionNode);
-            } elseif($this->definitionNode instanceof ObjectTypeDefinitionNode) {
+        if (! $model) {
+            if ($this->definitionNode instanceof FieldDefinitionNode) {
+                $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
+            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
                 $model = $this->definitionNode->name->value;
             }
         }
