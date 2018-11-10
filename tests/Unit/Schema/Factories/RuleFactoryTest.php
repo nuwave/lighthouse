@@ -61,10 +61,13 @@ class RuleFactoryTest extends TestCase
             $documentAST
         );
 
-        $this->assertEquals([
-            'input' => ['required'],
-            'input.email' => ['required', 'email'],
-        ], $rules);
+        $this->assertEquals(
+            [
+                'input' => ['required'],
+                'input.email' => ['required', 'email'],
+            ],
+            $rules
+        );
 
         $this->assertSame([], $messages);
     }

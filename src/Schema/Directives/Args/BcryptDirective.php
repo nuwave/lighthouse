@@ -22,7 +22,7 @@ class BcryptDirective extends BaseDirective implements ArgMiddleware
      * Apply transformations on the ArgumentValue.
      *
      * @param ArgumentValue $argumentValue
-     * @param \Closure       $next
+     * @param \Closure      $next
      *
      * @return ArgumentValue
      */
@@ -33,7 +33,7 @@ class BcryptDirective extends BaseDirective implements ArgMiddleware
                 return bcrypt($password);
             }
         );
-        
+
         return $next($argumentValue);
     }
 }

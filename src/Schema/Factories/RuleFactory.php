@@ -25,9 +25,9 @@ class RuleFactory
     /**
      * Build list of rules for field.
      *
-     * @param string $fieldName
-     * @param string $parentTypeName
-     * @param array $variables
+     * @param string      $fieldName
+     * @param string      $parentTypeName
+     * @param array       $variables
      * @param DocumentAST $documentAST
      *
      * @return array [$rules, $messages]

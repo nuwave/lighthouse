@@ -50,7 +50,7 @@ class FieldFactory
     {
         $fieldDefinition = $fieldValue->getField();
 
-        if($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinition)){
+        if ($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinition)) {
             $fieldValue = $fieldResolver->resolveField($fieldValue);
         }
 
