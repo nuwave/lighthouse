@@ -160,7 +160,7 @@ class PaginationManipulator
             ? "count: Int = {$defaultCount}"
             : 'count: Int!';
 
-        $paginationArguments = [
+        $inputValueDefinitions = [
             $countArgument,
             'page: Int',
         ];
