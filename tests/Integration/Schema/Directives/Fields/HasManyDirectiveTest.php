@@ -169,17 +169,12 @@ class HasManyDirectiveTest extends DBTestCase
         $schema = '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator", defaultCount: 2)
-            posts: [Post!]! @hasMany(type: "paginator", defaultCount: 2)
         }
         
         type Task {
             id: Int!
         }
-        
-        type Post {
-            id: Int!
-        }
-        
+
         type Query {
             user: User @auth
         }
