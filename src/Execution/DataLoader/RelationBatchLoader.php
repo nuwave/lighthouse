@@ -65,6 +65,11 @@ class RelationBatchLoader extends BatchLoader
                 // first is an required argument
                 $first = $this->args['first'];
                 $after = Cursor::decode($this->args);
+
+                if ($first instanceof \GraphQL\Language\AST\IntValueNode) {
+                    $first = $first->value;
+                }
+
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
 
                 $modelRelationFetcher->loadRelationsForPage($first, $currentPage);

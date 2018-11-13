@@ -246,6 +246,46 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanQueryHasManyRelayConnectionWithADefaultCount()
+    {
+        $schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "relay", defaultCount: 2)
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->executeQuery($schema, '
+        {
+            user {
+                tasks {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
+    }
+
+    /**
+     * @test
+     */
     public function itCanQueryHasManyNestedRelationships()
     {
         $schema = '
