@@ -2,12 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Tests\DBTestCase;
-use Tests\Utils\Models\Post;
-use Tests\Utils\Models\User;
-use Tests\Utils\Models\Comment;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder;
+use Tests\DBTestCase;
+use Tests\Utils\Models\Comment;
+use Tests\Utils\Models\Post;
+use Tests\Utils\Models\User;
 
 class PaginateDirectiveTest extends DBTestCase
 {
@@ -243,10 +243,10 @@ class PaginateDirectiveTest extends DBTestCase
             [
                 'total' => 0,
                 'count' => 0,
-                'currentPage' => 1 ,
+                'currentPage' => 1,
                 'lastPage' => 1,
                 'hasNextPage' => false,
-                'hasPreviousPage' =>false,
+                'hasPreviousPage' => false,
                 'startCursor' => null,
                 'endCursor' => null,
             ],
@@ -323,7 +323,7 @@ class PaginateDirectiveTest extends DBTestCase
         extend type Query @group {
             users: [User!]! @paginate(model: "User")
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $query = '
         {
@@ -339,5 +339,43 @@ class PaginateDirectiveTest extends DBTestCase
         $result = $this->executeQuery($schema, $query);
 
         $this->assertCount(1, array_get($result->data, 'users.data'));
+    }
+
+    /** @test */
+    public function itCanHaveADefaultPaginationCount()
+    {
+        factory(User::class, 10)->create();
+
+        $schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users: [User!]! @paginate(defaultCount: 5)
+        }
+        ';
+
+        $query = '
+        {
+            users {
+                paginatorInfo {
+                    count
+                    total
+                    currentPage
+                }
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ';
+
+        $result = $this->executeQuery($schema, $query);
+        $this->assertEquals(5, array_get($result->data, 'users.paginatorInfo.count'));
+        $this->assertEquals(10, array_get($result->data, 'users.paginatorInfo.total'));
+        $this->assertCount(5, array_get($result->data, 'users.data'));
     }
 }
