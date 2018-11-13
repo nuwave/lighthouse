@@ -91,7 +91,7 @@ class DeferExtensionDBTest extends DBTestCase
 
         $deferredCompany = $chunks[1];
         $this->assertArrayHasKey('user.company', $deferredCompany);
-        $this->assertEquals($company->name, array_get($deferredCompany['user.company'], 'name'));
+        $this->assertEquals($company->name, array_get($deferredCompany['user.company']['data'], 'name'));
     }
 
     /**
@@ -157,17 +157,17 @@ class DeferExtensionDBTest extends DBTestCase
 
         $deferredCompany = $chunks[1];
         $this->assertArrayHasKey('user.company', $deferredCompany);
-        $this->assertEquals($company->name, array_get($deferredCompany['user.company'], 'name'));
+        $this->assertEquals($company->name, array_get($deferredCompany['user.company']['data'], 'name'));
         $this->assertNull(array_get($deferredCompany['user.company'], 'users'));
 
         $deferredUsers = $chunks[2];
         $this->assertArrayHasKey('user.company.users', $deferredUsers);
-        $this->assertCount(5, $deferredUsers['user.company.users']);
+        $this->assertCount(5, $deferredUsers['user.company.users']['data']);
         $this->assertEquals(
             $users->map(function ($user) {
                 return ['email' => $user->email];
             })->values()->toArray(),
-            $deferredUsers['user.company.users']
+            $deferredUsers['user.company.users']['data']
         );
     }
 
@@ -247,13 +247,14 @@ class DeferExtensionDBTest extends DBTestCase
                         'company' => null,
                     ];
                 })->toArray(),
-                $deferredUsers[$key]
+                $deferredUsers[$key]['data']
             );
         });
 
         $deferredCompanies = $chunks[2];
         $this->assertCount(6, $deferredCompanies);
         collect($deferredCompanies)->each(function ($item) use ($companies) {
+            $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
             $this->assertTrue(
                 in_array($item['name'], $companies->pluck('name')->all())

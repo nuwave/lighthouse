@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Support\Http\Responses;
 
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
-class ResponseStream implements CanStreamResponse
+class ResponseStream extends Stream implements CanStreamResponse
 {
     /** @var string */
     const EOL = "\r\n";
@@ -25,13 +25,17 @@ class ResponseStream implements CanStreamResponse
             $lastKey = $paths->count() - 1;
             $paths->map(function ($path, $i) use ($data, $final, $lastKey) {
                 $terminating = $final && ($i == $lastKey);
+                $chunk['data'] = array_get($data, "data.{$path}");
+                $chunk['path'] = collect(explode('.', $path))->map(function ($partial) {
+                    return is_numeric($partial) ? intval($partial) : $partial;
+                })->toArray();
 
-                return $this->chunk([
-                    'path' => collect(explode('.', $path))->map(function ($partial) {
-                        return is_numeric($partial) ? intval($partial) : $partial;
-                    })->toArray(),
-                    'data' => array_get($data, "data.{$path}"),
-                ], $terminating);
+                $errors = $this->chunkError($path, $data);
+                if (! empty($errors)) {
+                    $chunk['errors'] = $errors;
+                }
+
+                return $this->chunk($chunk, $terminating);
             })->each(function ($chunk) {
                 $this->emit($chunk);
             });
