@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class HasManyDirectiveTest extends DBTestCase
 {

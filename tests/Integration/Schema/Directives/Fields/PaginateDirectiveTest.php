@@ -2,12 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Builder;
 use Tests\DBTestCase;
-use Tests\Utils\Models\Comment;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
+use Tests\Utils\Models\Comment;
+use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder;
 
 class PaginateDirectiveTest extends DBTestCase
 {
