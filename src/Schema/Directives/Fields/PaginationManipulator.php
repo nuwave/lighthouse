@@ -74,7 +74,7 @@ class PaginationManipulator
     {
         switch (self::assertValidPaginationType($paginationType)) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                return PaginationManipulator::registerConnection($fieldDefinition, $parentType, $current);
+                return PaginationManipulator::registerConnection($fieldDefinition, $parentType, $current, $defaultCount);
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
             default:
                 return PaginationManipulator::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount);
@@ -87,13 +87,14 @@ class PaginationManipulator
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $documentAST
+     * @param int|null                 $defaultCount
      *
      * @throws DefinitionException
      * @throws ParseException
      *
      * @return DocumentAST
      */
-    public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST): DocumentAST
+    public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
     {
         $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
         $connectionTypeName = "{$fieldTypeName}Connection";
@@ -114,10 +115,16 @@ class PaginationManipulator
             }
         ");
 
-        $connectionArguments = PartialParser::inputValueDefinitions([
-            'first: Int!',
+        $countArgument = $defaultCount
+            ? "first: Int = {$defaultCount}"
+            : 'first: Int!';
+
+        $inputValueDefinitions = [
+            $countArgument,
             'after: String',
-        ]);
+        ];
+
+        $connectionArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
 
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
