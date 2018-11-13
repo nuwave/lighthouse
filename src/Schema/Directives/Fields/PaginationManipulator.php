@@ -156,14 +156,14 @@ class PaginationManipulator
             }
         ");
 
-        $inputValueDefinitions = [
-            'count: Int!',
+        $countArgument = $defaultCount
+            ? "count: Int = {$defaultCount}"
+            : 'count: Int!';
+
+        $paginationArguments = [
+            $countArgument,
             'page: Int',
         ];
-
-        if ($defaultCount) {
-            $inputValueDefinitions[0] = "count: Int = {$defaultCount}";
-        }
 
         $paginationArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
 
