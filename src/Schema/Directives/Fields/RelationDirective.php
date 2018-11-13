@@ -2,15 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 abstract class RelationDirective extends BaseDirective
 {

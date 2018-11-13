@@ -2,21 +2,21 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\QueryUtils;
-use Nuwave\Lighthouse\Execution\Utils\Cursor;
-use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Execution\Utils\Pagination;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {

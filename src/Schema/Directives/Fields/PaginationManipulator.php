@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Types\ConnectionField;
+use Nuwave\Lighthouse\Exceptions\ParseException;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
+use Nuwave\Lighthouse\Schema\Types\ConnectionField;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginationManipulator
 {
