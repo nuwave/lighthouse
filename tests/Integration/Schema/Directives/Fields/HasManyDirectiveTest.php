@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class HasManyDirectiveTest extends DBTestCase
 {
@@ -38,7 +38,7 @@ class HasManyDirectiveTest extends DBTestCase
         factory(Task::class)->create([
             'user_id' => $this->user->getKey(),
             // This task should be ignored via global scope on the Task model
-            'name' => 'cleaning'
+            'name' => 'cleaning',
         ]);
 
         $this->be($this->user);
@@ -113,7 +113,6 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-
         $this->assertCount(2, array_get($result->data, 'user.tasks'));
     }
 
@@ -145,6 +144,51 @@ class HasManyDirectiveTest extends DBTestCase
         {
             user {
                 tasks(count: 2) {
+                    paginatorInfo {
+                        total
+                        count
+                        hasMorePages
+                    }
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertEquals(3, array_get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertTrue(array_get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.data'));
+    }
+
+    /** @test */
+    public function itCanQueryHasManyPaginatorWithADefaultCount()
+    {
+        $schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "paginator", defaultCount: 2)
+            posts: [Post!]! @hasMany(type: "paginator", defaultCount: 2)
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Post {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->executeQuery($schema, '
+        {
+            user {
+                tasks {
                     paginatorInfo {
                         total
                         count
