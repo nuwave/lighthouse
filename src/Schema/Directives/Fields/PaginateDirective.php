@@ -3,10 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryUtils;
-use Nuwave\Lighthouse\Execution\Utils\Cursor;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
@@ -15,8 +15,8 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
@@ -45,7 +45,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $this->getPaginationType(),
             $fieldDefinition,
             $parentType,
-            $current
+            $current,
+            $this->directiveArgValue('defaultCount')
         );
     }
 
@@ -96,6 +97,10 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             function ($root, array $args) {
                 $first = $args['count'];
                 $page = array_get($args, 'page', 1);
+
+                if ($first instanceof \GraphQL\Language\AST\IntValueNode) {
+                    $first = $first->value;
+                }
 
                 return $this->getPaginatedResults(\func_get_args(), $page, $first);
             }
@@ -172,7 +177,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         $model = $this->directiveArgValue('model');
 
         // Fallback to using information from the schema definition as the model name
-        if ( ! $model) {
+        if (! $model) {
             $model = ASTHelper::getFieldTypeName($this->definitionNode);
 
             // Cut the added type suffix to get the base model class name

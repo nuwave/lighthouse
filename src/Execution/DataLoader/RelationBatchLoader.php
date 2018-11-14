@@ -34,11 +34,11 @@ class RelationBatchLoader extends BatchLoader
      * @var string|null
      */
     protected $paginationType;
-    
+
     /**
-     * @param string $relationName
-     * @param array $args
-     * @param array $scopes
+     * @param string      $relationName
+     * @param array       $args
+     * @param array       $scopes
      * @param string|null $paginationType
      */
     public function __construct(string $relationName, array $args, array $scopes, string $paginationType = null)
@@ -48,7 +48,7 @@ class RelationBatchLoader extends BatchLoader
         $this->scopes = $scopes;
         $this->paginationType = $paginationType;
     }
-    
+
     /**
      * Resolve the keys.
      *
@@ -59,31 +59,40 @@ class RelationBatchLoader extends BatchLoader
     public function resolve(): array
     {
         $modelRelationFetcher = $this->getRelationFetcher();
-    
+
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
                 // first is an required argument
                 $first = $this->args['first'];
                 $after = Cursor::decode($this->args);
+
+                if ($first instanceof \GraphQL\Language\AST\IntValueNode) {
+                    $first = $first->value;
+                }
+
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
-            
+
                 $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                 // count must be set so we can safely get it like this
                 $count = $this->args['count'];
                 $page = array_get($this->args, 'page', 1);
-            
+
+                if ($count instanceof \GraphQL\Language\AST\IntValueNode) {
+                    $count = $count->value;
+                }
+
                 $modelRelationFetcher->loadRelationsForPage($count, $page);
                 break;
             default:
                 $modelRelationFetcher->loadRelations();
                 break;
         }
-    
+
         return $modelRelationFetcher->getRelationDictionary($this->relationName);
     }
-    
+
     /**
      * @return ModelRelationFetcher
      */
@@ -93,11 +102,12 @@ class RelationBatchLoader extends BatchLoader
             $this->getParentModels(),
             [$this->relationName => function ($query) {
                 $query = QueryUtils::applyScopes($query, $this->args, $this->scopes);
+
                 return QueryUtils::applyFilters($query, $this->args);
             }]
         );
     }
-    
+
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
