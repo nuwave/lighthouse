@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Extensions;
 use Carbon\Carbon;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -53,25 +54,10 @@ class TracingExtension extends GraphQLExtension
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST
     {
-        $tracingDirective = PartialParser::directive('@tracing');
-
-        return $documentAST->objectTypeDefinitions()
-            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($tracingDirective) {
-                if (! data_get($objectType, 'name.value')) {
-                    return $document;
-                }
-
-                $objectType->fields = new NodeList(collect($objectType->fields)
-                    ->map(function (FieldDefinitionNode $field) use ($tracingDirective) {
-                        $field->directives = $field->directives->merge([$tracingDirective]);
-
-                        return $field;
-                    })->all());
-
-                $document->setDefinition($objectType);
-
-                return $document;
-            }, $documentAST);
+        return ASTHelper::attachDirectiveToObjectTypeFields(
+            $documentAST,
+            PartialParser::directive('@tracing')
+        );
     }
 
     /**

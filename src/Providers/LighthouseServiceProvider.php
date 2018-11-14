@@ -13,9 +13,13 @@ use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
+use Nuwave\Lighthouse\Support\Http\Responses\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -71,6 +75,8 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(NodeRegistry::class);
         $this->app->singleton(TypeRegistry::class);
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
+        $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
+        $this->app->singleton(GraphQLResponse::class, Response::class);
 
         $this->app->singleton(
             SchemaSourceProvider::class,

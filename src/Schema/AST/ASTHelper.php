@@ -6,16 +6,18 @@ use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectFieldNode;
 use GraphQL\Language\AST\ObjectValueNode;
-use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
@@ -111,7 +113,7 @@ class ASTHelper
     public static function getFieldTypeName(FieldDefinitionNode $field): string
     {
         $type = $field->type;
-        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode){
+        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode) {
             $type = self::getUnderlyingNamedTypeNode($type);
         }
 
@@ -141,6 +143,40 @@ class ASTHelper
         }
 
         return self::getUnderlyingNamedTypeNode($type);
+    }
+
+    /**
+     * Check to see if a field contains a directive.
+     *
+     * @param FieldNode    $field
+     * @param string|array $directives
+     *
+     * @return bool
+     */
+    public static function fieldHasDirective(FieldNode $field, $directives)
+    {
+        $directives = is_string($directives) ? [$directives] : $directives;
+
+        foreach ($field->directives as $directive) {
+            if (in_array($directive->name->value, $directives)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check to see if a field doesn't contain a directive.
+     *
+     * @param FieldNode    $field
+     * @param string|array $directives
+     *
+     * @return bool
+     */
+    public static function fieldDoesNotHaveDirective(FieldNode $field, $directives)
+    {
+        return ! self::fieldHasDirective($field, $directives);
     }
 
     /**
@@ -212,7 +248,7 @@ class ASTHelper
                 return $directiveDefinitionNode->name->value === $name;
             });
     }
-    
+
     /**
      * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
      *
@@ -234,6 +270,35 @@ class ASTHelper
             ? static::directiveArgValue($namespaceDirective, $directiveName, '')
             // Default to an empty namespace if the namespace directive does not exist
             : '';
+    }
+
+    /**
+     * Attach directive to all registered object type fields.
+     *
+     * @param DocumentAST   $documentAST
+     * @param DirectiveNode $directive
+     *
+     * @return DocumentAST
+     */
+    public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): DocumentAST
+    {
+        return $documentAST->objectTypeDefinitions()
+            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive) {
+                if (! data_get($objectType, 'name.value')) {
+                    return $document;
+                }
+
+                $objectType->fields = new NodeList(collect($objectType->fields)
+                    ->map(function (FieldDefinitionNode $field) use ($directive) {
+                        $field->directives = $field->directives->merge([$directive]);
+
+                        return $field;
+                    })->all());
+
+                $document->setDefinition($objectType);
+
+                return $document;
+            }, $documentAST);
     }
 
     /**
