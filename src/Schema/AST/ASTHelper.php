@@ -76,7 +76,9 @@ class ASTHelper
                 );
 
                 if ($collisionOccured && ! $overwriteDuplicates) {
-                    throw new DefinitionException("Duplicate definition {$oldName} found when merging.");
+                    throw new DefinitionException(
+                        "Duplicate definition {$oldName} found when merging."
+                    );
                 }
 
                 return $collisionOccured;
@@ -135,7 +137,9 @@ class ASTHelper
         $type = data_get($node, 'type');
 
         if (! $type) {
-            throw new DefinitionException("The node '$node->kind' does not have a type associated with it.");
+            throw new DefinitionException(
+                "The node '$node->kind' does not have a type associated with it."
+            );
         }
 
         return self::getUnderlyingNamedTypeNode($type);

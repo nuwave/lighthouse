@@ -55,6 +55,9 @@ class GraphQLController extends Controller
      *
      * @param Request $request
      *
+     * @throws DirectiveException
+     * @throws ParseException
+     *
      * @return Response
      */
     public function query(Request $request)

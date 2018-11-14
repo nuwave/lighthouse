@@ -17,7 +17,9 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
@@ -95,8 +97,8 @@ class GraphQL
      * @param array  $variables
      * @param null   $rootValue
      *
-     * @throws Exceptions\DirectiveException
-     * @throws Exceptions\ParseException
+     * @throws DirectiveException
+     * @throws ParseException
      *
      * @return ExecutionResult
      */
@@ -189,9 +191,13 @@ class GraphQL
     {
         if (empty($this->documentAST)) {
             $this->documentAST = config('lighthouse.cache.enable')
-                ? app('cache')->rememberForever(config('lighthouse.cache.key'), function () {
-                    return $this->buildAST();
-                })
+                ? app('cache')
+                    ->rememberForever(
+                        config('lighthouse.cache.key'),
+                        function () {
+                            return $this->buildAST();
+                        }
+                    )
                 : $this->buildAST();
         }
 

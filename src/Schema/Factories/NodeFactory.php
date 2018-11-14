@@ -96,7 +96,7 @@ class NodeFactory
             })
             ->getType();
     }
-    
+
     /**
      * Check if node has a type resolver directive.
      *
@@ -110,14 +110,15 @@ class NodeFactory
     {
         return $this->directiveRegistry->hasNodeResolver($definition);
     }
-    
+
     /**
      * Use directive resolver to transform type.
      *
      * @param TypeDefinitionNode $definition
      *
-     * @return Type
      * @throws DirectiveException
+     *
+     * @return Type
      */
     protected function resolveTypeViaDirective(TypeDefinitionNode $definition): Type
     {
@@ -127,7 +128,7 @@ class NodeFactory
                 $this->valueFactory->node($definition)
             );
     }
-    
+
     /**
      * Transform value to type.
      *
@@ -157,7 +158,7 @@ class NodeFactory
                 throw new InvariantViolation("Unknown type for Node [{$definition->name->value}]");
         }
     }
-    
+
     /**
      * @param EnumTypeDefinitionNode $enumDefinition
      *
@@ -171,7 +172,7 @@ class NodeFactory
             'values' => collect($enumDefinition->values)
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     // Get the directive that is defined on the field itself
-                    $directive = ASTHelper::directiveDefinition( $field, 'enum');
+                    $directive = ASTHelper::directiveDefinition($field, 'enum');
 
                     return [
                         $field->name->value => [
@@ -180,43 +181,46 @@ class NodeFactory
                                 ? ASTHelper::directiveArgValue($directive, 'value')
                                 : $field->name->value,
                             'description' => data_get($field->description, 'value'),
-                        ]
+                        ],
                     ];
                 })
                 ->toArray(),
         ]);
     }
-    
+
     /**
      * @param ScalarTypeDefinitionNode $scalarDefinition
      *
+     * @throws DefinitionException
+     *
      * @return ScalarType
-     * @throws \Exception
      */
     protected function resolveScalarType(ScalarTypeDefinitionNode $scalarDefinition): ScalarType
     {
         $scalarName = $scalarDefinition->name->value;
-        
-        if($directive = ASTHelper::directiveDefinition($scalarDefinition, 'scalar')){
+
+        if ($directive = ASTHelper::directiveDefinition($scalarDefinition, 'scalar')) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
             $className = $scalarName;
         }
 
         $className = \namespace_classname($className, [
-            config('lighthouse.namespaces.scalars')
+            config('lighthouse.namespaces.scalars'),
         ]);
 
-        if(!$className){
-            throw new \Exception("No class found for the scalar {$scalarName}");
+        if (! $className) {
+            throw new DefinitionException(
+                "No class found for the scalar {$scalarName}"
+            );
         }
-        
+
         return new $className([
             'name' => $scalarName,
             'description' => data_get($scalarDefinition->description, 'value'),
         ]);
     }
-    
+
     /**
      * @param ObjectTypeDefinitionNode $objectDefinition
      *
@@ -263,11 +267,11 @@ class NodeFactory
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
     {
         $nodeName = $interfaceDefinition->name->value;
-        
-        if($directive = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')){
-            $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
 
-            if($interfaceDirective->directiveHasArgument('resolveType')){
+        if ($directive = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
+            $interfaceDirective = (new InterfaceDirective())->hydrate($interfaceDefinition);
+
+            if ($interfaceDirective->directiveHasArgument('resolveType')) {
                 $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
             } else {
                 /**
@@ -277,14 +281,14 @@ class NodeFactory
             }
         } else {
             $interfaceClass = \namespace_classname($nodeName, [
-                config('lighthouse.namespaces.interfaces')
+                config('lighthouse.namespaces.interfaces'),
             ]);
-        
+
             $typeResolver = \method_exists($interfaceClass, 'resolveType')
                 ? [resolve($interfaceClass), 'resolveType']
                 : static::typeResolverFallback();
         }
-    
+
         return new InterfaceType([
             'name' => $nodeName,
             'description' => data_get($interfaceDefinition->description, 'value'),
@@ -304,11 +308,11 @@ class NodeFactory
     protected function resolveUnionType(UnionTypeDefinitionNode $unionDefinition): UnionType
     {
         $nodeName = $unionDefinition->name->value;
-        
-        if($directive = ASTHelper::directiveDefinition($unionDefinition,'union')){
-            $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
 
-            if($unionDirective->directiveHasArgument('resolveType')){
+        if ($directive = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
+            $unionDirective = (new UnionDirective())->hydrate($unionDefinition);
+
+            if ($unionDirective->directiveHasArgument('resolveType')) {
                 $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
             } else {
                 /**
@@ -318,14 +322,14 @@ class NodeFactory
             }
         } else {
             $unionClass = \namespace_classname($nodeName, [
-                config('lighthouse.namespaces.unions')
+                config('lighthouse.namespaces.unions'),
             ]);
-            
+
             $typeResolver = \method_exists($unionClass, 'resolveType')
                 ? [resolve($unionClass), 'resolveType']
                 : static::typeResolverFallback();
         }
-        
+
         return new UnionType([
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
