@@ -56,7 +56,7 @@ return [
     |
     */
     'schema' => [
-        'register' => base_path('routes/graphql/schema.graphql'),
+        'register' => base_path('graphql/schema.graphql'),
     ],
 
     /*
@@ -82,7 +82,7 @@ return [
     | List directories that will be scanned for custom server-side directives.
     |
     */
-    'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
+    'directives' => [__DIR__.'/../app/GraphQL/Directives'],
 
     /*
     |--------------------------------------------------------------------------
@@ -94,12 +94,12 @@ return [
     |
     */
     'namespaces' => [
-        'models' => 'App\\Models',
-        'queries' => 'App\\Http\\GraphQL\\Queries',
-        'mutations' => 'App\\Http\\GraphQL\\Mutations',
-        'interfaces' => 'App\\Http\\GraphQL\\Interfaces',
-        'unions' => 'App\\Http\\GraphQL\\Unions',
-        'scalars' => 'App\\Http\\GraphQL\\Scalars',
+        'models' => 'App',
+        'queries' => 'App\\GraphQL\\Queries',
+        'mutations' => 'App\\GraphQL\\Mutations',
+        'interfaces' => 'App\\GraphQL\\Interfaces',
+        'unions' => 'App\\GraphQL\\Unions',
+        'scalars' => 'App\\GraphQL\\Scalars',
     ],
 
     /*
