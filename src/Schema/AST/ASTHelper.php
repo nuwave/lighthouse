@@ -11,6 +11,7 @@ use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
@@ -258,22 +259,25 @@ class ASTHelper
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): DocumentAST
     {
         return $documentAST->objectTypeDefinitions()
-            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive) {
-                if (! data_get($objectType, 'name.value')) {
+            ->reduce(
+                function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive) {
+                    if (! data_get($objectType, 'name.value')) {
+                        return $document;
+                    }
+
+                    $objectType->fields = new NodeList(collect($objectType->fields)
+                        ->map(function (FieldDefinitionNode $field) use ($directive) {
+                            $field->directives = $field->directives->merge([$directive]);
+
+                            return $field;
+                        })->all());
+
+                    $document->setDefinition($objectType);
+
                     return $document;
-                }
-
-                $objectType->fields = new NodeList(collect($objectType->fields)
-                    ->map(function (FieldDefinitionNode $field) use ($directive) {
-                        $field->directives = $field->directives->merge([$directive]);
-
-                        return $field;
-                    })->all());
-
-                $document->setDefinition($objectType);
-
-                return $document;
-            }, $documentAST);
+                },
+                $documentAST
+            );
     }
 
     /**
