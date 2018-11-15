@@ -248,6 +248,35 @@ class ASTHelper
     }
 
     /**
+     * Attach directive to all registered object type fields.
+     *
+     * @param DocumentAST   $documentAST
+     * @param DirectiveNode $directive
+     *
+     * @return DocumentAST
+     */
+    public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): DocumentAST
+    {
+        return $documentAST->objectTypeDefinitions()
+            ->reduce(function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive) {
+                if (! data_get($objectType, 'name.value')) {
+                    return $document;
+                }
+
+                $objectType->fields = new NodeList(collect($objectType->fields)
+                    ->map(function (FieldDefinitionNode $field) use ($directive) {
+                        $field->directives = $field->directives->merge([$directive]);
+
+                        return $field;
+                    })->all());
+
+                $document->setDefinition($objectType);
+
+                return $document;
+            }, $documentAST);
+    }
+
+    /**
      * This adds an Interface called "Node" to an ObjectType definition.
      *
      * @param ObjectTypeDefinitionNode $objectType
