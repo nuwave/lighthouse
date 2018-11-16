@@ -46,7 +46,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         return $value->setResolver(function ($root, $args, $context, $info) use ($value, $resolver, $maxAge, $privateCache) {
             /** @var \Illuminate\Support\Facades\Cache $cache */
             $cache = resolve('cache');
-            /** @var \Nuwave\Lighthouse\Schema\Values\CacheValue $cacheValue */
             $cacheValue = new CacheValue([
                 'field_value' => $value,
                 'root' => $root,
