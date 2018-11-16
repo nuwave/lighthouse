@@ -50,12 +50,12 @@ class RuleFactoryTest extends TestCase
         $this->assertSame(
             [
                 [
-                    '*.foo' => [
+                    'foo.*' => [
                         'email',
                     ],
                 ],
                 [
-                    '*.foo.email' => 'bar',
+                    'foo.*.email' => 'bar',
                 ],
             ],
             $result
@@ -162,7 +162,7 @@ class RuleFactoryTest extends TestCase
 
         $this->assertSame(
             [
-                '*.emailList' => ['required', 'email'],
+                'emailList.*' => ['required', 'email'],
             ],
             $rules
         );

@@ -115,9 +115,10 @@ class RuleFactory
 
         if ($rulesDirective) {
             // We want those rules to get applied to the contents of the field,
-            // so if the return type is a list, we prepend the path with *.
+            // so if the return type is a list, we utilize the Laravel array validation
+            // by appending .* to the array
             $rulesPath = $typeIncludesList
-                ? "*.{$inputDefinitionName}"
+                ? "{$inputDefinitionName}.*"
                 : $inputDefinitionName;
 
             $rules[$rulesPath] = self::getRulesFromDirective($rulesDirective, $inputDefinitionName);
