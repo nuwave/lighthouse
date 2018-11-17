@@ -10,7 +10,7 @@ class ValidationTest extends TestCase
     protected $schema = '
     type Query {
         foo(
-            email: String @rules(apply: ["email"])
+            email: String = "hans@peter.rudolf" @rules(apply: ["email"])
             required: String @rules(apply: ["required"])
             input: [Bar] @rulesForArray(apply: ["min:3"])
             list: [String] @rules(apply: ["required", "email"]) @rulesForArray(apply: ["max:2"])
@@ -25,6 +25,7 @@ class ValidationTest extends TestCase
     
     input Baz {
         barbaz: Int
+        invalidDefault: String = "invalid-mail" @rules(apply: ["email"])
         required: Int @rules(apply: ["required"])
     }
     ';
@@ -61,6 +62,7 @@ class ValidationTest extends TestCase
             'required',
             'input.0.foobar',
             'input.1.self.foobar',
+            'input.2.withRequired.invalidDefault',
             'input.2.withRequired.required',
         ], $result);
     }

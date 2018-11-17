@@ -66,10 +66,6 @@ class RelationBatchLoader extends BatchLoader
                 $first = $this->args['first'];
                 $after = Cursor::decode($this->args);
 
-                if ($first instanceof \GraphQL\Language\AST\IntValueNode) {
-                    $first = $first->value;
-                }
-
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
 
                 $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
@@ -78,10 +74,6 @@ class RelationBatchLoader extends BatchLoader
                 // count must be set so we can safely get it like this
                 $count = $this->args['count'];
                 $page = array_get($this->args, 'page', 1);
-
-                if ($count instanceof \GraphQL\Language\AST\IntValueNode) {
-                    $count = $count->value;
-                }
 
                 $modelRelationFetcher->loadRelationsForPage($count, $page);
                 break;

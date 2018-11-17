@@ -98,10 +98,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                 $first = $args['count'];
                 $page = array_get($args, 'page', 1);
 
-                if ($first instanceof \GraphQL\Language\AST\IntValueNode) {
-                    $first = $first->value;
-                }
-
                 return $this->getPaginatedResults(\func_get_args(), $page, $first);
             }
         );
