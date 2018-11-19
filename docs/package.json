@@ -4,7 +4,8 @@
     "vuepress": "^1.0.0-alpha.22"
   },
   "scripts": {
-    "docs:dev": "vuepress dev website",
-    "docs:build": "vuepress build website"
+    "docs:dev": "vuepress dev .",
+    "docs:version": "version.js",
+    "docs:build": "vuepress build ."
   }
 }
