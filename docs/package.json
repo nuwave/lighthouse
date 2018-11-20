@@ -1,11 +1,12 @@
 {
   "license": "MIT",
   "dependencies": {
+    "fs-extra": "^7.0.1",
     "vuepress": "^1.0.0-alpha.22"
   },
   "scripts": {
     "docs:dev": "vuepress dev .",
-    "docs:version": "version.js",
+    "docs:version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
     "docs:build": "vuepress build ."
   }
 }
