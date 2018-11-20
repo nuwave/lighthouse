@@ -18,17 +18,17 @@ class CanDirectiveTest extends TestCase
     {
         $this->be(new User());
 
-        $schema = sprintf('
+        $schema = '
         type Query {
             user: User!
-                @can(%s: "adminOnly")
-                @field(resolver: "%s@resolveUser")
+                @can('.$argumentName.': "adminOnly")
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
             name: String
         }
-        ', $argumentName, addslashes(self::class));
+        ';
 
         $query = '
         {
@@ -54,17 +54,17 @@ class CanDirectiveTest extends TestCase
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = sprintf('
+        $schema = '
         type Query {
             user: User!
-                @can(%s: "adminOnly")
-                @field(resolver: "%s@resolveUser")
+                @can('.$argumentName.': "adminOnly")
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
             name: String
         }
-        ', $argumentName, addslashes(self::class));
+        ';
 
         $query = '
         {
@@ -87,17 +87,17 @@ class CanDirectiveTest extends TestCase
      */
     public function itAcceptsGuestUser(string $argumentName)
     {
-        $schema = sprintf('
+        $schema = '
         type Query {
             user: User!
-                @can(%s: "guestOnly")
-                @field(resolver: "%s@resolveUser")
+                @can('.$argumentName.': "guestOnly")
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
             name: String
         }
-        ', $argumentName, addslashes(self::class));
+        ';
 
         $query = '
         {
@@ -124,17 +124,17 @@ class CanDirectiveTest extends TestCase
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = sprintf('
+        $schema = '
         type Query {
             user: User!
-                @can(%s: ["adminOnly", "alwaysTrue"])
-                @field(resolver: "%s@resolveUser")
+                @can('.$argumentName.': ["adminOnly", "alwaysTrue"])
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
             name: String
         }
-        ', $argumentName, addslashes(self::class));
+        ';
 
         $query = '
         {
@@ -157,17 +157,17 @@ class CanDirectiveTest extends TestCase
      */
     public function itProcessesTheArgsArgument(string $argumentName)
     {
-        $schema = sprintf('
+        $schema = '
         type Query {
             user: User!
-                @can(%s: "dependingOnArg", args: [false])
-                @field(resolver: "%s@resolveUser")
+                @can('.$argumentName.': "dependingOnArg", args: [false])
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
             name: String
         }
-        ', $argumentName, addslashes(self::class));
+        ';
 
         $query = '
         {
