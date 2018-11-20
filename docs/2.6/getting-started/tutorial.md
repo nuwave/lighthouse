@@ -47,10 +47,11 @@ The type `Person` has a field `posts` that returns a list of `Post` types.
 We also defined the inverse relationship from `Post` to `Person` through the `author` field.
 
 
-> This short intro is a compilation from many sources, all credits goes to the original authors.
-> - https://graphql.org
-> - https://howtographql.com
-
+::: tip NOTE
+ This short intro is a compilation from many sources, all credits goes to the original authors.
+ - [https://graphql.org](https://graphql.org)
+ - [https://howtographql.com](https://howtographql.com)
+:::
 
 ## What is Lighthouse?
 
@@ -85,8 +86,9 @@ In this tutorial we will create a GraphQL API for a simple Blog from scratch wit
 - Laravel GraphQL Playground
 - MySQL
 
-
-> You can download the source code for this tutorial at https://github.com/nuwave/lighthouse-tutorial
+::: tip
+You can download the source code for this tutorial at https://github.com/nuwave/lighthouse-tutorial
+:::
 
 
 ## Installation

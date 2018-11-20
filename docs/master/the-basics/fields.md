@@ -180,7 +180,7 @@ The newly created user is returned as a result:
 
 ### Update
 
-You can easily add a way to update your data with the [@update](../api-reference/directives#update) directive.
+You can easily add a way to update your data with the [@update](../api-reference/directives.md#update) directive.
 
 ```graphql
 type Mutation {
@@ -224,7 +224,7 @@ may fail to find the model you provided and return `null`:
 
 ### Delete
 
-Deleting data through your GraphQL API is really easy with the [@delete](../api-reference/directives#delete) directive. Dangerously easy.
+Deleting data through your GraphQL API is really easy with the [@delete](../api-reference/directives.md#delete) directive. Dangerously easy.
 
 ```graphql
 type Mutation {
