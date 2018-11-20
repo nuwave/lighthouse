@@ -11,7 +11,19 @@ footer: Copyright © 2018 Christopher Moore
 Lighthouse is a PHP package that allows you to serve a GraphQL endpoint from your Laravel application. It greatly reduces the boilerplate required to create a schema, integrates well with any Laravel project, and is highly customizable giving you full control over your data.
 
 
-<div class="features"><div class="feature"><h2>🔤 Schema Directives</h2> <p>Lighthouse provides you with a handful of helpful Schema Directives to get you up and running in no time. But it also allows you to create your own when needed.</p></div><div class="feature"><h2>❤️ Laravel Friendly</h2> <p>Lighthouse integrates with your Laravel application without the need to re-write your entire domain. Just build a GraphQL schema on top of your current logic and start querying!</p></div><div class="feature"><h2>💯 Optimized for Eloquent</h2> <p>Eloquent is an extremely powerful ORM. Lighthouse leverages your current model relationships and creates optimized database queries.</p></div></div>
+<div class="features">
+  <div class="feature">
+    <h2>🔤 Schema Directives</h2> 
+    <p>Lighthouse provides you with a handful of helpful Schema Directives to get you up and running in no time. But it also allows you to create your own when needed.</p>
+  </div>
+  <div class="feature">
+    <h2>❤️ Laravel Friendly</h2> 
+    <p>Lighthouse integrates with your Laravel application without the need to re-write your entire domain. Just build a GraphQL schema on top of your current logic and start querying!</p>
+  </div><div class="feature">
+    <h2>💯 Optimized for Eloquent</h2> 
+    <p>Eloquent is an extremely powerful ORM. Lighthouse leverages your current model relationships and creates optimized database queries.</p>
+  </div>
+</div>
 
 # Rapid GraphQL Development
 
