@@ -42,7 +42,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                     $args = $this->getArguments();
 
                     $this->getAbilities()->each(function (string $ability) use ($args, $gate, $user) {
-                        $this->validate($user, $gate, $ability, $args);
+                        $this->authorize($user, $gate, $ability, $args);
                     });
 
                     return \call_user_func_array($resolver, \func_get_args());
@@ -76,6 +76,8 @@ class CanDirective extends BaseDirective implements FieldMiddleware
         $modelClass = $this->getModelClass();
         $args = (array) $this->directiveArgValue('args');
 
+        // The signature of the second argument `$arguments` of `Gate::check`
+        // should be [modelClassName, additionalArg, additionalArg...]
         array_unshift($args, $modelClass);
 
         return $args;
@@ -89,7 +91,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * @throws AuthorizationException
      */
-    protected function validate($user, Gate $gate, string $ability, array $args)
+    protected function authorize($user, Gate $gate, string $ability, array $args)
     {
         $can = $gate->forUser($user)->check($ability, $args);
 
