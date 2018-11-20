@@ -10,22 +10,26 @@ class CanDirectiveTest extends TestCase
 {
     /**
      * @test
+     * @dataProvider provideAcceptableArgumentNames
+     *
+     * @param string $argumentName
      */
-    public function itThrowsIfNotAuthorized()
+    public function itThrowsIfNotAuthorized(string $argumentName)
     {
-        $this->be(new User);
+        $this->be(new User());
 
-        $schema = '
+        $schema = sprintf('
         type Query {
             user: User!
-                @can(if: "adminOnly")
-                @field(resolver: "'.addslashes(self::class).'@resolveUser")
+                @can(%s: "adminOnly")
+                @field(resolver: "%s@resolveUser")
         }
         
         type User {
             name: String
         }
-        ';
+        ', $argumentName, addslashes(self::class));
+
         $query = '
         {
             user {
@@ -40,24 +44,28 @@ class CanDirectiveTest extends TestCase
 
     /**
      * @test
+     * @dataProvider provideAcceptableArgumentNames
+     *
+     * @param string $argumentName
      */
-    public function itPassesAuthIfAuthorized()
+    public function itPassesAuthIfAuthorized(string $argumentName)
     {
-        $user = new User;
+        $user = new User();
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = '
+        $schema = sprintf('
         type Query {
             user: User!
-                @can(if: "adminOnly")
-                @field(resolver: "'.addslashes(self::class).'@resolveUser")
+                @can(%s: "adminOnly")
+                @field(resolver: "%s@resolveUser")
         }
         
         type User {
             name: String
         }
-        ';
+        ', $argumentName, addslashes(self::class));
+
         $query = '
         {
             user {
@@ -72,24 +80,28 @@ class CanDirectiveTest extends TestCase
 
     /**
      * @test
+     * @dataProvider provideAcceptableArgumentNames
+     *
+     * @param string $argumentName
      */
-    public function itPassesMultiplePolicies()
+    public function itPassesMultiplePolicies(string $argumentName)
     {
-        $user = new User;
+        $user = new User();
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = '
+        $schema = sprintf('
         type Query {
             user: User!
-                @can(if: ["adminOnly", "alwaysTrue"])
-                @field(resolver: "'.addslashes(self::class).'@resolveUser")
+                @can(%s: ["adminOnly", "alwaysTrue"])
+                @field(resolver: "%s@resolveUser")
         }
         
         type User {
             name: String
         }
-        ';
+        ', $argumentName, addslashes(self::class));
+
         $query = '
         {
             user {
@@ -102,10 +114,19 @@ class CanDirectiveTest extends TestCase
         $this->assertSame('foo', array_get($result, 'data.user.name'));
     }
 
-    public function resolveUser()
+    public function resolveUser(): User
     {
-        $user = new User;
+        $user = new User();
         $user->name = 'foo';
+
         return $user;
+    }
+
+    public function provideAcceptableArgumentNames(): array
+    {
+        return [
+            ['if'],
+            ['ability'],
+        ];
     }
 }
