@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Illuminate\Contracts\Auth\Access\Authorizable;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
-use Nuwave\Lighthouse\Exceptions\AuthenticationException;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class CanDirective extends BaseDirective implements FieldMiddleware
 {
@@ -25,7 +26,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure $next
+     * @param \Closure   $next
      *
      * @return FieldValue
      */
@@ -36,25 +37,64 @@ class CanDirective extends BaseDirective implements FieldMiddleware
         return $next(
             $value->setResolver(
                 function () use ($resolver) {
-                    /** @var Authorizable $user */
                     $user = auth()->user();
+                    $gate = resolve(Gate::class);
+                    $args = $this->getArguments();
 
-                    if (!$user) {
-                        throw new AuthenticationException('Not authenticated to access this field.');
-                    }
-
-                    $model = $this->getModelClass();
-                    $policies = $this->directiveArgValue('if');
-
-                    collect($policies)->each(function (string $policy) use ($user, $model) {
-                        if (!$user->can($policy, $model)) {
-                            throw new AuthorizationException('Not authorized to access this field.');
-                        }
+                    $this->getAbilities()->each(function (string $ability) use ($args, $gate, $user) {
+                        $this->validate($user, $gate, $ability, $args);
                     });
 
-                    return call_user_func_array($resolver, func_get_args());
+                    return \call_user_func_array($resolver, \func_get_args());
                 }
             )
         );
+    }
+
+    /**
+     * Get the ability argument.
+     *
+     * @return Collection
+     */
+    protected function getAbilities(): Collection
+    {
+        return collect(
+            $this->directiveArgValue('ability') ??
+            $this->directiveArgValue('if')
+        );
+    }
+
+    /**
+     * Get the arguments passing to `Gate::check`.
+     *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    protected function getArguments(): array
+    {
+        $modelClass = $this->getModelClass();
+        $args = (array) $this->directiveArgValue('args');
+
+        array_unshift($args, $modelClass);
+
+        return $args;
+    }
+
+    /**
+     * @param Authenticatable|null $user
+     * @param Gate                 $gate
+     * @param string               $ability
+     * @param array                $args
+     *
+     * @throws AuthorizationException
+     */
+    protected function validate($user, Gate $gate, string $ability, array $args)
+    {
+        $can = $gate->forUser($user)->check($ability, $args);
+
+        if (! $can) {
+            throw new AuthorizationException('Not authorized to access this field.');
+        }
     }
 }
