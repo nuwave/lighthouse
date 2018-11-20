@@ -96,7 +96,7 @@ class PaginationManipulator
      */
     public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
     {
-        $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
+        $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $connectionTypeName = "{$fieldTypeName}Connection";
         $connectionEdgeName = "{$fieldTypeName}Edge";
         $connectionFieldName = addslashes(ConnectionField::class);
@@ -152,7 +152,7 @@ class PaginationManipulator
      */
     public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
     {
-        $fieldTypeName = ASTHelper::getFieldTypeName($fieldDefinition);
+        $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 

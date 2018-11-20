@@ -9,20 +9,19 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class SchemaBuilder
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-    /** @var ValueFactory */
-    protected $valueFactory;
     /** @var NodeFactory */
     protected $nodeFactory;
     /** @var DefinitionNodeConverter */
@@ -30,18 +29,15 @@ class SchemaBuilder
 
     /**
      * @param TypeRegistry            $typeRegistry
-     * @param ValueFactory            $valueFactory
      * @param NodeFactory             $nodeFactory
      * @param DefinitionNodeConverter $definitionNodeConverter
      */
     public function __construct(
         TypeRegistry $typeRegistry,
-        ValueFactory $valueFactory,
         NodeFactory $nodeFactory,
         DefinitionNodeConverter $definitionNodeConverter
     ) {
         $this->typeRegistry = $typeRegistry;
-        $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
@@ -52,6 +48,8 @@ class SchemaBuilder
      * @param DocumentAST $documentAST
      *
      * @throws DirectiveException
+     * @throws DefinitionException
+     *
      * @return Schema
      */
     public function build($documentAST)
@@ -90,11 +88,6 @@ class SchemaBuilder
             ->setQuery(
                 $queryType
             )
-            // Not using lazy loading, as we do not have a way of discovering
-            // orphaned types at the moment
-            ->setTypes(
-                $types
-            )
             ->setDirectives(
                 $this->convertDirectives($documentAST)
                     ->toArray()
@@ -106,6 +99,11 @@ class SchemaBuilder
         }
         if (isset($subscriptionType)) {
             $config->setSubscription($subscriptionType);
+        }
+        // Not using lazy loading, as we do not have a way of discovering
+        // orphaned types at the moment
+        if (isset($types)) {
+            $config->setTypes($types);
         }
 
         return new Schema($config);

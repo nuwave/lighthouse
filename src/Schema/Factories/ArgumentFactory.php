@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -27,6 +28,8 @@ class ArgumentFactory
      * Convert argument definition to type.
      *
      * @param ArgumentValue $value
+     *
+     * @throws \Exception
      *
      * @return array
      */
@@ -54,7 +57,7 @@ class ArgumentFactory
 
         if ($defaultValue = $definition->defaultValue) {
             $fieldArgument += [
-                'defaultValue' => $defaultValue,
+                'defaultValue' => AST::valueFromASTUntyped($defaultValue),
             ];
         }
 

@@ -6,8 +6,6 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Schema\Values\CacheValue;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 
 class CacheDirectiveTest extends DBTestCase
 {
@@ -203,46 +201,6 @@ class CacheDirectiveTest extends DBTestCase
         // Get the the original user and the `find` directive checks the count
         $this->assertEquals(0, $queries);
         $this->assertEquals($result, $cache);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanUseCustomCacheValue()
-    {
-        /** @var ValueFactory $valueFactory */
-        $valueFactory = resolve(ValueFactory::class);
-        $valueFactory->cacheResolver(function ($arguments) {
-            return new class($arguments) extends CacheValue
-            {
-                public function getKey()
-                {
-                    return 'foo';
-                }
-            };
-        });
-
-        $resolver = addslashes(self::class) . '@resolve';
-        $schema = "
-        type User {
-            id: ID!
-            name: String @cache
-        }
-        
-        type Query {
-            user: User @field(resolver: \"{$resolver}\")
-        }
-        ";
-        $query = '
-        {
-            user {
-                name
-            }
-        }
-        ';
-        $this->execute($schema, $query);
-
-        $this->assertEquals('foobar', resolve('cache')->get('foo'));
     }
 
     /**

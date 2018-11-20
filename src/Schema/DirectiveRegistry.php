@@ -280,7 +280,7 @@ class DirectiveRegistry
      *
      * @return bool
      */
-    public function hasFieldResolver($fieldDefinition): bool
+    public function hasFieldResolver(FieldDefinitionNode $fieldDefinition): bool
     {
         return $this->fieldResolver($fieldDefinition) instanceof FieldResolver;
     }
@@ -292,7 +292,7 @@ class DirectiveRegistry
      *
      * @return bool
      */
-    public function hasFieldMiddleware($field): bool
+    public function hasFieldMiddleware(FieldDefinitionNode $field): bool
     {
         return $this->fieldMiddleware($field)->count() > 1;
     }
@@ -306,7 +306,7 @@ class DirectiveRegistry
      *
      * @return FieldResolver|null
      */
-    public function fieldResolver($field)
+    public function fieldResolver(FieldDefinitionNode $field)
     {
         return $this->singleDirectiveOfType($field, FieldResolver::class);
     }

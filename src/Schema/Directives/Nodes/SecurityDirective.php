@@ -40,11 +40,11 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
      */
     public function handleNode(NodeValue $value, \Closure $next)
     {
-        if ('Query' !== $value->getNodeName()) {
+        if ('Query' !== $value->getTypeDefinitionName()) {
             $message = sprintf(
                 'The `security` directive can only be placed on the %s type [%s]',
                 'Query',
-                $value->getNodeName()
+                $value->getTypeDefinitionName()
             );
 
             throw new DirectiveException($message);

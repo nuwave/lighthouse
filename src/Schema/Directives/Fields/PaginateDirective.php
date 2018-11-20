@@ -98,10 +98,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                 $first = $args['count'];
                 $page = array_get($args, 'page', 1);
 
-                if ($first instanceof \GraphQL\Language\AST\IntValueNode) {
-                    $first = $first->value;
-                }
-
                 return $this->getPaginatedResults(\func_get_args(), $page, $first);
             }
         );
@@ -178,7 +174,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
 
         // Fallback to using information from the schema definition as the model name
         if (! $model) {
-            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+            $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
             // Cut the added type suffix to get the base model class name
             $model = str_before($model, 'Paginator');

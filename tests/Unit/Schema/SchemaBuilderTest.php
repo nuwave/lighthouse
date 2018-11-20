@@ -38,12 +38,12 @@ class SchemaBuilderTest extends TestCase
             EMPLOYEE @enum(value:"employee")
         }
         ');
-    
+
         /** @var EnumType $enum */
         $enum = $schema->getType('Role');
         $this->assertInstanceOf(EnumType::class, $enum);
         $this->assertSame('Role description', $enum->description);
-    
+
         $enumValues = $enum->getValues();
         $this->assertCount(2, $enumValues);
         $this->assertSame('Company administrator.', $enum->getValue('ADMIN')->description);
@@ -63,11 +63,11 @@ class SchemaBuilderTest extends TestCase
             bar: String!
         }
         ');
-    
+
         /** @var InterfaceType $interface */
         $interface = $schema->getType('Foo');
         $this->assertInstanceOf(InterfaceType::class, $interface);
-        
+
         $this->assertSame('int', $interface->description);
         $this->assertSame('bar is baz', $interface->getField('bar')->description);
     }
@@ -83,7 +83,7 @@ class SchemaBuilderTest extends TestCase
             "bar attribute of Foo"
             bar(
                 "arg"
-                baz: Boolean
+                baz: Boolean = false
             ): String!
         }
         ');
@@ -93,10 +93,14 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(ObjectType::class, $foo);
 
         $this->assertSame('Foo', $foo->name);
-    
+
         $bar = $foo->getField('bar');
         $this->assertSame('bar attribute of Foo', $bar->description);
-        $this->assertSame('arg', $bar->getArg('baz')->description);
+
+        $baz = $bar->getArg('baz');
+        $this->assertSame('arg', $baz->description);
+        $this->assertTrue($baz->defaultValueExists());
+        $this->assertFalse($baz->defaultValue);
     }
 
     /**
@@ -109,7 +113,7 @@ class SchemaBuilderTest extends TestCase
         input CreateFoo {
             "xyz"
             foo: String!
-            bar: Int
+            bar: Int = 123
         }
         ');
 
@@ -120,6 +124,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('CreateFoo', $createFoo->name);
         $this->assertSame('bla', $createFoo->description);
         $this->assertSame('xyz', $createFoo->getField('foo')->description);
+        $this->assertSame(123, $createFoo->getField('bar')->defaultValue);
     }
 
     /**
@@ -192,7 +197,7 @@ class SchemaBuilderTest extends TestCase
 
         /** @var ObjectType $type */
         $type = $schema->getType('Foo');
-        
+
         $this->assertSame('yo?', $type->getField('bar')->description);
     }
 }

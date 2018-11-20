@@ -2,18 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 /**
- * Allows defining rules and messages on an InputValueDefinition.
+ * Allows defining rules and messages for arrays on an InputValueDefinition.
  *
  * @see RuleFactory::getRulesAndMessages() for how this is applied.
  */
-class RulesDirective extends BaseDirective
+class RulesForArrayDirective extends BaseDirective
 {
     /** @var string */
-    const NAME = 'rules';
+    const NAME = 'rulesForArray';
 
     /**
      * Name of the directive.
