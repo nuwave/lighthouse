@@ -81,6 +81,16 @@ class NodeValue
     }
 
     /**
+     * Get the underlying type definition fields.
+     *
+     * @return \GraphQL\Language\AST\NodeList|array
+     */
+    public function getTypeDefinitionFields()
+    {
+        return data_get($this->typeDefinition, 'fields', []);
+    }
+
+    /**
      * Get node's cache key.
      *
      * @return string|null
