@@ -73,6 +73,40 @@ class CanDirectiveTest extends TestCase
             }
         }
         ';
+
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame('foo', array_get($result, 'data.user.name'));
+    }
+
+    /**
+     * @test
+     * @dataProvider provideAcceptableArgumentNames
+     *
+     * @param string $argumentName
+     */
+    public function itAcceptsGuestUser(string $argumentName)
+    {
+        $schema = sprintf('
+        type Query {
+            user: User!
+                @can(%s: "guestOnly")
+                @field(resolver: "%s@resolveUser")
+        }
+        
+        type User {
+            name: String
+        }
+        ', $argumentName, addslashes(self::class));
+
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+
         $result = $this->execute($schema, $query);
 
         $this->assertSame('foo', array_get($result, 'data.user.name'));
@@ -109,9 +143,42 @@ class CanDirectiveTest extends TestCase
             }
         }
         ';
+
         $result = $this->execute($schema, $query);
 
         $this->assertSame('foo', array_get($result, 'data.user.name'));
+    }
+
+    /**
+     * @test
+     * @dataProvider provideAcceptableArgumentNames
+     *
+     * @param string $argumentName
+     */
+    public function itProcessesTheArgsArgument(string $argumentName)
+    {
+        $schema = sprintf('
+        type Query {
+            user: User!
+                @can(%s: "dependingOnArg", args: [false])
+                @field(resolver: "%s@resolveUser")
+        }
+        
+        type User {
+            name: String
+        }
+        ', $argumentName, addslashes(self::class));
+
+        $query = '
+        {
+            user {
+                name
+            }
+        }
+        ';
+
+        $this->expectException(AuthorizationException::class);
+        $this->execute($schema, $query);
     }
 
     public function resolveUser(): User
