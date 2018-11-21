@@ -1,52 +1,113 @@
 body
-{
-  font-family: Nunito !important;
-    background-color #fbfbfb
-}
+  font-family Nunito !important
+  background-color #fbfbfb
+
+/****************************** 
+  HOME
+*******************************/
+
+.home .custom-block.warning
+  background-color transparent !important
+  color inherit !important
+  margin-top 0px !important
+  padding-top 0px !important
+  border-color: transparent !important
+
+.home div[class*="language-"]
+  width 50%
+  float left
+  margin-right 40px    
+
+@media (max-width: 419px)
+  .content div[class*="language-"]
+    width inherit
+    float none
+    margin-right 0px
+
+.home 
+  div[class*="language-"] pre, div[class*="language-"] pre[class*="language-"]
+    padding 20px !important
+    margin-top 0px !important
+    margin-bottom 0px !important  
+
+.home .custom-block.warning .custom-block-title
+  color black
+  font-size 20pt
+  margin-top 0
+
+.home .feature h2
+  font-weight 800 !important
+  
+/****************************** 
+  CONTENT
+*******************************/
+
+  .content img
+    border #f3f3f3 1px solid !important
+    border-radius 6px !important
+
+/****************************** 
+  HERO
+*******************************/
+
+.home .hero img
+  height 120px !important
+  
+
+/****************************** 
+  PAGE
+*******************************/
 
 @media (min-width 719px)
   .page
     padding-left 17rem
 
-.content  img
-    border: #f3f3f3 1px solid !important
-    border-radius: 6px !important
+/****************************** 
+  NAVBAR
+*******************************/
 
-.navbar {    
-    border-bottom: none !important;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,.05) !important;
-}
+.navbar  
+  border-bottom none !important
+  box-shadow 0 2px 4px 0 rgba(0,0,0,.05) !important
 
-.navbar .site-name{
-    font-weight: 800 !important;
-}
 
-.nav-link, .repo-link , .nav-links .dropdown-title{
-  font-weight: 800 !important;
-}
+.navbar .site-name
+  font-weight 800 !important
+
+
+.nav-link, .repo-link , .nav-links .dropdown-title
+  font-weight 800 !important
+
+
+/****************************** 
+  BLOCKS
+*******************************/
 
 .custom-block-title
-  font-weight: 800 !important
+  font-weight 800 !important
 
-.custom-block.danger {
-    background-color: #fff6f6 !important;
-    border-color: #ffe6e6 !important;
-}
+.custom-block.danger 
+  background-color #fff6f6 !important
+  border-color #ffe6e6 !important
 
-.custom-block.warning {
-    background-color: rgba(239, 224, 153, 0.3) !important;
-    border-color: #ecd45a !important;
-}    
 
-.custom-block.tip {
-    border-color: #cec3d6 !important;
-}
+.custom-block.warning 
+  background-color rgba(239, 224, 153, 0.3) !important
+  border-color #ecd45a !important
+
+.custom-block.tip 
+  border-color #cec3d6 !important
+
+
+/****************************** 
+  SIDEBAR
+*******************************/
 
 #app .sidebar     
-    width:  17rem !important;
-    border-right: none !important;
-    background-color: transparent !important;
-    background-image: linear-gradient(0deg, #907f92, #2e1b33) !important;
+  width  17rem !important
+  border-right none !important
+  background-color transparent !important
+  background-image linear-gradient(0deg, #907f92, #2e1b33) !important
 
 
  .sidebar-group:not(.collapsable) .sidebar-heading,
@@ -83,16 +144,3 @@ body
   @media (max-width 719px)
     .nav-links a.nav-link, .nav-links a.repo-link, .nav-links .dropdown-title
       color #fff
-
-// .navbar {
-//   background-color: #2b2644 !important;
-// }
-  
-// .navbar .links {
-//   background-color: transparent !important;
-// }
-
-// .navbar .nav-item > a{
-//   color: white !important
-// }
-  
