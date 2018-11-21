@@ -5,14 +5,13 @@ actionText: Get Started  →
 actionLink: /docs/latest
 
 features:
-- title: 🔤 Schema Directives
-  details: Lighthouse provides you with a handful of helpful Schema Directives to get you up and running in no time. But it also allows you to create your own when needed.
+- title: 📜 Schema First
+  details: Lighthouse allows you to use the native Schema Definition Language to describe your data. Leverage server-side directives to add functionality and bring your schema to life.
 
 - title: ❤️ Laravel Friendly
   details: Lighthouse integrates with your Laravel application without the need to re-write your entire domain. Just build a GraphQL schema on top of your current logic and start querying!
 
-
-- title: 💯 Optimized for Eloquent
+- title: ⚡ Optimized for Eloquent
   details: Eloquent is an extremely powerful ORM. Lighthouse leverages your current model relationships and creates optimized database queries.
 
 footer: Copyright © 2018 Christopher Moore
@@ -44,18 +43,24 @@ footer: Copyright © 2018 Christopher Moore
   </div>
   <div class="highlight">
     <h2>Rapid GraphQL Development</h2>
-    Lighthouse enables schema-first development by allowing you to use the native Schema Definition Language to describe your data. Leverage server-side directives to add functionality and bring your schema to life. 
-    <br />
-    With nothing more than this schema file (along w/ Eloquent models and migrations set up), you have a fully functional GraphQL server with no additional code! But don't worry, you can extend Lighthouse to fit just about any data requirements. The docs will walk you through what directives are available, how to create your own directives and how to create your own resolvers, so let's get started!
+    <p>
+      Lighthouse enables schema-first development by allowing you to use the native Schema Definition Language to describe your data. Leverage server-side directives to add functionality and bring your schema to life. 
+    </p>
+    <p>
+      With nothing more than this schema file (along w/ Eloquent models and migrations set up), you have a fully functional GraphQL server with no additional code! But don't worry, you can extend Lighthouse to fit just about any data requirements. The docs will walk you through what directives are available, how to create your own directives and how to create your own resolvers, so let's get started!
+    </p>
   </div>
 </div>
 
 <div class="highlights">
   <div class="highlight">
   <h2>Laravel & GraphQL</h2>
-    Lighthouse dramatically reduces the amount of boilerplate needed to get a GraphQL project up and running. Many of the familiar concepts from Laravel are converted into Lighthouse directives, so you can reuse existing logic and work the way you are used to.
-    <br />
-    If you already have your models and migrations set up, it only takes minutes to get a GraphQL server up and running with Lighthouse!
+    <p>
+      Lighthouse dramatically reduces the amount of boilerplate needed to get a GraphQL project up and running. Many of the familiar concepts from Laravel are converted into Lighthouse directives, so you can reuse existing logic and work the way you are used to.
+    </p>
+    <p>
+      If you already have your models and migrations set up, it only takes minutes to get a GraphQL server up and running with Lighthouse!
+    </p>
   </div>
   <div class="highlight">
 
