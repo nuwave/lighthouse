@@ -6,37 +6,26 @@ body
   HOME
 *******************************/
 
-.home .custom-block.warning
-  background-color transparent !important
-  color inherit !important
-  margin-top 0px !important
-  padding-top 0px !important
-  border-color: transparent !important
+.home .highlights
+  padding 1.2rem 0
+  margin-top 2.5rem
+  display flex
+  flex-wrap wrap
+  align-items flex-start
+  align-content stretch
+  justify-content space-between
 
-.home div[class*="language-"]
-  width 50%
-  float left
-  margin-right 40px    
+.home .highlight 
+  flex-grow 1  
+  max-width 48%
 
-@media (max-width: 419px)
-  .content div[class*="language-"]
-    width inherit
-    float none
-    margin-right 0px
-
-.home 
-  div[class*="language-"] pre, div[class*="language-"] pre[class*="language-"]
-    padding 20px !important
-    margin-top 0px !important
-    margin-bottom 0px !important  
-
-.home .custom-block.warning .custom-block-title
-  color black
-  font-size 20pt
-  margin-top 0
+.home .highlight h2           
+  font-weight 800
+  border none !important
 
 .home .feature h2
   font-weight 800 !important
+  
   
 /****************************** 
   CONTENT
