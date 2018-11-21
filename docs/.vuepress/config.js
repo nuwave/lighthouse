@@ -2,7 +2,7 @@ let versioning = require('./lib/versioning.js')
 
 module.exports = {
   title: 'Lighthouse',
-  description: 'A GraphQL server for Laravel',
+  description: 'GraphQL server for Laravel',
   head: [
     ['link', { rel: 'icon', href: '/favicon.png' }],
     ['link', { rel: 'stylesheet', type: 'text/css', href: 'https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,800,800i,900,900i' },]
