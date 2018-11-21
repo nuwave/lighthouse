@@ -8,7 +8,7 @@ body
 
 .home .highlights
   padding 1.2rem 0
-  margin-top 2.5rem
+  margin-top 1rem
   display flex
   flex-wrap wrap
   align-items flex-start
@@ -18,10 +18,14 @@ body
 .home .highlight 
   flex-grow 1  
   max-width 48%
+  
+  @media (max-width 719px)
+    max-width: 100% !important
 
 .home .highlight h2           
   font-weight 800
   border none !important
+  margin-top 10px
 
 .home .feature h2
   font-weight 800 !important
