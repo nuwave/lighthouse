@@ -129,9 +129,11 @@ abstract class BaseDirective implements Directive
             );
         }
 
-        return $this->namespaceClassName($model, [
-            config('lighthouse.namespaces.models'),
-        ]);
+        $namespaces = \is_array(config('lighthouse.namespaces.models'))
+            ? config('lighthouse.namespaces.models')
+            : [config('lighthouse.namespaces.models')];
+
+        return $this->namespaceClassName($model, $namespaces);
     }
 
     /**
