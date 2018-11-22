@@ -186,9 +186,11 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
             );
         }
-
-        return $this->namespaceClassName($model, [
-            config('lighthouse.namespaces.models'),
-        ]);
+        
+        $namespaces = \is_array(config('lighthouse.namespaces.models'))
+            ? config('lighthouse.namespaces.models')
+            : [config('lighthouse.namespaces.models')];
+            
+        return $this->namespaceClassName($model, $namespaces);
     }
 }
