@@ -87,6 +87,10 @@ class CanDirectiveTest extends TestCase
      */
     public function itAcceptsGuestUser(string $argumentName)
     {
+        if ((float) $this->app->version() < 5.7) {
+            $this->markTestSkipped('Version less than 5.7 do not support guest user.');
+        }
+
         $schema = '
         type Query {
             user: User!
