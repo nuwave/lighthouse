@@ -15,9 +15,9 @@ Laravel application. It greatly reduces the boilerplate required to create a sch
 it integrates well with any Laravel project, and it's highly customizable
 giving you full control over your data.
 
-## [Documentation](https://lighthouse-php.netlify.com/)
+## [Documentation](https://lighthouse-php.com/)
 
-The documentation for Lighthouse is maintained in a seperate repository: https://github.com/nuwave/lighthouse-docs
+Documentation for Lighthouse is located in the [docs folder](/docs).
 
 ## Get started
 
