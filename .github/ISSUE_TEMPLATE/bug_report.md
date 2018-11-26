@@ -24,9 +24,13 @@ about: Report a bug to help us improve Lighthouse
 
 **Output/Logs**
 
+<details><summary>Click to expand</summary>
+
 ```
-# Relevant log output or error messages.
+# Add in log output/error messages here
 ```
+
+</details></br>
 
 **Environment**
 
