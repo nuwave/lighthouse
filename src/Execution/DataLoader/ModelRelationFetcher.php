@@ -45,7 +45,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    public function setRelations(array $relations): self
+    public function setRelations(array $relations) : self
     {
         // Parse and set the relations.
         $this->relations =
@@ -61,7 +61,7 @@ class ModelRelationFetcher
      *
      * @return EloquentBuilder
      */
-    protected function newModelQuery(): EloquentBuilder
+    protected function newModelQuery() : EloquentBuilder
     {
         return $this->models()
             ->first()
@@ -73,7 +73,7 @@ class ModelRelationFetcher
      *
      * @return EloquentCollection
      */
-    public function models(): EloquentCollection
+    public function models() : EloquentCollection
     {
         return $this->models;
     }
@@ -83,7 +83,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    protected function setModels($models): self
+    protected function setModels($models) : self
     {
         // We can not use the collect() helper here, since we require this
         // to be an Eloquent Collection
@@ -99,7 +99,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    public function loadRelations(): self
+    public function loadRelations() : self
     {
         $this->models->load($this->relations);
 
@@ -116,7 +116,7 @@ class ModelRelationFetcher
      *
      * @return ModelRelationFetcher
      */
-    public function loadRelationsForPage(int $perPage, int $page = 1): self
+    public function loadRelationsForPage(int $perPage, int $page = 1) : self
     {
         foreach ($this->relations as $name => $constraints) {
             $this->loadRelationForPage($perPage, $page, $name, $constraints);
@@ -139,7 +139,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    public function loadRelationForPage(int $perPage, int $page = 1, string $relationName, \Closure $relationConstraints): self
+    public function loadRelationForPage(int $perPage, int $page = 1, string $relationName, \Closure $relationConstraints) : self
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,
@@ -175,7 +175,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    public function reloadModelsWithRelationCount(): self
+    public function reloadModelsWithRelationCount() : self
     {
         /** @var EloquentBuilder $query */
         $query = $this->models()
@@ -184,7 +184,7 @@ class ModelRelationFetcher
             ->withCount($this->relations);
 
         $ids = $this->getModelIds();
-        
+
         $reloadedModels = $query
             ->whereKey($ids)
             ->get()
@@ -198,13 +198,13 @@ class ModelRelationFetcher
 
         return $this->setModels($reloadedModels);
     }
-    
+
     /**
      * Extract the primary keys from the underlying models.
      *
      * @return array
      */
-    protected function getModelIds(): array
+    protected function getModelIds() : array
     {
         return $this->models
             ->map(function (Model $model) {
@@ -223,7 +223,7 @@ class ModelRelationFetcher
      *
      * @return Collection Relation[]
      */
-    protected function buildRelationsFromModels(string $relationName, \Closure $relationConstraints): Collection
+    protected function buildRelationsFromModels(string $relationName, \Closure $relationConstraints) : Collection
     {
         return $this->models->toBase()->map(
             function (Model $model) use ($relationName, $relationConstraints) {
@@ -264,7 +264,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    protected function loadDefaultWith(EloquentCollection $collection): self
+    protected function loadDefaultWith(EloquentCollection $collection) : self
     {
         if ($collection->isNotEmpty()) {
             $model = $collection->first();
@@ -273,13 +273,13 @@ class ModelRelationFetcher
             $withProperty->setAccessible(true);
 
             $with = array_filter(
-                (array) $withProperty->getValue($model),
+                (array)$withProperty->getValue($model),
                 function ($relation) use ($model) {
-                    return ! $model->relationLoaded($relation);
+                    return !$model->relationLoaded($relation);
                 }
             );
 
-            if ( ! empty($with)) {
+            if (!empty($with)) {
                 $collection->load($with);
             }
         }
@@ -296,7 +296,7 @@ class ModelRelationFetcher
      *
      * @return string
      */
-    public function getRelationCountName(string $relationName): string
+    public function getRelationCountName(string $relationName) : string
     {
         return Str::snake("{$relationName}_count");
     }
@@ -306,12 +306,12 @@ class ModelRelationFetcher
      *
      * @return array
      */
-    public function getRelationDictionary(string $relationName): array
+    public function getRelationDictionary(string $relationName) : array
     {
         return $this->models
             ->mapWithKeys(
                 function (Model $model) use ($relationName) {
-                    return [$model->getKey() => $model->getRelation($relationName)];
+                    return [$this->getModelKey($model) => $model->getRelation($relationName)];
                 }
             )->all();
     }
@@ -323,7 +323,7 @@ class ModelRelationFetcher
      *
      * @return EloquentBuilder
      */
-    protected function unionAllRelationQueries(Collection $relations): EloquentBuilder
+    protected function unionAllRelationQueries(Collection $relations) : EloquentBuilder
     {
         return $relations
             ->reduce(
@@ -344,7 +344,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    protected function convertRelationToPaginator(int $perPage, int $page, string $relationName): self
+    protected function convertRelationToPaginator(int $perPage, int $page, string $relationName) : self
     {
         $this->models->each(function (Model $model) use ($page, $perPage, $relationName) {
             $total = $model->getAttribute(
@@ -354,11 +354,11 @@ class ModelRelationFetcher
             $paginator = app()->makeWith(
                 LengthAwarePaginator::class,
                 [
-                    'items'       => $model->getRelation($relationName),
-                    'total'       => $total,
-                    'perPage'     => $perPage,
+                    'items' => $model->getRelation($relationName),
+                    'total' => $total,
+                    'perPage' => $perPage,
                     'currentPage' => $page,
-                    'options'     => [],
+                    'options' => [],
                 ]
             );
 
@@ -376,7 +376,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    protected function associateRelationModels(string $relationName, EloquentCollection $relationModels): self
+    protected function associateRelationModels(string $relationName, EloquentCollection $relationModels) : self
     {
         $relation = $this->getRelationInstance($relationName);
 
@@ -407,16 +407,31 @@ class ModelRelationFetcher
             $hydrationMethod->invoke($relation, $relationModels->all());
         }
     }
-    
+
     /**
      * @param string $relationName
      *
      * @return Relation
      */
-    protected function getRelationInstance(string $relationName): Relation
+    protected function getRelationInstance(string $relationName) : Relation
     {
         return $this
             ->newModelQuery()
             ->getRelation($relationName);
+    }
+
+    /**
+     * Get model key. Support composite primary keys.
+     * Ex: $primaryKey = ['key1', 'key2'];
+     * 
+     * @param Model $model
+     *
+     * @return string
+     */
+    protected function getModelKey(Model $model)
+    {
+        return (is_array($model->getKey()))
+            ? implode('___', $model->getKey())
+            : $model->getKey();
     }
 }

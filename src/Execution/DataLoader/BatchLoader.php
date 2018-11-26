@@ -40,7 +40,7 @@ abstract class BatchLoader
      *
      * @return BatchLoader
      */
-    public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): self
+    public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []) : self
     {
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
@@ -49,14 +49,14 @@ abstract class BatchLoader
         $instance = app()->bound($instanceName)
             ? resolve($instanceName)
             : app()->instance(
-                $instanceName,
-                app()->makeWith($loaderClass, $constructorArgs)
-            );
-        
+            $instanceName,
+            app()->makeWith($loaderClass, $constructorArgs)
+        );
+
         if (!$instance instanceof self) {
             throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
         }
-        
+
         return $instance;
     }
 
@@ -67,7 +67,7 @@ abstract class BatchLoader
      *
      * @return string
      */
-    public static function instanceKey(array $path): string
+    public static function instanceKey(array $path) : string
     {
         return collect($path)
             ->filter(function ($path) {
@@ -86,8 +86,9 @@ abstract class BatchLoader
      *
      * @return Deferred
      */
-    public function load($key, array $metaInfo = []): Deferred
+    public function load($key, array $metaInfo = []) : Deferred
     {
+        $key = $this->buildKey($key);
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
@@ -101,9 +102,24 @@ abstract class BatchLoader
     }
 
     /**
+     * Build the model key. Support composite primary keys.     
+     * Ex: $primaryKey = ['key1', 'key2'];
+     * 
+     * @param mixed $key
+     *
+     * @return string
+     */
+    protected function buildKey($key)
+    {
+        return (is_array($key))
+            ? implode('___', $key)
+            : $key;
+    }
+
+    /**
      * Resolve the keys.
      *
      * The result has to be a map: [key => result]
      */
-    abstract public function resolve(): array;
+    abstract public function resolve() : array;
 }
