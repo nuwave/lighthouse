@@ -86,7 +86,7 @@ footer: Copyright © 2018 Christopher Moore
 
   </div>
 </div>
-<p class="action"><a href="/docs/latest.html" class="nav-link action-button">Get Started  →</a></p>
+<p class="action"><a href="/docs/latest.html" @click.prevent="$router.push('/docs/latest.html')" class="nav-link action-button">Get Started  →</a></p>
 
 <br />
 <br />

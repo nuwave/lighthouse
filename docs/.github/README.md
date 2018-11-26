@@ -40,6 +40,7 @@ Make sure you have:
 Then, start Vue Press on development mode (with hot reloading).
 ```bash
 cd docs/
+yarn install
 yarn docs:dev
 ```
 
