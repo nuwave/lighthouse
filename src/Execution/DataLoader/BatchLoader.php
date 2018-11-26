@@ -32,19 +32,19 @@ abstract class BatchLoader
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
-     * @param string $loaderClass The class name of the concrete BatchLoader to instantiate.
-     * @param array $pathToField Path to the GraphQL field from the root, is used as a key for BatchLoader instances.
-     * @param array $constructorArgs Those arguments are passed to the constructor of the new BatchLoader instance.
+     * @param string $loaderClass     the class name of the concrete BatchLoader to instantiate
+     * @param array  $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param array  $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
      *
      * @throws \Exception
      *
      * @return BatchLoader
      */
-    public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []) : self
+    public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): self
     {
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
-        
+
         // Only register a new instance if it is not already bound
         $instance = app()->bound($instanceName)
             ? resolve($instanceName)
@@ -53,7 +53,7 @@ abstract class BatchLoader
             app()->makeWith($loaderClass, $constructorArgs)
         );
 
-        if (!$instance instanceof self) {
+        if (! $instance instanceof self) {
             throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
         }
 
@@ -67,13 +67,13 @@ abstract class BatchLoader
      *
      * @return string
      */
-    public static function instanceKey(array $path) : string
+    public static function instanceKey(array $path): string
     {
         return collect($path)
             ->filter(function ($path) {
                 // Ignore numeric path entries, as those signify an array of fields
                 // Those are the very purpose for this batch loader, so they must not be included.
-                return !is_numeric($path);
+                return ! is_numeric($path);
             })
             ->implode('_');
     }
@@ -86,13 +86,13 @@ abstract class BatchLoader
      *
      * @return Deferred
      */
-    public function load($key, array $metaInfo = []) : Deferred
+    public function load($key, array $metaInfo = []): Deferred
     {
         $key = $this->buildKey($key);
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
-            if (!$this->hasLoaded) {
+            if (! $this->hasLoaded) {
                 $this->results = $this->resolve();
                 $this->hasLoaded = true;
             }
@@ -102,9 +102,9 @@ abstract class BatchLoader
     }
 
     /**
-     * Build the model key. Support composite primary keys.     
-     * Ex: $primaryKey = ['key1', 'key2'];
-     * 
+     * Build the model key. Support composite primary keys.
+     * Ex: $primaryKey = ['key1', 'key2'];.
+     *
      * @param mixed $key
      *
      * @return string
@@ -121,5 +121,5 @@ abstract class BatchLoader
      *
      * The result has to be a map: [key => result]
      */
-    abstract public function resolve() : array;
+    abstract public function resolve(): array;
 }
