@@ -3,25 +3,57 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Utils\AST;
+use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\InputType;
+use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Type\Definition\InputObjectType;
+use Nuwave\Lighthouse\Execution\ErrorBuffer;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
+use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\HasRootArgumentValue;
+use Nuwave\Lighthouse\Support\Traits\CanInjectArgumentFilter;
+use Nuwave\Lighthouse\Support\Contracts\HasResolverArguments as HasResolverArgumentsContract;
 
-class ArgumentFactory
+class ArgumentFactory implements HasResolverArgumentsContract
 {
-    /** @var DirectiveRegistry */
-    protected $directiveRegistry;
-    /** @var Pipeline */
-    protected $pipeline;
+    use HasResolverArguments, CanInjectArgumentFilter;
 
     /**
-     * @param DirectiveRegistry $directiveRegistry
-     * @param Pipeline          $pipeline
+     * @var array
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
+    protected $currentInputValueDefinition;
+
+    /**
+     * @var ErrorBuffer
+     */
+    protected $currentErrorBuffer;
+
+    /**
+     * @var string[]
+     */
+    protected $currentDirectiveTypes = [];
+
+    /**
+     * @var DirectiveFactory
+     */
+    protected $directiveFactory;
+
+    /**
+     * ArgumentFactory constructor.
+     *
+     * @param DirectiveFactory $directiveFactory
+     */
+    public function __construct(DirectiveFactory $directiveFactory)
     {
-        $this->directiveRegistry = $directiveRegistry;
-        $this->pipeline = $pipeline;
+        $this->directiveFactory = $directiveFactory;
     }
 
     /**
@@ -36,23 +68,13 @@ class ArgumentFactory
     public function handle(ArgumentValue $value): array
     {
         $definition = $value->getAstNode();
-        /** @var ArgumentValue $value */
-        $value = $this->pipeline
-            ->send($value)
-            ->through(
-                $this->directiveRegistry->argMiddleware($definition)
-            )
-            ->via('handleArgument')
-            ->then(function (ArgumentValue $value) {
-                return $value;
-            });
 
         $fieldArgument = [
             'name' => $definition->name->value,
             'description' => data_get($definition->description, 'value'),
             'type' => $value->getType(),
             'astNode' => $definition,
-            'transformers' => $value->getTransformers(),
+            '_argumentValueInstance' => $value,
         ];
 
         if ($defaultValue = $definition->defaultValue) {
@@ -66,5 +88,281 @@ class ArgumentFactory
 
         // Used to construct a FieldArgument class
         return $fieldArgument;
+    }
+
+    /**
+     * Call `ArgMiddleware::handleArgument` at the resolving time.
+     *
+     * For example, an argument may be encrypted before reaching the final resolver.
+     *
+     * @param \Closure          $resolver
+     * @param Collection<array> $inputValueDefinitions
+     *
+     * @return \Closure
+     */
+    public function handleArgMiddlewareInResolver(\Closure $resolver, Collection $inputValueDefinitions): \Closure
+    {
+        return function ($root, $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
+            $this->setResolverArguments($root, $args, $context, $resolveInfo);
+
+            // The list of arguments names that are not provided by the client.
+            $originalArguments = $args;
+
+            foreach ($inputValueDefinitions as $argumentName => $inputValueDefinition) {
+                $this->currentInputValueDefinition = $inputValueDefinition;
+                $this->resetCurrentErrorBuffer();
+                $this->resetCurrentDirectiveTypes();
+
+                $this->handleArgWithAssociatedDirectivesRecursively(
+                    $inputValueDefinition['type'],
+                    $args[$argumentName],
+                    $inputValueDefinition['astNode'],
+                    $argumentName
+                );
+
+                if ($this->currentErrorBuffer->hasErrors()) {
+                    $this->currentErrorBuffer->flush($this->gatherErrorMessage());
+                }
+            }
+
+            // Because we are passing the items of `$args` by reference to `$this->handleArgMiddleware`,
+            // arguments that were not provided in the original incoming arguments but exist in the
+            // `$inputValueDefinitions` can produce a null item to the `$args`. We should remove
+            // those newly produced items here before we can pass it to the next resolver.
+            $args = array_intersect_key($args, $originalArguments);
+
+            return $resolver($root, $args, $context, $resolveInfo);
+        };
+    }
+
+    /**
+     * Handle the ArgMiddleware.
+     *
+     * @param InputType                     $type
+     * @param mixed                         $argumentValue
+     * @param InputValueDefinitionNode|null $astNode
+     * @param string                        $argumentPath
+     */
+    protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argumentValue, InputValueDefinitionNode $astNode, string $argumentPath)
+    {
+        if ($type instanceof InputObjectType) {
+            foreach ($type->getFields() as $field) {
+                if (! array_key_exists($field->name, $argumentValue)) {
+                    continue;
+                }
+
+                $this->handleArgWithAssociatedDirectivesRecursively(
+                    $field->type,
+                    $argumentValue[$field->name],
+                    $field->astNode,
+                    "{$argumentPath}.{$field->name}"
+                );
+            }
+
+            return;
+        }
+
+        if ($type instanceof ListOfType) {
+            foreach ($argumentValue as $key => $fieldValue) {
+                // here we are passing by reference so the `$argumentValue[$key]` is intended.
+                $this->handleArgWithAssociatedDirectivesRecursively(
+                    $type->ofType,
+                    $argumentValue[$key],
+                    $astNode,
+                    "{$argumentPath}.{$key}"
+                );
+            }
+
+            return;
+        }
+
+        $argumentValue = $this->handleArgWithAssociatedDirectives($astNode, $argumentValue, $argumentPath);
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param $argumentValue
+     * @param string $argumentPath
+     *
+     * @return mixed
+     */
+    protected function handleArgWithAssociatedDirectives(
+        InputValueDefinitionNode $astNode,
+        $argumentValue,
+        string $argumentPath
+    ) {
+        $argumentValue = $this->handleArgMiddlewareDirectives($astNode, $argumentValue, $argumentPath);
+
+        $this->handleArgFilterDirectives($astNode, $argumentPath);
+
+        return $argumentValue;
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param $argumentValue
+     * @param string $argumentPath
+     *
+     * @return mixed
+     */
+    protected function handleArgMiddlewareDirectives(
+        InputValueDefinitionNode $astNode,
+        $argumentValue,
+        string $argumentPath
+    ) {
+        $directives = $this->directiveFactory->createArgMiddleware($astNode);
+
+        if ($directives->isEmpty()) {
+            return $argumentValue;
+        }
+
+        $this->prepareDirective($astNode, $argumentPath, $directives);
+
+        return resolve(Pipeline::class)
+            ->send($argumentValue)
+            ->through($directives)
+            ->via('handleArgument')
+            ->then(function ($value) {
+                return $value;
+            });
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param string                   $argumentPath
+     */
+    protected function handleArgFilterDirectives(
+        InputValueDefinitionNode $astNode,
+        string $argumentPath
+    ) {
+        $directives = $this->directiveFactory->createArgFilterDirective($astNode);
+
+        if ($directives->isEmpty()) {
+            return;
+        }
+
+        $this->prepareDirective($astNode, $argumentPath, $directives);
+
+        $directives->each(function (ArgFilterDirective $directive) use ($astNode) {
+            $this->injectArgumentFilter($directive, $astNode);
+        });
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param string                   $argumentPath
+     * @param Collection               $directives
+     */
+    protected function prepareDirective(InputValueDefinitionNode $astNode, string $argumentPath, Collection $directives)
+    {
+        $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
+            $this->addCurrentDirectiveType($directive);
+
+            if ($directive instanceof HasResolverArgumentsContract) {
+                $directive->setResolverArguments(...$this->resolverArguments());
+            }
+
+            if ($directive instanceof HasRootArgumentValue) {
+                $directive->setRootArgumentValue($this->currentArgumentValueInstance());
+            }
+
+            if ($directive instanceof HasErrorBuffer) {
+                $directive->setErrorBuffer($this->currentErrorBuffer);
+            }
+
+            if ($directive instanceof HasArgumentPath) {
+                $directive->setArgumentPath($argumentPath);
+            }
+        });
+    }
+
+    /**
+     * @param ArgFilterDirective       $directive
+     * @param InputValueDefinitionNode $astNode
+     */
+    protected function injectArgumentFilter(ArgFilterDirective $directive, InputValueDefinitionNode $astNode)
+    {
+        $argFilterType = $directive->type();
+        $parentField = $this->currentArgumentValueInstance()->getParentField();
+        $argumentName = $astNode->name->value;
+        $directiveDefinition = ASTHelper::directiveDefinition($astNode, $directive->name());
+        $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
+
+        if (ArgFilterDirective::SINGLE_TYPE === $argFilterType) {
+            $this->injectSingleArgumentFilter(
+                $argumentName,
+                $parentField,
+                $directive->filter(),
+                $columnName
+            );
+        }
+
+        if (ArgFilterDirective::MULTI_TYPE === $argFilterType) {
+            $this->injectMultiArgumentFilter(
+                $argumentName,
+                $parentField,
+                $directive->name(),
+                $directive->filter(),
+                $columnName
+            );
+        }
+    }
+
+    /**
+     * Add a directive type to current directive types.
+     *
+     * @param Directive $directive
+     */
+    protected function addCurrentDirectiveType(Directive $directive)
+    {
+        $className = \get_class($directive);
+
+        if (\in_array($className, $this->currentDirectiveTypes)) {
+            return;
+        }
+
+        $this->currentDirectiveTypes[] = $className;
+    }
+
+    /**
+     * clear the all the current directive types.
+     */
+    protected function resetCurrentDirectiveTypes()
+    {
+        $this->currentDirectiveTypes = [];
+    }
+
+    /**
+     * reset currentErrorBuffer.
+     */
+    protected function resetCurrentErrorBuffer()
+    {
+        $this->currentErrorBuffer = resolve(ErrorBuffer::class);
+    }
+
+    /**
+     * @return ArgumentValue
+     */
+    protected function currentArgumentValueInstance(): ArgumentValue
+    {
+        return $this->currentInputValueDefinition['_argumentValueInstance'];
+    }
+
+    /**
+     * Gather the error messages from each type of directive.
+     *
+     * @return string
+     */
+    protected function gatherErrorMessage(): string
+    {
+        $path = implode('.', $this->resolveInfo()->path);
+
+        return collect($this->currentDirectiveTypes)->map(function (string $directiveClass) use ($path) {
+            if (method_exists($directiveClass, 'getFlushErrorMessage')) {
+                return $directiveClass::getFlushErrorMessage($this->currentArgumentValueInstance(), $path);
+            }
+
+            return null;
+        })->filter()->implode(PHP_EOL);
     }
 }

@@ -23,7 +23,7 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name():string
     {
         return 'security';
     }

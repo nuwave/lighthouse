@@ -14,7 +14,7 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name():string
     {
         return 'lazyLoad';
     }

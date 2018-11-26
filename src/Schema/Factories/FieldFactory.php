@@ -4,10 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -50,21 +48,23 @@ class FieldFactory
             $fieldValue = $fieldResolver->resolveField($fieldValue);
         }
 
-        $initialResolver = $fieldValue->getResolver();
+        // This is the original resolver
+        $resolver = $fieldValue->getResolver();
 
         $inputValueDefinitions = $this->getInputValueDefinitions($fieldValue);
-        $resolver = $this->injectAdditionalArgs(
-            $initialResolver,
-            $fieldValue->getAdditionalArgs()
-        );
 
+        // Execution order [2].
+        // Inject additional args after argMiddleware has been handled
+        // which probably be used in the resolver of the parent field
+        $resolver = $this->injectAdditionalArgs($resolver, $fieldValue);
 
+        // Execution order [1].
         // No need to do transformation/validation of the arguments
         // if there are no arguments defined for the field
         if ($inputValueDefinitions->isNotEmpty()) {
-            $resolver = $this->wrapResolverByTransformingArgs($resolver, $inputValueDefinitions);
-            $resolver = $this->wrapResolverWithValidation($resolver, $inputValueDefinitions);
+            $resolver = $this->argumentFactory->handleArgMiddlewareInResolver($resolver, $inputValueDefinitions);
         }
+
 
         $fieldValue->setResolver($resolver);
 
@@ -115,92 +115,18 @@ class FieldFactory
     /**
      * Wrap the resolver by injecting additional arg values.
      *
-     * @param \Closure $resolver
-     * @param array    $additionalArgs
+     * @param \Closure   $resolver
+     * @param FieldValue $fieldValue
      *
      * @return \Closure
      */
-    protected function injectAdditionalArgs(\Closure $resolver, array $additionalArgs): \Closure
+    protected function injectAdditionalArgs(\Closure $resolver, FieldValue $fieldValue): \Closure
     {
-        return function () use ($resolver, $additionalArgs) {
-            $resolverArgs = func_get_args();
+        return function (...$resolverArgs) use ($resolver, $fieldValue) {
             // The second argument of resolvers are the argument values
-            $resolverArgs[1] = array_merge($resolverArgs[1], $additionalArgs);
+            $resolverArgs[1] = array_merge($resolverArgs[1], $fieldValue->getAdditionalArgs());
 
-            return call_user_func_array($resolver, $resolverArgs);
-        };
-    }
-
-    /**
-     * Perform transformations on the arguments given to the field.
-     *
-     * For example, an argument may be encrypted before reaching the final resolver.
-     *
-     * @param \Closure          $resolver
-     * @param Collection<array> $inputValueDefinitions
-     *
-     * @return \Closure
-     */
-    protected function wrapResolverByTransformingArgs(\Closure $resolver, Collection $inputValueDefinitions): \Closure
-    {
-        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
-            $inputArgs = collect($inputArgs)
-                ->map(function ($value, string $key) use ($inputValueDefinitions) {
-                    $definition = $inputValueDefinitions->get($key);
-
-                    return collect($definition['transformers'])
-                        ->reduce(
-                            function ($value, \Closure $transformer) {
-                                return $transformer($value);
-                            },
-                            $value
-                        );
-                })
-                ->toArray();
-
-            return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
-        };
-    }
-
-    /**
-     * Wrap field resolver function with validation logic.
-     *
-     * This has to happen as part of the field resolution, because we might have
-     * deeply nested input values and we can not generate the rules upfront.
-     *
-     * @param \Closure          $resolver
-     * @param Collection<array> $inputValueDefinitions
-     *
-     * @return \Closure
-     */
-    protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
-    {
-        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
-            list($rules, $messages) = RuleFactory::build(
-                $resolveInfo->fieldName,
-                $resolveInfo->parentType->name,
-                $inputArgs,
-                graphql()->documentAST()
-            );
-
-            if (count($rules) > 0) {
-                /** @var GraphQLValidator $validator */
-                $validator = validator(
-                    $inputArgs,
-                    $rules,
-                    $messages,
-                    [
-                        'root' => $rootValue,
-                        'context' => $context,
-                        // This makes it so that we get an instance of our own Validator class
-                        'resolveInfo' => $resolveInfo,
-                    ]
-                );
-
-                $validator->validate();
-            }
-
-            return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
+            return $resolver(...$resolverArgs);
         };
     }
 }

@@ -26,7 +26,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMid
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure $next
+     * @param \Closure   $next
      *
      * @return FieldValue
      */
@@ -37,8 +37,8 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMid
 
         return $next(
             $value->setResolver(
-                function ($root, $args, $context, ResolveInfo $resolveInfo) use ($type, $resolver){
-                    $resolvedValue = call_user_func_array($resolver, func_get_args());
+                function ($root, $args, $context, ResolveInfo $resolveInfo) use ($type, $resolver) {
+                    $resolvedValue = \call_user_func_array($resolver, \func_get_args());
 
                     return GlobalId::encode(
                         $type,
@@ -52,19 +52,13 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMid
     /**
      * Apply transformations on the ArgumentValue.
      *
-     * @param ArgumentValue $argument
+     * @param string   $argumentValue
      * @param \Closure $next
      *
-     * @return ArgumentValue
+     * @return string
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
+    public function handleArgument($argumentValue, \Closure $next)
     {
-        return $next(
-            $argument->addTransformer(
-                function ($globalId) {
-                    return GlobalId::decode($globalId);
-                }
-            )
-        );
+        return $next(GlobalId::decode($argumentValue));
     }
 }

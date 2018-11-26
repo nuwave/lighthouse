@@ -96,7 +96,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args) {
                 $first = $args['count'];
-                $page = array_get($args, 'page', 1);
+                $page = $args['page'] ?? 1;
 
                 return $this->getPaginatedResults(\func_get_args(), $page, $first);
             }

@@ -2,11 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
-class SearchDirective extends BaseDirective implements ArgFilterDirective
+class WhereDirective extends BaseDirective implements ArgFilterDirective
 {
     /**
      * Name of the directive.
@@ -15,7 +14,7 @@ class SearchDirective extends BaseDirective implements ArgFilterDirective
      */
     public function name(): string
     {
-        return 'search';
+        return 'where';
     }
 
     /**
@@ -25,20 +24,13 @@ class SearchDirective extends BaseDirective implements ArgFilterDirective
      */
     public function filter(): \Closure
     {
-        // Adds within method to specify custom index.
-        $within = $this->directiveArgValue('within');
+        $operator = $this->directiveArgValue('operator', '=');
+        $clause = $this->directiveArgValue('clause');
 
-        return function (Builder $query, string $columnName, $value) use ($within) {
-            $modelClass = \get_class($query->getModel());
-
-            /** @var \Laravel\Scout\Builder $query */
-            $query = $modelClass::search($value);
-
-            if (null !== $within) {
-                $query->within($within);
-            }
-
-            return $query;
+        return function ($query, string $columnName, $value) use ($operator, $clause) {
+            return $clause
+                ? $query->{$clause}($columnName, $operator, $value)
+                : $query->where($columnName, $operator, $value);
         };
     }
 

@@ -3,36 +3,39 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use Nuwave\Lighthouse\Execution\QueryFilter;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
-trait HandlesQueryFilter
+trait CanInjectArgumentFilter
 {
     /**
      * Inject query filter into field.
      *
-     * @param ArgumentValue $argument
-     * @param \Closure $filter
+     * @param string     $argumentName
+     * @param FieldValue $parentField
+     * @param \Closure   $filter
      *
      * The filter Closure receives three positional arguments:
      *
      * mixed $builder An instance of the query builder
      * string $columnName
      * mixed $value An array of values
+     * @param string $columnName
      *
-     * @return ArgumentValue
+     * @return static
      */
-    protected function injectFilter(ArgumentValue &$argument, \Closure $filter): ArgumentValue
-    {
-        $parentField = $argument->getParentField();
-        $query = QueryFilter::getInstance(
-            $parentField
-        );
-    
-        $argumentName = $this->definitionNode->name->value;
+    protected function injectSingleArgumentFilter(
+        string $argumentName,
+        FieldValue $parentField,
+        \Closure $filter,
+        string $columnName
+    ): self {
+        $query = QueryFilter::getInstance($parentField);
+
         $query->addSingleArgumentFilter(
             $argumentName,
             $filter,
-            $this->directiveArgValue('key', $argumentName)
+            $columnName
         );
 
         $parentField->injectArg(
@@ -40,37 +43,39 @@ trait HandlesQueryFilter
             $query
         );
 
-        return $argument;
+        return $this;
     }
-    
+
     /**
      * Inject a query filter that takes an array of values into the field.
      *
-     * @param ArgumentValue $argument
-     * @param \Closure $filter
+     * @param string     $argumentName
+     * @param FieldValue $parentField
+     * @param string     $filterType   You have to specify a filter type so that the filters can be matched together
+     * @param \Closure   $filter
      *
      * The filter Closure receives three positional arguments:
      *
      * mixed $builder An instance of the query builder
      * string $columnName
      * mixed $value A single value
+     * @param string $columnName
      *
-     * @param string $filterType You have to specify a filter type so that the filters can be matched together
-     *
-     * @return ArgumentValue
+     * @return static
      */
-    protected function injectMultiArgumentFilter(ArgumentValue &$argument, \Closure $filter, string $filterType): ArgumentValue
-    {
-        $parentField = $argument->getParentField();
-        $query = QueryFilter::getInstance(
-            $parentField
-        );
-    
-        $argumentName = $this->definitionNode->name->value;
+    protected function injectMultiArgumentFilter(
+        string $argumentName,
+        FieldValue $parentField,
+        string $filterType,
+        \Closure $filter,
+        string $columnName
+    ): self {
+        $query = QueryFilter::getInstance($parentField);
+
         $query->addMultiArgumentFilter(
             $argumentName,
             $filter,
-            $this->directiveArgValue('key', $argumentName),
+            $columnName,
             $filterType
         );
 
@@ -79,6 +84,6 @@ trait HandlesQueryFilter
             $query
         );
 
-        return $argument;
+        return $this;
     }
 }

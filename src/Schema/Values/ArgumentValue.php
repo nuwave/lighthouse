@@ -17,12 +17,12 @@ class ArgumentValue
 {
     /** @var InputValueDefinitionNode */
     protected $astNode;
+
     /** @var FieldValue|null */
     protected $parentField;
+
     /** @var Type */
     protected $type;
-    /** @var \Closure[] */
-    protected $transformers = [];
 
     /**
      * ArgumentValue constructor.
@@ -62,25 +62,5 @@ class ArgumentValue
         }
 
         return $this->type;
-    }
-
-    /**
-     * @return \Closure[]
-     */
-    public function getTransformers(): array
-    {
-        return $this->transformers;
-    }
-
-    /**
-     * @param \Closure $transformer
-     *
-     * @return ArgumentValue
-     */
-    public function addTransformer(\Closure $transformer): ArgumentValue
-    {
-        $this->transformers[] = $transformer;
-
-        return $this;
     }
 }

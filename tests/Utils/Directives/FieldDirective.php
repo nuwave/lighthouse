@@ -1,10 +1,10 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Fields;
+namespace Tests\Utils\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 
-class CacheKeyDirective implements Directive
+class FieldDirective implements Directive
 {
     /**
      * Name of the directive.
@@ -13,6 +13,6 @@ class CacheKeyDirective implements Directive
      */
     public function name(): string
     {
-        return 'cacheKey';
+        return 'field';
     }
 }

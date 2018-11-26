@@ -30,7 +30,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      *
      * @return string
      */
-    public function name()
+    public function name():string
     {
         return 'model';
     }

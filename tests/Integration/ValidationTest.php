@@ -35,6 +35,7 @@ class ValidationTest extends TestCase
      */
     public function itValidatesDifferentPathsIndividually()
     {
+        $this->markTestIncomplete();
         $query = '
         {
             foo(
@@ -72,6 +73,7 @@ class ValidationTest extends TestCase
      */
     public function itValidatesList()
     {
+        $this->markTestIncomplete();
         $query = '
         {
             foo(
@@ -98,6 +100,7 @@ class ValidationTest extends TestCase
      */
     public function itValidatesInputCount()
     {
+        $this->markTestIncomplete();
         $query = '
         {
             foo(
@@ -120,6 +123,7 @@ class ValidationTest extends TestCase
      */
     public function itPassesIfNothingRequiredIsMissing()
     {
+        $this->markTestIncomplete();
         $query = '
         {
             foo(required: "foo")
@@ -141,6 +145,7 @@ class ValidationTest extends TestCase
      */
     public function itErrorsIfSomethingRequiredIsMissing()
     {
+        $this->markTestIncomplete();
         $query = '
         {
             foo

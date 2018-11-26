@@ -16,7 +16,7 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'tracing';
     }

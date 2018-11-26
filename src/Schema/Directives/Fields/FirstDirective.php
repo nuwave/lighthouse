@@ -16,7 +16,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name():string
     {
         return 'first';
     }
