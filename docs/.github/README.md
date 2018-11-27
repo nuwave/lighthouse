@@ -39,6 +39,7 @@ Make sure you have:
 Then, start Vue Press on development mode (with hot reloading).
 
     cd docs/
+    yarn
     yarn docs:dev
 
 > Keep a eye on the console when editing pages.

@@ -103,8 +103,8 @@ class PaginationManipulator
 
         $connectionType = PartialParser::objectTypeDefinition("
             type $connectionTypeName {
-                pageInfo: PageInfo! @field(class: \"$connectionFieldName\" method: \"pageInfoResolver\")
-                edges: [$connectionEdgeName] @field(class: \"$connectionFieldName\" method: \"edgeResolver\")
+                pageInfo: PageInfo! @field(resolver: \"{$connectionFieldName}@pageInfoResolver\")
+                edges: [$connectionEdgeName] @field(resolver: \"{$connectionFieldName}@edgeResolver\")
             }
         ");
 
@@ -158,8 +158,8 @@ class PaginationManipulator
 
         $paginatorType = PartialParser::objectTypeDefinition("
             type $paginatorTypeName {
-                paginatorInfo: PaginatorInfo! @field(class: \"$paginatorFieldClassName\" method: \"paginatorInfoResolver\")
-                data: [$fieldTypeName!]! @field(class: \"$paginatorFieldClassName\" method: \"dataResolver\")
+                paginatorInfo: PaginatorInfo! @field(resolver: \"{$paginatorFieldClassName}@paginatorInfoResolver\")
+                data: [$fieldTypeName!]! @field(resolver: \"{$paginatorFieldClassName}@dataResolver\")
             }
         ");
 

@@ -28,32 +28,6 @@ if (! function_exists('auth')) {
     }
 }
 
-if (! function_exists('schema')) {
-    /**
-     * Get instance of schema container.
-     *
-     * @return \Nuwave\Lighthouse\Schema\TypeRegistry
-     * @deprecated Use resolve(TypeRegistry::class) directly in the future
-     */
-    function schema()
-    {
-        return resolve(TypeRegistry::class);
-    }
-}
-
-if (! function_exists('directives')) {
-    /**
-     * Get instance of directives container.
-     *
-     * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
-     * @deprecated Use resolve(DirectiveRegistry::class) directly in the future
-     */
-    function directives()
-    {
-        return resolve(DirectiveRegistry::class);
-    }
-}
-
 if (! function_exists('config_path')) {
     /**
      * Get base configuration path.

@@ -11,54 +11,6 @@ class SecurityTest extends TestCase
 {
     /**
      * @test
-     * @deprecated will be configured only by config in v3
-     */
-    public function itCanSetMaxQueryComplexityThroughSecurityDirective()
-    {
-        $this->assertMaxQueryComplexityIs1('
-        type Query @security(complexity: 1) {
-            user: User @first
-        }
-        
-        type User {
-            name: String
-        }
-        ');
-    }
-
-    /**
-     * @test
-     * @deprecated will be configured only by config in v3
-     */
-    public function itCanSetMaxDepthThroughSecurityDirective()
-    {
-        $this->assertMaxQueryDepthIs1('
-        type Query @security(depth: 1) {
-            user: User @first
-        }
-        
-        type User {
-            name: String
-            user: User
-        }
-        ');
-    }
-
-    /**
-     * @test
-     * @deprecated will be configured only by config in v3
-     */
-    public function itCanDisableIntrospectionThroughSecurityDirective()
-    {
-        $this->assertIntrospectionIsDisabled('
-        type Query @security(introspection: false) {
-            foo: Int
-        }
-        ');
-    }
-
-    /**
-     * @test
      */
     public function itCanSetMaxComplexityThroughConfig()
     {

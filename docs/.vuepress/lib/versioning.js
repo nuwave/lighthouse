@@ -7,7 +7,7 @@ const path = process.cwd()
 module.exports = {
   versions: {
     get latest () {
-      return versions.slice(-1)[0]
+      return versions[0]
     },
     get all () {
       return versions

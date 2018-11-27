@@ -62,7 +62,7 @@ class InterfaceTest extends DBTestCase
     public function itCanUseCustomTypeResolver()
     {
         $schema = '
-        interface Nameable @interface(resolver: "'.addslashes(self::class).'@resolveType"){
+        interface Nameable @interface(resolveType: "'.addslashes(self::class).'@resolveType"){
             name: String!
         }
 

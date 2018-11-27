@@ -23,9 +23,13 @@ you can hop into Slack first. We will help you figure out what is wrong. -->
 
 **Output/Logs**
 
+<details><summary>Click to expand</summary>
+
 ```
-# Relevant log output or error messages.
+# Add in log output/error messages here
 ```
+
+</details></br>
 
 **Environment**
 
