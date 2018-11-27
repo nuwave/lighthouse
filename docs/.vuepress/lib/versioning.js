@@ -1,11 +1,8 @@
 // TIP this file not work with hot reloading. You must restart server.
 
-
-
 const versions = require('../versions.json')
 const fse = require('fs-extra')
 const path = process.cwd()
-
 
 module.exports = {
   versions: {
@@ -85,5 +82,3 @@ module.exports = {
     console.log("\x1b[42m\x1b[30m%s\x1b[0m", ' DONE ', `${message}\n`)
   }
 }
-
-

@@ -362,7 +362,7 @@ Insert some fake data into your database, you can use [Laravel seeders](https://
 Visit [http://127.0.0.1:8000/graphql-playground](http://127.0.0.1:8000/graphql-playground) and try the following query:
 
 ```graphql
-query{
+{
   posts {
     id
     title

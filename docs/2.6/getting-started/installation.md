@@ -1,9 +1,5 @@
 # Installation
 
-::: warning TEST
-This content is from "2.6" version.
-::: 
-
 ## Install via composer
 
 ```bash
