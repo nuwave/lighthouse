@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Support\Traits;
 
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 trait CanInjectArgumentFilter
 {
