@@ -17,7 +17,8 @@ giving you full control over your data.
 
 ## [Documentation](https://lighthouse-php.com/)
 
-Documentation for Lighthouse is located in the [docs folder](/docs).
+The documentation for Lighthouse is located in the [docs folder](/docs).
+We also have a website over at [lighthouse-php.com](https://lighthouse-php.com/).
 
 ## Get started
 
@@ -25,7 +26,7 @@ If you have an existing Laravel project, all you really need is two steps:
 
 1. Install via `composer require nuwave/lighthouse`
 
-2. Define your schema in `routes/graphql/schema.graphql`
+2. Define your schema in `graphql/schema.graphql`
 
 ## Get involved
 
