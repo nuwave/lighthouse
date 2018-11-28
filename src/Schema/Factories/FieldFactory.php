@@ -59,10 +59,10 @@ class FieldFactory
         $resolver = $this->injectAdditionalArgs($resolver, $fieldValue);
 
         // Execution order [1].
-        // No need to do transformation/validation of the arguments
-        // if there are no arguments defined for the field
+        // No need to do handle the arguments if there are no
+        // arguments defined for the field
         if ($inputValueDefinitions->isNotEmpty()) {
-            $resolver = $this->argumentFactory->handleArgMiddlewareInResolver($resolver, $inputValueDefinitions);
+            $resolver = $this->argumentFactory->handleArgsInResolver($resolver, $inputValueDefinitions);
         }
 
 

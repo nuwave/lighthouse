@@ -100,7 +100,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
      *
      * @return \Closure
      */
-    public function handleArgMiddlewareInResolver(\Closure $resolver, Collection $inputValueDefinitions): \Closure
+    public function handleArgsInResolver(\Closure $resolver, Collection $inputValueDefinitions): \Closure
     {
         return function ($root, $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
