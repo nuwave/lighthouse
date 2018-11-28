@@ -8,16 +8,12 @@ use Nuwave\Lighthouse\Support\Traits\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer as HasErrorBufferContract;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
-use Nuwave\Lighthouse\Support\Contracts\HasResolverArguments as HasResolverArgumentsContract;
 
-class RulesDirective extends BaseDirective implements ArgMiddleware, HasResolverArgumentsContract, HasErrorBufferContract, HasArgumentPathContract
+class RulesDirective extends BaseDirective implements ArgMiddleware, HasErrorBufferContract, HasArgumentPathContract
 {
-    use HasResolverArguments, HasErrorBuffer, HasArgumentPath;
-
-    const NAME = 'rules';
+    use HasErrorBuffer, HasArgumentPath;
 
     const ERROR_TYPE = 'validation';
 
@@ -28,7 +24,7 @@ class RulesDirective extends BaseDirective implements ArgMiddleware, HasResolver
      */
     public function name(): string
     {
-        return self::NAME;
+        return 'rules';
     }
 
     /**
@@ -47,20 +43,7 @@ class RulesDirective extends BaseDirective implements ArgMiddleware, HasResolver
             return $value;
         }
 
-        $argumentName = $this->getArgumentName();
-        $validator = validator(
-            [$argumentName => $value],
-            [$argumentName => $rules],
-            (array) $this->getMessages(),
-            [
-                'root' => $this->root(),
-                'context' => $this->context(),
-                // This makes it so that we get an instance of our own Validator class
-                'resolveInfo' => $this->resolveInfo(),
-            ]
-        );
-
-        $validator->setAttributeNames([$this->getArgumentName() => $this->argumentPath()]);
+        $validator = $this->createValidator($value, $rules);
 
         if (! $validator->fails()) {
             return $value;
@@ -69,6 +52,27 @@ class RulesDirective extends BaseDirective implements ArgMiddleware, HasResolver
         $this->accumulateError($validator);
 
         return $value;
+    }
+
+    /**
+     * @param $value
+     * @param array $rules
+     *
+     * @return \Illuminate\Contracts\Validation\Factory|Validator
+     */
+    protected function createValidator($value, array $rules)
+    {
+        $argumentName = $this->getArgumentName();
+
+        $validator = validator(
+            [$argumentName => $value],
+            [$argumentName => $rules],
+            (array) $this->getMessages()
+        );
+
+        $validator->setAttributeNames([$this->getArgumentName() => $this->argumentPath()]);
+
+        return $validator;
     }
 
     /**
