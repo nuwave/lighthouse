@@ -7,14 +7,14 @@ interface HasArgumentPath
     /**
      * Get all the resolver arguments.
      *
-     * @return string
+     * @return array
      */
-    public function argumentPath(): string;
+    public function argumentPath(): array;
 
     /**
-     * @param string $argumentPath
+     * @param array $argumentPath
      *
      * @return static
      */
-    public function setArgumentPath(string $argumentPath);
+    public function setArgumentPath(array $argumentPath);
 }

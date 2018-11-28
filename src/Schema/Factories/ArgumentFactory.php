@@ -117,7 +117,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
                     $inputValueDefinition['type'],
                     $args[$argumentName],
                     $inputValueDefinition['astNode'],
-                    $argumentName
+                    [$argumentName]
                 );
 
                 if ($this->currentErrorBuffer->hasErrors()) {
@@ -141,9 +141,9 @@ class ArgumentFactory implements HasResolverArgumentsContract
      * @param InputType                     $type
      * @param mixed                         $argumentValue
      * @param InputValueDefinitionNode|null $astNode
-     * @param string                        $argumentPath
+     * @param array                         $argumentPath
      */
-    protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argumentValue, InputValueDefinitionNode $astNode, string $argumentPath)
+    protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argumentValue, InputValueDefinitionNode $astNode, array $argumentPath)
     {
         if ($type instanceof InputObjectType) {
             foreach ($type->getFields() as $field) {
@@ -155,7 +155,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
                     $field->type,
                     $argumentValue[$field->name],
                     $field->astNode,
-                    "{$argumentPath}.{$field->name}"
+                    $this->addPath($argumentPath, $field->name)
                 );
             }
 
@@ -169,7 +169,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
                     $type->ofType,
                     $argumentValue[$key],
                     $astNode,
-                    "{$argumentPath}.{$key}"
+                    $this->addPath($argumentPath, $key)
                 );
             }
 
@@ -180,16 +180,31 @@ class ArgumentFactory implements HasResolverArgumentsContract
     }
 
     /**
+     * Append a path to the base path to create a new path.
+     *
+     * @param array      $basePath
+     * @param string|int $pathToBeAdded
+     *
+     * @return array
+     */
+    protected function addPath(array $basePath, $pathToBeAdded): array
+    {
+        $basePath[] = $pathToBeAdded;
+
+        return $basePath;
+    }
+
+    /**
      * @param InputValueDefinitionNode $astNode
      * @param $argumentValue
-     * @param string $argumentPath
+     * @param array $argumentPath
      *
      * @return mixed
      */
     protected function handleArgWithAssociatedDirectives(
         InputValueDefinitionNode $astNode,
         $argumentValue,
-        string $argumentPath
+        array $argumentPath
     ) {
         $argumentValue = $this->handleArgMiddlewareDirectives($astNode, $argumentValue, $argumentPath);
 
@@ -201,14 +216,14 @@ class ArgumentFactory implements HasResolverArgumentsContract
     /**
      * @param InputValueDefinitionNode $astNode
      * @param $argumentValue
-     * @param string $argumentPath
+     * @param array $argumentPath
      *
      * @return mixed
      */
     protected function handleArgMiddlewareDirectives(
         InputValueDefinitionNode $astNode,
         $argumentValue,
-        string $argumentPath
+        array $argumentPath
     ) {
         $directives = $this->directiveFactory->createArgMiddleware($astNode);
 
@@ -229,11 +244,11 @@ class ArgumentFactory implements HasResolverArgumentsContract
 
     /**
      * @param InputValueDefinitionNode $astNode
-     * @param string                   $argumentPath
+     * @param array                    $argumentPath
      */
     protected function handleArgFilterDirectives(
         InputValueDefinitionNode $astNode,
-        string $argumentPath
+        array $argumentPath
     ) {
         $directives = $this->directiveFactory->createArgFilterDirective($astNode);
 
@@ -250,10 +265,10 @@ class ArgumentFactory implements HasResolverArgumentsContract
 
     /**
      * @param InputValueDefinitionNode $astNode
-     * @param string                   $argumentPath
+     * @param array                    $argumentPath
      * @param Collection               $directives
      */
-    protected function prepareDirective(InputValueDefinitionNode $astNode, string $argumentPath, Collection $directives)
+    protected function prepareDirective(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
     {
         $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
             $this->addCurrentDirectiveType($directive);

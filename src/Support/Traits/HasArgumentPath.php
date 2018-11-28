@@ -5,24 +5,32 @@ namespace Nuwave\Lighthouse\Support\Traits;
 trait HasArgumentPath
 {
     /**
-     * @var string
+     * @var array
      */
     protected $argumentPath;
 
     /**
-     * @return string
+     * @return array
      */
-    public function argumentPath(): string
+    public function argumentPath(): array
     {
         return $this->argumentPath;
     }
 
     /**
-     * @param mixed $argumentPath
+     * @return string
+     */
+    public function argumentPathAsDotNotation(): string
+    {
+        return implode('.', $this->argumentPath);
+    }
+
+    /**
+     * @param array $argumentPath
      *
      * @return static
      */
-    public function setArgumentPath(string  $argumentPath)
+    public function setArgumentPath(array $argumentPath)
     {
         $this->argumentPath = $argumentPath;
 

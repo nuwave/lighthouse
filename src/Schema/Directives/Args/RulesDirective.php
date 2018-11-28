@@ -70,7 +70,7 @@ class RulesDirective extends BaseDirective implements ArgMiddleware, HasErrorBuf
             (array) $this->getMessages()
         );
 
-        $validator->setAttributeNames([$this->getArgumentName() => $this->argumentPath()]);
+        $validator->setAttributeNames([$this->getArgumentName() => $this->argumentPathAsDotNotation()]);
 
         return $validator;
     }
@@ -85,7 +85,7 @@ class RulesDirective extends BaseDirective implements ArgMiddleware, HasErrorBuf
         $this->errorBuffer()->setErrorType(static::ERROR_TYPE);
         $errorMessage = $validator->errors()->get($this->getArgumentName());
 
-        $this->errorBuffer()->push($errorMessage[0], $this->argumentPath());
+        $this->errorBuffer()->push($errorMessage[0], $this->argumentPathAsDotNotation());
     }
 
     /**
