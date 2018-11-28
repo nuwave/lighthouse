@@ -4,11 +4,8 @@ about: Suggest an idea for this project
 
 ---
 
-<!--
-Before posting this issue, please ask yourself:
-- Is your issue actually a question? -> Ask in Slack
-- Is it about the docs? -> https://github.com/nuwave/lighthouse-docs/issues/
--->
+<!-- If you are not sure the problem you are having is actually an issue within Lighthouse,
+you can hop into Slack first. We will help you figure out what is wrong. -->
 
 **Is your feature request related to a problem? Please describe.**
 

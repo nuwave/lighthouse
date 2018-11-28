@@ -32,17 +32,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        if($this->directiveHasArgument('resolver')){
-            list($className, $methodName) = $this->getMethodArgumentParts('resolver');
-        } else {
-            /**
-             * @deprecated This behaviour will be removed in v3
-             *
-             * The only way to define methods will be via the resolver: "Class@method" style
-             */
-            $className = $this->directiveArgValue('class');
-            $methodName = $this->directiveArgValue('method');
-        }
+        list($className, $methodName) = $this->getMethodArgumentParts('resolver');
 
         if($parentNamespace = $fieldValue->getDefaultNamespaceForParent()){
             $namespacedClassName = $this->namespaceClassName($className, [$parentNamespace]);
