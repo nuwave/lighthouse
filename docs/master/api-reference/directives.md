@@ -749,14 +749,17 @@ scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date
 ```
 
 ## @search
+
 Creates a full-text search argument.
 
-This directive will make a argument use [Laravel Scout](https://laravel.com/docs/master/scout) to make a full-text search, what driver you use for Scout is up to you.
-The way it works is that it calls the `search` method for you and supplies your argument to it.
+This directive will make an argument use [Laravel Scout](https://laravel.com/docs/master/scout)
+to make a full-text search, what driver you use for Scout is up to you.
+
+The `search` method of the model is called with the value of the argument.
 
 ```graphql
 type Query {
-    posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
+  posts(search: String @search): [Post!]! @paginate
 }
 ```
 
@@ -765,7 +768,7 @@ However, in some situation a custom index might be needed, this can be achieved 
 
 ```graphql
 type Query {
-    posts(search: String @search(within: "my.index")): [Post!]! @paginate(type: "paginator" model: "Post")
+  posts(search: String @search(within: "my.index")): [Post!]! @paginate
 }
 ```
 
