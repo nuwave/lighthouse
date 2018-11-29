@@ -322,6 +322,14 @@ type User {
   postsByCategory(category: String @eq): [Post] @hasMany
 }
 ```
+If `category` field does not match with the database column, you can use the `key` argument.
+
+```graphql
+type User {
+  # this will place a equal operator for `cat` database column
+  postsByCategory(category: String @eq(key: "cat")): [Post] @hasMany
+}
+```
 
 ## @event
 
