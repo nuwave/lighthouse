@@ -323,6 +323,14 @@ type User {
 }
 ```
 
+If `category` field does not match with the database column, you can use the `key` argument.
+ ```graphql
+type User {
+  # this will place a equal operator for `cat` database column
+  postsByCategory(category: String @eq(key: "cat")): [Post] @hasMany
+}
+```
+
 ## @event
 
 Fire an event after a mutation has taken place. It requires the `fire` argument that should be the class name of the event you want to fire.
