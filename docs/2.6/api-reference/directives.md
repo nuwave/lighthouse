@@ -322,7 +322,8 @@ type User {
   postsByCategory(category: String @eq): [Post] @hasMany
 }
 ```
-If `category` field does not match with the database column, you can use the `key` argument.
+If the name of the argument does not match the database column,
+pass the actual column name as the `key`.
 
 ```graphql
 type User {
