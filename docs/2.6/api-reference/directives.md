@@ -322,6 +322,14 @@ type User {
   postsByCategory(category: String @eq): [Post] @hasMany
 }
 ```
+If the name of the argument does not match the database column,
+pass the actual column name as the `key`.
+
+```graphql
+type User {
+  postsByCategory(category: String @eq(key: "cat")): [Post] @hasMany
+}
+```
 
 ## @event
 
