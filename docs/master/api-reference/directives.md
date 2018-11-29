@@ -323,10 +323,10 @@ type User {
 }
 ```
 
-If `category` field does not match with the database column, you can use the `key` argument.
+If the name of the argument does not match the database column,
+pass the actual column name as the `key`.
  ```graphql
 type User {
-  # this will place a equal operator for `cat` database column
   postsByCategory(category: String @eq(key: "cat")): [Post] @hasMany
 }
 ```
