@@ -327,7 +327,6 @@ pass the actual column name as the `key`.
 
 ```graphql
 type User {
-  # this will place a equal operator for `cat` database column
   postsByCategory(category: String @eq(key: "cat")): [Post] @hasMany
 }
 ```
