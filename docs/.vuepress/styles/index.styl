@@ -1,6 +1,14 @@
+@import url('https://fonts.googleapis.com/css?family=Miriam+Libre:400,700')
+
 body
-  font-family Nunito !important
+  font-family $secondaryFont !important
   background-color #fbfbfb
+
+h1, h2, h3, h4, h5, h6
+  font-family: $primaryFont, sans-serif
+
+h1, h2 
+  font-weight: 400 !important
 
 /****************************** 
   HOME
@@ -65,7 +73,8 @@ body
 
 
 .navbar .site-name
-  font-weight 800 !important
+  font-weight 400 !important
+  font-family: $primaryFont
 
 
 .nav-link, .repo-link , .nav-links .dropdown-title
@@ -99,8 +108,7 @@ body
 #app .sidebar     
   width  17rem !important
   border-right none !important
-  background-color transparent !important
-  background-image linear-gradient(0deg, #907f92, #2e1b33) !important
+  background-color $backgroundColor !important
 
 
  .sidebar-group:not(.collapsable) .sidebar-heading,
@@ -123,11 +131,11 @@ body
   a.sidebar-link:active
     color #fff !important
     opacity 0.7 !important
-    border-left-color rgba(255, 255, 255, 0.5) !important
+    border-left-color $accentColor !important
 
   a.sidebar-link.active
     color #fff !important
-    border-left-color rgba(255, 255, 255, 0.5) !important
+    border-left-color $accentColor !important
 
 
   @media (max-width 959px)

@@ -1,9 +1,5 @@
 # Installation
 
-::: warning TEST
-This content is from "2.6" version.
-::: 
-
 ## Install via composer
 
 ```bash
@@ -32,7 +28,7 @@ $ composer require mll-lab/laravel-graphql-playground
 ```
 
 You can also use any external client with Lighthouse, make sure to point it to the URL defined in
-the config. Per default, the endpoint lives at `/graphql` 
+the config. Per default, the endpoint lives at `/graphql`
 
 ## Using the Facade
 
