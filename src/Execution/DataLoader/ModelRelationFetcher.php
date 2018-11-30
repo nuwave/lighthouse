@@ -9,11 +9,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class ModelRelationFetcher
 {
+    use HandlesCompositeKey;
+
     /**
      * The parent models that relations should be loaded for.
      *
@@ -311,7 +314,7 @@ class ModelRelationFetcher
         return $this->models
             ->mapWithKeys(
                 function (Model $model) use ($relationName) {
-                    return [$this->getModelKey($model) => $model->getRelation($relationName)];
+                    return [$this->buildKey($model->getKey()) => $model->getRelation($relationName)];
                 }
             )->all();
     }
@@ -418,20 +421,5 @@ class ModelRelationFetcher
         return $this
             ->newModelQuery()
             ->getRelation($relationName);
-    }
-
-    /**
-     * Get model key. Support composite primary keys.
-     * Ex: $primaryKey = ['key1', 'key2'];.
-     *
-     * @param Model $model
-     *
-     * @return string
-     */
-    protected function getModelKey(Model $model)
-    {
-        return (is_array($model->getKey()))
-            ? implode('___', $model->getKey())
-            : $model->getKey();
     }
 }
