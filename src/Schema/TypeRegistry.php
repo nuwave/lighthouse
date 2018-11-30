@@ -21,7 +21,7 @@ class TypeRegistry
      * @var Type[]
      */
     protected $types;
-    
+
     /**
      * Register type with registry.
      *
@@ -32,7 +32,7 @@ class TypeRegistry
     public function register(Type $type): TypeRegistry
     {
         $this->types[$type->name] = $type;
-        
+
         return $this;
     }
 
@@ -52,29 +52,5 @@ class TypeRegistry
         }
 
         return $this->types[$typeName];
-    }
-
-    /**
-     * Resolve type instance by name.
-     *
-     * @param string $typeName
-     *
-     * @return Type
-     * @deprecated in favour of get, remove in v3
-     */
-    public function instance($typeName)
-    {
-        return $this->get($typeName);
-    }
-
-    /**
-     * Register type with registry.
-     *
-     * @param Type $type
-     * @deprecated in favour of register, remove in v3
-     */
-    public function type(Type $type)
-    {
-        $this->register($type);
     }
 }

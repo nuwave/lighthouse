@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Carbon\Carbon;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
@@ -57,7 +58,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $useTags = $this->useTags();
             $cacheExp = $maxAge
-                ? now()->addSeconds($maxAge)
+                ? Carbon::now()->addSeconds($maxAge)
                 : null;
             $cacheKey = $cacheValue->getKey();
             $cacheTags = $cacheValue->getTags();

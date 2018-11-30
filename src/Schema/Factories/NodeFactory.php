@@ -324,14 +324,7 @@ class NodeFactory
         if ($directive = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
             $interfaceDirective = (new InterfaceDirective())->hydrate($interfaceDefinition);
 
-            if ($interfaceDirective->directiveHasArgument('resolveType')) {
-                $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
-            } else {
-                /**
-                 * @deprecated in v3 this will only be available as the argument resolveType
-                 */
-                $typeResolver = $interfaceDirective->getResolverFromArgument('resolver');
-            }
+            $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
             $interfaceClass = \namespace_classname($nodeName, [
                 config('lighthouse.namespaces.interfaces'),
@@ -382,14 +375,7 @@ class NodeFactory
         if ($directive = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
             $unionDirective = (new UnionDirective())->hydrate($unionDefinition);
 
-            if ($unionDirective->directiveHasArgument('resolveType')) {
-                $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
-            } else {
-                /**
-                 * @deprecated in v3 this will only be available as the argument resolveType
-                 */
-                $typeResolver = $unionDirective->getResolverFromArgument('resolver');
-            }
+            $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
             $unionClass = \namespace_classname($nodeName, [
                 config('lighthouse.namespaces.unions'),
