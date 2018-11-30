@@ -189,22 +189,30 @@ class RulesDirectiveTest extends TestCase
         $this->assertEquals([
             'input' => [
                 'emails' => [
-                    0 => ['Not an email'],
-                    1 => ['Not an email'],
-                ],
-                'self' => [
-                    'emails' => [
+                    'items' => [
                         0 => ['Not an email'],
                         1 => ['Not an email'],
                     ],
+                ],
+                'self' => [
+                    'emails' => [
+                        'items' => [
+                            0 => ['Not an email'],
+                            1 => ['Not an email'],
+                        ],
+                    ],
                     'self' => [
                         'emails' => [
-                            1 => ['Not an email'],
-                            3 => ['Not an email'],
+                            'items' => [
+                                1 => ['Not an email'],
+                                3 => ['Not an email'],
+                            ],
                         ],
                         'self' => [
                             'emails' => [
-                                0 => ['The input.self.self.self.emails.0 may not be greater than 20 characters.'],
+                                'items' => [
+                                    0 => ['The input.self.self.self.emails.items.0 may not be greater than 20 characters.'],
+                                ],
                             ],
                         ],
                     ],

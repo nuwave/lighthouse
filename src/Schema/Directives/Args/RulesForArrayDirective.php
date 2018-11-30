@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddlewareForArray;
 
-class RulesDirective extends BaseDirective implements ArgMiddleware, HasErrorBuffer, HasArgumentPath
+class RulesForArrayDirective extends BaseDirective implements ArgMiddlewareForArray, HasErrorBuffer, HasArgumentPath
 {
     use HandleRulesDirective;
 
@@ -18,6 +18,6 @@ class RulesDirective extends BaseDirective implements ArgMiddleware, HasErrorBuf
      */
     public function name(): string
     {
-        return 'rules';
+        return 'rulesForArray';
     }
 }

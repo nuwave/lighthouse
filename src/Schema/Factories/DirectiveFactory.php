@@ -7,11 +7,12 @@ use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddlewareForArray;
 use Nuwave\Lighthouse\Events\RegisteringDirectiveBaseNamespaces;
 
 class DirectiveFactory
@@ -103,6 +104,11 @@ class DirectiveFactory
             $className = $baseNamespace.'\\'.studly_case($directiveName).'Directive';
             if (class_exists($className)) {
                 $directive = resolve($className);
+
+                if (! $directive instanceof Directive) {
+                    throw new DirectiveException("Class $className is not a directive.");
+                }
+
                 $this->addResolved($directiveName, $className);
 
                 return $directive;
@@ -177,6 +183,18 @@ class DirectiveFactory
     public function createArgMiddleware(InputValueDefinitionNode $arg): Collection
     {
         return $this->associatedDirectivesOfType($arg, ArgMiddleware::class);
+    }
+
+    /**
+     * Get middleware for field arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function createArgMiddlewareForArray(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgMiddlewareForArray::class);
     }
 
     /**

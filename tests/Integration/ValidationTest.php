@@ -21,6 +21,7 @@ class ValidationTest extends TestCase
         foobar: Int @rules(apply: ["integer", "max:10"])
         self: Bar
         withRequired: Baz
+        optional: String
     }
     
     input Baz {
@@ -35,7 +36,6 @@ class ValidationTest extends TestCase
      */
     public function itValidatesDifferentPathsIndividually()
     {
-        $this->markTestIncomplete();
         $query = '
         {
             foo(
@@ -57,14 +57,15 @@ class ValidationTest extends TestCase
             )
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $this->assertValidationKeysSame([
             'required',
-            'input.0.foobar',
-            'input.1.self.foobar',
-            'input.2.withRequired.invalidDefault',
-            'input.2.withRequired.required',
+            'input.items.0.foobar',
+            'input.items.1.self.foobar',
+            'input.items.2.withRequired.invalidDefault',
+            'input.items.2.withRequired.required',
         ], $result);
     }
 
@@ -73,7 +74,6 @@ class ValidationTest extends TestCase
      */
     public function itValidatesList()
     {
-        $this->markTestIncomplete();
         $query = '
         {
             foo(
@@ -85,13 +85,14 @@ class ValidationTest extends TestCase
             )
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $this->assertValidationKeysSame([
             'required',
             'list',
-            'list.1',
-            'list.2',
+            'list.items.1',
+            'list.items.2',
         ], $result);
     }
 
@@ -100,7 +101,6 @@ class ValidationTest extends TestCase
      */
     public function itValidatesInputCount()
     {
-        $this->markTestIncomplete();
         $query = '
         {
             foo(
@@ -110,6 +110,7 @@ class ValidationTest extends TestCase
             )
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $this->assertValidationKeysSame([
@@ -123,12 +124,12 @@ class ValidationTest extends TestCase
      */
     public function itPassesIfNothingRequiredIsMissing()
     {
-        $this->markTestIncomplete();
         $query = '
         {
             foo(required: "foo")
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $expected = [
@@ -145,12 +146,12 @@ class ValidationTest extends TestCase
      */
     public function itErrorsIfSomethingRequiredIsMissing()
     {
-        $this->markTestIncomplete();
         $query = '
         {
             foo
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $expected = [
@@ -164,8 +165,9 @@ class ValidationTest extends TestCase
 
     protected function assertValidationKeysSame(array $keys, array $result)
     {
-        $actual = array_get($result, 'errors.0.extensions.validation');
-
-        $this->assertSame($keys, array_keys($actual));
+        $validation = array_get($result, 'errors.0.validation');
+        foreach ($keys as $key) {
+            $this->assertNotNull(data_get($validation, $key));
+        }
     }
 }

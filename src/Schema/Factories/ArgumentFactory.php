@@ -5,12 +5,14 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use GraphQL\Utils\AST;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\InputType;
+use Nuwave\Lighthouse\Support\NoValue;
 use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
+use GraphQL\Type\Definition\InputObjectField;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -35,11 +37,6 @@ class ArgumentFactory implements HasResolverArgumentsContract
      * @var ErrorBuffer
      */
     protected $currentErrorBuffer;
-
-    /**
-     * @var string[]
-     */
-    protected $currentDirectiveTypes = [];
 
     /**
      * @var DirectiveFactory
@@ -104,32 +101,31 @@ class ArgumentFactory implements HasResolverArgumentsContract
     {
         return function ($root, $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
+            $this->resetCurrentErrorBuffer();
 
-            // The list of arguments names that are not provided by the client.
-            $originalArguments = $args;
-
-            foreach ($inputValueDefinitions as $argumentName => $inputValueDefinition) {
+            $inputValueDefinitions->each(function ($inputValueDefinition, $argumentName) use (&$args) {
                 $this->currentInputValueDefinition = $inputValueDefinition;
-                $this->resetCurrentErrorBuffer();
-                $this->resetCurrentDirectiveTypes();
+
+                $noValuePassedForThisArgument = ! array_key_exists($argumentName, $args);
+
+                // because we are passing by reference, we need a variable to contain the null value.
+                if ($noValuePassedForThisArgument) {
+                    $value = new NoValue();
+                } else {
+                    $value = &$args[$argumentName];
+                }
 
                 $this->handleArgWithAssociatedDirectivesRecursively(
                     $inputValueDefinition['type'],
-                    $args[$argumentName],
+                    $value,
                     $inputValueDefinition['astNode'],
                     [$argumentName]
                 );
+            });
 
-                if ($this->currentErrorBuffer->hasErrors()) {
-                    $this->currentErrorBuffer->flush($this->gatherErrorMessage());
-                }
+            if ($this->currentErrorBuffer->hasErrors()) {
+                $this->currentErrorBuffer->flush($this->getErrorMessage());
             }
-
-            // Because we are passing the items of `$args` by reference to `$this->handleArgMiddleware`,
-            // arguments that were not provided in the original incoming arguments but exist in the
-            // `$inputValueDefinitions` can produce a null item to the `$args`. We should remove
-            // those newly produced items here before we can pass it to the next resolver.
-            $args = array_intersect_key($args, $originalArguments);
 
             return $resolver($root, $args, $context, $resolveInfo);
         };
@@ -145,37 +141,61 @@ class ArgumentFactory implements HasResolverArgumentsContract
      */
     protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argumentValue, InputValueDefinitionNode $astNode, array $argumentPath)
     {
+        if ($argumentValue instanceof NoValue || null === $argumentValue) {
+            if ($type instanceof InputObjectType) {
+                return;
+            }
+
+            if ($type instanceof ListOfType) {
+                $this->handleArgMiddlewareForArrayDirectives($astNode, $argumentValue, $argumentPath);
+
+                return;
+            }
+
+            // all other leaf types
+            $this->handleArgWithAssociatedDirectives($astNode, $argumentValue, $argumentPath);
+
+            return;
+        }
+
         if ($type instanceof InputObjectType) {
-            foreach ($type->getFields() as $field) {
-                if (! array_key_exists($field->name, $argumentValue)) {
-                    continue;
+            collect($type->getFields())->each(function (InputObjectField $field) use ($argumentPath, &$argumentValue) {
+                $noValuePassedForThisArgument = ! array_key_exists($field->name, $argumentValue);
+
+                // because we are passing by reference, we need a variable to contain the null value.
+                if ($noValuePassedForThisArgument) {
+                    $value = new NoValue();
+                } else {
+                    $value = &$argumentValue[$field->name];
                 }
 
                 $this->handleArgWithAssociatedDirectivesRecursively(
                     $field->type,
-                    $argumentValue[$field->name],
+                    $value,
                     $field->astNode,
                     $this->addPath($argumentPath, $field->name)
                 );
-            }
+            });
 
             return;
         }
 
         if ($type instanceof ListOfType) {
+            $argumentValue = $this->handleArgMiddlewareForArrayDirectives($astNode, $argumentValue, $argumentPath);
             foreach ($argumentValue as $key => $fieldValue) {
                 // here we are passing by reference so the `$argumentValue[$key]` is intended.
                 $this->handleArgWithAssociatedDirectivesRecursively(
                     $type->ofType,
                     $argumentValue[$key],
                     $astNode,
-                    $this->addPath($argumentPath, $key)
+                    $this->addPath($this->addPath($argumentPath, 'items'), $key)
                 );
             }
 
             return;
         }
 
+        // all other leaf types
         $argumentValue = $this->handleArgWithAssociatedDirectives($astNode, $argumentValue, $argumentPath);
     }
 
@@ -227,12 +247,57 @@ class ArgumentFactory implements HasResolverArgumentsContract
     ) {
         $directives = $this->directiveFactory->createArgMiddleware($astNode);
 
+        return $this->handleArgMiddlewareDirectivesFor($astNode, $argumentValue, $argumentPath, $directives);
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param $argumentValue
+     * @param array $argumentPath
+     *
+     * @return mixed
+     */
+    protected function handleArgMiddlewareForArrayDirectives(
+        InputValueDefinitionNode $astNode,
+        $argumentValue,
+        array $argumentPath
+    ) {
+        $directives = $this->directiveFactory->createArgMiddlewareForArray($astNode);
+
+        return $this->handleArgMiddlewareDirectivesFor($astNode, $argumentValue, $argumentPath, $directives);
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param $argumentValue
+     * @param array      $argumentPath
+     * @param Collection $directives
+     *
+     * @return mixed
+     */
+    protected function handleArgMiddlewareDirectivesFor(
+        InputValueDefinitionNode $astNode,
+        $argumentValue,
+        array $argumentPath,
+        Collection $directives
+    ) {
         if ($directives->isEmpty()) {
             return $argumentValue;
         }
 
         $this->prepareDirective($astNode, $argumentPath, $directives);
 
+        return $this->handleArgMiddlewareDirectivesThroughPipeline($argumentValue, $directives);
+    }
+
+    /**
+     * @param $argumentValue
+     * @param Collection $directives
+     *
+     * @return mixed
+     */
+    protected function handleArgMiddlewareDirectivesThroughPipeline($argumentValue, Collection $directives)
+    {
         return resolve(Pipeline::class)
             ->send($argumentValue)
             ->through($directives)
@@ -271,8 +336,6 @@ class ArgumentFactory implements HasResolverArgumentsContract
     protected function prepareDirective(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
     {
         $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
-            $this->addCurrentDirectiveType($directive);
-
             if ($directive instanceof HasResolverArgumentsContract) {
                 $directive->setResolverArguments(...$this->resolverArguments());
             }
@@ -324,35 +387,11 @@ class ArgumentFactory implements HasResolverArgumentsContract
     }
 
     /**
-     * Add a directive type to current directive types.
-     *
-     * @param Directive $directive
-     */
-    protected function addCurrentDirectiveType(Directive $directive)
-    {
-        $className = \get_class($directive);
-
-        if (\in_array($className, $this->currentDirectiveTypes)) {
-            return;
-        }
-
-        $this->currentDirectiveTypes[] = $className;
-    }
-
-    /**
-     * clear the all the current directive types.
-     */
-    protected function resetCurrentDirectiveTypes()
-    {
-        $this->currentDirectiveTypes = [];
-    }
-
-    /**
      * reset currentErrorBuffer.
      */
     protected function resetCurrentErrorBuffer()
     {
-        $this->currentErrorBuffer = resolve(ErrorBuffer::class);
+        $this->currentErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
     }
 
     /**
@@ -368,16 +407,10 @@ class ArgumentFactory implements HasResolverArgumentsContract
      *
      * @return string
      */
-    protected function gatherErrorMessage(): string
+    protected function getErrorMessage(): string
     {
         $path = implode('.', $this->resolveInfo()->path);
 
-        return collect($this->currentDirectiveTypes)->map(function (string $directiveClass) use ($path) {
-            if (method_exists($directiveClass, 'getFlushErrorMessage')) {
-                return $directiveClass::getFlushErrorMessage($this->currentArgumentValueInstance(), $path);
-            }
-
-            return null;
-        })->filter()->implode(PHP_EOL);
+        return "Validation failed for the field [$path].";
     }
 }

@@ -26,6 +26,6 @@ class BcryptDirective implements ArgMiddleware
      */
     public function handleArgument($argumentValue, \Closure $next)
     {
-        return $next(bcrypt($argumentValue));
+        return $next(\is_string($argumentValue) ? bcrypt($argumentValue) : $argumentValue);
     }
 }
