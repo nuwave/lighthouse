@@ -69,7 +69,7 @@ class TracingExtension extends GraphQLExtension
      */
     public function requestDidStart(ExtensionRequest $request): TracingExtension
     {
-        $this->requestStart = now();
+        $this->requestStart = Carbon::now();
 
         return $this;
     }
@@ -113,7 +113,7 @@ class TracingExtension extends GraphQLExtension
      */
     public function jsonSerialize(): array
     {
-        $end = now();
+        $end = Carbon::now();
         $duration = abs(($end->micro - $this->requestStart->micro) * 1000);
 
         return [

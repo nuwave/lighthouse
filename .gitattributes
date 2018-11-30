@@ -1,6 +1,8 @@
 * text=auto
 
+/.forestry export-ignore
 /.github export-ignore
+/docs export-ignore
 /tests export-ignore
 .codecov.yml export-ignore
 .editorconfig export-ignore
@@ -11,4 +13,5 @@
 .travis.yml export-ignore
 docker-compose.yml export-ignore
 logo.png export-ignore
+netlify.toml export-ignore
 phpunit.xml.dist export-ignore

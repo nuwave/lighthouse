@@ -248,42 +248,4 @@ class FieldValue
     {
         return $this->field->name->value;
     }
-
-    /**
-     * @return NodeValue
-     *
-     * @deprecated
-     */
-    public function getNode(): NodeValue
-    {
-        return $this->getParent();
-    }
-
-    /**
-     * Get field's node name.
-     *
-     * @return string
-     *
-     * @deprecated
-     */
-    public function getNodeName(): string
-    {
-        return $this->getParentName();
-    }
-
-    /**
-     * Set current type.
-     *
-     * @param \Closure|Type $type
-     *
-     * @return FieldValue
-     *
-     * @deprecated do this sort of manipulation in the DocumentAST in the future
-     */
-    public function setType($type): FieldValue
-    {
-        $this->returnType = $type;
-
-        return $this;
-    }
 }

@@ -1,10 +1,5 @@
 # Installation
 
-::: danger TEST 
-
-This content is from "master" version.
-::: 
-
 ## Install via composer
 
 ```bash
