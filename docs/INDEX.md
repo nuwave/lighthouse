@@ -33,7 +33,7 @@ footer: Copyright © 2018 Christopher Moore
             functional GraphQL server with no additional code! But don't worry, you can extend Lighthouse to fit just
             about any data requirements. The docs will walk you through what directives are available, how to create
             your own directives and how to create your own resolvers, so let's get started!</p>
-          <a href="/docs/2.0/installation" class="button mt-8">Get Started</a>
+          <a href="/docs/latest.html" class="button mt-8">Get Started</a>
         </div>
         <div class="w-full md:w-1/3">
           <div class="md:-mt-16 shadow-md">
@@ -70,19 +70,19 @@ type Query <span class="token punctuation">{</span>
           <h4 class="text-purple-darkest text-xl mb-2">Schema Directives</h4>
           <p class="mb-2">Lighthouse provides you with a handful of helpful Schema Directives to get you up and running
             in no time. But it also allows you to create your own when needed.</p>
-          <a href="#" class="font-bold uppercase text-sm">Read More</a>
+          <a href="/docs/latest.html" class="font-bold uppercase text-sm">Read More</a>
         </div>
         <div class="w-full mb-4 md:w-1/3 md:mb-0 px-4">
           <h4 class="text-purple-darkest text-xl mb-2">Laravel Friendly</h4>
           <p class="mb-2">Lighthouse integrates with your Laravel application without the need to re-write your entire
             domain. Just build a GraphQL schema on top of your current logic and start querying!</p>
-          <a href="#" class="font-bold uppercase text-sm">Read More</a>
+          <a href="/docs/latest" class="font-bold uppercase text-sm">Read More</a>
         </div>
         <div class="w-full md:w-1/3 md:mb-0 px-4">
           <h4 class="text-purple-darkest text-xl mb-2">Optimized for Eloquent</h4>
           <p class="mb-2">Eloquent is an extremly powerful ORM. Lighthouse leverages your current model relationships
             and, in most cases, creates optizmized queries to minimize round trips to your database.</p>
-          <a href="#" class="font-bold uppercase text-sm">Read More</a>
+          <a href="/docs/latest.html" class="font-bold uppercase text-sm">Read More</a>
         </div>
       </div>
     </div>
@@ -124,7 +124,7 @@ type Mutation <span class="token punctuation">{</span>
           <p>Lighthouse attempts to bring a "schema-first" design pattern to PHP &amp; GraphQL. If you already have
             your models and migrations set up, then it only takes minutes to get a GraphQL server up and running with
             Lighthouse!</p>
-          <a href="/docs/2.0/installation" class="button mt-8">Read the Docs</a>
+          <a href="/docs/latest.html" class="button mt-8">Read the Docs</a>
         </div>
       </div>
     </div>
