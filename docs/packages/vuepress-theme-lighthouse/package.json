@@ -1,0 +1,24 @@
+{
+    "private": true,
+    "name": "vuepress-theme-lighthouse",
+    "version": "1.0.0",
+    "description": "Lighthouse theme for official Lighthouse project",
+    "main": "index.js",
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nuwave/lighthouse.git"
+    },
+    "keywords": [
+        "documentation",
+        "lighthouse",
+        "generator"
+    ],
+    "author": "Christopher Moore",
+    "license": "MIT",
+    "dependencies": {
+        "@vuepress/theme-default": "^1.0.0-alpha.25"
+    }
+}
