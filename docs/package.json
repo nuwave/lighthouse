@@ -6,6 +6,7 @@
         "vuepress-theme-lighthouse": "file:./packages/vuepress-theme-lighthouse"
     },
     "scripts": {
+        "start": "npm run docs:dev",
         "docs:dev": "vuepress dev .",
         "docs:version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
         "docs:build": "vuepress build ."
