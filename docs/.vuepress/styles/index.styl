@@ -7,12 +7,15 @@ body
 h1, h2, h3, h4, h5, h6
   font-family: $primaryFont, sans-serif
 
-h1, h2 
+h1, h2, h3
   font-weight: 400 !important
 
 /****************************** 
   HOME
 *******************************/
+
+.home-container h2
+  border-bottom: none
 
 .home .highlights
   padding 1.2rem 0
@@ -43,9 +46,29 @@ h1, h2
   CONTENT
 *******************************/
 
-  .content img
-    border #f3f3f3 1px solid !important
-    border-radius 6px !important
+.content img
+  border #f3f3f3 1px solid !important
+  border-radius 6px !important
+
+.container
+  margin-left: auto
+  margin-right: auto
+
+.button
+  border: 1px solid #a74ff4;
+  display: inline-block;
+  line-height: 1.2em;
+  padding: 10px;
+  text-decoration: none!important;
+  text-transform: uppercase;
+  transition: background .3s,color .3s;
+  border-color: #2b2644;
+  color: #2b2644;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  background-color: #fff;
+  border-radius: 0;
 
 /****************************** 
   HERO
@@ -53,7 +76,33 @@ h1, h2
 
 .home .hero img
   height 120px !important
-  
+
+/****************************** 
+  CODE
+*******************************/
+
+pre,
+pre[class*="language-"],
+pre code[class*="language-"]
+  color: #EFEFEF
+  background-color: $backgroundColor !important
+  border-radius: 0 !important
+
+pre[class*="language-"] .token.attr-name,
+pre code[class*="language-"] .token.attr-name
+  color: #b2b7ff
+
+pre[class*="language-"] .token.function,
+pre code[class*="language-"] .token.function
+  color: #d6bbfc
+
+pre[class*="language-"] .token.string,
+pre code[class*="language-"] .token.string
+  color: #FFF
+
+pre[class*="language-"] .token.comment,
+pre code[class*="language-"] .token.comment
+  color: slategray
 
 /****************************** 
   PAGE
@@ -80,6 +129,14 @@ h1, h2
 .nav-link, .repo-link , .nav-links .dropdown-title
   font-weight 800 !important
 
+
+/****************************** 
+  FOOTER
+*******************************/
+
+.footer 
+  text-align: center
+  padding: 8rem 0rem
 
 /****************************** 
   BLOCKS
