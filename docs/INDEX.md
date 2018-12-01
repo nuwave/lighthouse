@@ -1,7 +1,5 @@
 ---
 home: true
-layout: Home
-heroImage: /logo.svg
 actionText: Get Started  →
 actionLink: /docs/latest
 
