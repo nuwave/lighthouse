@@ -127,7 +127,7 @@ trait HasResolverArguments
      *
      * @return array
      */
-    public function resolverArguments(): array
+    public function getResolverArguments(): array
     {
         return [
             $this->root(),

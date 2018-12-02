@@ -23,7 +23,7 @@ use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
-class ArgumentFactory implements HasResolverArgumentsContract
+class ArgumentFactory
 {
     use HasResolverArguments;
 
@@ -166,23 +166,26 @@ class ArgumentFactory implements HasResolverArgumentsContract
         }
 
         if ($type instanceof InputObjectType) {
-            collect($type->getFields())->each(function (InputObjectField $field) use ($argumentPath, &$argumentValue) {
-                $noValuePassedForThisArgument = ! array_key_exists($field->name, $argumentValue);
+            collect($type->getFields())
+                ->each(
+                    function (InputObjectField $field) use ($argumentPath, &$argumentValue) {
+                        $noValuePassedForThisArgument = ! array_key_exists($field->name, $argumentValue);
 
-                // because we are passing by reference, we need a variable to contain the null value.
-                if ($noValuePassedForThisArgument) {
-                    $value = new NoValue();
-                } else {
-                    $value = &$argumentValue[$field->name];
-                }
+                        // because we are passing by reference, we need a variable to contain the null value.
+                        if ($noValuePassedForThisArgument) {
+                            $value = new NoValue();
+                        } else {
+                            $value = &$argumentValue[$field->name];
+                        }
 
-                $this->handleArgWithAssociatedDirectivesRecursively(
-                    $field->type,
-                    $value,
-                    $field->astNode,
-                    $this->addPath($argumentPath, $field->name)
+                        $this->handleArgWithAssociatedDirectivesRecursively(
+                            $field->type,
+                            $value,
+                            $field->astNode,
+                            $this->addPath($argumentPath, $field->name)
+                        );
+                    }
                 );
-            });
 
             return;
         }
@@ -195,7 +198,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
                     $type->ofType,
                     $argumentValue[$key],
                     $astNode,
-                    $this->addPath($this->addPath($argumentPath, 'items'), $key)
+                    $this->addPath($argumentPath, $key)
                 );
             }
 

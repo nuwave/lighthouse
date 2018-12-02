@@ -62,10 +62,10 @@ class ValidationTest extends TestCase
 
         $this->assertValidationKeysSame([
             'required',
-            'input.items.0.foobar',
-            'input.items.1.self.foobar',
-            'input.items.2.withRequired.invalidDefault',
-            'input.items.2.withRequired.required',
+            'input.0.foobar',
+            'input.1.self.foobar',
+            'input.2.withRequired.invalidDefault',
+            'input.2.withRequired.required',
         ], $result);
     }
 
@@ -91,8 +91,8 @@ class ValidationTest extends TestCase
         $this->assertValidationKeysSame([
             'required',
             'list',
-            'list.items.1',
-            'list.items.2',
+            'list.1',
+            'list.2',
         ], $result);
     }
 
