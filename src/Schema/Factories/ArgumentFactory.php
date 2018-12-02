@@ -44,13 +44,20 @@ class ArgumentFactory implements HasResolverArgumentsContract
     protected $directiveFactory;
 
     /**
+     * @var Pipeline
+     */
+    protected $pipeline;
+
+    /**
      * ArgumentFactory constructor.
      *
      * @param DirectiveFactory $directiveFactory
+     * @param Pipeline         $pipeline
      */
-    public function __construct(DirectiveFactory $directiveFactory)
+    public function __construct(DirectiveFactory $directiveFactory, Pipeline $pipeline)
     {
         $this->directiveFactory = $directiveFactory;
+        $this->pipeline = $pipeline;
     }
 
     /**
@@ -90,7 +97,8 @@ class ArgumentFactory implements HasResolverArgumentsContract
     /**
      * Call `ArgMiddleware::handleArgument` at the resolving time.
      *
-     * For example, an argument may be encrypted before reaching the final resolver.
+     * This may be used to transform the arguments, log them or do anything else
+     * before they reach the final resolver.
      *
      * @param \Closure          $resolver
      * @param Collection<array> $inputValueDefinitions
@@ -216,8 +224,8 @@ class ArgumentFactory implements HasResolverArgumentsContract
 
     /**
      * @param InputValueDefinitionNode $astNode
-     * @param $argumentValue
-     * @param array $argumentPath
+     * @param mixed                    $argumentValue
+     * @param array                    $argumentPath
      *
      * @return mixed
      */
@@ -235,8 +243,8 @@ class ArgumentFactory implements HasResolverArgumentsContract
 
     /**
      * @param InputValueDefinitionNode $astNode
-     * @param $argumentValue
-     * @param array $argumentPath
+     * @param mixed                    $argumentValue
+     * @param array                    $argumentPath
      *
      * @return mixed
      */
@@ -285,7 +293,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
             return $argumentValue;
         }
 
-        $this->prepareDirective($astNode, $argumentPath, $directives);
+        $this->prepareDirectives($astNode, $argumentPath, $directives);
 
         return $this->handleArgMiddlewareDirectivesThroughPipeline($argumentValue, $directives);
     }
@@ -298,7 +306,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
      */
     protected function handleArgMiddlewareDirectivesThroughPipeline($argumentValue, Collection $directives)
     {
-        return resolve(Pipeline::class)
+        return $this->pipeline
             ->send($argumentValue)
             ->through($directives)
             ->via('handleArgument')
@@ -321,7 +329,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
             return;
         }
 
-        $this->prepareDirective($astNode, $argumentPath, $directives);
+        $this->prepareDirectives($astNode, $argumentPath, $directives);
 
         $directives->each(function (ArgFilterDirective $directive) use ($astNode) {
             $this->injectArgumentFilter($directive, $astNode);
@@ -333,7 +341,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
      * @param array                    $argumentPath
      * @param Collection               $directives
      */
-    protected function prepareDirective(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
+    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
     {
         $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
             if ($directive instanceof HasResolverArgumentsContract) {

@@ -21,17 +21,18 @@ trait HandleRulesDirective
     {
         $value = $next($argumentValue);
 
-        $rules = (array) $this->getRules();
-
-        if (! \count($rules)) {
-            return $value;
-        }
+        $rules = $this->getRules();
 
         if ($argumentValue instanceof NoValue && ! \in_array('required', $rules, true)) {
             return $value;
         }
 
-        $validator = $this->createValidator($value instanceof NoValue ? null : $value, $rules);
+        $validator = $this->createValidator(
+            $value instanceof NoValue
+                ? null
+                : $value,
+            $rules
+        );
 
         if (! $validator->fails()) {
             return $value;
@@ -43,22 +44,24 @@ trait HandleRulesDirective
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @param array $rules
      *
      * @return \Illuminate\Contracts\Validation\Factory|Validator
      */
     protected function createValidator($value, array $rules)
     {
-        $argumentName = $this->getArgumentName();
+        $argumentName = $this->definitionNode->name->value;
 
         $validator = validator(
             [$argumentName => $value],
             [$argumentName => $rules],
-            (array) $this->getMessages()
+            $this->getMessages()
         );
 
-        $validator->setAttributeNames([$this->getArgumentName() => $this->argumentPathAsDotNotation()]);
+        $validator->setAttributeNames([
+            $argumentName => $this->argumentPathAsDotNotation(),
+        ]);
 
         return $validator;
     }
@@ -70,33 +73,25 @@ trait HandleRulesDirective
      */
     protected function accumulateError(Validator $validator)
     {
-        $errorMessages = $validator->errors()->get($this->getArgumentName());
+        $errorMessages = $validator->errors()
+            ->get($this->definitionNode->name->value);
+
         foreach ($errorMessages as $errorMessage) {
-            $this->errorBuffer()->push($errorMessage, $this->argumentPathAsDotNotation());
+            $this->errorBuffer()
+                ->push(
+                    $errorMessage,
+                    $this->argumentPathAsDotNotation()
+                );
         }
     }
 
-    /**
-     * @return array|null
-     */
-    protected function getRules()
+    protected function getRules(): array
     {
         return $this->directiveArgValue('apply');
     }
 
-    /**
-     * @return array|null
-     */
-    protected function getMessages()
+    protected function getMessages(): array
     {
-        return $this->directiveArgValue('messages');
-    }
-
-    /**
-     * @return string
-     */
-    protected function getArgumentName(): string
-    {
-        return $this->definitionNode->name->value;
+        return (array) $this->directiveArgValue('messages');
     }
 }

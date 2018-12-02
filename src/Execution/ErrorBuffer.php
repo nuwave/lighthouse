@@ -30,17 +30,17 @@ class ErrorBuffer
     public function __construct(string $errorType = 'generic', \Closure $exceptionResolver = null)
     {
         $this->errorType = $errorType;
-        $this->exceptionResolver = $exceptionResolver ?? $this->getExceptionResolver();
+        $this->exceptionResolver = $exceptionResolver ?? $this->defaultExceptionResolver();
     }
 
     /**
-     * Get the Exception resolver.
+     * Construct a default exception resolver.
      *
      * @return \Closure
      */
-    protected function getExceptionResolver(): \Closure
+    protected function defaultExceptionResolver(): \Closure
     {
-        return function ($errorMessage) {
+        return function (string $errorMessage) {
             return (new GenericException($errorMessage))
                 ->setExtensions([$this->errorType => $this->errors])
                 ->setCategory($this->errorType);
@@ -62,7 +62,7 @@ class ErrorBuffer
     }
 
     /**
-     * Resolve the exception class.
+     * Resolve the exception by calling the exception handler with the given args.
      *
      * @param mixed ...$args
      *
@@ -123,7 +123,9 @@ class ErrorBuffer
     }
 
     /**
-     * Rest the errors to empty array.
+     * Reset the errors to an empty array.
+     *
+     * @return void
      */
     public function clearErrors()
     {
@@ -155,10 +157,12 @@ class ErrorBuffer
     }
 
     /**
+     * Do we have any errors yet?
+     *
      * @return bool
      */
     public function hasErrors(): bool
     {
-        return (bool) \count($this->errors);
+        return \count($this->errors) > 0;
     }
 }

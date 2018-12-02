@@ -18,7 +18,7 @@ use Nuwave\Lighthouse\Events\RegisteringDirectiveBaseNamespaces;
 class DirectiveFactory
 {
     /**
-     * The solved directive classes.
+     * The already resolved directive classes.
      *
      * @var array
      */
@@ -55,7 +55,9 @@ class DirectiveFactory
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Fields',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Nodes',
-        ])->flatten()->filter()->all();
+        ])->flatten()
+          ->filter()
+          ->all();
     }
 
     /**
@@ -70,9 +72,12 @@ class DirectiveFactory
      */
     public function create(string $directiveName, $definitionNode = null): Directive
     {
-        $directive = $this->resolve($directiveName) ?? $this->createOrFail($directiveName);
+        $directive = $this->resolve($directiveName)
+            ?? $this->createOrFail($directiveName);
 
-        return $definitionNode ? $this->hydrate($directive, $definitionNode) : $directive;
+        return $definitionNode
+            ? $this->hydrate($directive, $definitionNode)
+            : $directive;
     }
 
     /**
@@ -102,6 +107,7 @@ class DirectiveFactory
     {
         foreach ($this->directiveBaseNamespaces as $baseNamespace) {
             $className = $baseNamespace.'\\'.studly_case($directiveName).'Directive';
+
             if (class_exists($className)) {
                 $directive = resolve($className);
 

@@ -107,7 +107,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @param $root
+     * @param mixed|null  $root
      * @param array       $args
      * @param null        $context
      * @param ResolveInfo $resolveInfo
