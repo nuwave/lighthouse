@@ -22,8 +22,6 @@ use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
-use Nuwave\Lighthouse\Support\Contracts\HasRootArgumentValue;
-use Nuwave\Lighthouse\Support\Contracts\HasResolverArguments as HasResolverArgumentsContract;
 
 class ArgumentFactory implements HasResolverArgumentsContract
 {
@@ -345,14 +343,6 @@ class ArgumentFactory implements HasResolverArgumentsContract
     protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
     {
         $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
-            if ($directive instanceof HasResolverArgumentsContract) {
-                $directive->setResolverArguments(...$this->resolverArguments());
-            }
-
-            if ($directive instanceof HasRootArgumentValue) {
-                $directive->setRootArgumentValue($this->currentArgumentValueInstance());
-            }
-
             if ($directive instanceof HasErrorBuffer) {
                 $directive->setErrorBuffer($this->currentErrorBuffer);
             }
