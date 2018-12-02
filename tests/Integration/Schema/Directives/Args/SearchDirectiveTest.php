@@ -38,13 +38,13 @@ class SearchDirectiveTest extends DBTestCase
             'title' => 'great title',
         ]);
         $postB = factory(Post::class)->create([
-            'title' => 'Really great title',
+            'title' => 'Really bad title',
         ]);
         $postC = factory(Post::class)->create([
-            'title' => 'bad title',
+            'title' => 'another great title',
         ]);
 
-        $this->engine->shouldReceive('map')->andReturn(collect([$postA, $postB]));
+        $this->engine->shouldReceive('map')->andReturn(collect([$postA, $postC]));
 
         $schema = '     
         type Post {
@@ -69,7 +69,7 @@ class SearchDirectiveTest extends DBTestCase
         $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
-        $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
+        $this->assertEquals($postC->id, $result->data['posts']['data'][1]['id']);
     }
 
     /** @test */

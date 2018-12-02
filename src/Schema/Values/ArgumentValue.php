@@ -63,4 +63,12 @@ class ArgumentValue
 
         return $this->type;
     }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return  $this->astNode->name->value;
+    }
 }

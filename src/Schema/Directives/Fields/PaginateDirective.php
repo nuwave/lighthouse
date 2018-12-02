@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Execution\QueryUtils;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -150,10 +150,12 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $query = $model::query();
         }
 
-        $args = $resolveArgs[1];
-
-        $query = QueryUtils::applyFilters($query, $args);
-        $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
+        $query = QueryFilter::apply(
+            $query,
+            $resolveArgs[1],
+            $this->directiveArgValue('scopes', []),
+            $resolveArgs[3]
+        );
 
         return $query->paginate($first, ['*'], 'page', $page);
     }

@@ -2,13 +2,12 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
 class QueryFilter
 {
-    const QUERY_FILTER_KEY = 'query.filter';
-
     /**
      * Filters that only require a single argument.
      *
@@ -24,7 +23,7 @@ class QueryFilter
      *
      * @var ArgFilterDirective[]
      */
-    protected $argumentFilters = [];
+    protected $multiArgumentFilters = [];
 
     /**
      * A map from a composite key consisting of the columnName and type of key
@@ -32,7 +31,7 @@ class QueryFilter
      *
      * @var array[]
      */
-    protected $argumentFiltersArgNames = [];
+    protected $multiArgumentFiltersArgNames = [];
 
     /**
      * Get query filter instance for field.
@@ -43,7 +42,7 @@ class QueryFilter
      */
     public static function getInstance(FieldValue $value): QueryFilter
     {
-        $handler = static::QUERY_FILTER_KEY
+        $handler = 'query.filter'
             .'.'.strtolower($value->getParentName())
             .'.'.strtolower($value->getFieldName());
 
@@ -54,21 +53,25 @@ class QueryFilter
     }
 
     /**
-     * Build query with filter(s).
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
+     * @param array                                                                    $args
+     * @param array                                                                    $scopes
+     * @param ResolveInfo                                                              $resolveInfo
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array                              $args
-     *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public static function build($query, array $args)
+    public static function apply($query, array $args, array $scopes, ResolveInfo $resolveInfo)
     {
-        // Remove the query filter argument from the args
-        $filterInstance = array_pull($args, static::QUERY_FILTER_KEY);
+        /** @var QueryFilter $queryFilter */
+        if ($queryFilter = $resolveInfo->queryFilter ?? false) {
+            $query = $queryFilter->filter($query, $args);
+        }
 
-        return $filterInstance
-            ? $filterInstance->filter($query, $args)
-            : $query;
+        foreach ($scopes as $scope) {
+            call_user_func([$query, $scope], $args);
+        }
+
+        return $query;
     }
 
     /**
@@ -92,7 +95,7 @@ class QueryFilter
              * @var string
              * @var string[] $argNames
              */
-            foreach ($this->argumentFiltersArgNames as $filterKey => $argNames) {
+            foreach ($this->multiArgumentFiltersArgNames as $filterKey => $argNames) {
                 // Group together the values if multiple arguments are given the same key
                 if (in_array($key, $argNames)) {
                     $valuesGroupedByFilterKey[$filterKey][] = $value;
@@ -117,7 +120,7 @@ class QueryFilter
             $columnName = str_before($filterKey, '.');
 
             if ($values) {
-                $argFilterDirective = $this->argumentFilters[$filterKey];
+                $argFilterDirective = $this->multiArgumentFilters[$filterKey];
 
                 $builder = $argFilterDirective->applyFilter($builder, $columnName, $values);
             }
@@ -138,8 +141,8 @@ class QueryFilter
         if ($argFilterDirective->combinesMultipleArguments()) {
             $filterKey = "{$columnName}.{$argFilterDirective->name()}";
 
-            $this->argumentFilters[$filterKey] = $argFilterDirective;
-            $this->argumentFiltersArgNames[$filterKey][] = $argumentName;
+            $this->multiArgumentFilters[$filterKey] = $argFilterDirective;
+            $this->multiArgumentFiltersArgNames[$filterKey][] = $argumentName;
         } else {
             $this->singleArgumentFilters[$argumentName] = [
                 'filter' => $argFilterDirective,

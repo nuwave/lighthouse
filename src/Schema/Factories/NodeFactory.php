@@ -43,8 +43,6 @@ class NodeFactory
     protected $typeRegistry;
     /** @var Pipeline */
     protected $pipeline;
-    /** @var FieldFactory */
-    protected $fieldFactory;
     /** @var ArgumentFactory */
     protected $argumentFactory;
 
@@ -52,20 +50,17 @@ class NodeFactory
      * @param DirectiveRegistry $directiveRegistry
      * @param TypeRegistry      $typeRegistry
      * @param Pipeline          $pipeline
-     * @param FieldFactory      $fieldFactory
      * @param ArgumentFactory   $argumentFactory
      */
     public function __construct(
         DirectiveRegistry $directiveRegistry,
         TypeRegistry $typeRegistry,
         Pipeline $pipeline,
-        FieldFactory $fieldFactory,
         ArgumentFactory $argumentFactory
     ) {
         $this->directiveRegistry = $directiveRegistry;
         $this->typeRegistry = $typeRegistry;
         $this->pipeline = $pipeline;
-        $this->fieldFactory = $fieldFactory;
         $this->argumentFactory = $argumentFactory;
     }
 
@@ -266,7 +261,7 @@ class NodeFactory
                     );
 
                     return [
-                        $fieldDefinition->name->value => $this->fieldFactory->handle($fieldValue),
+                        $fieldDefinition->name->value => resolve(FieldFactory::class)->handle($fieldValue),
                     ];
                 })
                 ->toArray();
