@@ -22,6 +22,8 @@ use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgMiddlewareForArray;
 
 class DirectiveRegistry
 {
@@ -336,7 +338,7 @@ class DirectiveRegistry
     }
 
     /**
-     * Get middleware for field arguments.
+     * Get middleware for arguments.
      *
      * @param InputValueDefinitionNode $arg
      *
@@ -345,6 +347,30 @@ class DirectiveRegistry
     public function argMiddleware(InputValueDefinitionNode $arg): Collection
     {
         return $this->associatedDirectivesOfType($arg, ArgMiddleware::class);
+    }
+
+    /**
+     * Get middleware for array arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argMiddlewareForArray(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgMiddlewareForArray::class);
+    }
+
+    /**
+     * Get filters for arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argFilterDirective(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgFilterDirective::class);
     }
 
     /**

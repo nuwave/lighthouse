@@ -14,6 +14,7 @@ use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use GraphQL\Type\Definition\InputObjectField;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
@@ -39,9 +40,9 @@ class ArgumentFactory implements HasResolverArgumentsContract
     protected $currentErrorBuffer;
 
     /**
-     * @var DirectiveFactory
+     * @var DirectiveRegistry
      */
-    protected $directiveFactory;
+    protected $directiveRegistry;
 
     /**
      * @var Pipeline
@@ -51,12 +52,12 @@ class ArgumentFactory implements HasResolverArgumentsContract
     /**
      * ArgumentFactory constructor.
      *
-     * @param DirectiveFactory $directiveFactory
-     * @param Pipeline         $pipeline
+     * @param DirectiveRegistry $directiveRegistry
+     * @param Pipeline          $pipeline
      */
-    public function __construct(DirectiveFactory $directiveFactory, Pipeline $pipeline)
+    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
     {
-        $this->directiveFactory = $directiveFactory;
+        $this->directiveRegistry = $directiveRegistry;
         $this->pipeline = $pipeline;
     }
 
@@ -253,7 +254,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
         $argumentValue,
         array $argumentPath
     ) {
-        $directives = $this->directiveFactory->createArgMiddleware($astNode);
+        $directives = $this->directiveRegistry->argMiddleware($astNode);
 
         return $this->handleArgMiddlewareDirectivesFor($astNode, $argumentValue, $argumentPath, $directives);
     }
@@ -270,7 +271,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
         $argumentValue,
         array $argumentPath
     ) {
-        $directives = $this->directiveFactory->createArgMiddlewareForArray($astNode);
+        $directives = $this->directiveRegistry->argMiddlewareForArray($astNode);
 
         return $this->handleArgMiddlewareDirectivesFor($astNode, $argumentValue, $argumentPath, $directives);
     }
@@ -323,7 +324,7 @@ class ArgumentFactory implements HasResolverArgumentsContract
         InputValueDefinitionNode $astNode,
         array $argumentPath
     ) {
-        $directives = $this->directiveFactory->createArgFilterDirective($astNode);
+        $directives = $this->directiveRegistry->argFilterDirective($astNode);
 
         if ($directives->isEmpty()) {
             return;
