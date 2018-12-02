@@ -18,29 +18,32 @@ class WhereDirective extends BaseDirective implements ArgFilterDirective
     }
 
     /**
-     * Get the filter.
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param string                                                                   $columnName
+     * @param mixed                                                                    $value
      *
-     * @return \Closure
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function filter(): \Closure
+    public function applyFilter($builder, string $columnName, $value)
     {
         $operator = $this->directiveArgValue('operator', '=');
         $clause = $this->directiveArgValue('clause');
 
-        return function ($query, string $columnName, $value) use ($operator, $clause) {
-            return $clause
-                ? $query->{$clause}($columnName, $operator, $value)
-                : $query->where($columnName, $operator, $value);
-        };
+        return $clause
+            ? $builder->{$clause}($columnName, $operator, $value)
+            : $builder->where($columnName, $operator, $value);
     }
 
     /**
-     * Get the type of the ArgFilterDirective.
+     * Does this filter combine the values of multiple input arguments into one query?
      *
-     * @return string self::SINGLE_TYPE | self::MULTI_TYPE
+     * This is true for filter directives such as "whereBetween" that expects two
+     * different input values, given as seperate arguments.
+     *
+     * @return bool
      */
-    public function type(): string
+    public function combinesMultipleArguments(): bool
     {
-        return static::SINGLE_TYPE;
+        return false;
     }
 }

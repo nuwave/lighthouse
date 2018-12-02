@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
@@ -19,36 +18,40 @@ class SearchDirective extends BaseDirective implements ArgFilterDirective
     }
 
     /**
-     * Get the filter.
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param string                                                                   $columnName
+     * @param mixed                                                                    $value
      *
-     * @return \Closure
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function filter(): \Closure
+    public function applyFilter($builder, string $columnName, $value)
     {
-        // Adds within method to specify custom index.
         $within = $this->directiveArgValue('within');
 
-        return function (Builder $query, string $columnName, $value) use ($within) {
-            $modelClass = \get_class($query->getModel());
+        $modelClass = \get_class(
+            $builder->getModel()
+        );
 
-            /** @var \Laravel\Scout\Builder $query */
-            $query = $modelClass::search($value);
+        /** @var \Laravel\Scout\Builder $builder */
+        $builder = $modelClass::search($value);
 
-            if (null !== $within) {
-                $query->within($within);
-            }
+        if (null !== $within) {
+            $builder->within($within);
+        }
 
-            return $query;
-        };
+        return $builder;
     }
 
     /**
-     * Get the type of the ArgFilterDirective.
+     * Does this filter combine the values of multiple input arguments into one query?
      *
-     * @return string self::SINGLE_TYPE | self::MULTI_TYPE
+     * This is true for filter directives such as "whereBetween" that expects two
+     * different input values, given as seperate arguments.
+     *
+     * @return bool
      */
-    public function type(): string
+    public function combinesMultipleArguments(): bool
     {
-        return static::SINGLE_TYPE;
+        return false;
     }
 }

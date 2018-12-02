@@ -110,9 +110,9 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
+        $result = $this->execute($schema, $query);
 
-        $result = $this->executeQuery($schema, $query);
-        $this->assertCount(2, array_get($result->data, 'users.data'));
+        $this->assertCount(2, array_get($result, 'data.users.data'));
     }
 
     /**

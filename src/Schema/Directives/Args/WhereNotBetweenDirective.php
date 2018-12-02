@@ -17,24 +17,27 @@ class WhereNotBetweenDirective implements ArgFilterDirective
     }
 
     /**
-     * Get the type of the ArgFilterDirective.
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param string                                                                   $columnName
+     * @param mixed                                                                    $value
      *
-     * @return string self::SINGLE_TYPE | self::MULTI_TYPE
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function type(): string
+    public function applyFilter($builder, string $columnName, $value)
     {
-        return static::MULTI_TYPE;
+        return $builder->whereNotBetween($columnName, $value);
     }
 
     /**
-     * Get the filter.
+     * Does this filter combine the values of multiple input arguments into one query?
      *
-     * @return \Closure
+     * This is true for filter directives such as "whereBetween" that expects two
+     * different input values, given as seperate arguments.
+     *
+     * @return bool
      */
-    public function filter(): \Closure
+    public function combinesMultipleArguments(): bool
     {
-        return function ($query, string $columnName, array $values) {
-            return $query->whereNotBetween($columnName, $values);
-        };
+        return true;
     }
 }

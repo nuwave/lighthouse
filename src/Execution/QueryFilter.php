@@ -3,25 +3,28 @@
 namespace Nuwave\Lighthouse\Execution;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
 class QueryFilter
 {
     const QUERY_FILTER_KEY = 'query.filter';
+
     /**
      * Filters that only require a single argument.
      *
-     * Are keyed by the arguments name and contain the columnName and a Closure.
+     * Are keyed by the arguments name and contain the columnName and the ArgFilterDirective.
      *
      * @var array[]
      */
     protected $singleArgumentFilters = [];
+
     /**
      * A map from a composite key consisting of the columnName and type of key
      * to the Closure that will resolve the key.
      *
-     * @var \Closure[]
+     * @var ArgFilterDirective[]
      */
-    protected $multiArgumentFilters = [];
+    protected $argumentFilters = [];
 
     /**
      * A map from a composite key consisting of the columnName and type of key
@@ -29,7 +32,7 @@ class QueryFilter
      *
      * @var array[]
      */
-    protected $multiArgumentFiltersArgNames = [];
+    protected $argumentFiltersArgNames = [];
 
     /**
      * Get query filter instance for field.
@@ -78,7 +81,7 @@ class QueryFilter
      */
     public function filter($builder, array $args = [])
     {
-        $multiArgFilterValues = [];
+        $valuesGroupedByFilterKey = [];
 
         /**
          * @var string
@@ -89,19 +92,20 @@ class QueryFilter
              * @var string
              * @var string[] $argNames
              */
-            foreach ($this->multiArgumentFiltersArgNames as $filterKey => $argNames) {
-                // Gather the values for the filters that take an array of values
+            foreach ($this->argumentFiltersArgNames as $filterKey => $argNames) {
+                // Group together the values if multiple arguments are given the same key
                 if (in_array($key, $argNames)) {
-                    $multiArgFilterValues[$filterKey][] = $value;
+                    $valuesGroupedByFilterKey[$filterKey][] = $value;
                 }
             }
 
             // Filters that only take a single argument can be applied directly
             if ($filterInfo = array_get($this->singleArgumentFilters, $key)) {
-                $filterCallback = $filterInfo['filter'];
+                /** @var ArgFilterDirective $argFilterDirective */
+                $argFilterDirective = $filterInfo['filter'];
                 $columnName = $filterInfo['columnName'];
 
-                $builder = $filterCallback($builder, $columnName, $value);
+                $builder = $argFilterDirective->applyFilter($builder, $columnName, $value);
             }
         }
 
@@ -109,46 +113,39 @@ class QueryFilter
          * @var string
          * @var array  $values
          */
-        foreach ($multiArgFilterValues as $filterKey => $values) {
+        foreach ($valuesGroupedByFilterKey as $filterKey => $values) {
             $columnName = str_before($filterKey, '.');
 
-            $builder = $this->multiArgumentFilters[$filterKey]($builder, $columnName, $values);
+            if ($values) {
+                $argFilterDirective = $this->argumentFilters[$filterKey];
+
+                $builder = $argFilterDirective->applyFilter($builder, $columnName, $values);
+            }
         }
 
         return $builder;
     }
 
     /**
-     * @param string   $argumentName
-     * @param \Closure $filter
-     * @param string   $columnName
-     * @param string   $filterType
+     * @param string             $argumentName
+     * @param string             $columnName
+     * @param ArgFilterDirective $argFilterDirective
      *
      * @return QueryFilter
      */
-    public function addMultiArgumentFilter(string $argumentName, \Closure $filter, string $columnName, string $filterType): QueryFilter
+    public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): QueryFilter
     {
-        $filterKey = "$columnName.$filterType";
+        if ($argFilterDirective->combinesMultipleArguments()) {
+            $filterKey = "{$columnName}.{$argFilterDirective->name()}";
 
-        $this->multiArgumentFilters[$filterKey] = $filter;
-        $this->multiArgumentFiltersArgNames[$filterKey][] = $argumentName;
-
-        return $this;
-    }
-
-    /**
-     * @param string   $argumentName
-     * @param \Closure $filter
-     * @param string   $columnName
-     *
-     * @return QueryFilter
-     */
-    public function addSingleArgumentFilter(string $argumentName, \Closure $filter, string $columnName): QueryFilter
-    {
-        $this->singleArgumentFilters[$argumentName] = [
-            'filter' => $filter,
-            'columnName' => $columnName,
-        ];
+            $this->argumentFilters[$filterKey] = $argFilterDirective;
+            $this->argumentFiltersArgNames[$filterKey][] = $argumentName;
+        } else {
+            $this->singleArgumentFilters[$argumentName] = [
+                'filter' => $argFilterDirective,
+                'columnName' => $columnName,
+            ];
+        }
 
         return $this;
     }

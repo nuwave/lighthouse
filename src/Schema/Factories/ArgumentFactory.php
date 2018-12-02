@@ -12,6 +12,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use GraphQL\Type\Definition\InputObjectField;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -21,12 +22,11 @@ use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasRootArgumentValue;
-use Nuwave\Lighthouse\Support\Traits\CanInjectArgumentFilter;
 use Nuwave\Lighthouse\Support\Contracts\HasResolverArguments as HasResolverArgumentsContract;
 
 class ArgumentFactory implements HasResolverArgumentsContract
 {
-    use HasResolverArguments, CanInjectArgumentFilter;
+    use HasResolverArguments;
 
     /**
      * @var array
@@ -355,35 +355,30 @@ class ArgumentFactory implements HasResolverArgumentsContract
     }
 
     /**
-     * @param ArgFilterDirective       $directive
+     * @param ArgFilterDirective       $argFilterDirective
      * @param InputValueDefinitionNode $astNode
      */
-    protected function injectArgumentFilter(ArgFilterDirective $directive, InputValueDefinitionNode $astNode)
+    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $astNode)
     {
-        $argFilterType = $directive->type();
-        $parentField = $this->currentArgumentValueInstance()->getParentField();
+        $parentField = $this->currentArgumentValueInstance()
+            ->getParentField();
+
         $argumentName = $astNode->name->value;
-        $directiveDefinition = ASTHelper::directiveDefinition($astNode, $directive->name());
+        $directiveDefinition = ASTHelper::directiveDefinition($astNode, $argFilterDirective->name());
         $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
 
-        if (ArgFilterDirective::SINGLE_TYPE === $argFilterType) {
-            $this->injectSingleArgumentFilter(
-                $argumentName,
-                $parentField,
-                $directive->filter(),
-                $columnName
-            );
-        }
+        $query = QueryFilter::getInstance($parentField);
 
-        if (ArgFilterDirective::MULTI_TYPE === $argFilterType) {
-            $this->injectMultiArgumentFilter(
-                $argumentName,
-                $parentField,
-                $directive->name(),
-                $directive->filter(),
-                $columnName
-            );
-        }
+        $query->addArgumentFilter(
+            $argumentName,
+            $columnName,
+            $argFilterDirective
+        );
+
+        $parentField->injectArg(
+            QueryFilter::QUERY_FILTER_KEY,
+            $query
+        );
     }
 
     /**

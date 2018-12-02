@@ -4,20 +4,21 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 interface ArgFilterDirective extends Directive
 {
-    const SINGLE_TYPE = 'single_type';
-    const MULTI_TYPE = 'multi_type';
+    /**
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param string                                                                   $columnName
+     * @param mixed                                                                    $value
+     *
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function applyFilter($builder, string $columnName, $value);
 
     /**
-     * Get the filter.
+     * Does this filter combine the values of multiple input arguments into one query?
      *
-     * @return \Closure
-     */
-    public function filter(): \Closure;
-
-    /**
-     * Get the type of the ArgFilterDirective.
+     * This is true for filter directives such as "whereBetween".
      *
-     * @return string self::SINGLE_TYPE | self::MULTI_TYPE
+     * @return bool
      */
-    public function type(): string;
+    public function combinesMultipleArguments(): bool;
 }
