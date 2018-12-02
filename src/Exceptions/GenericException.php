@@ -15,7 +15,11 @@ class GenericException extends Error
      */
     public function setExtensions($extensions): self
     {
-        $this->extensions = (array) $extensions;
+        // TODO remove this wrapping as we switch to the new version of webonyx/graphql-php
+        // The underlying issue is already resolved there. For now, this fix will do
+        // and make sure we return a spec compliant error.
+        // https://github.com/webonyx/graphql-php/commit/f4008f0fb2294178fc0ecc3f7a7f71a13b543db1
+        $this->extensions = ['extensions' => (array) $extensions];
 
         return $this;
     }

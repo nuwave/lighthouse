@@ -131,7 +131,9 @@ class ArgumentFactory
             });
 
             if ($this->currentErrorBuffer->hasErrors()) {
-                $this->currentErrorBuffer->flush($this->getErrorMessage());
+                $this->currentErrorBuffer->flush(
+                    $this->getErrorMessage()
+                );
             }
 
             return $resolver($root, $args, $context, $resolveInfo);

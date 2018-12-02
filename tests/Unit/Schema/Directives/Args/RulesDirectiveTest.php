@@ -28,9 +28,11 @@ class RulesDirectiveTest extends TestCase
                     'locations' => [['line' => 3, 'column' => 13]],
                     'message' => 'Validation failed for the field [foo].',
                     'category' => 'validation',
-                    'validation' => [
-                        'bar' => [
-                            'The bar field is required.',
+                    'extensions' => [
+                        'validation' => [
+                            'bar' => [
+                                'The bar field is required.',
+                            ],
                         ],
                     ],
                 ],
@@ -71,7 +73,7 @@ class RulesDirectiveTest extends TestCase
         $this->assertNull(array_get($result, 'data.foo.full_name'));
         $this->assertCount(1, array_get($result, 'errors'));
         $this->assertSame('Validation failed for the field [foo.full_name].', array_get($result, 'errors.0.message'));
-        $this->assertSame(['formatted' => ['foobar']], array_get($result, 'errors.0.validation'));
+        $this->assertSame(['formatted' => ['foobar']], array_get($result, 'errors.0.extensions.validation'));
 
         $mutation = '
         mutation {
@@ -101,8 +103,8 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-
         $result = $this->executeWithoutDebug($this->schema(), $mutation);
+
         $this->assertNull(array_get($result, 'data.foo'));
         $this->assertCount(1, array_get($result, 'errors'));
 
@@ -115,8 +117,8 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-
         $queryResult = $this->executeWithoutDebug($this->schema(), $query);
+
         $this->assertSame($result, $queryResult);
     }
 
@@ -134,8 +136,8 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-
         $result = $this->executeWithoutDebug($this->schema(), $mutation);
+
         $this->assertEquals('John', array_get($result, 'data.foo.first_name'));
         $this->assertEquals('Doe', array_get($result, 'data.foo.last_name'));
         $this->assertNull(array_get($result, 'data.foo.full_name'));
@@ -150,8 +152,8 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-
         $queryResult = $this->executeWithoutDebug($this->schema(), $query);
+
         $this->assertSame($result, $queryResult);
     }
 
@@ -181,11 +183,9 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-
         $queryResult = $this->executeWithoutDebug($this->schema(), $query);
 
         $this->assertSame('John', array_get($queryResult, 'data.foo.first_name'));
-
         $this->assertEquals([
             'input' => [
                 'emails' => [
@@ -210,7 +210,7 @@ class RulesDirectiveTest extends TestCase
                     ],
                 ],
             ],
-        ], array_get($queryResult, 'errors.0.validation'));
+        ], array_get($queryResult, 'errors.0.extensions.validation'));
     }
 
     /**
@@ -239,7 +239,6 @@ class RulesDirectiveTest extends TestCase
             }
         }
         ';
-
         $queryResult = $this->executeWithoutDebug($this->schema(), $query);
 
         $this->assertSame('John', array_get($queryResult, 'data.foo.first_name'));
@@ -261,10 +260,10 @@ class RulesDirectiveTest extends TestCase
                     ],
                 ],
             ],
-        ], array_get($queryResult, 'errors.0.validation'));
+        ], array_get($queryResult, 'errors.0.extensions.validation'));
     }
 
-    public function resolve()
+    public function resolve(): array
     {
         return [
             'first_name' => 'John',
@@ -274,7 +273,7 @@ class RulesDirectiveTest extends TestCase
         ];
     }
 
-    protected function schema()
+    protected function schema(): string
     {
         $resolver = addslashes(self::class).'@resolve';
 

@@ -165,7 +165,7 @@ class ValidationTest extends TestCase
 
     protected function assertValidationKeysSame(array $keys, array $result)
     {
-        $validation = array_get($result, 'errors.0.validation');
+        $validation = array_get($result, 'errors.0.extensions.validation');
         foreach ($keys as $key) {
             $this->assertNotNull(data_get($validation, $key));
         }
