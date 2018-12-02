@@ -3,9 +3,12 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
+use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
 {
+    use HandlesCompositeKey;
+
     /**
      * Keys to resolve.
      *
@@ -90,6 +93,7 @@ abstract class BatchLoader
      */
     public function load($key, array $metaInfo = []): Deferred
     {
+        $key = $this->buildKey($key);
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {

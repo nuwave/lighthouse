@@ -76,7 +76,7 @@ class Date extends ScalarType
     private function tryParsingDate($value, string $exceptionClass): Carbon
     {
         try {
-            return Carbon::createFromFormat('Y-m-d', $value);
+            return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
         } catch (\Exception $e) {
             throw new $exceptionClass(
                 Utils::printSafeJson($e->getMessage())

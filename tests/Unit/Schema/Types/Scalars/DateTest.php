@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
+use Carbon\Carbon;
 use Tests\TestCase;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
@@ -50,11 +51,9 @@ class DateTest extends TestCase
     public function itParsesValueString()
     {
         $date = '2018-10-01';
-        $result = (new Date())->parseValue($date);
-
-        $this->assertSame(
-            $date,
-            $result->toDateString()
+        $this->assertEquals(
+            (new Carbon($date))->startOfDay(),
+            (new Date())->parseValue($date)
         );
     }
 

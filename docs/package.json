@@ -1,12 +1,14 @@
 {
-  "license": "MIT",
-  "dependencies": {
-    "fs-extra": "^7.0.1",
-    "vuepress": "^1.0.0-alpha.22"
-  },
-  "scripts": {
-    "docs:dev": "vuepress dev .",
-    "docs:version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
-    "docs:build": "vuepress build ."
-  }
+    "license": "MIT",
+    "dependencies": {
+        "fs-extra": "^7.0.1",
+        "vuepress": "^1.0.0-alpha.22",
+        "vuepress-theme-lighthouse": "file:./packages/vuepress-theme-lighthouse"
+    },
+    "scripts": {
+        "start": "npm run docs:dev",
+        "docs:dev": "vuepress dev .",
+        "docs:version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
+        "docs:build": "vuepress build ."
+    }
 }

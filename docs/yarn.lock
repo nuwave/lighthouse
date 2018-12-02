@@ -798,6 +798,13 @@
   dependencies:
     lodash.throttle "^4.1.1"
 
+"@vuepress/plugin-active-header-links@^1.0.0-alpha.25":
+  version "1.0.0-alpha.25"
+  resolved "https://registry.yarnpkg.com/@vuepress/plugin-active-header-links/-/plugin-active-header-links-1.0.0-alpha.25.tgz#b996f4f7b5e11c60e34beed209c019cb68f6835b"
+  integrity sha512-JsVUxVc6+UCW3XVuXykBCYpGOlaKmFx716ezgOpR8W1mOTwckr3z8QDJbSpt+BFA7d2nU/8ijaXvVsndkqlckA==
+  dependencies:
+    lodash.throttle "^4.1.1"
+
 "@vuepress/plugin-last-updated@^1.0.0-alpha.22":
   version "1.0.0-alpha.22"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-last-updated/-/plugin-last-updated-1.0.0-alpha.22.tgz#ebd2977622e5d4a40d938910a150e53fca3d0173"
@@ -816,6 +823,11 @@
   version "1.0.0-alpha.22"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-search/-/plugin-search-1.0.0-alpha.22.tgz#1e48928fdde5318a104819a73be6b56f397bb3bd"
   integrity sha512-S2uu3yCyz9MAbLk8iv4MDhtAqm4V/F3pJZ4me4l+FskvH8rbyI/vlZN4dfeuRGumcEg7eCywvvsGFYUMq4utbg==
+
+"@vuepress/plugin-search@^1.0.0-alpha.25":
+  version "1.0.0-alpha.25"
+  resolved "https://registry.yarnpkg.com/@vuepress/plugin-search/-/plugin-search-1.0.0-alpha.25.tgz#4099e9330f786f0ad6eb7bb54966fa6264fffe08"
+  integrity sha512-0fqlgwNGLRoat4muCiep+9mBbVS15KD+7ppja/h2oV3yRP8G/S6Zl+cSdDJNA+56wFoCokRFyTGBkEY/qcgFEQ==
 
 "@vuepress/shared-utils@^1.0.0-alpha.22":
   version "1.0.0-alpha.22"
@@ -837,6 +849,18 @@
   dependencies:
     "@vuepress/plugin-active-header-links" "^1.0.0-alpha.22"
     "@vuepress/plugin-search" "^1.0.0-alpha.22"
+    docsearch.js "^2.5.2"
+    nprogress "^0.2.0"
+    stylus "^0.54.5"
+    stylus-loader "^3.0.2"
+
+"@vuepress/theme-default@^1.0.0-alpha.25":
+  version "1.0.0-alpha.25"
+  resolved "https://registry.yarnpkg.com/@vuepress/theme-default/-/theme-default-1.0.0-alpha.25.tgz#079204dbb4a4a8323befb7a0c69841a581b27038"
+  integrity sha512-OXM5r2V3Zu6aWgqgL8GphrWWbBWtK5B4fvgDrduAJuO637kQ3zsJIA9Rl//eEkbaURJhWGM8dXXKzeivuqj3fQ==
+  dependencies:
+    "@vuepress/plugin-active-header-links" "^1.0.0-alpha.25"
+    "@vuepress/plugin-search" "^1.0.0-alpha.25"
     docsearch.js "^2.5.2"
     nprogress "^0.2.0"
     stylus "^0.54.5"
@@ -6842,6 +6866,11 @@ vuepress-html-webpack-plugin@^3.2.0:
     tapable "^1.0.0"
     toposort "^1.0.0"
     util.promisify "1.0.0"
+
+"vuepress-theme-lighthouse@file:./packages/vuepress-theme-lighthouse":
+  version "1.0.0"
+  dependencies:
+    "@vuepress/theme-default" "^1.0.0-alpha.25"
 
 vuepress@^1.0.0-alpha.22:
   version "1.0.0-alpha.22"
