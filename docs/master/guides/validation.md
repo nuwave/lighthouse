@@ -53,3 +53,8 @@ You can customize the error message for a particular argument.
 ```graphql
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
 ```
+
+## Custom Validator Classes
+
+Use the [@validate](../api-reference/directives#validate) directive to validate entire fields
+with a custom validator class.
