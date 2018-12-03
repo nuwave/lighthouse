@@ -18,5 +18,8 @@ sidebar: false
     <a href="https://www.entryninja.com">
       <img src="/img/users/entryninja.png" alt="Entry Ninja" title="Entry Ninja">
     </a>
+    <a href="https://worksome.co.uk">
+      <img src="/img/users/worksome.png" alt="Worksome" title="Worksome - Platform for local freelancers">
+    </a>
   </div>
 </div>
