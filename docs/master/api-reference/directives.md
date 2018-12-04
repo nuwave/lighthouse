@@ -779,8 +779,6 @@ You can customize the error message for a particular argument.
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
 ```
 
-To use a completely custom validator, use the [@validate](#validate) directive.
-
 ## @scalar
 
 Point Lighthouse to your scalar definition class.
@@ -912,23 +910,6 @@ class Person
     }
 }
 ```
-
-## @validate
-
-Use a custom validator class for validating the contents of a complete field.
-The validator class must extend `Nuwave\Lighthouse\Execution\GraphQLValidator`.
-
-```graphql
-type Mutation {
-  createUser @validate(validator: "App\\GraphQL\\Validators\\CreateUserValidator")(
-    name: String
-    email: String
-  ): User
-}
-```
-
-In most cases, it is sufficient to define inline rules directly on your arguments,
-use the [@rules](#rules) directive.
 
 ## @where
 
