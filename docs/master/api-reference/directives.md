@@ -640,12 +640,41 @@ type Query {
 
 ## @paginate
 
-Return a paginated list. This transforms the schema definition and automatically adds
-additional arguments and inbetween types.
+Transform a field so it returns a paginated list.
 
 ```graphql
 type Query {
   posts: [Post!]! @paginate
+}
+```
+
+The schema definition is automatically transformed to this:
+
+```graphql
+type Query {
+  posts(count: Int!, page: Int): PostPaginator
+}
+
+type PostPaginator {
+  data: [Post!]!
+  paginatorInfo: PaginatorInfo!
+}
+```
+
+And can be queried like this:
+
+```graphql
+{
+  posts(count: 10) {
+    data {
+      id
+      title
+    }
+    paginatorInfo {
+      currentPage
+      lastPage
+    }
+  }
 }
 ```
 
@@ -658,7 +687,26 @@ type Query {
 }
 ```
 
-By default, this looks for an Eloquent model in the configured default namespace, with the same
+You can supply a `defaultCount` to set a default count for any kind of paginator.
+
+```graphql
+type Query {
+  posts: [Post!]! @paginate(type: "connection", defaultCount: 25)
+}
+```
+
+This let's you omit the `count` argument when querying:
+
+```graphql
+query {
+  posts {
+    id
+    name
+  }
+}
+```
+
+By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same
 name as the returned type. You can overwrite this by setting the `model` argument.
 
 ```graphql
@@ -668,7 +716,6 @@ type Query {
 ```
 
 If simply querying Eloquent does not fit your use-case, you can specify a custom `builder`.
-
 
 ```graphql
 type Query {
