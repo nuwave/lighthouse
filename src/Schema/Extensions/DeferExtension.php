@@ -247,6 +247,16 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
+     * Override max nested fields.
+     *
+     * @param int $max
+     */
+    public function setMaxNestedFields(int $max)
+    {
+        $this->maxNestedFields = $max;
+    }
+
+    /**
      * @return bool
      */
     protected function executionTimeExpired(): bool
