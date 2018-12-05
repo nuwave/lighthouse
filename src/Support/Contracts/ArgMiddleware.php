@@ -10,7 +10,7 @@ interface ArgMiddleware extends Directive
      * Apply transformations on the ArgumentValue.
      *
      * @param ArgumentValue $argument
-     * @param \Closure       $next
+     * @param \Closure      $next
      *
      * @return ArgumentValue
      */

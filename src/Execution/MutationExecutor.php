@@ -37,7 +37,6 @@ class MutationExecutor
         return $model;
     }
 
-
     /**
      * @param Model $model
      * @param Collection $remaining

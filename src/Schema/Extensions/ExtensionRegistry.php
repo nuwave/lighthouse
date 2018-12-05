@@ -160,6 +160,8 @@ class ExtensionRegistry implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return $this->extensions->jsonSerialize();
+        return collect($this->extensions->jsonSerialize())->reject(function ($output) {
+            return empty($output);
+        })->toArray();
     }
 }

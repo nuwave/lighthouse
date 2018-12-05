@@ -3,22 +3,28 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ExtensionRequest
 {
     /** @var Request */
     protected $request;
 
+    /** @var GraphQLContext */
+    protected $context;
+
     /** @var bool */
     protected $batched;
 
     /**
-     * @param Request $request
-     * @param bool    $batched
+     * @param Request        $request
+     * @param GraphQLContext $context
+     * @param bool           $batched
      */
-    public function __construct(Request $request, $batched = false)
+    public function __construct(Request $request, GraphQLContext $context, $batched = false)
     {
         $this->request = $request;
+        $this->context = $context;
         $this->batched = $batched;
     }
 
@@ -30,6 +36,16 @@ class ExtensionRequest
     public function request(): Request
     {
         return $this->request;
+    }
+
+    /**
+     * Get request context.
+     *
+     * @return GraphQLContext
+     */
+    public function context(): GraphQLContext
+    {
+        return $this->context;
     }
 
     /**

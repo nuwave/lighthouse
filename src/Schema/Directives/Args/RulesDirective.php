@@ -2,50 +2,26 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 
-class RulesDirective extends BaseDirective implements ArgMiddleware
+/**
+ * Allows defining rules and messages on an InputValueDefinition.
+ *
+ * @see RuleFactory::getRulesAndMessages() for how this is applied.
+ */
+class RulesDirective extends BaseDirective
 {
+    /** @var string */
+    const NAME = 'rules';
+
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
-        return 'rules';
-    }
-
-    /**
-     * Resolve the field directive.
-     *
-     * @param ArgumentValue $argumentValue
-     * @param \Closure $next
-     *
-     * @return ArgumentValue
-     */
-    public function handleArgument(ArgumentValue $argumentValue, \Closure $next)
-    {
-        $argumentValue->rules = array_merge(
-            data_get($argumentValue, 'rules', []),
-            $this->directiveArgValue('apply', [])
-        );
-        
-        $argumentValue->messages = array_merge(
-            data_get($argumentValue, 'messages', []),
-            collect($this->directiveArgValue('messages', []))
-                ->mapWithKeys(
-                    function (string $message, string $path) use ($argumentValue) {
-                        return [
-                            "{$argumentValue->getAstNode()->name->value}.{$path}" => $message
-                        ];
-                    }
-                )
-                ->toArray()
-        );
-
-        return $next($argumentValue);
+        return self::NAME;
     }
 }

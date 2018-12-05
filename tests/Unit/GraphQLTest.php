@@ -16,7 +16,7 @@ class GraphQLTest extends TestCase
     }
     
     type Query {
-        user: User! @field(class: "Tests\\\Unit\\\GraphQLTest" method: "user")
+        user: User! @field(resolver: "Tests\\\Unit\\\GraphQLTest@user")
     }
     ';
 

@@ -25,7 +25,7 @@ class Context implements GraphQLContext
     /**
      * Create new context.
      *
-     * @param Request   $request
+     * @param Request $request
      */
     public function __construct(Request $request)
     {

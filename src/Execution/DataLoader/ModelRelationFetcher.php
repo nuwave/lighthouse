@@ -9,11 +9,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class ModelRelationFetcher
 {
+    use HandlesCompositeKey;
+
     /**
      * The parent models that relations should be loaded for.
      *
@@ -29,7 +32,7 @@ class ModelRelationFetcher
     protected $relations;
 
     /**
-     * @param mixed $models The parent models that relations should be loaded for.
+     * @param mixed $models    the parent models that relations should be loaded for
      * @param array $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
      */
     public function __construct($models, array $relations)
@@ -130,9 +133,9 @@ class ModelRelationFetcher
      *
      * The relation will be converted to a `Paginator` instance.
      *
-     * @param int $perPage
-     * @param int $page
-     * @param string $relationName
+     * @param int      $perPage
+     * @param int      $page
+     * @param string   $relationName
      * @param \Closure $relationConstraints
      *
      * @throws \Exception
@@ -184,7 +187,7 @@ class ModelRelationFetcher
             ->withCount($this->relations);
 
         $ids = $this->getModelIds();
-        
+
         $reloadedModels = $query
             ->whereKey($ids)
             ->get()
@@ -198,7 +201,7 @@ class ModelRelationFetcher
 
         return $this->setModels($reloadedModels);
     }
-    
+
     /**
      * Extract the primary keys from the underlying models.
      *
@@ -216,7 +219,7 @@ class ModelRelationFetcher
     /**
      * Get queries to fetch relationships.
      *
-     * @param string $relationName
+     * @param string   $relationName
      * @param \Closure $relationConstraints
      *
      * @throws \Exception
@@ -279,7 +282,7 @@ class ModelRelationFetcher
                 }
             );
 
-            if ( ! empty($with)) {
+            if (! empty($with)) {
                 $collection->load($with);
             }
         }
@@ -311,7 +314,7 @@ class ModelRelationFetcher
         return $this->models
             ->mapWithKeys(
                 function (Model $model) use ($relationName) {
-                    return [$model->getKey() => $model->getRelation($relationName)];
+                    return [$this->buildKey($model->getKey()) => $model->getRelation($relationName)];
                 }
             )->all();
     }
@@ -338,8 +341,8 @@ class ModelRelationFetcher
     }
 
     /**
-     * @param int $perPage
-     * @param int $page
+     * @param int    $perPage
+     * @param int    $page
      * @param string $relationName
      *
      * @return static
@@ -354,11 +357,11 @@ class ModelRelationFetcher
             $paginator = app()->makeWith(
                 LengthAwarePaginator::class,
                 [
-                    'items'       => $model->getRelation($relationName),
-                    'total'       => $total,
-                    'perPage'     => $perPage,
+                    'items' => $model->getRelation($relationName),
+                    'total' => $total,
+                    'perPage' => $perPage,
                     'currentPage' => $page,
-                    'options'     => [],
+                    'options' => [],
                 ]
             );
 
@@ -371,7 +374,7 @@ class ModelRelationFetcher
     /**
      * Associate the collection of all fetched relationModels back with their parents.
      *
-     * @param string $relationName
+     * @param string             $relationName
      * @param EloquentCollection $relationModels
      *
      * @return static
@@ -390,7 +393,7 @@ class ModelRelationFetcher
     }
 
     /**
-     * Ensure the pivot relation is hydrated too, if it exists
+     * Ensure the pivot relation is hydrated too, if it exists.
      *
      * @param string $relationName
      * @param $relationModels
@@ -407,7 +410,7 @@ class ModelRelationFetcher
             $hydrationMethod->invoke($relation, $relationModels->all());
         }
     }
-    
+
     /**
      * @param string $relationName
      *

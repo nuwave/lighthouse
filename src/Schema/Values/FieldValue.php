@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
@@ -19,9 +18,9 @@ class FieldValue
     protected $returnType;
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * The underlying AST definition of the Field.
      *
-     * @var FieldDefinitionNode|InputValueDefinitionNode
+     * @var FieldDefinitionNode
      */
     protected $field;
 
@@ -64,10 +63,9 @@ class FieldValue
      * Create new field value instance.
      *
      * @param NodeValue           $parent
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
-     * @param FieldDefinitionNode|InputValueDefinitionNode $field
+     * @param FieldDefinitionNode $field
      */
-    public function __construct(NodeValue $parent, $field)
+    public function __construct(NodeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
         $this->field = $field;
@@ -134,7 +132,7 @@ class FieldValue
      */
     public function getReturnType(): Type
     {
-        if(! isset($this->returnType)){
+        if (! isset($this->returnType)) {
             $this->returnType = resolve(DefinitionNodeConverter::class)->toType(
                 $this->field->type
             );
@@ -156,15 +154,15 @@ class FieldValue
      */
     public function getParentName(): string
     {
-        return $this->getParent()->getNodeName();
+        return $this->getParent()->getTypeDefinitionName();
     }
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * Get the underlying AST definition for the field.
      *
-     * @return FieldDefinitionNode|InputValueDefinitionNode
+     * @return FieldDefinitionNode
      */
-    public function getField()
+    public function getField(): FieldDefinitionNode
     {
         return $this->field;
     }
@@ -176,7 +174,7 @@ class FieldValue
      */
     public function getResolver(): \Closure
     {
-        if(!isset($this->resolver)){
+        if (! isset($this->resolver)) {
             $this->resolver = $this->defaultResolver();
         }
 
@@ -192,9 +190,9 @@ class FieldValue
      */
     protected function defaultResolver(): \Closure
     {
-        if($namespace = $this->getDefaultNamespaceForParent()){
+        if ($namespace = $this->getDefaultNamespaceForParent()) {
             return construct_resolver(
-                $namespace . '\\' . studly_case($this->getFieldName()),
+                $namespace.'\\'.studly_case($this->getFieldName()),
                 'resolve'
             );
         }
@@ -203,7 +201,7 @@ class FieldValue
         // return \Closure::fromCallable(
         //     [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
         // );
-        return function() {
+        return function () {
             return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
         };
     }
@@ -249,40 +247,5 @@ class FieldValue
     public function getFieldName(): string
     {
         return $this->field->name->value;
-    }
-
-    /**
-     * @return NodeValue
-     * @deprecated
-     */
-    public function getNode(): NodeValue
-    {
-        return $this->getParent();
-    }
-
-    /**
-     * Get field's node name.
-     *
-     * @return string
-     * @deprecated
-     */
-    public function getNodeName(): string
-    {
-        return $this->getParentName();
-    }
-
-    /**
-     * Set current type.
-     *
-     * @param \Closure|Type $type
-     *
-     * @return FieldValue
-     * @deprecated Do this sort of manipulation in the DocumentAST in the future.
-     */
-    public function setType($type): FieldValue
-    {
-        $this->returnType = $type;
-
-        return $this;
     }
 }

@@ -49,7 +49,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      */
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {
-        $typeName = $value->getNodeName();
+        $typeName = $value->getTypeDefinitionName();
         
         $this->nodeRegistry->registerNode(
             $typeName,

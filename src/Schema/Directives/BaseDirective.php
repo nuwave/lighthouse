@@ -52,7 +52,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get directive argument value.
      *
-     * @param string $name
+     * @param string     $name
      * @param mixed|null $default
      *
      * @return mixed|null
@@ -103,7 +103,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param string $argumentName The default argument name "model" may be overwritten.
+     * @param string $argumentName The default argument name "model" may be overwritten
      *
      * @throws DirectiveException
      * @throws DefinitionException
@@ -115,10 +115,10 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if(! $model){
-            if($this->definitionNode instanceof FieldDefinitionNode) {
-                $model = ASTHelper::getFieldTypeName($this->definitionNode);
-            } elseif($this->definitionNode instanceof ObjectTypeDefinitionNode) {
+        if (! $model) {
+            if ($this->definitionNode instanceof FieldDefinitionNode) {
+                $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
+            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
                 $model = $this->definitionNode->name->value;
             }
         }
@@ -130,13 +130,12 @@ abstract class BaseDirective implements Directive
         }
 
         return $this->namespaceClassName($model, [
-            config('lighthouse.namespaces.models')
+            config('lighthouse.namespaces.models'),
         ]);
     }
 
     /**
-     *
-     * @param string $classCandidate
+     * @param string   $classCandidate
      * @param string[] $namespacesToTry
      *
      * @throws DirectiveException
@@ -154,11 +153,11 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if(!$className = \namespace_classname($classCandidate, $namespacesToTry)){
+        if (! $className = \namespace_classname($classCandidate, $namespacesToTry)) {
             throw new DirectiveException(
                 "No class '$classCandidate' was found for directive '{$this->name()}'"
             );
-        };
+        }
 
         return $className;
     }
@@ -184,10 +183,10 @@ abstract class BaseDirective implements Directive
         );
 
         if (
-            count($argumentParts) !== 2
+            2 !== count($argumentParts)
             || empty($argumentParts[0])
             || empty($argumentParts[1])
-        ){
+        ) {
             throw new DirectiveException(
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName'"
             );
