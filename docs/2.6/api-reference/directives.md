@@ -136,6 +136,30 @@ class CreateUser
     }
 }
 ```
+## @cache
+
+Store a value field in the Cache
+
+```graphql
+type User {
+  name: String! @cache(maxAge: 300)
+}
+```
+
+This directive can be used with other directives
+
+```graphql
+type User {
+  created_at: String!
+    @field(resolver: "App\\Http\\GraphQL\\Types\\UserType@created_at")
+    @cache(maxAge: 300)
+}
+```
+
+You can pass the agument `private` as `true` if you want to "attach" the cached value to the logged used. By default is `false`.
+
+_Note: Setting the the agument `private` as `true` won't prevent other users to access to cache value, it will add the add the laravel `auth` user key to the cache key_
+
 
 ## @can
 
