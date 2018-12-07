@@ -80,10 +80,14 @@ return [
     | This operation is pretty expensive so it is recommended to enable
     | caching in production mode.
     |
+    | If your "cache" driver allows it you can set the "tags" option to tag
+    | the stored cache
+    |
     */
     'cache' => [
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+        //'tags' => true
     ],
 
     /*
