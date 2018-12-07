@@ -85,7 +85,7 @@ class Broadcaster implements BroadcastsSubscriptions
         $this->iterator->process(
             $subscribers,
             function (Subscriber $subscriber) use ($root) {
-                $data = graphql()->execute(
+                $data = graphql()->executeQuery(
                     $subscriber->queryString,
                     $subscriber->context,
                     $subscriber->args,

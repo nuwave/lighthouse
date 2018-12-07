@@ -28,6 +28,7 @@ module.exports = [{
     {
         title: 'Extensions',
         children: [
+            'extensions/subscriptions',
             'extensions/deferred'
         ]
     },
