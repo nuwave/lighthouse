@@ -53,7 +53,8 @@ class Subscriber
     public static function initialize($root, $args, $context, ResolveInfo $info, $queryString)
     {
         $instance = new static();
-        $instance->channel = 'private-'.(string) Str::uuid();
+
+        $instance->channel = $instance->channel();
         $instance->context = $context;
         $instance->args = $args;
         $instance->operationName = $info->operation->name->value;
@@ -112,6 +113,16 @@ class Subscriber
             'operation_name' => $this->operationName,
             'query_string' => $this->queryString,
         ];
+    }
+
+    /**
+     * Generate channel name.
+     *
+     * @return string
+     */
+    protected function channel()
+    {
+        return 'private-'.(string) str_random(32).'-'.time();
     }
 
     /**
