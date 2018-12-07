@@ -136,30 +136,37 @@ class CreateUser
     }
 }
 ```
+
 ## @cache
 
-Store a value field in the Cache
+Cache the result of a resolver.
+
+The cache is created on the first request and is cached forever by default.
+Use this for values that change seldomly and take long to fetch/compute.
 
 ```graphql
-type User {
-  name: String! @cache(maxAge: 300)
+type Query {
+  highestKnownPrimeNumber: Int! @cache
 }
 ```
 
-This directive can be used with other directives
+You can set an expiration time in seconds
+if you want to invalidate the cache after a while.
 
 ```graphql
-type User {
-  created_at: String!
-    @field(resolver: "App\\Http\\GraphQL\\Types\\UserType@created_at")
-    @cache(maxAge: 300)
+type Query {
+  temperature: Int! @cache(maxAge: 300)
 }
 ```
 
-You can pass the agument `private` as `true` if you want to "attach" the cached value to the logged used. By default is `false`.
+You can limit the cache to the logged in user making the request by marking it as private.
+This makes sense for data that is specific to a certain user.
 
-_Note: Setting the the agument `private` as `true` won't prevent other users to access to cache value, it will add the add the laravel `auth` user key to the cache key_
-
+```graphql
+type Query {
+  todos: [ToDo!]! @cache(private: true)
+}
+```
 
 ## @can
 
