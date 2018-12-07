@@ -13,9 +13,6 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionDirectiveTest extends TestCase
 {
-    /** @var StoresSubscriptions */
-    protected $storage;
-
     /**
      * Define environment setup.
      *
@@ -63,8 +60,6 @@ class SubscriptionDirectiveTest extends TestCase
         config(['lighthouse.extensions' => [
             \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
         ]]);
-
-        $this->storage = $app->get(StoresSubscriptions::class);
     }
 
     /**
@@ -86,7 +81,7 @@ class SubscriptionDirectiveTest extends TestCase
 
         $this->schema = $this->schema();
         $data = $this->postJson('/graphql', $json)->json();
-        $subscriber = $this->storage->subscribersByTopic('ON_POST_CREATED')->first();
+        $subscriber = app(StoresSubscriptions::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertEquals(
@@ -121,7 +116,7 @@ class SubscriptionDirectiveTest extends TestCase
 
         $this->schema = $this->schema();
         $data = $this->postJson('/graphql', $json)->json();
-        $subscribers = $this->storage->subscribersByTopic('ON_POST_CREATED');
+        $subscribers = app(StoresSubscriptions::class)->subscribersByTopic('ON_POST_CREATED');
 
         $this->assertCount(2, $subscribers);
 

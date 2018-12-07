@@ -4,6 +4,10 @@
 
 **Install the Pusher PHP Server package**
 
+::: tip NOTE
+A future version of Lighthouse will introduce a driver implementation so different websocket solutions can be leveraged by adjusting the config file and installing the required external package(s).
+:::
+
 ```bash
 composer require pusher/pusher-php-server
 ```
