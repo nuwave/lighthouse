@@ -11,19 +11,12 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator as Iterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent as Event;
 
-class Broadcaster implements BroadcastsSubscriptions
+class SubscriptionBroadcaster implements BroadcastsSubscriptions
 {
-    const EVENT_NAME = 'lighthouse-subscription';
-
     /**
      * @var Auth
      */
     protected $auth;
-
-    /**
-     * @var Pusher
-     */
-    protected $pusher;
 
     /**
      * @var Storage
@@ -36,21 +29,26 @@ class Broadcaster implements BroadcastsSubscriptions
     protected $iterator;
 
     /**
-     * @param Auth     $auth
-     * @param Pusher   $pusher
-     * @param Storage  $storage
-     * @param Iterator $iterator
+     * @var BroadcastManager
+     */
+    protected $broadcastManager;
+
+    /**
+     * @param Auth             $auth
+     * @param Storage          $storage
+     * @param Iterator         $iterator
+     * @param BroadcastManager $broadcastManager
      */
     public function __construct(
         Auth $auth,
-        Pusher $pusher,
         Storage $storage,
-        Iterator $iterator
+        Iterator $iterator,
+        BroadcastManager $broadcastManager
     ) {
         $this->auth = $auth;
-        $this->pusher = $pusher;
         $this->storage = $storage;
         $this->iterator = $iterator;
+        $this->broadcastManager = $broadcastManager;
     }
 
     /**
@@ -93,10 +91,7 @@ class Broadcaster implements BroadcastsSubscriptions
                     $subscriber->operationName
                 );
 
-                $this->pusher->trigger($subscriber->channel, self::EVENT_NAME, [
-                    'more' => true,
-                    'result' => $data,
-                ]);
+                $this->broadcastManager->broadcast($subscriber, $data);
             }
         );
     }
@@ -104,23 +99,14 @@ class Broadcaster implements BroadcastsSubscriptions
     /**
      * Authorize the subscription.
      *
-     * @param string  $channel
-     * @param string  $socketId
      * @param Request $request
      *
      * @return array
      */
-    public function authorize($channel, $socketId, Request $request)
+    public function authorize(Request $request)
     {
-        if (! $this->auth->authorize($channel, $request)) {
-            $this->storage->deleteSubscriber($channel);
-
-            return ['error' => 'unauthorized'];
-        }
-
-        return json_decode(
-            $this->pusher->socket_auth($channel, $socketId),
-            true
-        );
+        return $this->auth->authorize($request)
+            ? $this->broadcastManager->authorized($request)
+            : $this->broadcastManager->unauthorized($request);
     }
 }

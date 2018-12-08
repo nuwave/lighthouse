@@ -50,7 +50,7 @@ class SubscriptionDirectiveTest extends TestCase
                     $this->broadcasted[$fieldName] = $broadcasted;
                 }
 
-                public function authorize($channel, $socketId, Request $request)
+                public function authorize(Request $request)
                 {
                     return true;
                 }

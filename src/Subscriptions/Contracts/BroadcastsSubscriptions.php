@@ -28,11 +28,9 @@ interface BroadcastsSubscriptions
     /**
      * Authorize the subscription.
      *
-     * @param string  $channel
-     * @param string  $socketId
      * @param Request $request
      *
      * @return array
      */
-    public function authorize($channel, $socketId, Request $request);
+    public function authorize(Request $request);
 }

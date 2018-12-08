@@ -35,14 +35,14 @@ class Authorizer implements Auth
     /**
      * Authorize subscription request.
      *
-     * @param string  $channel
      * @param Request $request
      *
      * @return bool
      */
-    public function authorize($channel, Request $request)
+    public function authorize(Request $request)
     {
         try {
+            $channel = $this->channel($request);
             $subscriber = $this->storage->subscriberByChannel($channel);
             $subscriptions = $this->registry->subscriptions($subscriber);
 
@@ -60,5 +60,17 @@ class Authorizer implements Auth
 
             return false;
         }
+    }
+
+    /**
+     * Extract channel name from input.
+     *
+     * @param Request $request
+     *
+     * @return string
+     */
+    protected function channel(Request $request): string
+    {
+        return $request->input('channel_name');
     }
 }

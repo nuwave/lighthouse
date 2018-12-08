@@ -28,31 +28,16 @@ class SubscriptionProvider
      */
     public static function register(Application $app)
     {
+        $app->singleton(BroadcastManager::class);
+        $app->singleton(SubscriptionRegistry::class);
+
         $app->bind(ContextSerializer::class, Serializer::class);
         $app->bind(StoresSubscriptions::class, DatabaseStorage::class);
         $app->bind(AuthorizesSubscriptions::class, Authorizer::class);
         $app->bind(SubscriptionIterator::class, SyncIterator::class);
         $app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
         $app->bind(RegistersRoutes::class, Routes::class);
-
-        $app->singleton(SubscriptionRegistry::class);
-        $app->singleton(BroadcastsSubscriptions::class, function ($app) {
-            $appKey = env('PUSHER_APP_KEY');
-            $appSecret = env('PUSHER_APP_SECRET');
-            $appId = env('PUSHER_APP_ID');
-            $appCluster = env('PUSHER_APP_CLUSTER');
-            $appEncryption = env('PUSHER_MASTER_KEY');
-
-            $auth = $app->get(AuthorizesSubscriptions::class);
-            $storage = $app->get(StoresSubscriptions::class);
-            $iterator = $app->get(SubscriptionIterator::class);
-            $pusher = new \Pusher\Pusher($appKey, $appSecret, $appId, [
-                'cluster' => $appCluster,
-                'encryption_master_key' => $appEncryption,
-            ]);
-
-            return new Broadcaster($auth, $pusher, $storage, $iterator);
-        });
+        $app->bind(BroadcastsSubscriptions::class, SubscriptionBroadcaster::class);
 
         $app->get('events')->listen(
             BroadcastSubscriptionEvent::class,
