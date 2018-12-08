@@ -36,27 +36,13 @@ class BroadcastManager
     protected $customCreators = [];
 
     /**
-     * Create a new Cache manager instance.
+     * Create a new broadcaster manager instance.
      *
      * @param Application $app
      */
     public function __construct(Application $app)
     {
         $this->app = $app;
-    }
-
-    /**
-     * Get a cache store instance by name.
-     *
-     * @param string|null $name
-     *
-     * @return BroadcastsSubscriptions
-     */
-    public function store($name = null)
-    {
-        $name = $name ?: $this->getDefaultDriver();
-
-        return $this->broadcasters[$name] = $this->get($name);
     }
 
     /**
@@ -84,7 +70,7 @@ class BroadcastManager
     }
 
     /**
-     * Get a cache store instance by name.
+     * Get a broadcaster instance by name.
      *
      * @param string|null $name
      *
