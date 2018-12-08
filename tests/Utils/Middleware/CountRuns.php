@@ -3,6 +3,7 @@
 
 namespace Tests\Utils\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 
 class CountRuns
@@ -14,7 +15,7 @@ class CountRuns
      */
     public static $runCounter = 0;
 
-    public function handle(Request $request, \Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         self::$runCounter++;
 

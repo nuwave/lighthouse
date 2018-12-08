@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema;
 
+use Closure;
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
@@ -36,7 +37,7 @@ class DirectiveRegistryTest extends TestCase
             $this->directiveRegistry->get((new FieldDirective)->name())
         );
     }
-    
+
     /**
      * @test
      */
@@ -44,13 +45,13 @@ class DirectiveRegistryTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
         $this->directiveRegistry->get((new FooDirective)->name());
-        
+
         $this->directiveRegistry->load(
             __DIR__ . '../../Utils/Directives/Programmatically',
             'Tests\Utils\Directives\Programmatically',
             __DIR__ . '/../../'
         );
-        
+
         $this->assertInstanceOf(
             FooDirective::class,
             $this->directiveRegistry->get((new FooDirective)->name())
@@ -148,7 +149,7 @@ class DirectiveRegistryTest extends TestCase
                     return $this->definitionNode;
                 }
 
-                public function handleField(FieldValue $value, \Closure $next)
+                public function handleField(FieldValue $value, Closure $next)
                 {
                 }
             }
@@ -174,7 +175,7 @@ class DirectiveRegistryTest extends TestCase
                 return 'foo';
             }
 
-            public function handleField(FieldValue $value, \Closure $next)
+            public function handleField(FieldValue $value, Closure $next)
             {
             }
         };

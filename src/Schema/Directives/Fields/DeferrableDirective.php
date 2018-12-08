@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -46,7 +47,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $resolver = $value->getResolver();
         $fieldType = $value->getField()->type;

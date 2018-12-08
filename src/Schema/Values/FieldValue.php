@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Closure;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -78,7 +79,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setResolver(\Closure $resolver): FieldValue
+    public function setResolver(Closure $resolver): FieldValue
     {
         $this->resolver = $resolver;
 
@@ -92,7 +93,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setComplexity(\Closure $complexity): FieldValue
+    public function setComplexity(Closure $complexity): FieldValue
     {
         $this->complexity = $complexity;
 
@@ -172,7 +173,7 @@ class FieldValue
      *
      * @return \Closure
      */
-    public function getResolver(): \Closure
+    public function getResolver(): Closure
     {
         if (! isset($this->resolver)) {
             $this->resolver = $this->defaultResolver();
@@ -188,7 +189,7 @@ class FieldValue
      *
      * @return \Closure
      */
-    protected function defaultResolver(): \Closure
+    protected function defaultResolver(): Closure
     {
         if ($namespace = $this->getDefaultNamespaceForParent()) {
             return construct_resolver(

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
+use Closure;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
@@ -21,13 +22,13 @@ trait HandlesQueryFilter
      *
      * @return ArgumentValue
      */
-    protected function injectFilter(ArgumentValue &$argument, \Closure $filter): ArgumentValue
+    protected function injectFilter(ArgumentValue &$argument, Closure $filter): ArgumentValue
     {
         $parentField = $argument->getParentField();
         $query = QueryFilter::getInstance(
             $parentField
         );
-    
+
         $argumentName = $this->definitionNode->name->value;
         $query->addSingleArgumentFilter(
             $argumentName,
@@ -42,7 +43,7 @@ trait HandlesQueryFilter
 
         return $argument;
     }
-    
+
     /**
      * Inject a query filter that takes an array of values into the field.
      *
@@ -59,13 +60,13 @@ trait HandlesQueryFilter
      *
      * @return ArgumentValue
      */
-    protected function injectMultiArgumentFilter(ArgumentValue &$argument, \Closure $filter, string $filterType): ArgumentValue
+    protected function injectMultiArgumentFilter(ArgumentValue &$argument, Closure $filter, string $filterType): ArgumentValue
     {
         $parentField = $argument->getParentField();
         $query = QueryFilter::getInstance(
             $parentField
         );
-    
+
         $argumentName = $this->definitionNode->name->value;
         $query->addMultiArgumentFilter(
             $argumentName,

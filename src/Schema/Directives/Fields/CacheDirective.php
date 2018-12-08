@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Carbon\Carbon;
+use Closure;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
@@ -33,7 +34,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $this->setNodeKey(
             $value->getParent()

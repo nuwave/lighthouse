@@ -2,6 +2,7 @@
 
 namespace Tests\Utils\Interfaces;
 
+use GraphQL\Type\Definition\ObjectType;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
@@ -10,7 +11,7 @@ class Nameable
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-    
+
     /**
      * @param TypeRegistry $typeRegistry
      */
@@ -18,8 +19,8 @@ class Nameable
     {
         $this->typeRegistry = $typeRegistry;
     }
-    
-    public function resolve($value): \GraphQL\Type\Definition\ObjectType
+
+    public function resolve($value): ObjectType
     {
         if ($value instanceof User) {
             return $this->typeRegistry->get('User');

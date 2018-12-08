@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Closure;
 use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Error\InvariantViolation;
@@ -255,7 +256,7 @@ class NodeFactory
      *
      * @return \Closure
      */
-    protected function resolveFieldsFunction($definition): \Closure
+    protected function resolveFieldsFunction($definition): Closure
     {
         return function () use ($definition) {
             return collect($definition->fields)
@@ -294,7 +295,7 @@ class NodeFactory
      *
      * @return \Closure
      */
-    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): \Closure
+    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): Closure
     {
         return function () use ($definition) {
             return collect($definition->fields)
@@ -348,7 +349,7 @@ class NodeFactory
      *
      * @return \Closure
      */
-    public function typeResolverFallback(): \Closure
+    public function typeResolverFallback(): Closure
     {
         // The typeResolver receives only 3 arguments by `webonyx/graphql-php` instead of 4
         return function ($rootValue, $context, ResolveInfo $info) {

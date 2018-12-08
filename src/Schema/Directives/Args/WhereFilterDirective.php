@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -29,7 +30,7 @@ class WhereFilterDirective extends BaseDirective implements ArgMiddleware
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next)
+    public function handleArgument(ArgumentValue $argument, Closure $next)
     {
         $operator = $this->directiveArgValue('operator', '=');
         $clause = $this->directiveArgValue('clause');
@@ -42,7 +43,7 @@ class WhereFilterDirective extends BaseDirective implements ArgMiddleware
                     : $query->where($columnName, $operator, $value);
             }
         );
-        
+
         return $next($argument);
     }
 }

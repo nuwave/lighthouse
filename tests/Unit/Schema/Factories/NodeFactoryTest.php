@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Factories;
 
+use Closure;
 use Tests\TestCase;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\UnionType;
@@ -125,7 +126,7 @@ class NodeFactoryTest extends TestCase
         $this->assertSame('Foo', $interfaceType->name);
         $this->assertArrayHasKey('bar', $interfaceType->getFields());
     }
-    
+
     /**
      * @test
      */
@@ -138,7 +139,7 @@ class NodeFactoryTest extends TestCase
 
         $this->assertInstanceOf(UnionType::class, $unionType);
         $this->assertSame('Foo', $unionType->name);
-        $this->assertInstanceOf(\Closure::class, $unionType->config['resolveType']);
+        $this->assertInstanceOf(Closure::class, $unionType->config['resolveType']);
     }
 
     /**

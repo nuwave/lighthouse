@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -117,7 +118,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @return mixed
      */
-    public function defer(\Closure $resolver, string $path)
+    public function defer(Closure $resolver, string $path)
     {
         if ($data = array_get($this->data, "data.{$path}")) {
             return $data;
@@ -138,7 +139,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @return mixed
      */
-    public function findOrResolve(\Closure $originalResolver, string $path)
+    public function findOrResolve(Closure $originalResolver, string $path)
     {
         if (! $this->hasData($path)) {
             if (isset($this->deferred[$path])) {
@@ -159,7 +160,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @return mixed
      */
-    public function resolve(\Closure $originalResolver, string $path)
+    public function resolve(Closure $originalResolver, string $path)
     {
         $isDeferred = $this->isDeferred($path);
         $resolver = $isDeferred ? $this->deferred[$path] : $originalResolver;

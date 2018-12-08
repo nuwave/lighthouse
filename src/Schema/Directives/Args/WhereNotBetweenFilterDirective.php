@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -29,12 +30,12 @@ class WhereNotBetweenFilterDirective extends BaseDirective implements ArgMiddlew
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
+    public function handleArgument(ArgumentValue $argument, Closure $next): ArgumentValue
     {
         $this->injectMultiArgumentFilter(
             $argument,
             function ($query, string $columnName, array $values) {
-            
+
                 return $query->whereNotBetween($columnName, $values);
             },
             self::name()

@@ -3,6 +3,7 @@
 
 namespace Tests\Utils\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
@@ -10,7 +11,7 @@ class Authenticate
 {
     const MESSAGE = 'This middleware always throws.';
 
-    public function handle(Request $request, \Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         throw new AuthenticationException(self::MESSAGE);
     }

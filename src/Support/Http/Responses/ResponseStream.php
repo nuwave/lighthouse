@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
+use Closure;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
@@ -97,8 +98,8 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         echo $chunk;
 
-        $this->flush(\Closure::fromCallable('ob_flush'));
-        $this->flush(\Closure::fromCallable('flush'));
+        $this->flush(Closure::fromCallable('ob_flush'));
+        $this->flush(Closure::fromCallable('flush'));
     }
 
     /**
@@ -108,7 +109,7 @@ class ResponseStream extends Stream implements CanStreamResponse
      *
      * @todo Investigate exceptions that occur on Apache
      */
-    protected function flush(\Closure $flush)
+    protected function flush(Closure $flush)
     {
         try {
             $flush();

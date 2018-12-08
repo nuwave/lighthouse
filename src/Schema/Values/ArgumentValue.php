@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Closure;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
@@ -77,7 +78,7 @@ class ArgumentValue
      *
      * @return ArgumentValue
      */
-    public function addTransformer(\Closure $transformer): ArgumentValue
+    public function addTransformer(Closure $transformer): ArgumentValue
     {
         $this->transformers[] = $transformer;
 

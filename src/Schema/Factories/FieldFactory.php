@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Closure;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -120,7 +121,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function injectAdditionalArgs(\Closure $resolver, array $additionalArgs): \Closure
+    protected function injectAdditionalArgs(Closure $resolver, array $additionalArgs): Closure
     {
         return function () use ($resolver, $additionalArgs) {
             $resolverArgs = func_get_args();
@@ -141,7 +142,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function wrapResolverByTransformingArgs(\Closure $resolver, Collection $inputValueDefinitions): \Closure
+    protected function wrapResolverByTransformingArgs(Closure $resolver, Collection $inputValueDefinitions): Closure
     {
         return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
             $inputArgs = collect($inputArgs)
@@ -150,7 +151,7 @@ class FieldFactory
 
                     return collect($definition['transformers'])
                         ->reduce(
-                            function ($value, \Closure $transformer) {
+                            function ($value, Closure $transformer) {
                                 return $transformer($value);
                             },
                             $value
@@ -173,7 +174,7 @@ class FieldFactory
      *
      * @return \Closure
      */
-    protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
+    protected function wrapResolverWithValidation(Closure $resolver, Collection $inputValueDefinitions): Closure
     {
         return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
             list($rules, $messages) = RuleFactory::build(

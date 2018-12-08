@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -29,7 +30,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, Closure $next)
     {
         $resolver = $value->getResolver();
 

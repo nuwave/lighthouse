@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -29,7 +30,7 @@ class EqualsFilterDirective extends BaseDirective implements ArgMiddleware
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
+    public function handleArgument(ArgumentValue $argument, Closure $next): ArgumentValue
     {
         $this->injectFilter(
             $argument,

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -30,7 +31,7 @@ class SearchDirective extends BaseDirective implements ArgMiddleware
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
+    public function handleArgument(ArgumentValue $argument, Closure $next): ArgumentValue
     {
         // Adds within method to specify custom index.
         $within = $this->directiveArgValue('within');
@@ -41,7 +42,7 @@ class SearchDirective extends BaseDirective implements ArgMiddleware
                 $modelClass = get_class(
                     $query->getModel()
                 );
-                
+
                 /** @var \Laravel\Scout\Builder $query */
                 $query = $modelClass::search($value);
 

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -30,7 +31,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $contextAttributeName = $this->directiveArgValue('context');
         if (!$contextAttributeName) {

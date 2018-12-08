@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use GraphQL\Language\AST\Node;
@@ -63,7 +64,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $middleware = $this->getQualifiedMiddlewareNames(
             $this->directiveArgValue('checks')

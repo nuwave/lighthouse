@@ -1,5 +1,6 @@
 <?php
 
+use Closure;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -87,17 +88,17 @@ if (! function_exists('namespace_classname')) {
         if(\class_exists($classCandidate)){
             return $classCandidate;
         }
-    
+
         // Stop if the class is found or we are out of namespaces to try
         while(!empty($namespacesToTry)){
             // Pop off the first namespace and try it
             $className = \array_shift($namespacesToTry) . '\\' . $classCandidate;
-        
+
             if(\class_exists($className)){
                 return $className;
             }
         }
-        
+
         return false;
     }
 }
@@ -113,7 +114,7 @@ if (! function_exists('construct_resolver')) {
      *
      * @return \Closure
      */
-    function construct_resolver(string $className, string $methodName): \Closure
+    function construct_resolver(string $className, string $methodName): Closure
     {
         if (!method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");

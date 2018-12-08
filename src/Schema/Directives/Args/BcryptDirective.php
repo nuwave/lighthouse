@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
@@ -26,7 +27,7 @@ class BcryptDirective extends BaseDirective implements ArgMiddleware
      *
      * @return ArgumentValue
      */
-    public function handleArgument(ArgumentValue $argumentValue, \Closure $next): ArgumentValue
+    public function handleArgument(ArgumentValue $argumentValue, Closure $next): ArgumentValue
     {
         $argumentValue->addTransformer(
             function ($password) {

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
+use Closure;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
@@ -60,7 +61,7 @@ class GraphQLExtensionTest extends TestCase
                 return 'foo';
             }
 
-            public function willSendResponse(array $response, \Closure $next)
+            public function willSendResponse(array $response, Closure $next)
             {
                 return $next(array_merge($response, [
                     'meta' => 'data',
