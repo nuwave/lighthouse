@@ -2,9 +2,10 @@
 
 namespace Tests\Utils\Policies;
 
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as IlluminateAuthServiceProvider;
 use Tests\Utils\Models\User;
 
-class AuthServiceProvider extends \Illuminate\Foundation\Support\Providers\AuthServiceProvider
+class AuthServiceProvider extends IlluminateAuthServiceProvider
 {
     protected $policies = [
         User::class => UserPolicy::class,

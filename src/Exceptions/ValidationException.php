@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
+use Exception;
+use Illuminate\Validation\ValidationException as BaseValidationException;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 
-class ValidationException extends \Illuminate\Validation\ValidationException implements RendersErrorsExtensions
+class ValidationException extends BaseValidationException implements RendersErrorsExtensions
 {
     /**
      * Create a new exception instance.
@@ -15,7 +17,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
      */
     public function __construct(GraphQLValidator $validator, $response = null, $errorBag = 'default')
     {
-        \Exception::__construct('Validation failed for the field ['.$validator->getFieldPath().']');
+        Exception::__construct('Validation failed for the field ['.$validator->getFieldPath().']');
 
         $this->response = $response;
         $this->errorBag = $errorBag;

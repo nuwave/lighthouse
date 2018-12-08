@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Exception;
 use Illuminate\Support\Collection;
 use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Support\Pipeline;
@@ -28,7 +29,7 @@ class ExtensionRegistry implements \JsonSerializable
             $extensionInstance = resolve($extension);
 
             if (! $extensionInstance instanceof GraphQLExtension) {
-                throw new \Exception(sprintf(
+                throw new Exception(sprintf(
                     'The class [%s] was registered as an extensions but is not an instanceof %s',
                     $extension,
                     GraphQLExtension:: class

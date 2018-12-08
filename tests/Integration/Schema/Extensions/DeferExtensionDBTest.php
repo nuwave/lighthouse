@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Extensions;
 
+use DB;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -73,7 +74,7 @@ class DeferExtensionDBTest extends DBTestCase
             }
         }';
 
-        \DB::listen(function ($q) use (&$queries) {
+        DB::listen(function ($q) use (&$queries) {
             ++$queries;
         });
 
@@ -139,7 +140,7 @@ class DeferExtensionDBTest extends DBTestCase
             }
         }';
 
-        \DB::listen(function ($q) use (&$queries) {
+        DB::listen(function ($q) use (&$queries) {
             ++$queries;
         });
 
@@ -218,7 +219,7 @@ class DeferExtensionDBTest extends DBTestCase
             }
         }';
 
-        \DB::listen(function ($q) use (&$queries) {
+        DB::listen(function ($q) use (&$queries) {
             ++$queries;
         });
 

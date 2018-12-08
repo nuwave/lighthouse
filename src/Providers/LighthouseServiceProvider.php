@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Providers;
 
 use Illuminate\Support\Str;
+use Illuminate\Validation\Validator;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -109,13 +110,13 @@ class LighthouseServiceProvider extends ServiceProvider
                 array $rules,
                 array $messages,
                 array $customAttributes
-            ): \Illuminate\Validation\Validator {
+            ): Validator {
                 // This determines whether we are resolving a GraphQL field
                 $resolveInfo = array_get($customAttributes, 'resolveInfo');
 
                 return $resolveInfo instanceof ResolveInfo
                     ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
-                    : new \Illuminate\Validation\Validator($translator, $data, $rules, $messages, $customAttributes);
+                    : new Validator($translator, $data, $rules, $messages, $customAttributes);
             }
         );
 

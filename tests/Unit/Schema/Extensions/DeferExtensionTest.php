@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
+use Exception;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\TestResponse;
 use Nuwave\Lighthouse\Exceptions\ParseClientException;
@@ -678,6 +679,6 @@ class DeferExtensionTest extends TestCase
 
     public function throw()
     {
-        throw new \Exception('deferred_exception');
+        throw new Exception('deferred_exception');
     }
 }

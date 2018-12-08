@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-class AuthenticationException extends \Illuminate\Auth\AuthenticationException implements RendersErrorsExtensions
+use Illuminate\Auth\AuthenticationException as BaseAuthenticationException;
+
+class AuthenticationException extends BaseAuthenticationException implements RendersErrorsExtensions
 {
 
     /**

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
+use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use GraphQL\Language\AST\DirectiveNode;
 use Symfony\Component\Finder\SplFileInfo;
@@ -116,7 +117,7 @@ class DirectiveRegistry
      */
     public function tryRegisterClassName(string $className): DirectiveRegistry
     {
-        $reflection = new \ReflectionClass($className);
+        $reflection = new ReflectionClass($className);
 
         if ($reflection->isInstantiable() && $reflection->isSubclassOf(Directive::class)) {
             $this->register(

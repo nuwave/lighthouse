@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Exceptions;
 
 use GraphQL\Error\ClientAware;
+use Illuminate\Auth\Access\AuthorizationException as BaseAuthorizationException;
 
-class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationException implements ClientAware
+class AuthorizationException extends BaseAuthorizationException implements ClientAware
 {
 
     /**

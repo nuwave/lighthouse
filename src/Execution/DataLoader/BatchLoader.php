@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Exception;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
@@ -57,7 +58,7 @@ abstract class BatchLoader
         );
 
         if (! $instance instanceof self) {
-            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
+            throw new Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
         }
 
         return $instance;
