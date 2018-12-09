@@ -54,20 +54,6 @@ if (! function_exists('app_path')) {
     }
 }
 
-if (! function_exists('resolve')) {
-    /**
-     * Resolve a service from the container.
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
-    function resolve($name)
-    {
-        return app($name);
-    }
-}
-
 if (! function_exists('namespace_classname')) {
     /**
      * Attempt to find a given class in the given namespaces.
