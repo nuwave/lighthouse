@@ -2,11 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class DeferExtension extends GraphQLExtension

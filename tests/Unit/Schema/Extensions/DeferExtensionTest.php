@@ -3,8 +3,6 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\TestResponse;
-use Nuwave\Lighthouse\Exceptions\ParseClientException;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
