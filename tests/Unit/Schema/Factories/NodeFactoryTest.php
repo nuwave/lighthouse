@@ -28,7 +28,7 @@ class NodeFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = resolve(NodeFactory::class);
+        $this->factory = app(NodeFactory::class);
     }
 
     /**
@@ -125,7 +125,7 @@ class NodeFactoryTest extends TestCase
         $this->assertSame('Foo', $interfaceType->name);
         $this->assertArrayHasKey('bar', $interfaceType->getFields());
     }
-    
+
     /**
      * @test
      */

@@ -25,7 +25,7 @@ class ExtensionRegistry implements \JsonSerializable
         $this->extensions = collect(
             config('lighthouse.extensions', [])
         )->mapWithKeys(function (string $extension) {
-            $extensionInstance = resolve($extension);
+            $extensionInstance = app($extension);
 
             if (! $extensionInstance instanceof GraphQLExtension) {
                 throw new \Exception(sprintf(

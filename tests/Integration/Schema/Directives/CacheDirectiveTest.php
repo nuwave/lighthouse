@@ -35,7 +35,7 @@ class CacheDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertSame('foobar', array_get($result, 'data.user.name'));
-        $this->assertSame('foobar', resolve('cache')->get('user:1:name'));
+        $this->assertSame('foobar', app('cache')->get('user:1:name'));
     }
 
     /**
@@ -65,7 +65,7 @@ class CacheDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertSame('foobar', array_get($result, 'data.user.name'));
-        $this->assertSame('foobar', resolve('cache')->get('user:foo@bar.com:name'));
+        $this->assertSame('foobar', app('cache')->get('user:foo@bar.com:name'));
     }
 
     /**
@@ -98,7 +98,7 @@ class CacheDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertSame('foobar', array_get($result, 'data.user.name'));
-        $this->assertSame('foobar', resolve('cache')->get($cacheKey));
+        $this->assertSame('foobar', app('cache')->get($cacheKey));
     }
 
     /**
@@ -130,7 +130,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $this->execute($schema, $query);
 
-        $result = resolve('cache')->get('query:users:count:5');
+        $result = app('cache')->get('query:users:count:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
@@ -178,7 +178,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query)['data'];
 
-        $posts = resolve('cache')->get("user:{$user->getKey()}:posts:count:3");
+        $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
@@ -246,7 +246,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query)['data'];
 
-        $posts = resolve('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
+        $posts = app('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 

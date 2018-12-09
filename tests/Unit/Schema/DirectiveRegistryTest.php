@@ -23,7 +23,7 @@ class DirectiveRegistryTest extends TestCase
     {
         parent::setUp();
 
-        $this->directiveRegistry = resolve(DirectiveRegistry::class);
+        $this->directiveRegistry = app(DirectiveRegistry::class);
     }
 
     /**
@@ -36,7 +36,7 @@ class DirectiveRegistryTest extends TestCase
             $this->directiveRegistry->get((new FieldDirective)->name())
         );
     }
-    
+
     /**
      * @test
      */
@@ -44,13 +44,13 @@ class DirectiveRegistryTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
         $this->directiveRegistry->get((new FooDirective)->name());
-        
+
         $this->directiveRegistry->load(
             __DIR__ . '../../Utils/Directives/Programmatically',
             'Tests\Utils\Directives\Programmatically',
             __DIR__ . '/../../'
         );
-        
+
         $this->assertInstanceOf(
             FooDirective::class,
             $this->directiveRegistry->get((new FooDirective)->name())

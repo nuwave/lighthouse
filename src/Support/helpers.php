@@ -10,7 +10,7 @@ if (! function_exists('graphql')) {
      */
     function graphql()
     {
-        return resolve('graphql');
+        return app('graphql');
     }
 }
 
@@ -22,7 +22,7 @@ if (! function_exists('auth')) {
      */
     function auth()
     {
-        return resolve('auth');
+        return app('auth');
     }
 }
 
@@ -85,17 +85,17 @@ if (! function_exists('namespace_classname')) {
         if(\class_exists($classCandidate)){
             return $classCandidate;
         }
-    
+
         // Stop if the class is found or we are out of namespaces to try
         while(!empty($namespacesToTry)){
             // Pop off the first namespace and try it
             $className = \array_shift($namespacesToTry) . '\\' . $classCandidate;
-        
+
             if(\class_exists($className)){
                 return $className;
             }
         }
-        
+
         return false;
     }
 }
@@ -120,7 +120,7 @@ if (! function_exists('construct_resolver')) {
         // TODO convert this back once we require PHP 7.1
         // return \Closure::fromCallable([resolve($className), $methodName]);
         return function () use ($className, $methodName) {
-            return resolve($className)->{$methodName}(...func_get_args());
+            return app($className)->{$methodName}(...func_get_args());
         };
     }
 }

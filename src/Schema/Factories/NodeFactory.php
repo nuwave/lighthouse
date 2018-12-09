@@ -331,7 +331,7 @@ class NodeFactory
             ]);
 
             $typeResolver = \method_exists($interfaceClass, 'resolveType')
-                ? [resolve($interfaceClass), 'resolveType']
+                ? [app($interfaceClass), 'resolveType']
                 : static::typeResolverFallback();
         }
 
@@ -382,7 +382,7 @@ class NodeFactory
             ]);
 
             $typeResolver = \method_exists($unionClass, 'resolveType')
-                ? [resolve($unionClass), 'resolveType']
+                ? [app($unionClass), 'resolveType']
                 : static::typeResolverFallback();
         }
 
