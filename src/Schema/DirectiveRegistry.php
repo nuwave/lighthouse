@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 use GraphQL\Language\AST\DirectiveNode;
 use Symfony\Component\Finder\SplFileInfo;
