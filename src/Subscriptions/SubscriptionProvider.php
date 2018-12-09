@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Nuwave\Lighthouse\Subscriptions\Routes;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Container\Container as Application;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Storage\DatabaseStorage;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;

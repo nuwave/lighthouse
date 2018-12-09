@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Foundation\Application;
+use Illuminate\Container\Container as Application;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
