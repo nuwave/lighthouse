@@ -1,8 +1,10 @@
 <?php
 
 use Faker\Generator as Faker;
+use Tests\Utils\Models\Tag;
 
-$factory->define(Tests\Utils\Models\Tag::class, function (Faker $faker) {
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(Tag::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
     ];

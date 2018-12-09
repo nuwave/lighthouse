@@ -1,11 +1,11 @@
 <?php
 
 use Faker\Generator as Faker;
+use Tests\Utils\Models\Color;
 
-$factory->define(Tests\Utils\Models\Color::class, function (Faker $faker) {
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(Color::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
-        'created_at' => now(),
-        'updated_at' => now(),
     ];
 });
