@@ -13,9 +13,9 @@ php:
 
 env:
   matrix:
-  - LARAVEL='5.5.*' PHPUNIT='~6.0'
-  - LARAVEL='5.6.*' PHPUNIT='^7.0'
-  - LARAVEL='5.7.*' PHPUNIT='^7.0'
+  - LARAVEL='5.5.*'
+  - LARAVEL='5.6.*'
+  - LARAVEL='5.7.*'
   global:
   - COVERAGE=0
 
@@ -23,33 +23,23 @@ matrix:
   exclude:
   # Laravel > 5.6 requires PHP 7.1
   - php: 7.0
-    env: LARAVEL='5.6.*' PHPUNIT='^7.0'
+    env: LARAVEL='5.6.*'
   - php: 7.0
-    env: LARAVEL='5.7.*' PHPUNIT='^7.0'
+    env: LARAVEL='5.7.*'
   # This is run with coverage instead
   - php: 7.1
-    env: LARAVEL='5.7.*' PHPUNIT='^7.0'
+    env: LARAVEL='5.7.*'
   include:
   # Generating coverage on 7.1, as 7.2 does segfault, switch back eventually
   - php: 7.1
-    env: LARAVEL='5.7.*' PHPUNIT='^7.0' COVERAGE=1
+    env: LARAVEL='5.7.*' COVERAGE=1
   fast_finish: true
 
 before_install:
 - phpenv config-rm xdebug.ini
 - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 - composer global require hirak/prestissimo --update-no-dev
-- composer require
-  "illuminate/contracts:${LARAVEL}"
-  "illuminate/http:${LARAVEL}"
-  "illuminate/pagination:${LARAVEL}"
-  "illuminate/routing:${LARAVEL}"
-  "illuminate/support:${LARAVEL}"
-  "illuminate/validation:${LARAVEL}"
-  "orchestra/testbench:${LARAVEL/5\./3\.}"
-  "orchestra/database:${LARAVEL/5\./3\.}@dev"
-  "phpunit/phpunit:${PHPUNIT}"
-  --no-interaction --no-update
+- composer require "illuminate/contracts:${LARAVEL}" --no-interaction
 
 install:
 - composer install --prefer-dist --no-interaction --no-suggest
