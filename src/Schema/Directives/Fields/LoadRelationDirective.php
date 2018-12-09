@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -16,29 +17,29 @@ class LoadRelationDirective extends RelationDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'loadRelation';
     }
 
     /**
-     * Resolve the field directive.
+     * Eager load a relation on the parent instance.
      *
      * @param FieldValue $value
      * @param \Closure   $next
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $resolver = $value->getResolver();
 
         return $next(
             $value->setResolver(
-                function (Model $parent, array $resolveArgs, $context = null, $resolveInfo = null) use ($resolver) {
+                function (Model $parent, array $resolveArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver) {
                     $loader = BatchLoader::instance(
                         RelationBatchLoader::class,
-                        \array_slice($resolveInfo->path, 0, \count($resolveInfo->path) - 2),
+                        $resolveInfo->path,
                         $this->getLoaderConstructorArguments($parent, $resolveArgs, $context, $resolveInfo)
                     );
 
@@ -57,4 +58,3 @@ class LoadRelationDirective extends RelationDirective implements FieldMiddleware
         );
     }
 }
-

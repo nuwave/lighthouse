@@ -504,6 +504,19 @@ class Commentable
 }
 ```
 
+## @loadRelation
+
+Eager-load an Eloquent relation that is not returned directly but
+used for resolving other fields.
+
+```graphql
+type User {
+  taskSummary: String!
+    @loadRelation(relation: "tasks")
+    @method(name: "getTaskSummary")
+}
+```
+
 ## @method
 
 Call a method on the target model.

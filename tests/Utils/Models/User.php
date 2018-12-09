@@ -14,6 +14,10 @@ class User extends Authenticatable
 
     public function getTaskCountAsString(): string
     {
+        if (! $this->relationLoaded('tasks')) {
+            return 'This relation should have been preloaded via @loadRelation';
+        }
+
         return "User has {$this->tasks->count()} tasks.";
     }
 
@@ -44,8 +48,8 @@ class User extends Authenticatable
 
     public function scopeCompanyName(Builder $query, array $args): Builder
     {
-        return $query->whereHas("company", function($q) use ($args){
-            $q->where("name", $args['company']);
+        return $query->whereHas('company', function ($q) use ($args) {
+            $q->where('name', $args['company']);
         });
     }
 }

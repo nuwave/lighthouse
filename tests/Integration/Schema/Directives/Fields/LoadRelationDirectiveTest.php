@@ -29,7 +29,7 @@ class LoadRelationDirectiveTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->user  = factory(User::class)->create();
+        $this->user = factory(User::class)->create();
         $this->tasks = factory(Task::class, 3)->create([
             'user_id' => $this->user->getKey(),
         ]);
@@ -44,7 +44,9 @@ class LoadRelationDirectiveTest extends DBTestCase
     {
         $schema = '
         type User {
-            task_count_string: String! @loadRelation(relation: "tasks") @method(name: "getTaskCountAsString")
+            task_count_string: String!
+                @loadRelation(relation: "tasks")
+                @method(name: "getTaskCountAsString")
         }
         
         type Query {
@@ -52,7 +54,14 @@ class LoadRelationDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        /** @var User $user */
+        $user = auth()->user();
+
+        $this->assertFalse(
+            $user->relationLoaded('tasks')
+        );
+
+        $result = $this->execute($schema, '
         {
             user {
                 task_count_string
@@ -60,10 +69,14 @@ class LoadRelationDirectiveTest extends DBTestCase
         }
         ');
 
-        $tasks = auth()->user()->tasks()->count();
-        $this->assertSame(3, $tasks);
+        $this->assertCount(
+            3,
+            $user->tasks
+        );
 
-        // Ensure global scopes are respected here
-        $this->assertSame('User has 3 tasks.', array_get($result->data, 'user.task_count_string'));
+        $this->assertSame(
+            'User has 3 tasks.',
+            array_get($result, 'data.user.task_count_string')
+        );
     }
 }
