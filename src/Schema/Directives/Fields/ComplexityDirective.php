@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -45,10 +46,10 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
             $resolver = construct_resolver($namespacedClassName, $methodName);
         } else {
             $resolver = function (int $childrenComplexity, array $args): int {
-                $complexity = array_get(
+                $complexity = Arr::get(
                     $args,
                     'first',
-                    array_get($args, 'count', 1)
+                    Arr::get($args, 'count', 1)
                 );
 
                 return $childrenComplexity * $complexity;

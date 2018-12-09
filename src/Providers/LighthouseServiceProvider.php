@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Providers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\ServiceProvider;
@@ -111,7 +112,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 array $customAttributes
             ): \Illuminate\Validation\Validator {
                 // This determines whether we are resolving a GraphQL field
-                $resolveInfo = array_get($customAttributes, 'resolveInfo');
+                $resolveInfo = Arr::get($customAttributes, 'resolveInfo');
 
                 return $resolveInfo instanceof ResolveInfo
                     ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)

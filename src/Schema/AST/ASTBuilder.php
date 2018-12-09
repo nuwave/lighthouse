@@ -41,7 +41,7 @@ class ASTBuilder
         $document = self::addPaginationInfoTypes($document);
         $document = self::addNodeSupport($document);
 
-        return resolve(ExtensionRegistry::class)->manipulate($document);
+        return app(ExtensionRegistry::class)->manipulate($document);
     }
 
     /**
@@ -59,7 +59,7 @@ class ASTBuilder
             )
             ->reduce(
                 function (DocumentAST $document, Node $node) {
-                    $nodeManipulators = resolve(DirectiveRegistry::class)->nodeManipulators($node);
+                    $nodeManipulators = app(DirectiveRegistry::class)->nodeManipulators($node);
 
                     return $nodeManipulators->reduce(
                         function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
@@ -118,7 +118,7 @@ class ASTBuilder
             function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) {
                 return collect($objectType->fields)->reduce(
                     function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType) {
-                        $fieldManipulators = resolve(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
+                        $fieldManipulators = app(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
 
                         return $fieldManipulators->reduce(
                             function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType) {
@@ -147,7 +147,7 @@ class ASTBuilder
                     function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType) {
                         return collect($parentField->arguments)->reduce(
                             function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField) {
-                                $argManipulators = resolve(DirectiveRegistry::class)->argManipulators($argDefinition);
+                                $argManipulators = app(DirectiveRegistry::class)->argManipulators($argDefinition);
 
                                 return $argManipulators->reduce(
                                     function (DocumentAST $document, ArgManipulator $argManipulator) use (

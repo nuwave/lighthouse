@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Middleware\Authenticate;
 
 class GroupDirectiveTest extends TestCase
@@ -57,7 +58,7 @@ class GroupDirectiveTest extends TestCase
         ';
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.me'));
+        $this->assertSame(1, Arr::get($result, 'data.me'));
     }
 
     /**
@@ -85,10 +86,10 @@ class GroupDirectiveTest extends TestCase
         ';
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.withFoo'));
-        $this->assertSame(1, array_get($result, 'data.withNothing'));
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
-        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
-        $this->assertNull(array_get($result, 'data.foo'));
+        $this->assertSame(1, Arr::get($result, 'data.withFoo'));
+        $this->assertSame(1, Arr::get($result, 'data.withNothing'));
+        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
+        $this->assertSame('foo', Arr::get($result, 'errors.0.path.0'));
+        $this->assertNull(Arr::get($result, 'data.foo'));
     }
 }

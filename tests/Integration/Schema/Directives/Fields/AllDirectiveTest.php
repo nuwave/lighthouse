@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
@@ -35,7 +36,7 @@ class AllDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(2, array_get($result, 'data.users'));
+        $this->assertCount(2, Arr::get($result, 'data.users'));
     }
 
     /**
@@ -108,6 +109,6 @@ class AllDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(2, array_get($result, 'data.users'));
+        $this->assertCount(2, Arr::get($result, 'data.users'));
     }
 }

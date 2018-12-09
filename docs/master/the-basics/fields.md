@@ -16,12 +16,12 @@ type Query {
 ```
 
 You need to implement the actual resolver next. Lighthouse looks for a class with the capitalized name of the
-field in `App\Http\GraphQL\Queries` and calls its `resolve` function.
+field in `App\GraphQL\Queries` and calls its `resolve` function.
 
 ```php
 <?php
 
-namespace App\Http\GraphQL\Queries;
+namespace App\GraphQL\Queries;
 
 class Hello
 {
@@ -232,7 +232,7 @@ type Mutation {
 }
 ```
 
-Simply call it with the ID if the user you want gone:
+Simply call it with the ID of the user you want to delete.
 
 ```graphql
 mutation {
@@ -259,8 +259,8 @@ This mutation will return the deleted object, so you will have a last chance to 
 Sometimes, the built-in directives just don't cut it - you need more control!
 Lighthouse allows you to implement your own resolver function for fields.
 
-By default, Lighthouse looks for a class with the capitalized name of the field in `App\Http\GraphQL\Queries`
-or `App\Http\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers#resolver-function-signature).
+By default, Lighthouse looks for a class with the capitalized name of the field in `App\GraphQL\Queries`
+or `App\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers#resolver-function-signature).
 If you stick to that convention, you will not need to specify a directive at all.
 
 For example, the following field:
@@ -276,9 +276,9 @@ expects a class like this:
 ```php
 <?php
 
-namespace App\Http\GraphQL\Queries;
+namespace App\GraphQL\Queries;
 
-use App\Models\Post;
+use App\Post;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class LatestPost

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class InjectDirectiveTest extends DBTestCase
@@ -36,7 +37,7 @@ class InjectDirectiveTest extends DBTestCase
 
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.me.id'));
+        $this->assertSame(1, Arr::get($result, 'data.me.id'));
     }
 
     public function resolveUser($root, array $args): array
