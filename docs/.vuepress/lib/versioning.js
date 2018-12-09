@@ -1,4 +1,5 @@
-// TIP this file not work with hot reloading. You must restart server.
+// This file does not work with hot reloading
+// Restart the dev server to apply changes
 
 const versions = require('../versions.json')
 const fse = require('fs-extra')

@@ -12,7 +12,7 @@ module.exports = {
             rel: 'stylesheet',
             type: 'text/css',
             href: 'https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,800,800i,900,900i'
-        }, ]
+        },]
     ],
     theme: 'vuepress-theme-lighthouse',
     themeConfig: {
@@ -27,7 +27,8 @@ module.exports = {
             all: versioning.versions.all
         },
         search: false,
-        nav: [{
+        nav: [
+            {
                 text: `Docs`,
                 items: versioning.linksFor('getting-started/installation.md') // TODO create custom component
             },
