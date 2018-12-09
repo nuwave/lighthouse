@@ -40,7 +40,7 @@ class MethodDirectiveTest extends TestCase
 
     public function resolve()
     {
-        return new Foo;
+        return new Foo();
     }
 
     protected function schema()
@@ -59,9 +59,10 @@ class MethodDirectiveTest extends TestCase
     }
 }
 
-class Foo {
-    public function foobar(array $args = []): string
+class Foo
+{
+    public function foobar($root, array $args = []): string
     {
-        return 'foo' . array_get($args, 'baz');
+        return 'foo'.array_get($args, 'baz');
     }
 }
