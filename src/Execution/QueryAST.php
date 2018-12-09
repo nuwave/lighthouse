@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Language\Parser;
-use GraphQL\Language\AST\Node;
 use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;

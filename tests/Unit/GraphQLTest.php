@@ -4,8 +4,8 @@ namespace Tests\Unit;
 
 use Illuminate\Support\Arr;
 use Tests\TestCase;
-use GraphQL\Type\Schema;
 use GraphQL\Error\Debug;
+use GraphQL\Type\Schema;
 
 class GraphQLTest extends TestCase
 {
