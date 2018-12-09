@@ -9,7 +9,7 @@ $ composer require nuwave/lighthouse
 ## Publish the default schema
 
 Lighthouse includes a default schema to get you going right away. Publish
-it using the following artisan command:
+it using the following `artisan` command:
 
 ```bash
 $ php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider" --tag=schema
