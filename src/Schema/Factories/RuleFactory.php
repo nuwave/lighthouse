@@ -234,7 +234,7 @@ class RuleFactory
 
     /**
      * @param DirectiveNode $rulesDirective
-     * @param string inputDefinitionName
+     * @param string $inputDefinitionName
      *
      * @throws DirectiveException
      *

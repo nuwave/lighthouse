@@ -72,7 +72,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did start.
      *
-     * @param int index
+     * @param int $index
      *
      * @return ExtensionRegistry
      */
