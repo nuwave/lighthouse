@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Category;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -15,7 +16,7 @@ class UpdateDirectiveTest extends DBTestCase
     public function itCanUpdateFromFieldArguments()
     {
         factory(Company::class)->create(['name' => 'foo']);
-        
+
         $schema = '
         type Company {
             id: ID!
@@ -46,13 +47,14 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', array_get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
     }
+
     /**
      * @test
      */
     public function itCanUpdateFromInputObject()
     {
         factory(Company::class)->create(['name' => 'foo']);
-        
+
         $schema = '
         type Company {
             id: ID!
@@ -144,5 +146,43 @@ class UpdateDirectiveTest extends DBTestCase
         $task = Task::first();
         $this->assertSame('2', $task->user_id);
         $this->assertSame('foo', $task->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUpdateWithCustomPrimaryKey()
+    {
+        factory(Category::class)->create(['name' => 'foo']);
+
+        $schema = '
+        type Category {
+            category_id: ID!
+            name: String!
+        }
+        
+        type Mutation {
+            updateCategory(
+                category_id: ID!
+                name: String
+            ): Category @update
+        }
+        ' . $this->placeholderQuery();
+        $query = '
+        mutation {
+            updateCategory(
+                category_id: 1
+                name: "bar"
+            ) {
+                category_id
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame('1', array_get($result, 'data.updateCategory.category_id'));
+        $this->assertSame('bar', array_get($result, 'data.updateCategory.name'));
+        $this->assertSame('bar', Category::first()->name);
     }
 }
