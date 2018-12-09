@@ -17,29 +17,4 @@ resolve('router')->group(config('lighthouse.route', []), function () {
     ]);
 });
 
-/** @var \Nuwave\Lighthouse\Subscriptions\Contracts\RegistersRoutes $subscriptionRoutes */
-$subscriptionRoutes = app(\Nuwave\Lighthouse\Subscriptions\Contracts\RegistersRoutes::class);
-
-if ($subscriptionRoutes->authController()) {
-    resolve('router')->group(
-        $subscriptionRoutes->authGroup(),
-        function () use ($subscriptionRoutes) {
-            resolve('router')->post($subscriptionRoutes->authRoute(), [
-                'as' => 'lighthouse.subscriptions.auth',
-                'uses' => $subscriptionRoutes->authController(),
-            ]);
-        }
-    );
-}
-
-if ($subscriptionRoutes->webhookController()) {
-    resolve('router')->group(
-        $subscriptionRoutes->webhookGroup(),
-        function () use ($subscriptionRoutes) {
-            resolve('router')->post($subscriptionRoutes->webhookRoute(), [
-                'as' => 'lighthouse.subscriptions.auth',
-                'uses' => $subscriptionRoutes->webhookController(),
-            ]);
-        }
-    );
-}
+app(\Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class)->register();
