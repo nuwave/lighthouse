@@ -6,15 +6,16 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
-use GraphQL\Language\AST\Node;
 use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -35,25 +36,48 @@ class DocumentAST implements \Serializable
      *
      * @var Collection
      */
-    protected $typeExtensions;
-    
+    protected $typeExtensionsMap;
+
     /**
      * @param DocumentNode $documentNode
      */
     public function __construct(DocumentNode $documentNode)
     {
         // We can not store type extensions in the map, since they do not have unique names
-        list($this->typeExtensions, $definitionNodes) = collect($documentNode->definitions)
-            ->partition(function(DefinitionNode $definitionNode){
+        list($typeExtensions, $definitionNodes) = collect($documentNode->definitions)
+            ->partition(function (DefinitionNode $definitionNode) {
                 return $definitionNode instanceof TypeExtensionNode;
             });
-        
+
+        $this->typeExtensionsMap = $typeExtensions
+            ->mapWithKeys(function (TypeExtensionNode $node) {
+                return [$this->typeExtensionUniqueKey($node) => $node];
+            });
+
         $this->definitionMap = $definitionNodes
-            ->mapWithKeys(function(DefinitionNode $node){
-               return [$node->name->value => $node];
+            ->mapWithKeys(function (DefinitionNode $node) {
+                return [$node->name->value => $node];
             });
     }
-    
+
+    /**
+     * Return a unique key that identifies a type extension.
+     *
+     * @param TypeExtensionNode $typeExtensionNode
+     *
+     * @return string
+     */
+    protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
+    {
+        $fieldNames = collect($typeExtensionNode->fields)
+            ->map(function ($field) {
+                return $field->name->value;
+            })
+            ->implode(':');
+
+        return $typeExtensionNode->name->value.$fieldNames;
+    }
+
     /**
      * Create a new DocumentAST instance from a schema.
      *
@@ -65,7 +89,7 @@ class DocumentAST implements \Serializable
      */
     public static function fromSource(string $schema): DocumentAST
     {
-        try{
+        try {
             return new static(
                 Parser::parse(
                     $schema,
@@ -73,7 +97,7 @@ class DocumentAST implements \Serializable
                     ['noLocation' => true]
                 )
             );
-        } catch (SyntaxError $syntaxError){
+        } catch (SyntaxError $syntaxError) {
             // Throw our own error class instead, since otherwise a schema definition
             // error would get rendered to the Client.
             throw new ParseException(
@@ -89,43 +113,31 @@ class DocumentAST implements \Serializable
      */
     public function serialize(): string
     {
-        return \serialize([
-            'definitionMap' => $this->definitionMap
-                ->mapWithKeys(function(DefinitionNode $node, string $key){
+        return \serialize(
+            $this->definitionMap
+                ->mapWithKeys(function (DefinitionNode $node, string $key) {
                     return [$key => AST::toArray($node)];
-                }),
-            'typeExtensions' => $this->typeExtensions
-                ->map(function(TypeExtensionNode $node){
-                    return AST::toArray($node);
                 })
-        ]);
+        );
     }
 
     /**
      * Construct from the string representation.
      *
      * @param $serialized
-     *
-     * @return void
      */
     public function unserialize($serialized)
     {
-        $unserialize = \unserialize($serialized);
-        
-        $this->definitionMap = $unserialize['definitionMap']
-            ->mapWithKeys(function(array $node, string $key){
+        $this->definitionMap = \unserialize($serialized)
+            ->mapWithKeys(function (array $node, string $key) {
                 return [$key => AST::fromArray($node)];
-            });
-        $this->typeExtensions = $unserialize['typeExtensions']
-            ->map(function(array $node){
-                return AST::fromArray($node);
             });
     }
 
     /**
      * Get all type definitions from the document.
      *
-     * @return Collection
+     * @return Collection<TypeDefinitionNode>
      */
     public function typeDefinitions(): Collection
     {
@@ -151,26 +163,28 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * Get all definitions for type extensions.
+     * Get all extensions that apply to a named type.
      *
-     * Without a name, it simply return all TypeExtensions.
-     * If a name is given, it may return multiple type extensions
-     * that apply to a named type.
-     *
-     * @param string|null $extendedTypeName
+     * @param string $extendedTypeName
      *
      * @return Collection
      */
-    public function typeExtensionDefinitions(string $extendedTypeName = null): Collection
+    public function extensionsForType(string $extendedTypeName): Collection
     {
-        if(is_null($extendedTypeName)){
-            return $this->typeExtensions;
-        }
-        
-        return $this->typeExtensions
+        return $this->typeExtensionsMap
             ->filter(function (TypeExtensionNode $typeExtension) use ($extendedTypeName): bool {
                 return $extendedTypeName === $typeExtension->name->value;
             });
+    }
+
+    /**
+     * Return all the type extensions.
+     *
+     * @return Collection
+     */
+    public function typeExtensions(): Collection
+    {
+        return $this->typeExtensionsMap;
     }
 
     /**
@@ -290,7 +304,7 @@ class DocumentAST implements \Serializable
 
         return $this;
     }
-    
+
     /**
      * @param DefinitionNode $newDefinition
      *
@@ -298,15 +312,18 @@ class DocumentAST implements \Serializable
      */
     public function setDefinition(DefinitionNode $newDefinition): DocumentAST
     {
-        if($newDefinition instanceof TypeExtensionNode){
-            $this->typeExtensions->push($newDefinition);
+        if ($newDefinition instanceof TypeExtensionNode) {
+            $this->typeExtensionsMap->put(
+                $this->typeExtensionUniqueKey($newDefinition),
+                $newDefinition
+            );
         } else {
             $this->definitionMap->put(
                 $newDefinition->name->value,
                 $newDefinition
             );
         }
-        
+
         return $this;
     }
 }

@@ -9,7 +9,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\InputObjectType;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 
@@ -35,21 +34,37 @@ class NodeFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itCanTransformEnums()
+    public function itSetsEnumValueThroughDirective()
     {
         $enumNode = PartialParser::enumTypeDefinition('
         enum Role {
-            "Company administrator."
-            ADMIN @enum(value:"admin")
-
-            "Company employee."
-            EMPLOYEE @enum(value:"employee")
+            ADMIN @enum(value: 123)
         }
         ');
+        /** @var EnumType $type */
         $type = $this->factory->handle($enumNode);
 
         $this->assertInstanceOf(EnumType::class, $type);
         $this->assertSame('Role', $type->name);
+        $this->assertSame(123, $type->getValue('ADMIN')->value);
+    }
+
+    /**
+     * @test
+     */
+    public function itDefaultsEnumValueToItsName()
+    {
+        $enumNode = PartialParser::enumTypeDefinition('
+        enum Role {
+            EMPLOYEE
+        }
+        ');
+        /** @var EnumType $type */
+        $type = $this->factory->handle($enumNode);
+
+        $this->assertInstanceOf(EnumType::class, $type);
+        $this->assertSame('Role', $type->name);
+        $this->assertSame('EMPLOYEE', $type->getValue('EMPLOYEE')->value);
     }
 
     /**
@@ -78,6 +93,20 @@ class NodeFactoryTest extends TestCase
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
         $this->assertSame('DateTime', $scalarType->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanPointToScalarClassThroughDirectiveWithoutNamespace()
+    {
+        $scalarNode = PartialParser::scalarTypeDefinition('
+        scalar SomeEmail @scalar(class: "Email")
+        ');
+        $scalarType = $this->factory->handle($scalarNode);
+
+        $this->assertInstanceOf(ScalarType::class, $scalarType);
+        $this->assertSame('SomeEmail', $scalarType->name);
     }
 
     /**

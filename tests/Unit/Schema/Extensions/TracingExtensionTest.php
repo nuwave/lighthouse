@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
-use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
 class TracingExtensionTest extends TestCase
@@ -31,13 +30,11 @@ SCHEMA;
      */
     public function itCanAddTracingExtensionMetaToResult()
     {
-        $query = '
+        $result = $this->queryViaHttp('
         {
             foo
         }
-        ';
-
-        $result = $this->postJson('graphql', ['query' => $query])->json();
+        ');
 
         $this->assertArrayHasKey('tracing', array_get($result, 'extensions'));
         $this->assertArrayHasKey('resolvers', array_get($result, 'extensions.tracing.execution'));

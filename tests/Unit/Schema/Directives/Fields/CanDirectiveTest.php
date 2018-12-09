@@ -16,7 +16,9 @@ class CanDirectiveTest extends TestCase
     {
         $schema = '
         type Query {
-            user: User! @can(if: "adminOnly")
+            user: User!
+                @can(if: "adminOnly")
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
@@ -44,7 +46,9 @@ class CanDirectiveTest extends TestCase
 
         $schema = '
         type Query {
-            user: User! @can(if: "adminOnly")
+            user: User!
+                @can(if: "adminOnly")
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
@@ -74,7 +78,9 @@ class CanDirectiveTest extends TestCase
 
         $schema = '
         type Query {
-            user: User! @can(if: "adminOnly") @field(resolver: "'.addslashes(self::class).'@resolveUser")
+            user: User!
+                @can(if: "adminOnly")
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {
@@ -104,7 +110,9 @@ class CanDirectiveTest extends TestCase
 
         $schema = '
         type Query {
-            user: User! @can(if: ["adminOnly", "alwaysTrue"]) @field(resolver: "'.addslashes(self::class).'@resolveUser")
+            user: User!
+                @can(if: ["adminOnly", "alwaysTrue"])
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         
         type User {

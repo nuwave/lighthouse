@@ -21,11 +21,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID!): User @delete
         }
-        
-        type Query {
-            dummy: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = "
         mutation {
             deleteUser(id: 1) {
@@ -53,11 +49,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUsers(id: [ID!]!): [User!]! @delete
         }
-        
-        type Query {
-            dummy: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = "
         mutation {
             deleteUsers(id: [1, 2]) {
@@ -84,11 +76,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID): User @delete
         }
-        
-        type Query {
-            dummy: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = "
         mutation {
             deleteUser(id: 1) {
@@ -112,11 +100,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser: User @delete
         }
-        
-        type Query {
-            dummy: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = "
         mutation {
             deleteUser {
@@ -140,11 +124,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(foo: String, bar: Int): User @delete
         }
-        
-        type Query {
-            dummy: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = "
         mutation {
             deleteUser {

@@ -3,19 +3,20 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryUtils;
-use Nuwave\Lighthouse\Execution\Utils\Cursor;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
@@ -44,27 +45,28 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $this->getPaginationType(),
             $fieldDefinition,
             $parentType,
-            $current
+            $current,
+            $this->directiveArgValue('defaultCount')
         );
     }
 
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
      *
      * @throws \Exception
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value): FieldValue
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
         switch ($this->getPaginationType()) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                return $this->connectionTypeResolver($value);
+                return $this->connectionTypeResolver($fieldValue);
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
             default:
-                return $this->paginatorTypeResolver($value);
+                return $this->paginatorTypeResolver($fieldValue);
         }
     }
 
@@ -85,8 +87,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
      * @throws \Exception
+     *
+     * @return FieldValue
      */
     protected function paginatorTypeResolver(FieldValue $value): FieldValue
     {
@@ -105,8 +108,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * @param FieldValue $value
      *
-     * @return FieldValue
      * @throws \Exception
+     *
+     * @return FieldValue
      */
     protected function connectionTypeResolver(FieldValue $value): FieldValue
     {
@@ -123,13 +127,13 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         );
     }
 
-
     /**
      * @param array $resolveArgs
-     * @param int $page
-     * @param int $first
+     * @param int   $page
+     * @param int   $first
      *
-     * @throws \Exception
+     * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return LengthAwarePaginator
      */
@@ -137,7 +141,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         if ($this->directiveHasArgument('builder')) {
             $query = \call_user_func_array(
-                $this->getMethodArgument('builder'),
+                $this->getResolverFromArgument('builder'),
                 $resolveArgs
             );
         } else {
@@ -154,14 +158,13 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $query->paginate($first, ['*'], 'page', $page);
     }
 
-
     /**
      * Get the model class from the `model` argument of the field.
      *
      * This works differently as in other directives, so we define a seperate function for it.
      *
      * @throws DirectiveException
-     * @throws \Exception
+     * @throws DefinitionException
      *
      * @return string
      */
@@ -170,22 +173,22 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         $model = $this->directiveArgValue('model');
 
         // Fallback to using information from the schema definition as the model name
-        if ( ! $model) {
-            $model = ASTHelper::getFieldTypeName($this->definitionNode);
+        if (! $model) {
+            $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
             // Cut the added type suffix to get the base model class name
             $model = str_before($model, 'Paginator');
             $model = str_before($model, 'Connection');
         }
 
-        if ( ! $model) {
+        if (! $model) {
             throw new DirectiveException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
             );
         }
 
         return $this->namespaceClassName($model, [
-            config('lighthouse.namespaces.models')
+            config('lighthouse.namespaces.models'),
         ]);
     }
 }

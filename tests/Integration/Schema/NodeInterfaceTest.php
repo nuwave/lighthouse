@@ -31,11 +31,7 @@ class NodeInterfaceTest extends DBTestCase
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
-        
-        type Query {
-            dummy: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
 
         $firstGlobalId = GlobalId::encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = GlobalId::encode('User', $this->testTuples[2]['id']);
@@ -83,11 +79,7 @@ class NodeInterfaceTest extends DBTestCase
         type User @model {
             name: String!
         }
-        
-        type Query {
-            dummy: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
 
         $user = factory(User::class)->create(
             ['name' => 'Sepp']

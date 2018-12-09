@@ -41,7 +41,7 @@ class DirectiveRegistry
 
         // Load built-in directives from the default directory
         $this->load(
-            realpath(__DIR__ . '/Directives/'),
+            realpath(__DIR__.'/Directives/'),
             'Nuwave\\Lighthouse\\',
             \dirname(__DIR__)
         );
@@ -52,7 +52,7 @@ class DirectiveRegistry
             app_path()
         );
     }
-    
+
     /**
      * Gather all directives from a given directory and register them.
      *
@@ -60,8 +60,8 @@ class DirectiveRegistry
      * https://github.com/laravel/framework/blob/5.6/src/Illuminate/Foundation/Console/Kernel.php#L191-L225
      *
      * @param string[]|string $paths
-     * @param string $rootNamespace
-     * @param string $pathForRootNamespace
+     * @param string          $rootNamespace
+     * @param string          $pathForRootNamespace
      *
      * @throws \ReflectionException
      *
@@ -83,24 +83,28 @@ class DirectiveRegistry
             return $this;
         }
 
+        $fileIterator = (new Finder())
+            ->in($paths)
+            ->files();
+
         /** @var SplFileInfo $file */
-        foreach ((new Finder)->in($paths)->files() as $file) {
+        foreach ($fileIterator as $file) {
             // Cut off the given root path to get the path that is equivalent to the namespace
             $namespaceRelevantPath = str_after(
                 $file->getPathname(),
                 // Call realpath to resolve relative paths, e.g. /foo/../bar -> /bar
-                realpath($pathForRootNamespace) . DIRECTORY_SEPARATOR
+                realpath($pathForRootNamespace).DIRECTORY_SEPARATOR
             );
-            
+
             $withoutExtension = str_before($namespaceRelevantPath, '.php');
             $fileNamespace = str_replace(DIRECTORY_SEPARATOR, '\\', $withoutExtension);
 
-            $this->tryRegisterClassName($rootNamespace . $fileNamespace);
+            $this->tryRegisterClassName($rootNamespace.$fileNamespace);
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Register a directive class.
      *
@@ -119,10 +123,10 @@ class DirectiveRegistry
                 resolve($reflection->getName())
             );
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Register a directive.
      *
@@ -133,7 +137,7 @@ class DirectiveRegistry
     public function register(Directive $directive): DirectiveRegistry
     {
         $this->directives->put($directive->name(), $directive);
-        
+
         return $this;
     }
 
@@ -157,11 +161,11 @@ class DirectiveRegistry
         // Always return a new instance of the directive class to avoid side effects between them
         return resolve(\get_class($directive));
     }
-    
+
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
-     * @param Node $node
+     * @param Node   $node
      * @param string $directiveClass
      *
      * @return Collection
@@ -172,12 +176,40 @@ class DirectiveRegistry
             ->map(function (DirectiveNode $directive) {
                 return $this->get($directive->name->value);
             })
-            ->filter(function (Directive $directive) use ($directiveClass){
+            ->filter(function (Directive $directive) use ($directiveClass) {
                 return $directive instanceof $directiveClass;
             })
             ->map(function (Directive $directive) use ($node) {
                 return $this->hydrate($directive, $node);
             });
+    }
+
+    /**
+     * Get a single directive of a type that belongs to an AST node.
+     *
+     * Use this for directives types that can only occur once, such as field resolvers.
+     * This throws if more than one such directive is found.
+     *
+     * @param Node   $node
+     * @param string $directiveClass
+     *
+     * @throws DirectiveException
+     *
+     * @return Directive|null
+     */
+    protected function singleDirectiveOfType(Node $node, string $directiveClass)
+    {
+        $directives = $this->associatedDirectivesOfType($node, $directiveClass);
+
+        if ($directives->count() > 1) {
+            $directiveNames = $directives->implode(', ');
+
+            throw new DirectiveException(
+                "Node [{$node->name->value}] can only have one directive of type [{$directiveClass}] but found [{$directiveNames}]"
+            );
+        }
+
+        return $directives->first();
     }
 
     /**
@@ -209,7 +241,7 @@ class DirectiveRegistry
     {
         return $this->associatedDirectivesOfType($inputValueDefinition, ArgManipulator::class);
     }
-    
+
     /**
      * Get the node resolver directive for the given type definition.
      *
@@ -221,17 +253,10 @@ class DirectiveRegistry
      */
     public function nodeResolver(TypeDefinitionNode $node)
     {
-        $resolvers = $this->associatedDirectivesOfType($node, NodeResolver::class);
-
-        if ($resolvers->count() > 1) {
-            $resolverNames = $resolvers->implode(', ');
-    
-            throw new DirectiveException("Type [{$node->name->value}] has more then one resolver directive: [{$resolverNames}]");
-        }
-
-        return $resolvers->first();
+        /* @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->singleDirectiveOfType($node, NodeResolver::class);
     }
-    
+
     /**
      * Check if the given node has a type resolver directive handler assigned to it.
      *
@@ -245,7 +270,7 @@ class DirectiveRegistry
     {
         return $this->nodeResolver($typeDefinition) instanceof NodeResolver;
     }
-    
+
     /**
      * Check if the given field has a field resolver directive handler assigned to it.
      *
@@ -255,7 +280,7 @@ class DirectiveRegistry
      *
      * @return bool
      */
-    public function hasFieldResolver($fieldDefinition): bool
+    public function hasFieldResolver(FieldDefinitionNode $fieldDefinition): bool
     {
         return $this->fieldResolver($fieldDefinition) instanceof FieldResolver;
     }
@@ -267,7 +292,7 @@ class DirectiveRegistry
      *
      * @return bool
      */
-    public function hasFieldMiddleware($field): bool
+    public function hasFieldMiddleware(FieldDefinitionNode $field): bool
     {
         return $this->fieldMiddleware($field)->count() > 1;
     }
@@ -281,19 +306,9 @@ class DirectiveRegistry
      *
      * @return FieldResolver|null
      */
-    public function fieldResolver($field)
+    public function fieldResolver(FieldDefinitionNode $field)
     {
-        $resolvers = $this->associatedDirectivesOfType($field, FieldResolver::class);
-
-        if ($resolvers->count() > 1) {
-            $resolverNames = $resolvers->implode(', ');
-            
-            throw new DirectiveException(
-                "Field [{$field->name->value}] has more then one resolver directive: [{$resolverNames}]"
-            );
-        }
-
-        return $resolvers->first();
+        return $this->singleDirectiveOfType($field, FieldResolver::class);
     }
 
     /**
@@ -333,6 +348,8 @@ class DirectiveRegistry
     }
 
     /**
+     * Set the given definition on the directive.
+     *
      * @param Directive                $directive
      * @param TypeSystemDefinitionNode $definitionNode
      *
@@ -343,49 +360,5 @@ class DirectiveRegistry
         return $directive instanceof BaseDirective
             ? $directive->hydrate($definitionNode)
             : $directive;
-    }
-    
-    /**
-     * Get directive instance by name.
-     *
-     * @param string $name
-     *
-     * @throws DirectiveException
-     *
-     * @return Directive
-     *
-     * @deprecated Will be removed in next major release
-     */
-    public function handler($name)
-    {
-        return $this->get($name);
-    }
-    
-    /**
-     * Get the node resolver directive for the given type definition.
-     *
-     * @param Node $node
-     *
-     * @throws DirectiveException
-     *
-     * @return NodeResolver
-     * @deprecated in favour of nodeResolver()
-     */
-    public function forNode(Node $node)
-    {
-        return $this->nodeResolver($node);
-    }
-    
-    /**
-     * @param FieldDefinitionNode $fieldDefinition
-     *
-     * @throws DirectiveException
-     *
-     * @return bool
-     * @deprecated in favour of hasFieldResolver()
-     */
-    public function hasResolver($fieldDefinition)
-    {
-        return $this->hasFieldResolver($fieldDefinition);
     }
 }

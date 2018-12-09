@@ -15,6 +15,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
+use Nuwave\Lighthouse\Schema\Directives\Fields\MiddlewareDirective;
 
 /**
  * Class GroupDirective.
@@ -31,7 +32,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'group';
     }
@@ -40,53 +41,21 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      * @param Node $node
      * @param DocumentAST $documentAST
      *
-     * @throws DirectiveException
+     * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $documentAST)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
-        $nodeName = $node->name->value;
-
-        if (! in_array($nodeName, ['Query', 'Mutation'])) {
-            $message = "The group directive can only be placed on a Query or Mutation [$nodeName]";
-
-            throw new DirectiveException($message);
+        if($middlewareValues = $this->directiveArgValue('middleware')){
+            $node = MiddlewareDirective::addMiddlewareDirectiveToFields($node, $middlewareValues);
         }
 
-        $node = $this->setMiddlewareDirectiveOnFields($node);
         $node = $this->setNamespaceDirectiveOnFields($node);
 
         $documentAST->setDefinition($node);
 
         return $documentAST;
-    }
-
-    /**
-     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
-     *
-     * @throws \Exception
-     *
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
-     */
-    protected function setMiddlewareDirectiveOnFields($objectType)
-    {
-        $middlewareValues = $this->directiveArgValue('middleware');
-
-        if (! $middlewareValues) {
-            return $objectType;
-        }
-
-        $middlewareValues = '["'.implode('", "', $middlewareValues).'"]';
-        $middlewareDirective = PartialParser::directive("@middleware(checks: $middlewareValues)");
-
-        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
-
-            return $fieldDefinition;
-        })->toArray());
-
-        return $objectType;
     }
 
     /**
@@ -110,19 +79,24 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
         $namespaceValue = addslashes($namespaceValue);
 
-        $objectType->fields = new NodeList(collect($objectType->fields)->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
-            $previousNamespaces = ASTHelper::directiveDefinition(
-                $fieldDefinition,
-                (new NamespaceDirective)->name()
-            );
+        $objectType->fields = new NodeList(
+            collect($objectType->fields)
+                ->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
+                    $existingNamespaces = ASTHelper::directiveDefinition(
+                        $fieldDefinition,
+                        NamespaceDirective::NAME
+                    );
 
-            $previousNamespaces = $previousNamespaces
-                ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $previousNamespaces)
-                : PartialParser::directive("@namespace(field: \"$namespaceValue\", complexity: \"$namespaceValue\")");
-            $fieldDefinition->directives = $fieldDefinition->directives->merge([$previousNamespaces]);
+                    $newNamespaceDirective = $existingNamespaces
+                        ? $this->mergeNamespaceOnExistingDirective($namespaceValue, $existingNamespaces)
+                        : PartialParser::directive("@namespace(field: \"$namespaceValue\", complexity: \"$namespaceValue\")");
 
-            return $fieldDefinition;
-        })->toArray());
+                    $fieldDefinition->directives = $fieldDefinition->directives->merge([$newNamespaceDirective]);
+
+                    return $fieldDefinition;
+                })
+                ->toArray()
+        );
 
         return $objectType;
     }

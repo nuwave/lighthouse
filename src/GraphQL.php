@@ -10,16 +10,13 @@ use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -72,16 +69,16 @@ class GraphQL
         return collect($requests)->map(function ($request, $index) use ($context, $rootValue) {
             $this->extensionRegistry->batchedQueryDidStart($index);
 
-            $data = $this->executeQuery(
+            $result = $this->executeQuery(
                 array_get($request, 'query', ''),
                 $context,
                 array_get($request, 'variables', []),
                 $rootValue
             );
 
-            $this->extensionRegistry->batchedQueryDidEnd($index);
+            $this->extensionRegistry->batchedQueryDidEnd($result, $index);
 
-            return $data;
+            return $result;
         })->all();
     }
 
@@ -96,8 +93,8 @@ class GraphQL
      * @param array  $variables
      * @param null   $rootValue
      *
-     * @throws Exceptions\DirectiveException
-     * @throws Exceptions\ParseException
+     * @throws DirectiveException
+     * @throws ParseException
      *
      * @return ExecutionResult
      */
@@ -190,9 +187,13 @@ class GraphQL
     {
         if (empty($this->documentAST)) {
             $this->documentAST = config('lighthouse.cache.enable')
-                ? app('cache')->rememberForever(config('lighthouse.cache.key'), function () {
-                    return $this->buildAST();
-                })
+                ? app('cache')
+                    ->rememberForever(
+                        config('lighthouse.cache.key'),
+                        function () {
+                            return $this->buildAST();
+                        }
+                    )
                 : $this->buildAST();
         }
 
@@ -220,139 +221,5 @@ class GraphQL
         )->implode("\n");
 
         return ASTBuilder::generate($schemaString."\n".$additionalSchemas);
-    }
-
-    /**
-     * ATTENTION
-     * ONLY DEPRECATED METHODS FROM THIS POINT ON.
-     *
-     * Do not use the functions below, they will be removed in v3
-     *
-     * ONLY DEPRECATED METHODS FROM THIS POINT ON
-     * ATTENTION
-     */
-
-    /**
-     * Return an instance of a BatchLoader for a specific field.
-     *
-     * @param string $loaderClass
-     * @param array  $pathToField
-     * @param array  $constructorArgs Those arguments are passed to the constructor of the instance
-     *
-     * @throws \Exception
-     *
-     * @return BatchLoader
-     *
-     * @deprecated in favour of BatchLoader::instance()
-     */
-    public function batchLoader(string $loaderClass, array $pathToField, array $constructorArgs = []): BatchLoader
-    {
-        return BatchLoader::instance($loaderClass, $pathToField, $constructorArgs);
-    }
-
-    /**
-     * @throws Exceptions\DirectiveException
-     *
-     * @return Schema
-     *
-     * @deprecated in v3 in favour of prepSchema
-     */
-    public function buildSchema(): Schema
-    {
-        return $this->prepSchema();
-    }
-
-    /**
-     * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
-     *
-     * @throws Exceptions\DirectiveException
-     *
-     * @return array
-     *
-     * @deprecated use executeQuery()->toArray() instead. This allows to control the debug settings.
-     */
-    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
-    {
-        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
-    }
-
-    /**
-     * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
-     *
-     * @throws Exceptions\DirectiveException
-     *
-     * @return \GraphQL\Executor\ExecutionResult
-     *
-     * @deprecated renamed to executeQuery to match webonyx/graphql-php
-     */
-    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
-    {
-        return $this->executeQuery($query, $context, $variables, $rootValue);
-    }
-
-    /**
-     * @return DirectiveRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function directives(): DirectiveRegistry
-    {
-        return resolve(DirectiveRegistry::class);
-    }
-
-    /**
-     * @return TypeRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function types(): TypeRegistry
-    {
-        return resolve(TypeRegistry::class);
-    }
-
-    /**
-     * @return TypeRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function schema(): TypeRegistry
-    {
-        return $this->types();
-    }
-
-    /**
-     * @return MiddlewareRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function middleware(): MiddlewareRegistry
-    {
-        return resolve(MiddlewareRegistry::class);
-    }
-
-    /**
-     * @return NodeRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function nodes(): NodeRegistry
-    {
-        return resolve(NodeRegistry::class);
-    }
-
-    /**
-     * @return ExtensionRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function extensions(): ExtensionRegistry
-    {
-        return resolve(ExtensionRegistry::class);
     }
 }

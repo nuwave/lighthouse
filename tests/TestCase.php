@@ -4,6 +4,7 @@ namespace Tests;
 
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Tests\Utils\Middleware\CountRuns;
 use GraphQL\Executor\ExecutionResult;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
@@ -65,6 +66,13 @@ class TestCase extends BaseTestCase
         ]);
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        CountRuns::$runCounter = 0;
+    }
+
     /**
      * Execute query/mutation.
      *
@@ -91,7 +99,8 @@ class TestCase extends BaseTestCase
      */
     protected function executeWithoutDebug(string $schema, string $query, array $variables = []): array
     {
-        return $this->executeQuery($schema, $query, $variables)->toArray();
+        return $this->executeQuery($schema, $query, $variables)
+            ->toArray();
     }
 
     /**
@@ -106,7 +115,8 @@ class TestCase extends BaseTestCase
     protected function execute(string $schema, string $query, array $variables = []): array
     {
         // For test execution, it is more convenient to throw Exceptions so they show up in the PHPUnit command line
-        return $this->executeQuery($schema, $query, $variables)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
+        return $this->executeQuery($schema, $query, $variables)
+            ->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
     }
 
     /**
@@ -117,13 +127,27 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaWithDefaultQuery(string $schema): Schema
+    protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
-        return $this->buildSchemaFromString($schema.'
+        return $this->buildSchema(
+            $schema
+            . $this->placeholderQuery()
+        );
+    }
+
+    /**
+     * Convenience method to get a default Query, sometimes needed
+     * because the Schema is invalid without it.
+     *
+     * @return \GraphQL\Type\Schema
+     */
+    protected function placeholderQuery(): string
+    {
+        return '
         type Query {
-            dummy: String
+            foo: Int
         }
-        ');
+        ';
     }
 
     /**
@@ -131,10 +155,25 @@ class TestCase extends BaseTestCase
      *
      * @return \GraphQL\Type\Schema
      */
-    protected function buildSchemaFromString(string $schema): Schema
+    protected function buildSchema(string $schema): Schema
     {
         $this->schema = $schema;
 
         return graphql()->prepSchema();
+    }
+
+    /**
+     * Execute a query as if it was sent as a request to the server.
+     *
+     * @param string $query
+     *
+     * @return array
+     */
+    protected function queryViaHttp(string $query): array
+    {
+        return $this->postJson(
+            'graphql',
+            ['query' => $query]
+        )->json();
     }
 }

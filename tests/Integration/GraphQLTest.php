@@ -108,7 +108,7 @@ class GraphQLTest extends DBTestCase
     public function itCanResolveQueryThroughController()
     {
         $this->be($this->user);
-        $query = '
+        $data = $this->queryViaHttp('
         query UserWithTasks {
             user {
                 email
@@ -117,9 +117,8 @@ class GraphQLTest extends DBTestCase
                 }
             }
         }
-        ';
+        ');
 
-        $data = $this->postJson('graphql', ['query' => $query])->json();
 
         $expected = [
             'data' => [

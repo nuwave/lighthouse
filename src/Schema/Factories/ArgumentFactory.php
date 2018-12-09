@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -15,7 +16,7 @@ class ArgumentFactory
 
     /**
      * @param DirectiveRegistry $directiveRegistry
-     * @param Pipeline $pipeline
+     * @param Pipeline          $pipeline
      */
     public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
     {
@@ -27,6 +28,8 @@ class ArgumentFactory
      * Convert argument definition to type.
      *
      * @param ArgumentValue $value
+     *
+     * @throws \Exception
      *
      * @return array
      */
@@ -43,24 +46,24 @@ class ArgumentFactory
             ->then(function (ArgumentValue $value) {
                 return $value;
             });
-        
+
         $fieldArgument = [
             'name' => $definition->name->value,
             'description' => data_get($definition->description, 'value'),
             'type' => $value->getType(),
             'astNode' => $definition,
-            'transformers' => $value->getTransformers()
+            'transformers' => $value->getTransformers(),
         ];
-        
-        if($defaultValue = $definition->defaultValue){
+
+        if ($defaultValue = $definition->defaultValue) {
             $fieldArgument += [
-                'defaultValue' => $defaultValue
+                'defaultValue' => AST::valueFromASTUntyped($defaultValue),
             ];
         }
-        
+
         // Add any dynamically declared public properties of the FieldArgument
         $fieldArgument += get_object_vars($value);
-        
+
         // Used to construct a FieldArgument class
         return $fieldArgument;
     }

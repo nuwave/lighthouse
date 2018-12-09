@@ -28,11 +28,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
-        
-        type Query {
-            foo: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             updateCompany(
@@ -73,11 +69,7 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        
-        type Query {
-            foo: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             updateCompany(input: {
@@ -127,11 +119,7 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        
-        type Query {
-            foo: Int
-        }
-        ';
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             updateTask(input: {

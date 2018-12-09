@@ -5,10 +5,11 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Execution\QueryUtils;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class FindDirective extends BaseDirective implements FieldResolver
 {
@@ -17,7 +18,7 @@ class FindDirective extends BaseDirective implements FieldResolver
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'find';
     }
@@ -25,25 +26,29 @@ class FindDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param FieldValue $fieldValue
+     *
+     * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return FieldValue
-     * @throws DirectiveException
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $model = $this->getModelClass();
 
-        return $value->setResolver(function ($root, $args) use ($model) {
-            /** @var Builder $query */
-            $query = QueryUtils::applyFilters($model::query(), $args);
-            $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
-            $total = $query->count();
+        return $fieldValue->setResolver(
+            function ($root, array $args) use ($model) {
+                /** @var Builder $query */
+                $query = QueryUtils::applyFilters($model::query(), $args);
+                $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
+                $total = $query->count();
 
-            if ($total > 1) {
-                throw new Error('Query returned more than one result.');
+                if ($total > 1) {
+                    throw new Error('Query returned more than one result.');
+                }
+                return $query->first();
             }
-            return $query->first();
-        });
+        );
     }
 }

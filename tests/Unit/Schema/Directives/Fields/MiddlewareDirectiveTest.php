@@ -3,94 +3,189 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
+use Illuminate\Routing\Router;
+use Tests\Utils\Middleware\CountRuns;
+use Tests\Utils\Middleware\Authenticate;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class MiddlewareDirectiveTest extends TestCase
 {
-    /** @var MiddlewareRegistry */
-    protected $middlewareRegistry;
-
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->middlewareRegistry = resolve(MiddlewareRegistry::class);
-    }
-
     /**
      * @test
+     * @dataProvider fooMiddlewareQueries
+     *
+     * @param string $query
      */
-    public function itCanRegisterMiddleware()
+    public function itCallsFooMiddleware(string $query)
     {
-        $this->buildSchemaFromString('
-            type Query {
-                foo: String! @middleware(checks: ["auth:web", "auth:admin"])
-                bar: String!
-            }
-            type Mutation {
-                foo(bar: String!): String! @middleware(checks: ["auth:api"])
-                bar(baz: String!): String!
-            }
-        ');
-        $query = '
-        query FooQuery {
-            foo
-        }
-        ';
-
-        $middleware = $this->middlewareRegistry->forRequest($query);
-        $this->assertCount(2, $middleware);
-        $this->assertContains('auth:web', $middleware);
-        $this->assertContains('auth:admin', $middleware);
-
-        $mutation = '
-        mutation CreateFoo {
-            foo(bar:"baz")
-        }
-        ';
-        $middleware = $this->middlewareRegistry->forRequest($mutation);
-        $this->assertCount(1, $middleware);
-        $this->assertContains('auth:api', $middleware);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanRegisterMiddlewareWithFragments()
-    {
-        $this->buildSchemaFromString('
+        $this->schema = '
         type Query {
-            foo: String! @middleware(checks: ["auth:web", "auth:admin"])
-            bar: String!
+            foo: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
-        
-        type Mutation {
-            foo(bar: String!): String! @middleware(checks: ["auth:api"])
-            bar(baz: String!): String!
+        ';
+
+        $result = $this->queryViaHttp($query);
+
+        $this->assertSame(1, array_get($result, 'data.foo'));
+    }
+
+    public function fooMiddlewareQueries()
+    {
+        return [
+            ['
+            {
+                foo
+            }
+            '],
+            ['
+            query FooQuery {
+                ...Foo_Fragment
+            }
+            
+            fragment Foo_Fragment on Query {
+                foo
+            }
+            ']
+        ];
+    }
+
+    /**
+     * @test
+     */
+    public function itWrapsExceptionFromMiddlewareInResponse()
+    {
+        $this->schema = '
+        type Query {
+            foo: Int @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
+        }
+        ';
+
+        $result = $this->queryViaHttp('
+        {
+            foo
         }
         ');
 
-        $query = '
-        query FooQuery {
-            ...Foo_Fragment
+        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+    }
+
+    /**
+     * @test
+     */
+    public function itRunsAliasedMiddleware()
+    {
+        /** @var Router $router */
+        $router = $this->app['router'];
+        $router->aliasMiddleware('foo', CountRuns::class);
+
+        $this->schema = '
+        type Query {
+            foo: Int
+                @middleware(checks: ["foo"])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
-        
-        fragment Foo_Fragment on Query {
+        ';
+
+        $result = $this->queryViaHttp('
+        {
             foo
         }
-        ';
-        $middleware = $this->middlewareRegistry->forRequest($query);
-        $this->assertCount(2, $middleware);
-        $this->assertContains('auth:web', $middleware);
-        $this->assertContains('auth:admin', $middleware);
+        ');
 
-        $mutation = '
-        mutation CreateFoo {
-            foo(bar:"baz")
+        $this->assertSame(1, array_get($result, 'data.foo'));
+    }
+
+    /**
+     * @test
+     */
+    public function itRunsMiddlewareGroup()
+    {
+        /** @var Router $router */
+        $router = $this->app['router'];
+        $router->middlewareGroup('bar', [Authenticate::class]);
+
+        $this->schema = '
+        type Query {
+            foo: Int
+                @middleware(checks: ["bar"])
         }
         ';
-        $middleware = $this->middlewareRegistry->forRequest($mutation);
-        $this->assertCount(1, $middleware);
-        $this->assertContains('auth:api', $middleware);
+
+        $result = $this->queryViaHttp('
+        {
+            foo
+        }
+        ');
+
+        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+    }
+
+    /**
+     * @test
+     */
+    public function itPassesOneFieldButThrowsInAnother()
+    {
+        $this->schema = '
+        type Query {
+            foo: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\Authenticate"])
+            pass: Int
+                @middleware(checks: ["Tests\\\Utils\\\Middleware\\\CountRuns"])
+                @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
+        }
+        ';
+
+        $result = $this->queryViaHttp('
+        {
+            foo
+            pass
+        }
+        ');
+
+        $this->assertSame(1, array_get($result, 'data.pass'));
+        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
+        $this->assertNull(array_get($result, 'data.foo'));
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsWhenDefiningMiddlewareOnInvalidTypes()
+    {
+        $this->expectException(DirectiveException::class);
+        $this->buildSchemaWithPlaceholderQuery('
+        scalar Foo @middleware
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itAddsMiddlewareDirectiveToFields()
+    {
+        $document = ASTBuilder::generate('
+        type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {
+            foo: Int
+        } 
+        ');
+
+        $queryType = $document->queryTypeDefinition();
+
+        $middlewareOnFooArguments = $queryType->fields[0]->directives[0];
+        $fieldMiddlewares = ASTHelper::directiveArgValue($middlewareOnFooArguments, 'checks');
+
+        $this->assertSame(
+            [
+                'auth',
+                'Tests\\Utils\\Middleware\\Authenticate',
+                'api'
+            ],
+            $fieldMiddlewares
+        );
     }
 }

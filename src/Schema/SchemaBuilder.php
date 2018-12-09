@@ -9,20 +9,19 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class SchemaBuilder
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-    /** @var ValueFactory */
-    protected $valueFactory;
     /** @var NodeFactory */
     protected $nodeFactory;
     /** @var DefinitionNodeConverter */
@@ -30,18 +29,15 @@ class SchemaBuilder
 
     /**
      * @param TypeRegistry            $typeRegistry
-     * @param ValueFactory            $valueFactory
      * @param NodeFactory             $nodeFactory
      * @param DefinitionNodeConverter $definitionNodeConverter
      */
     public function __construct(
         TypeRegistry $typeRegistry,
-        ValueFactory $valueFactory,
         NodeFactory $nodeFactory,
         DefinitionNodeConverter $definitionNodeConverter
     ) {
         $this->typeRegistry = $typeRegistry;
-        $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
@@ -52,15 +48,18 @@ class SchemaBuilder
      * @param DocumentAST $documentAST
      *
      * @throws DirectiveException
+     * @throws DefinitionException
+     *
      * @return Schema
      */
     public function build($documentAST)
     {
-        foreach($documentAST->typeDefinitions() as $typeDefinition){
+        /** @var TypeDefinitionNode $typeDefinition */
+        foreach ($documentAST->typeDefinitions() as $typeDefinition) {
             $type = $this->nodeFactory->handle($typeDefinition);
             $this->typeRegistry->register($type);
 
-            switch($type->name){
+            switch ($type->name) {
                 case 'Query':
                     /** @var ObjectType $queryType */
                     $queryType = $type;
@@ -74,33 +73,20 @@ class SchemaBuilder
                     $subscriptionType = $type;
                     continue 2;
                 default:
-                    $types []= $type;
+                    $types[] = $type;
             }
         }
 
-        /**
-         * The fields for the root operations have to be loaded in advance.
-         *
-         * This is because they might have to register middleware.
-         * Other fields can be lazy-loaded to improve performance.
-         *
-         * Calling getFields() causes the fields MiddlewareDirective to run
-         * and thus registers the (Laravel)-Middleware for the fields.
-         */
-        if(empty($queryType)){
-            throw new InvariantViolation("The root Query type must be present in the schema.");
+        if (empty($queryType)) {
+            throw new InvariantViolation(
+                'The root Query type must be present in the schema.'
+            );
         }
-        $queryType->getFields();
 
         $config = SchemaConfig::create()
             // Always set Query since it is required
             ->setQuery(
                 $queryType
-            )
-            // Not using lazy loading, as we do not have a way of discovering
-            // orphaned types at the moment
-            ->setTypes(
-                $types
             )
             ->setDirectives(
                 $this->convertDirectives($documentAST)
@@ -109,12 +95,15 @@ class SchemaBuilder
 
         // Those are optional so only add them if they are present in the schema
         if (isset($mutationType)) {
-            $mutationType->getFields();
             $config->setMutation($mutationType);
         }
         if (isset($subscriptionType)) {
-            $subscriptionType->getFields();
             $config->setSubscription($subscriptionType);
+        }
+        // Not using lazy loading, as we do not have a way of discovering
+        // orphaned types at the moment
+        if (isset($types)) {
+            $config->setTypes($types);
         }
 
         return new Schema($config);

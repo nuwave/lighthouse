@@ -6,8 +6,6 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Schema\Values\CacheValue;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 
 class CacheDirectiveTest extends DBTestCase
 {
@@ -16,7 +14,7 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanStoreResolverResultInCache()
     {
-        $resolver = addslashes(self::class) . '@resolve';
+        $resolver = addslashes(self::class).'@resolve';
         $schema = "
         type User {
             id: ID!
@@ -36,8 +34,8 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get('user:1:name'));
+        $this->assertSame('foobar', array_get($result, 'data.user.name'));
+        $this->assertSame('foobar', resolve('cache')->get('user:1:name'));
     }
 
     /**
@@ -45,7 +43,7 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanPlaceCacheKeyOnAnyField()
     {
-        $resolver = addslashes(self::class) . '@resolve';
+        $resolver = addslashes(self::class).'@resolve';
         $schema = "
         type User {
             id: ID!
@@ -66,8 +64,8 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get('user:foo@bar.com:name'));
+        $this->assertSame('foobar', array_get($result, 'data.user.name'));
+        $this->assertSame('foobar', resolve('cache')->get('user:foo@bar.com:name'));
     }
 
     /**
@@ -79,7 +77,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->be($user);
         $cacheKey = "auth:{$user->getKey()}:user:1:name";
 
-        $resolver = addslashes(self::class) . '@resolve';
+        $resolver = addslashes(self::class).'@resolve';
         $schema = "
         type User {
             id: ID!
@@ -99,8 +97,8 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get($cacheKey));
+        $this->assertSame('foobar', array_get($result, 'data.user.name'));
+        $this->assertSame('foobar', resolve('cache')->get($cacheKey));
     }
 
     /**
@@ -167,7 +165,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $query = '
         {
-            user(id: ' . $user->getKey() . ') {
+            user(id: '.$user->getKey().') {
                 id
                 name
                 posts(count: 3) {
@@ -187,7 +185,7 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (!str_contains($query->sql, [
+            if (! str_contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',
@@ -203,46 +201,6 @@ class CacheDirectiveTest extends DBTestCase
         // Get the the original user and the `find` directive checks the count
         $this->assertEquals(0, $queries);
         $this->assertEquals($result, $cache);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanUseCustomCacheValue()
-    {
-        /** @var ValueFactory $valueFactory */
-        $valueFactory = resolve(ValueFactory::class);
-        $valueFactory->cacheResolver(function ($arguments) {
-            return new class($arguments) extends CacheValue
-            {
-                public function getKey()
-                {
-                    return 'foo';
-                }
-            };
-        });
-
-        $resolver = addslashes(self::class) . '@resolve';
-        $schema = "
-        type User {
-            id: ID!
-            name: String @cache
-        }
-        
-        type Query {
-            user: User @field(resolver: \"{$resolver}\")
-        }
-        ";
-        $query = '
-        {
-            user {
-                name
-            }
-        }
-        ';
-        $this->execute($schema, $query);
-
-        $this->assertEquals('foobar', resolve('cache')->get('foo'));
     }
 
     /**
@@ -275,7 +233,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $query = '
         {
-            user(id: ' . $user->getKey() . ') {
+            user(id: '.$user->getKey().') {
                 id
                 name
                 posts(count: 3) {
@@ -295,7 +253,7 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (!str_contains($query->sql, [
+            if (! str_contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',

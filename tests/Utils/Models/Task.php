@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Nuwave\Lighthouse\Support\Traits\IsRelayConnection;
 
 class Task extends Model
 {
-    use IsRelayConnection, SoftDeletes;
+    use SoftDeletes;
 
     protected $guarded = [];
 

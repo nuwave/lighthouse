@@ -13,7 +13,7 @@ the behaviour you want to achieve and go from there.
 Fixing a bug? The best way to ensure it is fixed for good and never comes
 back is to write a failing test for it and then make it pass. If you can
 not figure out how to fix it yourself, feel free to submit a PR with a
-failing test.  
+failing test.
 
 To run the tests locally, you can use [docker-compose](https://docs.docker.com/compose/install/).
 Just clone the project and run the following in the project root:
@@ -51,7 +51,5 @@ Prefer explicit naming and short functions over excessive comments.
 
 ## Documentation
 
-The docs for Lighthouse are maintained in a [seperate repo](https://github.com/nuwave/lighthouse-docs)
-
-Head over there if you want to contribute to the docs, or if you made a PR
-here and want to document your changes.
+The docs for Lighthouse are located in [`/docs`](/docs).
+Hop over there for more information on how to to contribute to the docs.

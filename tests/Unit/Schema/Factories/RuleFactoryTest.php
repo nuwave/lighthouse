@@ -4,10 +4,116 @@ namespace Tests\Unit\Schema\Factories;
 
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class RuleFactoryTest extends TestCase
 {
+    /**
+     * @test
+     */
+    public function itExtractsRulesFromAnInput()
+    {
+        $inputDefinition = PartialParser::inputValueDefinition('
+        foo: String @rules(apply: ["email"], messages: { email: "bar" })
+        ');
+
+        $result = RuleFactory::getRulesAndMessages($inputDefinition);
+
+        $this->assertSame(
+            [
+                [
+                    'foo' => [
+                        'email',
+                    ],
+                ],
+                [
+                    'foo.email' => 'bar',
+                ],
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itUsesRulesOnArrayIfInputIsList()
+    {
+        $inputDefinition = PartialParser::inputValueDefinition('
+        foo: [String] @rules(apply: ["email"], messages: { email: "bar" })
+        ');
+
+        $result = RuleFactory::getRulesAndMessages($inputDefinition);
+
+        $this->assertSame(
+            [
+                [
+                    'foo.*' => [
+                        'email',
+                    ],
+                ],
+                [
+                    'foo.*.email' => 'bar',
+                ],
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itGeneratesRulesForArrayItself()
+    {
+        $inputDefinition = PartialParser::inputValueDefinition('
+        foo: [String] @rulesForArray(apply: ["email"], messages: { email: "bar" })
+        ');
+
+        $result = RuleFactory::getRulesAndMessages($inputDefinition);
+
+        $this->assertSame(
+            [
+                [
+                    'foo' => [
+                        'email',
+                    ],
+                ],
+                [
+                    'foo.email' => 'bar',
+                ],
+            ],
+            $result
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsIfArrayRulesAreOnNonList()
+    {
+        $this->expectException(DirectiveException::class);
+        $inputDefinition = PartialParser::inputValueDefinition('
+        foo: String @rulesForArray
+        ');
+
+        RuleFactory::getRulesAndMessages($inputDefinition);
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsIfArrayRulesAreOnNonNullNonList()
+    {
+        $this->expectException(DirectiveException::class);
+        $inputDefinition = PartialParser::inputValueDefinition('
+        foo: String! @rulesForArray
+        ');
+
+        RuleFactory::getRulesAndMessages($inputDefinition);
+    }
+
     /**
      * @test
      */
@@ -26,9 +132,40 @@ class RuleFactoryTest extends TestCase
             $documentAST
         );
 
-        $this->assertSame([
-            'email' => ['required', 'email'],
-        ], $rules);
+        $this->assertSame(
+            [
+                'email' => ['required', 'email'],
+            ],
+            $rules
+        );
+
+        $this->assertSame([], $messages);
+    }
+
+    /**
+     * @test
+     */
+    public function itGeneratesArrayValidationRules()
+    {
+        $documentAST = ASTBuilder::generate('
+        type Mutation {
+            createUser(emailList: [String] @rules(apply: ["required", "email"])): String
+        }
+        ');
+
+        list($rules, $messages) = RuleFactory::build(
+            'createUser',
+            'Mutation',
+            [],
+            $documentAST
+        );
+
+        $this->assertSame(
+            [
+                'emailList.*' => ['required', 'email'],
+            ],
+            $rules
+        );
 
         $this->assertSame([], $messages);
     }
@@ -61,10 +198,13 @@ class RuleFactoryTest extends TestCase
             $documentAST
         );
 
-        $this->assertEquals([
-            'input' => ['required'],
-            'input.email' => ['required', 'email'],
-        ], $rules);
+        $this->assertEquals(
+            [
+                'input' => ['required'],
+                'input.email' => ['required', 'email'],
+            ],
+            $rules
+        );
 
         $this->assertSame([], $messages);
     }
@@ -141,7 +281,7 @@ class RuleFactoryTest extends TestCase
         
         input UserInput {
             email: String @rules(apply: ["required", "email"])
-            address: [AddressInput] @rules(apply: ["required"])
+            address: [AddressInput] @rulesForArray(apply: ["required"])
         }
         
         type Mutation {
@@ -152,7 +292,7 @@ class RuleFactoryTest extends TestCase
         $variables = [
             'input' => [
                 'address' => [
-                    'street' => 'bar',
+                    ['street' => 'bar'],
                 ],
             ],
         ];
@@ -168,12 +308,12 @@ class RuleFactoryTest extends TestCase
             'input' => ['required'],
             'input.email' => ['required', 'email'],
             'input.address' => ['required'],
-            'input.address.*.street' => ['required'],
-            'input.address.*.primary' => ['required'],
+            'input.address.0.street' => ['required'],
+            'input.address.0.primary' => ['required'],
         ], $rules);
 
         $this->assertSame([
-            'input.address.*.primary.required' => 'foobar',
+            'input.address.0.primary.required' => 'foobar',
         ], $messages);
     }
 
@@ -196,7 +336,7 @@ class RuleFactoryTest extends TestCase
         
         input UserInput {
             email: String @rules(apply: ["required", "email"])
-            settings: [Setting] @rules(apply: ["required"])
+            settings: [Setting] @rulesForArray(apply: ["required"])
         }
         
         type Mutation {
@@ -230,15 +370,15 @@ class RuleFactoryTest extends TestCase
             'input' => ['required'],
             'input.email' => ['required', 'email'],
             'input.settings' => ['required'],
-            'input.settings.*.option' => ['required'],
-            'input.settings.*.value' => ['required'],
-            'input.settings.*.setting.option' => ['required'],
-            'input.settings.*.setting.value' => ['required'],
+            'input.settings.0.option' => ['required'],
+            'input.settings.0.value' => ['required'],
+            'input.settings.0.setting.option' => ['required'],
+            'input.settings.0.setting.value' => ['required'],
         ], $rules);
 
         $this->assertEquals([
-            'input.settings.*.value.required' => 'foobar',
-            'input.settings.*.setting.value.required' => 'foobar',
+            'input.settings.0.value.required' => 'foobar',
+            'input.settings.0.setting.value.required' => 'foobar',
         ], $messages);
     }
 
@@ -262,40 +402,6 @@ class RuleFactoryTest extends TestCase
 
         $this->assertSame([
             'required' => ['required'],
-        ], $rules);
-    }
-
-    /**
-     * @test
-     */
-    public function itAlwaysGeneratesRulesForRequiredNestedInputs()
-    {
-        $documentAST = ASTBuilder::generate('
-        input FooInput {
-            required: String @rules(apply: ["required"])
-        }
-        
-        type Mutation {
-            createFoo(
-                requiredSDL: FooInput!
-                requiredRules: FooInput @rules(apply: ["required"])
-                requiredBoth: FooInput! @rules(apply: ["required"])
-            ): String
-        }
-        ');
-
-        list($rules, $messages) = RuleFactory::build(
-            'createFoo',
-            'Mutation',
-            [],
-            $documentAST
-        );
-
-        $this->assertEquals([
-            'requiredRules' => ['required'],
-            'requiredSDL.required' => ['required'],
-            'requiredBoth' => ['required'],
-            'requiredBoth.required' => ['required'],
         ], $rules);
     }
 
@@ -385,5 +491,55 @@ class RuleFactoryTest extends TestCase
         );
 
         $this->assertSame($mutationRules, $queryRules);
+    }
+
+    public function itGeneratesIndividualRulesForDifferentPaths()
+    {
+        $documentAST = ASTBuilder::generate('
+        input FooInput {
+            self: FooInput
+            required: String @rules(
+                apply: ["required"]
+                messages: {
+                    required: "foobar"
+                }
+            )
+        }
+        
+        type Mutation {
+            createFoo(input: [FooInput] @rulesForArray(apply: ["required"])): String
+        }
+        ');
+
+        $variables = [
+            'input' => [
+                [
+                    'required' => 'foobar',
+                ],
+                [
+                    'self' => [
+                        'required' => 'barbaz',
+                    ],
+                ],
+            ],
+        ];
+
+        list($rules, $messages) = RuleFactory::build(
+            'createFoo',
+            'Mutation',
+            $variables,
+            $documentAST
+        );
+
+        $this->assertEquals([
+            'input' => ['required'],
+            'input.0.required' => ['required'],
+            'input.1.self.required' => ['required'],
+        ], $rules);
+
+        $this->assertEquals([
+            'input.0.required.required' => 'foobar',
+            'input.1.self.required.required' => 'foobar',
+        ], $messages);
     }
 }

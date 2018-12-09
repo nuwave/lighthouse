@@ -19,13 +19,16 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
  */
 class NamespaceDirective implements Directive
 {
+    /** @var string todo remove as soon as name() is static itself */
+    const NAME = 'namespace';
+
     /**
      * Name of the directive.
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
-        return 'namespace';
+        return self::NAME;
     }
 }

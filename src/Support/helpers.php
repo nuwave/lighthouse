@@ -1,7 +1,6 @@
 <?php
 
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 if (! function_exists('graphql')) {
     /**
@@ -24,32 +23,6 @@ if (! function_exists('auth')) {
     function auth()
     {
         return resolve('auth');
-    }
-}
-
-if (! function_exists('schema')) {
-    /**
-     * Get instance of schema container.
-     *
-     * @return \Nuwave\Lighthouse\Schema\TypeRegistry
-     * @deprecated Use resolve(TypeRegistry::class) directly in the future
-     */
-    function schema()
-    {
-        return resolve(TypeRegistry::class);
-    }
-}
-
-if (! function_exists('directives')) {
-    /**
-     * Get instance of directives container.
-     *
-     * @return \Nuwave\Lighthouse\Schema\DirectiveRegistry
-     * @deprecated Use resolve(DirectiveRegistry::class) directly in the future
-     */
-    function directives()
-    {
-        return resolve(DirectiveRegistry::class);
     }
 }
 
@@ -124,5 +97,30 @@ if (! function_exists('namespace_classname')) {
         }
         
         return false;
+    }
+}
+
+if (! function_exists('construct_resolver')) {
+    /**
+     * Construct a closure that passes through the arguments.
+     *
+     * @param string $className This class is resolved through the container.
+     * @param string $methodName The method that gets passed the arguments of the closure.
+     *
+     * @throws DefinitionException
+     *
+     * @return \Closure
+     */
+    function construct_resolver(string $className, string $methodName): \Closure
+    {
+        if (!method_exists($className, $methodName)) {
+            throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
+        }
+
+        // TODO convert this back once we require PHP 7.1
+        // return \Closure::fromCallable([resolve($className), $methodName]);
+        return function () use ($className, $methodName) {
+            return resolve($className)->{$methodName}(...func_get_args());
+        };
     }
 }

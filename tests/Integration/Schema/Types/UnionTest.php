@@ -52,7 +52,7 @@ class UnionTest extends DBTestCase
 
         $prefix = $withCustomTypeResolver ? 'Custom' : '';
         $customResolver = $withCustomTypeResolver
-            ? '@union(resolver: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
+            ? '@union(resolveType: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
             : '';
 
         return [

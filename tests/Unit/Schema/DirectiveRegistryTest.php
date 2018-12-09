@@ -19,7 +19,7 @@ class DirectiveRegistryTest extends TestCase
     /** @var DirectiveRegistry */
     protected $directiveRegistry;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -64,7 +64,7 @@ class DirectiveRegistryTest extends TestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->buildSchemaWithDefaultQuery('
+        $this->buildSchemaWithPlaceholderQuery('
             scalar DateTime @scalar @foo
         ');
     }

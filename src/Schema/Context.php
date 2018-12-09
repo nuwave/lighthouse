@@ -3,23 +3,22 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Authenticatable as User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class Context
+class Context implements GraphQLContext
 {
     /**
-     * Http request.
+     * An instance of the incoming HTTP request.
      *
      * @var Request
      */
     public $request;
 
     /**
-     * Authenticated user.
+     * An instance of the currently authenticated user.
      *
-     * May be null since some fields may be accessible without authentication.
-     *
-     * @var User|null
+     * @var Authenticatable|null
      */
     public $user;
 
@@ -27,11 +26,32 @@ class Context
      * Create new context.
      *
      * @param Request $request
-     * @param User|null $user
      */
-    public function __construct(Request $request, User $user = null)
+    public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->user = $user;
+        $this->user = $request->user();
+    }
+
+    /**
+     * Get instance of authenticated user.
+     *
+     * May be null since some fields may be accessible without authentication.
+     *
+     * @return Authenticatable|null
+     */
+    public function user()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Get instance of request.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
     }
 }

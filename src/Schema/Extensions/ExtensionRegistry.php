@@ -3,17 +3,25 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Illuminate\Support\Collection;
+use GraphQL\Executor\ExecutionResult;
+use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class ExtensionRegistry implements \JsonSerializable
 {
-    /**
-     * @var Collection|GraphQLExtension[]
-     */
+    /** @var Pipeline */
+    protected $pipeline;
+
+    /** @var Collection|GraphQLExtension[] */
     protected $extensions;
 
-    public function __construct()
+    /**
+     * @param Pipeline $pipeline
+     */
+    public function __construct(Pipeline $pipeline)
     {
+        $this->pipeline = $pipeline;
+
         $this->extensions = collect(
             config('lighthouse.extensions', [])
         )->mapWithKeys(function (string $extension) {
@@ -64,7 +72,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did start.
      *
-     * @param int index
+     * @param int $index
      *
      * @return ExtensionRegistry
      */
@@ -80,17 +88,39 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did end.
      *
-     * @param int $index
+     * @param ExecutionResult $result
+     * @param int             $index
      *
      * @return ExtensionRegistry
      */
-    public function batchedQueryDidEnd($index)
+    public function batchedQueryDidEnd(ExecutionResult $result, $index)
     {
-        $this->extensions->each(function (GraphQLExtension $extension) use ($index) {
-            $extension->batchedQueryDidEnd($index);
-        });
+        $this->extensions->each(
+            function (GraphQLExtension $extension) use ($result, $index) {
+                $extension->batchedQueryDidEnd($result, $index);
+            }
+        );
 
         return $this;
+    }
+
+    /**
+     * Notify all registered extensions that the
+     * response will be sent.
+     *
+     * @param array $response
+     *
+     * @return array
+     */
+    public function willSendResponse(array $response)
+    {
+        return $this->pipeline
+            ->send($response)
+            ->through($this->extensions)
+            ->via('willSendResponse')
+            ->then(function (array $response) {
+                return $response;
+            });
     }
 
     /**
@@ -118,6 +148,8 @@ class ExtensionRegistry implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return $this->extensions->jsonSerialize();
+        return collect($this->extensions->jsonSerialize())->reject(function ($output) {
+            return empty($output);
+        })->toArray();
     }
 }

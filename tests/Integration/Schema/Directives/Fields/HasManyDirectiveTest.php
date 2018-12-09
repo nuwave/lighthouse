@@ -38,7 +38,7 @@ class HasManyDirectiveTest extends DBTestCase
         factory(Task::class)->create([
             'user_id' => $this->user->getKey(),
             // This task should be ignored via global scope on the Task model
-            'name' => 'cleaning'
+            'name' => 'cleaning',
         ]);
 
         $this->be($this->user);
@@ -113,7 +113,6 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-
         $this->assertCount(2, array_get($result->data, 'user.tasks'));
     }
 
@@ -164,6 +163,46 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertCount(2, array_get($result->data, 'user.tasks.data'));
     }
 
+    /** @test */
+    public function itCanQueryHasManyPaginatorWithADefaultCount()
+    {
+        $schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "paginator", defaultCount: 2)
+        }
+        
+        type Task {
+            id: Int!
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->executeQuery($schema, '
+        {
+            user {
+                tasks {
+                    paginatorInfo {
+                        total
+                        count
+                        hasMorePages
+                    }
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertEquals(3, array_get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertTrue(array_get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.data'));
+    }
+
     /**
      * @test
      */
@@ -187,6 +226,46 @@ class HasManyDirectiveTest extends DBTestCase
         {
             user {
                 tasks(first: 2) {
+                    pageInfo {
+                        hasNextPage
+                    }
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryHasManyRelayConnectionWithADefaultCount()
+    {
+        $schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "relay", defaultCount: 2)
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->executeQuery($schema, '
+        {
+            user {
+                tasks {
                     pageInfo {
                         hasNextPage
                     }
@@ -317,7 +396,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $schema = $this->buildSchemaWithDefaultQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             tasks(first: Int! after: Int): [Task!]! @hasMany(type:"foo")
         }

@@ -33,10 +33,16 @@ return [
     | Additional configuration for the route group.
     | Check options here https://lumen.laravel.com/docs/routing#route-groups
     |
+    | Beware that middleware defined here runs before the GraphQL execution phase.
+    | This means that errors will cause the whole query to abort and return a
+    | response that is not spec-compliant. It is preferable to use directives
+    | to add middleware to single fields in the schema.
+    | Read more about this in the docs https://lighthouse-php.netlify.com/docs/auth.html#apply-auth-middleware
+    |
     */
     'route' => [
         'prefix' => '',
-        // 'middleware' => ['web','api'],    // [ 'loghttp']
+        // 'middleware' => ['loghttp']
     ],
 
     /*
@@ -50,7 +56,7 @@ return [
     |
     */
     'schema' => [
-        'register' => base_path('routes/graphql/schema.graphql'),
+        'register' => base_path('graphql/schema.graphql'),
     ],
 
     /*
@@ -76,7 +82,7 @@ return [
     | List directories that will be scanned for custom server-side directives.
     |
     */
-    'directives' => [__DIR__.'/../app/Http/GraphQL/Directives'],
+    'directives' => [__DIR__.'/../app/GraphQL/Directives'],
 
     /*
     |--------------------------------------------------------------------------
@@ -88,12 +94,12 @@ return [
     |
     */
     'namespaces' => [
-        'models' => 'App\\Models',
-        'mutations' => 'App\\Http\\GraphQL\\Mutations',
-        'queries' => 'App\\Http\\GraphQL\\Queries',
-        'scalars' => 'App\\Http\\GraphQL\\Scalars',
-        'unions' => 'App\\Http\\GraphQL\\Unions',
-        'interfaces' => 'App\\Http\\GraphQL\\Interfaces',
+        'models' => 'App',
+        'queries' => 'App\\GraphQL\\Queries',
+        'mutations' => 'App\\GraphQL\\Mutations',
+        'interfaces' => 'App\\GraphQL\\Interfaces',
+        'unions' => 'App\\GraphQL\\Unions',
+        'scalars' => 'App\\GraphQL\\Scalars',
     ],
 
     /*
@@ -149,14 +155,14 @@ return [
         // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class
     ],
 
-     /*
-     |--------------------------------------------------------------------------
-     | GraphQL Controller
-     |--------------------------------------------------------------------------
-     |
-     | Specify which controller (and method) you want to handle GraphQL requests.
-     |
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | GraphQL Controller
+    |--------------------------------------------------------------------------
+    |
+    | Specify which controller (and method) you want to handle GraphQL requests.
+    |
+    */
     'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
 
     /*

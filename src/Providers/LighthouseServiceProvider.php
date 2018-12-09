@@ -8,13 +8,17 @@ use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
-use Nuwave\Lighthouse\Schema\MiddlewareRegistry;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
+use Nuwave\Lighthouse\Support\Http\Responses\Response;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -27,8 +31,11 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('lighthouse.php'),
+        ], 'config');
+
+        $this->publishes([
             __DIR__.'/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
-        ]);
+        ], 'schema');
 
         if (config('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
@@ -61,12 +68,13 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
 
-        $this->app->singleton(ValueFactory::class);
         $this->app->singleton(DirectiveRegistry::class);
         $this->app->singleton(ExtensionRegistry::class);
         $this->app->singleton(NodeRegistry::class);
-        $this->app->singleton(MiddlewareRegistry::class);
         $this->app->singleton(TypeRegistry::class);
+        $this->app->singleton(CreatesContext::class, ContextFactory::class);
+        $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
+        $this->app->singleton(GraphQLResponse::class, Response::class);
 
         $this->app->singleton(
             SchemaSourceProvider::class,
@@ -77,12 +85,14 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
+                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
+                \Nuwave\Lighthouse\Console\MutationCommand::class,
+                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
+                \Nuwave\Lighthouse\Console\QueryCommand::class,
                 \Nuwave\Lighthouse\Console\UnionCommand::class,
                 \Nuwave\Lighthouse\Console\ScalarCommand::class,
-                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
                 \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
             ]);
         }
     }
