@@ -4,8 +4,8 @@ namespace Tests;
 
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use Tests\Utils\Middleware\CountRuns;
 use GraphQL\Executor\ExecutionResult;
+use Tests\Utils\Middleware\CountRuns;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
