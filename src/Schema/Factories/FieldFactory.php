@@ -63,7 +63,7 @@ class FieldFactory
         // if there are no arguments defined for the field
         if ($inputValueDefinitions->isNotEmpty()) {
             $resolver = $this->wrapResolverByTransformingArgs($resolver, $inputValueDefinitions);
-            $resolver = $this->wrapResolverWithValidation($resolver, $inputValueDefinitions);
+            $resolver = $this->wrapResolverWithValidation($resolver);
         }
 
         $fieldValue->setResolver($resolver);
@@ -169,13 +169,12 @@ class FieldFactory
      * deeply nested input values and we can not generate the rules upfront.
      *
      * @param \Closure          $resolver
-     * @param Collection<array> $inputValueDefinitions
      *
      * @return \Closure
      */
-    protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
+    protected function wrapResolverWithValidation(\Closure $resolver): \Closure
     {
-        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
+        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver) {
             list($rules, $messages) = RuleFactory::build(
                 $resolveInfo->fieldName,
                 $resolveInfo->parentType->name,
