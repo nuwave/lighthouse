@@ -218,8 +218,8 @@ class GraphQL
             event(
                 new BuildingAST($schemaString)
             )
-        )->implode("\n");
+        )->implode(PHP_EOL);
 
-        return ASTBuilder::generate($schemaString."\n".$additionalSchemas);
+        return ASTBuilder::generate($schemaString.PHP_EOL.$additionalSchemas);
     }
 }
