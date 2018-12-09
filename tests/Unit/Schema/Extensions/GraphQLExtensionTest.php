@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 

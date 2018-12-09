@@ -1,7 +1,5 @@
 <?php
 
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 if (! function_exists('graphql')) {

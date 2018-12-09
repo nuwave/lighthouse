@@ -3,13 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Carbon\Carbon;
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class TracingExtension extends GraphQLExtension
 {

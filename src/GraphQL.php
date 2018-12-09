@@ -10,17 +10,13 @@ use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
