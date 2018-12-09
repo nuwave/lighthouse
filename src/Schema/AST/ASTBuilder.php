@@ -41,9 +41,7 @@ class ASTBuilder
         $document = self::addPaginationInfoTypes($document);
         $document = self::addNodeSupport($document);
 
-        $document = resolve(ExtensionRegistry::class)->manipulate($document);
-
-        return $document;
+        return resolve(ExtensionRegistry::class)->manipulate($document);
     }
 
     /**
