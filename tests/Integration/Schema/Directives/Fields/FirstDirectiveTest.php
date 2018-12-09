@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -32,7 +33,7 @@ class FirstDirectiveTest extends DBTestCase
         }
         ";
         $result = $this->execute($schema, $query);
-        $this->assertSame('B', \Illuminate\Support\Arr::get($result, 'data.user.name'));
+        $this->assertSame('B', Arr::get($result, 'data.user.name'));
     }
 
     /** @test */

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives\Args;
 
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class RulesDirectiveTest extends TestCase
@@ -67,13 +68,13 @@ class RulesDirectiveTest extends TestCase
 
         $result = $this->executeWithoutDebug($this->schema(), $query);
 
-        $this->assertSame('John', \Illuminate\Support\Arr::get($result, 'data.foo.first_name'));
-        $this->assertSame('Doe', \Illuminate\Support\Arr::get($result, 'data.foo.last_name'));
+        $this->assertSame('John', Arr::get($result, 'data.foo.first_name'));
+        $this->assertSame('Doe', Arr::get($result, 'data.foo.last_name'));
 
-        $this->assertNull(\Illuminate\Support\Arr::get($result, 'data.foo.full_name'));
-        $this->assertCount(1, \Illuminate\Support\Arr::get($result, 'errors'));
-        $this->assertSame('Validation failed for the field [foo.full_name]', \Illuminate\Support\Arr::get($result, 'errors.0.message'));
-        $this->assertSame(['formatted' => ['foobar']], \Illuminate\Support\Arr::get($result, 'errors.0.extensions.validation'));
+        $this->assertNull(Arr::get($result, 'data.foo.full_name'));
+        $this->assertCount(1, Arr::get($result, 'errors'));
+        $this->assertSame('Validation failed for the field [foo.full_name]', Arr::get($result, 'errors.0.message'));
+        $this->assertSame(['formatted' => ['foobar']], Arr::get($result, 'errors.0.extensions.validation'));
 
         $mutation = '
         mutation {
@@ -105,8 +106,8 @@ class RulesDirectiveTest extends TestCase
         ';
 
         $result = $this->executeWithoutDebug($this->schema(), $mutation);
-        $this->assertNull(\Illuminate\Support\Arr::get($result, 'data.foo'));
-        $this->assertCount(1, \Illuminate\Support\Arr::get($result, 'errors'));
+        $this->assertNull(Arr::get($result, 'data.foo'));
+        $this->assertCount(1, Arr::get($result, 'errors'));
 
         $query = '
         {
@@ -138,10 +139,10 @@ class RulesDirectiveTest extends TestCase
         ';
 
         $result = $this->executeWithoutDebug($this->schema(), $mutation);
-        $this->assertSame('John', \Illuminate\Support\Arr::get($result, 'data.foo.first_name'));
-        $this->assertSame('Doe', \Illuminate\Support\Arr::get($result, 'data.foo.last_name'));
-        $this->assertNull(\Illuminate\Support\Arr::get($result, 'data.foo.full_name'));
-        $this->assertCount(1, \Illuminate\Support\Arr::get($result, 'errors'));
+        $this->assertSame('John', Arr::get($result, 'data.foo.first_name'));
+        $this->assertSame('Doe', Arr::get($result, 'data.foo.last_name'));
+        $this->assertNull(Arr::get($result, 'data.foo.full_name'));
+        $this->assertCount(1, Arr::get($result, 'errors'));
 
         $query = '
         {
@@ -186,12 +187,12 @@ class RulesDirectiveTest extends TestCase
 
         $queryResult = $this->executeWithoutDebug($this->schema(), $query);
 
-        $this->assertSame('John', \Illuminate\Support\Arr::get($queryResult, 'data.foo.first_name'));
+        $this->assertSame('John', Arr::get($queryResult, 'data.foo.first_name'));
         $this->assertEquals([
             'input.email' => ['Not an email'],
             'input.self.email' => ['Not an email'],
             'input.self.self.self.email' => ['The input.self.self.self.email may not be greater than 20 characters.'],
-        ], \Illuminate\Support\Arr::get($queryResult, 'errors.0.extensions.validation'));
+        ], Arr::get($queryResult, 'errors.0.extensions.validation'));
     }
 
     public function resolve()

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
@@ -36,8 +37,8 @@ SCHEMA;
         }
         ');
 
-        $this->assertArrayHasKey('tracing', \Illuminate\Support\Arr::get($result, 'extensions'));
-        $this->assertArrayHasKey('resolvers', \Illuminate\Support\Arr::get($result, 'extensions.tracing.execution'));
+        $this->assertArrayHasKey('tracing', Arr::get($result, 'extensions'));
+        $this->assertArrayHasKey('resolvers', Arr::get($result, 'extensions.tracing.execution'));
     }
 
     /**
@@ -53,24 +54,24 @@ SCHEMA;
         $result = $this->postJson('graphql', $json)->json();
 
         $this->assertCount(2, $result);
-        $this->assertArrayHasKey('tracing', \Illuminate\Support\Arr::get($result[0], 'extensions'));
-        $this->assertArrayHasKey('resolvers', \Illuminate\Support\Arr::get($result[0], 'extensions.tracing.execution'));
+        $this->assertArrayHasKey('tracing', Arr::get($result[0], 'extensions'));
+        $this->assertArrayHasKey('resolvers', Arr::get($result[0], 'extensions.tracing.execution'));
 
-        $this->assertArrayHasKey('tracing', \Illuminate\Support\Arr::get($result[1], 'extensions'));
-        $this->assertArrayHasKey('resolvers', \Illuminate\Support\Arr::get($result[1], 'extensions.tracing.execution'));
+        $this->assertArrayHasKey('tracing', Arr::get($result[1], 'extensions'));
+        $this->assertArrayHasKey('resolvers', Arr::get($result[1], 'extensions.tracing.execution'));
 
         $this->assertEquals(
-            \Illuminate\Support\Arr::get($result[0], 'extensions.tracing.startTime'),
-            \Illuminate\Support\Arr::get($result[1], 'extensions.tracing.startTime')
+            Arr::get($result[0], 'extensions.tracing.startTime'),
+            Arr::get($result[1], 'extensions.tracing.startTime')
         );
 
         $this->assertNotEquals(
-            \Illuminate\Support\Arr::get($result[0], 'extensions.tracing.endTime'),
-            \Illuminate\Support\Arr::get($result[1], 'extensions.tracing.endTime')
+            Arr::get($result[0], 'extensions.tracing.endTime'),
+            Arr::get($result[1], 'extensions.tracing.endTime')
         );
 
-        $this->assertCount(1, \Illuminate\Support\Arr::get($result[0], 'extensions.tracing.execution.resolvers'));
-        $this->assertCount(1, \Illuminate\Support\Arr::get($result[1], 'extensions.tracing.execution.resolvers'));
+        $this->assertCount(1, Arr::get($result[0], 'extensions.tracing.execution.resolvers'));
+        $this->assertCount(1, Arr::get($result[1], 'extensions.tracing.execution.resolvers'));
     }
 
     public function resolve()

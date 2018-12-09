@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -78,7 +79,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertSame(4, $tasksWithoutGlobalScope);
 
         // Ensure global scopes are respected here
-        $this->assertCount(3, \Illuminate\Support\Arr::get($result->data, 'user.tasks'));
+        $this->assertCount(3, Arr::get($result->data, 'user.tasks'));
     }
 
     /**
@@ -113,7 +114,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks'));
+        $this->assertCount(2, Arr::get($result->data, 'user.tasks'));
     }
 
     /**
@@ -157,10 +158,10 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertEquals(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertEquals(3, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
-        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.data'));
+        $this->assertEquals(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertEquals(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertTrue(Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, Arr::get($result->data, 'user.tasks.data'));
     }
 
     /** @test */
@@ -197,10 +198,10 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertEquals(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertEquals(3, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
-        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.data'));
+        $this->assertEquals(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertEquals(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertTrue(Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, Arr::get($result->data, 'user.tasks.data'));
     }
 
     /**
@@ -239,8 +240,8 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges'));
+        $this->assertTrue(Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges'));
     }
 
     /**
@@ -279,8 +280,8 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges'));
+        $this->assertTrue(Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges'));
     }
 
     /**
@@ -329,9 +330,9 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges'));
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
+        $this->assertTrue(Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges'));
+        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
     }
 
     /**

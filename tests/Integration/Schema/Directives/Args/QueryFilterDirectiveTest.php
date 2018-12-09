@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives\Args;
 
+use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -48,7 +49,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(1, \Illuminate\Support\Arr::get($result, 'data.users.data'));
+        $this->assertCount(1, Arr::get($result, 'data.users.data'));
     }
 
     /**
@@ -78,7 +79,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(4, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(4, Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -112,7 +113,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(2, Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -146,7 +147,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(3, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(3, Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -179,7 +180,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertCount(4, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(4, Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -215,7 +216,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->execute($schema, $query);
-        $this->assertCount(3, \Illuminate\Support\Arr::get($result, 'data.users.data'));
+        $this->assertCount(3, Arr::get($result, 'data.users.data'));
     }
 
     /**
@@ -260,7 +261,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(2, Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -305,7 +306,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(3, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(3, Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -347,7 +348,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(2, Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -378,6 +379,6 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(1, \Illuminate\Support\Arr::get($result->data, 'users.data'));
+        $this->assertCount(1, Arr::get($result->data, 'users.data'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Types;
 
+use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -23,9 +24,9 @@ class UnionTest extends DBTestCase
 
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result, 'data.stuff'));
-        $this->assertArrayHasKey('name', \Illuminate\Support\Arr::get($result, 'data.stuff.0'));
-        $this->assertArrayHasKey('title', \Illuminate\Support\Arr::get($result, 'data.stuff.1'));
+        $this->assertCount(2, Arr::get($result, 'data.stuff'));
+        $this->assertArrayHasKey('name', Arr::get($result, 'data.stuff.0'));
+        $this->assertArrayHasKey('title', Arr::get($result, 'data.stuff.1'));
     }
 
     public function fetchResults(): Collection

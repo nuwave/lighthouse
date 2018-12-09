@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Types;
 
+use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
@@ -49,11 +50,11 @@ class InterfaceTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(2, \Illuminate\Support\Arr::get($result, 'data.namedThings'));
-        $this->assertArrayHasKey('name', \Illuminate\Support\Arr::get($result, 'data.namedThings.0'));
-        $this->assertArrayHasKey('id', \Illuminate\Support\Arr::get($result, 'data.namedThings.0'));
-        $this->assertArrayHasKey('name', \Illuminate\Support\Arr::get($result, 'data.namedThings.1'));
-        $this->assertArrayNotHasKey('id', \Illuminate\Support\Arr::get($result, 'data.namedThings.1'));
+        $this->assertCount(2, Arr::get($result, 'data.namedThings'));
+        $this->assertArrayHasKey('name', Arr::get($result, 'data.namedThings.0'));
+        $this->assertArrayHasKey('id', Arr::get($result, 'data.namedThings.0'));
+        $this->assertArrayHasKey('name', Arr::get($result, 'data.namedThings.1'));
+        $this->assertArrayNotHasKey('id', Arr::get($result, 'data.namedThings.1'));
     }
 
     /**
@@ -129,7 +130,7 @@ class InterfaceTest extends DBTestCase
         }';
 
         $result = $this->execute($schema, $query);
-        $interface = collect(\Illuminate\Support\Arr::get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
+        $interface = collect(Arr::get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);
     }

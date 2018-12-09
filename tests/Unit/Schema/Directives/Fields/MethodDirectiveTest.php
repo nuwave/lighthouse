@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class MethodDirectiveTest extends TestCase
@@ -19,7 +20,7 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'data.foo.bar'));
+        $this->assertSame('foo', Arr::get($result, 'data.foo.bar'));
     }
 
     /**
@@ -35,7 +36,7 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame('fooasdf', \Illuminate\Support\Arr::get($result, 'data.foo.bar'));
+        $this->assertSame('fooasdf', Arr::get($result, 'data.foo.bar'));
     }
 
     public function resolve()
@@ -62,6 +63,6 @@ class MethodDirectiveTest extends TestCase
 class Foo {
     public function foobar(array $args = []): string
     {
-        return 'foo' . \Illuminate\Support\Arr::get($args, 'baz');
+        return 'foo' . Arr::get($args, 'baz');
     }
 }

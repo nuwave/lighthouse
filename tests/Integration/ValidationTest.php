@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;
 
@@ -159,7 +160,7 @@ class ValidationTest extends TestCase
 
     protected function assertValidationKeysSame(array $keys, array $result)
     {
-        $actual = \Illuminate\Support\Arr::get($result, 'errors.0.extensions.validation');
+        $actual = Arr::get($result, 'errors.0.extensions.validation');
 
         $this->assertSame($keys, array_keys($actual));
     }

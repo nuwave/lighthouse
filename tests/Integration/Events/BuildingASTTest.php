@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Events;
 
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Events\BuildingAST;
 
@@ -56,7 +57,7 @@ class BuildingASTTest extends TestCase
         }
         ';
         $resultForFoo = $this->execute($schema, $queryForBaseSchema);
-        $this->assertSame('foo', \Illuminate\Support\Arr::get($resultForFoo, 'data.foo'));
+        $this->assertSame('foo', Arr::get($resultForFoo, 'data.foo'));
 
         $queryForAdditionalSchema = '
         {
@@ -64,7 +65,7 @@ class BuildingASTTest extends TestCase
         }
         ';
         $resultForSayHello = $this->execute($schema, $queryForAdditionalSchema);
-        $this->assertSame('hello', \Illuminate\Support\Arr::get($resultForSayHello, 'data.sayHello'));
+        $this->assertSame('hello', Arr::get($resultForSayHello, 'data.sayHello'));
     }
 
     public function resolveSayHello(): string

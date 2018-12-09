@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 use Tests\Utils\Models\User;
 
@@ -34,6 +35,6 @@ class AuthDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('bar', \Illuminate\Support\Arr::get($result, 'data.user.foo'));
+        $this->assertSame('bar', Arr::get($result, 'data.user.foo'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -34,7 +35,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foobar', \Illuminate\Support\Arr::get($result, 'data.user.name'));
+        $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
         $this->assertSame('foobar', resolve('cache')->get('user:1:name'));
     }
 
@@ -64,7 +65,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foobar', \Illuminate\Support\Arr::get($result, 'data.user.name'));
+        $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
         $this->assertSame('foobar', resolve('cache')->get('user:foo@bar.com:name'));
     }
 
@@ -97,7 +98,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foobar', \Illuminate\Support\Arr::get($result, 'data.user.name'));
+        $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
         $this->assertSame('foobar', resolve('cache')->get($cacheKey));
     }
 
