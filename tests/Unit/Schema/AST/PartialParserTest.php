@@ -12,7 +12,10 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class PartialParserTest extends TestCase
 {
-    public function testParseObjectType()
+    /**
+     * @test
+     */
+    public function itParsesObjectType()
     {
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
@@ -24,7 +27,10 @@ class PartialParserTest extends TestCase
         );
     }
 
-    public function testThrowsForInvalidDefinition()
+    /**
+     * @test
+     */
+    public function itThrowsForInvalidDefinition()
     {
         $this->expectException(SyntaxError::class);
         PartialParser::objectTypeDefinition('
@@ -32,7 +38,10 @@ class PartialParserTest extends TestCase
         ');
     }
 
-    public function testThrowsIfMultipleDefinitionsAreGiven()
+    /**
+     * @test
+     */
+    public function itThrowsIfMultipleDefinitionsAreGiven()
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinition('
@@ -46,7 +55,10 @@ class PartialParserTest extends TestCase
         ');
     }
 
-    public function testThrowsIfDefinitionIsUnexpectedType()
+    /**
+     * @test
+     */
+    public function itThrowsIfDefinitionIsUnexpectedType()
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinition('
@@ -56,7 +68,10 @@ class PartialParserTest extends TestCase
         ');
     }
 
-    public function testParsesObjectTypesArray()
+    /**
+     * @test
+     */
+    public function itParsesObjectTypesArray()
     {
         $objectTypes = PartialParser::objectTypeDefinitions(['
         type Foo {
@@ -73,7 +88,10 @@ class PartialParserTest extends TestCase
         $this->assertInstanceOf(ObjectTypeDefinitionNode::class, $objectTypes[1]);
     }
 
-    public function testThrowsOnInvalidTypeInObjectTypesArray()
+    /**
+     * @test
+     */
+    public function itThrowsOnInvalidTypeInObjectTypesArray()
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinitions(['
@@ -87,7 +105,10 @@ class PartialParserTest extends TestCase
         ']);
     }
 
-    public function testThrowsOnMultipleDefinitionsInArrayItem()
+    /**
+     * @test
+     */
+    public function itThrowsOnMultipleDefinitionsInArrayItem()
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinitions(['
@@ -101,7 +122,10 @@ class PartialParserTest extends TestCase
         ']);
     }
 
-    public function testParseOperationDefinition()
+    /**
+     * @test
+     */
+    public function itParsesOperationDefinition()
     {
         $this->assertInstanceOf(
             OperationDefinitionNode::class,
@@ -113,7 +137,10 @@ class PartialParserTest extends TestCase
         );
     }
 
-    public function testParseArgument()
+    /**
+     * @test
+     */
+    public function itParsesArgument()
     {
         $argumentNode = PartialParser::argument('key: "value"');
 
