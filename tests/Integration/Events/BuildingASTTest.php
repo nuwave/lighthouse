@@ -15,7 +15,7 @@ class BuildingASTTest extends TestCase
     {
         $schema = $this->placeholderQuery();
 
-        resolve('events')->listen(
+        app('events')->listen(
             BuildingAST::class,
             function (BuildingAST $buildingAST) use ($schema){
                 $this->assertSame($schema, $buildingAST->userSchema);
@@ -30,7 +30,7 @@ class BuildingASTTest extends TestCase
      */
     public function itCanAddAdditionalSchemaThroughEvent()
     {
-        resolve('events')->listen(
+        app('events')->listen(
             BuildingAST::class,
             function (BuildingAST $buildingAST) {
                 $resolver = $this->getResolver('resolveSayHello');

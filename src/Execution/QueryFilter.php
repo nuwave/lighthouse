@@ -48,8 +48,8 @@ class QueryFilter
 
         // Get an existing instance or register a new one
         return app()->has($handler)
-            ? resolve($handler)
-            : app()->instance($handler, resolve(static::class));
+            ? app($handler)
+            : app()->instance($handler, app(static::class));
     }
 
     /**

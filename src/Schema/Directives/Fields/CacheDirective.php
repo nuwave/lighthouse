@@ -46,7 +46,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
         return $value->setResolver(function ($root, $args, $context, $info) use ($value, $resolver, $maxAge, $privateCache) {
             /** @var \Illuminate\Support\Facades\Cache $cache */
-            $cache = resolve('cache');
+            $cache = app('cache');
             $cacheValue = new CacheValue([
                 'field_value' => $value,
                 'root' => $root,
@@ -118,7 +118,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     protected function useTags(): bool
     {
         return config('lighthouse.cache.tags', false)
-            && method_exists(resolve('cache')->store(), 'tags');
+            && method_exists(app('cache')->store(), 'tags');
     }
 
     /**
