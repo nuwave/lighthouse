@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Types;
 
-use Illuminate\Support\Arr;
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use GraphQL\Type\Definition\Type;

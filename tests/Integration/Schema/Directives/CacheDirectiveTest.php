@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Arr;
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;

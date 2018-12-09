@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;

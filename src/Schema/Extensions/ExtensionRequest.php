@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ExtensionRequest

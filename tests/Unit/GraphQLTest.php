@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Arr;
 
 class GraphQLTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Queries\FooBar;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 

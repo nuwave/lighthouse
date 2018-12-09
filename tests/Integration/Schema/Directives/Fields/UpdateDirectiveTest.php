@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Illuminate\Support\Arr;
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;

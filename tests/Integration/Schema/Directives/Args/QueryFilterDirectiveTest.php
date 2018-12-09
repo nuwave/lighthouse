@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives\Args;
 
-use Illuminate\Support\Arr;
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 

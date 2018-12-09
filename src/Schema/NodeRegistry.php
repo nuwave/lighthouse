@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Error\Error;
+use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Support\Arr;
 
 class NodeRegistry
 {

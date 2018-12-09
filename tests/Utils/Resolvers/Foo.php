@@ -2,8 +2,8 @@
 
 namespace Tests\Utils\Resolvers;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\ResolveInfo;
 
 class Foo
 {

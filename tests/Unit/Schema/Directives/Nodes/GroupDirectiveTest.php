@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Nodes;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Middleware\Authenticate;
 
 class GroupDirectiveTest extends TestCase

@@ -2,8 +2,8 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Queries\Foo;
 
 class ValidationTest extends TestCase

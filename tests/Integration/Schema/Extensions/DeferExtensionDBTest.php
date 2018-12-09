@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Extensions;
 
-use Illuminate\Support\Arr;
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;

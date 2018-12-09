@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Events;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildingAST;
 
 class BuildingASTTest extends TestCase

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Args;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 
 class RulesDirectiveTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives\Fields;
 
-use Illuminate\Support\Arr;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Illuminate\Routing\Router;
 use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Middleware\Authenticate;
