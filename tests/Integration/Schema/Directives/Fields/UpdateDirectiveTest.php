@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Category;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -43,8 +44,8 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', array_get($result, 'data.updateCompany.name'));
+        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
+        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
     }
 
@@ -85,8 +86,8 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', array_get($result, 'data.updateCompany.name'));
+        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
+        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
     }
 
@@ -139,9 +140,9 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.updateTask.id'));
-        $this->assertSame('foo', array_get($result, 'data.updateTask.name'));
-        $this->assertSame('2', array_get($result, 'data.updateTask.user.id'));
+        $this->assertSame('1', Arr::get($result, 'data.updateTask.id'));
+        $this->assertSame('foo', Arr::get($result, 'data.updateTask.name'));
+        $this->assertSame('2', Arr::get($result, 'data.updateTask.user.id'));
 
         $task = Task::first();
         $this->assertSame('2', $task->user_id);
@@ -181,8 +182,8 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.updateCategory.category_id'));
-        $this->assertSame('bar', array_get($result, 'data.updateCategory.name'));
+        $this->assertSame('1', Arr::get($result, 'data.updateCategory.category_id'));
+        $this->assertSame('bar', Arr::get($result, 'data.updateCategory.name'));
         $this->assertSame('bar', Category::first()->name);
     }
 }

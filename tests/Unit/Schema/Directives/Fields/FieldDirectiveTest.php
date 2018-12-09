@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Queries\FooBar;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
@@ -25,7 +26,7 @@ class FieldDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo.bar', array_get($result, 'data.bar'));
+        $this->assertSame('foo.bar', Arr::get($result, 'data.bar'));
     }
 
     /**
@@ -45,7 +46,7 @@ class FieldDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo.baz', array_get($result, 'data.bar'));
+        $this->assertSame('foo.baz', Arr::get($result, 'data.bar'));
     }
 
     /**
@@ -65,7 +66,7 @@ class FieldDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame(FooBar::CUSTOM_RESOLVE_RESULT, array_get($result, 'data.bar'));
+        $this->assertSame(FooBar::CUSTOM_RESOLVE_RESULT, Arr::get($result, 'data.bar'));
     }
 
     /**

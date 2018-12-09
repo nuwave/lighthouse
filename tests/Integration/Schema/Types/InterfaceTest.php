@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Types;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use GraphQL\Type\Definition\Type;
@@ -49,11 +50,11 @@ class InterfaceTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(2, array_get($result, 'data.namedThings'));
-        $this->assertArrayHasKey('name', array_get($result, 'data.namedThings.0'));
-        $this->assertArrayHasKey('id', array_get($result, 'data.namedThings.0'));
-        $this->assertArrayHasKey('name', array_get($result, 'data.namedThings.1'));
-        $this->assertArrayNotHasKey('id', array_get($result, 'data.namedThings.1'));
+        $this->assertCount(2, Arr::get($result, 'data.namedThings'));
+        $this->assertArrayHasKey('name', Arr::get($result, 'data.namedThings.0'));
+        $this->assertArrayHasKey('id', Arr::get($result, 'data.namedThings.0'));
+        $this->assertArrayHasKey('name', Arr::get($result, 'data.namedThings.1'));
+        $this->assertArrayNotHasKey('id', Arr::get($result, 'data.namedThings.1'));
     }
 
     /**
@@ -129,7 +130,7 @@ class InterfaceTest extends DBTestCase
         }';
 
         $result = $this->execute($schema, $query);
-        $interface = collect(array_get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
+        $interface = collect(Arr::get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);
     }
@@ -144,7 +145,7 @@ class InterfaceTest extends DBTestCase
 
     public function resolveType(): Type
     {
-        return resolve(TypeRegistry::class)->get('Guy');
+        return app(TypeRegistry::class)->get('Guy');
     }
 
     public function fetchGuy(): array

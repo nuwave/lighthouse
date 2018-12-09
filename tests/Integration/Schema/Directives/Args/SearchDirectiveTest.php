@@ -20,6 +20,7 @@ class SearchDirectiveTest extends DBTestCase
     protected function setUp()
     {
         parent::setUp();
+
         $this->engineManager = Mockery::mock();
         $this->engine = Mockery::mock(NullEngine::class)->makePartial();
 

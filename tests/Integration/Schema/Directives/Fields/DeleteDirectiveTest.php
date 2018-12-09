@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
@@ -31,7 +32,7 @@ class DeleteDirectiveTest extends DBTestCase
         ";
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals(1, array_get($result, 'data.deleteUser.id'));
+        $this->assertEquals(1, Arr::get($result, 'data.deleteUser.id'));
         $this->assertCount(0, User::all());
     }
 
@@ -59,7 +60,7 @@ class DeleteDirectiveTest extends DBTestCase
         ";
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(2, array_get($result, 'data.deleteUsers'));
+        $this->assertCount(2, Arr::get($result, 'data.deleteUsers'));
         $this->assertCount(0, User::all());
     }
 

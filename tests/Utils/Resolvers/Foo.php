@@ -2,6 +2,7 @@
 
 namespace Tests\Utils\Resolvers;
 
+use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class Foo
@@ -13,6 +14,6 @@ class Foo
 
     public function baz($root, array $args, $context = null, ResolveInfo $info = null)
     {
-        return array_get($args, 'directive.0');
+        return Arr::get($args, 'directive.0');
     }
 }

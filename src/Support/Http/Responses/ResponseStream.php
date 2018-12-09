@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
@@ -25,7 +26,7 @@ class ResponseStream extends Stream implements CanStreamResponse
             $lastKey = $paths->count() - 1;
             $paths->map(function ($path, $i) use ($data, $final, $lastKey) {
                 $terminating = $final && ($i == $lastKey);
-                $chunk['data'] = array_get($data, "data.{$path}");
+                $chunk['data'] = Arr::get($data, "data.{$path}");
                 $chunk['path'] = collect(explode('.', $path))->map(function ($partial) {
                     return is_numeric($partial) ? intval($partial) : $partial;
                 })->toArray();
