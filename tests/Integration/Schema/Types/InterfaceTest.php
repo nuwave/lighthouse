@@ -144,7 +144,7 @@ class InterfaceTest extends DBTestCase
 
     public function resolveType(): Type
     {
-        return resolve(TypeRegistry::class)->get('Guy');
+        return app(TypeRegistry::class)->get('Guy');
     }
 
     public function fetchGuy(): array

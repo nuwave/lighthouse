@@ -13,27 +13,27 @@ class BuildingASTTest extends TestCase
     public function itInjectsSourceSchemaIntoEvent()
     {
         $schema = $this->placeholderQuery();
-        
-        resolve('events')->listen(
+
+        app('events')->listen(
             BuildingAST::class,
             function (BuildingAST $buildingAST) use ($schema){
                 $this->assertSame($schema, $buildingAST->userSchema);
             }
         );
-    
+
         $this->buildSchema($schema);
     }
-    
+
     /**
      * @test
      */
     public function itCanAddAdditionalSchemaThroughEvent()
     {
-        resolve('events')->listen(
+        app('events')->listen(
             BuildingAST::class,
             function (BuildingAST $buildingAST) {
                 $resolver = $this->getResolver('resolveSayHello');
-            
+
                 return "
                 extend type Query {
                     sayHello: String @field(resolver: \"$resolver\")
@@ -41,7 +41,7 @@ class BuildingASTTest extends TestCase
                 ";
             }
         );
-        
+
         $resolver = $this->getResolver('resolveFoo');
 
         $schema = "
@@ -57,7 +57,7 @@ class BuildingASTTest extends TestCase
         ';
         $resultForFoo = $this->execute($schema, $queryForBaseSchema);
         $this->assertSame('foo', array_get($resultForFoo, 'data.foo'));
-        
+
         $queryForAdditionalSchema = '
         {
             sayHello

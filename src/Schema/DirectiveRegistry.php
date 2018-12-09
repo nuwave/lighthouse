@@ -121,7 +121,7 @@ class DirectiveRegistry
 
         if ($reflection->isInstantiable() && $reflection->isSubclassOf(Directive::class)) {
             $this->register(
-                resolve($reflection->getName())
+                app($reflection->getName())
             );
         }
 
@@ -160,7 +160,7 @@ class DirectiveRegistry
         }
 
         // Always return a new instance of the directive class to avoid side effects between them
-        return resolve(\get_class($directive));
+        return app(\get_class($directive));
     }
 
     /**

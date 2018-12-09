@@ -163,7 +163,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
     {
         /** @var Router $router */
-        $router = resolve('router');
+        $router = app('router');
         $middleware = $router->getMiddleware();
         $middlewareGroups = $router->getMiddlewareGroups();
 
