@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class QueryFilter
@@ -110,7 +111,7 @@ class QueryFilter
          * @var array $values
          */
         foreach($multiArgFilterValues as $filterKey => $values){
-            $columnName = str_before($filterKey, '.');
+            $columnName = Str::before($filterKey, '.');
 
             $builder = $this->multiArgumentFilters[$filterKey]($builder, $columnName, $values);
         }

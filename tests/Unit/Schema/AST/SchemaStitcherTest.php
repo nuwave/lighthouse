@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Schema\AST;
 
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
