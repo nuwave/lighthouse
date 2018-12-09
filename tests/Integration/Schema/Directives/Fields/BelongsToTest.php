@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -77,7 +78,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
+        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
     }
 
     /**
@@ -111,7 +112,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.account.name'));
+        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.account.name'));
     }
 
     /**
@@ -153,8 +154,8 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
-        $this->assertEquals($this->team->name, array_get($result, 'data.user.team.name'));
+        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
+        $this->assertEquals($this->team->name, Arr::get($result, 'data.user.team.name'));
     }
 
     /**
@@ -201,9 +202,9 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($products[0]->color_id, array_get($result, 'data.products.data.0.color.id'));
-        $this->assertEquals($products[1]->color_id, array_get($result, 'data.products.data.1.color.id'));
-        $this->assertEquals($products[2]->color_id, array_get($result, 'data.products.data.2.color.id'));
+        $this->assertEquals($products[0]->color_id, Arr::get($result, 'data.products.data.0.color.id'));
+        $this->assertEquals($products[1]->color_id, Arr::get($result, 'data.products.data.1.color.id'));
+        $this->assertEquals($products[2]->color_id, Arr::get($result, 'data.products.data.2.color.id'));
 
     }
 }

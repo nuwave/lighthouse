@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Arr;
 
 class GraphQLTest extends TestCase
 {
@@ -104,7 +105,7 @@ class GraphQLTest extends TestCase
         ';
         $result = graphql()->executeQuery($query)->toArray();
 
-        $this->assertContains('nonExistingField', array_get($result, 'errors.0.message'));
+        $this->assertContains('nonExistingField', Arr::get($result, 'errors.0.message'));
     }
 
     public function user($root, array $args, $context, $info): array

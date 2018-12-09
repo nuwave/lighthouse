@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
@@ -62,7 +63,7 @@ class QueryFilter
     public static function build($query, array $args)
     {
         // Remove the query filter argument from the args
-        $filterInstance = array_pull($args, static::QUERY_FILTER_KEY);
+        $filterInstance = Arr::pull($args, static::QUERY_FILTER_KEY);
 
         return $filterInstance
             ? $filterInstance->filter($query, $args)
@@ -98,7 +99,7 @@ class QueryFilter
             }
 
             // Filters that only take a single argument can be applied directly
-            if($filterInfo = array_get($this->singleArgumentFilters, $key)){
+            if($filterInfo = Arr::get($this->singleArgumentFilters, $key)){
                 $filterCallback = $filterInfo['filter'];
                 $columnName = $filterInfo['columnName'];
 

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\QueryUtils;
@@ -97,7 +98,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args) {
                 $first = $args['count'];
-                $page = array_get($args, 'page', 1);
+                $page = Arr::get($args, 'page', 1);
 
                 return $this->getPaginatedResults(\func_get_args(), $page, $first);
             }

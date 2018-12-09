@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -15,7 +16,7 @@ class UpdateDirectiveTest extends DBTestCase
     public function itCanUpdateFromFieldArguments()
     {
         factory(Company::class)->create(['name' => 'foo']);
-        
+
         $schema = '
         type Company {
             id: ID!
@@ -42,8 +43,8 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', array_get($result, 'data.updateCompany.name'));
+        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
+        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
     }
     /**
@@ -52,7 +53,7 @@ class UpdateDirectiveTest extends DBTestCase
     public function itCanUpdateFromInputObject()
     {
         factory(Company::class)->create(['name' => 'foo']);
-        
+
         $schema = '
         type Company {
             id: ID!
@@ -83,8 +84,8 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', array_get($result, 'data.updateCompany.name'));
+        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
+        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
     }
 
@@ -137,9 +138,9 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.updateTask.id'));
-        $this->assertSame('foo', array_get($result, 'data.updateTask.name'));
-        $this->assertSame('2', array_get($result, 'data.updateTask.user.id'));
+        $this->assertSame('1', Arr::get($result, 'data.updateTask.id'));
+        $this->assertSame('foo', Arr::get($result, 'data.updateTask.name'));
+        $this->assertSame('2', Arr::get($result, 'data.updateTask.user.id'));
 
         $task = Task::first();
         $this->assertSame('2', $task->user_id);

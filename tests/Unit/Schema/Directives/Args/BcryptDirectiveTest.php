@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Args;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 
 class BcryptDirectiveTest extends TestCase
 {
@@ -36,7 +37,7 @@ class BcryptDirectiveTest extends TestCase
 
         $resultFromMutation = $this->execute($schema, $mutationQuery);
 
-        $passwordFromMutation = array_get($resultFromMutation, 'data.foo.bar');
+        $passwordFromMutation = Arr::get($resultFromMutation, 'data.foo.bar');
         $this->assertNotSame('password', $passwordFromMutation);
         $this->assertTrue(password_verify('password', $passwordFromMutation));
 
@@ -50,7 +51,7 @@ class BcryptDirectiveTest extends TestCase
 
         $resultFromQuery = $this->execute($schema, $query);
 
-        $passwordFromQuery = array_get($resultFromQuery, 'data.foo.bar');
+        $passwordFromQuery = Arr::get($resultFromQuery, 'data.foo.bar');
         $this->assertNotSame('123', $passwordFromQuery);
         $this->assertTrue(password_verify('123', $passwordFromQuery));
     }

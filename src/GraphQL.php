@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Arr;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
@@ -70,9 +71,9 @@ class GraphQL
             $this->extensionRegistry->batchedQueryDidStart($index);
 
             $result = $this->executeQuery(
-                array_get($request, 'query', ''),
+                Arr::get($request, 'query', ''),
                 $context,
-                array_get($request, 'variables', []),
+                Arr::get($request, 'variables', []),
                 $rootValue
             );
 
