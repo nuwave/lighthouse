@@ -75,11 +75,11 @@ class DeferExtensionTest extends TestCase
         $chunks = $this->stream->chunks;
 
         $this->assertCount(2, $chunks);
-        $this->assertEquals('John Doe', array_get($chunks[0], 'data.user.name'));
+        $this->assertSame('John Doe', array_get($chunks[0], 'data.user.name'));
         $this->assertNull(array_get($chunks[0], 'data.user.parent'));
         $deferred = array_get($chunks[1], 'user.parent');
         $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertEquals('Jane Doe', $deferred['data']['name']);
+        $this->assertSame('Jane Doe', $deferred['data']['name']);
     }
 
     /**
@@ -442,7 +442,7 @@ class DeferExtensionTest extends TestCase
         $response = $this->postJson('/graphql', compact('query'))->json();
 
         $this->assertArrayHasKey('errors', $response);
-        $this->assertEquals('schema', $response['errors'][0]['category']);
+        $this->assertSame('schema', $response['errors'][0]['category']);
     }
 
     /**

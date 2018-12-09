@@ -45,7 +45,7 @@ class GraphQLExtensionTest extends TestCase
         ');
 
         $this->assertArrayHasKey('meta', $data);
-        $this->assertEquals('data', $data['meta']);
+        $this->assertSame('data', $data['meta']);
     }
 
     /**
