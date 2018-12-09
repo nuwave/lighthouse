@@ -122,7 +122,7 @@ class PartialParserTest extends TestCase
             $argumentNode
         );
 
-        $this->assertEquals('key', $argumentNode->name->value);
-        $this->assertEquals('value', $argumentNode->value->value);
+        $this->assertSame('key', $argumentNode->name->value);
+        $this->assertSame('value', $argumentNode->value->value);
     }
 }

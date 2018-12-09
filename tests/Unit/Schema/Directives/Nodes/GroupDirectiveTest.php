@@ -29,7 +29,7 @@ class GroupDirectiveTest extends TestCase
         }
         ';
         $result = $this->executeQuery($schema, $query);
-        $this->assertEquals('foo.bar', $result->data['me']);
+        $this->assertSame('foo.bar', $result->data['me']);
 
         $query = '
         {
@@ -37,7 +37,7 @@ class GroupDirectiveTest extends TestCase
         }
         ';
         $result = $this->executeQuery($schema, $query);
-        $this->assertEquals('foo.bar', $result->data['you']);
+        $this->assertSame('foo.bar', $result->data['you']);
     }
 
     /**

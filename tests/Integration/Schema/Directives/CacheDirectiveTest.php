@@ -34,8 +34,8 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get('user:1:name'));
+        $this->assertSame('foobar', array_get($result, 'data.user.name'));
+        $this->assertSame('foobar', resolve('cache')->get('user:1:name'));
     }
 
     /**
@@ -64,8 +64,8 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get('user:foo@bar.com:name'));
+        $this->assertSame('foobar', array_get($result, 'data.user.name'));
+        $this->assertSame('foobar', resolve('cache')->get('user:foo@bar.com:name'));
     }
 
     /**
@@ -97,8 +97,8 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get($cacheKey));
+        $this->assertSame('foobar', array_get($result, 'data.user.name'));
+        $this->assertSame('foobar', resolve('cache')->get($cacheKey));
     }
 
     /**

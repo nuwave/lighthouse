@@ -19,7 +19,7 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertEquals('foo', array_get($result, 'data.foo.bar'));
+        $this->assertSame('foo', array_get($result, 'data.foo.bar'));
     }
 
     /**
@@ -35,7 +35,7 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertEquals('fooasdf', array_get($result, 'data.foo.bar'));
+        $this->assertSame('fooasdf', array_get($result, 'data.foo.bar'));
     }
 
     public function resolve()
