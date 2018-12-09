@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Illuminate\Support\Str;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -185,7 +186,7 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (! str_contains($query->sql, [
+            if (! Str::contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',
@@ -253,7 +254,7 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (! str_contains($query->sql, [
+            if (! Str::contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',
