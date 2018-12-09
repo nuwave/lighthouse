@@ -77,7 +77,7 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle batch request start.
      *
-     * @param int index
+     * @param int $index
      */
     public function batchedQueryDidStart($index)
     {
