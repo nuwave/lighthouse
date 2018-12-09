@@ -27,22 +27,24 @@ mutation {
 ```
 
 ```json
-{  
-  "data":{  
-    "foo":null
+{
+  "data": {
+    "foo": null
   },
-  "errors":[  
-    {  
-      "message":"validation",
-      "locations":[  
-        {  
-          "line":2,
-          "column":13
+  "errors": [
+    {
+      "message": "validation",
+      "locations": [
+        {
+          "line": 2,
+          "column": 13
         }
       ],
-      "validation":[  
-        "The name field is required."
-      ]
+      "extensions": {
+        "validation": [
+          "The name field is required."
+        ]
+      }
     }
   ]
 }

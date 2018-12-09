@@ -11,12 +11,10 @@ GraphQL provides a complete and understandable description of the data in your A
 gives clients the power to ask for exactly what they need and nothing more,
 makes it easier to evolve APIs over time, and enables powerful developer tools.
 
-
 <div align="center">
   <img src="./assets/tutorial/playground.png">  
   <small>GraphQL Playground</small>
 </div>
-
 
 GraphQL has been released only as a [*specification*](https://facebook.github.io/graphql/).
 This means that GraphQL is in fact not more than a long document that describes in detail
@@ -32,7 +30,7 @@ relation to another type `Post`.
 type Person {
   name: String!
   age: Int!
-  posts: [Post]
+  posts: [Post!]!
 }
 
 type Post {
@@ -45,7 +43,6 @@ Note that we just created a one-to-many relationship between `Person` and `Post`
 The type `Person` has a field `posts` that returns a list of `Post` types.
 
 We also defined the inverse relationship from `Post` to `Person` through the `author` field.
-
 
 ::: tip NOTE
  This short intro is a compilation from many sources, all credits goes to the original authors.
@@ -68,14 +65,10 @@ The whole process of building your own GraphQL server can be described in 3 step
 
 **... and you are done!**
 
-
-
 <div align="center">
   <img src="./assets/tutorial/flow.png">  
   <small>The role of GraphQL in your application</small>
 </div>
-
-
 
 ## Agenda
 
@@ -86,11 +79,9 @@ In this tutorial we will create a GraphQL API for a simple Blog from scratch wit
 - Laravel GraphQL Playground
 - MySQL
 
-
 ::: tip
 You can download the source code for this tutorial at [https://github.com/nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial)
 :::
-
 
 ## Installation
 
@@ -104,28 +95,9 @@ as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super pow
 
     composer require nuwave/lighthouse mll-lab/laravel-graphql-playground
 
-Then publish the configuration and the default schema.
+Then publish the default schema to `graphql/schema.graphql`.
 
-
-```bash
-# lighthouse
-php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider"
-
-# playground
-php artisan vendor:publish --provider="MLL\GraphQLPlayground\GraphQLPlaygroundServiceProvider"
-```
-
-The default schema was published to `routes/graphql/schema.graphql`.
-Let's make sure everything is working.
-
-Change the default namespaces for Models in  `config/lighthouse.php` to the Laravel default.
-
-```php
-'namespaces' => [
-        'models' => 'App', 
-        ...
-],
-```
+    php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider" --tag=schema
 
 Consult the [Laravel docs on database configuration](https://laravel.com/docs/5.7/database#configuration)
 and ensure you have a working database set up.
@@ -157,7 +129,6 @@ and try the following query:
 ```
 
 Now, let's move on and create a GraphQL API for our Blog.
-
 
 ## The Models
 
@@ -324,7 +295,7 @@ Then, we add additional type definitions that clearly define the shape of our da
 
 ```graphql
 type Query{
-    posts: [Post] @all
+    posts: [Post!]! @all
     post (id: Int! @eq): Post @find
 }
 
@@ -334,7 +305,7 @@ type User {
     email: String!
     created_at: DateTime!
     updated_at: DateTime!
-    posts: [Post] @hasMany
+    posts: [Post!]! @hasMany
 }
 
 type Post {
@@ -342,7 +313,7 @@ type Post {
     title: String!
     content: String!
     user: User! @belongsTo
-    comments: [Comment] @hasMany
+    comments: [Comment!]! @hasMany
 }
 
 type Comment{
