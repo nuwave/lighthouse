@@ -541,15 +541,19 @@ class Commentable
 
 ## @method
 
-Call a method on the target model.
-This comes in handy if the data is not accessible as an attribute (e.g. `$model->myData`)
-but rather via a method like `$model->myData()`. It requires the `name` argument.
+Call a method with a given `name` on the class that represents a type to resolve a field.
+Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
 
 ```graphql
 type User {
   mySpecialData: String! @method(name: "findMySpecialData")
 }
 ```
+
+This calls a method `App\User::findMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
+
+The first argument is an instance of the class itself,
+so the method can be `public static` if needed.
 
 ## @middleware
 
