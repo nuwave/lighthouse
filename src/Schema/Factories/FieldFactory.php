@@ -151,7 +151,7 @@ class FieldFactory
      */
     public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
     {
-        return function ($root, $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
+        return function ($root, array $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
             $this->validationErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
 
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
@@ -251,7 +251,7 @@ class FieldFactory
             $argValue = $this->handleArgMiddlewareForArrayDirectives($astNode, $argValue, $argumentPath);
 
             foreach ($argValue as $key => $fieldValue) {
-                // here we are passing by reference so the `$argumentValue[$key]` is intended.
+                // here we are passing by reference so the `$argValue[$key]` is intended.
                 $this->handleArgWithAssociatedDirectivesRecursively(
                     $type->ofType,
                     $argValue[$key],

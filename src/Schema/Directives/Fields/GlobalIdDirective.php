@@ -50,14 +50,14 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMid
     }
 
     /**
-     * Apply transformations on the ArgumentValue.
+     * Return an array containing the type name and id.
      *
      * @param string   $argumentValue
      * @param \Closure $next
      *
-     * @return string
+     * @return array
      */
-    public function handleArgument($argumentValue, \Closure $next)
+    public function handleArgument($argumentValue, \Closure $next): array
     {
         return $next(GlobalId::decode($argumentValue));
     }
