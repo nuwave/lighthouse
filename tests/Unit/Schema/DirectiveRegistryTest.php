@@ -19,7 +19,7 @@ class DirectiveRegistryTest extends TestCase
     /** @var DirectiveRegistry */
     protected $directiveRegistry;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
