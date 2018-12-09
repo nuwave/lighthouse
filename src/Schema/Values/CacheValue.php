@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -49,12 +50,12 @@ class CacheValue
      */
     public function __construct(array $arguments = [])
     {
-        $this->fieldValue = array_get($arguments, 'field_value');
-        $this->rootValue = array_get($arguments, 'root');
-        $this->args = array_get($arguments, 'args');
-        $this->context = array_get($arguments, 'context');
-        $this->resolveInfo = array_get($arguments, 'resolve_info');
-        $this->privateCache = array_get($arguments, 'private_cache');
+        $this->fieldValue = Arr::get($arguments, 'field_value');
+        $this->rootValue = Arr::get($arguments, 'root');
+        $this->args = Arr::get($arguments, 'args');
+        $this->context = Arr::get($arguments, 'context');
+        $this->resolveInfo = Arr::get($arguments, 'resolve_info');
+        $this->privateCache = Arr::get($arguments, 'private_cache');
 
         $this->setFieldKey();
     }

@@ -104,7 +104,7 @@ class GraphQLTest extends TestCase
         ';
         $result = graphql()->executeQuery($query)->toArray();
 
-        $this->assertContains('nonExistingField', array_get($result, 'errors.0.message'));
+        $this->assertContains('nonExistingField', \Illuminate\Support\Arr::get($result, 'errors.0.message'));
     }
 
     public function user($root, array $args, $context, $info): array

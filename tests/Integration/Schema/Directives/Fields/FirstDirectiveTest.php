@@ -23,7 +23,7 @@ class FirstDirectiveTest extends DBTestCase
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
-    
+
         $query = "
         {
             user(id: {$userB->id}){
@@ -32,7 +32,7 @@ class FirstDirectiveTest extends DBTestCase
         }
         ";
         $result = $this->execute($schema, $query);
-        $this->assertSame('B', array_get($result, 'data.user.name'));
+        $this->assertSame('B', \Illuminate\Support\Arr::get($result, 'data.user.name'));
     }
 
     /** @test */

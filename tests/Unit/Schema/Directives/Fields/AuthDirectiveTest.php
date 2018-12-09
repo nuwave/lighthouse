@@ -34,6 +34,6 @@ class AuthDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('bar', array_get($result, 'data.user.foo'));
+        $this->assertSame('bar', \Illuminate\Support\Arr::get($result, 'data.user.foo'));
     }
 }

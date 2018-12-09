@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ExtensionRequest
@@ -59,7 +60,7 @@ class ExtensionRequest
     {
         return is_null($index)
             ? $this->request->input('query', '')
-            : array_get($this->request, "{$index}.query");
+            : Arr::get($this->request, "{$index}.query");
     }
 
     /**
@@ -73,7 +74,7 @@ class ExtensionRequest
     {
         $variables = is_null($index)
             ? $this->request->input('variables')
-            : array_get($this->request, "{$index}.variables");
+            : Arr::get($this->request, "{$index}.variables");
 
         return is_string($variables) ? json_decode($variables, true) : $variables;
     }

@@ -36,7 +36,7 @@ class BcryptDirectiveTest extends TestCase
 
         $resultFromMutation = $this->execute($schema, $mutationQuery);
 
-        $passwordFromMutation = array_get($resultFromMutation, 'data.foo.bar');
+        $passwordFromMutation = \Illuminate\Support\Arr::get($resultFromMutation, 'data.foo.bar');
         $this->assertNotSame('password', $passwordFromMutation);
         $this->assertTrue(password_verify('password', $passwordFromMutation));
 
@@ -50,7 +50,7 @@ class BcryptDirectiveTest extends TestCase
 
         $resultFromQuery = $this->execute($schema, $query);
 
-        $passwordFromQuery = array_get($resultFromQuery, 'data.foo.bar');
+        $passwordFromQuery = \Illuminate\Support\Arr::get($resultFromQuery, 'data.foo.bar');
         $this->assertNotSame('123', $passwordFromQuery);
         $this->assertTrue(password_verify('123', $passwordFromQuery));
     }

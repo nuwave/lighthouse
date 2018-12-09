@@ -20,22 +20,22 @@ class UnionTest extends DBTestCase
         // Prevent creating more users through nested factory
             ['task_id' => 1]
         );
-        
+
         $result = $this->execute($schema, $query);
-        
-        $this->assertCount(2, array_get($result, 'data.stuff'));
-        $this->assertArrayHasKey('name', array_get($result, 'data.stuff.0'));
-        $this->assertArrayHasKey('title', array_get($result, 'data.stuff.1'));
+
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result, 'data.stuff'));
+        $this->assertArrayHasKey('name', \Illuminate\Support\Arr::get($result, 'data.stuff.0'));
+        $this->assertArrayHasKey('title', \Illuminate\Support\Arr::get($result, 'data.stuff.1'));
     }
-    
+
     public function fetchResults(): Collection
     {
         $users = User::all();
         $posts = Post::all();
-        
+
         return $users->concat($posts);
     }
-    
+
     public function withAndWithoutCustomTypeResolver(): array
     {
         return [
@@ -45,7 +45,7 @@ class UnionTest extends DBTestCase
             $this->schema(true),
         ];
     }
-    
+
     public function schema(bool $withCustomTypeResolver): array
     {
         $fieldResolver = addslashes(self::class). '@fetchResults';

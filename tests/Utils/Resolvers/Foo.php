@@ -13,6 +13,6 @@ class Foo
 
     public function baz($root, array $args, $context = null, ResolveInfo $info = null)
     {
-        return array_get($args, 'directive.0');
+        return \Illuminate\Support\Arr::get($args, 'directive.0');
     }
 }

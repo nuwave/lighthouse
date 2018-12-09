@@ -7,6 +7,7 @@ use GraphQL\Type\Schema;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
@@ -70,9 +71,9 @@ class GraphQL
             $this->extensionRegistry->batchedQueryDidStart($index);
 
             $result = $this->executeQuery(
-                array_get($request, 'query', ''),
+                Arr::get($request, 'query', ''),
                 $context,
-                array_get($request, 'variables', []),
+                Arr::get($request, 'variables', []),
                 $rootValue
             );
 

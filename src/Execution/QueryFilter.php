@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 class QueryFilter
@@ -22,7 +23,7 @@ class QueryFilter
      * @var \Closure[]
      */
     protected $multiArgumentFilters = [];
-    
+
     /**
      * A map from a composite key consisting of the columnName and type of key
      * to a list of argument names associated with it.
@@ -30,7 +31,7 @@ class QueryFilter
      * @var array[]
      */
     protected $multiArgumentFiltersArgNames = [];
-    
+
     /**
      * Get query filter instance for field.
      *
@@ -61,13 +62,13 @@ class QueryFilter
     public static function build($query, array $args)
     {
         // Remove the query filter argument from the args
-        $filterInstance = array_pull($args, static::QUERY_FILTER_KEY);
-        
+        $filterInstance = Arr::pull($args, static::QUERY_FILTER_KEY);
+
         return $filterInstance
             ? $filterInstance->filter($query, $args)
             : $query;
     }
-    
+
     /**
      * Run query through filter.
      *
@@ -79,7 +80,7 @@ class QueryFilter
     public function filter($builder, array $args = [])
     {
         $multiArgFilterValues = [];
-        
+
         /**
          * @var string $key
          * @var mixed $value
@@ -95,29 +96,29 @@ class QueryFilter
                     $multiArgFilterValues[$filterKey] []= $value;
                 }
             }
-            
+
             // Filters that only take a single argument can be applied directly
-            if($filterInfo = array_get($this->singleArgumentFilters, $key)){
+            if($filterInfo = Arr::get($this->singleArgumentFilters, $key)){
                 $filterCallback = $filterInfo['filter'];
                 $columnName = $filterInfo['columnName'];
-                
+
                 $builder = $filterCallback($builder, $columnName, $value);
             }
         }
-        
+
         /**
          * @var string $filterKey
          * @var array $values
          */
         foreach($multiArgFilterValues as $filterKey => $values){
             $columnName = str_before($filterKey, '.');
-            
+
             $builder = $this->multiArgumentFilters[$filterKey]($builder, $columnName, $values);
         }
-        
+
         return $builder;
     }
-    
+
     /**
      * @param string $argumentName
      * @param \Closure $filter
@@ -129,13 +130,13 @@ class QueryFilter
     public function addMultiArgumentFilter(string $argumentName, \Closure $filter, string $columnName, string $filterType): QueryFilter
     {
         $filterKey = "$columnName.$filterType";
-        
+
         $this->multiArgumentFilters[$filterKey] = $filter;
         $this->multiArgumentFiltersArgNames[$filterKey] []= $argumentName;
-        
+
         return $this;
     }
-    
+
     /**
      * @param string $argumentName
      * @param \Closure $filter
@@ -149,7 +150,7 @@ class QueryFilter
             'filter' => $filter,
             'columnName' => $columnName,
         ];
-        
+
         return $this;
     }
 }

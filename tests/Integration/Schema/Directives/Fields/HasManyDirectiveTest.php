@@ -78,7 +78,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertSame(4, $tasksWithoutGlobalScope);
 
         // Ensure global scopes are respected here
-        $this->assertCount(3, array_get($result->data, 'user.tasks'));
+        $this->assertCount(3, \Illuminate\Support\Arr::get($result->data, 'user.tasks'));
     }
 
     /**
@@ -113,7 +113,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertCount(2, array_get($result->data, 'user.tasks'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks'));
     }
 
     /**
@@ -157,10 +157,10 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertEquals(3, array_get($result->data, 'user.tasks.paginatorInfo.total'));
-        $this->assertTrue(array_get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, array_get($result->data, 'user.tasks.data'));
+        $this->assertEquals(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertEquals(3, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.data'));
     }
 
     /** @test */
@@ -197,10 +197,10 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertEquals(2, array_get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertEquals(3, array_get($result->data, 'user.tasks.paginatorInfo.total'));
-        $this->assertTrue(array_get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, array_get($result->data, 'user.tasks.data'));
+        $this->assertEquals(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertEquals(3, \Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.data'));
     }
 
     /**
@@ -239,8 +239,8 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
+        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges'));
     }
 
     /**
@@ -279,8 +279,8 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
+        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges'));
     }
 
     /**
@@ -329,9 +329,9 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue(array_get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, array_get($result->data, 'user.tasks.edges'));
-        $this->assertCount(2, array_get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
+        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
     }
 
     /**

@@ -46,10 +46,10 @@ class PaginateDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertEquals(5, array_get($result->data, 'users.paginatorInfo.count'));
-        $this->assertEquals(10, array_get($result->data, 'users.paginatorInfo.total'));
-        $this->assertEquals(1, array_get($result->data, 'users.paginatorInfo.currentPage'));
-        $this->assertCount(5, array_get($result->data, 'users.data'));
+        $this->assertEquals(5, \Illuminate\Support\Arr::get($result->data, 'users.paginatorInfo.count'));
+        $this->assertEquals(10, \Illuminate\Support\Arr::get($result->data, 'users.paginatorInfo.total'));
+        $this->assertEquals(1, \Illuminate\Support\Arr::get($result->data, 'users.paginatorInfo.currentPage'));
+        $this->assertCount(5, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -81,7 +81,7 @@ class PaginateDirectiveTest extends DBTestCase
         ';
 
         $result = $this->execute($schema, $query);
-        $this->assertSame('2', array_get($result, 'data.users.data.0.id'), 'The custom builder did not change the sort order correctly.');
+        $this->assertSame('2', \Illuminate\Support\Arr::get($result, 'data.users.data.0.id'), 'The custom builder did not change the sort order correctly.');
     }
 
     public function builder($root, array $args, $context, ResolveInfo $resolveInfo): Builder
@@ -153,11 +153,11 @@ class PaginateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $users = array_get($result, 'data.users');
+        $users = \Illuminate\Support\Arr::get($result, 'data.users');
 
-        $this->assertSame(1, array_get($users, 'paginatorInfo.currentPage'));
-        $this->assertSame(2, array_get($users, 'data.0.posts.paginatorInfo.currentPage'));
-        $this->assertSame(3, array_get($users, 'data.0.posts.data.0.comments.paginatorInfo.currentPage'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($users, 'paginatorInfo.currentPage'));
+        $this->assertSame(2, \Illuminate\Support\Arr::get($users, 'data.0.posts.paginatorInfo.currentPage'));
+        $this->assertSame(3, \Illuminate\Support\Arr::get($users, 'data.0.posts.data.0.comments.paginatorInfo.currentPage'));
     }
 
     /**
@@ -195,8 +195,8 @@ class PaginateDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertTrue(array_get($result->data, 'users.pageInfo.hasNextPage'));
-        $this->assertCount(5, array_get($result->data, 'users.edges'));
+        $this->assertTrue(\Illuminate\Support\Arr::get($result->data, 'users.pageInfo.hasNextPage'));
+        $this->assertCount(5, \Illuminate\Support\Arr::get($result->data, 'users.edges'));
     }
 
     /**
@@ -250,9 +250,9 @@ class PaginateDirectiveTest extends DBTestCase
                 'startCursor' => null,
                 'endCursor' => null,
             ],
-            array_get($result->data, 'users.pageInfo')
+            \Illuminate\Support\Arr::get($result->data, 'users.pageInfo')
         );
-        $this->assertCount(0, array_get($result->data, 'users.edges'));
+        $this->assertCount(0, \Illuminate\Support\Arr::get($result->data, 'users.edges'));
     }
 
     /**
@@ -302,9 +302,9 @@ class PaginateDirectiveTest extends DBTestCase
                 'perPage' => 5,
                 'total' => 0,
             ],
-            array_get($result->data, 'users.paginatorInfo')
+            \Illuminate\Support\Arr::get($result->data, 'users.paginatorInfo')
         );
-        $this->assertCount(0, array_get($result->data, 'users.data'));
+        $this->assertCount(0, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -338,7 +338,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(1, array_get($result->data, 'users.data'));
+        $this->assertCount(1, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /** @test */
@@ -374,8 +374,8 @@ class PaginateDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertEquals(5, array_get($result->data, 'users.paginatorInfo.count'));
-        $this->assertEquals(10, array_get($result->data, 'users.paginatorInfo.total'));
-        $this->assertCount(5, array_get($result->data, 'users.data'));
+        $this->assertEquals(5, \Illuminate\Support\Arr::get($result->data, 'users.paginatorInfo.count'));
+        $this->assertEquals(10, \Illuminate\Support\Arr::get($result->data, 'users.paginatorInfo.total'));
+        $this->assertCount(5, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 }

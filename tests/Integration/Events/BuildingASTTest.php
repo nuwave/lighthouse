@@ -13,17 +13,17 @@ class BuildingASTTest extends TestCase
     public function itInjectsSourceSchemaIntoEvent()
     {
         $schema = $this->placeholderQuery();
-        
+
         resolve('events')->listen(
             BuildingAST::class,
             function (BuildingAST $buildingAST) use ($schema){
                 $this->assertSame($schema, $buildingAST->userSchema);
             }
         );
-    
+
         $this->buildSchema($schema);
     }
-    
+
     /**
      * @test
      */
@@ -33,7 +33,7 @@ class BuildingASTTest extends TestCase
             BuildingAST::class,
             function (BuildingAST $buildingAST) {
                 $resolver = $this->getResolver('resolveSayHello');
-            
+
                 return "
                 extend type Query {
                     sayHello: String @field(resolver: \"$resolver\")
@@ -41,7 +41,7 @@ class BuildingASTTest extends TestCase
                 ";
             }
         );
-        
+
         $resolver = $this->getResolver('resolveFoo');
 
         $schema = "
@@ -56,15 +56,15 @@ class BuildingASTTest extends TestCase
         }
         ';
         $resultForFoo = $this->execute($schema, $queryForBaseSchema);
-        $this->assertSame('foo', array_get($resultForFoo, 'data.foo'));
-        
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($resultForFoo, 'data.foo'));
+
         $queryForAdditionalSchema = '
         {
             sayHello
         }
         ';
         $resultForSayHello = $this->execute($schema, $queryForAdditionalSchema);
-        $this->assertSame('hello', array_get($resultForSayHello, 'data.sayHello'));
+        $this->assertSame('hello', \Illuminate\Support\Arr::get($resultForSayHello, 'data.sayHello'));
     }
 
     public function resolveSayHello(): string

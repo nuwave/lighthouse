@@ -73,6 +73,6 @@ class ComplexityDirectiveTest extends TestCase
 
     public function complexity(int $childrenComplexity, array $args): int
     {
-        return $childrenComplexity * array_get($args, 'foo', 0);
+        return $childrenComplexity * \Illuminate\Support\Arr::get($args, 'foo', 0);
     }
 }

@@ -19,7 +19,7 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame('foo', array_get($result, 'data.foo.bar'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'data.foo.bar'));
     }
 
     /**
@@ -35,7 +35,7 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame('fooasdf', array_get($result, 'data.foo.bar'));
+        $this->assertSame('fooasdf', \Illuminate\Support\Arr::get($result, 'data.foo.bar'));
     }
 
     public function resolve()
@@ -62,6 +62,6 @@ class MethodDirectiveTest extends TestCase
 class Foo {
     public function foobar(array $args = []): string
     {
-        return 'foo' . array_get($args, 'baz');
+        return 'foo' . \Illuminate\Support\Arr::get($args, 'baz');
     }
 }

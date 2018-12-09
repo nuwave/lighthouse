@@ -159,7 +159,7 @@ class ValidationTest extends TestCase
 
     protected function assertValidationKeysSame(array $keys, array $result)
     {
-        $actual = array_get($result, 'errors.0.extensions.validation');
+        $actual = \Illuminate\Support\Arr::get($result, 'errors.0.extensions.validation');
 
         $this->assertSame($keys, array_keys($actual));
     }

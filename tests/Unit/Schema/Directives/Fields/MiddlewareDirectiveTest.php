@@ -30,7 +30,7 @@ class MiddlewareDirectiveTest extends TestCase
 
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.foo'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($result, 'data.foo'));
     }
 
     public function fooMiddlewareQueries()
@@ -70,7 +70,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+        $this->assertSame(Authenticate::MESSAGE, \Illuminate\Support\Arr::get($result, 'errors.0.message'));
     }
 
     /**
@@ -96,7 +96,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(1, array_get($result, 'data.foo'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($result, 'data.foo'));
     }
 
     /**
@@ -121,7 +121,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+        $this->assertSame(Authenticate::MESSAGE, \Illuminate\Support\Arr::get($result, 'errors.0.message'));
     }
 
     /**
@@ -146,10 +146,10 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(1, array_get($result, 'data.pass'));
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
-        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
-        $this->assertNull(array_get($result, 'data.foo'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($result, 'data.pass'));
+        $this->assertSame(Authenticate::MESSAGE, \Illuminate\Support\Arr::get($result, 'errors.0.message'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'errors.0.path.0'));
+        $this->assertNull(\Illuminate\Support\Arr::get($result, 'data.foo'));
     }
 
     /**

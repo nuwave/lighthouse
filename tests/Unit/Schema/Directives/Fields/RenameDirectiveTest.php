@@ -32,7 +32,7 @@ class RenameDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('asdf', array_get($result, 'data.bar.bar'));
+        $this->assertSame('asdf', \Illuminate\Support\Arr::get($result, 'data.bar.bar'));
     }
 
     public function resolve()

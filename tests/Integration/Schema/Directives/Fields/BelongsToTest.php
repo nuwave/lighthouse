@@ -77,7 +77,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
+        $this->assertEquals($this->company->name, \Illuminate\Support\Arr::get($result, 'data.user.company.name'));
     }
 
     /**
@@ -111,7 +111,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.account.name'));
+        $this->assertEquals($this->company->name, \Illuminate\Support\Arr::get($result, 'data.user.account.name'));
     }
 
     /**
@@ -153,8 +153,8 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
-        $this->assertEquals($this->team->name, array_get($result, 'data.user.team.name'));
+        $this->assertEquals($this->company->name, \Illuminate\Support\Arr::get($result, 'data.user.company.name'));
+        $this->assertEquals($this->team->name, \Illuminate\Support\Arr::get($result, 'data.user.team.name'));
     }
 
     /**
@@ -201,9 +201,9 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($products[0]->color_id, array_get($result, 'data.products.data.0.color.id'));
-        $this->assertEquals($products[1]->color_id, array_get($result, 'data.products.data.1.color.id'));
-        $this->assertEquals($products[2]->color_id, array_get($result, 'data.products.data.2.color.id'));
+        $this->assertEquals($products[0]->color_id, \Illuminate\Support\Arr::get($result, 'data.products.data.0.color.id'));
+        $this->assertEquals($products[1]->color_id, \Illuminate\Support\Arr::get($result, 'data.products.data.1.color.id'));
+        $this->assertEquals($products[2]->color_id, \Illuminate\Support\Arr::get($result, 'data.products.data.2.color.id'));
 
     }
 }

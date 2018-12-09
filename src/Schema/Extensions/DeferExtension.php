@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -117,7 +118,7 @@ class DeferExtension extends GraphQLExtension
      */
     public function defer(\Closure $resolver, string $path)
     {
-        if ($data = array_get($this->data, "data.{$path}")) {
+        if ($data = Arr::get($this->data, "data.{$path}")) {
             return $data;
         }
 
@@ -146,7 +147,7 @@ class DeferExtension extends GraphQLExtension
             return $this->resolve($originalResolver, $path);
         }
 
-        return array_get($this->data, "data.{$path}");
+        return Arr::get($this->data, "data.{$path}");
     }
 
     /**
@@ -188,7 +189,7 @@ class DeferExtension extends GraphQLExtension
      */
     public function hasData(string $path): bool
     {
-        return array_has($this->data, "data.{$path}");
+        return Arr::has($this->data, "data.{$path}");
     }
 
     /**

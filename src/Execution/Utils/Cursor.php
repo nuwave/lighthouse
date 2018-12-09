@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
+use Illuminate\Support\Arr;
+
 /**
  * Encode and decode pagination cursors.
  *
@@ -26,7 +28,7 @@ class Cursor
      */
     public static function decode(array $args): int
     {
-        if(!$cursor = array_get($args, 'after')){
+        if(!$cursor = Arr::get($args, 'after')){
             return 0;
         }
 

@@ -32,8 +32,8 @@ class CreateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', array_get($result, 'data.createCompany.name'));
+        $this->assertSame('1', \Illuminate\Support\Arr::get($result, 'data.createCompany.id'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'data.createCompany.name'));
     }
 
     /**
@@ -67,8 +67,8 @@ class CreateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', array_get($result, 'data.createCompany.name'));
+        $this->assertSame('1', \Illuminate\Support\Arr::get($result, 'data.createCompany.id'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'data.createCompany.name'));
     }
 
     /**
@@ -114,8 +114,8 @@ class CreateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.createTask.id'));
-        $this->assertSame('foo', array_get($result, 'data.createTask.name'));
-        $this->assertSame('1', array_get($result, 'data.createTask.user.id'));
+        $this->assertSame('1', \Illuminate\Support\Arr::get($result, 'data.createTask.id'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'data.createTask.name'));
+        $this->assertSame('1', \Illuminate\Support\Arr::get($result, 'data.createTask.user.id'));
     }
 }

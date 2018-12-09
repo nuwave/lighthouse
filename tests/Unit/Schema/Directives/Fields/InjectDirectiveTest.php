@@ -36,7 +36,7 @@ class InjectDirectiveTest extends DBTestCase
 
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.me.id'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($result, 'data.me.id'));
     }
 
     public function resolveUser($root, array $args): array

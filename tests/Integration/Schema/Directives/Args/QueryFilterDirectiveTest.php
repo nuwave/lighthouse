@@ -48,7 +48,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertCount(1, array_get($result, 'data.users.data'));
+        $this->assertCount(1, \Illuminate\Support\Arr::get($result, 'data.users.data'));
     }
 
     /**
@@ -78,7 +78,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(4, array_get($result->data, 'users.data'));
+        $this->assertCount(4, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -112,7 +112,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertCount(2, array_get($result->data, 'users.data'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -146,7 +146,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(3, array_get($result->data, 'users.data'));
+        $this->assertCount(3, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -179,7 +179,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertCount(4, array_get($result->data, 'users.data'));
+        $this->assertCount(4, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -215,7 +215,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->execute($schema, $query);
-        $this->assertCount(3, array_get($result, 'data.users.data'));
+        $this->assertCount(3, \Illuminate\Support\Arr::get($result, 'data.users.data'));
     }
 
     /**
@@ -260,7 +260,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(2, array_get($result->data, 'users.data'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -305,7 +305,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(3, array_get($result->data, 'users.data'));
+        $this->assertCount(3, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -347,7 +347,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertCount(2, array_get($result->data, 'users.data'));
+        $this->assertCount(2, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 
     /**
@@ -378,6 +378,6 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertCount(1, array_get($result->data, 'users.data'));
+        $this->assertCount(1, \Illuminate\Support\Arr::get($result->data, 'users.data'));
     }
 }

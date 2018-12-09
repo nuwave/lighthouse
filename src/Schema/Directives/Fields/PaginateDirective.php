@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Execution\QueryUtils;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -96,7 +97,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args) {
                 $first = $args['count'];
-                $page = array_get($args, 'page', 1);
+                $page = Arr::get($args, 'page', 1);
 
                 return $this->getPaginatedResults(\func_get_args(), $page, $first);
             }

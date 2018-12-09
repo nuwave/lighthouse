@@ -96,7 +96,7 @@ class CanDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', array_get($result, 'data.user.name'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'data.user.name'));
     }
 
     /**
@@ -128,7 +128,7 @@ class CanDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', array_get($result, 'data.user.name'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'data.user.name'));
     }
 
     public function resolveUser()

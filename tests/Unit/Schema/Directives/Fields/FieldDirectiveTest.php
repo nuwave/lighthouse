@@ -25,7 +25,7 @@ class FieldDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo.bar', array_get($result, 'data.bar'));
+        $this->assertSame('foo.bar', \Illuminate\Support\Arr::get($result, 'data.bar'));
     }
 
     /**
@@ -45,7 +45,7 @@ class FieldDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo.baz', array_get($result, 'data.bar'));
+        $this->assertSame('foo.baz', \Illuminate\Support\Arr::get($result, 'data.bar'));
     }
 
     /**
@@ -65,7 +65,7 @@ class FieldDirectiveTest extends TestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame(FooBar::CUSTOM_RESOLVE_RESULT, array_get($result, 'data.bar'));
+        $this->assertSame(FooBar::CUSTOM_RESOLVE_RESULT, \Illuminate\Support\Arr::get($result, 'data.bar'));
     }
 
     /**

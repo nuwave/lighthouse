@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\Node;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
@@ -153,7 +154,7 @@ class RuleFactory
                 $inputDefinitionName = $inputDefinition->name->value;
                 // The input is not given in the current variables
                 // so we can stop generating further rules
-                $variableForInput = array_get($variables, $inputDefinitionName);
+                $variableForInput = Arr::get($variables, $inputDefinitionName);
                 if (is_null($variableForInput)) {
                     return;
                 }

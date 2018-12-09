@@ -57,7 +57,7 @@ class GroupDirectiveTest extends TestCase
         ';
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.me'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($result, 'data.me'));
     }
 
     /**
@@ -85,10 +85,10 @@ class GroupDirectiveTest extends TestCase
         ';
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.withFoo'));
-        $this->assertSame(1, array_get($result, 'data.withNothing'));
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
-        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
-        $this->assertNull(array_get($result, 'data.foo'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($result, 'data.withFoo'));
+        $this->assertSame(1, \Illuminate\Support\Arr::get($result, 'data.withNothing'));
+        $this->assertSame(Authenticate::MESSAGE, \Illuminate\Support\Arr::get($result, 'errors.0.message'));
+        $this->assertSame('foo', \Illuminate\Support\Arr::get($result, 'errors.0.path.0'));
+        $this->assertNull(\Illuminate\Support\Arr::get($result, 'data.foo'));
     }
 }
