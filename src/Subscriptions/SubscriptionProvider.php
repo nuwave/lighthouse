@@ -39,7 +39,7 @@ class SubscriptionProvider
         $app->bind(RegistersRoutes::class, Routes::class);
         $app->bind(BroadcastsSubscriptions::class, SubscriptionBroadcaster::class);
 
-        $app->get('events')->listen(
+        $app->make('events')->listen(
             BroadcastSubscriptionEvent::class,
             BroadcastSubscriptionListener::class
         );
