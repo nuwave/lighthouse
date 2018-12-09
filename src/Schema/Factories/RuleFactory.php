@@ -166,7 +166,7 @@ class RuleFactory
                 }
 
                 // Prepend the given path unless we are still on the root level
-                $nestedPath = '' === $path
+                $nestedPath = $path === ''
                     ? $inputDefinitionName
                     : "{$path}.{$inputDefinitionName}";
 
@@ -244,7 +244,7 @@ class RuleFactory
     {
         $rules = ASTHelper::directiveArgValue($rulesDirective, 'apply');
 
-        if (0 === count($rules)) {
+        if (count($rules) === 0) {
             throw new DirectiveException(
                 "Must define at least one rule for on {$inputDefinitionName}"
             );
@@ -282,7 +282,7 @@ class RuleFactory
      */
     protected static function prependArrayKeysWithPath(array $keyedArray, string $path): array
     {
-        if ('' === $path) {
+        if ($path === '') {
             return $keyedArray;
         }
 

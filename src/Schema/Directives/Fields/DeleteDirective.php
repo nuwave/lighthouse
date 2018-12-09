@@ -37,7 +37,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
             function ($root, array $args) {
                 $argumentDefinition = $this->getSingleArgumentDefinition();
 
-                if(NodeKind::NON_NULL_TYPE !== $argumentDefinition->type->kind){
+                if($argumentDefinition->type->kind !== NodeKind::NON_NULL_TYPE){
                     throw new DirectiveException(
                         "The @delete directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
                     );
@@ -46,7 +46,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
                 $idOrIds = reset($args);
                 if($this->directiveArgValue('globalId', false)){
                     // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-                    if(NodeKind::LIST_TYPE === $argumentDefinition->type->type->kind){
+                    if($argumentDefinition->type->type->kind === NodeKind::LIST_TYPE){
                         $idOrIds = array_map([GlobalId::class, 'decodeId'], $idOrIds);
                     } else {
                         $idOrIds = GlobalId::decodeId($idOrIds);
@@ -82,7 +82,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
      */
     protected function getSingleArgumentDefinition(): InputValueDefinitionNode
     {
-        if (1 !== count($this->definitionNode->arguments)) {
+        if (count($this->definitionNode->arguments) !== 1) {
             throw new DirectiveException(
                 "The @delete directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
             );

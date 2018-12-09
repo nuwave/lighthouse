@@ -260,7 +260,7 @@ class ASTBuilder
             ->contains(function (ObjectTypeDefinitionNode $objectType) {
                 return collect($objectType->interfaces)
                     ->contains(function (NamedTypeNode $interface) {
-                        return 'Node' === $interface->name->value;
+                        return $interface->name->value === 'Node';
                     });
             });
 

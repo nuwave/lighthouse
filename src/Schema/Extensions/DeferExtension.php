@@ -249,7 +249,7 @@ class DeferExtension extends GraphQLExtension
      */
     protected function executionTimeExpired(): bool
     {
-        if (0 === $this->maxExecutionTime) {
+        if ($this->maxExecutionTime === 0) {
             return false;
         }
 
@@ -263,7 +263,7 @@ class DeferExtension extends GraphQLExtension
      */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
-        if (0 === $this->maxNestedFields) {
+        if ($this->maxNestedFields === 0) {
             return false;
         }
 

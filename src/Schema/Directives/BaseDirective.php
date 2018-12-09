@@ -183,7 +183,7 @@ abstract class BaseDirective implements Directive
         );
 
         if (
-            2 !== count($argumentParts)
+            count($argumentParts) !== 2
             || empty($argumentParts[0])
             || empty($argumentParts[1])
         ) {

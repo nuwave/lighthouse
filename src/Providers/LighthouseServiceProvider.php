@@ -124,7 +124,7 @@ class LighthouseServiceProvider extends ServiceProvider
             function (string $attribute, $value, array $parameters, GraphQLValidator $validator): bool {
                 $info = $validator->getResolveInfo();
 
-                if ('Mutation' !== data_get($info, 'parentType.name')) {
+                if (data_get($info, 'parentType.name') !== 'Mutation') {
                     return true;
                 }
 

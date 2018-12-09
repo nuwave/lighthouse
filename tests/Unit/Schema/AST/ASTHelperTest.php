@@ -62,7 +62,7 @@ class ASTHelperTest extends TestCase
         $this->assertCount(3, $objectType1->fields);
 
         $firstNameField = collect($objectType1->fields)->first(function ($field) {
-            return 'first_name' === $field->name->value;
+            return $field->name->value === 'first_name';
         });
 
         $this->assertCount(1, $firstNameField->directives);
