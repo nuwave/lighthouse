@@ -5,6 +5,7 @@ use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Faker\Generator as Faker;
 
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Post::class, function (Faker $faker) {
     return [
         'title' => $faker->title,
@@ -15,6 +16,6 @@ $factory->define(Post::class, function (Faker $faker) {
         'task_id' => function () {
             return factory(Task::class)->create()->getKey();
         },
-        'parent_id' => null
+        'parent_id' => null,
     ];
 });
