@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Illuminate\Support\Str;
 use Tests\DBTestCase;
+use Illuminate\Support\Str;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
