@@ -879,6 +879,14 @@ type Mutation {
 }
 ```
 
+Update an Eloquent model with a custom primary key.
+
+```graphql
+type Mutation {
+  updatePost(post_id: ID!, content: String): Post @update
+}
+```
+
 If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
 
 ```graphql
