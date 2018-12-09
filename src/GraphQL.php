@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Arr;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
