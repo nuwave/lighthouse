@@ -23,6 +23,8 @@ class SchemaStitcherTest extends TestCase
      */
     protected function setUp()
     {
+        parent::setUp();
+
         $currentDir = new Filesystem(new Local(__DIR__));
 
         $currentDir->deleteDir('schema');
@@ -33,6 +35,8 @@ class SchemaStitcherTest extends TestCase
 
     protected function tearDown()
     {
+        parent::tearDown();
+
         $currentDir = new Filesystem(new Local(__DIR__));
 
         $currentDir->deleteDir('schema');
