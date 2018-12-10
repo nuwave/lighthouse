@@ -110,33 +110,33 @@ class BcryptDirectiveTest extends TestCase
 
         $result = $this->execute($schema, $query);
 
-        $password = array_get($result, 'data.user.password');
+        $password = Arr::get($result, 'data.user.password');
         $this->assertNotSame('password', $password);
         $this->assertTrue(password_verify('password', $password));
 
         // apply to array
-        $altPasswordOne = array_get($result, 'data.user.alt_passwords.0');
+        $altPasswordOne = Arr::get($result, 'data.user.alt_passwords.0');
         $this->assertNotSame('alt_password_1', $altPasswordOne);
         $this->assertTrue(password_verify('alt_password_1', $altPasswordOne));
 
-        $altPasswordTwo = array_get($result, 'data.user.alt_passwords.1');
+        $altPasswordTwo = Arr::get($result, 'data.user.alt_passwords.1');
         $this->assertNotSame('alt_password_2', $altPasswordTwo);
         $this->assertTrue(password_verify('alt_password_2', $altPasswordTwo));
 
         // apply to (nested) input
-        $friendPasswordOne = array_get($result, 'data.user.friends.0.password');
+        $friendPasswordOne = Arr::get($result, 'data.user.friends.0.password');
         $this->assertNotSame('friend_password_1', $friendPasswordOne);
         $this->assertTrue(password_verify('friend_password_1', $friendPasswordOne));
 
-        $friendPasswordTwo = array_get($result, 'data.user.friends.1.password');
+        $friendPasswordTwo = Arr::get($result, 'data.user.friends.1.password');
         $this->assertNotSame('friend_password_2', $friendPasswordTwo);
         $this->assertTrue(password_verify('friend_password_2', $friendPasswordTwo));
 
-        $friendPasswordThree = array_get($result, 'data.user.friends.2.password');
+        $friendPasswordThree = Arr::get($result, 'data.user.friends.2.password');
         $this->assertNotSame('friend_password_3', $friendPasswordThree);
         $this->assertTrue(password_verify('friend_password_3', $friendPasswordThree));
 
-        $friendPasswordFour = array_get($result, 'data.user.friends.2.friends.0.password');
+        $friendPasswordFour = Arr::get($result, 'data.user.friends.2.friends.0.password');
         $this->assertNotSame('friend_password_4', $friendPasswordFour);
         $this->assertTrue(password_verify('friend_password_4', $friendPasswordFour));
     }

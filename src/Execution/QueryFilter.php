@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
@@ -103,7 +105,7 @@ class QueryFilter
             }
 
             // Filters that only take a single argument can be applied directly
-            if ($filterInfo = array_get($this->singleArgumentFilters, $key)) {
+            if ($filterInfo = Arr::get($this->singleArgumentFilters, $key)) {
                 /** @var ArgFilterDirective $argFilterDirective */
                 $argFilterDirective = $filterInfo['filter'];
                 $columnName = $filterInfo['columnName'];
@@ -117,7 +119,7 @@ class QueryFilter
          * @var array  $values
          */
         foreach ($valuesGroupedByFilterKey as $filterKey => $values) {
-            $columnName = str_before($filterKey, '.');
+            $columnName = Str::before($filterKey, '.');
 
             if ($values) {
                 $argFilterDirective = $this->multiArgumentFilters[$filterKey];

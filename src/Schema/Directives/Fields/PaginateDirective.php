@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryFilter;
@@ -179,8 +180,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
             // Cut the added type suffix to get the base model class name
-            $model = str_before($model, 'Paginator');
-            $model = str_before($model, 'Connection');
+            $model = Str::before($model, 'Paginator');
+            $model = Str::before($model, 'Connection');
         }
 
         if (! $model) {

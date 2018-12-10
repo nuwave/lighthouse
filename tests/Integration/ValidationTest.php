@@ -3,6 +3,7 @@
 namespace Tests\Integration;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Queries\Foo;
 
 class ValidationTest extends TestCase
@@ -13,12 +14,17 @@ class ValidationTest extends TestCase
             email: String = "hans@peter.rudolf" @rules(apply: ["email"])
             required: String @rules(apply: ["required"])
             input: [Bar] @rulesForArray(apply: ["min:3"])
-            list: [String] @rules(apply: ["required", "email"]) @rulesForArray(apply: ["max:2"])
+            list: [String]
+                @rules(apply: ["required", "email"])
+                @rulesForArray(apply: ["max:2"])
         ): Int
         
         password(
             id: String
-            password: String @trim @rules(apply: ["min:6", "max:20", "required_with:id"]) @bcrypt
+            password: String
+                @trim
+                @rules(apply: ["min:6", "max:20", "required_with:id"])
+                @bcrypt
         ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")
     }
     
@@ -148,34 +154,33 @@ class ValidationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     /**
      * @test
      */
-    public function itEvaluateArgDirectivesInOrder()
+    public function itEvaluatesArgDirectivesInDefinitionOrder()
     {
         $validPasswordQuery = '
         {
             password(password: " 1234567 ")
         }
         ';
+        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+
+        $password = Arr::get($result, 'data.password');
+        $this->assertNotSame('password', ' 1234567 ');
+        $this->assertTrue(password_verify('1234567', $password));
 
         $invalidPasswordQuery = '
         {
             password(password: " 1234 ")
         }
         ';
-
-        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
-
-        $password = array_get($result, 'data.password');
-        $this->assertNotSame('password', ' 1234567 ');
-        $this->assertTrue(password_verify('1234567', $password));
-
         $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
-        $password = array_get($result, 'data.password');
+
+        $password = Arr::get($result, 'data.password');
         $this->assertNull($password);
         $this->assertValidationKeysSame(['password'], $result);
     }
@@ -183,29 +188,28 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itEvaluateConditionalValidation()
+    public function itEvaluatesConditionalValidation()
     {
         $validPasswordQuery = '
         {
             password
         }
         ';
+        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+
+        $this->assertSame('no-password', Arr::get($result, 'data.password'));
 
         $invalidPasswordQuery = '
         {
             password(id: "foo")
         }
         ';
-
-        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
-        $this->assertEquals('no-password', data_get($result, 'data.password'));
-
         $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
-        $password = array_get($result, 'data.password');
+
+        $password = Arr::get($result, 'data.password');
         $this->assertNull($password);
         $this->assertValidationKeysSame(['password'], $result);
     }
-
 
     /**
      * @test
@@ -231,9 +235,10 @@ class ValidationTest extends TestCase
 
     protected function assertValidationKeysSame(array $keys, array $result)
     {
-        $validation = array_get($result, 'errors.0.extensions.validation');
+        $validation = Arr::get($result, 'errors.0.extensions.validation');
+
         foreach ($keys as $key) {
-            $this->assertNotNull(data_get($validation, $key));
+            $this->assertNotNull(Arr::get($validation, $key));
         }
     }
 }
