@@ -20,7 +20,7 @@
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
-        "php": "^7.1",
+        "php": ">= 7.0",
         "ext-json": "*",
         "illuminate/contracts": "5.7.*",
         "illuminate/http": "5.7.*",
