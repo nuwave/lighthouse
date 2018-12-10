@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -89,10 +88,10 @@ class MutationExecutor
      */
     public static function executeUpdate(Model $model, Collection $args, HasMany $parentRelation = null): Model
     {
-        $id = Arr::get($args, 'id');
-        if (!$id) {
-            $id = Arr::get($args, $model->getKeyName());
-        }
+        $id = $args->pull('id')
+            ?? $args->pull(
+                $model->getKeyName()
+            );
 
         $model = $model->newQuery()->findOrFail($id);
 
