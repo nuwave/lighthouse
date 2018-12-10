@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-interface ArgFilterDirective extends Directive
+interface ArgFilterDirective extends ArgDirective
 {
     /**
      * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder

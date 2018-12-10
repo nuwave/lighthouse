@@ -20,14 +20,14 @@
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
-        "php": ">= 7.0",
+        "php": "^7.1",
         "ext-json": "*",
-        "illuminate/contracts": "5.5.*|5.6.*|5.7.*",
-        "illuminate/http": "5.5.*|5.6.*|5.7.*",
-        "illuminate/pagination": "5.5.*|5.6.*|5.7.*",
-        "illuminate/routing": "5.5.*|5.6.*|5.7.*",
-        "illuminate/support": "5.5.*|5.6.*|5.7.*",
-        "illuminate/validation": "5.5.*|5.6.*|5.7.*",
+        "illuminate/contracts": "5.7.*",
+        "illuminate/http": "5.7.*",
+        "illuminate/pagination": "5.7.*",
+        "illuminate/routing": "5.7.*",
+        "illuminate/support": "5.7.*",
+        "illuminate/validation": "5.7.*",
         "opis/closure": "^3.0",
         "webonyx/graphql-php": "^0.12"
     },

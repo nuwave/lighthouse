@@ -15,6 +15,11 @@ class ValidationTest extends TestCase
             input: [Bar] @rulesForArray(apply: ["min:3"])
             list: [String] @rules(apply: ["required", "email"]) @rulesForArray(apply: ["max:2"])
         ): Int
+        
+        password(
+            id: String
+            password: String @trim @rules(apply: ["min:6", "max:20", "required_with:id"]) @bcrypt
+        ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")
     }
     
     input Bar {
@@ -30,6 +35,11 @@ class ValidationTest extends TestCase
         required: Int @rules(apply: ["required"])
     }
     ';
+
+    public function resolvePassword($root, array $args): string
+    {
+        return $args['password'] ?? 'no-password';
+    }
 
     /**
      * @test
@@ -140,6 +150,62 @@ class ValidationTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @test
+     */
+    public function itEvaluateArgDirectivesInOrder()
+    {
+        $validPasswordQuery = '
+        {
+            password(password: " 1234567 ")
+        }
+        ';
+
+        $invalidPasswordQuery = '
+        {
+            password(password: " 1234 ")
+        }
+        ';
+
+        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+
+        $password = array_get($result, 'data.password');
+        $this->assertNotSame('password', ' 1234567 ');
+        $this->assertTrue(password_verify('1234567', $password));
+
+        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+        $password = array_get($result, 'data.password');
+        $this->assertNull($password);
+        $this->assertValidationKeysSame(['password'], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itEvaluateConditionalValidation()
+    {
+        $validPasswordQuery = '
+        {
+            password
+        }
+        ';
+
+        $invalidPasswordQuery = '
+        {
+            password(id: "foo")
+        }
+        ';
+
+        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+        $this->assertEquals('no-password', data_get($result, 'data.password'));
+
+        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+        $password = array_get($result, 'data.password');
+        $this->assertNull($password);
+        $this->assertValidationKeysSame(['password'], $result);
+    }
+
 
     /**
      * @test

@@ -5,12 +5,11 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMiddleware
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective
 {
     /**
      * Name of the directive.
@@ -52,13 +51,12 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgMid
     /**
      * Return an array containing the type name and id.
      *
-     * @param string   $argumentValue
-     * @param \Closure $next
+     * @param string $argumentValue
      *
      * @return array
      */
-    public function handleArgument($argumentValue, \Closure $next): array
+    public function transform($argumentValue): array
     {
-        return $next(GlobalId::decode($argumentValue));
+        return GlobalId::decode($argumentValue);
     }
 }

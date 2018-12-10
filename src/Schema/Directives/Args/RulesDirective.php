@@ -3,11 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 
-class RulesDirective extends BaseDirective implements ArgMiddleware, HasErrorBuffer, HasArgumentPath
+class RulesDirective extends BaseDirective implements ArgValidationDirective, HasArgumentPath
 {
     use HandleRulesDirective;
 

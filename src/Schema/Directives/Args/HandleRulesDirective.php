@@ -4,12 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Support\NoValue;
 use Illuminate\Contracts\Validation\Validator;
-use Nuwave\Lighthouse\Support\Traits\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath;
 
 trait HandleRulesDirective
 {
-    use HasErrorBuffer, HasArgumentPath;
+    use HasArgumentPath;
 
     /**
      * @param mixed    $argumentValue
@@ -74,24 +73,32 @@ trait HandleRulesDirective
     protected function accumulateError(Validator $validator)
     {
         $errorMessages = $validator->errors()
-            ->get($this->definitionNode->name->value);
+                                   ->get($this->definitionNode->name->value);
 
         foreach ($errorMessages as $errorMessage) {
             $this->errorBuffer()
-                ->push(
-                    $errorMessage,
-                    $this->argumentPathAsDotNotation()
-                );
+                 ->push(
+                     $errorMessage,
+                     $this->argumentPathAsDotNotation()
+                 );
         }
     }
 
-    protected function getRules(): array
+    public function getRules(): array
     {
-        return $this->directiveArgValue('apply');
+        $rules = $this->directiveArgValue('apply');
+
+        return [$this->argumentPathAsDotNotation() => $rules];
     }
 
-    protected function getMessages(): array
+    public function getMessages(): array
     {
-        return (array) $this->directiveArgValue('messages');
+        return collect((array) $this->directiveArgValue('messages'))
+            ->mapWithKeys(function ($message, $rule) {
+                $prefix = $this->argumentPathAsDotNotation();
+
+                return ["{$prefix}.{$rule}" => $message];
+            })
+            ->all();
     }
 }
