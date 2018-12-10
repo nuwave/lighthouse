@@ -879,7 +879,11 @@ type Mutation {
 }
 ```
 
-Update an Eloquent model with a custom primary key.
+By default, Lighthouse assumes the argument `id` to be used as the primary key.
+This will work even if your model has a differently named primary key.
+
+If you want your schema to also use a custom primary key, you can also use that,
+although it is not recommended as it makes client-side caching more difficult.
 
 ```graphql
 type Mutation {
