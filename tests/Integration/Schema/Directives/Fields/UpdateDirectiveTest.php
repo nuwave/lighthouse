@@ -3,11 +3,11 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Category;
 use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Category;
 
 class UpdateDirectiveTest extends DBTestCase
 {
