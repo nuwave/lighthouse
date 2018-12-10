@@ -50,7 +50,7 @@ abstract class BatchLoader
 
         // Only register a new instance if it is not already bound
         $instance = app()->bound($instanceName)
-            ? resolve($instanceName)
+            ? app($instanceName)
             : app()->instance(
                 $instanceName,
                 app()->makeWith($loaderClass, $constructorArgs)

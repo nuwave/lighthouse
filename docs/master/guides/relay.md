@@ -8,19 +8,20 @@ directive with the pagination type `connection`.
 
 ```graphql
 type Query {
-    users: [User] @paginate(type: "connection")
+    users: [User!]! @paginate(type: "connection")
 }
 ```
 
 This automatically converts the type definition into a relay connection and constructs
 the appropriate queries via the underlying Eloquent model.
+
 Connections can also be used for sub-fields of a type, given they are defined as a HasMany-Relationship
 in Eloquent. Use the [@hasMany](../api-reference/directives.md#hasMany) directive.
 
 ```graphql
 type User {
     name: String
-    posts: [Post] @hasMany(type: "connection")
+    posts: [Post!]! @hasMany(type: "connection")
 }
 ```
 

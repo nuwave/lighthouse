@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\TypeNode;
-use GraphQL\Language\AST\FieldNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\NonNullTypeNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;

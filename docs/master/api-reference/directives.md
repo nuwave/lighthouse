@@ -21,7 +21,7 @@ type Query {
 ```
 
 This assumes your model has the same name as the type you are returning and is defined
-in the default model namespace `App\Models`. [You can change this configuration](../getting-started/configuration.md). 
+in the default model namespace `App`. [You can change this configuration](../getting-started/configuration.md). 
 
 If you need to use a different model for a single field, you can pass a class name as the `model` argument.
 
@@ -46,7 +46,7 @@ It assumes both the field and the relationship method to have the same name.
 ```php
 <?php
 
-namespace App\Models;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -84,7 +84,7 @@ It assumes both the field and the relationship method to have the same name.
 ```php
 <?php
 
-namespace App\Models;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -122,7 +122,7 @@ When you resolve the field, the argument will hold the `bcrypt` value.
 ```php
 <?php
 
-namespace App\Http\GraphQL\Mutations;
+namespace App\GraphQL\Mutations;
 
 class CreateUser
 {
@@ -208,6 +208,19 @@ type Mutation {
 }
 ```
 
+If you are using a single input object as an argument, you must tell Lighthouse
+to `flatten` it before applying it to the resolver.
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput!): Post @create(flatten: true)
+}
+
+input CreatePostInput {
+  title: String!
+}
+```
+
 ## @delete
 
 Delete a model with a given id field. The field must be an `ID` type.
@@ -237,7 +250,6 @@ type Mutation {
 }
 ```
 
-
 ## @field
 
 Specify a custom resolver function for a single field.
@@ -251,13 +263,13 @@ Pass a class and a method to the `resolver` argument and seperate them with an `
 ```graphql
 type Mutation {
   createPost(title: String!): Post
-    @field(resolver: "App\\Http\\GraphQL\\Mutations\\PostMutator@create")
+    @field(resolver: "App\\GraphQL\\Mutations\\PostMutator@create")
 }
 ```
 
 If your field is defined on the root types `Query` or `Mutation`, you can take advantage
 of the default namespaces that are defined in the [configuration](../getting-started/configuration.md). The following
-will look for a class in `App\Http\Queries` by default.
+will look for a class in `App\GraphQL\Queries` by default.
 
 ```graphql
 type Query {
@@ -271,7 +283,7 @@ such as transforming the value of scalar fields, e.g. reformat a date.
 ```graphql
 type User {
   created_at: String!
-    @field(resolver: "App\\Http\\GraphQL\\Types\\UserType@created_at")
+    @field(resolver: "App\\GraphQL\\Types\\UserType@created_at")
 }
 ```
 
@@ -281,12 +293,20 @@ Find a model based on the arguments provided.
 
 ```graphql
 type Query {
-  userById(id: ID! @eq): User @find(model: "App\\User")
+  userById(id: ID! @eq): User @find
 }
 ```
 
 This throws when more then one result is returned.
 Use [@first](#first) if you can not ensure that.
+
+If your model does not sit in the default namespace, you can overwrite it.
+
+```graphql
+type Query {
+  userById(id: ID! @eq): User @find(model: "App\\Authentication\\User")
+}
+```
 
 ## @first
 
@@ -294,16 +314,24 @@ Get the first query result from a collection of Eloquent models.
 
 ```graphql
 type Query {
-  userByFirstName(first_name: String! @eq): User @first(model: "App\\User")
+  userByFirstName(first_name: String! @eq): User @first
 }
 ```
 
 Other then [@find](#find), this will not throw an error if more then one items are in the collection.
 
+If your model does not sit in the default namespace, you can overwrite it.
+
+```graphql
+type Query {
+  userByFirstName(first_name: String! @eq): User @first(model: "App\\Authentication\\User")
+}
+```
+
 ## @enum
 
 Map the underlying value to an enum key. When dealing with the Enum type in your code,
-you will recieve the defined value instead of the string key.
+you will receive the defined value instead of the string key.
 
 ```graphql
 enum Role {
@@ -312,28 +340,33 @@ enum Role {
 }
 ```
 
+You do not need this directive if the internal value of each enum key
+is an identical string. [Read more about enum types](../the-basics/types.md#enum)
+
 ## @eq
 
-Place an equal operator on a eloquent query.
+Place an equal operator on an Eloquent query.
 
 ```graphql
 type User {
-  # this will filter a user's posts by the category.
-  postsByCategory(category: String @eq): [Post] @hasMany
+  posts(category: String @eq): [Post!]! @hasMany
 }
 ```
 
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
+
  ```graphql
 type User {
-  postsByCategory(category: String @eq(key: "cat")): [Post] @hasMany
+  posts(category: String @eq(key: "cat")): [Post!]! @hasMany
 }
 ```
 
 ## @event
 
-Fire an event after a mutation has taken place. It requires the `fire` argument that should be the class name of the event you want to fire.
+Fire an event after a mutation has taken place.
+It requires the `fire` argument that should be
+the class name of the event you want to fire.
 
 ```graphql
 type Mutation {
@@ -353,8 +386,8 @@ type User {
 }
 ```
 
-Instead of the original ID, the `id` field will now return a base64-encoded String that globally identifies the User and can be used
-for querying the `node` endpoint.
+Instead of the original ID, the `id` field will now return a base64-encoded String
+that globally identifies the User and can be used for querying the `node` endpoint.
 
 ## @group
 
@@ -364,7 +397,7 @@ Set a common namespace for the [@field](#field) and the [@complexity](#complexit
 that are defined on the fields of the defined type.
 
 ```graphql
-extend type Query @group(namespace: "App\\Models") {
+extend type Query @group(namespace: "App\\Authentication") {
   activeUsers @field(resolver: "User@getActiveUsers")
 }
 ```
@@ -426,26 +459,28 @@ type User {
 
 ## @in
 
-Filter a column by an array.
+Filter a column by an array using a `whereIn` clause.
 
 ```graphql
 type Query {
-  # this will filter a user's posts by the category id(s).
-  postsByCategory(category_id: [Int] @in): [Post] @hasMany
+  posts(includeIds: [Int!] @in(key: "id")): [Post!]! @paginate
 }
 ```
 
 ## @inject
 
-Inject a value from the context object into the arguments. This is really useful with the `@create` directive that rely on the authenticated user's `id` that you don't want the client to fill in themselves.
+Inject a value from the context object into the arguments.
 
 ```graphql
 type Mutation {
   createPost(title: String!, content: String!): Post
-    @create(model: "App\\Post")
+    @create
     @inject(context: "user.id", name: "user_id")
 }
 ```
+
+This is useful to ensure that the authenticated user's `id` is
+automatically used for creating new models and can not be manipulated.
 
 ## @interface
 
@@ -467,7 +502,7 @@ return an Object Type. You can get the appropriate Object Type from Lighthouse's
 ```php
 <?php
 
-namespace App\Http\GraphQL\Interfaces;
+namespace App\GraphQL\Interfaces;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -506,15 +541,19 @@ class Commentable
 
 ## @method
 
-Call a method on the target model.
-This comes in handy if the data is not accessible as an attribute (e.g. `$model->myData`)
-but rather via a method like `$model->myData()`. It requires the `name` argument.
+Call a method with a given `name` on the class that represents a type to resolve a field.
+Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
 
 ```graphql
 type User {
   mySpecialData: String! @method(name: "findMySpecialData")
 }
 ```
+
+This calls a method `App\User::findMySpecialData` with [the typical resolver arguments](resolvers.md#resolver-function-signature).
+
+The first argument is an instance of the class itself,
+so the method can be `public static` if needed.
 
 ## @middleware
 
@@ -523,7 +562,7 @@ middleware.
 
 ```graphql
 type Query {
-  users: [User!]! @middleware(checks: ["auth:api"])
+  users: [User!]! @middleware(checks: ["auth:api"]) @all
 }
 ```
 
@@ -532,13 +571,15 @@ class name, an alias or a middleware group - or any combination of them.
 
 ```graphql
 type Query {
-  users: [User!]! @middleware(
-    checks: [
-        "auth:api",
-        "App\\Http\\Middleware\\MyCustomAuth",
-        "api"
-    ]
-  )
+  users: [User!]!
+    @middleware(
+      checks: [
+          "auth:api",
+          "App\\Http\\Middleware\\MyCustomAuth",
+          "api"
+      ]
+    )
+    @all
 }
 ```
 
@@ -548,12 +589,12 @@ The middleware will apply only to direct child fields of the type definition.
 ```graphql
 type Query @middleware(checks: ["auth:api"]) {
   # This field will use the "auth:api" middleware
-  users: [User!]!
+  users: [User!]! @all
 }
 
 extend type Query {
   # This field will not use any middleware
-  posts: [Post!]
+  posts: [Post!]! @all
 }
 ```
 
@@ -578,7 +619,7 @@ Enable fetching an Eloquent model by its global id, may be used for Relay.
 Behind the scenes, Lighthouse will decode the global id sent from the client to find the model by it's primary id in the database.
 
 ```graphql
-type User @model(class: "App\\User") {
+type User @model {
   id: ID! @globalId
 }
 ```
@@ -589,8 +630,7 @@ Place a not equals operator `!=` on an Eloquent query.
 
 ```graphql
 type User {
-  # this will filter a user's posts that do not have the provided category.
-  postsByCategory(category: String @neq): [Post] @hasMany
+  posts(excludeCategory: String @neq(key: "category")): [Post!]! @hasMany
 }
 ```
 
@@ -629,23 +669,51 @@ public function resolveNodeType($value): \GraphQL\Type\Definition\Type
 
 ## @notIn
 
-Filter a column by an array.
+Filter a column by an array using a `whereNotIn` clause.
 
 ```graphql
 type Query {
-  # this will filter a user's posts that are not in the array of id(s).
-  postsByCategory(category_id: [Int] @notIn): [Post] @hasMany
+  posts(excludeIds: [Int!] @notIn(key: "id")): [Post!]! @paginate
 }
 ```
 
 ## @paginate
 
-Return a paginated list. This transforms the schema definition and automatically adds
-additional arguments and inbetween types.
+Transform a field so it returns a paginated list.
 
 ```graphql
 type Query {
   posts: [Post!]! @paginate
+}
+```
+
+The schema definition is automatically transformed to this:
+
+```graphql
+type Query {
+  posts(count: Int!, page: Int): PostPaginator
+}
+
+type PostPaginator {
+  data: [Post!]!
+  paginatorInfo: PaginatorInfo!
+}
+```
+
+And can be queried like this:
+
+```graphql
+{
+  posts(count: 10) {
+    data {
+      id
+      title
+    }
+    paginatorInfo {
+      currentPage
+      lastPage
+    }
+  }
 }
 ```
 
@@ -658,7 +726,26 @@ type Query {
 }
 ```
 
-By default, this looks for an Eloquent model in the configured default namespace, with the same
+You can supply a `defaultCount` to set a default count for any kind of paginator.
+
+```graphql
+type Query {
+  posts: [Post!]! @paginate(type: "connection", defaultCount: 25)
+}
+```
+
+This let's you omit the `count` argument when querying:
+
+```graphql
+query {
+  posts {
+    id
+    name
+  }
+}
+```
+
+By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same
 name as the returned type. You can overwrite this by setting the `model` argument.
 
 ```graphql
@@ -668,7 +755,6 @@ type Query {
 ```
 
 If simply querying Eloquent does not fit your use-case, you can specify a custom `builder`.
-
 
 ```graphql
 type Query {
@@ -711,15 +797,18 @@ type User {
 ## @rules
 
 Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/5.6/validation#available-validation-rules).
-Can be defined on Field Arguments and Input Object Values.
 
 ```graphql
 type Query {
   users(
     countryCode: String @rules(apply: ["string", "size:2"])
-  ): User
+  ): [User!]! @paginate
 }
+```
 
+Rules can also be defined on Input Object Values.
+
+```graphql
 input CreatePostInput {
   title: String @rules(apply: ["required"])
   content: String @rules(apply: ["min:50", "max:150"])
@@ -827,7 +916,7 @@ return an Object Type. You can get the appropriate Object Type from Lighthouse's
 ```php
 <?php
 
-namespace App\Http\GraphQL\Unions;
+namespace App\GraphQL\Unions;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -872,7 +961,7 @@ You can specify simple operators:
 
 ```graphql
 type Query {
-  postsSearchTitle(title: String! @where(operator: "like")): [Post] @hasMany
+  postsSearchTitle(title: String! @where(operator: "like")): [Post!]! @hasMany
 }
 ```
 
@@ -880,7 +969,7 @@ Or use the additional clauses that Laravel provides:
 
 ```graphql
 type Query {
-  postsByYear(created_at: Int! @where(clause: "whereYear")): [Post] @hasMany
+  postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @hasMany
 }
 ```
 
@@ -892,11 +981,10 @@ _Note: You will need to add a `key` to the column to want to query for each date
 
 ```graphql
 type Query {
-  # this will filter a user's posts between a set of dates.
-  postsBetweenDates(
-    start_date: String! @whereBetween(key: "created_at")
-    end_date: String! @whereBetween(key: "created_at")
-  ): [Post] @hasMany
+  posts(
+    createdAfter: Date! @whereBetween(key: "created_at")
+    createdBefore: String! @whereBetween(key: "created_at")
+  ): [Post!]! @all
 }
 ```
 
@@ -908,9 +996,9 @@ _Note: You will need to add a `key` to the column to want to query for each date
 
 ```graphql
 type Query {
-  postsBetweenDates(
-    start_date: String! @whereNotBetween(key: "created_at")
-    end_date: String! @whereNotBetween(key: "created_at")
-  ): [Post] @hasMany
+  users(
+    bornBefore: Date! @whereNotBetween(key: "created_at")
+    bornAfter: Date! @whereNotBetween(key: "created_at")
+  ): [User!]! @all
 }
 ```

@@ -155,14 +155,14 @@ return [
         // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class
     ],
 
-     /*
-     |--------------------------------------------------------------------------
-     | GraphQL Controller
-     |--------------------------------------------------------------------------
-     |
-     | Specify which controller (and method) you want to handle GraphQL requests.
-     |
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | GraphQL Controller
+    |--------------------------------------------------------------------------
+    |
+    | Specify which controller (and method) you want to handle GraphQL requests.
+    |
+    */
     'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
 
     /*

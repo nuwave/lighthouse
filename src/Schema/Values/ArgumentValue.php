@@ -58,7 +58,7 @@ class ArgumentValue
     public function getType(): Type
     {
         if (! $this->type) {
-            $this->type = resolve(DefinitionNodeConverter::class)->toType($this->astNode->type);
+            $this->type = app(DefinitionNodeConverter::class)->toType($this->astNode->type);
         }
 
         return $this->type;

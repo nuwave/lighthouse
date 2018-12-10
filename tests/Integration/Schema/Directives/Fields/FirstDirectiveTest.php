@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class FirstDirectiveTest extends DBTestCase
@@ -23,7 +24,7 @@ class FirstDirectiveTest extends DBTestCase
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
-    
+
         $query = "
         {
             user(id: {$userB->id}){
@@ -32,7 +33,7 @@ class FirstDirectiveTest extends DBTestCase
         }
         ";
         $result = $this->execute($schema, $query);
-        $this->assertSame('B', array_get($result, 'data.user.name'));
+        $this->assertSame('B', Arr::get($result, 'data.user.name'));
     }
 
     /** @test */

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Error\Error;
+use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -26,7 +27,7 @@ class NodeRegistry
      * @var \Closure[]
      */
     protected $nodeResolver = [];
-    
+
     /**
      * The stashed current type.
      *
@@ -37,7 +38,7 @@ class NodeRegistry
      * @var string
      */
     protected $currentType;
-    
+
     /**
      * @param string $typeName
      *
@@ -75,10 +76,10 @@ class NodeRegistry
         $this->nodeResolver[$typeName] = function ($id) use ($modelName) {
             return $modelName::find($id);
         };
-        
+
         return $this;
     }
-    
+
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
@@ -96,16 +97,16 @@ class NodeRegistry
         list($decodedType, $decodedId) = $args['id'];
 
         // Check if we have a resolver registered for the given type
-        if (! $resolver = array_get($this->nodeResolver, $decodedType)) {
+        if (! $resolver = Arr::get($this->nodeResolver, $decodedType)) {
             throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
         }
-        
+
         // Stash the decoded type, as it will later be used to determine the correct return type of the node query
         $this->currentType = $decodedType;
-    
+
         return $resolver($decodedId, $context, $resolveInfo);
     }
-    
+
     /**
      * Get the Type for the stashed type.
      *

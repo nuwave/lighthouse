@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 
 class MethodDirectiveTest extends TestCase
 {
@@ -19,7 +20,7 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertEquals('foo', array_get($result, 'data.foo.bar'));
+        $this->assertSame('foo', Arr::get($result, 'data.foo.bar'));
     }
 
     /**
@@ -35,12 +36,12 @@ class MethodDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertEquals('fooasdf', array_get($result, 'data.foo.bar'));
+        $this->assertSame('fooasdf', Arr::get($result, 'data.foo.bar'));
     }
 
     public function resolve()
     {
-        return new Foo;
+        return new Foo();
     }
 
     protected function schema()
@@ -59,9 +60,10 @@ class MethodDirectiveTest extends TestCase
     }
 }
 
-class Foo {
-    public function foobar(array $args = []): string
+class Foo
+{
+    public function foobar($root, array $args = []): string
     {
-        return 'foo' . array_get($args, 'baz');
+        return 'foo' . Arr::get($args, 'baz');
     }
 }

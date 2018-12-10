@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class MemoryStream extends Stream implements CanStreamResponse
@@ -20,7 +21,7 @@ class MemoryStream extends Stream implements CanStreamResponse
     {
         if (! empty($paths)) {
             $data = collect($paths)->mapWithKeys(function ($path) use ($data) {
-                $response['data'] = array_get($data, "data.{$path}", []);
+                $response['data'] = Arr::get($data, "data.{$path}", []);
                 $errors = $this->chunkError($path, $data);
                 if (! empty($errors)) {
                     $response['errors'] = $errors;

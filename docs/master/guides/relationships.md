@@ -8,7 +8,7 @@ Suppose you have defined the following model:
 ```php
 <?php
 
-namespace App\Models;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,7 +38,7 @@ type Post {
 ```
 
 This approach is fine if performance is not super critical or if you only fetch a single post.
-However, as your queries become larger and more complex, you might want to optimise performance.
+However, as your queries become larger and more complex, you might want to optimize performance.
 
 ## Defining Relationships
 
@@ -122,7 +122,7 @@ This would work for the following model:
 ```php
 <?php
 
-namespace App\Models;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

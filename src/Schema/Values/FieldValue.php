@@ -100,7 +100,7 @@ class FieldValue
     public function getReturnType(): Type
     {
         if (! isset($this->returnType)) {
-            $this->returnType = resolve(DefinitionNodeConverter::class)->toType(
+            $this->returnType = app(DefinitionNodeConverter::class)->toType(
                 $this->field->type
             );
         }

@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
+use Illuminate\Support\Str;
+
 abstract class Stream
 {
     /**
@@ -19,7 +21,7 @@ abstract class Stream
         }
 
         return collect($data['errors'])->filter(function ($error) use ($path) {
-            return starts_with(implode('.', $error['path']), $path);
+            return Str::startsWith(implode('.', $error['path']), $path);
         })->values()->toArray();
     }
 }
