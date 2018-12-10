@@ -1,18 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateTestbenchCompaniesTable extends Migration
+class CreateTestbenchCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up()
     {
-        Schema::create('companies', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('categories', function (Blueprint $table) {
+            $table->increments('category_id');
             $table->string('name');
             $table->timestamps();
         });
@@ -23,6 +23,6 @@ class CreateTestbenchCompaniesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('companies');
+        Schema::drop('categories');
     }
 }

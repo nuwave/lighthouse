@@ -15,7 +15,7 @@ Sending the following query will return the authenticated user's info
 or `null` if the request is not authenticated.
 
 ```graphql
-query Me {
+{
   me {
     name
     email
@@ -40,7 +40,7 @@ such as the `auth` middleware, to selected fields of your GraphQL endpoint.
 
 ```graphql
 type Query {
-  users: [User] @middleware(checks: ["auth:api", "custom"])
+  users: [User!]! @middleware(checks: ["auth:api", "custom"]) @all
 }
 ```
 

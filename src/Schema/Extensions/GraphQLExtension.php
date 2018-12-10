@@ -32,7 +32,7 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Handle batch request start.
      *
-     * @param int index
+     * @param int $index
      */
     public function batchedQueryDidStart($index)
     {

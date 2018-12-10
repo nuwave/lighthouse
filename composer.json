@@ -30,12 +30,11 @@
         "webonyx/graphql-php": "^0.12"
     },
     "require-dev": {
-        "orchestra/testbench": "3.5.*|3.6.*|3.7.*",
-        "orchestra/database": "3.5.*|3.6.*|3.7.*@dev",
         "friendsofphp/php-cs-fixer": "^2.10",
         "laravel/scout": "^4.0",
         "mockery/mockery": "dev-master",
-        "phpunit/phpunit": "^7.0",
+        "orchestra/database": "3.5.*|3.6.*|3.7.*@dev",
+        "orchestra/testbench": "3.5.*|3.6.*|3.7.*",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
@@ -62,7 +61,9 @@
     },
     "extra": {
         "laravel": {
-            "providers": ["Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"],
+            "providers": [
+                "Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"
+            ],
             "aliases": {
                 "graphql": "Nuwave\\Lighthouse\\GraphQL"
             }

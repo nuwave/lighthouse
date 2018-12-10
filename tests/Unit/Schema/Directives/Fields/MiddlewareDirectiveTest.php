@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Illuminate\Routing\Router;
 use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Middleware\Authenticate;
@@ -30,7 +31,7 @@ class MiddlewareDirectiveTest extends TestCase
 
         $result = $this->queryViaHttp($query);
 
-        $this->assertSame(1, array_get($result, 'data.foo'));
+        $this->assertSame(1, Arr::get($result, 'data.foo'));
     }
 
     public function fooMiddlewareQueries()
@@ -70,7 +71,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
     }
 
     /**
@@ -96,7 +97,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(1, array_get($result, 'data.foo'));
+        $this->assertSame(1, Arr::get($result, 'data.foo'));
     }
 
     /**
@@ -121,7 +122,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
+        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
     }
 
     /**
@@ -146,10 +147,10 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ');
 
-        $this->assertSame(1, array_get($result, 'data.pass'));
-        $this->assertSame(Authenticate::MESSAGE, array_get($result, 'errors.0.message'));
-        $this->assertSame('foo', array_get($result, 'errors.0.path.0'));
-        $this->assertNull(array_get($result, 'data.foo'));
+        $this->assertSame(1, Arr::get($result, 'data.pass'));
+        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
+        $this->assertSame('foo', Arr::get($result, 'errors.0.path.0'));
+        $this->assertNull(Arr::get($result, 'data.foo'));
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -81,7 +82,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
             ->count();
 
         $this->assertSame($this->rolesCount, $rolesCount);
-        $this->assertCount($this->rolesCount, array_get($result->data, 'user.roles'));
+        $this->assertCount($this->rolesCount, Arr::get($result->data, 'user.roles'));
     }
 
     /**
@@ -121,10 +122,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertSame(2, array_get($result->data, 'user.roles.paginatorInfo.count'));
-        $this->assertSame($this->rolesCount, array_get($result->data, 'user.roles.paginatorInfo.total'));
-        $this->assertTrue(array_get($result->data, 'user.roles.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, array_get($result->data, 'user.roles.data'));
+        $this->assertSame(2, Arr::get($result->data, 'user.roles.paginatorInfo.count'));
+        $this->assertSame($this->rolesCount, Arr::get($result->data, 'user.roles.paginatorInfo.total'));
+        $this->assertTrue(Arr::get($result->data, 'user.roles.paginatorInfo.hasMorePages'));
+        $this->assertCount(2, Arr::get($result->data, 'user.roles.data'));
     }
 
     /**
@@ -164,8 +165,8 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertTrue(array_get($result->data, 'user.roles.pageInfo.hasNextPage'));
-        $this->assertCount(2, array_get($result->data, 'user.roles.edges'));
+        $this->assertTrue(Arr::get($result->data, 'user.roles.pageInfo.hasNextPage'));
+        $this->assertCount(2, Arr::get($result->data, 'user.roles.edges'));
     }
 
     /**
@@ -232,14 +233,14 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $userRolesEdges = array_get($result->data, 'user.roles.edges');
-        $nestedUserRolesEdges = array_get($result->data, 'user.roles.edges.0.node.users.0.roles.edges');
+        $userRolesEdges = Arr::get($result->data, 'user.roles.edges');
+        $nestedUserRolesEdges = Arr::get($result->data, 'user.roles.edges.0.node.users.0.roles.edges');
 
-        $this->assertTrue(array_get($result->data, 'user.roles.pageInfo.hasNextPage'));
+        $this->assertTrue(Arr::get($result->data, 'user.roles.pageInfo.hasNextPage'));
         $this->assertCount(2, $userRolesEdges);
         $this->assertCount(2, $nestedUserRolesEdges);
-        $this->assertSame(array_get($userRolesEdges,'node.0.acl.id'), array_get($nestedUserRolesEdges,'node.0.acl.id'));
-        $this->assertSame(array_get($userRolesEdges,'node.1.acl.id'), array_get($nestedUserRolesEdges,'node.1.acl.id'));
+        $this->assertSame(Arr::get($userRolesEdges,'node.0.acl.id'), Arr::get($nestedUserRolesEdges,'node.0.acl.id'));
+        $this->assertSame(Arr::get($userRolesEdges,'node.1.acl.id'), Arr::get($nestedUserRolesEdges,'node.1.acl.id'));
     }
 
     /**

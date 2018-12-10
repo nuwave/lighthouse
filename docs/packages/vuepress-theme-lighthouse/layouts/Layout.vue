@@ -7,6 +7,7 @@
 <script>
 import ParentLayout from "@parent-theme/layouts/Layout.vue";
 import Footer from "../components/Footer.vue";
+
 export default {
   components: {
     ParentLayout,
@@ -14,4 +15,5 @@ export default {
   }
 };
 </script>
+
 <style src="../assets/tailwind.min.css"></style>

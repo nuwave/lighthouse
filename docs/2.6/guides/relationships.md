@@ -38,7 +38,7 @@ type Post {
 ```
 
 This approach is fine if performance is not super critical or if you only fetch a single post.
-However, as your queries become larger and more complex, you might want to optimise performance.
+However, as your queries become larger and more complex, you might want to optimize performance.
 
 ## Defining Relationships
 

@@ -1,16 +1,17 @@
 <?php
 
 use Faker\Generator as Faker;
+use Tests\Utils\Models\Color;
+use Tests\Utils\Models\Product;
 
-$factory->define(Tests\Utils\Models\Product::class, function (Faker $faker) {
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(Product::class, function (Faker $faker) {
     return [
         'barcode' => $faker->ean13,
         'uuid' => $faker->uuid,
         'color_id' => function () {
-            return factory(Tests\Utils\Models\Color::class)->create()->getKey();
+            return factory(Color::class)->create()->getKey();
         },
         'name' => $faker->name,
-        'created_at' => now(),
-        'updated_at' => now(),
     ];
 });

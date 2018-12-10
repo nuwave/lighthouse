@@ -1,10 +1,15 @@
 # Deferred Fields
 
 ::: warning
-Currently the `@defer` directive requires Apollo Client in alpha, although there has been talk of merging some pending PRs after the GraphQL Summit which starts today.
+Currently the `@defer` directive requires Apollo Client in alpha,
+although there has been talk of merging some pending PRs after the GraphQL Summit which starts today.
 :::
 
-Deferring fields allows you to prioritize fetching data needed to render the most important content as fast as possible, and then loading the rest of the page in the background. Lighthouse's `DeferExtension` adds support for the the experimental `@defer` directive provided by Apollo which you can read more about [here](https://www.apollographql.com/docs/react/features/defer-support.html).
+Deferring fields allows you to prioritize fetching data needed to render the most important content
+as fast as possible, and then loading the rest of the page in the background.
+
+Lighthouse's `DeferExtension` adds support for the the experimental `@defer` directive
+provided by Apollo which you can read more about [here](https://www.apollographql.com/docs/react/features/defer-support.html).
 
 To enable support, add the extension to the `lighthouse.php` configuration file:
 

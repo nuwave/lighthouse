@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 
 class ComplexityDirectiveTest extends TestCase
 {
@@ -73,6 +74,6 @@ class ComplexityDirectiveTest extends TestCase
 
     public function complexity(int $childrenComplexity, array $args): int
     {
-        return $childrenComplexity * array_get($args, 'foo', 0);
+        return $childrenComplexity * Arr::get($args, 'foo', 0);
     }
 }

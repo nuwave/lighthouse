@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\QueryUtils;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
@@ -73,7 +74,7 @@ class RelationBatchLoader extends BatchLoader
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                 // count must be set so we can safely get it like this
                 $count = $this->args['count'];
-                $page = array_get($this->args, 'page', 1);
+                $page = Arr::get($this->args, 'page', 1);
 
                 $modelRelationFetcher->loadRelationsForPage($count, $page);
                 break;

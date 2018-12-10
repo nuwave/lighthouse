@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
@@ -90,13 +91,13 @@ class DirectiveRegistry
         /** @var SplFileInfo $file */
         foreach ($fileIterator as $file) {
             // Cut off the given root path to get the path that is equivalent to the namespace
-            $namespaceRelevantPath = str_after(
+            $namespaceRelevantPath = Str::after(
                 $file->getPathname(),
                 // Call realpath to resolve relative paths, e.g. /foo/../bar -> /bar
                 realpath($pathForRootNamespace).DIRECTORY_SEPARATOR
             );
 
-            $withoutExtension = str_before($namespaceRelevantPath, '.php');
+            $withoutExtension = Str::before($namespaceRelevantPath, '.php');
             $fileNamespace = str_replace(DIRECTORY_SEPARATOR, '\\', $withoutExtension);
 
             $this->tryRegisterClassName($rootNamespace.$fileNamespace);
@@ -120,7 +121,7 @@ class DirectiveRegistry
 
         if ($reflection->isInstantiable() && $reflection->isSubclassOf(Directive::class)) {
             $this->register(
-                resolve($reflection->getName())
+                app($reflection->getName())
             );
         }
 
@@ -159,7 +160,7 @@ class DirectiveRegistry
         }
 
         // Always return a new instance of the directive class to avoid side effects between them
-        return resolve(\get_class($directive));
+        return app(\get_class($directive));
     }
 
     /**

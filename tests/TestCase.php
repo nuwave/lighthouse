@@ -78,6 +78,7 @@ class TestCase extends BaseTestCase
     protected function tearDown()
     {
         parent::tearDown();
+
         CountRuns::$runCounter = 0;
     }
 

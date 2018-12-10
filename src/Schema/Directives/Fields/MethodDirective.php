@@ -35,7 +35,7 @@ class MethodDirective extends BaseDirective implements FieldResolver
 
         return $fieldValue->setResolver(
             function ($root, array $args, $context = null, ResolveInfo $info = null) use ($method) {
-                return call_user_func_array([$root, $method], [$args, $context, $info]);
+                return call_user_func([$root, $method], $root, $args, $context, $info);
             }
         );
     }

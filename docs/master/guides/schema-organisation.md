@@ -84,6 +84,7 @@ This is because `extend type` needs the original type to get merged into.
 
 Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
 in your main file, but that spreads the definition apart, and could also grow quite large over time.
+
 Another way would be to extend the `Query` type and colocate the type definition with its Queries in `post.graphql`.
 
 ```graphql
@@ -93,7 +94,7 @@ type Post {
 }
 
 extend type Query {
-  posts: [Post] @paginate
+  posts: [Post!]! @paginate
 }
 ```
 
