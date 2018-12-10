@@ -2,8 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Nuwave\Lighthouse\Support\DriverManager;
 use Illuminate\Container\Container as Application;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 /**
@@ -12,158 +14,26 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
  * @method \Illuminate\Http\Response authorized(\Illuminate\Http\Request $request)
  * @method \Illuminate\Http\Response unauthorized(\Illuminate\Http\Request $request)
  */
-class BroadcastManager
+class BroadcastManager extends DriverManager
 {
     /**
-     * The application instance.
-     *
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * The array of resolved broadcasters.
-     *
-     * @var array
-     */
-    protected $broadcasters = [];
-
-    /**
-     * The registered custom driver creators.
-     *
-     * @var array
-     */
-    protected $customCreators = [];
-
-    /**
-     * Create a new broadcaster manager instance.
-     *
-     * @param Application $app
-     */
-    public function __construct(Application $app)
-    {
-        $this->app = $app;
-    }
-
-    /**
-     * Get a broadcaster driver instance.
-     *
-     * @param string|null $driver
-     *
-     * @return mixed
-     */
-    public function driver($driver = null)
-    {
-        return $this->broadcaster($driver);
-    }
-
-    /**
-     * Attempt to get the broadcaster from the local cache.
-     *
-     * @param string $name
-     *
-     * @return BroadcastsSubscriptions
-     */
-    protected function get(string $name)
-    {
-        return $this->broadcasters[$name] ?? $this->resolve($name);
-    }
-
-    /**
-     * Get a broadcaster instance by name.
-     *
-     * @param string|null $name
-     *
-     * @return BroadcastsSubscriptions
-     */
-    public function broadcaster($name = null)
-    {
-        $name = $name ?: $this->getDefaultDriver();
-
-        return $this->broadcasters[$name] = $this->get($name);
-    }
-
-    /**
-     * Get the default broadcast driver name.
+     * Get configuration key.
      *
      * @return string
      */
-    public function getDefaultDriver()
+    protected function configKey()
     {
-        return $this->app['config']['lighthouse.subscriptions.driver'];
+        return 'lighthouse.subscriptions.broadcasters';
     }
 
     /**
-     * Set the default broadcast driver name.
+     * Get configuration driver key.
      *
-     * @param string $name
+     * @return string
      */
-    public function setDefaultDriver($name)
+    protected function driverKey()
     {
-        $this->app['config']['lighthouse.subscriptions.driver'] = $name;
-    }
-
-    /**
-     * Get the subscription configuration.
-     *
-     * @return array
-     */
-    protected function getConfig()
-    {
-        return $this->app['config']['lighthouse.subscriptions'];
-    }
-
-    /**
-     * Register a custom driver creator Closure.
-     *
-     * @param string   $driver
-     * @param \Closure $callback
-     *
-     * @return self
-     */
-    public function extend($driver, \Closure $callback)
-    {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Resolve the given broadcaster.
-     *
-     * @param string $name
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return BroadcastsSubscriptions
-     */
-    protected function resolve($name)
-    {
-        $config = $this->getConfig();
-
-        if (isset($this->customCreators[$name])) {
-            return $this->callCustomCreator($config);
-        }
-
-        $driverMethod = 'create'.ucfirst($name).'Driver';
-
-        if (! method_exists($this, $driverMethod)) {
-            throw new \InvalidArgumentException("Subscription driver [{$name}] is not supported.");
-        }
-
-        return $this->{$driverMethod}($config);
-    }
-
-    /**
-     * Call a custom driver creator.
-     *
-     * @param array $config
-     *
-     * @return mixed
-     */
-    protected function callCustomCreator(array $config)
-    {
-        return $this->customCreators[$config['driver']]($this->app, $config);
+        return 'lighthouse.subscriptions.broadcaster';
     }
 
     /**
@@ -178,25 +48,22 @@ class BroadcastManager
         $appKey = config('broadcasting.pusher.key');
         $appSecret = config('broadcasting.pusher.secret');
         $appId = config('broadcasting.pusher.app_id');
-        $appCluster = config('broadcasting.pusher.options.cluster');
+        $options = config('broadcasting.pusher.options', []);
 
-        $pusher = new \Pusher\Pusher($appKey, $appSecret, $appId, [
-            'cluster' => $appCluster,
-        ]);
+        $pusher = new \Pusher\Pusher($appKey, $appSecret, $appId, $options);
 
         return new PusherBroadcaster($pusher);
     }
 
     /**
-     * Dynamically call the default driver instance.
+     * Create instance of log driver.
      *
-     * @param string $method
-     * @param array  $parameters
+     * @param array $config
      *
-     * @return mixed
+     * @return LogBroadcaster
      */
-    public function __call($method, $parameters)
+    protected function createLogDriver(array $config)
     {
-        return $this->driver()->$method(...$parameters);
+        return new LogBroadcaster($config);
     }
 }
