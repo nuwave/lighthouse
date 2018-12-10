@@ -17,16 +17,16 @@ class BcryptDirective implements ArgTransformerDirective
     }
 
     /**
-     * Apply transformations on the ArgumentValue.
+     * Run Laravel's bcrypt helper on the argument.
+     *
+     * Useful for hashing passwords before inserting them into the database.
      *
      * @param string $argumentValue
      *
      * @return mixed
      */
-    public function transform($argumentValue)
+    public function transform($argumentValue): string
     {
-        return \is_string($argumentValue) ?
-                bcrypt($argumentValue) :
-                $argumentValue;
+        return bcrypt($argumentValue);
     }
 }
