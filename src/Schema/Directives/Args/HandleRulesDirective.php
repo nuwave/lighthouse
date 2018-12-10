@@ -17,11 +17,11 @@ trait HandleRulesDirective
 
     public function getMessages(): array
     {
-        return collect((array) $this->directiveArgValue('messages'))
-            ->mapWithKeys(function ($message, $rule) {
-                $prefix = $this->argumentPathAsDotNotation();
+        return collect($this->directiveArgValue('messages'))
+            ->mapWithKeys(function (string $message, string $rule) {
+                $argumentPath = $this->argumentPathAsDotNotation();
 
-                return ["{$prefix}.{$rule}" => $message];
+                return ["{$argumentPath}.{$rule}" => $message];
             })
             ->all();
     }

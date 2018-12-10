@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema;
 use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Symfony\Component\Finder\Finder;
 use GraphQL\Language\AST\DirectiveNode;
 use Symfony\Component\Finder\SplFileInfo;
@@ -15,9 +14,9 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
@@ -26,6 +25,7 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class DirectiveRegistry
 {
@@ -346,7 +346,7 @@ class DirectiveRegistry
      *
      * @return Collection
      */
-    public function argTransformerDirectives(InputValueDefinitionNode $arg): Collection
+    public function argTransformers(InputValueDefinitionNode $arg): Collection
     {
         return $this->associatedDirectivesOfType($arg, ArgTransformerDirective::class);
     }

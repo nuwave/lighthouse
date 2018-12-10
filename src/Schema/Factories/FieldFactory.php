@@ -350,8 +350,6 @@ class FieldFactory
         array $argumentPath,
         Collection $directives
     ) {
-        //$directives = $directives ?? $this->directiveRegistry->argDirectives($astNode);
-
         if ($directives->isEmpty()) {
             return $argumentValue;
         }
@@ -359,8 +357,13 @@ class FieldFactory
         $this->prepareDirectives($astNode, $argumentPath, $directives);
 
         foreach ($directives as $directive) {
+            // Remove the directive from the list to avoid evaluating
+            // the same directive twice
             $directives->shift();
 
+            // Pause the iteration once we hit any directive that has to do
+            // with validation. We will resume running through the remaining
+            // directives later, after we completed validation
             if ($directive instanceof ArgValidationDirective) {
                 $this->collectRulesAndMessages($directive, $argumentPath);
                 break;
@@ -375,6 +378,8 @@ class FieldFactory
             }
         }
 
+        // If directives remain, snapshot the state that we are in now
+        // to allow resuming after validation has run
         if ($directives->count()) {
             $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective[] = [$astNode, $argumentValue, $argumentPath, $directives];
         }
