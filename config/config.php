@@ -193,11 +193,16 @@ return [
     | Batched Queries
     |--------------------------------------------------------------------------
     |
-    | Here you can define GraphQL subscription "broadcasters" as well their required
-    | configuration options.
+    | Here you can define GraphQL subscription "broadcasters" and "storage" drivers
+    | as well their required configuration options.
     |
      */
     'subscriptions' => [
+        /*
+         * Default subscription storage.
+         */
+        'storage' => env('LIGHTHOUSE_STORAGE', 'redis'),
+
         /*
          * Default subscription broadcaster.
          */
@@ -207,9 +212,12 @@ return [
          * Subscription broadcasting drivers w/ config options.
          */
         'broadcasters' => [
+            'log' => [
+                'driver' => 'log',
+            ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => 'Nuwave\Lighthouse\Subscriptions\SubscriptionRouter@routes',
+                'routes' => 'Nuwave\Lighthouse\Subscriptions\SubscriptionRouter@pusher',
             ],
         ],
     ],
