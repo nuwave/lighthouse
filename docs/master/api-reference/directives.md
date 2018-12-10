@@ -879,11 +879,14 @@ type Mutation {
 }
 ```
 
-By default, Lighthouse assumes the argument `id` to be used as the primary key.
-This will work even if your model has a differently named primary key.
+Lighthouse uses the argument `id` to fetch the model by its primary key.
+This will work even if your model has a differently named primary key,
+so you can keep your schema simple and independent of your database structure.
 
-If you want your schema to also use a custom primary key, you can also use that,
-although it is not recommended as it makes client-side caching more difficult.
+If you want your schema to directly reflect your database schema,
+you can also use the name of the underlying primary key.
+This is not recommended as it makes client-side caching more difficult
+and couples your schema to the underlying implementation.
 
 ```graphql
 type Mutation {
