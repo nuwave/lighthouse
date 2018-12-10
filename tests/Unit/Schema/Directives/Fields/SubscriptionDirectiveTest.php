@@ -6,8 +6,10 @@ use Tests\TestCase;
 use Illuminate\Http\Request;
 use Tests\Utils\Directives\FooSubscription;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Subscriptions\StorageManager;
+use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Nuwave\Lighthouse\Subscriptions\Storage\MemoryStorage;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
@@ -22,42 +24,7 @@ class SubscriptionDirectiveTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->singleton(StoresSubscriptions::class, MemoryStorage::class);
-        $app->singleton(BroadcastsSubscriptions::class, function () {
-            return new class() implements BroadcastsSubscriptions {
-                protected $broadcasted = [];
-
-                public function broadcasted($topic = null)
-                {
-                    if (is_null($topic)) {
-                        return $this->broadcasted;
-                    }
-
-                    return array_get($this->broadcasted, $topic);
-                }
-
-                public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root)
-                {
-                    $this->broadcast($subscription, $fieldName, $root);
-                }
-
-                public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root)
-                {
-                    $broadcasted = array_get($this->broadcasted, $fieldName, []);
-
-                    $broadcasted[] = $root;
-
-                    $this->broadcasted[$fieldName] = $broadcasted;
-                }
-
-                public function authorize(Request $request)
-                {
-                    return true;
-                }
-            };
-        });
-
-        config(['lighthouse.extensions' => [
+        $app['config']->set(['lighthouse.extensions' => [
             \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
         ]]);
     }
@@ -67,21 +34,8 @@ class SubscriptionDirectiveTest extends TestCase
      */
     public function itSendsSubscriptionChannelInResponse()
     {
-        $subscription = '
-        subscription OnPostCreated {
-            onPostCreated {
-                body
-            }
-        }';
-
-        $json = [
-            'query' => $subscription,
-            'operationName' => 'OnPostCreated',
-        ];
-
-        $this->schema = $this->schema();
-        $data = $this->postJson('/graphql', $json)->json();
-        $subscriber = app(StoresSubscriptions::class)->subscribersByTopic('ON_POST_CREATED')->first();
+        $data = $this->subscribe();
+        $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertEquals(
@@ -116,7 +70,7 @@ class SubscriptionDirectiveTest extends TestCase
 
         $this->schema = $this->schema();
         $data = $this->postJson('/graphql', $json)->json();
-        $subscribers = app(StoresSubscriptions::class)->subscribersByTopic('ON_POST_CREATED');
+        $subscribers = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED');
 
         $this->assertCount(2, $subscribers);
 
@@ -140,10 +94,16 @@ class SubscriptionDirectiveTest extends TestCase
             }
         }';
 
-        $data = $this->execute($this->schema(), $mutation);
-        $broadcasted = resolve(BroadcastsSubscriptions::class)->broadcasted();
+        $this->subscribe();
+        $this->postJson('/graphql', ['query' => $mutation])->json();
+
+        /** @var LogBroadcaster $log */
+        $log = app(BroadcastManager::class)->driver();
+        $this->assertCount(1, $log->broadcasts());
+
+        $broadcasted = array_get(array_first($log->broadcasts()), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
-        $this->assertEquals(['body' => 'Foobar'], $broadcasted['onPostCreated'][0]);
+        $this->assertEquals(['body' => 'Foobar'], $broadcasted['onPostCreated']);
     }
 
     public function resolve($root, array $args)
@@ -172,6 +132,25 @@ class SubscriptionDirectiveTest extends TestCase
                 foo: String
             }
         ";
+    }
+
+    protected function subscribe()
+    {
+        $subscription = '
+        subscription OnPostCreated {
+            onPostCreated {
+                body
+            }
+        }';
+
+        $json = [
+            'query' => $subscription,
+            'operationName' => 'OnPostCreated',
+        ];
+
+        $this->schema = $this->schema();
+
+        return $this->postJson('/graphql', $json)->json();
     }
 
     protected function buildResponse($channelName, $channel)
