@@ -6,7 +6,6 @@ use Pusher\Pusher;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator as Iterator;
 use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent as Event;
@@ -19,7 +18,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     protected $auth;
 
     /**
-     * @var Storage
+     * @var StorageManager
      */
     protected $storage;
 
@@ -35,13 +34,13 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
 
     /**
      * @param Auth             $auth
-     * @param Storage          $storage
+     * @param StorageManager   $storage
      * @param Iterator         $iterator
      * @param BroadcastManager $broadcastManager
      */
     public function __construct(
         Auth $auth,
-        Storage $storage,
+        StorageManager $storage,
         Iterator $iterator,
         BroadcastManager $broadcastManager
     ) {
@@ -91,7 +90,10 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
                     $subscriber->operationName
                 );
 
-                $this->broadcastManager->broadcast($subscriber, $data);
+                $this->broadcastManager->broadcast(
+                    $subscriber,
+                    $data->jsonSerialize()
+                );
             }
         );
     }

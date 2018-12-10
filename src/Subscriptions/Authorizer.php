@@ -3,15 +3,15 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
 use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
 
 class Authorizer implements Auth
 {
-    /** @var Storage */
+    /** @var StorageManager */
     protected $storage;
 
     /** @var Registry */
@@ -21,11 +21,11 @@ class Authorizer implements Auth
     protected $exceptionHandler;
 
     /**
-     * @param Storage          $storage
+     * @param StorageManager   $storage
      * @param Registry         $registry
      * @param ExceptionHandler $exceptionHandler
      */
-    public function __construct(Storage $storage, Registry $registry, ExceptionHandler $exceptionHandler)
+    public function __construct(StorageManager $storage, Registry $registry, ExceptionHandler $exceptionHandler)
     {
         $this->storage = $storage;
         $this->registry = $registry;

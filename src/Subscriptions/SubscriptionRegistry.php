@@ -10,7 +10,6 @@ use GraphQL\Language\AST\OperationDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class SubscriptionRegistry
 {
@@ -20,7 +19,7 @@ class SubscriptionRegistry
     protected $serializer;
 
     /**
-     * @var StoresSubscriptions
+     * @var StorageManager
      */
     protected $storage;
 
@@ -35,10 +34,10 @@ class SubscriptionRegistry
     protected $subscriptions = [];
 
     /**
-     * @param ContextSerializer   $serializer
-     * @param StoresSubscriptions $storage
+     * @param ContextSerializer $serializer
+     * @param StorageManager    $storage
      */
-    public function __construct(ContextSerializer $serializer, StoresSubscriptions $storage)
+    public function __construct(ContextSerializer $serializer, StorageManager $storage)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
