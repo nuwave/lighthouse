@@ -88,9 +88,12 @@ class MutationExecutor
      */
     public static function executeUpdate(Model $model, Collection $args, HasMany $parentRelation = null): Model
     {
-        $model = $model->newQuery()->findOrFail(
-            $args->pull('id')
-        );
+        $id = $args->pull('id')
+            ?? $args->pull(
+                $model->getKeyName()
+            );
+
+        $model = $model->newQuery()->findOrFail($id);
 
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
 

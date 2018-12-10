@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Category;
 
 class UpdateDirectiveTest extends DBTestCase
 {
@@ -47,6 +48,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
     }
+
     /**
      * @test
      */
@@ -145,5 +147,43 @@ class UpdateDirectiveTest extends DBTestCase
         $task = Task::first();
         $this->assertSame('2', $task->user_id);
         $this->assertSame('foo', $task->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUpdateWithCustomPrimaryKey()
+    {
+        factory(Category::class)->create(['name' => 'foo']);
+
+        $schema = '
+        type Category {
+            category_id: ID!
+            name: String!
+        }
+        
+        type Mutation {
+            updateCategory(
+                category_id: ID!
+                name: String
+            ): Category @update
+        }
+        ' . $this->placeholderQuery();
+        $query = '
+        mutation {
+            updateCategory(
+                category_id: 1
+                name: "bar"
+            ) {
+                category_id
+                name
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame('1', Arr::get($result, 'data.updateCategory.category_id'));
+        $this->assertSame('bar', Arr::get($result, 'data.updateCategory.name'));
+        $this->assertSame('bar', Category::first()->name);
     }
 }
