@@ -17,4 +17,4 @@ resolve('router')->group(config('lighthouse.route', []), function () {
     ]);
 });
 
-app(\Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class)->register();
+app(\Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class)->routes();

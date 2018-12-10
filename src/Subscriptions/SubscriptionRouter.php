@@ -21,7 +21,7 @@ class SubscriptionRouter
     /**
      * Generate subscription routes.
      */
-    public function register()
+    public function routes()
     {
         if (! $this->activated()) {
             return;
@@ -44,7 +44,7 @@ class SubscriptionRouter
      *
      * @param \Illuminate\Routing\Router $router
      */
-    public function routes($router)
+    public function pusher($router)
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
