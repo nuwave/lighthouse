@@ -56,7 +56,7 @@ class PusherBroadcaster implements Broadcaster
      *
      * @return \Illuminate\Http\Response
      */
-    public function unauthorized(Request $request)
+    public function unauthorized(Request $request): Response
     {
         $this->storage()->deleteSubscriber(
             $request->input('channel_name')
