@@ -200,6 +200,8 @@ return [
     'subscriptions' => [
         /*
          * Default subscription storage.
+         *
+         * NOTE: Any laravel supported cache driver options are available here.
          */
         'storage' => env('LIGHTHOUSE_STORAGE', 'redis'),
 

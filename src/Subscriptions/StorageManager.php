@@ -2,67 +2,108 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Nuwave\Lighthouse\Support\DriverManager;
+use Illuminate\Cache\CacheManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Subscriptions\Storage\RedisStorage;
-use Nuwave\Lighthouse\Subscriptions\Storage\MemoryStorage;
-use Nuwave\Lighthouse\Subscriptions\Storage\DatabaseStorage;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
-/**
- * @method Subscriber|null                subscriberByChannel(string $channel)
- * @method \Illuminate\Support\Collection subscriberByTopic($topic)
- * @method void                           storeSubscriber(Subscriber $subscriber, string $topic)
- * @method Subscriber|null                deleteSubscriber(string $channel)
- */
-class StorageManager extends DriverManager
+class StorageManager implements StoresSubscriptions
 {
+    const TOPIC_KEY = 'graphql.topic';
+    const SUBSCRIBER_KEY = 'graphql.subscriber';
+
+    /** @var Cache */
+    protected $cache;
+
     /**
-     * Get configuration key.
-     *
-     * @return string
+     * @param CacheManager $cache
      */
-    protected function configKey()
+    public function __construct(CacheManager $cache)
     {
-        return 'lighthouse.subscriptions.stores';
+        $store = config('lighthouse.subscriptions.storage', 'redis');
+
+        $this->cache = $cache->store($store);
     }
 
     /**
-     * Get configuration driver key.
+     * Find subscriber by channel.
      *
-     * @return string
+     * @param string $channel
+     *
+     * @return Subscriber|null
      */
-    protected function driverKey()
+    public function subscriberByChannel($channel)
     {
-        return 'lighthouse.subscriptions.storage';
+        $key = self::SUBSCRIBER_KEY.".{$channel}";
+
+        return $this->cache->has($key)
+            ? Subscriber::unserialize($this->cache->get($key))
+            : null;
     }
 
     /**
-     * Create instance of memory storage.
+     * Get collection of subscribers by channel.
      *
-     * @return MemoryStorage
+     * @param string $topic
+     *
+     * @return \Illuminate\Support\Collection
      */
-    protected function createMemoryDriver()
+    public function subscribersByTopic($topic)
     {
-        return new MemoryStorage();
+        $key = self::TOPIC_KEY.".{$topic}";
+
+        if (! $this->cache->has($key)) {
+            return collect();
+        }
+
+        $channels = json_decode($this->cache->get($key), true);
+
+        return collect($channels)->map(function ($channel) {
+            return $this->subscriberByChannel($channel);
+        })->filter()->values();
     }
 
     /**
-     * Create instance of database storage.
+     * Store subscription.
      *
-     * @return DatabaseStorage
+     * @param Subscriber $subscriber
+     * @param string     $topic
      */
-    protected function createDatabaseStorage()
+    public function storeSubscriber(Subscriber $subscriber, $topic)
     {
-        return new DatabaseStorage();
+        $topicKey = self::TOPIC_KEY.".{$topic}";
+        $subscriberKey = self::SUBSCRIBER_KEY.".{$subscriber->channel}";
+
+        $topic = $this->cache->has($topicKey)
+            ? json_decode($this->cache->get($topicKey), true)
+            : [];
+
+        $topic[] = $subscriber->channel;
+
+        $this->cache->forever($topicKey, json_encode($topic));
+        $this->cache->forever($subscriberKey, json_encode($subscriber->toArray()));
     }
 
     /**
-     * Create instance of redis storage.
+     * Delete subscriber.
      *
-     * @return RedisStorage
+     * @param string $channel
+     *
+     * @return Subscriber|null
      */
-    protected function createRedisStorage()
+    public function deleteSubscriber($channel)
     {
-        return new RedisStorage();
+        $key = self::SUBSCRIBER_KEY.".{$channel}";
+        $hasSubscriber = $this->cache->has($key);
+
+        $subscriber = $hasSubscriber
+            ? Subscriber::unserialize($this->cache->get($key))
+            : null;
+
+        if ($hasSubscriber) {
+            $this->cache->forget($key);
+        }
+
+        return $subscriber;
     }
 }

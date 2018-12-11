@@ -64,7 +64,7 @@ class TestCase extends BaseTestCase
                 'models' => 'Tests\\Utils\\Models',
             ],
             'subscriptions' => [
-                'storage' => 'memory',
+                'storage' => 'array',
                 'broadcaster' => 'log',
                 'broadcasters' => [
                     'log' => [
