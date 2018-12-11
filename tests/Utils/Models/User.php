@@ -15,7 +15,7 @@ class User extends Authenticatable
     public function getTaskCountAsString(): string
     {
         if (! $this->relationLoaded('tasks')) {
-            return 'This relation should have been preloaded via @loadRelation';
+            return 'This relation should have been preloaded via @with';
         }
 
         return "User has {$this->tasks->count()} tasks.";

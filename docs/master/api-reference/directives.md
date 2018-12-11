@@ -504,18 +504,23 @@ class Commentable
 }
 ```
 
-## @loadRelation
+## @with
 
-Eager-load an Eloquent relation that is not returned directly but
-used for resolving other fields.
+Eager-load an Eloquent relation.
 
 ```graphql
 type User {
   taskSummary: String!
-    @loadRelation(relation: "tasks")
+    @with(relation: "tasks")
     @method(name: "getTaskSummary")
 }
 ```
+
+This can be a useful optimization for fields that are not returned directly
+but rather used for resolving other fields.
+
+If you just want to return the relation itself as-is,
+look into [handling Eloquent relationships](../guides/relationships.md).
 
 ## @method
 

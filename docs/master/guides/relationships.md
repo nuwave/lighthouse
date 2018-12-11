@@ -48,6 +48,9 @@ Lighthouse has got you covered with specialized directives that optimize the Que
 Suppose you want to load a list of posts and associated comments. When you tell
 Lighthouse about the relationship, it automatically eager loads the comments when you need them.
 
+For special cases, you can use [`@with`](../api-reference/directives.md#with) to eager-load a relation
+without returning it directly.
+
 ### One To One
 
 Use the [@hasOne](../api-reference/directives.md#hasOne) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one)

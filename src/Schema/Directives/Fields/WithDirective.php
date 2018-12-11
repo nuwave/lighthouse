@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 
-class LoadRelationDirective extends RelationDirective implements FieldMiddleware
+class WithDirective extends RelationDirective implements FieldMiddleware
 {
     /**
      * Name of the directive.
@@ -19,7 +19,7 @@ class LoadRelationDirective extends RelationDirective implements FieldMiddleware
      */
     public function name(): string
     {
-        return 'loadRelation';
+        return 'with';
     }
 
     /**

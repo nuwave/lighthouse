@@ -6,7 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class LoadRelationDirectiveTest extends DBTestCase
+class WithDirectiveTest extends DBTestCase
 {
     /**
      * Auth user.
@@ -45,7 +45,7 @@ class LoadRelationDirectiveTest extends DBTestCase
         $schema = '
         type User {
             task_count_string: String!
-                @loadRelation(relation: "tasks")
+                @with(relation: "tasks")
                 @method(name: "getTaskCountAsString")
         }
         
