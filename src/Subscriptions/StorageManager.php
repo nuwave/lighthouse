@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Support\Arr;
 use Illuminate\Cache\CacheManager;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -23,6 +24,21 @@ class StorageManager implements StoresSubscriptions
         $store = config('lighthouse.subscriptions.storage', 'redis');
 
         $this->cache = $cache->store($store);
+    }
+
+    /**
+     * Get subscriber by request.
+     *
+     * @param array $input
+     * @param array $headers
+     *
+     * @return Subscriber|null
+     */
+    public function subscriberByRequest(array $input, array $headers)
+    {
+        $channel = Arr::get($input, 'channel_name');
+
+        return $channel ? $this->subscriberByChannel($channel) : null;
     }
 
     /**
