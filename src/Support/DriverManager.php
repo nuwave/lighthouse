@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Illuminate\Container\Container as Application;
+use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 
 /**
  * NOTE: Implementation pulled from \Illuminate\Cache\CacheManager. Purpose is
@@ -135,13 +136,15 @@ abstract class DriverManager
             throw new \InvalidArgumentException("Driver [{$name}] is not defined.");
         }
 
+        $interface = $this->interface();
+
         if (isset($this->customCreators[$config['driver']])) {
-            return $this->callCustomCreator($config);
+            return $this->validateDriver($this->callCustomCreator($config));
         } else {
             $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
 
             if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
+                return $this->validateDriver($this->{$driverMethod}($config));
             } else {
                 throw new \InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
             }
@@ -158,6 +161,26 @@ abstract class DriverManager
     protected function callCustomCreator(array $config)
     {
         return $this->customCreators[$config['driver']]($this->app, $config);
+    }
+
+    /**
+     * Validate driver implements the proper interface.
+     *
+     * @param mixed $driver
+     *
+     * @throws InvalidDriverException
+     *
+     * @return mixed
+     */
+    protected function validateDriver($driver)
+    {
+        $interface = $this->interface();
+
+        if (! (new \ReflectionClass($driver))->implementsInterface($interface)) {
+            throw new InvalidDriverException(get_class($driver)." does not implement {$interface}");
+        }
+
+        return $driver;
     }
 
     /**
@@ -186,4 +209,11 @@ abstract class DriverManager
      * @return string
      */
     abstract protected function driverKey();
+
+    /**
+     * The interface the driver should implement.
+     *
+     * @return string
+     */
+    abstract protected function interface();
 }

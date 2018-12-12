@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Nuwave\Lighthouse\Support\DriverManager;
 use Illuminate\Container\Container as Application;
-use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 /**
@@ -34,6 +34,16 @@ class BroadcastManager extends DriverManager
     protected function driverKey()
     {
         return 'lighthouse.subscriptions.broadcaster';
+    }
+
+    /**
+     * The interface the driver should implement.
+     *
+     * @return string
+     */
+    protected function interface()
+    {
+        return 'Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster';
     }
 
     /**
