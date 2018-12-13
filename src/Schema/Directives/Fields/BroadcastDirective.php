@@ -59,7 +59,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
         $value = $next($value);
         $resolver = $value->getResolver();
         $subscriptionField = $this->directiveArgValue('subscription');
-        $queueBroadcast = $this->directiveArgValue('queue', config('lighthouse.subscriptions.queue', false));
+        $queueBroadcast = $this->directiveArgValue('queue', config('lighthouse.subscriptions.queue_broadcasts', false));
         $broadcastMethod = $queueBroadcast ? 'queueBroadcast' : 'broadcast';
 
         return $value->setResolver(function () use ($resolver, $subscriptionField, $broadcastMethod) {
@@ -85,7 +85,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
                         $resolved
                     );
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->exceptionHandler->handleBroadcastError($e);
             }
 

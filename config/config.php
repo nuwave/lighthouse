@@ -199,11 +199,16 @@ return [
      */
     'subscriptions' => [
         /*
+         * Determines if broadcasts should be queued by default.
+         */
+        'queue_broadcasts' => env('LIGHTHOUSE_QUEUE_BROADCASTS', true),
+
+        /*
          * Default subscription storage.
          *
          * NOTE: Any laravel supported cache driver options are available here.
          */
-        'storage' => env('LIGHTHOUSE_STORAGE', 'redis'),
+        'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
         /*
          * Default subscription broadcaster.
