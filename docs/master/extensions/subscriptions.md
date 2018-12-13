@@ -4,10 +4,6 @@
 
 **Install the Pusher PHP Server package**
 
-::: tip NOTE
-A future version of Lighthouse will introduce a driver implementation so different websocket solutions can be leveraged by adjusting the config file and installing the required external package(s).
-:::
-
 ```bash
 composer require pusher/pusher-php-server
 ```
@@ -23,28 +19,27 @@ composer require pusher/pusher-php-server
 
 ## Basic Setup
 
-TODO: Add description here...
+To fire a subscription from the server down to the client you must create a `Subscription` type with fields decorated with the `@subscription` directive which will point to the `GraphQLSubscription` class responsible for managing the subscribed client(s).
 
 ```graphql
-type Mutation {
-    updatePost(input: UpdatePostInput!): Post
-        # This will pipe the Post returned from this mutation to the
-        # PostUpdatedSubscription resolve function
-        @broadcast(subscription: "postUpdated")
-}
-
 type Subscription {
     postUpdated(author: ID): Post
         @subscription(
             class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
         )
 }
+
+type Mutation {
+    updatePost(input: UpdatePostInput!): Post
+        # This will pipe the Post returned from this mutation to the
+        # PostUpdatedSubscription resolve function
+        @broadcast(subscription: "postUpdated")
+}
 ```
 
 ## The Subscription Class
 
-TODO: Go through example showing all class methods...
-TODO: Create example that creates a custom topic name to help filter listeners...
+All subscriptions must have a defined `GraphQLSubscription` class which defines methods for authorization, filtering, etc. At a minimum, the assigned `GraphQLSubscription` must define the `authorize` and `filter` methods.
 
 ```php
 namespace App\GraphQL\Subscriptions;
@@ -66,15 +61,16 @@ class PostUpdatedSubscription extends GraphQLSubscription
     public function authorize(Subscriber $subscriber, Request $request)
     {
         $user = $subscriber->context->user;
+        $author = \App\Models\Author::find($subscriber->args['author']);
 
-        return $user->hasPermission('some-permission');
+        return $user->can('viewPosts', $author);
     }
 
     /**
      * Filter subscribers who should receive subscription.
      *
      * @param Subscriber $subscriber
-     * @param mixed      \App\Models\Event $root
+     * @param mixed      $root
      *
      * @return bool
      */
@@ -82,24 +78,79 @@ class PostUpdatedSubscription extends GraphQLSubscription
     {
         $user = $subscriber->context->user;
 
-        // Don't send the subscription update to the same
+        // Don't broadcast the subscription to the same
         // person who updated the post.
         return $root->updated_by !== $user->id;
+    }
+
+    /**
+     * Encode topic name.
+     *
+     * @param Subscriber $subscriber
+     *
+     * @return string
+     */
+    public function encodeTopic(Subscriber $subscriber, $fieldName)
+    {
+        // Optionally create a unique topic name based on the
+        // `author` argument.
+        $args = $subscriber->args;
+
+        return snake_case($fieldName).':'.$args['author'];
+    }
+
+    /**
+     * Decode topic name.
+     *
+     * @param string           $operationName
+     * @param \App\Models\Post $root
+     * @param mixed            $context
+     *
+     * @return string
+     */
+    public function decodeTopic(string $fieldName, $root)
+    {
+        // Decode the topic name if the `encodeTopic` has been overwritten.
+        $author_id = $root->author_id;
+
+        return snake_case($fieldName).':'.$author_id;
+    }
+
+    /**
+     * Resolve the subscription.
+     *
+     * @param \App\Models\Post $root
+     * @param array            $args
+     * @param Context          $context
+     * @param ResolveInfo      $info
+     *
+     * @return mixed
+     */
+    public function resolve($root, array $args, $context, ResolveInfo $info)
+    {
+        // Optionally manipulate the `$root` item before it gets broadcasted to
+        // subscribed client(s).
+        $root->load(['author', 'author.achievements']);
+
+        return $root;
     }
 }
 ```
 
 ## Firing a subscription via code
 
+The `BroadcastsSubscriptions` `broadcast` or `queueBroadcast` methods can be used to fire subscriptions via code.
+
 **Using an event listener**
 
 ```php
 namespace App\Listeners\Post;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Http\GraphQL\Subscriptions\PostUpdatedSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
-class BroadcastPostUpdated
+class BroadcastPostUpdated implements ShouldQueue
 {
     /**
      * @var BroadcastsSubscriptions
@@ -208,3 +259,7 @@ class PusherLink extends ApolloLink {
 
 export default PusherLink;
 ```
+
+::: tip Note
+Details on Relay Modern integration are coming soon.
+:::
