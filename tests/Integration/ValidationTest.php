@@ -94,9 +94,9 @@ class ValidationTest extends TestCase
         {
             foo(
                 list: [
-                    "asdf@asfd.com"
+                    "valid_email@example.com"
                     null
-                    "asdfasdf"
+                    "invalid_email"
                 ]
             )
         }
@@ -236,9 +236,6 @@ class ValidationTest extends TestCase
     protected function assertValidationKeysSame(array $keys, array $result)
     {
         $validation = Arr::get($result, 'errors.0.extensions.validation');
-
-        foreach ($keys as $key) {
-            $this->assertNotNull(Arr::get($validation, $key));
-        }
+        $this->assertSame($keys, array_keys($validation));
     }
 }

@@ -89,15 +89,7 @@ class ErrorBuffer
             return $this;
         }
 
-        $errorRecord = data_get($this->errors, $key);
-
-        if ($errorRecord) {
-            $errorRecord[] = $errorMessage;
-        } else {
-            $errorRecord = [$errorMessage];
-        }
-
-        data_set($this->errors, $key, $errorRecord);
+        $this->errors[$key][] = $errorMessage;
 
         return $this;
     }
@@ -124,8 +116,6 @@ class ErrorBuffer
 
     /**
      * Reset the errors to an empty array.
-     *
-     * @return void
      */
     public function clearErrors()
     {

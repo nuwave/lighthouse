@@ -188,28 +188,26 @@ class RulesDirectiveTest extends TestCase
 
         $this->assertSame('John', Arr::get($queryResult, 'data.foo.first_name'));
         $this->assertEquals([
-            'input' => [
-                'emails' => [
-                        0 => ['Not an email'],
-                        1 => ['Not an email'],
-                ],
-                'self' => [
-                    'emails' => [
-                            0 => ['Not an email'],
-                            1 => ['Not an email'],
-                    ],
-                    'self' => [
-                        'emails' => [
-                                1 => ['Not an email'],
-                                3 => ['Not an email'],
-                        ],
-                        'self' => [
-                            'emails' => [
-                                    0 => ['The input.self.self.self.emails.0 may not be greater than 20 characters.'],
-                            ],
-                        ],
-                    ],
-                ],
+            'input.emails.0' => [
+                'Not an email',
+            ],
+            'input.emails.1' => [
+                'Not an email',
+            ],
+            'input.self.emails.0' => [
+                'Not an email',
+            ],
+            'input.self.emails.1' => [
+                'Not an email',
+            ],
+            'input.self.self.emails.1' => [
+                'Not an email',
+            ],
+            'input.self.self.emails.3' => [
+                'Not an email',
+            ],
+            'input.self.self.self.emails.0' => [
+                'The input.self.self.self.emails.0 may not be greater than 20 characters.',
             ],
         ], Arr::get($queryResult, 'errors.0.extensions.validation'));
     }
@@ -244,22 +242,14 @@ class RulesDirectiveTest extends TestCase
 
         $this->assertSame('John', Arr::get($queryResult, 'data.foo.first_name'));
         $this->assertEquals([
-            'input' => [
-                'email' => [
-                    0 => 'Not an email',
-                ],
-                'self' => [
-                    'email' => [
-                        0 => 'Not an email',
-                    ],
-                    'self' => [
-                        'self' => [
-                            'email' => [
-                                0 => 'The input.self.self.self.email may not be greater than 20 characters.',
-                            ],
-                        ],
-                    ],
-                ],
+            'input.email' => [
+                'Not an email',
+            ],
+            'input.self.email' => [
+                'Not an email',
+            ],
+            'input.self.self.self.email' => [
+                'The input.self.self.self.email may not be greater than 20 characters.',
             ],
         ], Arr::get($queryResult, 'errors.0.extensions.validation'));
     }
