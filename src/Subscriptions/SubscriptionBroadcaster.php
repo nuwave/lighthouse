@@ -71,17 +71,13 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root)
     {
-        info('broadcast.subscription');
         $topic = $subscription->decodeTopic($fieldName, $root);
-        info('subcsription.topic: '.$topic);
 
         $subscribers = $this->storage
             ->subscribersByTopic($topic)
             ->filter(function (Subscriber $subscriber) use ($subscription, $root) {
                 return $subscription->filter($subscriber, $root);
             });
-
-        info('subscribers', $subscribers->toArray());
 
         $this->iterator->process(
             $subscribers,
