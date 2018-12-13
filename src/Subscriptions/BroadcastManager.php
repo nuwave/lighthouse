@@ -2,11 +2,9 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Nuwave\Lighthouse\Support\DriverManager;
-use Illuminate\Container\Container as Application;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Support\DriverManager;
 
 /**
  * @method void                      broadcast(Subscriber $subscriber, array $data)
@@ -55,10 +53,10 @@ class BroadcastManager extends DriverManager
      */
     protected function createPusherDriver(array $config)
     {
-        $appKey = config('broadcasting.pusher.key');
-        $appSecret = config('broadcasting.pusher.secret');
-        $appId = config('broadcasting.pusher.app_id');
-        $options = config('broadcasting.pusher.options', []);
+        $appKey = config('broadcasting.connections.pusher.key');
+        $appSecret = config('broadcasting.connections.pusher.secret');
+        $appId = config('broadcasting.connections.pusher.app_id');
+        $options = config('broadcasting.connections.pusher.options', []);
 
         $pusher = new \Pusher\Pusher($appKey, $appSecret, $appId, $options);
 

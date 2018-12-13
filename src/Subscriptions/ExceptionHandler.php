@@ -19,9 +19,9 @@ class ExceptionHandler implements SubscriptionExceptionHandler
     /**
      * Handle broadcast error.
      *
-     * @param \Exception $e
+     * @param \Throwable $e
      */
-    public function handleBroadcastError(\Exception $e)
+    public function handleBroadcastError($e)
     {
         info('graphql.broadcast.exception', [
             'message' => $e->getMessage(),

@@ -59,6 +59,8 @@ class SubscriptionDirective extends BaseDirective implements FieldResolver
             $value->getFieldName()
         );
 
+        info('registered.subscriptions', $this->registry->keys());
+
         return $value->setResolver(function ($root, $args, $context, ResolveInfo $info) use ($subscription, $fieldName) {
             if ($root instanceof Subscriber) {
                 return $subscription->resolve($root->root, $args, $context, $info);

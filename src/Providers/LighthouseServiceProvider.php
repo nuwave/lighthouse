@@ -88,7 +88,6 @@ class LighthouseServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
-                \Nuwave\Lighthouse\Console\CreateMigrationsCommand::class,
                 \Nuwave\Lighthouse\Console\InterfaceCommand::class,
                 \Nuwave\Lighthouse\Console\MutationCommand::class,
                 \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,

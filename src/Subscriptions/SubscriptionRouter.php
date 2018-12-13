@@ -28,7 +28,7 @@ class SubscriptionRouter
         }
 
         $broadcaster = config('lighthouse.subscriptions.broadcaster');
-        $router = config("lighthouse.subscriptions.{$broadcaster}.routes");
+        $router = config("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes");
         $routerParts = explode('@', $router);
 
         if (2 == count($routerParts) && ! empty($routerParts[0]) && ! empty($routerParts[1])) {

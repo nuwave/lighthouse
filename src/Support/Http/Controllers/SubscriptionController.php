@@ -5,20 +5,27 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionController extends Controller
 {
     /**
-     * @var BroadcastManager
+     * @var BroadcastsSubscriptions
      */
     protected $broadcaster;
 
     /**
+     * @var BroadcastManager
+     */
+    protected $broadcasterManager;
+
+    /**
      * @param BroadcastManager $broadcaster
      */
-    public function __construct(Broadcaster $broadcaster)
+    public function __construct(BroadcastsSubscriptions $broadcaster, BroadcastManager $broadcastManager)
     {
         $this->broadcaster = $broadcaster;
+        $this->broadcasterManager = $broadcastManager;
     }
 
     /**
@@ -42,6 +49,6 @@ class SubscriptionController extends Controller
      */
     public function webhook(Request $request)
     {
-        return $this->broadcaster->hook($request);
+        return $this->broadcasterManager->hook($request);
     }
 }

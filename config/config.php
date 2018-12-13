@@ -190,7 +190,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Batched Queries
+    | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
     | Here you can define GraphQL subscription "broadcasters" and "storage" drivers

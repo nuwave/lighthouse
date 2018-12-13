@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Subscriptions\Storage\DatabaseStorage;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
 use Nuwave\Lighthouse\Subscriptions\Contracts\RegistersRoutes;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Directives\BroadcastDirective;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Directives\SubscriptionDirective;
@@ -28,8 +29,8 @@ class SubscriptionProvider
     public static function register(Application $app)
     {
         $app->singleton(BroadcastManager::class);
-        $app->singleton(StorageManager::class);
         $app->singleton(SubscriptionRegistry::class);
+        $app->singleton(StoresSubscriptions::class, StorageManager::class);
 
         $app->bind(ContextSerializer::class, Serializer::class);
         $app->bind(AuthorizesSubscriptions::class, Authorizer::class);

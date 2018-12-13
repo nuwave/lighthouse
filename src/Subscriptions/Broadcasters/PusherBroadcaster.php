@@ -4,21 +4,19 @@ namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
-use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Authorizer;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class PusherBroadcaster implements Broadcaster
 {
     const EVENT_NAME = 'lighthouse-subscription';
 
-    /**
-     * Undocumented variable.
-     *
-     * @var \Pusher\Pusher
-     */
+    /** @var \Pusher\Pusher */
     protected $pusher;
+
+    /** @var Storage */
+    protected $storage;
 
     /**
      * Create instance of pusher broadcaster.
@@ -28,6 +26,7 @@ class PusherBroadcaster implements Broadcaster
     public function __construct($pusher)
     {
         $this->pusher = $pusher;
+        $this->storage = app(Storage::class);
     }
 
     /**
@@ -37,7 +36,7 @@ class PusherBroadcaster implements Broadcaster
      *
      * @return \Illuminate\Http\Response
      */
-    public function authorized(Request $request): Response
+    public function authorized(Request $request)
     {
         $channel = $request->input('channel_name');
         $socketId = $request->input('socket_id');
@@ -45,6 +44,7 @@ class PusherBroadcaster implements Broadcaster
             $this->pusher->socket_auth($channel, $socketId),
             true
         );
+        info('socket.auth', array_merge($data, $request->all()));
 
         return response()->json($data, 200);
     }
@@ -56,12 +56,8 @@ class PusherBroadcaster implements Broadcaster
      *
      * @return \Illuminate\Http\Response
      */
-    public function unauthorized(Request $request): Response
+    public function unauthorized(Request $request)
     {
-        $this->storage()->deleteSubscriber(
-            $request->input('channel_name')
-        );
-
         return response()->json(['error' => 'unauthorized'], 403);
     }
 
@@ -72,13 +68,13 @@ class PusherBroadcaster implements Broadcaster
      *
      * @return \Illuminate\Support\Response
      */
-    public function hook(Request $request): Response
+    public function hook(Request $request)
     {
         collect($request->input('events', []))
             ->filter(function ($event) {
                 return 'channel_vacated' == array_get($event, 'name');
             })->each(function ($event) {
-                $this->storage()->deleteSubscriber(
+                $this->storage->deleteSubscriber(
                     array_get($event, 'channel')
                 );
             });
@@ -98,19 +94,9 @@ class PusherBroadcaster implements Broadcaster
             $subscriber->channel,
             self::EVENT_NAME,
             [
-                'more' => true,
+                'more'   => true,
                 'result' => $data,
             ]
         );
-    }
-
-    /**
-     * Get instance of subscription storage.
-     *
-     * @return Storage
-     */
-    protected function storage(): Storage
-    {
-        return app(Storage::class);
     }
 }

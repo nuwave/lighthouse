@@ -59,6 +59,28 @@ class SubscriptionRegistry
     }
 
     /**
+     * Check if subscription is registered.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function has($key): bool
+    {
+        return isset($this->subscriptions[$key]);
+    }
+
+    /**
+     * get subscription keys.
+     *
+     * @return array
+     */
+    public function keys(): array
+    {
+        return array_keys($this->subscriptions);
+    }
+
+    /**
      * Get instance of subscription.
      *
      * @param string $key
@@ -100,7 +122,7 @@ class SubscriptionRegistry
     {
         // A subscription can be fired w/out a request so we must make
         // sure the schema has been generated.
-        graphql()->prepSchema();
+        app('graphql')->prepSchema();
 
         $documentNode = Parser::parse($subscriber->queryString, [
             'noLocation' => true,
