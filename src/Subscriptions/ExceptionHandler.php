@@ -9,9 +9,9 @@ class ExceptionHandler implements SubscriptionExceptionHandler
     /**
      * Handle authentication error.
      *
-     * @param \Exception $e
+     * @param \Throwable $e
      */
-    public function handleAuthError(\Exception $e)
+    public function handleAuthError($e)
     {
         // Do nothing....
     }
