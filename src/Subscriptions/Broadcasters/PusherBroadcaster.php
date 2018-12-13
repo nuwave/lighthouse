@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class PusherBroadcaster implements Broadcaster
 {
@@ -44,7 +44,6 @@ class PusherBroadcaster implements Broadcaster
             $this->pusher->socket_auth($channel, $socketId),
             true
         );
-        info('socket.auth', array_merge($data, $request->all()));
 
         return response()->json($data, 200);
     }
@@ -94,7 +93,7 @@ class PusherBroadcaster implements Broadcaster
             $subscriber->channel,
             self::EVENT_NAME,
             [
-                'more'   => true,
+                'more' => true,
                 'result' => $data,
             ]
         );

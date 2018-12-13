@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions as Broadcaster;
 
-class BroadcastSubscriptionListener
+class BroadcastSubscriptionListener implements ShouldQueue
 {
     /**
      * @var Broadcaster

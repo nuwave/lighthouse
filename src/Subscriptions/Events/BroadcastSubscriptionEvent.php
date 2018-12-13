@@ -3,10 +3,9 @@
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription as Subscription;
 
-class BroadcastSubscriptionEvent implements ShouldQueue
+class BroadcastSubscriptionEvent
 {
     use SerializesModels;
 
