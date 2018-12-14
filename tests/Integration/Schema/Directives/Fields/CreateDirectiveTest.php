@@ -181,4 +181,35 @@ class CreateDirectiveTest extends DBTestCase
         $this->assertSame('1', Arr::get($result, 'data.createUser.tasks.0.id'));
         $this->assertSame('bar', Arr::get($result, 'data.createUser.tasks.0.name'));
     }
+
+    /**
+     * @test
+     */
+    public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately()
+    {
+        $schema = '
+        type Mutation {
+            createTag(name: String): Tag @create
+        }
+        
+        type Tag {
+            name: String!
+            default_string: String!
+        }
+        ' . $this->placeholderQuery();
+        $query = '
+        mutation {
+            createTag(name: "foobar"){
+                name
+                default_string
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame([
+            'name' => 'foobar',
+            'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
+        ], Arr::get($result, 'data.createTag'));
+    }
 }

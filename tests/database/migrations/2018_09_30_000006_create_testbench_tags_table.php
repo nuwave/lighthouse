@@ -6,6 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTestbenchTagsTable extends Migration
 {
+    const DEFAULT_STRING = 'this is the default string';
+
     /**
      * Run the migrations.
      */
@@ -14,6 +16,7 @@ class CreateTestbenchTagsTable extends Migration
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('default_string')->default(self::DEFAULT_STRING);
             $table->timestamps();
         });
     }
