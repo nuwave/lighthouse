@@ -69,7 +69,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
                 $subscription = $this->registry->subscription($subscriptionField);
 
                 if ($resolved instanceof Deferred) {
-                    $resolved->then(function ($root) use ($subscription, $broadcastMethod) {
+                    $resolved->then(function ($root) use ($subscription, $subscriptionField, $broadcastMethod) {
                         call_user_func(
                             [$this->broadcaster, $broadcastMethod],
                             $subscription,
