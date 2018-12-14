@@ -260,6 +260,24 @@ class PusherLink extends ApolloLink {
 export default PusherLink;
 ```
 
+Then initialize the pusher client and use it in the link stack.
+
+```js
+const pusherLink = new PusherLink({
+    pusher: new Pusher(PUSHER_API_KEY, {
+        cluster: PUSHER_CLUSTER,
+        authEndpoint: `${API_LOCATION}/graphql/subscriptions/auth`,
+        auth: {
+            headers: {
+                authorization: BEARER_TOKEN
+            }
+        }
+    })
+});
+
+const link = ApolloLink.from([pusherLink, httpLink(`${API_LOCATION}/graphql`)]);
+```
+
 ::: tip Note
 Details on Relay Modern integration are coming soon.
 :::
