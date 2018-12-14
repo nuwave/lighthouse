@@ -49,7 +49,7 @@ abstract class BatchLoader
         $instanceName = static::instanceKey($pathToField);
         $currentBatchIndex = app('graphql')->currentBatchIndex();
 
-        if (null !== ! $currentBatchIndex) {
+        if (null !== $currentBatchIndex) {
             $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
         }
 
