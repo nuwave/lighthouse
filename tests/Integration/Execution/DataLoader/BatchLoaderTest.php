@@ -44,7 +44,8 @@ class BatchLoaderTest extends DBTestCase
                     name
                 }
             }
-        }';
+        }
+        ';
 
         $batchedQueries = [
             ['query' => $query, 'variables' => ['id' => $users[0]->getKey()]],

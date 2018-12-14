@@ -47,6 +47,9 @@ abstract class BatchLoader
     {
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
+
+        // If we are resolving a batched query, we need to assign each
+        // query a uniquely indexed instance
         $currentBatchIndex = app('graphql')->currentBatchIndex();
 
         if (null !== $currentBatchIndex) {

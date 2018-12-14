@@ -59,7 +59,8 @@ class GraphQL
     }
 
     /**
-     * Get current batch index.
+     * Returns the index of the current batch if we are resolving
+     * a batched query or `null` if we are resolving a single query.
      *
      * @return int|null
      */
