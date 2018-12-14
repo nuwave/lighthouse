@@ -41,6 +41,9 @@ class GraphQL
     /** @var Pipeline */
     protected $pipeline;
 
+    /** @var int|null */
+    protected $currentBatchIndex = null;
+
     /**
      * @param ExtensionRegistry    $extensionRegistry
      * @param SchemaBuilder        $schemaBuilder
@@ -56,6 +59,16 @@ class GraphQL
     }
 
     /**
+     * Get current batch index.
+     *
+     * @return int|null
+     */
+    public function currentBatchIndex()
+    {
+        return $this->currentBatchIndex;
+    }
+
+    /**
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
@@ -68,6 +81,7 @@ class GraphQL
     public function executeBatchedQueries(array $requests, $context = null, $rootValue = null): array
     {
         return collect($requests)->map(function ($request, $index) use ($context, $rootValue) {
+            $this->currentBatchIndex = $index;
             $this->extensionRegistry->batchedQueryDidStart($index);
 
             $result = $this->executeQuery(
@@ -171,9 +185,9 @@ class GraphQL
     protected function getValidationRules(): array
     {
         return [
-            new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
-            new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
-            new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
+            QueryComplexity::class => new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
+            QueryDepth::class => new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
+            DisableIntrospection::class => new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
         ];
     }
 

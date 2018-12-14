@@ -47,6 +47,11 @@ abstract class BatchLoader
     {
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
+        $currentBatchIndex = app('graphql')->currentBatchIndex();
+
+        if (null !== ! $currentBatchIndex) {
+            $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
+        }
 
         // Only register a new instance if it is not already bound
         $instance = app()->bound($instanceName)
