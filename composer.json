@@ -9,10 +9,12 @@
         "laravel-graphql"
     ],
     "license": "MIT",
-    "authors": [{
-        "name": "Christopher Moore",
-        "email": "chris@nuwavecommerce.com"
-    }],
+    "authors": [
+        {
+          "name": "Christopher Moore",
+          "email": "chris@nuwavecommerce.com"
+      }
+    ],
     "support": {
         "issues": "https://github.com/nuwave/lighthouse/issues",
         "source": "https://github.com/nuwave/lighthouse"
