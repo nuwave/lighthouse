@@ -19,6 +19,10 @@ class Subscription
      */
     public static function broadcast(string $subscriptionField, $root, $queue = null)
     {
+        // Ensure we have a schema and registered subscription fields
+        // in the event we are calling this method in code.
+        app('graphql')->prepSchema();
+
         /** @var SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
         /** @var BroadcastsSubscriptions $broadcaster */
