@@ -35,6 +35,13 @@ class SubscriptionTest extends TestCase
 
         $this->broadcaster = $this->prophesize(SubscriptionBroadcaster::class);
         $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());
+
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
+        type Query {
+            subscription: String @field(resolver: \"{$resolver}\")
+        }
+        ";
     }
 
     /**
@@ -62,6 +69,11 @@ class SubscriptionTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         Subscription::broadcast('unknownField', []);
+    }
+
+    public function resolve()
+    {
+        return self::SUBSCRIPTION_FIELD;
     }
 
     protected function subscription(): GraphQLSubscription
