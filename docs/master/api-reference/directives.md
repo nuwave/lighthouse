@@ -109,6 +109,8 @@ type User {
 
 ## @bcrypt
 
+***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+
 Run the `bcrypt` function on the argument it is defined on.
 
 ```graphql
@@ -117,23 +119,16 @@ type Mutation {
 }
 ```
 
-When you resolve the field, the argument will hold the `bcrypt` value.
+## @trim
 
-```php
-<?php
+***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
 
-namespace App\GraphQL\Mutations;
+Run the `trim` function on the argument it is defined on.
 
-class CreateUser
-{
-    public function resolve($root, array $args)
-    {
-        return User::create([
-          'name' => $args['name'],
-          // This will be the bcrypt value of the password argument
-          'password' => $args['password']
-        ]);
-    }
+
+```graphql
+type Mutation {
+  createUser(name: String @trim): User
 }
 ```
 

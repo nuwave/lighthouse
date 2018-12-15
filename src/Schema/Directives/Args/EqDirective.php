@@ -32,7 +32,7 @@ class EqDirective implements ArgFilterDirective
      * Does this filter combine the values of multiple input arguments into one query?
      *
      * This is true for filter directives such as "whereBetween" that expects two
-     * different input values, given as seperate arguments.
+     * different input values, given as separate arguments.
      *
      * @return bool
      */

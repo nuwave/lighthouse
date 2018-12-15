@@ -22,6 +22,7 @@ module.exports = [{
             'guides/auth',
             'guides/validation',
             'guides/relationships',
+            'guides/defining-directives',
             'guides/plugin-development'
         ]
     },
