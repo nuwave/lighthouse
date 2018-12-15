@@ -25,6 +25,8 @@ class ValidationTest extends TestCase
                 @trim
                 @rules(apply: ["min:6", "max:20", "required_with:id"])
                 @bcrypt
+            bar: Bar
+                @rules(apply: ["required_if:id,bar"])
         ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")
     }
     
@@ -209,6 +211,23 @@ class ValidationTest extends TestCase
         $password = Arr::get($result, 'data.password');
         $this->assertNull($password);
         $this->assertValidationKeysSame(['password'], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itEvaluatesInputFieldRules()
+    {
+        $invalidPasswordQuery = '
+        {
+            password(id: "bar", password: "123456")
+        }
+        ';
+        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+        $password = Arr::get($result, 'data.password');
+
+        $this->assertNull($password);
+        $this->assertValidationKeysSame(['bar'], $result);
     }
 
     /**
