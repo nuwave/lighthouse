@@ -1,4 +1,4 @@
-# Defining Directives
+# Custom Directives
 
 Lighthouse provides various convenient server side directives that can be applied to a lots of generic use cases.
 However you are free to create your own directives depending upon your needs. 
@@ -7,26 +7,31 @@ However you are free to create your own directives depending upon your needs.
 
 There are 3 different levels of directives in Lighthouse.
 
-* [Node Directive](#node-directive)
-* [Field Directive](#field-directive)
-* [Argument Directive](#argument-directive)
+* [Node Directives](#node-directives)
+* [Field Directives](#field-directives)
+* [Argument Directives](#argument-directives)
 
-They are applied to different places where associate with the [DirectiveLocation](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
+They can be applied to different parts of the schema, according to the [DirectiveLocation](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
 
 ## Directive Class Naming Convention
-All directives must have their class name to be:
+
+The class name of directive must follow the following pattern:
 
 ```
 <Study case of directive name> + "Directive"
 ```
 
-For example the class name of directive `@foo_bar` must be `FooBarDirective`. 
+For example the class name of directive `@fooBar` must be `FooBarDirective`. 
 
-## Node Directive
+## Node Directives
 
-## Field Directive
+// TODO
 
-## Argument Directive
+## Field Directives
+
+// TODO
+
+## Argument Directives
 
 Argument directives are applied to the [InputValueDefinition](https://facebook.github.io/graphql/June2018/#InputValueDefinition).
 
@@ -74,13 +79,11 @@ class TrimDirective implements ArgTransformerDirective
 }
 ```
 
-As you can see, to create an `ArgTransformerDirective` you should implement the `ArgTransformerDirective` interface.
-
+To create an `ArgTransformerDirective` you must implement the `ArgTransformerDirective` interface.
 This interface requires you to implement a method called `transform`.
 
-The `transform` method takes an argument which represents the actual incoming value of the argument.
-
-Apply the transformation then simply return the transformed value.
+The `transform` method takes an argument which represents the actual incoming value that is given
+to an argument in a query and is expected to transform the value and return it.
 
 For example, if we have the following schema.
 
@@ -113,7 +116,7 @@ class CreateUser
 
 The `ArgFilterDirective` applies additional queries to those directives that are using the `Nuwave\Lighthouse\Execution\QueryFilter`. 
 
-Currently, the following directives. 
+Currently, the following directives use the defined filters for resolving the query:
 
 * `@all`
 * `@paginate`
@@ -127,7 +130,8 @@ type User {
 }
 ```
 
-as a result, it will select the user's posts where it's category(cat) is equal to the value of `category` argument.
+as a result, it will select the user's posts where its category(cat)
+is equal to the value of the `category` argument.
 
 So let's take a look at the built-in `@eq` directive.
 
@@ -206,9 +210,8 @@ Where the `@whereBetween` directive must be applied to 2 arguments to get an arr
 In such a case, you want to have the `combinesMultipleArguments` method returned `true` to gather all the values of all the same directives.
 
 ### Evaluation Order
-Argument directives are evaluated by their written order.
 
-Considering the following example.
+Argument directives are evaluated in the order that they are defined in the schema.
 
 ```graphql
 type Mutation {
