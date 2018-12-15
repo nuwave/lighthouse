@@ -1,5 +1,9 @@
 # GraphQL Subscriptions
 
+::: tip NOTE
+Much of the credit should be given to the [Ruby implementation](https://github.com/rmosolgo/graphql-ruby/blob/master/guides/subscriptions/overview.md) as they provided a great overview of how the backend should work.
+:::
+
 ## Requirements
 
 **Install the Pusher PHP Server package**
@@ -231,6 +235,106 @@ const pusherLink = new PusherLink({
 const link = ApolloLink.from([pusherLink, httpLink(`${API_LOCATION}/graphql`)]);
 ```
 
-::: tip Note
-Details on Relay Modern integration are coming soon.
-:::
+## Relay Modern Handler
+
+To use Lighthouse's subscriptions with Relay Modern you'll need to create a custom handler and inject it into Relay's environment.
+
+```js
+import Pusher from "pusher-js";
+import { Environment, Network, RecordSource, Store } from "relay-runtime";
+
+const pusherClient = new Pusher(PUSHER_API_KEY, {
+    cluster: "us2",
+    authEndpoint: `${API_LOCATION}/graphql/subscriptions/auth`,
+    auth: {
+        headers: {
+            authorization: BEARER_TOKEN
+        }
+    }
+});
+
+const createHandler = options => {
+    let channelName;
+    const { pusher, fetchOperation } = options;
+
+    return (operation, variables, cacheConfig, observer) => {
+        fetchOperation(operation, variables, cacheConfig)
+            .then(response => {
+                return response.json();
+            })
+            .then(response => {
+                channelName =
+                    !!response.extensions &&
+                    !!response.extensions.lighthouse_subscriptions &&
+                    !!response.extensions.lighthouse_subscriptions.channels
+                        ? response.extensions.lighthouse_subscriptions.channels[
+                              operation.name
+                          ]
+                        : null;
+
+                if (!channelName) {
+                    return;
+                }
+
+                const channel = pusher.subscribe(channelName);
+
+                channel.bind("lighthouse-subscription", payload => {
+                    const result = payload.result;
+                    if (result && result.errors) {
+                        observer.onError(result.errors);
+                    } else if (result) {
+                        observer.onNext({
+                            data: result.data
+                        });
+                    }
+                    if (!payload.more) {
+                        observer.onCompleted();
+                    }
+                });
+            });
+
+        return {
+            dispose: () => pusher.unsubscribe(channelName)
+        };
+    };
+};
+
+const fetchOperation = (operation, variables, cacheConfig) => {
+    const bodyValues = {
+        variables,
+        query: operation.text,
+        operationName: operation.name
+    };
+
+    return fetch(`${API_LOCATION}/graphql`, {
+        method: "POST",
+        opts: {
+            credentials: "include"
+        },
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: BEARER_TOKEN
+        },
+        body: JSON.stringify(bodyValues)
+    });
+};
+
+const fetchQuery = (operation, variables, cacheConfig) => {
+    return fetchOperation(operation, variables, cacheConfig).then(response => {
+        return response.json();
+    });
+};
+
+const subscriptionHandler = createHandler({
+    pusher: pusherClient,
+    fetchOperation: fetchOperation
+});
+
+const network = Network.create(fetchQuery, subscriptionHandler);
+
+export const environment = new Environment({
+    network,
+    store: new Store(new RecordSource())
+});
+```
