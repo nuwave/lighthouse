@@ -216,7 +216,7 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itEvaluatesInputFieldRules()
+    public function itEvaluatesInputArgValidation()
     {
         $invalidPasswordQuery = '
         {

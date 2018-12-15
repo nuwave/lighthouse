@@ -2,13 +2,16 @@
 
 namespace Nuwave\Lighthouse\Providers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\ServiceProvider;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Support\Http\Responses\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -38,6 +41,8 @@ class LighthouseServiceProvider extends ServiceProvider
         if (config('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
         }
+
+        $this->registerValidator();
     }
 
     /**
@@ -91,5 +96,28 @@ class LighthouseServiceProvider extends ServiceProvider
                 \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
             ]);
         }
+    }
+
+    /**
+     * Register GraphQL validator.
+     */
+    protected function registerValidator()
+    {
+        $this->app->make(\Illuminate\Validation\Factory::class)->resolver(
+            function (
+                $translator,
+                array $data,
+                array $rules,
+                array $messages,
+                array $customAttributes
+            ): \Illuminate\Validation\Validator {
+                // This determines whether we are resolving a GraphQL field
+                $resolveInfo = Arr::get($customAttributes, 'resolveInfo');
+
+                return $resolveInfo instanceof ResolveInfo
+                    ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
+                    : new \Illuminate\Validation\Validator($translator, $data, $rules, $messages, $customAttributes);
+            }
+        );
     }
 }

@@ -224,10 +224,10 @@ class FieldFactory
             );
 
             // Validate arguments placed before `ValidationDirective`s
-            $this->validateArgumentsBeforeValidationDirectives($args);
+            $this->validateArgumentsBeforeValidationDirectives($root, $args, $context, $resolveInfo);
 
             // Handle `ArgDirective`s after `ValidationDirective`s
-            $this->handleArgDirectivesAfterValidationDirectives($args);
+            $this->handleArgDirectivesAfterValidationDirectives($root, $args, $context, $resolveInfo);
 
             // We (ab)use the ResolveInfo as a way of passing down the query filter
             // to the final resolver
@@ -463,11 +463,14 @@ class FieldFactory
     }
 
     /**
-     * @param array $args
+     * @param mixed       $root
+     * @param array       $args
+     * @param mixed       $context
+     * @param ResolveInfo $resolveInfo
      *
      * @throws \Exception
      */
-    protected function validateArgumentsBeforeValidationDirectives(array $args)
+    protected function validateArgumentsBeforeValidationDirectives($root, array $args, $context, ResolveInfo $resolveInfo)
     {
         if (! $this->currentRules) {
             return;
@@ -476,7 +479,13 @@ class FieldFactory
         $validator = validator(
             $args,
             $this->currentRules,
-            $this->currentMessages
+            $this->currentMessages,
+            [
+                'root' => $root,
+                'context' => $context,
+                // This makes it so that we get an instance of our own Validator class
+                'resolveInfo' => $resolveInfo,
+            ]
         );
 
         if ($validator->fails()) {
@@ -508,11 +517,14 @@ class FieldFactory
     }
 
     /**
-     * @param array $args
+     * @param mixed       $root
+     * @param array       $args
+     * @param mixed       $context
+     * @param ResolveInfo $resolveInfo
      *
      * @throws \Exception
      */
-    protected function handleArgDirectivesAfterValidationDirectives(array &$args)
+    protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, $context, ResolveInfo $resolveInfo)
     {
         if (! $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective) {
             return;
@@ -536,8 +548,8 @@ class FieldFactory
         }
 
         if ($this->currentHandlerArgsOfArgDirectivesAfterValidationDirective) {
-            $this->validateArgumentsBeforeValidationDirectives($args);
-            $this->handleArgDirectivesAfterValidationDirectives($args);
+            $this->validateArgumentsBeforeValidationDirectives($root, $args, $context, $resolveInfo);
+            $this->handleArgDirectivesAfterValidationDirectives($root, $args, $context, $resolveInfo);
         }
     }
 }
