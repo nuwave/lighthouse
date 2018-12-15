@@ -139,57 +139,10 @@ class PostUpdatedSubscription extends GraphQLSubscription
 
 ## Firing a subscription via code
 
-The `BroadcastsSubscriptions` `broadcast` or `queueBroadcast` methods can be used to fire subscriptions via code.
-
-**Using an event listener**
+The `Subscription` utility class can be used to broadcast subscriptions via code. It accepts the subscription field, the `$root` object you want to pass through and an optional boolean to override the `lighthouse.subscriptions.queue_broadcasts` configuration setting.
 
 ```php
-namespace App\Listeners\Post;
-
-use Illuminate\Contracts\Queue\ShouldQueue;
-use App\Http\GraphQL\Subscriptions\PostUpdatedSubscription;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
-
-class BroadcastPostUpdated implements ShouldQueue
-{
-    /**
-     * @var BroadcastsSubscriptions
-     */
-    protected $broadcaster;
-
-    /**
-     * @var BroadcastsSubscriptions
-     */
-    protected $subscription;
-
-    /**
-     * Create the event listener.
-     *
-     * @param BroadcastsSubscriptions  $broadcaster
-     * @param PostUpdatedSubscription $subscription
-     */
-    public function __construct(
-        BroadcastsSubscriptions $broadcaster,
-        PostUpdatedSubscription $subscription
-    ) {
-        $this->broadcaster = $broadcaster;
-        $this->subscription = $subscription;
-    }
-
-    /**
-     * Handle the event.
-     *
-     * @param PostUpdatedEvent $event
-     */
-    public function handle(PostUpdatedEvent $event)
-    {
-        $this->broadcaster->broadcast(
-            $this->subscription, // <-- The subscription class you created
-            'postUpdated', // <-- Name of the subscription field to broadcast
-            $event->post // <-- The root object that will be passed into the subscription resolver
-        );
-    }
-}
+\Nuwave\Lighthouse\Execution\Utils\Subscription::broadcast('postUpdated', $post);
 ```
 
 ## Apollo Link

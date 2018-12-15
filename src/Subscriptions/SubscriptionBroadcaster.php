@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Pusher\Pusher;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
