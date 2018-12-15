@@ -4,38 +4,12 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
-use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
 
 class BroadcastDirective extends BaseDirective implements FieldMiddleware
 {
-    /** @var Registry */
-    protected $registry;
-
-    /** @var BroadcastsSubscriptions */
-    protected $broadcaster;
-
-    /** @var ExceptionHandler */
-    protected $exceptionHandler;
-
-    /**
-     * @param Registry                $registry
-     * @param BroadcastsSubscriptions $broadcaster
-     * @param ExceptionHandler        $exceptionHandler
-     */
-    public function __construct(
-        Registry $registry,
-        BroadcastsSubscriptions $broadcaster,
-        ExceptionHandler $exceptionHandler
-    ) {
-        $this->registry = $registry;
-        $this->broadcaster = $broadcaster;
-        $this->exceptionHandler = $exceptionHandler;
-    }
-
     /**
      * Name of the directive.
      *
@@ -59,34 +33,17 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
         $value = $next($value);
         $resolver = $value->getResolver();
         $subscriptionField = $this->directiveArgValue('subscription');
-        $queueBroadcast = $this->directiveArgValue('queue', config('lighthouse.subscriptions.queue_broadcasts', false));
-        $broadcastMethod = $queueBroadcast ? 'queueBroadcast' : 'broadcast';
+        $queue = $this->directiveArgValue('queue');
 
-        return $value->setResolver(function () use ($resolver, $subscriptionField, $broadcastMethod) {
+        return $value->setResolver(function () use ($resolver, $subscriptionField, $queue) {
             $resolved = call_user_func_array($resolver, func_get_args());
 
-            try {
-                $subscription = $this->registry->subscription($subscriptionField);
-
-                if ($resolved instanceof Deferred) {
-                    $resolved->then(function ($root) use ($subscription, $subscriptionField, $broadcastMethod) {
-                        call_user_func(
-                            [$this->broadcaster, $broadcastMethod],
-                            $subscription,
-                            $subscriptionField,
-                            $root
-                        );
-                    });
-                } else {
-                    call_user_func(
-                        [$this->broadcaster, $broadcastMethod],
-                        $subscription,
-                        $subscriptionField,
-                        $resolved
-                    );
-                }
-            } catch (\Throwable $e) {
-                $this->exceptionHandler->handleBroadcastError($e);
+            if ($resolved instanceof Deferred) {
+                $resolved->then(function ($root) use ($subscriptionField) {
+                    Subscription::broadcast($subscriptionField, $root, $queue);
+                });
+            } else {
+                Subscription::broadcast($subscriptionField, $resolved, $queue);
             }
 
             return $resolved;
