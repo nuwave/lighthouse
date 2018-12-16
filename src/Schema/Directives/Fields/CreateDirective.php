@@ -7,9 +7,21 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-
+use Illuminate\Database\DatabaseManager;
 class CreateDirective extends BaseDirective implements FieldResolver
 {
+    /**
+     * The policy mappings for the application.
+     *
+     * @var DatabaseManager
+     */
+    private $db;
+
+    public function __construct(DatabaseManager $database)
+    {
+        $this->db = $database;
+    }
+
     /**
      * Name of the directive.
      *
@@ -40,7 +52,10 @@ class CreateDirective extends BaseDirective implements FieldResolver
                     ? reset($args)
                     : $args;
 
-                return MutationExecutor::executeCreate($model, collect($args));
+                $this->db->connection()->beginTransaction();
+                $mutEx = MutationExecutor::executeCreate($model, collect($args));
+                $this->db->connection()->commit();
+                return $mutEx;
             }
         );
     }
