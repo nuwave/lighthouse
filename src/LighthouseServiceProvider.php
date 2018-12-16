@@ -1,10 +1,11 @@
 <?php
 
-namespace Nuwave\Lighthouse\Providers;
+namespace Nuwave\Lighthouse;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\GraphQL;
+use Illuminate\Container\Container;
+use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
@@ -15,6 +16,7 @@ use Nuwave\Lighthouse\Console\ScalarCommand;
 use Nuwave\Lighthouse\Console\MutationCommand;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
@@ -23,10 +25,10 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Support\Http\Responses\Response;
+use Illuminate\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
@@ -38,18 +40,18 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
+        $this->mergeConfigFrom(__DIR__.'/../config/lighthouse.php', 'lighthouse');
 
         $this->publishes([
-            __DIR__.'/../../config/config.php' => config_path('lighthouse.php'),
+            __DIR__.'/../config/lighthouse.php' => config_path('lighthouse.php'),
         ], 'config');
 
         $this->publishes([
-            __DIR__.'/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
+            __DIR__.'/../assets/default-schema.graphql' => config('lighthouse.schema.register'),
         ], 'schema');
 
         if (config('lighthouse.controller')) {
-            $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
         }
 
         $this->registerValidator();
@@ -79,6 +81,10 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
 
+        $this->app->singleton(GraphQLRequest::class, function (Container $app) {
+            return new GraphQLRequest($app->make('request'));
+        });
+
         $this->app->singleton(DirectiveRegistry::class);
         $this->app->singleton(ExtensionRegistry::class);
         $this->app->singleton(NodeRegistry::class);
@@ -107,8 +113,6 @@ class LighthouseServiceProvider extends ServiceProvider
                 ValidateSchemaCommand::class,
             ]);
         }
-
-        SubscriptionProvider::register($this->app);
     }
 
     /**
@@ -116,20 +120,20 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     protected function registerValidator()
     {
-        $this->app->make(\Illuminate\Validation\Factory::class)->resolver(
+        $this->app->make(ValidationFactory::class)->resolver(
             function (
                 $translator,
                 array $data,
                 array $rules,
                 array $messages,
                 array $customAttributes
-            ): \Illuminate\Validation\Validator {
+            ): Validator {
                 // This determines whether we are resolving a GraphQL field
                 $resolveInfo = Arr::get($customAttributes, 'resolveInfo');
 
                 return $resolveInfo instanceof ResolveInfo
                     ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
-                    : new \Illuminate\Validation\Validator($translator, $data, $rules, $messages, $customAttributes);
+                    : new Validator($translator, $data, $rules, $messages, $customAttributes);
             }
         );
 

@@ -1,20 +1,25 @@
 <?php
 
-app('router')->group(config('lighthouse.route', []), function () {
+/** @var \Illuminate\Routing\Router|\Laravel\Lumen\Routing\Router $router */
+$router = app('router');
+
+$router->group(config('lighthouse.route', []), function () use ($router) {
     $routeName = config('lighthouse.route_name', 'graphql');
     $controller = config('lighthouse.controller');
 
     if (config('lighthouse.route_enable_get', false)) {
-        app('router')->get($routeName, [
+        $router->get($routeName, [
             'as' => 'lighthouse.graphql',
             'uses' => $controller,
         ]);
     }
 
-    app('router')->post($routeName, [
+    $router->post($routeName, [
         'as' => 'lighthouse.graphql',
         'uses' => $controller,
     ]);
 });
 
-app(\Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class)->routes();
+if (\Nuwave\Lighthouse\SubscriptionServiceProvider::enabled()) {
+    \Nuwave\Lighthouse\SubscriptionServiceProvider::registerRoutes($router);
+}

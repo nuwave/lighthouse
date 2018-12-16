@@ -104,4 +104,22 @@ class PusherBroadcaster implements Broadcaster
             ]
         );
     }
+
+    /**
+     * Register subscription routes.
+     *
+     * @param \Illuminate\Routing\Router|\Laravel\Lumen\Routing\Router $router
+     */
+    public static function routes($router)
+    {
+        $router->post('graphql/subscriptions/auth', [
+            'as' => 'lighthouse.subscriptions.auth',
+            'uses' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@authorize',
+        ]);
+
+        $router->post('graphql/subscriptions/webhook', [
+            'as' => 'lighthouse.subscriptions.auth',
+            'uses' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@webhook',
+        ]);
+    }
 }
