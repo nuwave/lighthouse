@@ -212,4 +212,64 @@ class CreateDirectiveTest extends DBTestCase
             'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
         ], Arr::get($result, 'data.createTag'));
     }
+
+    /**
+     * @test
+     */
+    public function itDoesNotCreateWithFailingRelationship()
+    {
+        $schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            createUser(input: CreateUserInput!): User @create(flatten: true)
+        }
+        
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+            user: ID
+        }
+        ' . $this->placeholderQuery();
+        $query = '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    corruptField: [{
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+        $data = ['id' => 1, 'name' => 'foo'];
+        $this->assertDatabaseMissing('users', $data);
+        $this->assertTrue( Arr::has($result,'errors'));
+    }
 }
