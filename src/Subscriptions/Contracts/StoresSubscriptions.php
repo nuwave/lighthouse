@@ -8,16 +8,6 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 interface StoresSubscriptions
 {
     /**
-     * Get subscriber by request.
-     *
-     * @param array $input
-     * @param array $headers
-     *
-     * @return Subscriber|null
-     */
-    public function subscriberByRequest(array $input, array $headers);
-
-    /**
      * Find subscriber by channel.
      *
      * @param string $channel
