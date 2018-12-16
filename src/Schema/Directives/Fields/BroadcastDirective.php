@@ -15,7 +15,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'broadcast';
     }
@@ -28,25 +28,25 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $value = $next($value);
         $resolver = $value->getResolver();
         $subscriptionField = $this->directiveArgValue('subscription');
-        $queue = $this->directiveArgValue('queue');
+        $shouldQueue = $this->directiveArgValue('shouldQueue');
 
-        return $value->setResolver(function () use ($resolver, $subscriptionField, $queue) {
-            $resolved = call_user_func_array($resolver, func_get_args());
+        return $value->setResolver(function () use ($resolver, $subscriptionField, $shouldQueue) {
+            $result = call_user_func_array($resolver, func_get_args());
 
-            if ($resolved instanceof Deferred) {
-                $resolved->then(function ($root) use ($subscriptionField) {
-                    Subscription::broadcast($subscriptionField, $root, $queue);
+            if ($result instanceof Deferred) {
+                $result->then(function ($result) use ($subscriptionField, $shouldQueue) {
+                    Subscription::broadcast($subscriptionField, $result, $shouldQueue);
                 });
             } else {
-                Subscription::broadcast($subscriptionField, $resolved, $queue);
+                Subscription::broadcast($subscriptionField, $result, $shouldQueue);
             }
 
-            return $resolved;
+            return $result;
         });
     }
 }

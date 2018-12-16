@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
@@ -11,17 +12,17 @@ class Subscription
     /**
      * Broadcast subscription to client(s).
      *
-     * @param string $subscriptionField
-     * @param string $root
-     * @param bool|null
+     * @param string    $subscriptionField
+     * @param mixed     $root
+     * @param bool|null $shouldQueue
      *
      * @throws \InvalidArgumentException
      */
-    public static function broadcast(string $subscriptionField, $root, $queue = null)
+    public static function broadcast(string $subscriptionField, $root, bool $shouldQueue = null)
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
-        app('graphql')->prepSchema();
+        app(GraphQL::class)->prepSchema();
 
         /** @var SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
@@ -31,17 +32,22 @@ class Subscription
         $exceptionHandler = app(ExceptionHandler::class);
 
         if (! $registry->has($subscriptionField)) {
-            throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
+            throw new \InvalidArgumentException(
+                "No subscription field registered for {$subscriptionField}"
+            );
         }
 
-        $queue = null === $queue ? config('lighthouse.subscriptions.queue_broadcasts', false) : $queue;
-        $method = $queue ? 'queueBroadcast' : 'broadcast';
-        $subscription = $registry->subscription($subscriptionField);
+        $shouldQueue = null === $shouldQueue
+            ? config('lighthouse.subscriptions.queue_broadcasts', false)
+            : $shouldQueue;
+        $method = $shouldQueue
+            ? BroadcastsSubscriptions::QUEUE_BROADCAST_METHOD_NAME
+            : BroadcastsSubscriptions::BROADCAST_METHOD_NAME;
 
         try {
             call_user_func(
                 [$broadcaster, $method],
-                $subscription,
+                $registry->subscription($subscriptionField),
                 $subscriptionField,
                 $root
             );

@@ -149,8 +149,11 @@ type Mutation {
     createPost(input: CreatePostInput!): Post
         @broadcast(subscription: "postCreated")
 
-    # The `@broadcast` directive also takes an optional `queue` argument
-    # to determine if this broadcast should go through Laravel's queue.
+You may override the default queueing behaviour from the configuration by
+passing the `shouldQueue` argument. 
+
+```graphql
+type Mutation {
     updatePost(input: UpdatePostInput!): Post
         @broadcast(subscription: "postUpdated", queue: false)
 }
