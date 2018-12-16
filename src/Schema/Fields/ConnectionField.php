@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Types;
+namespace Nuwave\Lighthouse\Schema\Fields;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
@@ -61,7 +61,7 @@ class ConnectionField
         return $paginator->values()->map(function ($item, $index) use ($firstItem) {
             return [
                 'cursor' => Cursor::encode($firstItem + $index),
-                'node' => $item
+                'node' => $item,
             ];
         });
     }

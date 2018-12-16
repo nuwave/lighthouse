@@ -58,7 +58,6 @@ class FieldFactory
             $fieldValue->getAdditionalArgs()
         );
 
-
         // No need to do transformation/validation of the arguments
         // if there are no arguments defined for the field
         if ($inputValueDefinitions->isNotEmpty()) {

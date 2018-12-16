@@ -4,15 +4,15 @@
 Much of the credit should be given to the [Ruby implementation](https://github.com/rmosolgo/graphql-ruby/blob/master/guides/subscriptions/overview.md) as they provided a great overview of how the backend should work.
 :::
 
-## Requirements
+## Setup
 
-**Install the Pusher PHP Server package**
+Install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php) for interacting with the Pusher HTTP API.
 
 ```bash
 composer require pusher/pusher-php-server
 ```
 
-**Enable the extension in the lighthouse.php config file**
+Enable the extension in `config/lighthouse.php`
 
 ```php
 'extensions' => [
@@ -21,41 +21,45 @@ composer require pusher/pusher-php-server
 ],
 ```
 
-## Basic Setup
+## Defining Fields
 
-To fire a subscription from the server down to the client you must create a `Subscription` type with fields decorated with the `@subscription` directive which will point to the `GraphQLSubscription` class responsible for managing the subscribed client(s).
+Define your subscriptions as field on the root `Subscription` type in your schema.
 
 ```graphql
 type Subscription {
     postUpdated(author: ID): Post
-        @subscription(
-            class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
-        )
-}
-
-type Mutation {
-    updatePost(input: UpdatePostInput!): Post
-        # This will pipe the Post returned from this mutation to the
-        # PostUpdatedSubscription resolve function
-        @broadcast(subscription: "postUpdated")
 }
 ```
+The quickest way to define such a field is through the `artisan` generator command:
 
-## The Subscription Class
+    php artisan lighthouse:subscription PostUpdated
 
-All subscriptions must have a defined `GraphQLSubscription` class which defines methods for authorization, filtering, etc. At a minimum, the assigned `GraphQLSubscription` must define the `authorize` and `filter` methods.
+Lighthouse will look for a class with the capitalized name of the field that
+is defined within the default subscription namespace.
+For example, the field `postUpdated` should have a corresponding class at
+`App\GraphQL\Subscriptions\PostUpdated`.
+
+All subscription field classes **must** implement the abstract class
+`Nuwave\Lighthouse\Schema\Fields\SubscriptionField` and implement two methods:
+`authorize` and `filter`.
 
 ```php
+<?php
+
 namespace App\GraphQL\Subscriptions;
 
+use App\User;
+use App\Post;
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Schema\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Schema\Context;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
 
-class PostUpdatedSubscription extends GraphQLSubscription
+class PostUpdatedSubscription extends SubscriptionField
 {
     /**
-     * Check if subscriber can listen to the subscription.
+     * Check if subscriber is allowed to listen to the subscription.
      *
      * @param Subscriber $subscriber
      * @param Request    $request
@@ -65,7 +69,7 @@ class PostUpdatedSubscription extends GraphQLSubscription
     public function authorize(Subscriber $subscriber, Request $request)
     {
         $user = $subscriber->context->user;
-        $author = \App\Models\Author::find($subscriber->args['author']);
+        $author = User::find($subscriber->args['author']);
 
         return $user->can('viewPosts', $author);
     }
@@ -91,10 +95,11 @@ class PostUpdatedSubscription extends GraphQLSubscription
      * Encode topic name.
      *
      * @param Subscriber $subscriber
-     *
+     * @param string     $fieldName
+     * 
      * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, $fieldName)
+    public function encodeTopic(Subscriber $subscriber, string $fieldName)
     {
         // Optionally create a unique topic name based on the
         // `author` argument.
@@ -106,9 +111,8 @@ class PostUpdatedSubscription extends GraphQLSubscription
     /**
      * Decode topic name.
      *
-     * @param string           $operationName
-     * @param \App\Models\Post $root
-     * @param mixed            $context
+     * @param string $fieldName
+     * @param Post   $root
      *
      * @return string
      */
@@ -123,10 +127,10 @@ class PostUpdatedSubscription extends GraphQLSubscription
     /**
      * Resolve the subscription.
      *
-     * @param \App\Models\Post $root
-     * @param array            $args
-     * @param Context          $context
-     * @param ResolveInfo      $info
+     * @param Post        $root
+     * @param array       $args
+     * @param Context     $context
+     * @param ResolveInfo $info
      *
      * @return mixed
      */
@@ -141,7 +145,29 @@ class PostUpdatedSubscription extends GraphQLSubscription
 }
 ```
 
-## Firing a subscription via code
+If the default namespaces are not working with your application structure
+or you want to be more explicit, you can use the [`@subscription`](../api-reference/directives.md#subscription)
+directive to point to a different class.
+
+## Trigger Subscriptions
+
+Now that clients can subscribe to a field, you will need to notify Lighthouse
+when the underlying data has changed.
+
+### Broadcast Directive
+
+The [`@broadcast`](../api-reference/directives.md#broadcast)
+directive will all updates to the `Post` model to the `postUpdated` subscription.
+
+```graphql
+type Mutation {
+    updatePost(input: UpdatePostInput!): Post
+        @broadcast(subscription: "postUpdated")
+}
+```
+
+You can reference the same subscription from multiple fields, or vice-versa,
+trigger multiple subscriptions from a single field. 
 
 ### Fire Subscriptions From Code
 
@@ -158,12 +184,21 @@ The following example shows how to trigger a subscription after an update
 to the `Post` model.
 
 ```php
+$post->title = $newTitle;
+$post->save();
+
 \Nuwave\Lighthouse\Execution\Utils\Subscription::broadcast('postUpdated', $post);
 ```
 
-## Apollo Link
+## Client Implementations
 
-To use Lighthouse's subscriptions for Apollo's client side library you'll need to create an `apollo-link`
+To get you up and running quickly, the following sections show how to use subcriptions
+with common GraphQL client libraries.
+
+### Apollo
+
+To use Lighthouse subscriptions with the [Apollo](https://www.apollographql.com/docs/react/)
+client library you will need to create an `apollo-link`
 
 ```js
 import { ApolloLink, Observable } from "apollo-link";
@@ -247,9 +282,10 @@ const pusherLink = new PusherLink({
 const link = ApolloLink.from([pusherLink, httpLink(`${API_LOCATION}/graphql`)]);
 ```
 
-## Relay Modern Handler
+## Relay Modern
 
-To use Lighthouse's subscriptions with Relay Modern you'll need to create a custom handler and inject it into Relay's environment.
+To use Lighthouse's subscriptions with Relay Modern you will
+need to create a custom handler and inject it into Relay's environment.
 
 ```js
 import Pusher from "pusher-js";

@@ -9,10 +9,19 @@ use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Console\QueryCommand;
+use Nuwave\Lighthouse\Console\UnionCommand;
+use Nuwave\Lighthouse\Console\ScalarCommand;
+use Nuwave\Lighthouse\Console\MutationCommand;
+use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
+use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Support\Http\Responses\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
@@ -87,14 +96,15 @@ class LighthouseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
-                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
-                \Nuwave\Lighthouse\Console\MutationCommand::class,
-                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\QueryCommand::class,
-                \Nuwave\Lighthouse\Console\UnionCommand::class,
-                \Nuwave\Lighthouse\Console\ScalarCommand::class,
-                \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
+                ClearCacheCommand::class,
+                InterfaceCommand::class,
+                MutationCommand::class,
+                PrintSchemaCommand::class,
+                QueryCommand::class,
+                ScalarCommand::class,
+                SubscriptionCommand::class,
+                UnionCommand::class,
+                ValidateSchemaCommand::class,
             ]);
         }
 

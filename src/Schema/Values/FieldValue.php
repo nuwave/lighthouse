@@ -3,10 +3,16 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\StringValueNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Subscriptions\Exceptions\UnauthorizedSubscriber;
 
 class FieldValue
 {
@@ -190,6 +196,10 @@ class FieldValue
      */
     protected function defaultResolver(): \Closure
     {
+        if ('Subscription' === $this->getParentName()) {
+            return $this->defaultSubscriptionResolver();
+        }
+
         if ($namespace = $this->getDefaultNamespaceForParent()) {
             return construct_resolver(
                 $namespace.'\\'.studly_case($this->getFieldName()),
@@ -206,6 +216,62 @@ class FieldValue
         };
     }
 
+    protected function defaultSubscriptionResolver()
+    {
+        if ($directive = ASTHelper::directiveDefinition($this->field, 'subscription')) {
+            $className = ASTHelper::directiveArgValue($directive, 'class');
+        } else {
+            $className = $this->getFieldName();
+        }
+
+        $className = \namespace_classname($className, [
+            $this->getDefaultNamespaceForParent(),
+        ]);
+
+        if (! $className) {
+            throw new DefinitionException(
+                "No class found for the subscription field {$this->getFieldName()}"
+            );
+        }
+
+        /** @var SubscriptionField $subscription */
+        $subscription = app($className);
+        /** @var SubscriptionRegistry $subscriptionRegistry */
+        $subscriptionRegistry = app(SubscriptionRegistry::class);
+
+        // Subscriptions can only be placed on a single field on the root
+        // query, so there is no need to consider the field path
+        $subscriptionRegistry->registerSubscription(
+            $subscription,
+            $this->getFieldName()
+        );
+
+        return function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($subscription, $subscriptionRegistry) {
+            if ($root instanceof Subscriber) {
+                return $subscription->resolve($root->root, $args, $context, $resolveInfo);
+            }
+
+            $subscriber = new Subscriber(
+                $args,
+                $context,
+                $resolveInfo
+            );
+
+            if (! $subscription->can($subscriber)) {
+                throw new UnauthorizedSubscriber(
+                    'Unauthorized subscription request'
+                );
+            }
+
+            $subscriptionRegistry->registerSubscriber(
+                $subscriber,
+                $subscription->encodeTopic($subscriber, $this->getFieldName())
+            );
+
+            return null;
+        };
+    }
+
     /**
      * If a default namespace exists for the parent type, return it.
      *
@@ -214,10 +280,12 @@ class FieldValue
     public function getDefaultNamespaceForParent()
     {
         switch ($this->getParentName()) {
-            case 'Mutation':
-                return config('lighthouse.namespaces.mutations');
             case 'Query':
                 return config('lighthouse.namespaces.queries');
+            case 'Mutation':
+                return config('lighthouse.namespaces.mutations');
+            case 'Subscription':
+                return config('lighthouse.namespaces.subscriptions');
             default:
                 return null;
         }

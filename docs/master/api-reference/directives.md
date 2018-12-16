@@ -139,15 +139,17 @@ class CreateUser
 
 ## @broadcast
 
-Broadcast mutation results to subscribed clients.
-[Read More](../extensions/subscriptions.md#requirements)
+Broadcast the results of a mutation to subscribed clients.
+[Read more about subscriptions](../extensions/subscriptions.md)
 
-_Note: There should be a subscription with a field with the same name as the `subscription` argument._
+The `subscription` argument must reference the name of a subscription field. 
 
 ```graphql
 type Mutation {
     createPost(input: CreatePostInput!): Post
         @broadcast(subscription: "postCreated")
+}
+```
 
 You may override the default queueing behaviour from the configuration by
 passing the `shouldQueue` argument. 
@@ -891,13 +893,16 @@ type Query {
 
 ## @subscription
 
-Declare a [class](../extensions/subscriptions.md#the-subscription-class) to handle the broadcasting of a subscription to clients.
+Declare a class to handle the broadcasting of a subscription to clients.
+
+If you follow the default naming conventions for [defining subscription fields]([class](../extensions/subscriptions.md#defining-fields) )
+you do not need this directive. It is only useful if you need to override the default namespace.
 
 ```graphql
 type Subscription {
     postUpdated(author: ID!): Post
         @subscription(
-            class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
+            class: "App\\GraphQL\\Blog\\PostUpdatedSubscription"
         )
 }
 ```

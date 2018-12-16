@@ -1,12 +1,13 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Types;
+namespace Nuwave\Lighthouse\Schema\Fields;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
-class NotFoundSubscription extends GraphQLSubscription
+class NotFoundSubscriptionField extends SubscriptionField
 {
     /**
      * Authorize subscriber request.
@@ -40,11 +41,11 @@ class NotFoundSubscription extends GraphQLSubscription
      * @param mixed         $root
      * @param array         $args
      * @param Context|mixed $context
-     * @param ResolveInfo   $info
+     * @param ResolveInfo   $resolveInfo
      *
      * @return mixed
      */
-    public function resolve($root, array $args, $context, ResolveInfo $info)
+    public function resolve($root, array $args, $context, ResolveInfo $resolveInfo)
     {
         return null;
     }

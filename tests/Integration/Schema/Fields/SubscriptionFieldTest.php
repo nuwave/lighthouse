@@ -117,20 +117,23 @@ class SubscriptionDirectiveTest extends TestCase
         $subscription = addslashes(FooSubscription::class);
 
         return "
-            type Post {
-                body: String
-            }
-            type Subscription {
-                onPostCreated: Post @subscription(class: \"{$subscription}\")
-            }
-            type Mutation {
-                createPost(post: String!): Post
-                    @field(resolver: \"{$resolver}\")
-                    @broadcast(subscription: \"onPostCreated\")
-            }
-            type Query {
-                foo: String
-            }
+        type Post {
+            body: String
+        }
+        
+        type Subscription {
+            onPostCreated: Post
+        }
+        
+        type Mutation {
+            createPost(post: String!): Post
+                @field(resolver: \"{$resolver}\")
+                @broadcast(subscription: \"onPostCreated\")
+        }
+        
+        type Query {
+            foo: String
+        }
         ";
     }
 

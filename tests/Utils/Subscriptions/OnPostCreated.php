@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Utils\Directives;
+namespace Tests\Utils\Subscriptions;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
 
-class FooSubscription extends GraphQLSubscription
+class OnPostCreated extends SubscriptionField
 {
     /**
      * Authorize subscriber request.

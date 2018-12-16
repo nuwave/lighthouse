@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Prophecy\Prophecy\ObjectProphecy;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -52,7 +52,7 @@ class SubscriptionTest extends TestCase
         $root = ['post' => ['id' => 1]];
 
         $this->broadcaster->broadcast(
-            Argument::type(GraphQLSubscription::class),
+            Argument::type(SubscriptionField::class),
             self::SUBSCRIPTION_FIELD,
             $root
         )->shouldBeCalled();
@@ -76,9 +76,9 @@ class SubscriptionTest extends TestCase
         return self::SUBSCRIPTION_FIELD;
     }
 
-    protected function subscription(): GraphQLSubscription
+    protected function subscription(): SubscriptionField
     {
-        return new class() extends GraphQLSubscription {
+        return new class() extends SubscriptionField {
             public function authorize(Subscriber $subscriber, Request $request)
             {
                 return true;

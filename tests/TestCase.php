@@ -61,6 +61,7 @@ class TestCase extends BaseTestCase
                 'unions' => 'Tests\\Utils\\Unions',
                 'queries' => 'Tests\\Utils\\Queries',
                 'mutations' => 'Tests\\Utils\\Mutations',
+                'subscriptions' => 'Tests\\Utils\\Subscriptions',
                 'models' => 'Tests\\Utils\\Models',
             ],
             'subscriptions' => [
