@@ -248,19 +248,14 @@ class FieldFactory
     protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argValue, InputValueDefinitionNode $astNode, array $argumentPath)
     {
         if ($argValue instanceof NoValue || null === $argValue) {
-            // No rules apply to input objects themselves, so we can stop looking further
-            if ($type instanceof InputObjectType) {
-                return;
-            }
-
-            // There might still be some rules for the list itself
+            // Handle `ListOfType` with associated directives which implement `ArgDirectiveForArray`
             if ($type instanceof ListOfType) {
                 $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath, ArgDirectiveForArray::class);
                 // No need to consider the rules for the elements of the list, since we know it is empty
                 return;
             }
 
-            // all other leaf types
+            // Handle `InputObjectType` and all other leaf types
             $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath);
 
             return;
