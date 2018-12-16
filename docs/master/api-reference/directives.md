@@ -476,15 +476,23 @@ type Mutation {
   createPost(title: String!, content: String!): Post
     @create
     @inject(context: "user.id", name: "user_id")
-
-  createTask(input: CreateTaskInput!): Task
-    @create
-    @inject(context: "user.id", name: "input.user_id")
 }
 ```
 
 This is useful to ensure that the authenticated user's `id` is
 automatically used for creating new models and can not be manipulated.
+
+If you are using an Input Object as an argument, you can use dot notation to
+set a nested argument.
+
+
+```graphql
+type Mutation {
+  createTask(input: CreateTaskInput!): Task
+    @create
+    @inject(context: "user.id", name: "input.user_id")
+}
+```
 
 ## @interface
 
