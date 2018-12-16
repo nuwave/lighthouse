@@ -476,6 +476,10 @@ type Mutation {
   createPost(title: String!, content: String!): Post
     @create
     @inject(context: "user.id", name: "user_id")
+
+  createTask(input: CreateTaskInput!): Task
+    @create
+    @inject(context: "user.id", name: "input.user_id")
 }
 ```
 
