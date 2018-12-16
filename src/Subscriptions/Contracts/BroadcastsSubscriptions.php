@@ -3,34 +3,38 @@
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Illuminate\Http\Response;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
 
 interface BroadcastsSubscriptions
 {
+    const BROADCAST_METHOD_NAME = 'broadcast';
+    const QUEUE_BROADCAST_METHOD_NAME = 'broadcast';
+
     /**
      * Push subscription data to subscribers.
      *
-     * @param GraphQLSubscription $subscription
+     * @param SubscriptionField $subscription
      * @param string              $fieldName
      * @param mixed               $root
      */
-    public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root);
+    public function broadcast(SubscriptionField $subscription, string $fieldName, $root);
 
     /**
      * Queue pushing subscription data to subscribers.
      *
-     * @param GraphQLSubscription $subscription
+     * @param SubscriptionField $subscription
      * @param string              $fieldName
-     * @param mixed               $root
+     * @param mixed               $result
      */
-    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root);
+    public function queueBroadcast(SubscriptionField $subscription, string $fieldName, $result);
 
     /**
      * Authorize the subscription.
      *
      * @param Request $request
      *
-     * @return array
+     * @return Response
      */
     public function authorize(Request $request);
 }

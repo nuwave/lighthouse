@@ -84,7 +84,7 @@ class CacheValue
      *
      * @todo Check to see if tags are available on the
      * cache store (or add to config) and use tags to
-     * flush cache w/out args.
+     * flush cache without args.
      *
      * @return array
      */

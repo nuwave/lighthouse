@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface Broadcaster
@@ -12,7 +13,7 @@ interface Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function authorized(Request $request);
 
@@ -21,7 +22,7 @@ interface Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function unauthorized(Request $request);
 
@@ -30,7 +31,7 @@ interface Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Support\Response
+     * @return Response
      */
     public function hook(Request $request);
 

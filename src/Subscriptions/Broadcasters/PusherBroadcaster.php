@@ -2,31 +2,33 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
+use Pusher\Pusher;
+use Pusher\PusherException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class PusherBroadcaster implements Broadcaster
 {
     const EVENT_NAME = 'lighthouse-subscription';
 
-    /** @var \Pusher\Pusher */
+    /** @var Pusher */
     protected $pusher;
 
-    /** @var Storage */
+    /** @var StoresSubscriptions */
     protected $storage;
 
     /**
      * Create instance of pusher broadcaster.
      *
-     * @param \Pusher\Pusher $pusher
+     * @param Pusher $pusher
      */
-    public function __construct($pusher)
+    public function __construct(Pusher $pusher)
     {
         $this->pusher = $pusher;
-        $this->storage = app(Storage::class);
+        $this->storage = app(StoresSubscriptions::class);
     }
 
     /**
@@ -34,7 +36,9 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @throws PusherException
+     *
+     * @return Response
      */
     public function authorized(Request $request)
     {
@@ -53,7 +57,7 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function unauthorized(Request $request)
     {
@@ -65,7 +69,7 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Support\Response
+     * @return Response
      */
     public function hook(Request $request)
     {
@@ -86,6 +90,8 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param Subscriber $subscriber
      * @param array      $data
+     *
+     * @throws PusherException
      */
     public function broadcast(Subscriber $subscriber, array $data)
     {

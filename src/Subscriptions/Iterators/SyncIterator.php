@@ -11,20 +11,20 @@ class SyncIterator implements SubscriptionIterator
      * Process collection of items.
      *
      * @param Collection    $items
-     * @param \Closure      $cb
-     * @param \Closure|null $error
+     * @param \Closure      $callback
+     * @param \Closure|null $errorHandler
      */
-    public function process(Collection $items, \Closure $cb, \Closure $error = null)
+    public function process(Collection $items, \Closure $callback, \Closure $errorHandler = null)
     {
-        $items->each(function ($item) use ($cb, $error) {
+        $items->each(function ($item) use ($callback, $errorHandler) {
             try {
-                $cb($item);
+                $callback($item);
             } catch (\Exception $e) {
-                if (! $error) {
+                if (! $errorHandler) {
                     throw $e;
                 }
 
-                $error($e);
+                $errorHandler($e);
             }
         });
     }

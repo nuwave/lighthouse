@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use GraphQL\Language\Parser;
+use GraphQL\GraphQL;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
+use Nuwave\Lighthouse\Schema\Fields\NotFoundSubscriptionField;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
 class SubscriptionRegistry
@@ -19,25 +19,37 @@ class SubscriptionRegistry
     protected $serializer;
 
     /**
-     * @var StorageManager
+     * @var SubscriptionStorage
      */
     protected $storage;
 
     /**
-     * @var array
+     * A map from operation name to channel name.
+     *
+     * E.g.
+     * [
+     *   'MyPostSubscription' => 'private-12398121248124-ysdafsd',
+     *   'PostSub2' => 'private-190asofhdföaoshdfoa-asdf0afjs',
+     * ]
+     *
+     * @var string[]
      */
     protected $subscribers = [];
 
     /**
-     * @var array
+     * The subscriptions themselves, keyed by the field name.
+     *
+     * E.g. ['onPostCreated' => SomeClass that is an instanceof GraphQlSubscription]
+     *
+     * @var SubscriptionField[]
      */
     protected $subscriptions = [];
 
     /**
-     * @param ContextSerializer $serializer
-     * @param StorageManager    $storage
+     * @param ContextSerializer   $serializer
+     * @param SubscriptionStorage $storage
      */
-    public function __construct(ContextSerializer $serializer, StorageManager $storage)
+    public function __construct(ContextSerializer $serializer, SubscriptionStorage $storage)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
@@ -46,14 +58,14 @@ class SubscriptionRegistry
     /**
      * Add subscription to registry.
      *
-     * @param GraphQLSubscription $subscription
-     * @param string              $field
+     * @param SubscriptionField $subscription
+     * @param string            $fieldName
      *
      * @return SubscriptionRegistry
      */
-    public function register(GraphQLSubscription $subscription, $field): SubscriptionRegistry
+    public function registerSubscription(SubscriptionField $subscription, string $fieldName): SubscriptionRegistry
     {
-        $this->subscriptions[$field] = $subscription;
+        $this->subscriptions[$fieldName] = $subscription;
 
         return $this;
     }
@@ -65,13 +77,13 @@ class SubscriptionRegistry
      *
      * @return bool
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return isset($this->subscriptions[$key]);
     }
 
     /**
-     * get subscription keys.
+     * Get subscription keys.
      *
      * @return array
      */
@@ -85,9 +97,9 @@ class SubscriptionRegistry
      *
      * @param string $key
      *
-     * @return GraphQLSubscription
+     * @return SubscriptionField
      */
-    public function subscription($key): GraphQLSubscription
+    public function subscription(string $key): SubscriptionField
     {
         return $this->subscriptions[$key];
     }
@@ -96,14 +108,14 @@ class SubscriptionRegistry
      * Add subscription to registry.
      *
      * @param Subscriber $subscriber
-     * @param string     $channel
+     * @param string     $topic
      *
      * @return SubscriptionRegistry
      */
-    public function subscriber(Subscriber $subscriber, $channel): SubscriptionRegistry
+    public function registerSubscriber(Subscriber $subscriber, string $topic): SubscriptionRegistry
     {
         if ($subscriber->channel) {
-            $this->storage->storeSubscriber($subscriber, $channel);
+            $this->storage->storeSubscriber($subscriber, $topic);
         }
 
         $this->subscribers[$subscriber->operationName] = $subscriber->channel;
@@ -112,51 +124,57 @@ class SubscriptionRegistry
     }
 
     /**
-     * Get registered subscriptions.
+     * Get all subscriptions for a given subscriber.
      *
      * @param Subscriber $subscriber
      *
-     * @return Collection
+     * @return Collection<SubscriptionField>
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {
-        // A subscription can be fired w/out a request so we must make
+        // A subscription can be fired without a request so we must make
         // sure the schema has been generated.
-        app('graphql')->prepSchema();
+        app(GraphQL::class)->prepSchema();
 
-        $documentNode = Parser::parse($subscriber->queryString, [
-            'noLocation' => true,
-        ]);
-
-        return collect($documentNode->definitions)->filter(function (Node $node) {
-            return $node instanceof OperationDefinitionNode;
-        })->filter(function (OperationDefinitionNode $node) {
-            return 'subscription' === $node->operation;
-        })->flatMap(function (OperationDefinitionNode $node) {
-            return collect($node->selectionSet->selections)->map(function (FieldNode $field) {
-                return $field->name->value;
-            })->toArray();
-        })->map(function ($subscriptionField) {
-            return array_get(
-                $this->subscriptions,
-                $subscriptionField,
-                new NotFoundSubscription()
-            );
-        });
+        return collect($subscriber->query->definitions)
+            ->filter(function (Node $node) {
+                return $node instanceof OperationDefinitionNode;
+            })
+            ->filter(function (OperationDefinitionNode $node) {
+                return 'subscription' === $node->operation;
+            })
+            ->flatMap(function (OperationDefinitionNode $node) {
+                return collect($node->selectionSet->selections)
+                    ->map(function (FieldNode $field) {
+                        return $field->name->value;
+                    })
+                    ->toArray();
+            })
+            ->map(function (string $subscriptionField) {
+                return array_get(
+                    $this->subscriptions,
+                    $subscriptionField,
+                    new NotFoundSubscriptionField()
+                );
+            });
     }
 
     /**
-     * @return array
+     * Get the subscribers for the current request.
+     *
+     * @return string[]
      */
-    public function toArray(): array
+    public function subscribers(): array
     {
         return $this->subscribers;
     }
 
     /**
-     * Reset collection of subscribers.
+     * Reset the currently held subscribers.
+     *
+     * @return void
      */
-    public function reset()
+    public function resetSubscribers()
     {
         $this->subscribers = [];
     }

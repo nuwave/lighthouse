@@ -8,9 +8,9 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Types\PaginatorField;
-use Nuwave\Lighthouse\Schema\Types\ConnectionField;
+use Nuwave\Lighthouse\Schema\Fields\PaginatorField;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Fields\ConnectionField;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginationManipulator
@@ -82,7 +82,7 @@ class PaginationManipulator
     }
 
     /**
-     * Register connection w/ schema.
+     * Register connection with schema.
      *
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
@@ -138,7 +138,7 @@ class PaginationManipulator
     }
 
     /**
-     * Register paginator w/ schema.
+     * Register paginator with schema.
      *
      * @param FieldDefinitionNode      $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType

@@ -3,33 +3,31 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
-use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
-use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
+use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
+use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 
-class Authorizer implements Auth
+class Authorizer implements AuthorizesSubscriptions
 {
     /** @var StoresSubscriptions */
     protected $storage;
 
-    /** @var Registry */
+    /** @var SubscriptionRegistry */
     protected $registry;
 
-    /** @var ExceptionHandler */
+    /** @var SubscriptionExceptionHandler */
     protected $exceptionHandler;
 
     /**
-     * @param StoresSubscriptions $storage
-     * @param Registry            $registry
-     * @param ExceptionHandler    $exceptionHandler
+     * @param StoresSubscriptions          $storage
+     * @param SubscriptionRegistry         $registry
+     * @param SubscriptionExceptionHandler $exceptionHandler
      */
     public function __construct(
         StoresSubscriptions $storage,
-        Registry $registry,
-        ExceptionHandler $exceptionHandler
+        SubscriptionRegistry $registry,
+        SubscriptionExceptionHandler $exceptionHandler
     ) {
         $this->storage = $storage;
         $this->registry = $registry;
@@ -43,7 +41,7 @@ class Authorizer implements Auth
      *
      * @return bool
      */
-    public function authorize(Request $request)
+    public function authorize(Request $request): bool
     {
         try {
             $subscriber = $this->storage->subscriberByRequest(
@@ -61,17 +59,17 @@ class Authorizer implements Auth
                 return false;
             }
 
-            $authorized = $subscriptions->reduce(
-                function ($authorized, GraphQLSubscription $subscription) use ($subscriber, $request) {
-                    return false === $authorized ? false : $subscription->authorize($subscriber, $request);
+            $authorizedForAnySubscriptions = $subscriptions->contains(
+                function (SubscriptionField $subscription) use ($subscriber, $request) {
+                    return $subscription->authorize($subscriber, $request);
                 }
             );
 
-            if (! $authorized) {
+            if (! $authorizedForAnySubscriptions) {
                 $this->storage->deleteSubscriber($subscriber->channel);
             }
 
-            return $authorized;
+            return $authorizedForAnySubscriptions;
         } catch (\Exception $e) {
             $this->exceptionHandler->handleAuthError($e);
 

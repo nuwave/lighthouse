@@ -29,7 +29,7 @@ class LogBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function authorized(Request $request): Response
     {
@@ -41,7 +41,7 @@ class LogBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function unauthorized(Request $request): Response
     {
@@ -53,7 +53,7 @@ class LogBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Support\Response
+     * @return Response
      */
     public function hook(Request $request): Response
     {

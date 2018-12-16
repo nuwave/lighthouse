@@ -3,14 +3,13 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
 class Serializer implements ContextSerializer
 {
     /**
-     * @var
+     * @var CreatesContext
      */
     protected $createsContext;
 
@@ -29,7 +28,7 @@ class Serializer implements ContextSerializer
      *
      * @return string
      */
-    public function serialize($context)
+    public function serialize($context): string
     {
         $user = null;
         $request = null;
@@ -72,7 +71,7 @@ class Serializer implements ContextSerializer
      *
      * @return string
      */
-    protected function serializeRequest(Request $request)
+    protected function serializeRequest(Request $request): string
     {
         return json_encode([
             'query' => $request->query->all(),
@@ -93,7 +92,7 @@ class Serializer implements ContextSerializer
      *
      * @return Request
      */
-    protected function unserializeRequest($request): Request
+    protected function unserializeRequest(string $request): Request
     {
         $data = json_decode($request, true);
         $request = new Request(

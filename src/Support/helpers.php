@@ -62,22 +62,22 @@ if (! function_exists('namespace_classname')) {
      * Else, the given namespaces are tried in order.
      *
      * @param string $classCandidate
-     * @param array $namespacesToTry
+     * @param array  $namespacesToTry
      *
      * @return string|false
      */
     function namespace_classname(string $classCandidate, array $namespacesToTry = [])
     {
-        if(\class_exists($classCandidate)){
+        if (\class_exists($classCandidate)) {
             return $classCandidate;
         }
 
         // Stop if the class is found or we are out of namespaces to try
-        while(!empty($namespacesToTry)){
+        while (! empty($namespacesToTry)) {
             // Pop off the first namespace and try it
-            $className = \array_shift($namespacesToTry) . '\\' . $classCandidate;
+            $className = \array_shift($namespacesToTry).'\\'.$classCandidate;
 
-            if(\class_exists($className)){
+            if (\class_exists($className)) {
                 return $className;
             }
         }
@@ -90,8 +90,8 @@ if (! function_exists('construct_resolver')) {
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param string $className This class is resolved through the container.
-     * @param string $methodName The method that gets passed the arguments of the closure.
+     * @param string $className  this class is resolved through the container
+     * @param string $methodName the method that gets passed the arguments of the closure
      *
      * @throws DefinitionException
      *
@@ -99,7 +99,7 @@ if (! function_exists('construct_resolver')) {
      */
     function construct_resolver(string $className, string $methodName): \Closure
     {
-        if (!method_exists($className, $methodName)) {
+        if (! method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 

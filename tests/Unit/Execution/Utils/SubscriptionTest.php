@@ -31,7 +31,7 @@ class SubscriptionTest extends TestCase
         parent::setUp();
 
         $this->registry = app(SubscriptionRegistry::class);
-        $this->registry->register($this->subscription(), self::SUBSCRIPTION_FIELD);
+        $this->registry->registerSubscription($this->subscription(), self::SUBSCRIPTION_FIELD);
 
         $this->broadcaster = $this->prophesize(SubscriptionBroadcaster::class);
         $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());

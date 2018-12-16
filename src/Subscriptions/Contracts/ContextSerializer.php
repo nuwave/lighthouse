@@ -2,6 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
+/**
+ * The GraphQL context can have different implementations,
+ * so we can not have a uniform serializer for it.
+ */
 interface ContextSerializer
 {
     /**

@@ -3,9 +3,8 @@
 namespace Tests\Integration\Subscriptions;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorage;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionStorage;
 
 class StorageManagerTest extends TestCase implements GraphQLContext
 {
@@ -13,7 +12,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
 
     use HandlesSubscribers;
 
-    /** @var StorageManager */
+    /** @var SubscriptionStorage */
     protected $storage;
 
     /**
@@ -23,7 +22,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
     {
         parent::setUp();
 
-        $this->storage = app(StorageManager::class);
+        $this->storage = $this->app->make(SubscriptionStorage::class);
     }
 
     /**
@@ -39,12 +38,8 @@ class StorageManagerTest extends TestCase implements GraphQLContext
         $this->storage->storeSubscriber($subscriber3, self::TOPIC.'-foo');
 
         $this->assertEquals(
-            $subscriber1->queryString,
-            $this->storage->subscriberByChannel($subscriber1->channel)->queryString
-        );
-        $this->assertEquals(
-            $subscriber2->queryString,
-            $this->storage->subscriberByChannel($subscriber2->channel)->queryString
+            $subscriber1->query,
+            $this->storage->subscriberByChannel($subscriber1->channel)->query
         );
         $this->assertEquals(
             $subscriber1->queryString,

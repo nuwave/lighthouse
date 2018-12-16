@@ -2,9 +2,12 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Pusher\Pusher;
+use Pusher\PusherException;
+use Nuwave\Lighthouse\Support\DriverManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
-use Nuwave\Lighthouse\Support\DriverManager;
 
 /**
  * @method void                      broadcast(Subscriber $subscriber, array $data)
@@ -19,7 +22,7 @@ class BroadcastManager extends DriverManager
      *
      * @return string
      */
-    protected function configKey()
+    protected function configKey(): string
     {
         return 'lighthouse.subscriptions.broadcasters';
     }
@@ -29,7 +32,7 @@ class BroadcastManager extends DriverManager
      *
      * @return string
      */
-    protected function driverKey()
+    protected function driverKey(): string
     {
         return 'lighthouse.subscriptions.broadcaster';
     }
@@ -39,9 +42,9 @@ class BroadcastManager extends DriverManager
      *
      * @return string
      */
-    protected function interface()
+    protected function interface(): string
     {
-        return 'Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster';
+        return Broadcaster::class;
     }
 
     /**
@@ -49,16 +52,18 @@ class BroadcastManager extends DriverManager
      *
      * @param array $config
      *
-     * @return Broadcaster
+     * @throws PusherException
+     *
+     * @return PusherBroadcaster
      */
-    protected function createPusherDriver(array $config)
+    protected function createPusherDriver(array $config): PusherBroadcaster
     {
-        $appKey = config('broadcasting.connections.pusher.key');
-        $appSecret = config('broadcasting.connections.pusher.secret');
-        $appId = config('broadcasting.connections.pusher.app_id');
-        $options = config('broadcasting.connections.pusher.options', []);
-
-        $pusher = new \Pusher\Pusher($appKey, $appSecret, $appId, $options);
+        $pusher = new Pusher(
+            config('broadcasting.connections.pusher.key'),
+            config('broadcasting.connections.pusher.secret'),
+            config('broadcasting.connections.pusher.app_id'),
+            config('broadcasting.connections.pusher.options', [])
+        );
 
         return new PusherBroadcaster($pusher);
     }
@@ -70,7 +75,7 @@ class BroadcastManager extends DriverManager
      *
      * @return LogBroadcaster
      */
-    protected function createLogDriver(array $config)
+    protected function createLogDriver(array $config): LogBroadcaster
     {
         return new LogBroadcaster($config);
     }

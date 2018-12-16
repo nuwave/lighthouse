@@ -50,7 +50,7 @@ abstract class DriverManager
      *
      * @return mixed
      */
-    public function driver($name = null)
+    public function driver(string $name = null)
     {
         $name = $name ?: $this->getDefaultDriver();
 
@@ -74,7 +74,7 @@ abstract class DriverManager
      *
      * @return string
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
         return $this->app['config'][$this->driverKey()];
     }
@@ -84,7 +84,7 @@ abstract class DriverManager
      *
      * @param string $name
      */
-    public function setDefaultDriver($name)
+    public function setDefaultDriver(string $name)
     {
         $this->app['config'][$this->driverKey()] = $name;
     }
@@ -96,7 +96,7 @@ abstract class DriverManager
      *
      * @return array
      */
-    protected function getConfig($name)
+    protected function configForDriver(string $name): array
     {
         return $this->app['config']->get(
             $this->configKey().".{$name}",
@@ -112,7 +112,7 @@ abstract class DriverManager
      *
      * @return self
      */
-    public function extend($driver, \Closure $callback)
+    public function extend(string $driver, \Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -125,18 +125,13 @@ abstract class DriverManager
      * @param string $name
      *
      * @throws \InvalidArgumentException
+     * @throws InvalidDriverException
      *
      * @return mixed
      */
-    protected function resolve($name)
+    protected function resolve(string $name)
     {
-        $config = $this->getConfig($name);
-
-        if (is_null($config)) {
-            throw new \InvalidArgumentException("Driver [{$name}] is not defined.");
-        }
-
-        $interface = $this->interface();
+        $config = $this->configForDriver($name);
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->validateDriver($this->callCustomCreator($config));
@@ -146,7 +141,9 @@ abstract class DriverManager
             if (method_exists($this, $driverMethod)) {
                 return $this->validateDriver($this->{$driverMethod}($config));
             } else {
-                throw new \InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+                throw new \InvalidArgumentException(
+                    "Driver [{$config['driver']}] is not supported."
+                );
             }
         }
     }
@@ -177,7 +174,9 @@ abstract class DriverManager
         $interface = $this->interface();
 
         if (! (new \ReflectionClass($driver))->implementsInterface($interface)) {
-            throw new InvalidDriverException(get_class($driver)." does not implement {$interface}");
+            throw new InvalidDriverException(
+                get_class($driver)." does not implement {$interface}"
+            );
         }
 
         return $driver;
@@ -191,9 +190,9 @@ abstract class DriverManager
      *
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters)
     {
-        return $this->driver()->$method(...$parameters);
+        return $this->driver()->{$method}(...$parameters);
     }
 
     /**

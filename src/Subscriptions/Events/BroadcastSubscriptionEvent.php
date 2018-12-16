@@ -3,14 +3,14 @@
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
 use Illuminate\Queue\SerializesModels;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription as Subscription;
+use Nuwave\Lighthouse\Schema\Fields\SubscriptionField;
 
 class BroadcastSubscriptionEvent
 {
     use SerializesModels;
 
     /**
-     * @var Subscription
+     * @var SubscriptionField
      */
     public $subscription;
 
@@ -25,11 +25,11 @@ class BroadcastSubscriptionEvent
     public $root;
 
     /**
-     * @param Subscription $subscription
-     * @param string       $fieldName
-     * @param mixed        $root
+     * @param SubscriptionField $subscription
+     * @param string            $fieldName
+     * @param mixed             $root
      */
-    public function __construct(Subscription $subscription, string $fieldName, $root)
+    public function __construct(SubscriptionField $subscription, string $fieldName, $root)
     {
         $this->subscription = $subscription;
         $this->fieldName = $fieldName;

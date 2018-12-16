@@ -3,19 +3,19 @@
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions as Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class BroadcastSubscriptionListener implements ShouldQueue
 {
     /**
-     * @var Broadcaster
+     * @var BroadcastsSubscriptions
      */
     protected $broadcaster;
 
     /**
-     * @param Broadcaster $broadcaster
+     * @param BroadcastsSubscriptions $broadcaster
      */
-    public function __construct(Broadcaster $broadcaster)
+    public function __construct(BroadcastsSubscriptions $broadcaster)
     {
         $this->broadcaster = $broadcaster;
     }
