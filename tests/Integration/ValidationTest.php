@@ -28,6 +28,16 @@ class ValidationTest extends TestCase
             bar: Bar
                 @rules(apply: ["required_if:id,bar"])
         ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")
+
+        email(
+            userId: ID!
+            email: Email!
+        ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolveEmail")
+    }
+
+    input Email {
+        emailAddress: String! @rules(apply: ["email"])
+        business: Boolean @rules(apply: ["required"])
     }
     
     input Bar {
@@ -47,6 +57,11 @@ class ValidationTest extends TestCase
     public function resolvePassword($root, array $args): string
     {
         return $args['password'] ?? 'no-password';
+    }
+
+    public function resolveEmail($root, array $args): string
+    {
+        return array_get($args, 'email.emailAddress', 'no-email');
     }
 
     /**
@@ -228,6 +243,45 @@ class ValidationTest extends TestCase
 
         $this->assertNull($password);
         $this->assertValidationKeysSame(['bar'], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itEvaluatesNonNullInputArgValidation()
+    {
+        $validEmailQuery = '
+        {
+            email(
+                userId: 1
+                email: {
+                    emailAddress: "john@doe.com"
+                    business: true
+                }
+            )
+        }
+        ';
+        $result = graphql()->executeQuery($validEmailQuery)->toArray();
+        $email = Arr::get($result, 'data.email');
+        $this->assertSame('john@doe.com', $email);
+
+        $invalidEmailQuery = '
+        {
+            email(
+                userId: 1
+                email: {
+                    emailAddress: "invalid_email_address"
+                }
+            )
+        }
+        ';
+        $result = graphql()->executeQuery($invalidEmailQuery)->toArray();
+        $email = Arr::get($result, 'data.email');
+        $this->assertNull($email);
+        $this->assertValidationKeysSame([
+            'email.emailAddress',
+            'email.business',
+        ], $result);
     }
 
     /**
