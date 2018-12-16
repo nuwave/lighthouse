@@ -9,9 +9,10 @@ use Tests\Utils\Middleware\CountRuns;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
+use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Nuwave\Lighthouse\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -37,6 +38,7 @@ class TestCase extends BaseTestCase
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
             LighthouseServiceProvider::class,
+            SubscriptionServiceProvider::class,
             ConsoleServiceProvider::class,
         ];
     }
@@ -90,7 +92,7 @@ class TestCase extends BaseTestCase
      * @param string $query
      * @param array  $variables
      *
-     * @return \GraphQL\Executor\ExecutionResult
+     * @return ExecutionResult
      */
     protected function executeQuery(string $schema, string $query, array $variables = []): ExecutionResult
     {

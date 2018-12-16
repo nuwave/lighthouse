@@ -85,7 +85,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
             $subscribers,
             function (Subscriber $subscriber) use ($root) {
                 $data = graphql()->executeQuery(
-                    $subscriber->queryString,
+                    $subscriber->query,
                     $subscriber->context,
                     $subscriber->args,
                     $subscriber->setRoot($root),

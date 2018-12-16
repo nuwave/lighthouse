@@ -42,12 +42,8 @@ class StorageManagerTest extends TestCase implements GraphQLContext
             $this->storage->subscriberByChannel($subscriber1->channel)->query
         );
         $this->assertEquals(
-            $subscriber1->queryString,
-            $this->storage->subscriberByRequest(['channel_name' => $subscriber1->channel], [])->queryString
-        );
-        $this->assertEquals(
-            $subscriber2->queryString,
-            $this->storage->subscriberByRequest(['channel_name' => $subscriber2->channel], [])->queryString
+            $subscriber2->query,
+            $this->storage->subscriberByChannel($subscriber2->channel)->query
         );
 
         $topicSubscribers = $this->storage->subscribersByTopic(self::TOPIC);

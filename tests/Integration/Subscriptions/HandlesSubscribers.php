@@ -2,31 +2,25 @@
 
 namespace Tests\Integration\Subscriptions;
 
+use GraphQL\Language\Parser;
 use Tests\Utils\Models\User;
-use GraphQL\Language\AST\NameNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use GraphQL\Language\AST\OperationDefinitionNode;
 
 trait HandlesSubscribers
 {
     protected function subscriber($queryString = null): Subscriber
     {
         $queryString = $queryString ?: '{ me }';
-        $info = new ResolveInfo([
-            'operation' => new OperationDefinitionNode([
-                'name' => new NameNode([
-                    'value' => 'foo',
-                ]),
-            ]),
+        $document = Parser::parse('subscription foo '.$queryString);
+        $resolveInfo = new ResolveInfo([
+            'operation' => $document->definitions[0],
         ]);
 
-        return Subscriber::initialize(
-            'root',
+        return new Subscriber(
             ['foo' => 'bar'],
             $this,
-            $info,
-            $queryString
+            $resolveInfo
         );
     }
 
