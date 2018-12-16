@@ -2,8 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
 class SubscriptionExtension extends GraphQLExtension
@@ -11,24 +10,14 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * @var SubscriptionRegistry
      */
-    protected $registry;
+    protected $subscriptionRegistry;
 
     /**
-     * @var Request
+     * @param SubscriptionRegistry $subscriptionRegistry
      */
-    protected $request;
-
-    /**
-     * @var string
-     */
-    protected $currentQuery = '';
-
-    /**
-     * @param SubscriptionRegistry $registry
-     */
-    public function __construct(SubscriptionRegistry $registry)
+    public function __construct(SubscriptionRegistry $subscriptionRegistry)
     {
-        $this->registry = $registry;
+        $this->subscriptionRegistry = $subscriptionRegistry;
     }
 
     /**
@@ -44,25 +33,11 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
+     * @param GraphQLRequest $request
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function start(GraphQLRequest $request)
     {
-        $this->request = $request->request();
-        $this->currentQuery = $request->isBatchedRequest()
-            ? array_get($this->request->toArray(), '0.query', '')
-            : $this->request->input('query', '');
-    }
-
-    /**
-     * Handle batch request start.
-     *
-     * @param int index
-     */
-    public function batchedQueryDidStart($index)
-    {
-        $this->registry->reset();
-        $this->currentQuery = array_get($this->request->toArray(), "{$index}.query", '');
+        $this->subscriptionRegistry->resetSubscribers();
     }
 
     /**
@@ -74,17 +49,7 @@ class SubscriptionExtension extends GraphQLExtension
     {
         return [
             'version' => 1,
-            'channels' => $this->registry->toArray(),
+            'channels' => $this->subscriptionRegistry->subscribers(),
         ];
-    }
-
-    /**
-     * Get the current query.
-     *
-     * @return string
-     */
-    public function currentQuery(): string
-    {
-        return $this->currentQuery;
     }
 }

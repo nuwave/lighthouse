@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class TracingExtension extends GraphQLExtension
@@ -21,14 +22,6 @@ class TracingExtension extends GraphQLExtension
      * @var \Illuminate\Support\Collection
      */
     protected $resolvers;
-
-    /**
-     * Create instance of trace extension.
-     */
-    public function __construct()
-    {
-        $this->resolvers = collect();
-    }
 
     /**
      * Extension name.
@@ -60,24 +53,16 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
-     *
-     * @return TracingExtension
+     * @param GraphQLRequest $request
      */
-    public function requestDidStart(ExtensionRequest $request): TracingExtension
+    public function start(GraphQLRequest $request)
     {
-        $this->requestStart = Carbon::now();
+        // Keep this value the same in case we are dealing
+        // with a batched request and this is called multiple times
+        if (! $this->requestStart) {
+            $this->requestStart = Carbon::now();
+        }
 
-        return $this;
-    }
-
-    /**
-     * Handle batch request start.
-     *
-     * @param int $index
-     */
-    public function batchedQueryDidStart($index)
-    {
         $this->resolvers = collect();
     }
 

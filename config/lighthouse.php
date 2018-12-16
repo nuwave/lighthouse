@@ -97,6 +97,7 @@ return [
         'models' => 'App',
         'queries' => 'App\\GraphQL\\Queries',
         'mutations' => 'App\\GraphQL\\Mutations',
+        'subscription' => 'App\\GraphQL\\Subscriptions',
         'interfaces' => 'App\\GraphQL\\Interfaces',
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
@@ -179,24 +180,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Batched Queries
-    |--------------------------------------------------------------------------
-    |
-    | GraphQL query batching means sending multiple queries to the server in one request,
-    | You may set this flag to process/deny batched queries.
-    |
-     */
-    'batched_queries' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
     | Here you can define GraphQL subscription "broadcasters" and "storage" drivers
     | as well their required configuration options.
     |
-     */
+    */
     'subscriptions' => [
         /*
          * Determines if broadcasts should be queued by default.
@@ -206,7 +196,7 @@ return [
         /*
          * Default subscription storage.
          *
-         * NOTE: Any laravel supported cache driver options are available here.
+         * NOTE: Any Laravel supported cache driver options are available here.
          */
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
@@ -216,7 +206,7 @@ return [
         'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),
 
         /*
-         * Subscription broadcasting drivers w/ config options.
+         * Subscription broadcasting drivers with config options.
          */
         'broadcasters' => [
             'log' => [
@@ -224,7 +214,7 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => 'Nuwave\Lighthouse\Subscriptions\SubscriptionRouter@pusher',
+                'routes' => 'Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster@routes',
             ],
         ],
     ],

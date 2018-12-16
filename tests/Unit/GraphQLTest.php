@@ -45,7 +45,8 @@ class GraphQLTest extends TestCase
             }
         }
         ';
-        $result = graphql()->executeQuery($query)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
+        $result = graphql()->executeQuery($query)
+            ->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
 
         $expected = [
             'data' => [
@@ -73,14 +74,15 @@ class GraphQLTest extends TestCase
             }
         }
         
-        query userOnlyId {
+        query UserQuery {
             user {
                 id
             }
         }
         ';
         request()->merge(['operationName' => 'userOnlyId']);
-        $result = graphql()->executeQuery($query)->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
+        $result = graphql()->executeQuery($query, null, null, null, 'UserQuery')
+            ->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
 
         $expected = [
             'data' => [

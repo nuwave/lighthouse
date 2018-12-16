@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
@@ -45,27 +46,31 @@ abstract class BatchLoader
      */
     public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): self
     {
-        // The path to the field serves as the unique key for the instance
+        // The path to the field serves as the unique key for the instance...
         $instanceName = static::instanceKey($pathToField);
-
-        // If we are resolving a batched query, we need to assign each
-        // query a uniquely indexed instance
-        $currentBatchIndex = app('graphql')->currentBatchIndex();
-
-        if (null !== $currentBatchIndex) {
-            $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
+        // ...unless we are resolving a batched query, in that case
+        // each field of each batch needs its own instance
+        /** @var GraphQLRequest $request */
+        $request = app(GraphQLRequest::class);
+        if ($request->isBatched()) {
+            $instanceName = "batch_{$request->batchIndex()}_{$instanceName}";
         }
 
-        // Only register a new instance if it is not already bound
-        $instance = app()->bound($instanceName)
-            ? app($instanceName)
-            : app()->instance(
-            $instanceName,
-            app()->makeWith($loaderClass, $constructorArgs)
-        );
+        if (app()->bound($instanceName)) {
+            // We have found a matching instance of a BatchLoader so we just resolve
+            $instance = app($instanceName);
+        } else {
+            // Register a new BatchLoader instance for the current field
+            $instance = app()->instance(
+                $instanceName,
+                app()->makeWith($loaderClass, $constructorArgs)
+            );
+        }
 
         if (! $instance instanceof self) {
-            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
+            throw new \Exception(
+                "The given class '$loaderClass' must resolve to an instance of ".self::class
+            );
         }
 
         return $instance;

@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Illuminate\Support\Collection;
-use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 
 class ExtensionRegistry implements \JsonSerializable
 {
@@ -28,11 +28,9 @@ class ExtensionRegistry implements \JsonSerializable
             $extensionInstance = app($extension);
 
             if (! $extensionInstance instanceof GraphQLExtension) {
-                throw new \Exception(sprintf(
-                    'The class [%s] was registered as an extensions but is not an instanceof %s',
-                    $extension,
-                    GraphQLExtension:: class
-                ));
+                throw new \Exception(
+                    "The class [$extension] was registered as an extension but is not an instanceof ".GraphQLExtension:: class
+                );
             }
 
             return [$extensionInstance::name() => $extensionInstance];
@@ -60,7 +58,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @return bool
      */
-    public function has(string $shortName)
+    public function has(string $shortName): bool
     {
         return $this->extensions->has($shortName);
     }
@@ -68,48 +66,15 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a request did start.
      *
-     * @param ExtensionRequest $request
+     * @param GraphQLRequest $request
      *
      * @return ExtensionRegistry
      */
-    public function requestDidStart(ExtensionRequest $request): ExtensionRegistry
-    {
-        $this->extensions->each(function (GraphQLExtension $extension) use ($request) {
-            $extension->requestDidStart($request);
-        });
-
-        return $this;
-    }
-
-    /**
-     * Notify all registered extensions that a batched query did start.
-     *
-     * @param int $index
-     *
-     * @return ExtensionRegistry
-     */
-    public function batchedQueryDidStart($index)
-    {
-        $this->extensions->each(function (GraphQLExtension $extension) use ($index) {
-            $extension->batchedQueryDidStart($index);
-        });
-
-        return $this;
-    }
-
-    /**
-     * Notify all registered extensions that a batched query did end.
-     *
-     * @param ExecutionResult $result
-     * @param int             $index
-     *
-     * @return ExtensionRegistry
-     */
-    public function batchedQueryDidEnd(ExecutionResult $result, $index)
+    public function start(GraphQLRequest $request): ExtensionRegistry
     {
         $this->extensions->each(
-            function (GraphQLExtension $extension) use ($result, $index) {
-                $extension->batchedQueryDidEnd($result, $index);
+            function (GraphQLExtension $extension) use ($request) {
+                $extension->start($request);
             }
         );
 
@@ -124,7 +89,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @return array
      */
-    public function willSendResponse(array $response)
+    public function willSendResponse(array $response): array
     {
         return $this->pipeline
             ->send($response)
@@ -160,8 +125,10 @@ class ExtensionRegistry implements \JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return collect($this->extensions->jsonSerialize())->reject(function ($output) {
-            return empty($output);
-        })->toArray();
+        return collect($this->extensions->jsonSerialize())
+            ->reject(function ($output) {
+                return empty($output);
+            })
+            ->toArray();
     }
 }
