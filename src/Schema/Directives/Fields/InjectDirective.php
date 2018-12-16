@@ -53,7 +53,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
                 use ($contextAttributeName, $argumentName, $previousResolvers) {
                     return $previousResolvers(
                         $rootValue,
-                        $args + [$argumentName => data_get($context, $contextAttributeName)],
+                        array_add($args, $argumentName,data_get($context, $contextAttributeName)),
                         $context,
                         $resolveInfo
                     );
