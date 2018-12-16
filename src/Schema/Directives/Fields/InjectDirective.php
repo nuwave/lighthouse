@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -53,7 +54,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
                 use ($contextAttributeName, $argumentName, $previousResolvers) {
                     return $previousResolvers(
                         $rootValue,
-                        array_add($args, $argumentName,data_get($context, $contextAttributeName)),
+                        Arr::add($args, $argumentName,data_get($context, $contextAttributeName)),
                         $context,
                         $resolveInfo
                     );
