@@ -22,7 +22,6 @@ trait HandlesSubscribers
         ]);
 
         return Subscriber::initialize(
-            'root',
             ['foo' => 'bar'],
             $this,
             $info,
