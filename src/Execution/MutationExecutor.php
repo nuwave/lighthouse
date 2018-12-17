@@ -34,6 +34,10 @@ class MutationExecutor
             });
         });
 
+        // Make sure that values that are set through the database insert
+        // are immediately available for return, e.g. default values
+        $model->refresh();
+
         return $model;
     }
 
@@ -73,7 +77,11 @@ class MutationExecutor
     protected static function handleHasManyCreate(Collection $multiValues, HasMany $relation)
     {
         $multiValues->each(function ($singleValues) use ($relation) {
-            self::executeCreate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+            self::executeCreate(
+                $relation->getModel()->newInstance(),
+                collect($singleValues),
+                $relation
+            );
         });
     }
 
@@ -88,26 +96,33 @@ class MutationExecutor
      */
     public static function executeUpdate(Model $model, Collection $args, HasMany $parentRelation = null): Model
     {
-        $model = $model->newQuery()->findOrFail(
-            $args->pull('id')
-        );
+        $id = $args->pull('id')
+            ?? $args->pull(
+                $model->getKeyName()
+            );
+
+        $model = $model->newQuery()->findOrFail($id);
 
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
-        $hasMany->each(function ($nestedOperations, $relationName) use ($model) {
+        $hasMany->each(function ($nestedOperations, string $relationName) use ($model) {
             /** @var HasMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, $operationKey) use ($relation) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
                 if ($operationKey === 'create') {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
 
                 if ($operationKey === 'update') {
                     collect($values)->each(function ($singleValues) use ($relation) {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                        self::executeUpdate(
+                            $relation->getModel()->newInstance(),
+                            collect($singleValues),
+                            $relation
+                        );
                     });
                 }
 
@@ -141,8 +156,9 @@ class MutationExecutor
      */
     protected static function extractBelongsToArgs(Model $model, Collection $args): Collection
     {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof BelongsTo);
+        return $args->partition(function ($value, string $key) use ($model) {
+            return method_exists($model, $key)
+                && ($model->{$key}() instanceof BelongsTo);
         });
     }
 
@@ -176,8 +192,9 @@ class MutationExecutor
      */
     protected static function extractHasManyArgs(Model $model, Collection $args): Collection
     {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof HasMany);
+        return $args->partition(function ($value, string $key) use ($model) {
+            return method_exists($model, $key)
+                && ($model->{$key}() instanceof HasMany);
         });
     }
 }

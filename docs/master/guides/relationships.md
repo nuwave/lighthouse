@@ -40,13 +40,16 @@ type Post {
 This approach is fine if performance is not super critical or if you only fetch a single post.
 However, as your queries become larger and more complex, you might want to optimize performance.
 
-## Defining Relationships
+## Querying Relationships
 
 Just like in Laravel, you can define [Eloquent Relationships](https://laravel.com/docs/eloquent-relationships) in your schema.
 Lighthouse has got you covered with specialized directives that optimize the Queries for you.
 
 Suppose you want to load a list of posts and associated comments. When you tell
 Lighthouse about the relationship, it automatically eager loads the comments when you need them.
+
+For special cases, you can use [`@with`](../api-reference/directives.md#with) to eager-load a relation
+without returning it directly.
 
 ### One To One
 
@@ -133,5 +136,97 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+}
+```
+
+## Mutating Relationships
+
+Lighthouse allows you to create, update or delete your relationships in
+a single mutation.
+
+### Belongs To
+
+You can allow the user to attach a `BelongsTo` relationship by defining
+an argument that is named just like the underlying relationship method.
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput!): Post @create(flatten: true)
+}
+
+input CreatePostInput {
+  title: String!
+  author: ID
+}
+```
+
+Just pass the ID of the model you want to associate.
+
+```graphql
+mutation {
+  createPost(input: {
+    title: "My new Post"
+    author: 123
+  }){
+    id
+    author {
+      name
+    }
+  }
+}
+```
+
+Lighthouse will detect the relationship and attach it.
+
+```json
+{
+  "data": {
+    "createPost": {
+      "id": 456,
+      "author": {
+        "name": "Herbert"
+      }
+    }
+  }
+}
+```
+
+You may also allow the user to change or remove a relation.
+
+```graphql
+type Mutation {
+  updatePost(input: UpdatePostInput!): Post @update(flatten: true)
+}
+
+input UpdatePostInput {
+  title: String
+  author: ID
+}
+```
+
+If you want to remove a relation, simply set it to `null`,
+
+```graphql
+mutation {
+  updatePost(input: {
+    title: "An updated title"
+    author: null
+  }){
+    title
+    author {
+      name
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "updatePost": {
+      "title": "An updated title",
+      "author": null
+    }
+  }
 }
 ```

@@ -139,9 +139,12 @@ And, if found, receive a result like this:
 
 ## Mutate data
 
-Reading data is all fine and dandy through Queries, but you might want to offer a way to change data, too.
-Per convention, a GraphQL *Query* is not allowed to change data, so you will need to define a *Mutation* for that.
-The only difference between them is their ability to change data, apart from that, they are the same.
+Per convention, a GraphQL *Query* is not allowed to change data.
+You will need to define a *Mutation* for that.
+Mutations look just like queries, but only they can create, update or delete data.
+
+The following examples will show you how to make changes to a single model.
+If you need to save multiple related models at once, look into [Mutating Relationships](../guides/relationships.md#mutating-relationships).
 
 ### Create
 
@@ -189,7 +192,6 @@ type Mutation {
 ```
 
 Since GraphQL allows you to update just parts of your data, it is best to have all arguments except `id` as optional.
-
 
 ```graphql
 mutation {
