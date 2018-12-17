@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Type\Definition\NonNull;
 use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use Nuwave\Lighthouse\Support\NoValue;
 use GraphQL\Type\Definition\ListOfType;
