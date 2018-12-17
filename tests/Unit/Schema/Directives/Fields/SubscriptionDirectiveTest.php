@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Tests\Utils\Directives\FooSubscription;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -101,9 +102,33 @@ class SubscriptionDirectiveTest extends TestCase
         $log = app(BroadcastManager::class)->driver();
         $this->assertCount(1, $log->broadcasts());
 
-        $broadcasted = array_get(array_first($log->broadcasts()), 'data', []);
+        $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
         $this->assertEquals(['body' => 'Foobar'], $broadcasted['onPostCreated']);
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsWithMissingOperationName()
+    {
+        $subscription = '
+        subscription {
+            onPostCreated {
+                body
+            }
+        }
+        ';
+
+        $json = ['query' => $subscription];
+
+        $this->schema = $this->schema();
+        $data = $this->postJson('/graphql', $json)->json();
+        $this->assertArrayHasKey('errors', $data);
+        $this->assertTrue(Arr::has($data, 'data.onPostCreated'));
+        $this->assertTrue(Arr::has($data, 'extensions.lighthouse_subscriptions.channels'));
+        $this->assertNull($data['data']['onPostCreated']);
+        $this->assertEmpty($data['extensions']['lighthouse_subscriptions']['channels']);
     }
 
     public function resolve($root, array $args)

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension as Extension;
@@ -43,7 +44,6 @@ class Subscriber
     /**
      * Create new subscription instance.
      *
-     * @param mixed          $root
      * @param array          $args
      * @param GraphQLContext $context
      * @param ResolveInfo    $info
@@ -53,12 +53,15 @@ class Subscriber
      * @return Subscription
      */
     public static function initialize(
-        $root,
-        $args,
+        array $args,
         GraphQLContext $context,
         ResolveInfo $info,
         string $queryString
     ) {
+        if (null === $info->operation->name) {
+            throw new SubscriptionException('An operation name must be present on a subscription request.');
+        }
+
         $instance = new static();
 
         $instance->channel = $instance->channel();

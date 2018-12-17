@@ -65,7 +65,6 @@ class SubscriptionDirective extends BaseDirective implements FieldResolver
             }
 
             $subscriber = Subscriber::initialize(
-                $root,
                 $args,
                 $context,
                 $info,
