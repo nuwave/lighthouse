@@ -108,21 +108,24 @@ class GraphQL
      * @param null   $context
      * @param array  $variables
      * @param null   $rootValue
+     * @param string $operationName
      *
      * @throws DirectiveException
      * @throws ParseException
      *
      * @return ExecutionResult
      */
-    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null, $operationName = null): ExecutionResult
     {
+        $operationName = $operationName ?: app('request')->input('operationName');
+
         $result = GraphQLBase::executeQuery(
             $this->prepSchema(),
             $query,
             $rootValue,
             $context,
             $variables,
-            app('request')->input('operationName'),
+            $operationName,
             null,
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );

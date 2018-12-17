@@ -17,6 +17,7 @@ use Nuwave\Lighthouse\Support\Http\Responses\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
@@ -96,6 +97,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
             ]);
         }
+
+        SubscriptionProvider::register($this->app);
     }
 
     /**

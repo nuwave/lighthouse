@@ -23,7 +23,7 @@ class TestCase extends BaseTestCase
      * @var string
      */
     protected $schema = '';
-    
+
     /**
      * Get package providers.
      *
@@ -62,7 +62,16 @@ class TestCase extends BaseTestCase
                 'queries' => 'Tests\\Utils\\Queries',
                 'mutations' => 'Tests\\Utils\\Mutations',
                 'models' => 'Tests\\Utils\\Models',
-            ]
+            ],
+            'subscriptions' => [
+                'storage' => 'array',
+                'broadcaster' => 'log',
+                'broadcasters' => [
+                    'log' => [
+                        'driver' => 'log',
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -93,7 +102,7 @@ class TestCase extends BaseTestCase
     /**
      * @param string $schema
      * @param string $query
-     * @param array $variables
+     * @param array  $variables
      *
      * @return array
      */
@@ -131,7 +140,7 @@ class TestCase extends BaseTestCase
     {
         return $this->buildSchema(
             $schema
-            . $this->placeholderQuery()
+            .$this->placeholderQuery()
         );
     }
 
