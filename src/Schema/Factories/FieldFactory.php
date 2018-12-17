@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Type\Definition\NonNull;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\InputType;
 use Nuwave\Lighthouse\Support\NoValue;
@@ -257,6 +258,12 @@ class FieldFactory
 
             // Handle `InputObjectType` and all other leaf types
             $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath);
+
+            return;
+        }
+
+        if ($type instanceof NonNull) {
+            $this->handleArgWithAssociatedDirectivesRecursively($type->getWrappedType(), $argValue, $astNode, $argumentPath);
 
             return;
         }
