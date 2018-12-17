@@ -2,11 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
-class BcryptDirective extends BaseDirective implements ArgMiddleware
+class BcryptDirective implements ArgTransformerDirective
 {
     /**
      * Directive name.
@@ -19,21 +17,16 @@ class BcryptDirective extends BaseDirective implements ArgMiddleware
     }
 
     /**
-     * Apply transformations on the ArgumentValue.
+     * Run Laravel's bcrypt helper on the argument.
      *
-     * @param ArgumentValue $argumentValue
-     * @param \Closure      $next
+     * Useful for hashing passwords before inserting them into the database.
      *
-     * @return ArgumentValue
+     * @param string $argumentValue
+     *
+     * @return mixed
      */
-    public function handleArgument(ArgumentValue $argumentValue, \Closure $next): ArgumentValue
+    public function transform($argumentValue): string
     {
-        $argumentValue->addTransformer(
-            function ($password) {
-                return bcrypt($password);
-            }
-        );
-
-        return $next($argumentValue);
+        return bcrypt($argumentValue);
     }
 }

@@ -11,7 +11,7 @@ class InterfaceDirective extends BaseDirective
      *
      * @return string
      */
-    public function name()
+    public function name():string
     {
         return 'interface';
     }

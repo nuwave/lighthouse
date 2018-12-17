@@ -111,9 +111,9 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
+        $result = $this->execute($schema, $query);
 
-        $result = $this->executeQuery($schema, $query);
-        $this->assertCount(2, Arr::get($result->data, 'users.data'));
+        $this->assertCount(2, Arr::get($result, 'data.users.data'));
     }
 
     /**

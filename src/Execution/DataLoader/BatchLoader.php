@@ -60,12 +60,14 @@ abstract class BatchLoader
         $instance = app()->bound($instanceName)
             ? app($instanceName)
             : app()->instance(
-            $instanceName,
-            app()->makeWith($loaderClass, $constructorArgs)
-        );
+                $instanceName,
+                app()->makeWith($loaderClass, $constructorArgs)
+            );
 
         if (! $instance instanceof self) {
-            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
+            throw new \Exception(
+                "The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader"
+            );
         }
 
         return $instance;

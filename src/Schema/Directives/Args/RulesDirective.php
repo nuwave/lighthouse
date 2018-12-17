@@ -2,18 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Nuwave\Lighthouse\Schema\Factories\RuleFactory;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 
-/**
- * Allows defining rules and messages on an InputValueDefinition.
- *
- * @see RuleFactory::getRulesAndMessages() for how this is applied.
- */
-class RulesDirective extends BaseDirective
+class RulesDirective extends BaseDirective implements ArgValidationDirective, HasArgumentPath
 {
-    /** @var string */
-    const NAME = 'rules';
+    use HandleRulesDirective;
 
     /**
      * Name of the directive.
@@ -22,6 +17,6 @@ class RulesDirective extends BaseDirective
      */
     public function name(): string
     {
-        return self::NAME;
+        return 'rules';
     }
 }

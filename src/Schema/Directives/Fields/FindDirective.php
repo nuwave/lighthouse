@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder;
-use Nuwave\Lighthouse\Execution\QueryUtils;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -38,15 +39,20 @@ class FindDirective extends BaseDirective implements FieldResolver
         $model = $this->getModelClass();
 
         return $fieldValue->setResolver(
-            function ($root, array $args) use ($model) {
+            function ($root, array $args, $context = null, ResolveInfo $resolveInfo) use ($model) {
                 /** @var Builder $query */
-                $query = QueryUtils::applyFilters($model::query(), $args);
-                $query = QueryUtils::applyScopes($query, $args, $this->directiveArgValue('scopes', []));
+                $query = QueryFilter::apply(
+                    $model::query(),
+                    $args,
+                    $this->directiveArgValue('scopes', []),
+                    $resolveInfo
+                );
                 $total = $query->count();
 
                 if ($total > 1) {
                     throw new Error('Query returned more than one result.');
                 }
+
                 return $query->first();
             }
         );
