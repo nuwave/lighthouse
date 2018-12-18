@@ -53,13 +53,6 @@ class FieldValue
     protected $privateCache = false;
 
     /**
-     * Additional args to inject into resolver.
-     *
-     * @var array
-     */
-    protected $additionalArgs = [];
-
-    /**
      * Create new field value instance.
      *
      * @param NodeValue           $parent
@@ -97,32 +90,6 @@ class FieldValue
         $this->complexity = $complexity;
 
         return $this;
-    }
-
-    /**
-     * Inject field argument.
-     *
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return FieldValue
-     */
-    public function injectArg(string $key, $value): FieldValue
-    {
-        $this->additionalArgs = array_merge(
-            $this->additionalArgs,
-            [$key => $value]
-        );
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdditionalArgs(): array
-    {
-        return $this->additionalArgs;
     }
 
     /**

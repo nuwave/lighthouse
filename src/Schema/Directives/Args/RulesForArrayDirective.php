@@ -3,16 +3,13 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 
-/**
- * Allows defining rules and messages for arrays on an InputValueDefinition.
- *
- * @see RuleFactory::getRulesAndMessages() for how this is applied.
- */
-class RulesForArrayDirective extends BaseDirective
+class RulesForArrayDirective extends BaseDirective implements ArgValidationDirective, ArgDirectiveForArray, HasArgumentPath
 {
-    /** @var string */
-    const NAME = 'rulesForArray';
+    use HandleRulesDirective;
 
     /**
      * Name of the directive.
@@ -21,6 +18,6 @@ class RulesForArrayDirective extends BaseDirective
      */
     public function name(): string
     {
-        return self::NAME;
+        return 'rulesForArray';
     }
 }

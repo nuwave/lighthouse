@@ -32,7 +32,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      *
      * @return string
      */
-    public function name()
+    public function name():string
     {
         return 'deferrable';
     }

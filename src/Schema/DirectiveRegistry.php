@@ -14,15 +14,18 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class DirectiveRegistry
 {
@@ -337,15 +340,52 @@ class DirectiveRegistry
     }
 
     /**
-     * Get middleware for field arguments.
+     * Get middleware for arguments.
      *
      * @param InputValueDefinitionNode $arg
      *
      * @return Collection
      */
-    public function argMiddleware(InputValueDefinitionNode $arg): Collection
+    public function argTransformers(InputValueDefinitionNode $arg): Collection
     {
-        return $this->associatedDirectivesOfType($arg, ArgMiddleware::class);
+        return $this->associatedDirectivesOfType($arg, ArgTransformerDirective::class);
+    }
+
+    /**
+     * Create `ArgDirective` instances from `InputValueDefinitionNode`.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argDirectives(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgDirective::class);
+    }
+
+
+    /**
+     * Get middleware for array arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argMiddlewareForArray(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgDirectiveForArray::class);
+    }
+
+    /**
+     * Get filters for arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argFilterDirective(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgFilterDirective::class);
     }
 
     /**

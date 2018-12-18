@@ -45,7 +45,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
             function ($root, array $args) {
                 $modelClassName = $this->getModelClass();
                 /** @var Model $model */
-                $model = new $modelClassName;
+                $model = new $modelClassName();
 
                 $flatten = $this->directiveArgValue('flatten', false);
                 $args = $flatten

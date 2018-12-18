@@ -54,6 +54,18 @@ class ExtensionRegistry implements \JsonSerializable
     }
 
     /**
+     * Check if extension is registered by its short name.
+     *
+     * @param string $shortName
+     *
+     * @return bool
+     */
+    public function has(string $shortName)
+    {
+        return $this->extensions->has($shortName);
+    }
+
+    /**
      * Notify all registered extensions that a request did start.
      *
      * @param ExtensionRequest $request

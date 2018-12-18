@@ -3,23 +3,85 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\InputType;
+use Nuwave\Lighthouse\Support\NoValue;
+use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Type\Definition\InputObjectType;
+use Nuwave\Lighthouse\Execution\ErrorBuffer;
+use Nuwave\Lighthouse\Execution\QueryFilter;
+use GraphQL\Type\Definition\InputObjectField;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
+use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class FieldFactory
 {
-    /** @var DirectiveRegistry */
+    use HasResolverArguments;
+
+    /**
+     * @var FieldValue
+     */
+    protected $fieldValue;
+
+    /**
+     * @var QueryFilter
+     */
+    protected $queryFilter;
+
+    /**
+     * @var DirectiveRegistry
+     */
     protected $directiveRegistry;
-    /** @var ArgumentFactory */
+
+    /**
+     * @var ArgumentFactory
+     */
     protected $argumentFactory;
-    /** @var Pipeline */
+
+    /**
+     * @var Pipeline
+     */
     protected $pipeline;
+
+    /**
+     * @var array
+     */
+    protected $currentRules = [];
+
+    /**
+     * @var array
+     */
+    protected $currentMessages = [];
+
+    /**
+     * @var ErrorBuffer
+     */
+    protected $currentValidationErrorBuffer;
+
+    /**
+     * @var ArgumentValue
+     */
+    protected $currentArgumentValueInstance;
+
+    /**
+     * @var ArgDirective[]
+     */
+    protected $currentHandlerArgsOfArgDirectivesAfterValidationDirective = [];
 
     /**
      * @param DirectiveRegistry $directiveRegistry
@@ -44,34 +106,30 @@ class FieldFactory
      */
     public function handle(FieldValue $fieldValue): array
     {
-        $fieldDefinition = $fieldValue->getField();
+        $this->fieldValue = $fieldValue;
+        $fieldDefinitionNode = $fieldValue->getField();
 
-        if ($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinition)) {
-            $fieldValue = $fieldResolver->resolveField($fieldValue);
+        // Get the initial resolver from the FieldValue
+        // This is either the webonyx default resolver or provided by a directive
+        if ($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinitionNode)) {
+            $this->fieldValue = $fieldResolver->resolveField($fieldValue);
+        }
+        $resolver = $this->fieldValue->getResolver();
+
+        $argumentValues = $this->getArgumentValues();
+        // No need to do handle the arguments if there are no
+        // arguments defined for the field
+        if ($argumentValues->isNotEmpty()) {
+            $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
+
+            $resolver = $this->decorateResolverWithArgs($resolver, $argumentValues);
         }
 
-        $initialResolver = $fieldValue->getResolver();
-
-        $inputValueDefinitions = $this->getInputValueDefinitions($fieldValue);
-        $resolver = $this->injectAdditionalArgs(
-            $initialResolver,
-            $fieldValue->getAdditionalArgs()
-        );
-
-
-        // No need to do transformation/validation of the arguments
-        // if there are no arguments defined for the field
-        if ($inputValueDefinitions->isNotEmpty()) {
-            $resolver = $this->wrapResolverByTransformingArgs($resolver, $inputValueDefinitions);
-            $resolver = $this->wrapResolverWithValidation($resolver, $inputValueDefinitions);
-        }
-
-        $fieldValue->setResolver($resolver);
-
+        $this->fieldValue->setResolver($resolver);
         $resolverWithMiddleware = $this->pipeline
-            ->send($fieldValue)
+            ->send($this->fieldValue)
             ->through(
-                $this->directiveRegistry->fieldMiddleware($fieldDefinition)
+                $this->directiveRegistry->fieldMiddleware($fieldDefinitionNode)
             )
             ->via('handleField')
             ->then(
@@ -83,124 +141,417 @@ class FieldFactory
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
-        return [
-            'name' => $fieldDefinition->name->value,
-            'type' => $fieldValue->getReturnType(),
-            'args' => $inputValueDefinitions->toArray(),
+        $fieldDefinition = [
+            'name' => $fieldDefinitionNode->name->value,
+            'type' => $this->fieldValue->getReturnType(),
+            'args' => $this->getInputValueDefinitions($argumentValues),
             'resolve' => $resolverWithMiddleware,
-            'description' => data_get($fieldDefinition->description, 'value'),
-            'complexity' => $fieldValue->getComplexity(),
+            'description' => data_get($fieldDefinitionNode->description, 'value'),
+            'complexity' => $this->fieldValue->getComplexity(),
         ];
+
+        return $fieldDefinition;
     }
 
     /**
-     * Get collection of field arguments.
+     * Transform the ArgumentValues into the final InputValueDefinitions.
      *
-     * @param FieldValue $fieldValue
+     * @param Collection<ArgumentValue> $argumentValues
      *
-     * @return Collection
+     * @return InputValueDefinitionNode[]
      */
-    protected function getInputValueDefinitions(FieldValue $fieldValue): Collection
+    protected function getInputValueDefinitions(Collection $argumentValues): array
     {
-        return collect($fieldValue->getField()->arguments)
-            ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($fieldValue) {
-                $argValue = new ArgumentValue($inputValueDefinition, $fieldValue);
-
+        return $argumentValues
+            ->mapWithKeys(function (ArgumentValue $argumentValue) {
                 return [
-                    $inputValueDefinition->name->value => $this->argumentFactory->handle($argValue),
+                    $argumentValue->getName() => $this->argumentFactory->handle($argumentValue),
                 ];
+            })
+            ->all();
+    }
+
+    /**
+     * Get a collection of the fields argument definitions.
+     *
+     * @return Collection<ArgumentValue>
+     */
+    protected function getArgumentValues(): Collection
+    {
+        return collect($this->fieldValue->getField()->arguments)
+            ->map(function (InputValueDefinitionNode $inputValueDefinition) {
+                return new ArgumentValue($inputValueDefinition, $this->fieldValue);
             });
     }
 
     /**
-     * Wrap the resolver by injecting additional arg values.
+     * Call `ArgMiddleware::handleArgument` at the resolving time.
      *
-     * @param \Closure $resolver
-     * @param array    $additionalArgs
+     * This may be used to transform the arguments, log them or do anything else
+     * before they reach the final resolver.
      *
-     * @return \Closure
-     */
-    protected function injectAdditionalArgs(\Closure $resolver, array $additionalArgs): \Closure
-    {
-        return function () use ($resolver, $additionalArgs) {
-            $resolverArgs = func_get_args();
-            // The second argument of resolvers are the argument values
-            $resolverArgs[1] = array_merge($resolverArgs[1], $additionalArgs);
-
-            return call_user_func_array($resolver, $resolverArgs);
-        };
-    }
-
-    /**
-     * Perform transformations on the arguments given to the field.
-     *
-     * For example, an argument may be encrypted before reaching the final resolver.
-     *
-     * @param \Closure          $resolver
-     * @param Collection<array> $inputValueDefinitions
+     * @param \Closure                  $resolver
+     * @param Collection<ArgumentValue> $argumentValues
      *
      * @return \Closure
      */
-    protected function wrapResolverByTransformingArgs(\Closure $resolver, Collection $inputValueDefinitions): \Closure
+    public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
     {
-        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
-            $inputArgs = collect($inputArgs)
-                ->map(function ($value, string $key) use ($inputValueDefinitions) {
-                    $definition = $inputValueDefinitions->get($key);
+        return function ($root, array $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
+            $this->currentValidationErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
 
-                    return collect($definition['transformers'])
-                        ->reduce(
-                            function ($value, \Closure $transformer) {
-                                return $transformer($value);
-                            },
-                            $value
-                        );
-                })
-                ->toArray();
+            $this->setResolverArguments($root, $args, $context, $resolveInfo);
 
-            return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
-        };
-    }
+            $argumentValues->each(
+                function (ArgumentValue $argumentValue) use (&$args) {
+                    $this->currentArgumentValueInstance = $argumentValue;
 
-    /**
-     * Wrap field resolver function with validation logic.
-     *
-     * This has to happen as part of the field resolution, because we might have
-     * deeply nested input values and we can not generate the rules upfront.
-     *
-     * @param \Closure          $resolver
-     * @param Collection<array> $inputValueDefinitions
-     *
-     * @return \Closure
-     */
-    protected function wrapResolverWithValidation(\Closure $resolver, Collection $inputValueDefinitions): \Closure
-    {
-        return function ($rootValue, $inputArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver, $inputValueDefinitions) {
-            list($rules, $messages) = RuleFactory::build(
-                $resolveInfo->fieldName,
-                $resolveInfo->parentType->name,
-                $inputArgs,
-                graphql()->documentAST()
+                    $noValuePassedForThisArgument = ! array_key_exists($argumentValue->getName(), $args);
+
+                    // because we are passing by reference, we need a variable to contain the null value.
+                    if ($noValuePassedForThisArgument) {
+                        $argValue = new NoValue();
+                    } else {
+                        $argValue = &$args[$argumentValue->getName()];
+                    }
+
+                    $this->handleArgWithAssociatedDirectivesRecursively(
+                        $argumentValue->getType(),
+                        $argValue,
+                        $argumentValue->getAstNode(),
+                        [$argumentValue->getName()]
+                    );
+                }
             );
 
-            if (count($rules) > 0) {
-                /** @var GraphQLValidator $validator */
-                $validator = validator(
-                    $inputArgs,
-                    $rules,
-                    $messages,
-                    [
-                        'root' => $rootValue,
-                        'context' => $context,
-                        // This makes it so that we get an instance of our own Validator class
-                        'resolveInfo' => $resolveInfo,
-                    ]
-                );
+            // Validate arguments placed before `ValidationDirective`s
+            $this->validateArgumentsBeforeValidationDirectives($root, $args, $context, $resolveInfo);
 
-                $validator->validate();
+            // Handle `ArgDirective`s after `ValidationDirective`s
+            $this->handleArgDirectivesAfterValidationDirectives($root, $args, $context, $resolveInfo);
+
+            // We (ab)use the ResolveInfo as a way of passing down the query filter
+            // to the final resolver
+            $resolveInfo->queryFilter = $this->queryFilter;
+
+            return $resolver($root, $args, $context, $resolveInfo);
+        };
+    }
+
+    /**
+     * Handle the ArgMiddleware.
+     *
+     * @param InputType                     $type
+     * @param mixed                         $argValue
+     * @param InputValueDefinitionNode|null $astNode
+     * @param array                         $argumentPath
+     */
+    protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argValue, InputValueDefinitionNode $astNode, array $argumentPath)
+    {
+        if ($argValue instanceof NoValue || null === $argValue) {
+            // Handle `ListOfType` with associated directives which implement `ArgDirectiveForArray`
+            if ($type instanceof ListOfType) {
+                $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath, ArgDirectiveForArray::class);
+                // No need to consider the rules for the elements of the list, since we know it is empty
+                return;
             }
 
-            return $resolver($rootValue, $inputArgs, $context, $resolveInfo);
-        };
+            // Handle `InputObjectType` and all other leaf types
+            $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath);
+
+            return;
+        }
+
+        if ($type instanceof NonNull) {
+            $this->handleArgWithAssociatedDirectivesRecursively($type->getWrappedType(), $argValue, $astNode, $argumentPath);
+
+            return;
+        }
+
+        if ($type instanceof InputObjectType) {
+            collect($type->getFields())
+                ->each(
+                    function (InputObjectField $field) use ($argumentPath, &$argValue) {
+                        $noValuePassedForThisArgument = ! array_key_exists($field->name, $argValue);
+
+                        // because we are passing by reference, we need a variable to contain the null value.
+                        if ($noValuePassedForThisArgument) {
+                            $value = new NoValue();
+                        } else {
+                            $value = &$argValue[$field->name];
+                        }
+
+                        $this->handleArgWithAssociatedDirectivesRecursively(
+                            $field->type,
+                            $value,
+                            $field->astNode,
+                            $this->addPath($argumentPath, $field->name)
+                        );
+                    }
+                );
+
+            return;
+        }
+
+        if ($type instanceof ListOfType) {
+            $argValue = $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath, ArgDirectiveForArray::class);
+
+            foreach ($argValue as $key => $fieldValue) {
+                // here we are passing by reference so the `$argValue[$key]` is intended.
+                $this->handleArgWithAssociatedDirectivesRecursively(
+                    $type->ofType,
+                    $argValue[$key],
+                    $astNode,
+                    $this->addPath($argumentPath, $key)
+                );
+            }
+
+            return;
+        }
+
+        // all other leaf types
+        $argValue = $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath);
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param mixed                    $argValue
+     * @param array                    $argumentPath
+     * @param string                   $mustImplementClass
+     *
+     * @return mixed
+     */
+    protected function handleArgWithAssociatedDirectives(
+        InputValueDefinitionNode $astNode,
+        $argValue,
+        array $argumentPath,
+        string $mustImplementClass = null
+    ) {
+        $directives = $this->directiveRegistry->argDirectives($astNode);
+
+        if ($mustImplementClass) {
+            $directives = $directives->filter(function ($directive) use ($mustImplementClass) {
+                return $directive instanceof $mustImplementClass;
+            });
+        }
+
+        return $this->handleArgDirectives($astNode, $argValue, $argumentPath, $directives);
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param mixed                    $argumentValue
+     * @param array                    $argumentPath
+     * @param Collection|null          $directives
+     *
+     * @return mixed
+     */
+    protected function handleArgDirectives(
+        InputValueDefinitionNode $astNode,
+        $argumentValue,
+        array $argumentPath,
+        Collection $directives
+    ) {
+        if ($directives->isEmpty()) {
+            return $argumentValue;
+        }
+
+        $this->prepareDirectives($astNode, $argumentPath, $directives);
+
+        foreach ($directives as $directive) {
+            // Remove the directive from the list to avoid evaluating
+            // the same directive twice
+            $directives->shift();
+
+            // Pause the iteration once we hit any directive that has to do
+            // with validation. We will resume running through the remaining
+            // directives later, after we completed validation
+            if ($directive instanceof ArgValidationDirective) {
+                $this->collectRulesAndMessages($directive, $argumentPath);
+                break;
+            }
+
+            if ($directive instanceof ArgTransformerDirective && ! $argumentValue instanceof NoValue) {
+                $argumentValue = $directive->transform($argumentValue);
+            }
+
+            if ($directive instanceof ArgFilterDirective) {
+                $this->injectArgumentFilter($directive, $astNode);
+            }
+        }
+
+        // If directives remain, snapshot the state that we are in now
+        // to allow resuming after validation has run
+        if ($directives->count()) {
+            $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective[] = [$astNode, $argumentValue, $argumentPath, $directives];
+        }
+
+        return $argumentValue;
+    }
+
+    /**
+     * @param InputValueDefinitionNode $astNode
+     * @param array                    $argumentPath
+     * @param Collection               $directives
+     */
+    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
+    {
+        $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
+            if ($directive instanceof HasErrorBuffer) {
+                $directive->setErrorBuffer($this->currentValidationErrorBuffer);
+            }
+
+            if ($directive instanceof HasArgumentPath) {
+                $directive->setArgumentPath($argumentPath);
+            }
+        });
+    }
+
+    /**
+     * @param ArgValidationDirective $directive
+     * @param array                  $argumentPath
+     */
+    protected function collectRulesAndMessages(ArgValidationDirective $directive, array $argumentPath)
+    {
+        $this->currentRules = array_merge($this->currentRules, $directive->getRules());
+        $this->currentMessages = array_merge($this->currentMessages, $directive->getMessages());
+    }
+
+    /**
+     * @param ArgFilterDirective       $argFilterDirective
+     * @param InputValueDefinitionNode $inputValueDefinition
+     */
+    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition)
+    {
+        $argumentName = $inputValueDefinition->name->value;
+        $directiveDefinition = ASTHelper::directiveDefinition($inputValueDefinition, $argFilterDirective->name());
+        $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
+
+        $this->queryFilter->addArgumentFilter(
+            $argumentName,
+            $columnName,
+            $argFilterDirective
+        );
+    }
+
+    /**
+     * Append a path to the base path to create a new path.
+     *
+     * @param array      $basePath
+     * @param string|int $pathToBeAdded
+     *
+     * @return array
+     */
+    protected function addPath(array $basePath, $pathToBeAdded): array
+    {
+        $basePath[] = $pathToBeAdded;
+
+        return $basePath;
+    }
+
+    /**
+     * Gather the error messages from each type of directive.
+     *
+     * @return string
+     */
+    protected function getValidationErrorMessage(): string
+    {
+        $path = implode(
+            '.',
+            $this->resolveInfo()->path
+        );
+
+        return "Validation failed for the field [$path].";
+    }
+
+    /**
+     * @param mixed       $root
+     * @param array       $args
+     * @param mixed       $context
+     * @param ResolveInfo $resolveInfo
+     *
+     * @throws \Exception
+     */
+    protected function validateArgumentsBeforeValidationDirectives($root, array $args, $context, ResolveInfo $resolveInfo)
+    {
+        if (! $this->currentRules) {
+            return;
+        }
+
+        $validator = validator(
+            $args,
+            $this->currentRules,
+            $this->currentMessages,
+            [
+                'root' => $root,
+                'context' => $context,
+                // This makes it so that we get an instance of our own Validator class
+                'resolveInfo' => $resolveInfo,
+            ]
+        );
+
+        if ($validator->fails()) {
+            $messageBag = $validator->errors();
+            foreach ($messageBag->getMessages() as $key => $errorMessages) {
+                foreach ($errorMessages as $errorMessage) {
+                    $this->currentValidationErrorBuffer->push($errorMessage, $key);
+                }
+            }
+        }
+
+        $this->flushErrorBufferIfHasErrors();
+
+        // reset current rules and messages
+        $this->currentRules = [];
+        $this->currentMessages = [];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function flushErrorBufferIfHasErrors()
+    {
+        if ($this->currentValidationErrorBuffer->hasErrors()) {
+            $this->currentValidationErrorBuffer->flush(
+                $this->getValidationErrorMessage()
+            );
+        }
+    }
+
+    /**
+     * @param mixed       $root
+     * @param array       $args
+     * @param mixed       $context
+     * @param ResolveInfo $resolveInfo
+     *
+     * @throws \Exception
+     */
+    protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, $context, ResolveInfo $resolveInfo)
+    {
+        if (! $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective) {
+            return;
+        }
+
+        // copy
+        $currentHandlerArgsOfArgDirectivesAfterValidationDirective = $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective;
+
+        // reset
+        $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective = [];
+
+        foreach ($currentHandlerArgsOfArgDirectivesAfterValidationDirective as $handlerArgs) {
+            $value = $this->handleArgDirectives(...$handlerArgs);
+
+            if ($value instanceof NoValue) {
+                continue;
+            }
+
+            $path = implode('.', $handlerArgs[2]);
+            data_set($args, $path, $value);
+        }
+
+        if ($this->currentHandlerArgsOfArgDirectivesAfterValidationDirective) {
+            $this->validateArgumentsBeforeValidationDirectives($root, $args, $context, $resolveInfo);
+            $this->handleArgDirectivesAfterValidationDirectives($root, $args, $context, $resolveInfo);
+        }
     }
 }
