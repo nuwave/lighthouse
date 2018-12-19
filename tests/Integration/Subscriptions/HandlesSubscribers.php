@@ -3,32 +3,35 @@
 namespace Tests\Integration\Subscriptions;
 
 use Tests\Utils\Models\User;
-use GraphQL\Language\AST\NameNode;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use GraphQL\Language\AST\OperationDefinitionNode;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait HandlesSubscribers
 {
-    protected function subscriber($queryString = null): Subscriber
+    /**
+     * Construct a dummy subscriber for testing.
+     *
+     * @param string|null $queryString
+     *
+     * @return Subscriber
+     */
+    protected function subscriber(?string $queryString = null): Subscriber
     {
-        $queryString = $queryString ?: '{ me }';
-        $info = new ResolveInfo([
-            'operation' => new OperationDefinitionNode([
-                'name' => new NameNode([
-                    'value' => 'foo',
-                ]),
-            ]),
-        ]);
+        $subscriber = new Subscriber();
+        $subscriber->args = ['foo' => 'bar'];
+        $subscriber->context = $this;
+        $subscriber->operationName = 'foo';
+        $subscriber->queryString = $queryString ?: '{ me }';
+        $subscriber->channel = Subscriber::uniqueChannelName();
 
-        return Subscriber::initialize(
-            ['foo' => 'bar'],
-            $this,
-            $info,
-            $queryString
-        );
+        return $subscriber;
     }
 
+    /**
+     * @see GraphQLContext::user()
+     *
+     * @return User
+     */
     public function user(): User
     {
         return new User([
@@ -38,6 +41,11 @@ trait HandlesSubscribers
         ]);
     }
 
+    /**
+     * @see GraphQLContext::request()
+     *
+     * @return null
+     */
     public function request()
     {
         return null;
