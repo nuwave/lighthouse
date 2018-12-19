@@ -7,7 +7,9 @@ use Nuwave\Lighthouse\Exceptions\GenericException;
 class ErrorBuffer
 {
     /**
-     * @var array
+     * The gathered error messages.
+     *
+     * @var string[]
      */
     protected $errors = [];
 
@@ -27,7 +29,7 @@ class ErrorBuffer
      * @param string        $errorType
      * @param \Closure|null $exceptionResolver
      */
-    public function __construct(string $errorType = 'generic', \Closure $exceptionResolver = null)
+    public function __construct(string $errorType = 'generic', ?\Closure $exceptionResolver = null)
     {
         $this->errorType = $errorType;
         $this->exceptionResolver = $exceptionResolver ?? $this->defaultExceptionResolver();
@@ -52,7 +54,7 @@ class ErrorBuffer
      *
      * @param \Closure $exceptionResolver
      *
-     * @return static
+     * @return $this
      */
     public function setExceptionResolver(\Closure $exceptionResolver): self
     {
@@ -76,12 +78,12 @@ class ErrorBuffer
     /**
      * Push an error message into the buffer.
      *
-     * @param $key
-     * @param $errorMessage
+     * @param string      $errorMessage
+     * @param string|null $key
      *
-     * @return static
+     * @return $this
      */
-    public function push(string $errorMessage, string $key = null): self
+    public function push(string $errorMessage, ?string $key = null): self
     {
         if (null === $key) {
             $this->errors[] = $errorMessage;
@@ -100,8 +102,10 @@ class ErrorBuffer
      * @param string $errorMessage
      *
      * @throws \Exception
+     *
+     * @return void
      */
-    public function flush(string $errorMessage)
+    public function flush(string $errorMessage): void
     {
         if (! $this->hasErrors()) {
             return;
@@ -116,8 +120,10 @@ class ErrorBuffer
 
     /**
      * Reset the errors to an empty array.
+     *
+     * @return void
      */
-    public function clearErrors()
+    public function clearErrors(): void
     {
         $this->errors = [];
     }
@@ -137,7 +143,7 @@ class ErrorBuffer
      *
      * @param string $errorType
      *
-     * @return static
+     * @return $this
      */
     public function setErrorType(string $errorType): self
     {
@@ -147,7 +153,7 @@ class ErrorBuffer
     }
 
     /**
-     * Do we have any errors yet?
+     * Have we encountered any errors yet?
      *
      * @return bool
      */

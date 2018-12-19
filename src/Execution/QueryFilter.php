@@ -4,9 +4,11 @@ namespace Nuwave\Lighthouse\Execution;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Database\Query\Builder;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class QueryFilter
 {
@@ -36,13 +38,13 @@ class QueryFilter
     protected $multiArgumentFiltersArgNames = [];
 
     /**
-     * Get query filter instance for field.
+     * Get the single instance of the query filter for a field.
      *
      * @param FieldValue $value
      *
-     * @return self
+     * @return static
      */
-    public static function getInstance(FieldValue $value): QueryFilter
+    public static function getInstance(FieldValue $value): self
     {
         $handler = 'query.filter'
             .'.'.strtolower($value->getParentName())
@@ -55,12 +57,14 @@ class QueryFilter
     }
 
     /**
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
-     * @param array                                                                    $args
-     * @param array                                                                    $scopes
-     * @param ResolveInfo                                                              $resolveInfo
+     * Check if the ResolveInfo contains a QueryFilter instance and apply it to the query if given.
      *
-     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @param Builder|EloquentBuilder $query
+     * @param array                   $args
+     * @param string[]                $scopes
+     * @param ResolveInfo             $resolveInfo
+     *
+     * @return Builder|EloquentBuilder
      */
     public static function apply($query, array $args, array $scopes, ResolveInfo $resolveInfo)
     {
@@ -77,24 +81,24 @@ class QueryFilter
     }
 
     /**
-     * Run query through filter.
+     * Apply all registered filters to the query.
      *
-     * @param \Illuminate\Database\Query\Builder $builder
-     * @param array                              $args
+     * @param Builder|EloquentBuilder $query
+     * @param array                   $args
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return Builder|EloquentBuilder
      */
-    public function filter($builder, array $args = [])
+    public function filter($query, array $args = [])
     {
         $valuesGroupedByFilterKey = [];
 
         /**
-         * @var string
+         * @var string $key
          * @var mixed  $value
          */
         foreach ($args as $key => $value) {
             /**
-             * @var string
+             * @var string   $filterKey
              * @var string[] $argNames
              */
             foreach ($this->multiArgumentFiltersArgNames as $filterKey => $argNames) {
@@ -110,12 +114,12 @@ class QueryFilter
                 $argFilterDirective = $filterInfo['filter'];
                 $columnName = $filterInfo['columnName'];
 
-                $builder = $argFilterDirective->applyFilter($builder, $columnName, $value);
+                $query = $argFilterDirective->applyFilter($query, $columnName, $value);
             }
         }
 
         /**
-         * @var string
+         * @var string $filterKey
          * @var array  $values
          */
         foreach ($valuesGroupedByFilterKey as $filterKey => $values) {
@@ -124,11 +128,11 @@ class QueryFilter
             if ($values) {
                 $argFilterDirective = $this->multiArgumentFilters[$filterKey];
 
-                $builder = $argFilterDirective->applyFilter($builder, $columnName, $values);
+                $query = $argFilterDirective->applyFilter($query, $columnName, $values);
             }
         }
 
-        return $builder;
+        return $query;
     }
 
     /**
@@ -136,7 +140,7 @@ class QueryFilter
      * @param string             $columnName
      * @param ArgFilterDirective $argFilterDirective
      *
-     * @return QueryFilter
+     * @return $this
      */
     public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): QueryFilter
     {

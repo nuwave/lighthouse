@@ -8,7 +8,7 @@ namespace Nuwave\Lighthouse\Execution\Utils;
  * The way that IDs are generated basically works like this:
  *
  * 1. Take the name of a type, e.g. "User" and an ID, e.g. 123
- * 2. Glue them together, seperated by a colon, e.g. "User:123"
+ * 2. Glue them together, separated by a colon, e.g. "User:123"
  * 3. base64_encode the result
  *
  * This can then be reversed to uniquely identify an entity in our

@@ -11,13 +11,15 @@ class Subscription
     /**
      * Broadcast subscription to client(s).
      *
-     * @param string $subscriptionField
-     * @param string $root
-     * @param bool|null
+     * @param string    $subscriptionField
+     * @param mixed     $root
+     * @param bool|null $queue
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
-    public static function broadcast(string $subscriptionField, $root, $queue = null)
+    public static function broadcast(string $subscriptionField, $root, ?bool $queue = null): void
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.

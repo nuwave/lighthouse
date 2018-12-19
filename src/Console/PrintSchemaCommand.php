@@ -36,7 +36,7 @@ class PrintSchemaCommand extends Command
      * @throws DirectiveException
      * @throws ParseException
      */
-    public function handle(Repository $cache, Filesystem $storage)
+    public function handle(Repository $cache, Filesystem $storage): void
     {
         // Clear the cache so this always gets the current schema
         $cache->forget(config('lighthouse.cache.key'));

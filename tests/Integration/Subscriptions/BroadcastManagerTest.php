@@ -11,19 +11,22 @@ use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class BroadcastManagerTest extends TestCase implements GraphQLContext
 {
     use HandlesSubscribers;
 
-    /** @var BroadcastManager */
+    /**
+     * @var BroadcastManager
+     */
     protected $broadcastManager;
 
     /**
      * Set up test environment.
+     *
+     * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +36,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
     /**
      * @test
      */
-    public function itCanResolveDrivers()
+    public function itCanResolveDrivers(): void
     {
         $pusherDriver = $this->broadcastManager->driver('pusher');
         $this->assertInstanceOf(PusherBroadcaster::class, $pusherDriver);
@@ -45,7 +48,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
     /**
      * @test
      */
-    public function itCanExtendBroadcastManager()
+    public function itCanExtendBroadcastManager(): void
     {
         $broadcasterConfig = [];
 
@@ -85,7 +88,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
     /**
      * @test
      */
-    public function itThrowsIfDriverDoesNotImplementInterface()
+    public function itThrowsIfDriverDoesNotImplementInterface(): void
     {
         $this->broadcastManager->extend('foo', function ($app, $config) {
             return new class() {

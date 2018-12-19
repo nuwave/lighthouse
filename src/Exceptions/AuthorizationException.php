@@ -13,7 +13,7 @@ class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationExcept
      * @api
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
@@ -26,7 +26,7 @@ class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationExcept
      * @api
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'authorization';
     }

@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
@@ -18,18 +19,21 @@ class RelationBatchLoader extends BatchLoader
      * @var string
      */
     protected $relationName;
+
     /**
      * The arguments that were passed to the field.
      *
      * @var array
      */
     protected $args;
+
     /**
      * Names of the scopes that have to be called for the query.
      *
      * @var string[]
      */
     protected $scopes;
+
     /**
      * The ResolveInfo of the currently executing field. Used for retrieving
      * the QueryFilter.
@@ -37,6 +41,7 @@ class RelationBatchLoader extends BatchLoader
      * @var ResolveInfo
      */
     protected $resolveInfo;
+
     /**
      * The pagination type can either be "connection", "paginator" or null, in which case there is no pagination.
      *
@@ -47,7 +52,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * @param string      $relationName
      * @param array       $args
-     * @param array       $scopes
+     * @param string[]    $scopes
      * @param ResolveInfo $resolveInfo
      * @param string|null $paginationType
      */
@@ -65,7 +70,7 @@ class RelationBatchLoader extends BatchLoader
      *
      * @throws \Exception
      *
-     * @return array
+     * @return mixed[]
      */
     public function resolve(): array
     {
@@ -97,6 +102,8 @@ class RelationBatchLoader extends BatchLoader
     }
 
     /**
+     * Construct a new instance of a relation fetcher.
+     *
      * @return ModelRelationFetcher
      */
     protected function getRelationFetcher(): ModelRelationFetcher
@@ -117,7 +124,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @return Collection
+     * @return Collection<Model>
      */
     protected function getParentModels(): Collection
     {

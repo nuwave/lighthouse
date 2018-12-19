@@ -11,7 +11,7 @@ class AuthenticationException extends \Illuminate\Auth\AuthenticationException i
      * @api
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
@@ -24,7 +24,7 @@ class AuthenticationException extends \Illuminate\Auth\AuthenticationException i
      * @api
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'authentication';
     }

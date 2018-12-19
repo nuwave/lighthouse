@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Language\Parser;
@@ -15,15 +13,12 @@ use GraphQL\Language\AST\OperationDefinitionNode;
 class QueryAST
 {
     /**
+     * The definitions contained in the AST of an incoming query.
+     *
      * @var Collection
      */
     protected $definitions;
-    
-    /**
-     * @var Collection
-     */
-    protected $typeExtensions;
-    
+
     /**
      * @param DocumentNode $documentNode
      */
@@ -33,25 +28,25 @@ class QueryAST
     }
     
     /**
-     * Create a new DocumentAST instance from a schema.
+     * Create a new instance from a query string.
      *
-     * @param string $schema
+     * @param string $query
      *
      * @throws SyntaxError
      *
-     * @return QueryAST
+     * @return static
      */
-    public static function fromSource(string $schema): QueryAST
+    public static function fromSource(string $query): self
     {
         return new static(
-            Parser::parse($schema)
+            Parser::parse($query)
         );
     }
 
     /**
-     * Get all definitions for operations.
+     * Get all operation definitions.
      *
-     * @return Collection
+     * @return Collection<OperationDefinitionNode>
      */
     public function operationDefinitions(): Collection
     {
@@ -61,7 +56,7 @@ class QueryAST
     /**
      * Get all fragment definitions.
      *
-     * @return Collection
+     * @return Collection<FragmentDefinitionNode>
      */
     public function fragmentDefinitions(): Collection
     {

@@ -5,12 +5,13 @@ namespace Nuwave\Lighthouse\Execution;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Validator;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class GraphQLValidator extends Validator
 {
     /**
+     * Get the root object that was passed to the field that is being validated.
+     *
      * @return mixed
      */
     public function getRoot()
@@ -19,14 +20,18 @@ class GraphQLValidator extends Validator
     }
 
     /**
+     * Get the context that was passed to the field that is being validated.
+     *
      * @return GraphQLContext
      */
-    public function getContext()
+    public function getContext(): GraphQLContext
     {
         return Arr::get($this->customAttributes, 'context');
     }
 
     /**
+     * Get the resolve info that was passed to the field that is being validated.
+     *
      * @return ResolveInfo
      */
     public function getResolveInfo(): ResolveInfo

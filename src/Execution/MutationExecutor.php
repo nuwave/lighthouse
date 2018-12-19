@@ -17,7 +17,7 @@ class MutationExecutor
      *
      * @return Model
      */
-    public static function executeCreate(Model $model, Collection $args, HasMany $parentRelation = null): Model
+    public static function executeCreate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
     {
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
 
@@ -90,7 +90,7 @@ class MutationExecutor
      *
      * @return Model
      */
-    public static function executeUpdate(Model $model, Collection $args, HasMany $parentRelation = null): Model
+    public static function executeUpdate(Model $model, Collection $args,?HasMany $parentRelation = null): Model
     {
         $id = $args->pull('id')
             ?? $args->pull(

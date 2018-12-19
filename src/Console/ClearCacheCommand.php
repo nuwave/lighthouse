@@ -26,7 +26,7 @@ class ClearCacheCommand extends Command
      *
      * @param Repository $cache
      */
-    public function handle(Repository $cache)
+    public function handle(Repository $cache): void
     {
         $cache->forget(config('lighthouse.cache.key'));
         

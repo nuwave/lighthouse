@@ -21,7 +21,7 @@ abstract class BatchLoader
      *
      * [key => resolvedValue]
      *
-     * @var array
+     * @var mixed[]
      */
     private $results = [];
 
@@ -35,13 +35,13 @@ abstract class BatchLoader
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
-     * @param string $loaderClass     the class name of the concrete BatchLoader to instantiate
-     * @param array  $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param array  $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
+     * @param string  $loaderClass     the class name of the concrete BatchLoader to instantiate
+     * @param mixed[] $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param mixed[] $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
      *
      * @throws \Exception
      *
-     * @return BatchLoader
+     * @return static
      */
     public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): self
     {
@@ -76,7 +76,7 @@ abstract class BatchLoader
     /**
      * Generate a unique key for the instance, using the path in the query.
      *
-     * @param array $path
+     * @param mixed[] $path
      *
      * @return string
      */
@@ -117,7 +117,9 @@ abstract class BatchLoader
     /**
      * Resolve the keys.
      *
-     * The result has to be a map: [key => result]
+     * The result has to be an associative array: [key => result]
+     *
+     * @return array
      */
     abstract public function resolve(): array;
 }

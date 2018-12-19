@@ -32,7 +32,7 @@ class ValidateSchemaCommand extends Command
      * @throws DirectiveException
      * @throws ParseException
      */
-    public function handle(Repository $cache, GraphQL $graphQL)
+    public function handle(Repository $cache, GraphQL $graphQL): void
     {
         // Clear the cache so this always validates the current schema
         $cache->forget(config('lighthouse.cache.key'));

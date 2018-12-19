@@ -36,7 +36,93 @@ Just clone the project and run the following in the project root:
 
 ## Code guidelines
 
-Do not use Facades and utilize dependency injection instead. Not every application has them enabled.
+### Laravel feature usage
+
+We strive to be compatible with both Lumen and Laravel.
+
+Do not use Facades and utilize dependency injection instead.
+Not every application has them enabled - Lumen does not use Facades by default.
+
+Prefer direct usage of Illuminate classes instead of helpers.
+
+```php
+# WRONG
+array_get($foo, 'bar');
+
+# CORRECT
+\Illuminate\Support\Arr::get($foo, 'bar');
+```
+
+Prefer the strictest possible type annotations wherever possible.
+If known, add additional type information in the PHPDoc.
+
+```php
+/**
+ * We know we get an array of strings here.
+ *
+ * @param string[] $bar
+ * @return string
+ */
+function foo(array $bar): string
+```
+
+For aggregate types such as the commonly used `Collection` class, use
+the generic type hint style. While not officially part of PHPDoc, it is understood
+by PHPStorm and most other editors.
+
+```php
+/**
+ * Hint at the contents of the Collection.
+ *
+ * @return Collection<string>
+ */
+function foo(): Collection
+```
+
+Use `self` to annotate that a class returns an instance of itself (or its child).
+Use [PHPDoc type hints](http://docs.phpdoc.org/guides/types.html#keywords) to
+differentiate between:
+
+```php
+<?php
+
+class Foo
+{
+    /**
+     * Some attribute.
+     *
+     * @var string
+     */
+    protected $bar;
+    
+    /**
+     * Use $this for fluent setters when we expect the exact same object back. 
+     *
+     * @param string $bar
+     *
+     * @return $this
+     */
+    public function setBar(string $bar): self
+    {
+        $this->bar = $bar;
+
+        return $this;
+    }
+
+    /**
+     * Use static when you return a new instance.
+     *
+     * @return static
+     */
+    public function duplicate(): self
+    {
+        $instance = new static();
+        $instance->bar = $this->bar;
+
+        return $instance;
+    }
+}
+```
 
 ## Code style
 

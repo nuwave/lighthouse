@@ -20,7 +20,7 @@ class ModelRelationFetcher
     /**
      * The parent models that relations should be loaded for.
      *
-     * @var EloquentCollection
+     * @var EloquentCollection<Model>
      */
     protected $models;
 
@@ -46,7 +46,7 @@ class ModelRelationFetcher
      *
      * @param array $relations
      *
-     * @return static
+     * @return $this
      */
     public function setRelations(array $relations): self
     {
@@ -74,7 +74,7 @@ class ModelRelationFetcher
     /**
      * Get all the underlying models.
      *
-     * @return EloquentCollection
+     * @return EloquentCollection<Model>
      */
     public function models(): EloquentCollection
     {
@@ -82,9 +82,11 @@ class ModelRelationFetcher
     }
 
     /**
+     * Set one or more Model instances as an EloquentCollection.
+     *
      * @param mixed $models
      *
-     * @return static
+     * @return $this
      */
     protected function setModels($models): self
     {
@@ -100,7 +102,7 @@ class ModelRelationFetcher
     /**
      * Load all the relations of all the models.
      *
-     * @return static
+     * @return $this
      */
     public function loadRelations(): self
     {
@@ -117,7 +119,7 @@ class ModelRelationFetcher
      *
      * @throws \Exception
      *
-     * @return ModelRelationFetcher
+     * @return $this
      */
     public function loadRelationsForPage(int $perPage, int $page = 1): self
     {
@@ -140,9 +142,9 @@ class ModelRelationFetcher
      *
      * @throws \Exception
      *
-     * @return static
+     * @return $this
      */
-    public function loadRelationForPage(int $perPage, int $page = 1, string $relationName, \Closure $relationConstraints): self
+    public function loadRelationForPage(int $perPage, int $page, string $relationName, \Closure $relationConstraints): self
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,
@@ -176,7 +178,7 @@ class ModelRelationFetcher
     /**
      * Reload the models to get the `{relation}_count` attributes of models set.
      *
-     * @return static
+     * @return $this
      */
     public function reloadModelsWithRelationCount(): self
     {
@@ -205,7 +207,7 @@ class ModelRelationFetcher
     /**
      * Extract the primary keys from the underlying models.
      *
-     * @return array
+     * @return mixed[]
      */
     protected function getModelIds(): array
     {
@@ -224,7 +226,7 @@ class ModelRelationFetcher
      *
      * @throws \Exception
      *
-     * @return Collection Relation[]
+     * @return Collection<Relation>
      */
     protected function buildRelationsFromModels(string $relationName, \Closure $relationConstraints): Collection
     {
@@ -261,7 +263,7 @@ class ModelRelationFetcher
     /**
      * Load default eager loads.
      *
-     * @param EloquentCollection $collection
+     * @param EloquentCollection<Model> $collection
      *
      * @throws \ReflectionException
      *
@@ -293,7 +295,7 @@ class ModelRelationFetcher
     /**
      * This is the name that Eloquent gives to the attribute that contains the count.
      *
-     * @see Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
+     * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
      *
      * @param string $relationName
      *
@@ -305,9 +307,11 @@ class ModelRelationFetcher
     }
 
     /**
+     * Get an associative array of relations, keyed by the models primary key.
+     *
      * @param string $relationName
      *
-     * @return array
+     * @return mixed[]
      */
     public function getRelationDictionary(string $relationName): array
     {
@@ -345,7 +349,7 @@ class ModelRelationFetcher
      * @param int    $page
      * @param string $relationName
      *
-     * @return static
+     * @return $this
      */
     protected function convertRelationToPaginator(int $perPage, int $page, string $relationName): self
     {
@@ -374,10 +378,10 @@ class ModelRelationFetcher
     /**
      * Associate the collection of all fetched relationModels back with their parents.
      *
-     * @param string             $relationName
-     * @param EloquentCollection $relationModels
+     * @param string                    $relationName
+     * @param EloquentCollection<Model> $relationModels
      *
-     * @return static
+     * @return $this
      */
     protected function associateRelationModels(string $relationName, EloquentCollection $relationModels): self
     {
@@ -395,12 +399,14 @@ class ModelRelationFetcher
     /**
      * Ensure the pivot relation is hydrated too, if it exists.
      *
-     * @param string $relationName
-     * @param $relationModels
+     * @param string                    $relationName
+     * @param EloquentCollection<Model> $relationModels
      *
      * @throws \ReflectionException
+     *
+     * @return $this
      */
-    protected function hydratePivotRelation(string $relationName, EloquentCollection $relationModels)
+    protected function hydratePivotRelation(string $relationName, EloquentCollection $relationModels): self
     {
         $relation = $this->getRelationInstance($relationName);
 
@@ -409,9 +415,13 @@ class ModelRelationFetcher
             $hydrationMethod->setAccessible(true);
             $hydrationMethod->invoke($relation, $relationModels->all());
         }
+
+        return $this;
     }
 
     /**
+     * Use the underlying model to instantiate a relation by name.
+     *
      * @param string $relationName
      *
      * @return Relation
