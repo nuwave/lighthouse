@@ -196,7 +196,18 @@ return [
     | GraphQL query batching means sending multiple queries to the server in one request,
     | You may set this flag to process/deny batched queries.
     |
-     */
+    */
     'batched_queries' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Transactional Mutations
+    |--------------------------------------------------------------------------
+    |
+    | Sets default setting for transactional mutations.
+    | You may set this flag to have @create|@update mutations transactional or not.
+    |
+    */
+    'transactional_mutations' => true,
 ];
 ```

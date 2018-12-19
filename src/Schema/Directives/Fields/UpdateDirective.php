@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
@@ -11,6 +12,18 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class UpdateDirective extends BaseDirective implements FieldResolver
 {
+    /**
+     * The policy mappings for the application.
+     *
+     * @var DatabaseManager
+     */
+    private $db;
+
+    public function __construct(DatabaseManager $database)
+    {
+        $this->db = $database;
+    }
+
     /**
      * Name of the directive.
      *
@@ -34,18 +47,24 @@ class UpdateDirective extends BaseDirective implements FieldResolver
             function ($root, array $args) {
                 $modelClassName = $this->getModelClass();
                 /** @var Model $model */
-                $model = new $modelClassName;
+                $model = new $modelClassName();
 
                 $flatten = $this->directiveArgValue('flatten', false);
                 $args = $flatten
                     ? reset($args)
                     : $args;
 
-                if($this->directiveArgValue('globalId', false)){
+                if ($this->directiveArgValue('globalId', false)) {
                     $args['id'] = GlobalId::decodeId($args['id']);
                 }
 
-                return MutationExecutor::executeUpdate($model, collect($args));
+                if (! config('lighthouse.transactional_mutations', true)) {
+                    return MutationExecutor::executeUpdate($model, collect($args))->refresh();
+                }
+
+                return $this->db->connection()->transaction(function () use ($model, $args) {
+                    return MutationExecutor::executeUpdate($model, collect($args))->refresh();
+                });
             }
         );
     }

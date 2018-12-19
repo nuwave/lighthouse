@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class MutationExecutor
 {
     /**
-     * @param Model $model An empty instance of the model that should be created.
-     * @param Collection $args The corresponding slice of the input arguments for creating this model.
-     * @param HasMany|null $parentRelation If we are in a nested create, we can use this to associate the new model to its parent.
+     * @param Model        $model          an empty instance of the model that should be created
+     * @param Collection   $args           the corresponding slice of the input arguments for creating this model
+     * @param HasMany|null $parentRelation if we are in a nested create, we can use this to associate the new model to its parent
      *
      * @return Model
      */
@@ -28,23 +28,19 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ($operationKey === 'create') {
+                if ('create' === $operationKey) {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
             });
         });
 
-        // Make sure that values that are set through the database insert
-        // are immediately available for return, e.g. default values
-        $model->refresh();
-
         return $model;
     }
 
     /**
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $remaining
-     * @param HasMany $parentRelation
+     * @param HasMany    $parentRelation
      *
      * @return Model
      */
@@ -86,9 +82,9 @@ class MutationExecutor
     }
 
     /**
-     * @param Model $model An empty instance of the model that should be updated.
-     * @param Collection $args The corresponding slice of the input arguments for updating this model.
-     * @param HasMany|null $parentRelation If we are in a nested update, we can use this to associate the new model to its parent.
+     * @param Model        $model          an empty instance of the model that should be updated
+     * @param Collection   $args           the corresponding slice of the input arguments for updating this model
+     * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
      *
      * @throws ModelNotFoundException
      *
@@ -112,11 +108,11 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ($operationKey === 'create') {
+                if ('create' === $operationKey) {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
 
-                if ($operationKey === 'update') {
+                if ('update' === $operationKey) {
                     collect($values)->each(function ($singleValues) use ($relation) {
                         self::executeUpdate(
                             $relation->getModel()->newInstance(),
@@ -126,7 +122,7 @@ class MutationExecutor
                     });
                 }
 
-                if ($operationKey === 'delete') {
+                if ('delete' === $operationKey) {
                     $relation->getModel()::destroy($values);
                 }
             });
@@ -149,7 +145,7 @@ class MutationExecutor
      *   ['name' => 'Ralf']
      * ]
      *
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $args
      *
      * @return Collection
@@ -185,7 +181,7 @@ class MutationExecutor
      *   ]
      * ]
      *
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $args
      *
      * @return Collection

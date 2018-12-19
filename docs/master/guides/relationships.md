@@ -144,6 +144,10 @@ class Post extends Model
 Lighthouse allows you to create, update or delete your relationships in
 a single mutation.
 
+By default all mutations are wrapped in a database transaction, so if any of the nested
+operations fail, the whole mutation is aborted and no changes are written to the database.
+You can change this setting [in the configuration](../getting-started/configuration.md).
+
 ### Belongs To
 
 You can allow the user to attach a `BelongsTo` relationship by defining
