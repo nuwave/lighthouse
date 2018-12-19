@@ -349,7 +349,9 @@ class DeferExtensionTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxNestedFields()
     {
-        config(['lighthouse.defer.max_nested_fields' => 1]);
+        /** @var DeferExtension $deferExtension */
+        $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
+        $deferExtension->setMaxNestedFields(1);
 
         self::$data = [
             'name' => 'John Doe',

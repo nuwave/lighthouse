@@ -14,14 +14,37 @@ class ValidationTest extends TestCase
             email: String = "hans@peter.rudolf" @rules(apply: ["email"])
             required: String @rules(apply: ["required"])
             input: [Bar] @rulesForArray(apply: ["min:3"])
-            list: [String] @rules(apply: ["required", "email"]) @rulesForArray(apply: ["max:2"])
+            list: [String]
+                @rules(apply: ["required", "email"])
+                @rulesForArray(apply: ["max:2"])
         ): Int
+        
+        password(
+            id: String
+            password: String
+                @trim
+                @rules(apply: ["min:6", "max:20", "required_with:id"])
+                @bcrypt
+            bar: Bar
+                @rules(apply: ["required_if:id,bar"])
+        ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolvePassword")
+
+        email(
+            userId: ID!
+            email: Email!
+        ): String @field(resolver: "Tests\\\\Integration\\\\ValidationTest@resolveEmail")
+    }
+
+    input Email {
+        emailAddress: String! @rules(apply: ["email"])
+        business: Boolean @rules(apply: ["required"])
     }
     
     input Bar {
         foobar: Int @rules(apply: ["integer", "max:10"])
         self: Bar
         withRequired: Baz
+        optional: String
     }
     
     input Baz {
@@ -30,6 +53,16 @@ class ValidationTest extends TestCase
         required: Int @rules(apply: ["required"])
     }
     ';
+
+    public function resolvePassword($root, array $args): string
+    {
+        return $args['password'] ?? 'no-password';
+    }
+
+    public function resolveEmail($root, array $args): string
+    {
+        return array_get($args, 'email.emailAddress', 'no-email');
+    }
 
     /**
      * @test
@@ -57,6 +90,7 @@ class ValidationTest extends TestCase
             )
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $this->assertValidationKeysSame([
@@ -77,13 +111,14 @@ class ValidationTest extends TestCase
         {
             foo(
                 list: [
-                    "asdf@asfd.com"
+                    "valid_email@example.com"
                     null
-                    "asdfasdf"
+                    "invalid_email"
                 ]
             )
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $this->assertValidationKeysSame([
@@ -108,6 +143,7 @@ class ValidationTest extends TestCase
             )
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $this->assertValidationKeysSame([
@@ -126,6 +162,7 @@ class ValidationTest extends TestCase
             foo(required: "foo")
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $expected = [
@@ -134,7 +171,117 @@ class ValidationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itEvaluatesArgDirectivesInDefinitionOrder()
+    {
+        $validPasswordQuery = '
+        {
+            password(password: " 1234567 ")
+        }
+        ';
+        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+
+        $password = Arr::get($result, 'data.password');
+        $this->assertNotSame('password', ' 1234567 ');
+        $this->assertTrue(password_verify('1234567', $password));
+
+        $invalidPasswordQuery = '
+        {
+            password(password: " 1234 ")
+        }
+        ';
+        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+
+        $password = Arr::get($result, 'data.password');
+        $this->assertNull($password);
+        $this->assertValidationKeysSame(['password'], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itEvaluatesConditionalValidation()
+    {
+        $validPasswordQuery = '
+        {
+            password
+        }
+        ';
+        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+
+        $this->assertSame('no-password', Arr::get($result, 'data.password'));
+
+        $invalidPasswordQuery = '
+        {
+            password(id: "foo")
+        }
+        ';
+        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+
+        $password = Arr::get($result, 'data.password');
+        $this->assertNull($password);
+        $this->assertValidationKeysSame(['password'], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itEvaluatesInputArgValidation()
+    {
+        $invalidPasswordQuery = '
+        {
+            password(id: "bar", password: "123456")
+        }
+        ';
+        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+        $password = Arr::get($result, 'data.password');
+
+        $this->assertNull($password);
+        $this->assertValidationKeysSame(['bar'], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itEvaluatesNonNullInputArgValidation()
+    {
+        $validEmailQuery = '
+        {
+            email(
+                userId: 1
+                email: {
+                    emailAddress: "john@doe.com"
+                    business: true
+                }
+            )
+        }
+        ';
+        $result = graphql()->executeQuery($validEmailQuery)->toArray();
+        $email = Arr::get($result, 'data.email');
+        $this->assertSame('john@doe.com', $email);
+
+        $invalidEmailQuery = '
+        {
+            email(
+                userId: 1
+                email: {
+                    emailAddress: "invalid_email_address"
+                }
+            )
+        }
+        ';
+        $result = graphql()->executeQuery($invalidEmailQuery)->toArray();
+        $email = Arr::get($result, 'data.email');
+        $this->assertNull($email);
+        $this->assertValidationKeysSame([
+            'email.emailAddress',
+            'email.business',
+        ], $result);
     }
 
     /**
@@ -147,6 +294,7 @@ class ValidationTest extends TestCase
             foo
         }
         ';
+
         $result = graphql()->executeQuery($query)->toArray();
 
         $expected = [
@@ -160,8 +308,7 @@ class ValidationTest extends TestCase
 
     protected function assertValidationKeysSame(array $keys, array $result)
     {
-        $actual = Arr::get($result, 'errors.0.extensions.validation');
-
-        $this->assertSame($keys, array_keys($actual));
+        $validation = Arr::get($result, 'errors.0.extensions.validation');
+        $this->assertSame($keys, array_keys($validation));
     }
 }

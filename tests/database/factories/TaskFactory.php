@@ -10,6 +10,6 @@ $factory->define(Task::class, function (Faker $faker) {
         'user_id' => function () {
             return factory(User::class)->create()->getKey();
         },
-        'name' => $faker->sentence,
+        'name' => $faker->unique()->sentence,
     ];
 });

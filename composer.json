@@ -9,12 +9,10 @@
         "laravel-graphql"
     ],
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Christopher Moore",
-            "email": "chris@nuwavecommerce.com"
-        }
-    ],
+    "authors": [{
+        "name": "Christopher Moore",
+        "email": "chris@nuwavecommerce.com"
+    }],
     "support": {
         "issues": "https://github.com/nuwave/lighthouse/issues",
         "source": "https://github.com/nuwave/lighthouse"
@@ -36,7 +34,8 @@
         "laravel/scout": "^4.0",
         "mockery/mockery": "dev-master",
         "orchestra/database": "3.5.*|3.6.*|3.7.*@dev",
-        "orchestra/testbench": "3.5.*|3.6.*|3.7.*"
+        "orchestra/testbench": "3.5.*|3.6.*|3.7.*",
+        "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
         "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflows - integrated with Laravel"

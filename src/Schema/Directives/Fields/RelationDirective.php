@@ -76,9 +76,10 @@ abstract class RelationDirective extends BaseDirective
     protected function getLoaderConstructorArguments(Model $parent, array $args, $context, ResolveInfo $resolveInfo): array
     {
         $constructorArgs = [
-            'scopes' => $this->directiveArgValue('scopes', []),
-            'args' => $args,
             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
+            'args' => $args,
+            'scopes' => $this->directiveArgValue('scopes', []),
+            'resolveInfo' => $resolveInfo,
         ];
 
         if ($paginationType = $this->directiveArgValue('type')) {

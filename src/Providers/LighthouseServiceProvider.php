@@ -17,6 +17,7 @@ use Nuwave\Lighthouse\Support\Http\Responses\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
@@ -96,6 +97,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
             ]);
         }
+
+        SubscriptionProvider::register($this->app);
     }
 
     /**
@@ -117,23 +120,6 @@ class LighthouseServiceProvider extends ServiceProvider
                 return $resolveInfo instanceof ResolveInfo
                     ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
                     : new \Illuminate\Validation\Validator($translator, $data, $rules, $messages, $customAttributes);
-            }
-        );
-
-        $this->app['validator']->extendImplicit(
-            'required_with_mutation',
-            function (string $attribute, $value, array $parameters, GraphQLValidator $validator): bool {
-                $info = $validator->getResolveInfo();
-
-                if ('Mutation' !== data_get($info, 'parentType.name')) {
-                    return true;
-                }
-
-                if (in_array($info->fieldName, $parameters)) {
-                    return ! is_null($value);
-                }
-
-                return true;
             }
         );
     }

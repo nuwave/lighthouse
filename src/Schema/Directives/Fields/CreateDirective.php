@@ -3,11 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Illuminate\Database\DatabaseManager;
+
 class CreateDirective extends BaseDirective implements FieldResolver
 {
     /**
@@ -45,17 +46,20 @@ class CreateDirective extends BaseDirective implements FieldResolver
             function ($root, array $args) {
                 $modelClassName = $this->getModelClass();
                 /** @var Model $model */
-                $model = new $modelClassName;
+                $model = new $modelClassName();
 
                 $flatten = $this->directiveArgValue('flatten', false);
                 $args = $flatten
                     ? reset($args)
                     : $args;
 
-                $this->db->connection()->beginTransaction();
-                $mutEx = MutationExecutor::executeCreate($model, collect($args));
-                $this->db->connection()->commit();
-                return $mutEx;
+                if (! config('lighthouse.transactional_mutations', true)) {
+                    return MutationExecutor::executeCreate($model, collect($args))->refresh();
+                }
+
+                return $this->db->connection()->transaction(function () use ($model, $args) {
+                    return MutationExecutor::executeCreate($model, collect($args))->refresh();
+                });
             }
         );
     }

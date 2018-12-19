@@ -2,16 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Illuminate\Database\Eloquent\Builder;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
-use Nuwave\Lighthouse\Support\Traits\HandlesQueryFilter;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
-class SearchDirective extends BaseDirective implements ArgMiddleware
+class SearchDirective extends BaseDirective implements ArgFilterDirective
 {
-    use HandlesQueryFilter;
-
     /**
      * Name of the directive.
      *
@@ -23,36 +18,40 @@ class SearchDirective extends BaseDirective implements ArgMiddleware
     }
 
     /**
-     * Resolve the field directive.
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param string                                                                   $columnName
+     * @param mixed                                                                    $value
      *
-     * @param ArgumentValue $argument
-     * @param \Closure       $next
-     *
-     * @return ArgumentValue
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleArgument(ArgumentValue $argument, \Closure $next): ArgumentValue
+    public function applyFilter($builder, string $columnName, $value)
     {
-        // Adds within method to specify custom index.
         $within = $this->directiveArgValue('within');
 
-        $this->injectFilter(
-            $argument,
-            function (Builder $query, string $columnName, $value) use ($within) {
-                $modelClass = get_class(
-                    $query->getModel()
-                );
-                
-                /** @var \Laravel\Scout\Builder $query */
-                $query = $modelClass::search($value);
-
-                if (! is_null($within)) {
-                    $query->within($within);
-                }
-
-                return $query;
-            }
+        $modelClass = \get_class(
+            $builder->getModel()
         );
 
-        return $next($argument);
+        /** @var \Laravel\Scout\Builder $builder */
+        $builder = $modelClass::search($value);
+
+        if (null !== $within) {
+            $builder->within($within);
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Does this filter combine the values of multiple input arguments into one query?
+     *
+     * This is true for filter directives such as "whereBetween" that expects two
+     * different input values, given as separate arguments.
+     *
+     * @return bool
+     */
+    public function combinesMultipleArguments(): bool
+    {
+        return false;
     }
 }

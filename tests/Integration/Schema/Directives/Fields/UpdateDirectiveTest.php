@@ -30,7 +30,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             updateCompany(
@@ -72,7 +72,7 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             updateCompany(input: {
@@ -122,7 +122,7 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             updateTask(input: {
@@ -168,7 +168,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Category @update
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             updateCategory(
@@ -185,5 +185,69 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('1', Arr::get($result, 'data.updateCategory.category_id'));
         $this->assertSame('bar', Arr::get($result, 'data.updateCategory.name'));
         $this->assertSame('bar', Category::first()->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itDoesNotUpdateWithFailingRelationship()
+    {
+        factory(User::class)->create(['name' => 'Original']);
+
+        $schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            updateUser(input: UpdateUserInput!): User @update(flatten: true)
+        }
+        
+        input UpdateUserInput {
+            id: ID!
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+            user: ID
+        }
+        '.$this->placeholderQuery();
+        $query = '
+        mutation {
+            updateUser(input: {
+                id: 1
+                name: "Changed"
+                tasks: {
+                    corruptField: [{
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertEquals('Original', User::first()->name);
+        $this->assertTrue(Arr::has($result, 'errors'));
     }
 }
