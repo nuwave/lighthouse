@@ -53,6 +53,8 @@ array_get($foo, 'bar');
 \Illuminate\Support\Arr::get($foo, 'bar');
 ```
 
+### Type definitions
+
 Prefer the strictest possible type annotations wherever possible.
 If known, add additional type information in the PHPDoc.
 
@@ -130,8 +132,6 @@ We use [StyleCI](https://styleci.io/) to ensure clean formatting, oriented
 at the Laravel coding style.
 
 Look through some of the code to get a feel for the naming conventions.
-
-Use type hints and return types whenever possible and make sure to include proper **PHPDocs**
 
 Prefer explicit naming and short functions over excessive comments.
 
