@@ -488,9 +488,9 @@ Inject a value from the context object into the arguments.
 
 ```graphql
 type Mutation {
-    createPost(title: String!, content: String!): Post
-        @create
-        @inject(context: "user.id", name: "user_id")
+  createPost(title: String!, content: String!): Post
+    @create
+    @inject(context: "user.id", name: "user_id")
 }
 ```
 

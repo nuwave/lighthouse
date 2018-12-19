@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Task extends Model
@@ -43,5 +45,15 @@ class Task extends Model
     public function scopeFoo(Builder $query, $args): Builder
     {
         return $query->limit($args['foo']);
+    }
+
+    public function hours(): MorphMany
+    {
+        return $this->morphMany(Hour::class, 'hourable');
+    }
+
+    public function hour(): MorphOne
+    {
+        return $this->morphOne(Hour::class, 'hourable');
     }
 }

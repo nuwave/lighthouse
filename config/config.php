@@ -198,7 +198,7 @@ return [
     |
     */
     'transactional_mutations' => true,
-  
+
     /*
     |--------------------------------------------------------------------------
     | GraphQL Subscriptions
@@ -239,5 +239,4 @@ return [
             ],
         ],
     ],
-
 ];
