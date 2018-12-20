@@ -155,9 +155,9 @@ class MutationExecutor
      *   ]
      * ]
      *
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $args
-     * @param string $relationClass
+     * @param string     $relationClass
      *
      * @return Collection
      */
@@ -167,15 +167,20 @@ class MutationExecutor
         return $args->partition(function ($value, string $key) use ($model, $relationClass) {
             $reflection = new \ReflectionClass($model);
 
-            if(! $reflection->hasMethod($key)) return false;
+            if(! $reflection->hasMethod($key)){
+                return false;
+            }
 
-            $relationMethodClass = $reflection->getMethod($key)->class;
-            $modelClass = $reflection->getName();
+            $relationMethodCandidate = $model->getMethod($key);
+            if(!$returnType = $relationMethodCandidate->getReturnType()){
+                return false;
+            }
 
-            // Means the method is native
-            if($relationMethodClass !== $modelClass) return false;
+            if(! $returnType instanceof \ReflectionNamedType){
+                return false;
+            }
 
-            return ($model->{$key}() instanceof $relationClass);
+            return $returnType->getName() === $relationClass;
         });
     }
 }
