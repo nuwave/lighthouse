@@ -137,6 +137,48 @@ class CreateUser
 }
 ```
 
+## @cache
+
+Cache the result of a resolver.
+
+The cache is created on the first request and is cached forever by default.
+Use this for values that change seldomly and take long to fetch/compute.
+
+```graphql
+type Query {
+  highestKnownPrimeNumber: Int! @cache
+}
+```
+
+You can set an expiration time in seconds
+if you want to invalidate the cache after a while.
+
+```graphql
+type Query {
+  temperature: Int! @cache(maxAge: 300)
+}
+```
+
+You can limit the cache to the logged in user making the request by marking it as private.
+This makes sense for data that is specific to a certain user.
+
+```graphql
+type Query {
+  todos: [ToDo!]! @cache(private: true)
+}
+```
+
+## @cacheKey
+
+When generating a cached result for a resolver, Lighthouse produces a unique key for each type. By default, Lighthouse will look for a field with the `ID` type to generate the key. If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+
+```graphql
+type GithubProfile {
+  username: String @cacheKey
+  repos: [Repository] @cache
+}
+```
+
 ## @can
 
 Check a Laravel Policy to ensure the current user is authorized to access a field.
