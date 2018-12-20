@@ -168,6 +168,17 @@ type Query {
 }
 ```
 
+## @cacheKey
+
+When generating a cached result for a resolver, Lighthouse produces a unique key for each type. By default, Lighthouse will look for a field with the `ID` type to generate the key. If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+
+```graphql
+type GithubProfile {
+  username: String @cacheKey
+  repos: [Repository] @cache
+}
+```
+
 ## @can
 
 Check a Laravel Policy to ensure the current user is authorized to access a field.
