@@ -15,6 +15,10 @@ class CreateTestbenchTasksTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->string('name')->unique();
+            // Properties which collide with native model method names
+            $table->string('guard')->nullable();
+            $table->boolean('delete')->nullable();
+            // -------------------------------------------------------
             $table->timestamps();
             $table->softDeletes();
         });
