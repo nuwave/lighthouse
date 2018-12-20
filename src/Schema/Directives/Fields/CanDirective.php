@@ -49,7 +49,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                     $policies = $this->directiveArgValue('if');
 
                     collect($policies)->each(
-                        function (string $policy) use ($user, $model) {
+                        function (string $policy) use ($user, $model): void {
                             if (!$user->can($policy, $model)) {
                                 throw new AuthorizationException(
                                     "You are not not authorized to access {$this->definitionNode->name->value}"

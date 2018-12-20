@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class FindDirective extends BaseDirective implements FieldResolver
 {
@@ -39,7 +40,7 @@ class FindDirective extends BaseDirective implements FieldResolver
         $model = $this->getModelClass();
 
         return $fieldValue->setResolver(
-            function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($model) {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model) {
                 /** @var Builder $query */
                 $query = QueryFilter::apply(
                     $model::query(),

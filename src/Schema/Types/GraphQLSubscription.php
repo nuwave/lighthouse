@@ -3,18 +3,20 @@
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 abstract class GraphQLSubscription
 {
     /**
      * Check if subscriber can listen to this subscription.
      *
+     * @param Subscriber $subscriber
+     *
      * @return bool
      */
-    public function can(Subscriber $subscriber)
+    public function can(Subscriber $subscriber): bool
     {
         return true;
     }
@@ -23,10 +25,11 @@ abstract class GraphQLSubscription
      * Encode topic name.
      *
      * @param Subscriber $subscriber
+     * @param string     $fieldName
      *
      * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, $fieldName)
+    public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
         return strtoupper(snake_case($fieldName));
     }
@@ -34,13 +37,12 @@ abstract class GraphQLSubscription
     /**
      * Decode topic name.
      *
-     * @param string $operationName
+     * @param string $fieldName
      * @param mixed  $root
-     * @param mixed  $context
      *
      * @return string
      */
-    public function decodeTopic(string $fieldName, $root)
+    public function decodeTopic(string $fieldName, $root): string
     {
         return strtoupper(snake_case($fieldName));
     }
@@ -48,14 +50,14 @@ abstract class GraphQLSubscription
     /**
      * Resolve the subscription.
      *
-     * @param mixed       $root
-     * @param array       $args
-     * @param Context     $context
-     * @param ResolveInfo $info
+     * @param mixed          $root
+     * @param array          $args
+     * @param GraphQLContext $context
+     * @param ResolveInfo    $info
      *
      * @return mixed
      */
-    public function resolve($root, array $args, $context, ResolveInfo $info)
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info)
     {
         return $root;
     }
@@ -68,7 +70,7 @@ abstract class GraphQLSubscription
      *
      * @return bool
      */
-    abstract public function authorize(Subscriber $subscriber, Request $request);
+    abstract public function authorize(Subscriber $subscriber, Request $request): bool;
 
     /**
      * Filter subscribers who should receive subscription.
@@ -78,5 +80,5 @@ abstract class GraphQLSubscription
      *
      * @return bool
      */
-    abstract public function filter(Subscriber $subscriber, $root);
+    abstract public function filter(Subscriber $subscriber, $root): bool;
 }

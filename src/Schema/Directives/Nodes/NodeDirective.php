@@ -15,7 +15,9 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
 class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
-    /** @var NodeRegistry */
+    /**
+     * @var NodeRegistry
+     */
     protected $nodeRegistry;
     
     /**

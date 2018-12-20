@@ -4,13 +4,15 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Carbon\Carbon;
 use GraphQL\Deferred;
-use GraphQL\Language\AST\DirectiveNode;
 use Illuminate\Support\Facades\Cache;
+use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class CacheDirective extends BaseDirective implements FieldMiddleware
@@ -46,7 +48,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         $maxAge = $this->directiveArgValue('maxAge');
         $privateCache = $this->directiveArgValue('private', false);
 
-        return $value->setResolver(function ($root, $args, $context, $info) use ($value, $resolver, $maxAge, $privateCache) {
+        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($value, $resolver, $maxAge, $privateCache) {
             /** @var Cache $cache */
             $cache = app('cache');
             $cacheValue = new CacheValue([
@@ -77,7 +79,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             $resolvedValue = $resolver($root, $args, $context, $info);
 
             ($resolvedValue instanceof Deferred)
-                ? $resolvedValue->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags) {
+                ? $resolvedValue->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags): void {
                     $this->store($cache, $cacheKey, $result, $cacheExp, $cacheTags);
                 })
                 : $this->store($cache, $cacheKey, $resolvedValue, $cacheExp, $cacheTags);
@@ -141,13 +143,13 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         }
 
         $fields = data_get($nodeValue->getTypeDefinition(), 'fields', []);
-        $nodeKey = collect($fields)->reduce(function ($key, $field) {
+        $nodeKey = collect($fields)->reduce(function ($key, $field): ?string {
             if ($key) {
                 return $key;
             }
 
             $hasCacheKey = collect(data_get($field, 'directives', []))
-                ->contains(function (DirectiveNode $directive) {
+                ->contains(function (DirectiveNode $directive): bool {
                     return 'cacheKey' === $directive->name->value;
                 });
 
@@ -155,7 +157,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         });
 
         if (! $nodeKey) {
-            $nodeKey = collect($fields)->reduce(function ($key, $field) {
+            $nodeKey = collect($fields)->reduce(function ($key, $field): ?string {
                 if ($key) {
                     return $key;
                 }

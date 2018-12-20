@@ -6,6 +6,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MethodDirective extends BaseDirective implements FieldResolver
 {
@@ -34,7 +35,7 @@ class MethodDirective extends BaseDirective implements FieldResolver
         );
 
         return $fieldValue->setResolver(
-            function ($root, array $args, $context = null, ResolveInfo $info = null) use ($method) {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($method) {
                 return call_user_func([$root, $method], $root, $args, $context, $info);
             }
         );

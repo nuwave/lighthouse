@@ -38,7 +38,7 @@ class RenameDirective extends BaseDirective implements FieldResolver
         }
 
         return $fieldValue->setResolver(
-            function ($rootValue, array $args) use ($attribute) {
+            function ($rootValue) use ($attribute) {
                 return data_get($rootValue, $attribute);
             }
         );

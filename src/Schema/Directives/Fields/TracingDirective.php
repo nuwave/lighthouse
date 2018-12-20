@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class TracingDirective extends BaseDirective implements FieldMiddleware
 {
@@ -36,7 +37,7 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
 
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function ($root, $args, $context, ResolveInfo $info) use ($resolver) {
+        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver) {
             /** @var ExtensionRegistry $extensionRegistry */
             $extensionRegistry = resolve(ExtensionRegistry::class);
             /** @var TracingExtension $tracingExtension */

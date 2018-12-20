@@ -2,14 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 
 abstract class RelationDirective extends BaseDirective
@@ -19,14 +24,12 @@ abstract class RelationDirective extends BaseDirective
      *
      * @param FieldValue $value
      *
-     * @throws \Exception
-     *
      * @return FieldValue
      */
     public function resolveField(FieldValue $value): FieldValue
     {
         return $value->setResolver(
-            function (Model $parent, array $args, $context, ResolveInfo $resolveInfo) {
+            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                 return BatchLoader::instance(
                     RelationBatchLoader::class,
                     $resolveInfo->path,
@@ -40,11 +43,13 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
+     * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
+     * @param DocumentAST $current
      *
-     * @throws \Exception
+     * @throws DirectiveException
+     * @throws DefinitionException
+     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -64,16 +69,16 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param Model       $parent
-     * @param array       $args
-     * @param null        $context
-     * @param ResolveInfo $resolveInfo
+     * @param Model          $parent
+     * @param array          $args
+     * @param GraphQLContext $context
+     * @param ResolveInfo    $resolveInfo
      *
-     * @throws \Exception
+     * @throws DirectiveException
      *
      * @return array
      */
-    protected function getLoaderConstructorArguments(Model $parent, array $args, $context, ResolveInfo $resolveInfo): array
+    protected function getLoaderConstructorArguments(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         $constructorArgs = [
             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),

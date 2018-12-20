@@ -39,7 +39,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
             $resolved = call_user_func_array($resolver, func_get_args());
 
             if ($resolved instanceof Deferred) {
-                $resolved->then(function ($root) use ($subscriptionField) {
+                $resolved->then(function ($root) use ($subscriptionField, $queue) {
                     Subscription::broadcast($subscriptionField, $root, $queue);
                 });
             } else {

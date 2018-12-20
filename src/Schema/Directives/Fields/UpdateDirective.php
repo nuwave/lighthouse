@@ -47,7 +47,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function ($root, array $args) {
+            function ($root, array $args): Model {
                 $modelClassName = $this->getModelClass();
                 /** @var Model $model */
                 $model = new $modelClassName();
@@ -65,7 +65,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                     return MutationExecutor::executeUpdate($model, collect($args))->refresh();
                 }
 
-                return $this->db->connection()->transaction(function () use ($model, $args) {
+                return $this->db->connection()->transaction(function () use ($model, $args): Model {
                     return MutationExecutor::executeUpdate($model, collect($args))->refresh();
                 });
             }

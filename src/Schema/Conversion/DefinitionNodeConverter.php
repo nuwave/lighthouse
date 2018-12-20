@@ -56,7 +56,7 @@ class DefinitionNodeConverter
         return collect($wrappers)
             ->reverse()
             ->reduce(
-                function (Type $type, string $kind) {
+                function (Type $type, string $kind): Type {
                     if (NodeKind::NON_NULL_TYPE === $kind) {
                         return Type::nonNull($type);
                     } elseif (NodeKind::LIST_TYPE === $kind) {

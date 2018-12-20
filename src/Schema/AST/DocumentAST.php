@@ -85,7 +85,7 @@ class DocumentAST implements \Serializable
      *
      * @throws ParseException
      *
-     * @return self
+     * @return static
      */
     public static function fromSource(string $schema): self
     {
@@ -125,6 +125,7 @@ class DocumentAST implements \Serializable
      * Construct from the string representation.
      *
      * @param string $serialized
+     *
      * @return void
      */
     public function unserialize($serialized): void

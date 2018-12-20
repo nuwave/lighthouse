@@ -8,13 +8,16 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
 class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
-    /** @var NodeRegistry */
+    /**
+     * @var NodeRegistry
+     */
     protected $nodeRegistry;
     
     /**
@@ -30,22 +33,23 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      *
      * @return string
      */
-    public function name():string
+    public function name(): string
     {
         return 'model';
     }
-    
+
     /**
      * Handle type construction.
      *
      * @param NodeValue $value
-     * @param \Closure $next
+     * @param \Closure  $next
      *
      * @throws DirectiveException
+     * @throws DefinitionException
      *
      * @return NodeValue
      */
-    public function handleNode(NodeValue $value, \Closure $next)
+    public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {
         $this->nodeRegistry->registerModel(
             $value->getTypeDefinitionName(), $this->getModelClass('class')
@@ -55,14 +59,14 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     }
 
     /**
-     * @param Node $node
+     * @param Node        $node
      * @param DocumentAST $documentAST
      *
      * @throws \Exception
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(Node $node, DocumentAST $documentAST)
+    public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
         return ASTHelper::attachNodeInterfaceToObjectType($node, $documentAST);
     }

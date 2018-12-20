@@ -58,7 +58,7 @@ class ASTBuilder
                 $document->typeExtensions()
             )
             ->reduce(
-                function (DocumentAST $document, Node $node) {
+                function (DocumentAST $document, Node $node): DocumentAST {
                     $nodeManipulators = app(DirectiveRegistry::class)->nodeManipulators($node);
 
                     return $nodeManipulators->reduce(
@@ -88,7 +88,7 @@ class ASTBuilder
                 $objectType = $document
                     ->extensionsForType($name)
                     ->reduce(
-                        function (ObjectTypeDefinitionNode $relatedObjectType, ObjectTypeExtensionNode $typeExtension) {
+                        function (ObjectTypeDefinitionNode $relatedObjectType, ObjectTypeExtensionNode $typeExtension): ObjectTypeDefinitionNode {
                             $relatedObjectType->fields = ASTHelper::mergeUniqueNodeList(
                                 $relatedObjectType->fields,
                                 $typeExtension->fields
@@ -115,13 +115,13 @@ class ASTBuilder
     protected static function applyFieldManipulators(DocumentAST $document): DocumentAST
     {
         return $document->objectTypeDefinitions()->reduce(
-            function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) {
+            function (DocumentAST $document, ObjectTypeDefinitionNode $objectType): DocumentAST {
                 return collect($objectType->fields)->reduce(
-                    function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType) {
+                    function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType): DocumentAST {
                         $fieldManipulators = app(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
 
                         return $fieldManipulators->reduce(
-                            function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType) {
+                            function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType): DocumentAST {
                                 return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document);
                             },
                             $document
@@ -142,11 +142,11 @@ class ASTBuilder
     protected static function applyArgManipulators(DocumentAST $document): DocumentAST
     {
         return $document->objectTypeDefinitions()->reduce(
-            function (DocumentAST $document, ObjectTypeDefinitionNode $parentType) {
+            function (DocumentAST $document, ObjectTypeDefinitionNode $parentType): DocumentAST {
                 return collect($parentType->fields)->reduce(
-                    function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType) {
+                    function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType): DocumentAST {
                         return collect($parentField->arguments)->reduce(
-                            function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField) {
+                            function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField): DocumentAST {
                                 $argManipulators = app(DirectiveRegistry::class)->argManipulators($argDefinition);
 
                                 return $argManipulators->reduce(
@@ -154,7 +154,7 @@ class ASTBuilder
                                         $argDefinition,
                                         $parentField,
                                         $parentType
-                                    ) {
+                                    ): DocumentAST {
                                         return $argManipulator->manipulateSchema(
                                             $argDefinition,
                                             $parentField,
@@ -257,9 +257,9 @@ class ASTBuilder
     protected static function addNodeSupport(DocumentAST $document): DocumentAST
     {
         $hasTypeImplementingNode = $document->objectTypeDefinitions()
-            ->contains(function (ObjectTypeDefinitionNode $objectType) {
+            ->contains(function (ObjectTypeDefinitionNode $objectType): bool {
                 return collect($objectType->interfaces)
-                    ->contains(function (NamedTypeNode $interface) {
+                    ->contains(function (NamedTypeNode $interface): bool {
                         return 'Node' === $interface->name->value;
                     });
             });

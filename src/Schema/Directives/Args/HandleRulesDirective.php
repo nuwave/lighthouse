@@ -9,7 +9,7 @@ trait HandleRulesDirective
     use HasArgumentPath;
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getRules(): array
     {

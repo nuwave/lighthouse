@@ -27,12 +27,20 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
 {
-    /** @var string todo remove as soon as name() is static itself */
+    /**
+     * todo remove as soon as name() is static itself
+     * @var string
+     */
     const NAME = 'middleware';
 
-    /** @var Pipeline */
+    /**
+     * @var Pipeline
+     */
     protected $pipeline;
-    /** @var CreatesContext */
+
+    /**
+     * @var CreatesContext
+     */
     protected $createsContext;
 
     /**
@@ -76,7 +84,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                     return $this->pipeline
                         ->send($context->request())
                         ->through($middleware)
-                        ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo){
+                        ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo) {
                             return $resolver(
                                 $root,
                                 $args,
@@ -128,7 +136,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
         }
 
         $middlewareArgValue = collect($middlewareArgValue)
-            ->map(function(string $middleware){
+            ->map(function(string $middleware): string{
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
             })
@@ -138,7 +146,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
 
         $objectType->fields = new NodeList(
             collect($objectType->fields)
-                ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
+                ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective): FieldDefinitionNode {
                     // If the field already has middleware defined, skip over it
                     // Field middleware are more specific then those defined on a type
                     if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
@@ -158,7 +166,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     /**
      * @param mixed $middlewareArgValue
      *
-     * @return Collection
+     * @return Collection<string>
      */
     protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
     {
@@ -168,7 +176,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
         $middlewareGroups = $router->getMiddlewareGroups();
 
         return collect($middlewareArgValue)
-            ->map(function (string $name) use ($middleware, $middlewareGroups) {
+            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
                 return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
             })
             ->flatten();

@@ -81,7 +81,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
         $objectType->fields = new NodeList(
             collect($objectType->fields)
-                ->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
+                ->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue): FieldDefinitionNode {
                     $existingNamespaces = ASTHelper::directiveDefinition(
                         $fieldDefinition,
                         NamespaceDirective::NAME

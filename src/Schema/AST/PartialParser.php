@@ -73,9 +73,12 @@ class PartialParser
      */
     public static function inputValueDefinitions(array $inputValueDefinitions): array
     {
-        return array_map(function ($inputValueDefinition) {
-            return self::inputValueDefinition($inputValueDefinition);
-        }, $inputValueDefinitions);
+        return array_map(
+            function (string $inputValueDefinition): InputValueDefinitionNode {
+                return self::inputValueDefinition($inputValueDefinition);
+            },
+            $inputValueDefinitions
+        );
     }
 
     /**
@@ -96,13 +99,16 @@ class PartialParser
     /**
      * @param string[] $argumentDefinitions
      *
-     * @return InputValueDefinitionNode[]
+     * @return ArgumentNode[]
      */
     public static function arguments(array $argumentDefinitions): array
     {
-        return array_map(function ($argumentDefinition) {
-            return self::argument($argumentDefinition);
-        }, $argumentDefinitions);
+        return array_map(
+            function (string $argumentDefinition): ArgumentNode {
+                return self::argument($argumentDefinition);
+            },
+            $argumentDefinitions
+        );
     }
 
     /**
@@ -176,9 +182,12 @@ class PartialParser
      */
     public static function directives(array $directives): array
     {
-        return array_map(function ($directive): InputValueDefinitionNode {
-            return self::inputValueDefinition($directive);
-        }, $directives);
+        return array_map(
+            function (string $directive): DirectiveNode {
+                return self::directive($directive);
+            },
+            $directives
+        );
     }
 
     /**
@@ -203,9 +212,12 @@ class PartialParser
      */
     public static function directiveDefinitions(array $directiveDefinitions): array
     {
-        return array_map(function ($directiveDefinition): InputValueDefinitionNode {
-            return self::inputValueDefinition($directiveDefinition);
-        }, $directiveDefinitions);
+        return array_map(
+            function (string $directiveDefinition): DirectiveDefinitionNode {
+                return self::directiveDefinition($directiveDefinition);
+            },
+            $directiveDefinitions
+        );
     }
 
     /**
@@ -297,7 +309,7 @@ class PartialParser
             NamedTypeNode::class
         );
     }
-    
+
     /**
      * @param string $definition
      *

@@ -173,7 +173,7 @@ abstract class BaseDirective implements Directive
      *
      * @throws DirectiveException
      *
-     * @return array [string $className, string $methodName]
+     * @return string[] Contains two entries: [string $className, string $methodName]
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {

@@ -62,20 +62,20 @@ class ASTHelper
             ->all();
 
         $remainingDefinitions = collect($original)
-            ->reject(function ($definition) use ($newNames, $overwriteDuplicates) {
+            ->reject(function ($definition) use ($newNames, $overwriteDuplicates): bool {
                 $oldName = $definition->name->value;
-                $collisionOccured = in_array(
+                $collisionOccurred = in_array(
                     $oldName,
                     $newNames
                 );
 
-                if ($collisionOccured && ! $overwriteDuplicates) {
+                if ($collisionOccurred && ! $overwriteDuplicates) {
                     throw new DefinitionException(
                         "Duplicate definition {$oldName} found when merging."
                     );
                 }
 
-                return $collisionOccured;
+                return $collisionOccurred;
             })
             ->values()
             ->all();
@@ -149,7 +149,7 @@ class ASTHelper
     public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
     {
         return collect($directiveDefinition->arguments)
-            ->contains(function (ArgumentNode $argumentNode) use ($name) {
+            ->contains(function (ArgumentNode $argumentNode) use ($name): bool {
                 return $argumentNode->name->value === $name;
             });
     }
@@ -164,7 +164,7 @@ class ASTHelper
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
         $arg = collect($directive->arguments)
-            ->first(function (ArgumentNode $argumentNode) use ($name) {
+            ->first(function (ArgumentNode $argumentNode) use ($name): bool {
                 return $argumentNode->name->value === $name;
             });
 
@@ -203,7 +203,7 @@ class ASTHelper
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         return collect($definitionNode->directives)
-            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {
+            ->first(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
                 return $directiveDefinitionNode->name->value === $name;
             });
     }
@@ -219,7 +219,7 @@ class ASTHelper
     public static function hasDirectiveDefinition(Node $definitionNode, string $name): bool
     {
         return collect($definitionNode->directives)
-            ->contains(function (DirectiveNode $directiveDefinitionNode) use ($name) {
+            ->contains(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
                 return $directiveDefinitionNode->name->value === $name;
             });
     }
@@ -259,17 +259,18 @@ class ASTHelper
     {
         return $documentAST->objectTypeDefinitions()
             ->reduce(
-                function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive) {
+                function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive): DocumentAST {
                     if (! data_get($objectType, 'name.value')) {
                         return $document;
                     }
 
                     $objectType->fields = new NodeList(collect($objectType->fields)
-                        ->map(function (FieldDefinitionNode $field) use ($directive) {
+                        ->map(function (FieldDefinitionNode $field) use ($directive): FieldDefinitionNode {
                             $field->directives = $field->directives->merge([$directive]);
 
                             return $field;
-                        })->all());
+                        })
+                        ->all());
 
                     $document->setDefinition($objectType);
 

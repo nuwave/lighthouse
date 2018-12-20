@@ -13,10 +13,13 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeferrableDirective extends BaseDirective implements Directive, FieldMiddleware
 {
-    /** @var ExtensionRegistry */
+    /**
+     * @var ExtensionRegistry
+     */
     protected $extensions;
 
     /**
@@ -51,7 +54,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
         $fieldType = $value->getField()->type;
 
         $value->setResolver(
-            function ($root, $args, $context, ResolveInfo $info) use ($resolver, $fieldType) {
+            function ($root, $args, GraphQLContext $context, ResolveInfo $info) use ($resolver, $fieldType) {
                 $path = implode('.', $info->path);
                 $extension = $this->getDeferExtension();
                 $wrappedResolver = function () use ($resolver, $root, $args, $context, $info) {

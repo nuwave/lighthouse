@@ -6,8 +6,9 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective
 {
@@ -36,7 +37,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
 
         return $next(
             $value->setResolver(
-                function ($root, $args, $context, ResolveInfo $resolveInfo) use ($type, $resolver) {
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($type, $resolver) {
                     $resolvedValue = \call_user_func_array($resolver, \func_get_args());
 
                     return GlobalId::encode(

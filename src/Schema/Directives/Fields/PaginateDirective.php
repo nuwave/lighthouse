@@ -95,7 +95,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     protected function paginatorTypeResolver(FieldValue $value): FieldValue
     {
         return $value->setResolver(
-            function ($root, array $args) {
+            function ($root, array $args): LengthAwarePaginator {
                 $first = $args['count'];
                 $page = $args['page'] ?? 1;
 
@@ -116,7 +116,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     protected function connectionTypeResolver(FieldValue $value): FieldValue
     {
         return $value->setResolver(
-            function ($root, array $args) {
+            function ($root, array $args): LengthAwarePaginator {
                 $first = $args['first'];
                 $page = Pagination::calculateCurrentPage(
                     $first,
