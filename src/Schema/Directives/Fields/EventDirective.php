@@ -22,13 +22,13 @@ class EventDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure   $next
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $eventBaseName = $this->directiveArgValue('fire') ?? $this->directiveArgValue('class');
         $eventClassName = $this->namespaceClassName($eventBaseName);

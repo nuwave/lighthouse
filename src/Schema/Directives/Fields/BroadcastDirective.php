@@ -28,7 +28,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $value = $next($value);
         $resolver = $value->getResolver();

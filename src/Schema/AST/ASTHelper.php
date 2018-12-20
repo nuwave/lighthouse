@@ -111,7 +111,6 @@ class ASTHelper
             $type = self::getUnderlyingNamedTypeNode($type);
         }
 
-        /* @var NamedTypeNode $type */
         return $type->name->value;
     }
 
@@ -201,7 +200,7 @@ class ASTHelper
      *
      * @return DirectiveNode|null
      */
-    public static function directiveDefinition(Node $definitionNode, string $name)
+    public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
         return collect($definitionNode->directives)
             ->first(function (DirectiveNode $directiveDefinitionNode) use ($name) {

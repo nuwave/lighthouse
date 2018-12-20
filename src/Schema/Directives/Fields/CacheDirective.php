@@ -3,7 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Carbon\Carbon;
+use GraphQL\Deferred;
 use GraphQL\Language\AST\DirectiveNode;
+use Illuminate\Support\Facades\Cache;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -33,7 +35,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $this->setNodeKey(
             $value->getParent()
@@ -45,7 +47,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         $privateCache = $this->directiveArgValue('private', false);
 
         return $value->setResolver(function ($root, $args, $context, $info) use ($value, $resolver, $maxAge, $privateCache) {
-            /** @var \Illuminate\Support\Facades\Cache $cache */
+            /** @var Cache $cache */
             $cache = app('cache');
             $cacheValue = new CacheValue([
                 'field_value' => $value,
@@ -74,7 +76,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $resolvedValue = $resolver($root, $args, $context, $info);
 
-            ($resolvedValue instanceof \GraphQL\Deferred)
+            ($resolvedValue instanceof Deferred)
                 ? $resolvedValue->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags) {
                     $this->store($cache, $cacheKey, $result, $cacheExp, $cacheTags);
                 })
@@ -87,25 +89,27 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     /**
      * Store value in cache.
      *
-     * @param \Illuminate\Support\Facades\Cache $cache
-     * @param string                            $key
-     * @param mixed                             $value
-     * @param \Carbon\Carbon|null               $expiration
-     * @param array                             $tags
+     * @param Cache       $cache
+     * @param string      $key
+     * @param mixed       $value
+     * @param Carbon|null $expiration
+     * @param array       $tags
+     *
+     * @return void
      */
-    protected function store($cache, $key, $value, $expiration, $tags)
+    protected function store(Cache $cache, string $key, $value, ?Carbon $expiration, array $tags): void
     {
         $supportsTags = $this->useTags();
 
         if ($expiration) {
-            ($supportsTags)
+            $supportsTags
                 ? $cache->tags($tags)->put($key, $value, $expiration)
                 : $cache->put($key, $value, $expiration);
 
             return;
         }
 
-        ($supportsTags)
+        $supportsTags
             ? $cache->tags($tags)->forever($key, $value)
             : $cache->forever($key, $value);
     }
@@ -127,8 +131,10 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      * @param NodeValue $nodeValue
      *
      * @throws DirectiveException
+     *
+     * @return void
      */
-    protected function setNodeKey(NodeValue $nodeValue)
+    protected function setNodeKey(NodeValue $nodeValue): void
     {
         if ($nodeValue->getCacheKey()) {
             return;

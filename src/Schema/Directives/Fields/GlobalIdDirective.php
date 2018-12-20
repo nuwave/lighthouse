@@ -53,7 +53,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      *
      * @param string $argumentValue
      *
-     * @return array
+     * @return string[]
      */
     public function transform($argumentValue): array
     {

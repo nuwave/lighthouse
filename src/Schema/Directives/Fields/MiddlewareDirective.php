@@ -59,7 +59,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure    $next
+     * @param \Closure   $next
      *
      * @return FieldValue
      */
@@ -156,9 +156,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param $middlewareArgValue
+     * @param mixed $middlewareArgValue
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
     {

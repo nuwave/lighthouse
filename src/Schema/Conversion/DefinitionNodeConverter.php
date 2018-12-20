@@ -36,7 +36,7 @@ class DefinitionNodeConverter
      * Unwrap the node if needed and convert to type.
      *
      * @param mixed $node
-     * @param array $wrappers
+     * @param string[] $wrappers
      *
      * @return Type
      */

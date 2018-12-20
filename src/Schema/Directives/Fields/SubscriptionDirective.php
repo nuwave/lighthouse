@@ -24,7 +24,7 @@ class SubscriptionDirective extends BaseDirective implements FieldResolver
 
     /**
      * @param SubscriptionRegistry $registry
-     * @param Extension            $extension
+     * @param ExtensionRegistry    $extensions
      */
     public function __construct(SubscriptionRegistry $registry, ExtensionRegistry $extensions)
     {
@@ -49,7 +49,7 @@ class SubscriptionDirective extends BaseDirective implements FieldResolver
      *
      * @return FieldValue
      */
-    public function resolveField(FieldValue $value)
+    public function resolveField(FieldValue $value): FieldValue
     {
         $subscription = $this->getSubscription();
         $fieldName = $value->getFieldName();

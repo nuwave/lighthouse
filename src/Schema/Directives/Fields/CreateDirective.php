@@ -18,6 +18,9 @@ class CreateDirective extends BaseDirective implements FieldResolver
      */
     private $db;
 
+    /**
+     * @param DatabaseManager $database
+     */
     public function __construct(DatabaseManager $database)
     {
         $this->db = $database;

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -37,7 +38,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
         $model = $this->getModelClass();
 
         return $fieldValue->setResolver(
-            function ($root, array $args, $context = null, ResolveInfo $resolveInfo) use ($model) {
+            function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($model) {
                 /** @var Builder $query */
                 $query = QueryFilter::apply(
                     $model::query(),

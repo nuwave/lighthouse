@@ -26,13 +26,13 @@ class DocumentAST implements \Serializable
     /**
      * A map from definition name to the definition node.
      *
-     * @var Collection
+     * @var Collection<DefinitionNode>
      */
     protected $definitionMap;
     /**
      * A collection of type extensions.
      *
-     * @var Collection
+     * @var Collection<TypeExtensionNode>
      */
     protected $typeExtensionsMap;
 
@@ -41,19 +41,21 @@ class DocumentAST implements \Serializable
      */
     public function __construct(DocumentNode $documentNode)
     {
+        /** @var Collection<TypeExtensionNode> $typeExtensions */
+        /** @var Collection<DefinitionNode> $definitionNodes */
         // We can not store type extensions in the map, since they do not have unique names
         list($typeExtensions, $definitionNodes) = collect($documentNode->definitions)
-            ->partition(function (DefinitionNode $definitionNode) {
+            ->partition(function (DefinitionNode $definitionNode): bool {
                 return $definitionNode instanceof TypeExtensionNode;
             });
 
         $this->typeExtensionsMap = $typeExtensions
-            ->mapWithKeys(function (TypeExtensionNode $node) {
+            ->mapWithKeys(function (TypeExtensionNode $node): array {
                 return [$this->typeExtensionUniqueKey($node) => $node];
             });
 
         $this->definitionMap = $definitionNodes
-            ->mapWithKeys(function (DefinitionNode $node) {
+            ->mapWithKeys(function (DefinitionNode $node): array {
                 return [$node->name->value => $node];
             });
     }
@@ -68,7 +70,7 @@ class DocumentAST implements \Serializable
     protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
     {
         $fieldNames = collect($typeExtensionNode->fields)
-            ->map(function ($field) {
+            ->map(function ($field): string {
                 return $field->name->value;
             })
             ->implode(':');
@@ -83,9 +85,9 @@ class DocumentAST implements \Serializable
      *
      * @throws ParseException
      *
-     * @return DocumentAST
+     * @return self
      */
-    public static function fromSource(string $schema): DocumentAST
+    public static function fromSource(string $schema): self
     {
         try {
             return new static(
@@ -113,7 +115,7 @@ class DocumentAST implements \Serializable
     {
         return \serialize(
             $this->definitionMap
-                ->mapWithKeys(function (DefinitionNode $node, string $key) {
+                ->mapWithKeys(function (DefinitionNode $node, string $key): array {
                     return [$key => AST::toArray($node)];
                 })
         );
@@ -122,12 +124,13 @@ class DocumentAST implements \Serializable
     /**
      * Construct from the string representation.
      *
-     * @param $serialized
+     * @param string $serialized
+     * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->definitionMap = \unserialize($serialized)
-            ->mapWithKeys(function (array $node, string $key) {
+            ->mapWithKeys(function (array $node, string $key): array {
                 return [$key => AST::fromArray($node)];
             });
     }
@@ -153,7 +156,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions for directives.
      *
-     * @return Collection
+     * @return Collection<DirectiveDefinitionNode>
      */
     public function directiveDefinitions(): Collection
     {
@@ -165,7 +168,7 @@ class DocumentAST implements \Serializable
      *
      * @param string $extendedTypeName
      *
-     * @return Collection
+     * @return Collection<TypeExtensionNode>
      */
     public function extensionsForType(string $extendedTypeName): Collection
     {
@@ -178,7 +181,7 @@ class DocumentAST implements \Serializable
     /**
      * Return all the type extensions.
      *
-     * @return Collection
+     * @return Collection<TypeExtensionNode>
      */
     public function typeExtensions(): Collection
     {
@@ -188,7 +191,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions for object types.
      *
-     * @return Collection
+     * @return Collection<ObjectTypeDefinitionNode>
      */
     public function objectTypeDefinitions(): Collection
     {
@@ -202,16 +205,16 @@ class DocumentAST implements \Serializable
      *
      * @return ObjectTypeDefinitionNode|null
      */
-    public function objectTypeDefinition(string $name)
+    public function objectTypeDefinition(string $name): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinitions()
-            ->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
+            ->first(function (ObjectTypeDefinitionNode $objectType) use ($name): bool {
                 return $objectType->name->value === $name;
             });
     }
 
     /**
-     * @return Collection
+     * @return Collection<InputObjectTypeDefinitionNode>
      */
     public function inputObjectTypeDefinitions(): Collection
     {
@@ -223,10 +226,10 @@ class DocumentAST implements \Serializable
      *
      * @return InputObjectTypeDefinitionNode|null
      */
-    public function inputObjectTypeDefinition(string $name)
+    public function inputObjectTypeDefinition(string $name): ?InputObjectTypeDefinitionNode
     {
         return $this->inputObjectTypeDefinitions()
-            ->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
+            ->first(function (InputObjectTypeDefinitionNode $inputType) use ($name): bool {
                 return $inputType->name->value === $name;
             });
     }
@@ -234,7 +237,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all interface definitions.
      *
-     * @return Collection
+     * @return Collection<InterfaceTypeDefinitionNode>
      */
     public function interfaceDefinitions(): Collection
     {
@@ -244,9 +247,9 @@ class DocumentAST implements \Serializable
     /**
      * Get the root query type definition.
      *
-     * @return ObjectTypeDefinitionNode
+     * @return ObjectTypeDefinitionNode|null
      */
-    public function queryTypeDefinition(): ObjectTypeDefinitionNode
+    public function queryTypeDefinition(): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition('Query');
     }
@@ -256,7 +259,7 @@ class DocumentAST implements \Serializable
      *
      * @return ObjectTypeDefinitionNode|null
      */
-    public function mutationTypeDefinition()
+    public function mutationTypeDefinition(): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition('Mutation');
     }
@@ -266,7 +269,7 @@ class DocumentAST implements \Serializable
      *
      * @return ObjectTypeDefinitionNode|null
      */
-    public function subscriptionTypeDefinition()
+    public function subscriptionTypeDefinition(): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition('Subscription');
     }
@@ -291,9 +294,9 @@ class DocumentAST implements \Serializable
      *
      * @param FieldDefinitionNode $field
      *
-     * @return DocumentAST
+     * @return $this
      */
-    public function addFieldToQueryType(FieldDefinitionNode $field): DocumentAST
+    public function addFieldToQueryType(FieldDefinitionNode $field): self
     {
         $query = $this->queryTypeDefinition();
         $query->fields = ASTHelper::mergeNodeList($query->fields, [$field]);
@@ -306,9 +309,9 @@ class DocumentAST implements \Serializable
     /**
      * @param DefinitionNode $newDefinition
      *
-     * @return DocumentAST
+     * @return $this
      */
-    public function setDefinition(DefinitionNode $newDefinition): DocumentAST
+    public function setDefinition(DefinitionNode $newDefinition): self
     {
         if ($newDefinition instanceof TypeExtensionNode) {
             $this->typeExtensionsMap->put(

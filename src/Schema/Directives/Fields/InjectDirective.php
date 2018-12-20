@@ -25,7 +25,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure $next
+     * @param \Closure   $next
      *
      * @throws DirectiveException
      *
@@ -34,14 +34,14 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $contextAttributeName = $this->directiveArgValue('context');
-        if (!$contextAttributeName) {
+        if (! $contextAttributeName) {
             throw new DirectiveException(
                 "The `inject` directive on {$value->getParentName()} [{$value->getFieldName()}] must have a `context` argument"
             );
         }
 
         $argumentName = $this->directiveArgValue('name');
-        if (!$argumentName) {
+        if (! $argumentName) {
             throw new DirectiveException(
                 "The `inject` directive on {$value->getParentName()} [{$value->getFieldName()}] must have a `name` argument"
             );

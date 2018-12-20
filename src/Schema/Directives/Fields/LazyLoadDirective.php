@@ -27,7 +27,7 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations', []);
         $resolver = $value->getResolver();

@@ -31,7 +31,7 @@ class PartialParser
      */
     public static function objectTypeDefinitions(array $objectTypes): array
     {
-        return array_map(function ($objectType) {
+        return array_map(function ($objectType): ObjectTypeDefinitionNode {
             return self::objectTypeDefinition($objectType);
         }, $objectTypes);
     }
@@ -176,7 +176,7 @@ class PartialParser
      */
     public static function directives(array $directives): array
     {
-        return array_map(function ($directive) {
+        return array_map(function ($directive): InputValueDefinitionNode {
             return self::inputValueDefinition($directive);
         }, $directives);
     }
@@ -203,7 +203,7 @@ class PartialParser
      */
     public static function directiveDefinitions(array $directiveDefinitions): array
     {
-        return array_map(function ($directiveDefinition) {
+        return array_map(function ($directiveDefinition): InputValueDefinitionNode {
             return self::inputValueDefinition($directiveDefinition);
         }, $directiveDefinitions);
     }
@@ -301,7 +301,7 @@ class PartialParser
     /**
      * @param string $definition
      *
-     * @return \GraphQL\Language\AST\DocumentNode
+     * @return DocumentNode
      */
     protected static function parse(string $definition): DocumentNode
     {

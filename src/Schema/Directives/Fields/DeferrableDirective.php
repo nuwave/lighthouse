@@ -32,7 +32,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      *
      * @return string
      */
-    public function name():string
+    public function name(): string
     {
         return 'deferrable';
     }
@@ -45,7 +45,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $resolver = $value->getResolver();
         $fieldType = $value->getField()->type;
