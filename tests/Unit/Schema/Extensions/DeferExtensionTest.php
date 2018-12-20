@@ -445,7 +445,7 @@ class DeferExtensionTest extends TestCase
         $response = $this->postJson('/graphql', compact('query'))->json();
 
         $this->assertArrayHasKey('errors', $response);
-        $this->assertSame('schema', $response['errors'][0]['category']);
+        $this->assertArrayHaskey('category', $response['errors'][0]['extensions']);
     }
 
     /**

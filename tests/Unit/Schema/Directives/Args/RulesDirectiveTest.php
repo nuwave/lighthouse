@@ -28,8 +28,8 @@ class RulesDirectiveTest extends TestCase
                     'path' => ['foo'],
                     'locations' => [['line' => 3, 'column' => 13]],
                     'message' => 'Validation failed for the field [foo].',
-                    'category' => 'validation',
                     'extensions' => [
+                        'category' => 'validation',
                         'validation' => [
                             'bar' => [
                                 'The bar field is required.',

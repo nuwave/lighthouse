@@ -2,12 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
-use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension as Extension;
 
 class Subscriber
 {
@@ -47,10 +45,9 @@ class Subscriber
      * @param array          $args
      * @param GraphQLContext $context
      * @param ResolveInfo    $info
-     * @param Extension      $extension
      * @param string         $queryString
      *
-     * @return Subscription
+     * @return static
      */
     public static function initialize(
         array $args,
@@ -64,7 +61,7 @@ class Subscriber
 
         $instance = new static();
 
-        $instance->channel = $instance->channel();
+        $instance->channel = $instance->uniqueChannelName();
         $instance->context = $context;
         $instance->args = $args;
         $instance->operationName = $info->operation->name->value;
@@ -78,7 +75,7 @@ class Subscriber
      *
      * @param string $subscription
      *
-     * @return Subscription
+     * @return static
      */
     public static function unserialize($subscription)
     {
@@ -100,9 +97,9 @@ class Subscriber
      *
      * @param mixed $root
      *
-     * @return Subscriber
+     * @return $this
      */
-    public function setRoot($root)
+    public function setRoot($root): self
     {
         $this->root = $root;
 
@@ -112,9 +109,9 @@ class Subscriber
     /**
      * Serialized subscription.
      *
-     * @return string
+     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'channel' => $this->channel,
@@ -126,11 +123,11 @@ class Subscriber
     }
 
     /**
-     * Generate channel name.
+     * Generate a globally unique channel name.
      *
      * @return string
      */
-    protected function channel()
+    public static function uniqueChannelName(): string
     {
         return 'private-'.(string) str_random(32).'-'.time();
     }

@@ -7,7 +7,6 @@ cache:
 language: php
 
 php:
-- 7.0
 - 7.1
 - 7.2
 
@@ -21,11 +20,6 @@ env:
 
 matrix:
   exclude:
-  # Laravel > 5.6 requires PHP 7.1
-  - php: 7.0
-    env: LARAVEL='5.6.*' PHPUNIT='^7.0'
-  - php: 7.0
-    env: LARAVEL='5.7.*' PHPUNIT='^7.0'
   # This is run with coverage instead
   - php: 7.1
     env: LARAVEL='5.7.*' PHPUNIT='^7.0'

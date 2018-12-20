@@ -164,13 +164,9 @@ class FieldValue
             );
         }
 
-        // TODO convert this back once we require PHP 7.1
-        // return \Closure::fromCallable(
-        //     [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
-        // );
-        return function () {
-            return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
-        };
+         return \Closure::fromCallable(
+             [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
+         );
     }
 
     /**
