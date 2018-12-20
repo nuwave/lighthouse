@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,7 +20,7 @@ class MutationExecutor
      */
     public static function executeCreate(Model $model, Collection $args, HasMany $parentRelation = null): Model
     {
-        list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
+        list($hasMany, $remaining) = self::partitionArgsByRelationType($model, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
@@ -46,7 +47,7 @@ class MutationExecutor
      */
     protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, HasMany $parentRelation = null): Model
     {
-        list($belongsTo, $remaining) = self::extractBelongsToArgs($model, $remaining);
+        list($belongsTo, $remaining) = self::partitionArgsByRelationType($model, $remaining,BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
         $model->fill(
@@ -99,7 +100,7 @@ class MutationExecutor
 
         $model = $model->newQuery()->findOrFail($id);
 
-        list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
+        list($hasMany, $remaining) = self::partitionArgsByRelationType($model, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
@@ -132,34 +133,7 @@ class MutationExecutor
     }
 
     /**
-     * Extract all the arguments that are named the same as a BelongsTo relationship on the model.
-     *
-     * For example, if the args array looks like this:
-     *
-     * ['user' => 123, 'name' => 'Ralf']
-     *
-     * and the model has a method "user" that returns a BelongsTo relationship,
-     * the result will be:
-     * [
-     *   ['user' => 123],
-     *   ['name' => 'Ralf']
-     * ]
-     *
-     * @param Model      $model
-     * @param Collection $args
-     *
-     * @return Collection
-     */
-    protected static function extractBelongsToArgs(Model $model, Collection $args): Collection
-    {
-        return $args->partition(function ($value, string $key) use ($model) {
-            return method_exists($model, $key)
-                && ($model->{$key}() instanceof BelongsTo);
-        });
-    }
-
-    /**
-     * Extract all the arguments that are named the same as a HasMany relationship on the model.
+     * Extract all the arguments that correspond to a relation of a certain type on the model.
      *
      * For example, if the args array looks like this:
      *
@@ -181,16 +155,27 @@ class MutationExecutor
      *   ]
      * ]
      *
-     * @param Model      $model
+     * @param Model $model
      * @param Collection $args
+     * @param string $relationClass
      *
      * @return Collection
      */
-    protected static function extractHasManyArgs(Model $model, Collection $args): Collection
+    protected static function partitionArgsByRelationType(Model $model, Collection $args, string $relationClass): Collection
     {
-        return $args->partition(function ($value, string $key) use ($model) {
-            return method_exists($model, $key)
-                && ($model->{$key}() instanceof HasMany);
+
+        return $args->partition(function ($value, string $key) use ($model, $relationClass) {
+            $reflection = new \ReflectionClass($model);
+
+            if(! $reflection->hasMethod($key)) return false;
+
+            $relationMethodClass = $reflection->getMethod($key)->class;
+            $modelClass = $reflection->getName();
+
+            // Means the method is native
+            if($relationMethodClass !== $modelClass) return false;
+
+            return ($model->{$key}() instanceof $relationClass);
         });
     }
 }

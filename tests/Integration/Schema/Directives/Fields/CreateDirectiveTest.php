@@ -351,6 +351,7 @@ class CreateDirectiveTest extends DBTestCase
         type Task {
             id: ID!
             name: String!
+            guard: String
         }
         
         type User {
@@ -375,7 +376,6 @@ class CreateDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
             guard: String
-            delete: Boolean
         }
         '.$this->placeholderQuery();
         $query = '
@@ -385,9 +385,7 @@ class CreateDirectiveTest extends DBTestCase
                 tasks: {
                     create: [{
                         name: "Uniq"
-                        delete: true
                         guard: "api"
-                        
                     }]
                 }
             }) {
@@ -396,13 +394,14 @@ class CreateDirectiveTest extends DBTestCase
                 tasks {
                     id
                     name
+                    guard
                 }
             }
         }
         ';
         $result = $this->execute($schema, $query);
-
+        print_r($result);
         $this->assertSame('api', Arr::get($result, 'data.createUser.tasks.0.guard'));
-        $this->assertSame(true, Arr::get($result, 'data.createUser.tasks.0.delete'));
+
     }
 }
