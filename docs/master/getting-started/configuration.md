@@ -88,16 +88,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Directives
-    |--------------------------------------------------------------------------
-    |
-    | List directories that will be scanned for custom server-side directives.
-    |
-    */
-    'directives' => [__DIR__.'/../app/GraphQL/Directives'],
-
-    /*
-    |--------------------------------------------------------------------------
     | Namespaces
     |--------------------------------------------------------------------------
     |
@@ -112,6 +102,7 @@ return [
         'interfaces' => 'App\\GraphQL\\Interfaces',
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
+        'directives' => ['App\\GraphQL\\Directives'],
     ],
 
     /*
@@ -164,7 +155,8 @@ return [
     |
     */
     'extensions' => [
-        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class
+        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
+        // \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
     ],
 
     /*
@@ -209,5 +201,46 @@ return [
     |
     */
     'transactional_mutations' => true,
+  
+    /*
+    |--------------------------------------------------------------------------
+    | GraphQL Subscriptions
+    |--------------------------------------------------------------------------
+    |
+    | Here you can define GraphQL subscription "broadcasters" and "storage" drivers
+    | as well their required configuration options.
+    |
+     */
+    'subscriptions' => [
+        /*
+         * Determines if broadcasts should be queued by default.
+         */
+        'queue_broadcasts' => env('LIGHTHOUSE_QUEUE_BROADCASTS', true),
+
+        /*
+         * Default subscription storage.
+         *
+         * NOTE: Any laravel supported cache driver options are available here.
+         */
+        'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
+
+        /*
+         * Default subscription broadcaster.
+         */
+        'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),
+
+        /*
+         * Subscription broadcasting drivers w/ config options.
+         */
+        'broadcasters' => [
+            'log' => [
+                'driver' => 'log',
+            ],
+            'pusher' => [
+                'driver' => 'pusher',
+                'routes' => 'Nuwave\Lighthouse\Subscriptions\SubscriptionRouter@pusher',
+            ],
+        ],
+    ],
 ];
 ```
