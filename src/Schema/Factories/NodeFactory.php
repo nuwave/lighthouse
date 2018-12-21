@@ -45,7 +45,7 @@ class NodeFactory
     protected $argumentFactory;
 
     /**
-     * @param DirectiveFactory $directiveFactory
+     * @param DirectiveFactory  $directiveFactory
      * @param TypeRegistry      $typeRegistry
      * @param Pipeline          $pipeline
      * @param ArgumentFactory   $argumentFactory

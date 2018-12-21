@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Illuminate\Support\Arr;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
@@ -28,14 +29,23 @@ use Nuwave\Lighthouse\Events\RegisteringDirectiveBaseNamespaces;
 class DirectiveFactory
 {
     /**
-     * The solved directive classes.
+     * A map from short directive names to full class names.
      *
-     * @var array
+     * E.g.
+     * [
+     *   'create' => 'Nuwave\Lighthouse\Schema\Directives\CreateDirective',
+     *   'custom' => 'App\GraphQL\Directives\CustomDirective',
+     * ]
+     *
+     * @var string[]
      */
     protected $resolved = [];
 
     /**
-     * The paths used for locating directive class.
+     * The paths used for locating directive classes.
+     *
+     * Should be tried in the order they are contained in this array,
+     * going from the most significant to least significant.
      *
      * @var string[]
      */
@@ -45,14 +55,6 @@ class DirectiveFactory
      * DirectiveFactory constructor.
      */
     public function __construct()
-    {
-        $this->registerDirectiveBaseNamespaces();
-    }
-
-    /**
-     * Init the `$this->directiveBaseNamespaces`.
-     */
-    public function registerDirectiveBaseNamespaces(): void
     {
         $this->directiveBaseNamespaces = collect([
             // User defined directives (top priority)
@@ -65,14 +67,16 @@ class DirectiveFactory
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Fields',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Nodes',
-        ])->flatten()->filter()->all();
+        ])->flatten()
+            ->filter()
+            ->all();
     }
 
     /**
      * Create a directive by the given directive name.
      *
-     * @param string                   $directiveName
-     * @param TypeSystemDefinitionNode $definitionNode
+     * @param string                        $directiveName
+     * @param TypeSystemDefinitionNode|null $definitionNode
      *
      * @throws DirectiveException
      *
@@ -82,7 +86,9 @@ class DirectiveFactory
     {
         $directive = $this->resolve($directiveName) ?? $this->createOrFail($directiveName);
 
-        return $definitionNode ? $this->hydrate($directive, $definitionNode) : $directive;
+        return $definitionNode
+            ? $this->hydrate($directive, $definitionNode)
+            : $directive;
     }
 
     /**
@@ -94,8 +100,8 @@ class DirectiveFactory
      */
     protected function resolve(string $directiveName): ?Directive
     {
-        if ($className = data_get($this->resolved, $directiveName)) {
-            return resolve($className);
+        if ($className = Arr::get($this->resolved, $directiveName)) {
+            return app($className);
         }
 
         return null;
@@ -113,7 +119,7 @@ class DirectiveFactory
         foreach ($this->directiveBaseNamespaces as $baseNamespace) {
             $className = $baseNamespace.'\\'.studly_case($directiveName).'Directive';
             if (class_exists($className)) {
-                $directive = resolve($className);
+                $directive = app($className);
 
                 if (! $directive instanceof Directive) {
                     throw new DirectiveException("Class $className is not a directive.");
@@ -132,10 +138,12 @@ class DirectiveFactory
      * @param string $directiveName
      * @param string $className
      *
-     * @return static
+     * @return $this
      */
     public function addResolved(string $directiveName, string $className): self
     {
+        // Bail to respect the priority of namespaces, the first
+        // resolved directive is kept
         if (\in_array($directiveName, $this->resolved, true)) {
             return $this;
         }
@@ -149,7 +157,7 @@ class DirectiveFactory
      * @param string $directiveName
      * @param string $className
      *
-     * @return static
+     * @return $this
      */
     public function setResolved(string $directiveName, string $className): self
     {
@@ -159,7 +167,7 @@ class DirectiveFactory
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function clearResolved(): self
     {
@@ -189,7 +197,7 @@ class DirectiveFactory
      * @param Node   $node
      * @param string $directiveClass
      *
-     * @return Collection
+     * @return Collection<$directiveClass>
      */
     protected function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
@@ -233,7 +241,7 @@ class DirectiveFactory
     /**
      * @param Node $node
      *
-     * @return Collection
+     * @return Collection<NodeManipulator>
      */
     public function createNodeManipulators(Node $node): Collection
     {
@@ -243,7 +251,7 @@ class DirectiveFactory
     /**
      * @param FieldDefinitionNode $fieldDefinition
      *
-     * @return Collection
+     * @return Collection<FieldManipulator>
      */
     public function createFieldManipulators(FieldDefinitionNode $fieldDefinition): Collection
     {
@@ -253,7 +261,7 @@ class DirectiveFactory
     /**
      * @param $inputValueDefinition
      *
-     * @return Collection
+     * @return Collection<ArgManipulator>
      */
     public function createArgManipulators(InputValueDefinitionNode $inputValueDefinition): Collection
     {
@@ -334,7 +342,7 @@ class DirectiveFactory
      *
      * @param Node $typeDefinition
      *
-     * @return Collection
+     * @return Collection<NodeMiddleware>
      */
     public function createNodeMiddleware(Node $typeDefinition): Collection
     {
@@ -346,7 +354,7 @@ class DirectiveFactory
      *
      * @param FieldDefinitionNode $fieldDefinition
      *
-     * @return Collection
+     * @return Collection<FieldMiddleware>
      */
     public function createFieldMiddleware($fieldDefinition): Collection
     {
@@ -358,7 +366,7 @@ class DirectiveFactory
      *
      * @param InputValueDefinitionNode $arg
      *
-     * @return Collection
+     * @return Collection<ArgTransformerDirective>
      */
     public function createArgTransformers(InputValueDefinitionNode $arg): Collection
     {
@@ -370,7 +378,7 @@ class DirectiveFactory
      *
      * @param InputValueDefinitionNode $arg
      *
-     * @return Collection
+     * @return Collection<ArgDirective>
      */
     public function createArgDirectives(InputValueDefinitionNode $arg): Collection
     {
@@ -383,7 +391,7 @@ class DirectiveFactory
      *
      * @param InputValueDefinitionNode $arg
      *
-     * @return Collection
+     * @return Collection<ArgDirectiveForArray>
      */
     public function createArgDirectivesForArray(InputValueDefinitionNode $arg): Collection
     {
@@ -395,7 +403,7 @@ class DirectiveFactory
      *
      * @param InputValueDefinitionNode $arg
      *
-     * @return Collection
+     * @return Collection<ArgFilterDirective>
      */
     public function createArgFilterDirective(InputValueDefinitionNode $arg): Collection
     {

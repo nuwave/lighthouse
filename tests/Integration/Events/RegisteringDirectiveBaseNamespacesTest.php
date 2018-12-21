@@ -17,14 +17,14 @@ class RegisteringDirectiveBaseNamespacesTest extends TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        resolve('events')->listen(
+        $app->make('events')->listen(
             RegisteringDirectiveBaseNamespaces::class,
             function () {
                 return ['Tests\\Utils\\Directives'];
             }
         );
 
-        $this->directiveFactory = $app[DirectiveFactory::class];
+        $this->directiveFactory = $app->make(DirectiveFactory::class);
 
         parent::getEnvironmentSetUp($app);
     }

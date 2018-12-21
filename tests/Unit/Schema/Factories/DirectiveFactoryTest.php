@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema;
 
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective;
@@ -18,9 +18,9 @@ class DirectiveFactoryTest extends TestCase
      */
     protected $directiveFactory;
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
-        $this->directiveFactory = $app[DirectiveFactory::class];
+        $this->directiveFactory = $app->make(DirectiveFactory::class);
 
         parent::getEnvironmentSetUp($app);
     }
@@ -28,7 +28,7 @@ class DirectiveFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itRegistersLighthouseDirectives()
+    public function itRegistersLighthouseDirectives(): void
     {
         $this->assertInstanceOf(
             FieldDirective::class,
@@ -39,7 +39,7 @@ class DirectiveFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itHydratesBaseDirectives()
+    public function itHydratesBaseDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String
@@ -53,7 +53,7 @@ class DirectiveFactoryTest extends TestCase
      * @deprecated this test is for compatibility reasons and can likely be removed in v3
      * @test
      */
-    public function itSkipsHydrationForNonBaseDirectives()
+    public function itSkipsHydrationForNonBaseDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String
@@ -79,7 +79,7 @@ class DirectiveFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfDirectiveNameCanNotBeResolved()
+    public function itThrowsIfDirectiveNameCanNotBeResolved(): void
     {
         $this->expectException(DirectiveException::class);
         $this->directiveFactory->create('bar');
@@ -88,7 +88,7 @@ class DirectiveFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itCanCreateFieldResolverDirective()
+    public function itCanCreateFieldResolverDirective(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: [Foo!]! @hasMany
@@ -101,7 +101,7 @@ class DirectiveFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsExceptionWhenMultipleFieldResolverDirectives()
+    public function itThrowsExceptionWhenMultipleFieldResolverDirectives(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -115,7 +115,7 @@ class DirectiveFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itCanCreateCollectionOfFieldMiddleware()
+    public function itCanCreateCollectionOfFieldMiddleware(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             bar: String @can(if: ["viewBar"]) @event
@@ -124,6 +124,4 @@ class DirectiveFactoryTest extends TestCase
         $middleware = $this->directiveFactory->createFieldMiddleware($fieldDefinition);
         $this->assertCount(2, $middleware);
     }
-
-
 }
