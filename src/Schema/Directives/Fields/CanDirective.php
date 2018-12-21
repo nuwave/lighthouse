@@ -23,7 +23,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * Resolve the field directive.
+     * Ensure the user is authorized to access this field.
      *
      * @param FieldValue $value
      * @param \Closure   $next
