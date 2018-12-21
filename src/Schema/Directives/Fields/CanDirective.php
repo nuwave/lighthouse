@@ -26,11 +26,11 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure $next
+     * @param \Closure   $next
      *
      * @return FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $resolver = $value->getResolver();
 
@@ -38,12 +38,14 @@ class CanDirective extends BaseDirective implements FieldMiddleware
             $value->setResolver(
                 function () use ($resolver) {
                     $user = auth()->user();
-                    $gate = resolve(Gate::class);
-                    $args = $this->getArguments();
+                    $gate = app(Gate::class);
+                    $gateArguments = $this->getGateArguments();
 
-                    $this->getAbilities()->each(function (string $ability) use ($args, $gate, $user) {
-                        $this->authorize($user, $gate, $ability, $args);
-                    });
+                    $this->getAbilities()->each(
+                        function (string $ability) use ($gate, $user, $gateArguments) {
+                            $this->authorize($user, $gate, $ability, $gateArguments);
+                        }
+                    );
 
                     return \call_user_func_array($resolver, \func_get_args());
                 }
@@ -54,27 +56,29 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     /**
      * Get the ability argument.
      *
+     * For compatibility reasons, the alias "if" will be kept until the next major version.
+     *
      * @return Collection
      */
     protected function getAbilities(): Collection
     {
         return collect(
-            $this->directiveArgValue('ability') ??
-            $this->directiveArgValue('if')
+            $this->directiveArgValue('ability')
+            ?? $this->directiveArgValue('if')
         );
     }
 
     /**
-     * Get the arguments passing to `Gate::check`.
+     * Get additional arguments that are passed to `Gate::check`.
      *
      * @throws \Exception
      *
      * @return array
      */
-    protected function getArguments(): array
+    protected function getGateArguments(): array
     {
         $modelClass = $this->getModelClass();
-        $args = (array)$this->directiveArgValue('args');
+        $args = (array) $this->directiveArgValue('args');
 
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
@@ -85,11 +89,13 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
     /**
      * @param Authenticatable|null $user
-     * @param Gate $gate
-     * @param string $ability
-     * @param array $args
+     * @param Gate                 $gate
+     * @param string               $ability
+     * @param array                $args
      *
      * @throws AuthorizationException
+     *
+     * @return void
      */
     protected function authorize($user, Gate $gate, string $ability, array $args)
     {
