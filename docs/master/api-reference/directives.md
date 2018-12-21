@@ -206,7 +206,7 @@ type Mutation {
 ```
 
 This is currently limited to doing [general checks on a resource and not a specific instance](https://laravel.com/docs/authorization#methods-without-models).
-The defined function on the policy the currently authenticated user.
+The defined function on the policy will receive the currently authenticated user.
 
 ```php
 class PostPolicy
