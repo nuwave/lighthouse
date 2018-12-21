@@ -30,7 +30,7 @@ class Email extends ScalarType
     /**
      * @inheritdoc
      */
-    public function parseLiteral($valueNode, array $variables = null)
+    public function parseLiteral($valueNode, ?array $variables = null)
     {
         if (! $valueNode instanceof StringValueNode) {
             throw new Error('Query error: Can only parse strings got: '.$valueNode->kind, [$valueNode]);

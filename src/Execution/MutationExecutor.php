@@ -25,7 +25,8 @@ class MutationExecutor
      */
     public static function executeCreate(Model $model, Collection $args, Relation $parentRelation = null): Model
     {
-        list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
+        $reflection = new \ReflectionClass($model);
+        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         list($morphMany, $remaining) = self::extractMorphManyArgs($model, $remaining);
 
@@ -37,7 +38,7 @@ class MutationExecutor
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
-        $hasMany->each(function ($nestedOperations, string $relationName) use ($model) {
+        $hasMany->each(function ($nestedOperations, string $relationName) use ($model): void {
             /** @var HasMany $relation */
             $relation = $model->{$relationName}();
 
@@ -108,14 +109,15 @@ class MutationExecutor
      */
     protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, Relation $parentRelation = null): Model
     {
-        list($belongsTo, $remaining) = self::extractBelongsToArgs($model, $remaining);
+        $reflection = new \ReflectionClass($model);
+        list($belongsTo, $remaining) = self::partitionArgsByRelationType($reflection, $remaining,BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
         $model->fill(
             $remaining->all()
         );
 
-        $belongsTo->each(function ($nestedOperations, string $relationName) use ($model) {
+        $belongsTo->each(function ($relatedId, string $relationName) use ($model): void {
             /** @var BelongsTo $belongsTo */
             $relation = $model->{$relationName}();
 
@@ -144,8 +146,12 @@ class MutationExecutor
      */
     protected static function handleHasManyCreate(Collection $multiValues, HasMany $relation)
     {
-        $multiValues->each(function ($singleValues) use ($relation) {
-            self::executeCreate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+        $multiValues->each(function ($singleValues) use ($relation): void {
+            self::executeCreate(
+                $relation->getModel()->newInstance(),
+                collect($singleValues),
+                $relation
+            );
         });
     }
 
@@ -199,7 +205,7 @@ class MutationExecutor
      *
      * @return Model
      */
-    public static function executeUpdate(Model $model, Collection $args, HasMany $parentRelation = null): Model
+    public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
     {
         $id = $args->pull('id')
             ?? $args->pull(
@@ -208,16 +214,16 @@ class MutationExecutor
 
         $model = $model->newQuery()->findOrFail($id);
 
-        list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
+        $reflection = new \ReflectionClass($model);
+        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
-        $hasMany->each(function ($nestedOperations, $relationName) use ($model) {
+        $hasMany->each(function ($nestedOperations, string $relationName) use ($model): void {
             /** @var HasMany $relation */
             $relation = $model->{$relationName}();
 
-
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
                 if ('create' === $operationKey) {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
@@ -238,74 +244,9 @@ class MutationExecutor
     }
 
     /**
-     * Extract all the arguments that are named the same as a BelongsTo relationship on the model.
+     * Extract all the arguments that correspond to a relation of a certain type on the model.
      *
-     * For example, if the args array looks like this:
-     *
-     * ['user' => 123, 'name' => 'Ralf']
-     *
-     * and the model has a method "user" that returns a BelongsTo relationship,
-     * the result will be:
-     * [
-     *   ['user' => 123],
-     *   ['name' => 'Ralf']
-     * ]
-     *
-     * @param Model      $model
-     * @param Collection $args
-     *
-     * @return Collection
-     */
-    protected static function extractBelongsToArgs(Model $model, Collection $args): Collection
-    {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof BelongsTo);
-        });
-    }
-
-    /**
-     * @param Model      $model
-     * @param Collection $args
-     *
-     * @return Collection
-     */
-    protected static function extractMorphToArgs(Model $model, Collection $args): Collection
-    {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof MorphTo);
-        });
-    }
-
-    /**
-     * @param Model      $model
-     * @param Collection $args
-     *
-     * @return Collection
-     */
-    protected static function extractBelongsToManyArgs(Model $model, Collection $args): Collection
-    {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof BelongsToMany);
-        });
-    }
-
-    /**
-     * @param Model      $model
-     * @param Collection $args
-     *
-     * @return Collection
-     */
-    protected static function extractMorphOneArgs(Model $model, Collection $args): Collection
-    {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof MorphOne);
-        });
-    }
-
-    /**
-     * Extract all the arguments that are named the same as a HasMany relationship on the model.
-     *
-     * For example, if the args array looks like this:
+     * For example, if the args input looks like this:
      *
      * [
      *  'comments' =>
@@ -325,16 +266,32 @@ class MutationExecutor
      *   ]
      * ]
      *
-     * @param Model      $model
-     * @param Collection $args
+     * @param \ReflectionClass $modelReflection
+     * @param Collection       $args
+     * @param string           $relationClass
      *
-     * @return Collection
+     * @return Collection [relationshipArgs, remainingArgs]
      */
-    protected static function extractHasManyArgs(Model $model, Collection $args): Collection
+    protected static function partitionArgsByRelationType(\ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
     {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof HasMany);
-        });
+        return $args->partition(
+            function ($value, string $key) use ($modelReflection, $relationClass): bool {
+                if(! $modelReflection->hasMethod($key)){
+                    return false;
+                }
+
+                $relationMethodCandidate = $modelReflection->getMethod($key);
+                if(!$returnType = $relationMethodCandidate->getReturnType()){
+                    return false;
+                }
+
+                if(! $returnType instanceof \ReflectionNamedType){
+                    return false;
+                }
+
+                return $returnType->getName() === $relationClass;
+            }
+        );
     }
 
     /**

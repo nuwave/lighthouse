@@ -103,10 +103,6 @@ if (! function_exists('construct_resolver')) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
-        // TODO convert this back once we require PHP 7.1
-        // return \Closure::fromCallable([resolve($className), $methodName]);
-        return function () use ($className, $methodName) {
-            return app($className)->{$methodName}(...func_get_args());
-        };
+        return \Closure::fromCallable([resolve($className), $methodName]);
     }
 }

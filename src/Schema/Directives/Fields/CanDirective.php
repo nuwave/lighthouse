@@ -2,12 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Illuminate\Contracts\Auth\Access\Authorizable;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class CanDirective extends BaseDirective implements FieldMiddleware
 {
@@ -22,10 +23,10 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * Ensure the user is both authenticated and authorized to access this field.
+     * Ensure the user is authorized to access this field.
      *
      * @param FieldValue $value
-     * @param \Closure $next
+     * @param \Closure   $next
      *
      * @return FieldValue
      */
@@ -36,31 +37,74 @@ class CanDirective extends BaseDirective implements FieldMiddleware
         return $next(
             $value->setResolver(
                 function () use ($resolver) {
-                    /** @var Authorizable $user */
                     $user = auth()->user();
+                    $gate = app(Gate::class);
+                    $gateArguments = $this->getGateArguments();
 
-                    if (!$user) {
-                        throw new AuthenticationException(
-                            "You must be authenticated to access {$this->definitionNode->name->value}. Please log in and try again."
-                        );
-                    }
-
-                    $model = $this->getModelClass();
-                    $policies = $this->directiveArgValue('if');
-
-                    collect($policies)->each(
-                        function (string $policy) use ($user, $model) {
-                            if (!$user->can($policy, $model)) {
-                                throw new AuthorizationException(
-                                    "You are not not authorized to access {$this->definitionNode->name->value}"
-                                );
-                            }
+                    $this->getAbilities()->each(
+                        function (string $ability) use ($gate, $user, $gateArguments) {
+                            $this->authorize($user, $gate, $ability, $gateArguments);
                         }
                     );
 
-                    return call_user_func_array($resolver, func_get_args());
+                    return \call_user_func_array($resolver, \func_get_args());
                 }
             )
         );
+    }
+
+    /**
+     * Get the ability argument.
+     *
+     * For compatibility reasons, the alias "if" will be kept until the next major version.
+     *
+     * @return Collection
+     */
+    protected function getAbilities(): Collection
+    {
+        return collect(
+            $this->directiveArgValue('ability')
+            ?? $this->directiveArgValue('if')
+        );
+    }
+
+    /**
+     * Get additional arguments that are passed to `Gate::check`.
+     *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    protected function getGateArguments(): array
+    {
+        $modelClass = $this->getModelClass();
+        $args = (array) $this->directiveArgValue('args');
+
+        // The signature of the second argument `$arguments` of `Gate::check`
+        // should be [modelClassName, additionalArg, additionalArg...]
+        array_unshift($args, $modelClass);
+
+        return $args;
+    }
+
+    /**
+     * @param Authenticatable|null $user
+     * @param Gate                 $gate
+     * @param string               $ability
+     * @param array                $args
+     *
+     * @throws AuthorizationException
+     *
+     * @return void
+     */
+    protected function authorize($user, Gate $gate, string $ability, array $args)
+    {
+        $can = $gate->forUser($user)->check($ability, $args);
+
+        if ( ! $can) {
+            throw new AuthorizationException(
+                "You are not not authorized to access {$this->definitionNode->name->value}"
+            );
+        }
     }
 }

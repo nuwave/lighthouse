@@ -151,19 +151,62 @@ type Mutation {
 }
 ```
 
-## @can
-
-Check a Laravel Policy to ensure the current user is authorized to access a field.
-Set the name of the policy and the model to check against.
+## @cache
+ 
+Cache the result of a resolver.
+ 
+The cache is created on the first request and is cached forever by default.
+Use this for values that change seldomly and take long to fetch/compute.
 
 ```graphql
-type Mutation {
-    createPost(input: PostInput): Post @can(if: "create", model: "App\\Post")
+type Query {
+  highestKnownPrimeNumber: Int! @cache
+}
+```
+ 
+You can set an expiration time in seconds
+if you want to invalidate the cache after a while.
+ 
+```graphql
+type Query {
+  temperature: Int! @cache(maxAge: 300)
+}
+```
+ 
+You can limit the cache to the logged in user making the request by marking it as private.
+This makes sense for data that is specific to a certain user.
+ 
+```graphql
+type Query {
+  todos: [ToDo!]! @cache(private: true)
 }
 ```
 
-This is currently limited to doing [general checks on a resource and not a specific instance](https://laravel.com/docs/5.6/authorization#methods-without-models).
-The defined functions receive the currently authenticated user.
+## @cacheKey
+
+When generating a cached result for a resolver, Lighthouse produces a unique key for each type. By default, Lighthouse will look for a field with the `ID` type to generate the key. If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+
+```graphql
+type GithubProfile {
+  username: String @cacheKey
+  repos: [Repository] @cache
+}
+```
+
+## @can
+
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+
+Set the name of the policy to check against.
+
+```graphql
+type Mutation {
+    createPost(input: PostInput): Post @can(ability: "create")
+}
+```
+
+This is currently limited to doing [general checks on a resource and not a specific instance](https://laravel.com/docs/authorization#methods-without-models).
+The defined function on the policy will receive the currently authenticated user.
 
 ```php
 class PostPolicy
@@ -174,6 +217,26 @@ class PostPolicy
     }
 }
 ```
+
+The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
+passing the `model` argument.
+
+```graphql
+type Mutation {
+    createBlogPost(input: PostInput): BlogPost @can(ability: "create", model: "App\\Post")
+}
+```
+
+You can pass additional arguments to the policy checks by specifying them as `args`.
+
+```graphql
+type Mutation {
+    createPost(input: PostInput): Post @can(ability: "create", args: ["FROM_GRAPHQL"])
+}
+```
+
+Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
+Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
 
 ## @complexity
 

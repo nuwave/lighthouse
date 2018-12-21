@@ -344,6 +344,70 @@ class CreateDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods()
+    {
+
+        $schema = '
+        type Task {
+            id: ID!
+            name: String!
+            guard: String
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            createUser(input: CreateUserInput!): User @create(flatten: true)
+        }
+        
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+            guard: String
+        }
+        '.$this->placeholderQuery();
+        $query = '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "Uniq"
+                        guard: "api"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                    guard
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame('api', Arr::get($result, 'data.createUser.tasks.0.guard'));
+
+    }
+
+    /**
+     * @test
+     */
     public function itCanCreateWithNewBelongsTo()
     {
         $schema = '
