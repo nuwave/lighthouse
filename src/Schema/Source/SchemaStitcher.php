@@ -97,8 +97,10 @@ class SchemaStitcher implements SchemaSourceProvider
      * @param string $path
      *
      * @throws FileNotFoundException
+     *
+     * @return void
      */
-    protected static function throwFileNotFoundException(string $path)
+    protected static function throwFileNotFoundException(string $path): void
     {
         throw new FileNotFoundException(
             "Failed to find a GraphQL schema file at {$path}. If you just installed Lighthouse, run php artisan vendor:publish --provider=\"Nuwave\Lighthouse\Providers\LighthouseServiceProvider\" --tag=schema"

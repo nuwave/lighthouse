@@ -197,7 +197,7 @@ class FieldFactory
      */
     public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
     {
-        return function ($root, array $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
+        return function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
             $this->currentValidationErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
 
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
@@ -245,9 +245,15 @@ class FieldFactory
      * @param mixed                         $argValue
      * @param InputValueDefinitionNode|null $astNode
      * @param array                         $argumentPath
+     *
+     * @return void
      */
-    protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argValue, InputValueDefinitionNode $astNode, array $argumentPath)
-    {
+    protected function handleArgWithAssociatedDirectivesRecursively(
+        InputType $type,
+        &$argValue,
+        InputValueDefinitionNode $astNode,
+        array $argumentPath
+    ): void {
         if ($argValue instanceof NoValue || null === $argValue) {
             // Handle `ListOfType` with associated directives which implement `ArgDirectiveForArray`
             if ($type instanceof ListOfType) {
@@ -330,7 +336,7 @@ class FieldFactory
         $directives = $this->directiveRegistry->argDirectives($astNode);
 
         if ($mustImplementClass) {
-            $directives = $directives->filter(function ($directive) use ($mustImplementClass) {
+            $directives = $directives->filter(function ($directive) use ($mustImplementClass): bool {
                 return $directive instanceof $mustImplementClass;
             });
         }
@@ -342,7 +348,7 @@ class FieldFactory
      * @param InputValueDefinitionNode $astNode
      * @param mixed                    $argumentValue
      * @param array                    $argumentPath
-     * @param Collection|null          $directives
+     * @param Collection               $directives
      *
      * @return mixed
      */
@@ -393,8 +399,10 @@ class FieldFactory
      * @param InputValueDefinitionNode $astNode
      * @param array                    $argumentPath
      * @param Collection               $directives
+     *
+     * @return void
      */
-    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
+    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives): void
     {
         $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
             if ($directive instanceof HasErrorBuffer) {
@@ -410,8 +418,10 @@ class FieldFactory
     /**
      * @param ArgValidationDirective $directive
      * @param array                  $argumentPath
+     *
+     * @return void
      */
-    protected function collectRulesAndMessages(ArgValidationDirective $directive, array $argumentPath)
+    protected function collectRulesAndMessages(ArgValidationDirective $directive, array $argumentPath): void
     {
         $this->currentRules = array_merge($this->currentRules, $directive->getRules());
         $this->currentMessages = array_merge($this->currentMessages, $directive->getMessages());
@@ -420,8 +430,10 @@ class FieldFactory
     /**
      * @param ArgFilterDirective       $argFilterDirective
      * @param InputValueDefinitionNode $inputValueDefinition
+     *
+     * @return void
      */
-    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition)
+    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition): void
     {
         $argumentName = $inputValueDefinition->name->value;
         $directiveDefinition = ASTHelper::directiveDefinition($inputValueDefinition, $argFilterDirective->name());
@@ -471,8 +483,10 @@ class FieldFactory
      * @param ResolveInfo $resolveInfo
      *
      * @throws \Exception
+     *
+     * @return void
      */
-    protected function validateArgumentsBeforeValidationDirectives($root, array $args, $context, ResolveInfo $resolveInfo)
+    protected function validateArgumentsBeforeValidationDirectives($root, array $args, $context, ResolveInfo $resolveInfo): void
     {
         if (! $this->currentRules) {
             return;
@@ -508,8 +522,10 @@ class FieldFactory
 
     /**
      * @throws \Exception
+     *
+     * @return void
      */
-    protected function flushErrorBufferIfHasErrors()
+    protected function flushErrorBufferIfHasErrors(): void
     {
         if ($this->currentValidationErrorBuffer->hasErrors()) {
             $this->currentValidationErrorBuffer->flush(
@@ -525,8 +541,10 @@ class FieldFactory
      * @param ResolveInfo $resolveInfo
      *
      * @throws \Exception
+     *
+     * @return void
      */
-    protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, $context, ResolveInfo $resolveInfo)
+    protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, $context, ResolveInfo $resolveInfo): void
     {
         if (! $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective) {
             return;

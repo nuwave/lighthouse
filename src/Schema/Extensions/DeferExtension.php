@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -62,6 +62,7 @@ class DeferExtension extends GraphQLExtension
      * Handle request start.
      *
      * @param ExtensionRequest $request
+     *
      * @return void
      */
     public function requestDidStart(ExtensionRequest $request): void

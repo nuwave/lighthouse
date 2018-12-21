@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
@@ -252,9 +251,9 @@ class NodeFactory
      */
     protected function resolveFieldsFunction($definition): \Closure
     {
-        return function () use ($definition) {
+        return function () use ($definition): array {
             return collect($definition->fields)
-                ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition) {
+                ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition): array {
                     $fieldValue = new FieldValue(
                         new NodeValue($definition),
                         $fieldDefinition

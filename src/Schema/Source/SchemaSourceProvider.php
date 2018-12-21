@@ -21,5 +21,5 @@ interface SchemaSourceProvider
      *
      * @return string
      */
-    public function getSchemaString();
+    public function getSchemaString(): string;
 }
