@@ -196,16 +196,17 @@ type GithubProfile {
 ## @can
 
 Check a Laravel Policy to ensure the current user is authorized to access a field.
-Set the name of the policy and the model to check against.
+
+Set the name of the policy to check against.
 
 ```graphql
 type Mutation {
-    createPost(input: PostInput): Post @can(if: "create", model: "App\\Post")
+    createPost(input: PostInput): Post @can(ability: "create")
 }
 ```
 
-This is currently limited to doing [general checks on a resource and not a specific instance](https://laravel.com/docs/5.6/authorization#methods-without-models).
-The defined functions receive the currently authenticated user.
+This is currently limited to doing [general checks on a resource and not a specific instance](https://laravel.com/docs/authorization#methods-without-models).
+The defined function on the policy will receive the currently authenticated user.
 
 ```php
 class PostPolicy
@@ -216,6 +217,26 @@ class PostPolicy
     }
 }
 ```
+
+The name of the returned Type `Post` is used as the Model class, however you may overwrite this by
+passing the `model` argument.
+
+```graphql
+type Mutation {
+    createBlogPost(input: PostInput): BlogPost @can(ability: "create", model: "App\\Post")
+}
+```
+
+You can pass additional arguments to the policy checks by specifying them as `args`.
+
+```graphql
+type Mutation {
+    createPost(input: PostInput): Post @can(ability: "create", args: ["FROM_GRAPHQL"])
+}
+```
+
+Starting from Laravel 5.7, [authorization of guest users](https://laravel.com/docs/authorization#guest-users) is supported.
+Because of this, Lighthouse does **not** validate that the user is authenticated before passing it along to the policy.
 
 ## @complexity
 
