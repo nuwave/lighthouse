@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
@@ -19,7 +18,6 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
@@ -37,8 +35,8 @@ use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
 
 class NodeFactory
 {
-    /** @var DirectiveRegistry */
-    protected $directiveRegistry;
+    /** @var DirectiveFactory */
+    protected $directiveFactory;
     /** @var TypeRegistry */
     protected $typeRegistry;
     /** @var Pipeline */
@@ -47,18 +45,18 @@ class NodeFactory
     protected $argumentFactory;
 
     /**
-     * @param DirectiveRegistry $directiveRegistry
+     * @param DirectiveFactory $directiveFactory
      * @param TypeRegistry      $typeRegistry
      * @param Pipeline          $pipeline
      * @param ArgumentFactory   $argumentFactory
      */
     public function __construct(
-        DirectiveRegistry $directiveRegistry,
+        DirectiveFactory $directiveFactory,
         TypeRegistry $typeRegistry,
         Pipeline $pipeline,
         ArgumentFactory $argumentFactory
     ) {
-        $this->directiveRegistry = $directiveRegistry;
+        $this->directiveFactory = $directiveFactory;
         $this->typeRegistry = $typeRegistry;
         $this->pipeline = $pipeline;
         $this->argumentFactory = $argumentFactory;
@@ -86,7 +84,7 @@ class NodeFactory
         return $this->pipeline
             ->send($nodeValue)
             ->through(
-                $this->directiveRegistry->nodeMiddleware($definition)
+                $this->directiveFactory->createNodeMiddleware($definition)
             )
             ->via('handleNode')
             ->then(function (NodeValue $value) {
@@ -106,7 +104,7 @@ class NodeFactory
      */
     protected function hasTypeResolver(TypeDefinitionNode $definition): bool
     {
-        return $this->directiveRegistry->hasNodeResolver($definition);
+        return $this->directiveFactory->hasNodeResolver($definition);
     }
 
     /**
@@ -120,8 +118,8 @@ class NodeFactory
      */
     protected function resolveTypeViaDirective(TypeDefinitionNode $definition): Type
     {
-        return $this->directiveRegistry
-            ->nodeResolver($definition)
+        return $this->directiveFactory
+            ->createNodeResolver($definition)
             ->resolveNode(
                 new NodeValue($definition)
             );
