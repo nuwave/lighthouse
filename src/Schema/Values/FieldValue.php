@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
@@ -19,9 +18,9 @@ class FieldValue
     protected $returnType;
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * The underlying AST definition of the Field.
      *
-     * @var FieldDefinitionNode|InputValueDefinitionNode
+     * @var FieldDefinitionNode
      */
     protected $field;
 
@@ -54,20 +53,12 @@ class FieldValue
     protected $privateCache = false;
 
     /**
-     * Additional args to inject into resolver.
-     *
-     * @var array
-     */
-    protected $additionalArgs = [];
-
-    /**
      * Create new field value instance.
      *
      * @param NodeValue           $parent
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
-     * @param FieldDefinitionNode|InputValueDefinitionNode $field
+     * @param FieldDefinitionNode $field
      */
-    public function __construct(NodeValue $parent, $field)
+    public function __construct(NodeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
         $this->field = $field;
@@ -102,32 +93,6 @@ class FieldValue
     }
 
     /**
-     * Inject field argument.
-     *
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return FieldValue
-     */
-    public function injectArg(string $key, $value): FieldValue
-    {
-        $this->additionalArgs = array_merge(
-            $this->additionalArgs,
-            [$key => $value]
-        );
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdditionalArgs(): array
-    {
-        return $this->additionalArgs;
-    }
-
-    /**
      * Get an instance of the return type of the field.
      *
      * @return Type
@@ -135,7 +100,7 @@ class FieldValue
     public function getReturnType(): Type
     {
         if (! isset($this->returnType)) {
-            $this->returnType = resolve(DefinitionNodeConverter::class)->toType(
+            $this->returnType = app(DefinitionNodeConverter::class)->toType(
                 $this->field->type
             );
         }
@@ -156,15 +121,15 @@ class FieldValue
      */
     public function getParentName(): string
     {
-        return $this->getParent()->getNodeName();
+        return $this->getParent()->getTypeDefinitionName();
     }
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * Get the underlying AST definition for the field.
      *
-     * @return FieldDefinitionNode|InputValueDefinitionNode
+     * @return FieldDefinitionNode
      */
-    public function getField()
+    public function getField(): FieldDefinitionNode
     {
         return $this->field;
     }
@@ -199,13 +164,9 @@ class FieldValue
             );
         }
 
-        // TODO convert this back once we require PHP 7.1
-        // return \Closure::fromCallable(
-        //     [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
-        // );
-        return function () {
-            return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
-        };
+         return \Closure::fromCallable(
+             [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
+         );
     }
 
     /**
@@ -249,43 +210,5 @@ class FieldValue
     public function getFieldName(): string
     {
         return $this->field->name->value;
-    }
-
-    /**
-     * @return NodeValue
-     *
-     * @deprecated
-     */
-    public function getNode(): NodeValue
-    {
-        return $this->getParent();
-    }
-
-    /**
-     * Get field's node name.
-     *
-     * @return string
-     *
-     * @deprecated
-     */
-    public function getNodeName(): string
-    {
-        return $this->getParentName();
-    }
-
-    /**
-     * Set current type.
-     *
-     * @param \Closure|Type $type
-     *
-     * @return FieldValue
-     *
-     * @deprecated do this sort of manipulation in the DocumentAST in the future
-     */
-    public function setType($type): FieldValue
-    {
-        $this->returnType = $type;
-
-        return $this;
     }
 }

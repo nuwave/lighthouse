@@ -13,7 +13,7 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
     /**
      * Setup test environment.
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

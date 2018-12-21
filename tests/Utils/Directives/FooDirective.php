@@ -11,7 +11,7 @@ class FooDirective implements Directive
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'foo';
     }

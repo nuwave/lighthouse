@@ -17,7 +17,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'can';
     }
@@ -26,7 +26,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      * Resolve the field directive.
      *
      * @param FieldValue $value
-     * @param \Closure   $next
+     * @param \Closure $next
      *
      * @return FieldValue
      */
@@ -74,7 +74,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     protected function getArguments(): array
     {
         $modelClass = $this->getModelClass();
-        $args = (array) $this->directiveArgValue('args');
+        $args = (array)$this->directiveArgValue('args');
 
         // The signature of the second argument `$arguments` of `Gate::check`
         // should be [modelClassName, additionalArg, additionalArg...]
@@ -85,9 +85,9 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
     /**
      * @param Authenticatable|null $user
-     * @param Gate                 $gate
-     * @param string               $ability
-     * @param array                $args
+     * @param Gate $gate
+     * @param string $ability
+     * @param array $args
      *
      * @throws AuthorizationException
      */
@@ -95,8 +95,10 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     {
         $can = $gate->forUser($user)->check($ability, $args);
 
-        if (! $can) {
-            throw new AuthorizationException('Not authorized to access this field.');
+        if ( ! $can) {
+            throw new AuthorizationException(
+                "You are not not authorized to access {$this->definitionNode->name->value}"
+            );
         }
     }
 }

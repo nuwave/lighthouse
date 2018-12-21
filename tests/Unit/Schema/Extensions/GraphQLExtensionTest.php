@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -46,7 +45,7 @@ class GraphQLExtensionTest extends TestCase
         ');
 
         $this->assertArrayHasKey('meta', $data);
-        $this->assertEquals('data', $data['meta']);
+        $this->assertSame('data', $data['meta']);
     }
 
     /**

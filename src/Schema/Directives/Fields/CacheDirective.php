@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Carbon\Carbon;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -45,9 +46,8 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
         return $value->setResolver(function ($root, $args, $context, $info) use ($value, $resolver, $maxAge, $privateCache) {
             /** @var \Illuminate\Support\Facades\Cache $cache */
-            $cache = resolve('cache');
-            /** @var \Nuwave\Lighthouse\Schema\Values\CacheValue $cacheValue */
-            $cacheValue = resolve(ValueFactory::class)->cache([
+            $cache = app('cache');
+            $cacheValue = new CacheValue([
                 'field_value' => $value,
                 'root' => $root,
                 'args' => $args,
@@ -58,7 +58,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $useTags = $this->useTags();
             $cacheExp = $maxAge
-                ? now()->addSeconds($maxAge)
+                ? Carbon::now()->addSeconds($maxAge)
                 : null;
             $cacheKey = $cacheValue->getKey();
             $cacheTags = $cacheValue->getTags();
@@ -118,7 +118,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     protected function useTags(): bool
     {
         return config('lighthouse.cache.tags', false)
-            && method_exists(resolve('cache')->store(), 'tags');
+            && method_exists(app('cache')->store(), 'tags');
     }
 
     /**
@@ -134,7 +134,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             return;
         }
 
-        $fields = data_get($nodeValue->getNode(), 'fields', []);
+        $fields = data_get($nodeValue->getTypeDefinition(), 'fields', []);
         $nodeKey = collect($fields)->reduce(function ($key, $field) {
             if ($key) {
                 return $key;
@@ -165,10 +165,10 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             });
         }
 
-        if (! $nodeKey && 'Query' !== $nodeValue->getNodeName()) {
+        if (! $nodeKey && 'Query' !== $nodeValue->getTypeDefinitionName()) {
             $message = sprintf(
                 'No @cacheKey or ID field defined on %s',
-                $nodeValue->getNodeName()
+                $nodeValue->getTypeDefinitionName()
             );
 
             throw new DirectiveException($message);

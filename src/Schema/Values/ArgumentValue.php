@@ -6,32 +6,36 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
+/**
+ * Data wrapper around a InputValueDefinitionNode.
+ *
+ * The main use for this class is to be passed through ArgMiddleware directives.
+ * They may get information on the field or modify it to influence the
+ * resulting executable schema.
+ */
 class ArgumentValue
 {
     /** @var InputValueDefinitionNode */
     protected $astNode;
-    
-    /** @var FieldValue */
+
+    /** @var FieldValue|null */
     protected $parentField;
 
     /** @var Type */
     protected $type;
-    
-    /** @var \Closure[] */
-    protected $transformers = [];
-    
+
     /**
      * ArgumentValue constructor.
      *
-     * @param FieldValue $parentField
      * @param InputValueDefinitionNode $astNode
+     * @param FieldValue               $parentField
      */
-    public function __construct(FieldValue $parentField, InputValueDefinitionNode $astNode)
+    public function __construct(InputValueDefinitionNode $astNode, FieldValue $parentField = null)
     {
-        $this->parentField = $parentField;
         $this->astNode = $astNode;
+        $this->parentField = $parentField;
     }
-    
+
     /**
      * @return InputValueDefinitionNode
      */
@@ -39,44 +43,32 @@ class ArgumentValue
     {
         return $this->astNode;
     }
-    
+
     /**
-     * @return FieldValue
+     * @return FieldValue|null
      */
-    public function getParentField(): FieldValue
+    public function getParentField()
     {
         return $this->parentField;
     }
-    
+
     /**
      * @return Type
      */
     public function getType(): Type
     {
-        if(!$this->type){
-            $this->type = resolve(DefinitionNodeConverter::class)->toType($this->astNode->type);
+        if (! $this->type) {
+            $this->type = app(DefinitionNodeConverter::class)->toType($this->astNode->type);
         }
-        
+
         return $this->type;
     }
-    
+
     /**
-     * @return \Closure[]
+     * @return string
      */
-    public function getTransformers(): array
+    public function getName(): string
     {
-        return $this->transformers;
-    }
-    
-    /**
-     * @param \Closure $transformer
-     *
-     * @return ArgumentValue
-     */
-    public function addTransformer(\Closure $transformer): ArgumentValue
-    {
-        $this->transformers[] = $transformer;
-        
-        return $this;
+        return  $this->astNode->name->value;
     }
 }

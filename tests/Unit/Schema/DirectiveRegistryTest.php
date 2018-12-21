@@ -4,8 +4,8 @@ namespace Tests\Unit\Schema;
 
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -33,27 +33,27 @@ class DirectiveRegistryTest extends TestCase
     {
         $this->assertInstanceOf(
             FieldDirective::class,
-            $this->directiveRegistry->get((new FieldDirective)->name())
+            $this->directiveRegistry->get((new FieldDirective())->name())
         );
     }
-    
+
     /**
      * @test
      */
     public function itRegistersDirectiveFromProgrammaticallyGivenLocation()
     {
         $this->expectException(DirectiveException::class);
-        $this->directiveRegistry->get((new FooDirective)->name());
-        
+        $this->directiveRegistry->get((new FooDirective())->name());
+
         $this->directiveRegistry->load(
-            __DIR__ . '../../Utils/Directives/Programmatically',
+            __DIR__.'../../Utils/Directives/Programmatically',
             'Tests\Utils\Directives\Programmatically',
-            __DIR__ . '/../../'
+            __DIR__.'/../../'
         );
-        
+
         $this->assertInstanceOf(
             FooDirective::class,
-            $this->directiveRegistry->get((new FooDirective)->name())
+            $this->directiveRegistry->get((new FooDirective())->name())
         );
     }
 
@@ -115,7 +115,7 @@ class DirectiveRegistryTest extends TestCase
     public function itCanRegisterDirectivesDirectly()
     {
         $fooDirective = new class() implements Directive {
-            public function name()
+            public function name(): string
             {
                 return 'foo';
             }
@@ -138,7 +138,7 @@ class DirectiveRegistryTest extends TestCase
 
         $this->directiveRegistry->register(
             new class() extends BaseDirective implements FieldMiddleware {
-                public function name()
+                public function name(): string
                 {
                     return 'foo';
                 }
@@ -169,7 +169,7 @@ class DirectiveRegistryTest extends TestCase
         ');
 
         $originalDefinition = new class() implements FieldMiddleware {
-            public function name()
+            public function name(): string
             {
                 return 'foo';
             }

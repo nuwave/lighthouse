@@ -3,6 +3,8 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class CreateDirectiveTest extends DBTestCase
@@ -21,7 +23,7 @@ class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             createCompany(name: "foo") {
@@ -32,8 +34,8 @@ class CreateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', array_get($result, 'data.createCompany.name'));
+        $this->assertSame('1', Arr::get($result, 'data.createCompany.id'));
+        $this->assertSame('foo', Arr::get($result, 'data.createCompany.name'));
     }
 
     /**
@@ -54,7 +56,7 @@ class CreateDirectiveTest extends DBTestCase
         input CreateCompanyInput {
             name: String
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             createCompany(input: {
@@ -67,8 +69,8 @@ class CreateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', array_get($result, 'data.createCompany.name'));
+        $this->assertSame('1', Arr::get($result, 'data.createCompany.id'));
+        $this->assertSame('foo', Arr::get($result, 'data.createCompany.name'));
     }
 
     /**
@@ -97,7 +99,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             createTask(input: {
@@ -114,8 +116,228 @@ class CreateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', array_get($result, 'data.createTask.id'));
-        $this->assertSame('foo', array_get($result, 'data.createTask.name'));
-        $this->assertSame('1', array_get($result, 'data.createTask.user.id'));
+        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
+        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
+        $this->assertSame('1', Arr::get($result, 'data.createTask.user.id'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanCreateWithHasMany()
+    {
+        $schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            createUser(input: CreateUserInput!): User @create(flatten: true)
+        }
+        
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+            user: ID
+        }
+        '.$this->placeholderQuery();
+        $query = '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame('1', Arr::get($result, 'data.createUser.id'));
+        $this->assertSame('foo', Arr::get($result, 'data.createUser.name'));
+        $this->assertSame('1', Arr::get($result, 'data.createUser.tasks.0.id'));
+        $this->assertSame('bar', Arr::get($result, 'data.createUser.tasks.0.name'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately()
+    {
+        $schema = '
+        type Mutation {
+            createTag(name: String): Tag @create
+        }
+        
+        type Tag {
+            name: String!
+            default_string: String!
+        }
+        '.$this->placeholderQuery();
+        $query = '
+        mutation {
+            createTag(name: "foobar"){
+                name
+                default_string
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertSame([
+            'name' => 'foobar',
+            'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
+        ], Arr::get($result, 'data.createTag'));
+    }
+
+    /**
+     * @test
+     */
+    public function itDoesNotCreateWithFailingRelationship()
+    {
+        factory(Task::class)->create(['name' => 'Uniq']);
+
+        $schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            createUser(input: CreateUserInput!): User @create(flatten: true)
+        }
+        
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+            user: ID
+        }
+        '.$this->placeholderQuery();
+        $query = '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "Uniq"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ';
+
+        try {
+            $this->execute($schema, $query);
+        } catch (\Exception $err) {
+            $this->assertCount(1, User::all());
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function itDoesCreateWithFailingRelationshipAndTransactionParam()
+    {
+        factory(Task::class)->create(['name' => 'Uniq']);
+        config(['lighthouse.transactional_mutations' => false]);
+        $schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type User {
+            id: ID!
+            name: String
+            tasks: [Task!]! @hasMany
+        }
+        
+        type Mutation {
+            createUser(input: CreateUserInput!): User @create(flatten: true)
+        }
+        
+        input CreateUserInput {
+            name: String
+            tasks: CreateTaskRelation
+        }
+        
+        input CreateTaskRelation {
+            create: [CreateTaskInput!]
+        }
+        
+        input CreateTaskInput {
+            name: String
+            user: ID
+        }
+        '.$this->placeholderQuery();
+        $query = '
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    create: [{
+                        name: "Uniq"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ';
+        try {
+            $this->execute($schema, $query);
+        } catch (\Exception $err) {
+            $this->assertCount(2, User::all());
+        }
     }
 }

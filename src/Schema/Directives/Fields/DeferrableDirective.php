@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Language\AST\TypeNode;
-use GraphQL\Language\AST\FieldNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\NonNullTypeNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -33,7 +32,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      *
      * @return string
      */
-    public function name()
+    public function name():string
     {
         return 'deferrable';
     }

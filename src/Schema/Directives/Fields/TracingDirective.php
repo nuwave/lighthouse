@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -16,7 +17,7 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'tracing';
     }
@@ -41,14 +42,14 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
             /** @var TracingExtension $tracingExtension */
             $tracingExtension = $extensionRegistry->get(TracingExtension::name());
 
-            $start = now();
+            $start = Carbon::now();
             $result = $resolver($root, $args, $context, $info);
 
             ($result instanceof \GraphQL\Deferred)
                 ? $result->then(function (&$items) use ($info, $start, $tracingExtension) {
-                    $tracingExtension->record($info, $start, now());
+                    $tracingExtension->record($info, $start, Carbon::now());
                 })
-                : $tracingExtension->record($info, $start, now());
+                : $tracingExtension->record($info, $start, Carbon::now());
 
             return $result;
         });

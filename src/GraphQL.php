@@ -4,23 +4,20 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
+use Illuminate\Support\Arr;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -44,6 +41,9 @@ class GraphQL
     /** @var Pipeline */
     protected $pipeline;
 
+    /** @var int|null */
+    protected $currentBatchIndex = null;
+
     /**
      * @param ExtensionRegistry    $extensionRegistry
      * @param SchemaBuilder        $schemaBuilder
@@ -59,6 +59,17 @@ class GraphQL
     }
 
     /**
+     * Returns the index of the current batch if we are resolving
+     * a batched query or `null` if we are resolving a single query.
+     *
+     * @return int|null
+     */
+    public function currentBatchIndex()
+    {
+        return $this->currentBatchIndex;
+    }
+
+    /**
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
@@ -71,12 +82,13 @@ class GraphQL
     public function executeBatchedQueries(array $requests, $context = null, $rootValue = null): array
     {
         return collect($requests)->map(function ($request, $index) use ($context, $rootValue) {
+            $this->currentBatchIndex = $index;
             $this->extensionRegistry->batchedQueryDidStart($index);
 
             $result = $this->executeQuery(
-                array_get($request, 'query', ''),
+                Arr::get($request, 'query', ''),
                 $context,
-                array_get($request, 'variables', []),
+                Arr::get($request, 'variables', []),
                 $rootValue
             );
 
@@ -96,21 +108,24 @@ class GraphQL
      * @param null   $context
      * @param array  $variables
      * @param null   $rootValue
+     * @param string $operationName
      *
      * @throws DirectiveException
      * @throws ParseException
      *
      * @return ExecutionResult
      */
-    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
+    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null, $operationName = null): ExecutionResult
     {
+        $operationName = $operationName ?: app('request')->input('operationName');
+
         $result = GraphQLBase::executeQuery(
             $this->prepSchema(),
             $query,
             $rootValue,
             $context,
             $variables,
-            app('request')->input('operationName'),
+            $operationName,
             null,
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
@@ -174,9 +189,9 @@ class GraphQL
     protected function getValidationRules(): array
     {
         return [
-            new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
-            new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
-            new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
+            QueryComplexity::class => new QueryComplexity(config('lighthouse.security.max_query_complexity', 0)),
+            QueryDepth::class => new QueryDepth(config('lighthouse.security.max_query_depth', 0)),
+            DisableIntrospection::class => new DisableIntrospection(config('lighthouse.security.disable_introspection', false)),
         ];
     }
 
@@ -225,129 +240,5 @@ class GraphQL
         )->implode("\n");
 
         return ASTBuilder::generate($schemaString."\n".$additionalSchemas);
-    }
-
-    /**
-     * ATTENTION
-     * ONLY DEPRECATED METHODS FROM THIS POINT ON.
-     *
-     * Do not use the functions below, they will be removed in v3
-     *
-     * ONLY DEPRECATED METHODS FROM THIS POINT ON
-     * ATTENTION
-     */
-
-    /**
-     * Return an instance of a BatchLoader for a specific field.
-     *
-     * @param string $loaderClass
-     * @param array  $pathToField
-     * @param array  $constructorArgs Those arguments are passed to the constructor of the instance
-     *
-     * @throws \Exception
-     *
-     * @return BatchLoader
-     *
-     * @deprecated in favour of BatchLoader::instance()
-     */
-    public function batchLoader(string $loaderClass, array $pathToField, array $constructorArgs = []): BatchLoader
-    {
-        return BatchLoader::instance($loaderClass, $pathToField, $constructorArgs);
-    }
-
-    /**
-     * @throws Exceptions\DirectiveException
-     *
-     * @return Schema
-     *
-     * @deprecated in v3 in favour of prepSchema
-     */
-    public function buildSchema(): Schema
-    {
-        return $this->prepSchema();
-    }
-
-    /**
-     * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
-     *
-     * @throws Exceptions\DirectiveException
-     *
-     * @return array
-     *
-     * @deprecated use executeQuery()->toArray() instead. This allows to control the debug settings.
-     */
-    public function execute(string $query, $context = null, $variables = [], $rootValue = null): array
-    {
-        return $this->queryAndReturnResult($query, $context, $variables, $rootValue)->toArray();
-    }
-
-    /**
-     * @param string $query
-     * @param mixed  $context
-     * @param array  $variables
-     * @param mixed  $rootValue
-     *
-     * @throws Exceptions\DirectiveException
-     *
-     * @return \GraphQL\Executor\ExecutionResult
-     *
-     * @deprecated renamed to executeQuery to match webonyx/graphql-php
-     */
-    public function queryAndReturnResult(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
-    {
-        return $this->executeQuery($query, $context, $variables, $rootValue);
-    }
-
-    /**
-     * @return DirectiveRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function directives(): DirectiveRegistry
-    {
-        return resolve(DirectiveRegistry::class);
-    }
-
-    /**
-     * @return TypeRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function types(): TypeRegistry
-    {
-        return resolve(TypeRegistry::class);
-    }
-
-    /**
-     * @return TypeRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function schema(): TypeRegistry
-    {
-        return $this->types();
-    }
-
-    /**
-     * @return NodeRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function nodes(): NodeRegistry
-    {
-        return resolve(NodeRegistry::class);
-    }
-
-    /**
-     * @return ExtensionRegistry
-     *
-     * @deprecated Use resolve() instead, will be removed in v3
-     */
-    public function extensions(): ExtensionRegistry
-    {
-        return resolve(ExtensionRegistry::class);
     }
 }

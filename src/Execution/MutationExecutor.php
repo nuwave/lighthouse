@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class MutationExecutor
 {
     /**
-     * @param Model $model An empty instance of the model that should be created.
-     * @param Collection $args The corresponding slice of the input arguments for creating this model.
-     * @param HasMany|null $parentRelation If we are in a nested create, we can use this to associate the new model to its parent.
+     * @param Model        $model          an empty instance of the model that should be created
+     * @param Collection   $args           the corresponding slice of the input arguments for creating this model
+     * @param HasMany|null $parentRelation if we are in a nested create, we can use this to associate the new model to its parent
      *
      * @return Model
      */
@@ -28,7 +28,7 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ($operationKey === 'create') {
+                if ('create' === $operationKey) {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
             });
@@ -37,11 +37,10 @@ class MutationExecutor
         return $model;
     }
 
-
     /**
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $remaining
-     * @param HasMany $parentRelation
+     * @param HasMany    $parentRelation
      *
      * @return Model
      */
@@ -74,14 +73,18 @@ class MutationExecutor
     protected static function handleHasManyCreate(Collection $multiValues, HasMany $relation)
     {
         $multiValues->each(function ($singleValues) use ($relation) {
-            self::executeCreate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+            self::executeCreate(
+                $relation->getModel()->newInstance(),
+                collect($singleValues),
+                $relation
+            );
         });
     }
 
     /**
-     * @param Model $model An empty instance of the model that should be updated.
-     * @param Collection $args The corresponding slice of the input arguments for updating this model.
-     * @param HasMany|null $parentRelation If we are in a nested update, we can use this to associate the new model to its parent.
+     * @param Model        $model          an empty instance of the model that should be updated
+     * @param Collection   $args           the corresponding slice of the input arguments for updating this model
+     * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
      *
      * @throws ModelNotFoundException
      *
@@ -89,30 +92,37 @@ class MutationExecutor
      */
     public static function executeUpdate(Model $model, Collection $args, HasMany $parentRelation = null): Model
     {
-        $model = $model->newQuery()->findOrFail(
-            $args->pull('id')
-        );
+        $id = $args->pull('id')
+            ?? $args->pull(
+                $model->getKeyName()
+            );
+
+        $model = $model->newQuery()->findOrFail($id);
 
         list($hasMany, $remaining) = self::extractHasManyArgs($model, $args);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
-        $hasMany->each(function ($nestedOperations, $relationName) use ($model) {
+        $hasMany->each(function ($nestedOperations, string $relationName) use ($model) {
             /** @var HasMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, $operationKey) use ($relation) {
-                if ($operationKey === 'create') {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
+                if ('create' === $operationKey) {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
 
-                if ($operationKey === 'update') {
+                if ('update' === $operationKey) {
                     collect($values)->each(function ($singleValues) use ($relation) {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                        self::executeUpdate(
+                            $relation->getModel()->newInstance(),
+                            collect($singleValues),
+                            $relation
+                        );
                     });
                 }
 
-                if ($operationKey === 'delete') {
+                if ('delete' === $operationKey) {
                     $relation->getModel()::destroy($values);
                 }
             });
@@ -135,15 +145,16 @@ class MutationExecutor
      *   ['name' => 'Ralf']
      * ]
      *
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $args
      *
      * @return Collection
      */
     protected static function extractBelongsToArgs(Model $model, Collection $args): Collection
     {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof BelongsTo);
+        return $args->partition(function ($value, string $key) use ($model) {
+            return method_exists($model, $key)
+                && ($model->{$key}() instanceof BelongsTo);
         });
     }
 
@@ -170,15 +181,16 @@ class MutationExecutor
      *   ]
      * ]
      *
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $args
      *
      * @return Collection
      */
     protected static function extractHasManyArgs(Model $model, Collection $args): Collection
     {
-        return $args->partition(function ($value, $key) use ($model) {
-            return method_exists($model, $key) && ($model->{$key}() instanceof HasMany);
+        return $args->partition(function ($value, string $key) use ($model) {
+            return method_exists($model, $key)
+                && ($model->{$key}() instanceof HasMany);
         });
     }
 }

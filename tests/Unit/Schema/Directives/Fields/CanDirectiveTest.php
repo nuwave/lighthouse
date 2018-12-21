@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
@@ -113,7 +114,7 @@ class CanDirectiveTest extends TestCase
 
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', array_get($result, 'data.user.name'));
+        $this->assertSame('foo', Arr::get($result, 'data.user.name'));
     }
 
     /**
@@ -150,7 +151,7 @@ class CanDirectiveTest extends TestCase
 
         $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo', array_get($result, 'data.user.name'));
+        $this->assertSame('foo', Arr::get($result, 'data.user.name'));
     }
 
     /**

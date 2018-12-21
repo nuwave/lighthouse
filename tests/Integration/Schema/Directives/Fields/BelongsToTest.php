@@ -3,9 +3,11 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\User;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Team;
+use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
+use Tests\Utils\Models\Product;
 
 class BelongsToTest extends DBTestCase
 {
@@ -76,7 +78,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
+        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
     }
 
     /**
@@ -110,7 +112,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.account.name'));
+        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.account.name'));
     }
 
     /**
@@ -152,7 +154,57 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, array_get($result, 'data.user.company.name'));
-        $this->assertEquals($this->team->name, array_get($result, 'data.user.team.name'));
+        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
+        $this->assertEquals($this->team->name, Arr::get($result, 'data.user.team.name'));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanResolveBelongsToRelationshipWhenMainModelhasCompositePrimaryKey()
+    {
+        $this->be($this->user);
+
+        $products = factory(Product::class, 3)->create();
+
+        $schema = '
+        type Color {
+            id: ID!
+            name: String
+        }
+                
+        type Product {
+            barcode: String!
+            uuid: String!
+            name: String!
+            color: Color @belongsTo
+
+        }
+            
+        type Query {
+            products: [Product] @paginate
+        }
+        ';
+        $query = '
+        {
+            products(count: 3) {     
+                data{
+                    barcode
+                    uuid
+                    name
+                    color {
+                        id
+                        name
+                    }
+                }                           
+            }
+        }
+        ';
+        $result = $this->execute($schema, $query);
+
+        $this->assertEquals($products[0]->color_id, Arr::get($result, 'data.products.data.0.color.id'));
+        $this->assertEquals($products[1]->color_id, Arr::get($result, 'data.products.data.1.color.id'));
+        $this->assertEquals($products[2]->color_id, Arr::get($result, 'data.products.data.2.color.id'));
+
     }
 }

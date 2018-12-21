@@ -2,56 +2,28 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Validator;
-use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\ValidationException;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class GraphQLValidator extends Validator
 {
-    /**
-     * Run the validator's rules against its data.
-     *
-     * @throws ValidationException
-     *
-     * @return array
-     */
-    public function validate()
-    {
-        if ($this->fails()) {
-            throw new ValidationException($this);
-        }
-
-        $data = collect($this->getData());
-
-        return $data
-            ->only(
-                collect($this->getRules())
-                    ->keys()
-                    ->map(
-                        function (string $rule) {
-                            return explode('.', $rule)[0];
-                        }
-                    )
-                    ->unique()
-            )
-            ->toArray();
-    }
-
     /**
      * @return mixed
      */
     public function getRoot()
     {
-        return array_get($this->customAttributes, 'root');
+        return Arr::get($this->customAttributes, 'root');
     }
 
     /**
-     * @return Context
+     * @return GraphQLContext
      */
     public function getContext()
     {
-        return array_get($this->customAttributes, 'context');
+        return Arr::get($this->customAttributes, 'context');
     }
 
     /**
@@ -59,7 +31,7 @@ class GraphQLValidator extends Validator
      */
     public function getResolveInfo(): ResolveInfo
     {
-        return array_get($this->customAttributes, 'resolveInfo');
+        return Arr::get($this->customAttributes, 'resolveInfo');
     }
 
     /**

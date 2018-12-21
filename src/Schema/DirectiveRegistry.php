@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
@@ -13,15 +14,18 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class DirectiveRegistry
 {
@@ -90,13 +94,13 @@ class DirectiveRegistry
         /** @var SplFileInfo $file */
         foreach ($fileIterator as $file) {
             // Cut off the given root path to get the path that is equivalent to the namespace
-            $namespaceRelevantPath = str_after(
+            $namespaceRelevantPath = Str::after(
                 $file->getPathname(),
                 // Call realpath to resolve relative paths, e.g. /foo/../bar -> /bar
                 realpath($pathForRootNamespace).DIRECTORY_SEPARATOR
             );
 
-            $withoutExtension = str_before($namespaceRelevantPath, '.php');
+            $withoutExtension = Str::before($namespaceRelevantPath, '.php');
             $fileNamespace = str_replace(DIRECTORY_SEPARATOR, '\\', $withoutExtension);
 
             $this->tryRegisterClassName($rootNamespace.$fileNamespace);
@@ -120,7 +124,7 @@ class DirectiveRegistry
 
         if ($reflection->isInstantiable() && $reflection->isSubclassOf(Directive::class)) {
             $this->register(
-                resolve($reflection->getName())
+                app($reflection->getName())
             );
         }
 
@@ -159,7 +163,7 @@ class DirectiveRegistry
         }
 
         // Always return a new instance of the directive class to avoid side effects between them
-        return resolve(\get_class($directive));
+        return app(\get_class($directive));
     }
 
     /**
@@ -280,7 +284,7 @@ class DirectiveRegistry
      *
      * @return bool
      */
-    public function hasFieldResolver($fieldDefinition): bool
+    public function hasFieldResolver(FieldDefinitionNode $fieldDefinition): bool
     {
         return $this->fieldResolver($fieldDefinition) instanceof FieldResolver;
     }
@@ -292,7 +296,7 @@ class DirectiveRegistry
      *
      * @return bool
      */
-    public function hasFieldMiddleware($field): bool
+    public function hasFieldMiddleware(FieldDefinitionNode $field): bool
     {
         return $this->fieldMiddleware($field)->count() > 1;
     }
@@ -306,7 +310,7 @@ class DirectiveRegistry
      *
      * @return FieldResolver|null
      */
-    public function fieldResolver($field)
+    public function fieldResolver(FieldDefinitionNode $field)
     {
         return $this->singleDirectiveOfType($field, FieldResolver::class);
     }
@@ -336,15 +340,52 @@ class DirectiveRegistry
     }
 
     /**
-     * Get middleware for field arguments.
+     * Get middleware for arguments.
      *
      * @param InputValueDefinitionNode $arg
      *
      * @return Collection
      */
-    public function argMiddleware(InputValueDefinitionNode $arg): Collection
+    public function argTransformers(InputValueDefinitionNode $arg): Collection
     {
-        return $this->associatedDirectivesOfType($arg, ArgMiddleware::class);
+        return $this->associatedDirectivesOfType($arg, ArgTransformerDirective::class);
+    }
+
+    /**
+     * Create `ArgDirective` instances from `InputValueDefinitionNode`.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argDirectives(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgDirective::class);
+    }
+
+
+    /**
+     * Get middleware for array arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argMiddlewareForArray(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgDirectiveForArray::class);
+    }
+
+    /**
+     * Get filters for arguments.
+     *
+     * @param InputValueDefinitionNode $arg
+     *
+     * @return Collection
+     */
+    public function argFilterDirective(InputValueDefinitionNode $arg): Collection
+    {
+        return $this->associatedDirectivesOfType($arg, ArgFilterDirective::class);
     }
 
     /**
@@ -360,51 +401,5 @@ class DirectiveRegistry
         return $directive instanceof BaseDirective
             ? $directive->hydrate($definitionNode)
             : $directive;
-    }
-
-    /**
-     * Get directive instance by name.
-     *
-     * @param string $name
-     *
-     * @throws DirectiveException
-     *
-     * @return Directive
-     *
-     * @deprecated Will be removed in next major release
-     */
-    public function handler($name)
-    {
-        return $this->get($name);
-    }
-
-    /**
-     * Get the node resolver directive for the given type definition.
-     *
-     * @param Node $node
-     *
-     * @throws DirectiveException
-     *
-     * @return NodeResolver
-     *
-     * @deprecated in favour of nodeResolver()
-     */
-    public function forNode(Node $node)
-    {
-        return $this->nodeResolver($node);
-    }
-
-    /**
-     * @param FieldDefinitionNode $fieldDefinition
-     *
-     * @throws DirectiveException
-     *
-     * @return bool
-     *
-     * @deprecated in favour of hasFieldResolver()
-     */
-    public function hasResolver($fieldDefinition)
-    {
-        return $this->hasFieldResolver($fieldDefinition);
     }
 }

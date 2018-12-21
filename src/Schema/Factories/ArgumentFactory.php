@@ -2,18 +2,26 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class ArgumentFactory
 {
-    /** @var DirectiveRegistry */
+    /**
+     * @var DirectiveRegistry
+     */
     protected $directiveRegistry;
-    /** @var Pipeline */
+
+    /**
+     * @var Pipeline
+     */
     protected $pipeline;
 
     /**
+     * ArgumentFactory constructor.
+     *
      * @param DirectiveRegistry $directiveRegistry
      * @param Pipeline          $pipeline
      */
@@ -26,40 +34,31 @@ class ArgumentFactory
     /**
      * Convert argument definition to type.
      *
-     * @param ArgumentValue $value
+     * @param ArgumentValue $argumentValue
+     *
+     * @throws \Exception
      *
      * @return array
      */
-    public function handle(ArgumentValue $value): array
+    public function handle(ArgumentValue $argumentValue): array
     {
-        $definition = $value->getAstNode();
-        /** @var ArgumentValue $value */
-        $value = $this->pipeline
-            ->send($value)
-            ->through(
-                $this->directiveRegistry->argMiddleware($definition)
-            )
-            ->via('handleArgument')
-            ->then(function (ArgumentValue $value) {
-                return $value;
-            });
+        $definition = $argumentValue->getAstNode();
 
         $fieldArgument = [
-            'name' => $definition->name->value,
+            'name' => $argumentValue->getName(),
             'description' => data_get($definition->description, 'value'),
-            'type' => $value->getType(),
+            'type' => $argumentValue->getType(),
             'astNode' => $definition,
-            'transformers' => $value->getTransformers(),
         ];
 
         if ($defaultValue = $definition->defaultValue) {
             $fieldArgument += [
-                'defaultValue' => $defaultValue,
+                'defaultValue' => AST::valueFromASTUntyped($defaultValue),
             ];
         }
 
         // Add any dynamically declared public properties of the FieldArgument
-        $fieldArgument += get_object_vars($value);
+        $fieldArgument += get_object_vars($argumentValue);
 
         // Used to construct a FieldArgument class
         return $fieldArgument;

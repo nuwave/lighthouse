@@ -3,9 +3,12 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
+use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
 {
+    use HandlesCompositeKey;
+
     /**
      * Keys to resolve.
      *
@@ -32,9 +35,9 @@ abstract class BatchLoader
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
-     * @param string $loaderClass The class name of the concrete BatchLoader to instantiate.
-     * @param array $pathToField Path to the GraphQL field from the root, is used as a key for BatchLoader instances.
-     * @param array $constructorArgs Those arguments are passed to the constructor of the new BatchLoader instance.
+     * @param string $loaderClass     the class name of the concrete BatchLoader to instantiate
+     * @param array  $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param array  $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
      *
      * @throws \Exception
      *
@@ -44,19 +47,29 @@ abstract class BatchLoader
     {
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
-        
+
+        // If we are resolving a batched query, we need to assign each
+        // query a uniquely indexed instance
+        $currentBatchIndex = app('graphql')->currentBatchIndex();
+
+        if (null !== $currentBatchIndex) {
+            $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
+        }
+
         // Only register a new instance if it is not already bound
         $instance = app()->bound($instanceName)
-            ? resolve($instanceName)
+            ? app($instanceName)
             : app()->instance(
                 $instanceName,
                 app()->makeWith($loaderClass, $constructorArgs)
             );
-        
-        if (!$instance instanceof self) {
-            throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
+
+        if (! $instance instanceof self) {
+            throw new \Exception(
+                "The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader"
+            );
         }
-        
+
         return $instance;
     }
 
@@ -73,7 +86,7 @@ abstract class BatchLoader
             ->filter(function ($path) {
                 // Ignore numeric path entries, as those signify an array of fields
                 // Those are the very purpose for this batch loader, so they must not be included.
-                return !is_numeric($path);
+                return ! is_numeric($path);
             })
             ->implode('_');
     }
@@ -88,10 +101,11 @@ abstract class BatchLoader
      */
     public function load($key, array $metaInfo = []): Deferred
     {
+        $key = $this->buildKey($key);
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
-            if (!$this->hasLoaded) {
+            if (! $this->hasLoaded) {
                 $this->results = $this->resolve();
                 $this->hasLoaded = true;
             }

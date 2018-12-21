@@ -3,13 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Carbon\Carbon;
-use GraphQL\Language\AST\NodeList;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class TracingExtension extends GraphQLExtension
 {
@@ -69,7 +66,7 @@ class TracingExtension extends GraphQLExtension
      */
     public function requestDidStart(ExtensionRequest $request): TracingExtension
     {
-        $this->requestStart = now();
+        $this->requestStart = Carbon::now();
 
         return $this;
     }
@@ -77,7 +74,7 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle batch request start.
      *
-     * @param int index
+     * @param int $index
      */
     public function batchedQueryDidStart($index)
     {
@@ -113,7 +110,7 @@ class TracingExtension extends GraphQLExtension
      */
     public function jsonSerialize(): array
     {
-        $end = now();
+        $end = Carbon::now();
         $duration = abs(($end->micro - $this->requestStart->micro) * 1000);
 
         return [
