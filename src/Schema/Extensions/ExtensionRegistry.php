@@ -24,7 +24,7 @@ class ExtensionRegistry implements \JsonSerializable
 
         $this->extensions = collect(
             config('lighthouse.extensions', [])
-        )->mapWithKeys(function (string $extension) {
+        )->mapWithKeys(function (string $extension): array {
             $extensionInstance = app($extension);
 
             if (! $extensionInstance instanceof GraphQLExtension) {
@@ -48,7 +48,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @return GraphQLExtension|null
      */
-    public function get(string $shortName)
+    public function get(string $shortName): ?GraphQLExtension
     {
         return $this->extensions->get($shortName);
     }
@@ -60,7 +60,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @return bool
      */
-    public function has(string $shortName)
+    public function has(string $shortName): bool
     {
         return $this->extensions->has($shortName);
     }
@@ -70,9 +70,9 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @param ExtensionRequest $request
      *
-     * @return ExtensionRegistry
+     * @return $this
      */
-    public function requestDidStart(ExtensionRequest $request): ExtensionRegistry
+    public function requestDidStart(ExtensionRequest $request): self
     {
         $this->extensions->each(function (GraphQLExtension $extension) use ($request) {
             $extension->requestDidStart($request);
@@ -86,9 +86,9 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @param int $index
      *
-     * @return ExtensionRegistry
+     * @return $this
      */
-    public function batchedQueryDidStart($index)
+    public function batchedQueryDidStart($index): self
     {
         $this->extensions->each(function (GraphQLExtension $extension) use ($index) {
             $extension->batchedQueryDidStart($index);
@@ -103,9 +103,9 @@ class ExtensionRegistry implements \JsonSerializable
      * @param ExecutionResult $result
      * @param int             $index
      *
-     * @return ExtensionRegistry
+     * @return $this
      */
-    public function batchedQueryDidEnd(ExecutionResult $result, $index)
+    public function batchedQueryDidEnd(ExecutionResult $result, $index): self
     {
         $this->extensions->each(
             function (GraphQLExtension $extension) use ($result, $index) {
@@ -124,7 +124,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @return array
      */
-    public function willSendResponse(array $response)
+    public function willSendResponse(array $response): array
     {
         return $this->pipeline
             ->send($response)

@@ -14,7 +14,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(DocumentAST $documentAST)
+    public function manipulateSchema(DocumentAST $documentAST): DocumentAST
     {
         return $documentAST;
     }
@@ -34,7 +34,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @param int $index
      */
-    public function batchedQueryDidStart($index)
+    public function batchedQueryDidStart(int $index)
     {
         return;
     }
@@ -45,7 +45,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      * @param ExecutionResult $result
      * @param int             $index
      */
-    public function batchedQueryDidEnd(ExecutionResult $result, $index)
+    public function batchedQueryDidEnd(ExecutionResult $result, int $index)
     {
         return;
     }
@@ -68,5 +68,5 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @return string
      */
-    abstract public static function name();
+    abstract public static function name(): string;
 }

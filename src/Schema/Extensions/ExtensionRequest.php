@@ -56,7 +56,7 @@ class ExtensionRequest
      *
      * @return string
      */
-    public function queryString($index = null): string
+    public function queryString(int $index = null): string
     {
         return is_null($index)
             ? $this->request->input('query', '')
@@ -70,7 +70,7 @@ class ExtensionRequest
      *
      * @return array|null
      */
-    public function variables($index = null)
+    public function variables(int $index = null)
     {
         $variables = is_null($index)
             ? $this->request->input('variables')

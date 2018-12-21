@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -52,7 +53,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'defer';
     }
@@ -61,8 +62,9 @@ class DeferExtension extends GraphQLExtension
      * Handle request start.
      *
      * @param ExtensionRequest $request
+     * @return void
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function requestDidStart(ExtensionRequest $request): void
     {
         $this->request = $request;
     }
@@ -195,9 +197,9 @@ class DeferExtension extends GraphQLExtension
     /**
      * @param array $data
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function response(array $data)
+    public function response(array $data): Response
     {
         if (empty($this->deferred)) {
             return response($data);
@@ -239,8 +241,10 @@ class DeferExtension extends GraphQLExtension
 
     /**
      * @param int $time
+     *
+     * @return void
      */
-    public function setMaxExecutionTime(int $time)
+    public function setMaxExecutionTime(int $time): void
     {
         $this->maxExecutionTime = $time;
     }
@@ -249,8 +253,10 @@ class DeferExtension extends GraphQLExtension
      * Override max nested fields.
      *
      * @param int $max
+     *
+     * @return void
      */
-    public function setMaxNestedFields(int $max)
+    public function setMaxNestedFields(int $max): void
     {
         $this->maxNestedFields = $max;
     }
@@ -283,8 +289,10 @@ class DeferExtension extends GraphQLExtension
 
     /**
      * Execute deferred fields.
+     *
+     * @return void
      */
-    protected function executeDeferred()
+    protected function executeDeferred(): void
     {
         // TODO: Properly parse variables array
         // TODO: Get debug setting

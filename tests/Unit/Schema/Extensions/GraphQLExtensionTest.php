@@ -54,7 +54,7 @@ class GraphQLExtensionTest extends TestCase
     public static function getExtension(): GraphQLExtension
     {
         return new class() extends GraphQLExtension {
-            public static function name()
+            public static function name(): string
             {
                 return 'foo';
             }

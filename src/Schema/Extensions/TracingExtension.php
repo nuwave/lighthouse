@@ -62,9 +62,9 @@ class TracingExtension extends GraphQLExtension
      *
      * @param ExtensionRequest $request
      *
-     * @return TracingExtension
+     * @return $this
      */
-    public function requestDidStart(ExtensionRequest $request): TracingExtension
+    public function requestDidStart(ExtensionRequest $request): self
     {
         $this->requestStart = Carbon::now();
 
@@ -75,8 +75,10 @@ class TracingExtension extends GraphQLExtension
      * Handle batch request start.
      *
      * @param int $index
+     *
+     * @return void
      */
-    public function batchedQueryDidStart($index)
+    public function batchedQueryDidStart(int $index): void
     {
         $this->resolvers = collect();
     }
@@ -87,8 +89,10 @@ class TracingExtension extends GraphQLExtension
      * @param ResolveInfo $info
      * @param Carbon      $start
      * @param Carbon      $end
+     *
+     * @return void
      */
-    public function record(ResolveInfo $info, Carbon $start, Carbon $end)
+    public function record(ResolveInfo $info, Carbon $start, Carbon $end): void
     {
         $startOffset = abs(($start->micro - $this->requestStart->micro) * 1000);
         $duration = abs(($end->micro - $start->micro) * 1000);
