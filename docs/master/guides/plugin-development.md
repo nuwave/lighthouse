@@ -17,3 +17,10 @@ the schema string.
 
 Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/BuildingASTTest.php)
 for an example of how this works.
+
+## Add custom directives
+
+You can add your custom directives to the Lighthouse by listening for the `RegisteringDirectiveBaseNamespaces` event.
+
+Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/RegisteringDirectiveBaseNamespacesTest.php)
+for an example of how this works.
