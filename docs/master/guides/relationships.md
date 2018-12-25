@@ -144,8 +144,31 @@ class Post extends Model
 Lighthouse allows you to create, update or delete your relationships in
 a single mutation.
 
-By default all mutations are wrapped in a database transaction, so if any of the nested
-operations fail, the whole mutation is aborted and no changes are written to the database.
+You have to define return types on your relationship methods so that Lighthouse
+can detect them.
+
+```php
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Post extends Model 
+{
+    // WORKS
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // DOES NOT WORK
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);        
+    }
+}
+```
+
+By default, all mutations are wrapped in a database transaction.
+If any of the nested operations fail, the whole mutation is aborted
+and no changes are written to the database.
 You can change this setting [in the configuration](../getting-started/configuration.md).
 
 ### Belongs To

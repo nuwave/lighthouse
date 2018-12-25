@@ -3,34 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Utils\AST;
-use Nuwave\Lighthouse\Support\Pipeline;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class ArgumentFactory
 {
-    /**
-     * @var DirectiveRegistry
-     */
-    protected $directiveRegistry;
-
-    /**
-     * @var Pipeline
-     */
-    protected $pipeline;
-
-    /**
-     * ArgumentFactory constructor.
-     *
-     * @param DirectiveRegistry $directiveRegistry
-     * @param Pipeline          $pipeline
-     */
-    public function __construct(DirectiveRegistry $directiveRegistry, Pipeline $pipeline)
-    {
-        $this->directiveRegistry = $directiveRegistry;
-        $this->pipeline = $pipeline;
-    }
-
     /**
      * Convert argument definition to type.
      *

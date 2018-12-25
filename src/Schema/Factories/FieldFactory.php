@@ -14,7 +14,6 @@ use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use GraphQL\Type\Definition\InputObjectField;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -45,9 +44,9 @@ class FieldFactory
     protected $queryFilter;
 
     /**
-     * @var DirectiveRegistry
+     * @var DirectiveFactory
      */
-    protected $directiveRegistry;
+    protected $directiveFactory;
 
     /**
      * @var ArgumentFactory
@@ -85,13 +84,13 @@ class FieldFactory
     protected $currentHandlerArgsOfArgDirectivesAfterValidationDirective = [];
 
     /**
-     * @param DirectiveRegistry $directiveRegistry
+     * @param DirectiveFactory $directiveFactory
      * @param ArgumentFactory   $argumentFactory
      * @param Pipeline          $pipeline
      */
-    public function __construct(DirectiveRegistry $directiveRegistry, ArgumentFactory $argumentFactory, Pipeline $pipeline)
+    public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {
-        $this->directiveRegistry = $directiveRegistry;
+        $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
     }
@@ -112,7 +111,7 @@ class FieldFactory
 
         // Get the initial resolver from the FieldValue
         // This is either the webonyx default resolver or provided by a directive
-        if ($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinitionNode)) {
+        if ($fieldResolver = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
             $this->fieldValue = $fieldResolver->resolveField($fieldValue);
         }
         $resolver = $this->fieldValue->getResolver();
@@ -130,7 +129,7 @@ class FieldFactory
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
             ->through(
-                $this->directiveRegistry->fieldMiddleware($fieldDefinitionNode)
+                $this->directiveFactory->createFieldMiddleware($fieldDefinitionNode)
             )
             ->via('handleField')
             ->then(
@@ -334,7 +333,7 @@ class FieldFactory
         array $argumentPath,
         ?string $mustImplementClass = null
     ) {
-        $directives = $this->directiveRegistry->argDirectives($astNode);
+        $directives = $this->directiveFactory->createArgDirectives($astNode);
 
         if ($mustImplementClass) {
             $directives = $directives->filter(function ($directive) use ($mustImplementClass): bool {

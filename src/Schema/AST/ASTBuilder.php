@@ -5,11 +5,11 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -59,7 +59,7 @@ class ASTBuilder
             )
             ->reduce(
                 function (DocumentAST $document, Node $node): DocumentAST {
-                    $nodeManipulators = app(DirectiveRegistry::class)->nodeManipulators($node);
+                    $nodeManipulators = app(DirectiveFactory::class)->createNodeManipulators($node);
 
                     return $nodeManipulators->reduce(
                         function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
@@ -118,7 +118,7 @@ class ASTBuilder
             function (DocumentAST $document, ObjectTypeDefinitionNode $objectType): DocumentAST {
                 return collect($objectType->fields)->reduce(
                     function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType): DocumentAST {
-                        $fieldManipulators = app(DirectiveRegistry::class)->fieldManipulators($fieldDefinition);
+                        $fieldManipulators = app(DirectiveFactory::class)->createFieldManipulators($fieldDefinition);
 
                         return $fieldManipulators->reduce(
                             function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType): DocumentAST {
@@ -147,7 +147,7 @@ class ASTBuilder
                     function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType): DocumentAST {
                         return collect($parentField->arguments)->reduce(
                             function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField): DocumentAST {
-                                $argManipulators = app(DirectiveRegistry::class)->argManipulators($argDefinition);
+                                $argManipulators = app(DirectiveFactory::class)->createArgManipulators($argDefinition);
 
                                 return $argManipulators->reduce(
                                     function (DocumentAST $document, ArgManipulator $argManipulator) use (
