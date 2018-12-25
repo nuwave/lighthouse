@@ -14,7 +14,7 @@ class Pipeline extends BasePipeline
      *
      * @param Collection|array $pipes
      *
-     * @return self
+     * @return $this
      */
     public function through($pipes)
     {
@@ -30,7 +30,7 @@ class Pipeline extends BasePipeline
      *
      * @return \Closure
      */
-    protected function carry()
+    protected function carry(): \Closure
     {
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
@@ -51,9 +51,9 @@ class Pipeline extends BasePipeline
      *
      * @param \Closure $always
      *
-     * @return self
+     * @return $this
      */
-    public function always(\Closure $always)
+    public function always(\Closure $always): self
     {
         $this->always = $always;
 

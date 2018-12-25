@@ -6,6 +6,7 @@ use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use GraphQL\Executor\ExecutionResult;
 use Tests\Utils\Middleware\CountRuns;
+use Illuminate\Foundation\Application;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
@@ -27,11 +28,11 @@ class TestCase extends BaseTestCase
     /**
      * Get package providers.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      *
-     * @return array
+     * @return string[]
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             ScoutServiceProvider::class,
@@ -44,9 +45,9 @@ class TestCase extends BaseTestCase
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         $app->bind(
             SchemaSourceProvider::class,
@@ -55,7 +56,7 @@ class TestCase extends BaseTestCase
             }
         );
 
-        $app['config']->set('lighthouse', [
+        $app->make('config')->set('lighthouse', [
             'namespaces' => [
                 'scalars' => 'Tests\\Utils\\Scalars',
                 'unions' => 'Tests\\Utils\\Unions',
@@ -75,7 +76,7 @@ class TestCase extends BaseTestCase
         ]);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -129,12 +130,11 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * Convenience method to add a default Query, sometimes needed
-     * because the Schema is invalid without it.
+     * Build an executable schema from a SDL string, adding on a default Query type.
      *
      * @param string $schema
      *
-     * @return \GraphQL\Type\Schema
+     * @return Schema
      */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
@@ -148,7 +148,7 @@ class TestCase extends BaseTestCase
      * Convenience method to get a default Query, sometimes needed
      * because the Schema is invalid without it.
      *
-     * @return \GraphQL\Type\Schema
+     * @return string
      */
     protected function placeholderQuery(): string
     {
@@ -160,9 +160,11 @@ class TestCase extends BaseTestCase
     }
 
     /**
+     * Build an executable schema from an SDL string.
+     *
      * @param string $schema
      *
-     * @return \GraphQL\Type\Schema
+     * @return Schema
      */
     protected function buildSchema(string $schema): Schema
     {

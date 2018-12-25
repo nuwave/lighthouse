@@ -186,7 +186,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
 
         if (! $model) {
             throw new DirectiveException(
-                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+                "A `model` argument must be assigned to the '{$this->name()}' directive on '{$this->definitionNode->name->value}"
             );
         }
 

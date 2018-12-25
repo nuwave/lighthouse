@@ -37,7 +37,7 @@ return [
     | This means that errors will cause the whole query to abort and return a
     | response that is not spec-compliant. It is preferable to use directives
     | to add middleware to single fields in the schema.
-    | Read more about this in the docs https://lighthouse-php.netlify.com/docs/auth.html#apply-auth-middleware
+    | Read more https://lighthouse-php.com/docs/auth.html#apply-auth-middleware
     |
     */
     'route' => [
@@ -125,8 +125,8 @@ return [
     | Error Handlers
     |--------------------------------------------------------------------------
     |
-    | Register error handlers that receive the Errors that occur during execution and
-    | handle them. You may use this to log, filter or format the errors.
+    | Register error handlers that receive the Errors that occur during execution
+    | and handle them. You may use this to log, filter or format the errors.
     | The classes must implement Nuwave\Lighthouse\Execution\ErrorHandler
     |
     */
@@ -189,7 +189,7 @@ return [
     |
     */
     'transactional_mutations' => true,
-  
+
     /*
     |--------------------------------------------------------------------------
     | GraphQL Subscriptions

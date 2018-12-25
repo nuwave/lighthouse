@@ -3,10 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -36,15 +38,13 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
         return $next(
             $value->setResolver(
-                function () use ($resolver) {
-                    /** @var Authorizable $user */
-                    $user = auth()->user();
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
                     $gate = app(Gate::class);
                     $gateArguments = $this->getGateArguments();
 
                     $this->getAbilities()->each(
-                        function (string $ability) use ($gate, $user, $gateArguments) {
-                            $this->authorize($user, $gate, $ability, $gateArguments);
+                        function (string $ability) use ($context, $gate, $gateArguments): void {
+                            $this->authorize($context->user(), $gate, $ability, $gateArguments);
                         }
                     );
 
@@ -95,14 +95,12 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      * @param array                $args
      *
      * @throws AuthorizationException
-     *
-     * @return void
      */
     protected function authorize($user, Gate $gate, string $ability, array $args): void
     {
         $can = $gate->forUser($user)->check($ability, $args);
 
-        if ( ! $can) {
+        if (! $can) {
             throw new AuthorizationException(
                 "You are not not authorized to access {$this->definitionNode->name->value}"
             );
