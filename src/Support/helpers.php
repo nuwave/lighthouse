@@ -67,7 +67,7 @@ if (! function_exists('construct_resolver')) {
      */
     function construct_resolver(string $className, string $methodName): \Closure
     {
-        if (!method_exists($className, $methodName)) {
+        if (! method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
