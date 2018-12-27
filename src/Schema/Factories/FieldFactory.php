@@ -147,6 +147,7 @@ class FieldFactory
             'resolve' => $resolverWithMiddleware,
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $this->fieldValue->getComplexity(),
+            'deprecationReason' => $this->fieldValue->getDeprecationReason(),
         ];
 
         return $fieldDefinition;

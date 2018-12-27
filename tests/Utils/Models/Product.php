@@ -26,6 +26,7 @@ class Product extends Model
         foreach ($this->getKeyName() as $key) {
             $attributes[$key] = $this->getAttribute($key);
         }
+
         return $attributes;
     }
 }

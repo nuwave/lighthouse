@@ -10,7 +10,7 @@ class CustomStuff
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-    
+
     /**
      * @param TypeRegistry $typeRegistry
      */
@@ -18,7 +18,7 @@ class CustomStuff
     {
         $this->typeRegistry = $typeRegistry;
     }
-    
+
     /**
      * Decide which GraphQL type a resolved value has.
      *
@@ -32,7 +32,7 @@ class CustomStuff
     {
         return $this->typeRegistry->get(
             // Add prefix
-            'Custom' . class_basename($rootValue)
+            'Custom'.class_basename($rootValue)
         );
     }
 }

@@ -26,12 +26,12 @@ class Post extends Model
 
     public function parent() : BelongsTo
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(self::class);
     }
 
     public function children() : HasMany
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(self::class);
     }
 
     public function tags(): MorphToMany

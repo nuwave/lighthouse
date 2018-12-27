@@ -47,7 +47,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
-        if($middlewareValues = $this->directiveArgValue('middleware')){
+        if ($middlewareValues = $this->directiveArgValue('middleware')) {
             $node = MiddlewareDirective::addMiddlewareDirectiveToFields($node, $middlewareValues);
         }
 

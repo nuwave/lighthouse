@@ -127,8 +127,6 @@ class DeferExtension extends GraphQLExtension
         }
 
         $this->deferred[$path] = $resolver;
-
-        return null;
     }
 
     /**
@@ -220,7 +218,7 @@ class DeferExtension extends GraphQLExtension
                 ! $this->executionTimeExpired() &&
                 ! $this->maxNestedFieldsResolved($nested)
             ) {
-                ++$nested;
+                $nested++;
                 $this->executeDeferred();
             }
 

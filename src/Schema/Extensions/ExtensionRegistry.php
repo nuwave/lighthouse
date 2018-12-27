@@ -72,7 +72,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * @return ExtensionRegistry
      */
-    public function requestDidStart(ExtensionRequest $request): ExtensionRegistry
+    public function requestDidStart(ExtensionRequest $request): self
     {
         $this->extensions->each(function (GraphQLExtension $extension) use ($request) {
             $extension->requestDidStart($request);

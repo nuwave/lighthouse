@@ -73,11 +73,11 @@ class PaginationManipulator
     public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null): DocumentAST
     {
         switch (self::assertValidPaginationType($paginationType)) {
-            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                return PaginationManipulator::registerConnection($fieldDefinition, $parentType, $current, $defaultCount);
-            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
+            case self::PAGINATION_TYPE_CONNECTION:
+                return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount);
+            case self::PAGINATION_TYPE_PAGINATOR:
             default:
-                return PaginationManipulator::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount);
+                return self::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount);
         }
     }
 

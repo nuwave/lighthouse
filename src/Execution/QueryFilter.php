@@ -42,7 +42,7 @@ class QueryFilter
      *
      * @return self
      */
-    public static function getInstance(FieldValue $value): QueryFilter
+    public static function getInstance(FieldValue $value): self
     {
         $handler = 'query.filter'
             .'.'.strtolower($value->getParentName())
@@ -138,7 +138,7 @@ class QueryFilter
      *
      * @return QueryFilter
      */
-    public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): QueryFilter
+    public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): self
     {
         if ($argFilterDirective->combinesMultipleArguments()) {
             $filterKey = "{$columnName}.{$argFilterDirective->name()}";

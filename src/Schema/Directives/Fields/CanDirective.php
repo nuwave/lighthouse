@@ -101,7 +101,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     {
         $can = $gate->forUser($user)->check($ability, $args);
 
-        if ( ! $can) {
+        if (! $can) {
             throw new AuthorizationException(
                 "You are not not authorized to access {$this->definitionNode->name->value}"
             );
