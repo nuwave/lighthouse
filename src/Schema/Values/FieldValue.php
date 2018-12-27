@@ -39,6 +39,13 @@ class FieldValue
     protected $resolver;
 
     /**
+     * Text describing by this field is deprecated.
+     *
+     * @var string|null
+     */
+    protected $deprecationReason = null;
+
+    /**
      * A closure that determines the complexity of executing the field.
      *
      * @var \Closure
@@ -88,6 +95,20 @@ class FieldValue
     public function setComplexity(\Closure $complexity): FieldValue
     {
         $this->complexity = $complexity;
+
+        return $this;
+    }
+
+    /**
+     * Set deprecation reason for field.
+     *
+     * @param string $deprecationReason
+     *
+     * @return FieldValue
+     */
+    public function setDeprecationReason(string $deprecationReason): FieldValue
+    {
+        $this->deprecationReason = $deprecationReason;
 
         return $this;
     }
@@ -164,7 +185,7 @@ class FieldValue
             );
         }
 
-         return \Closure::fromCallable(
+        return \Closure::fromCallable(
              [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
          );
     }
@@ -210,5 +231,13 @@ class FieldValue
     public function getFieldName(): string
     {
         return $this->field->name->value;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDeprecationReason(): ?string
+    {
+        return $this->deprecationReason;
     }
 }
