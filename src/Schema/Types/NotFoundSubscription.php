@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 class NotFoundSubscription extends GraphQLSubscription
 {
@@ -46,6 +46,5 @@ class NotFoundSubscription extends GraphQLSubscription
      */
     public function resolve($root, array $args, $context, ResolveInfo $info)
     {
-        return null;
     }
 }

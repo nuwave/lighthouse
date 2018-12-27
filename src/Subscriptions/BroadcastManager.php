@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Nuwave\Lighthouse\Support\DriverManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
-use Nuwave\Lighthouse\Support\DriverManager;
 
 /**
  * @method void                      broadcast(Subscriber $subscriber, array $data)

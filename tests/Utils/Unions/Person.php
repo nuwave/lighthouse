@@ -10,7 +10,7 @@ class Person
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-    
+
     /**
      * @param TypeRegistry $typeRegistry
      */
@@ -18,7 +18,7 @@ class Person
     {
         $this->typeRegistry = $typeRegistry;
     }
-    
+
     public function resolveType($value, $context, ResolveInfo $info): Type
     {
         // The return type can be a string either,

@@ -57,7 +57,7 @@ class Serializer implements ContextSerializer
         $data = json_decode($context, true);
 
         if (! $serializedRequest = array_get($data, 'request')) {
-            return null;
+            return;
         }
 
         return $this->createsContext->generate(

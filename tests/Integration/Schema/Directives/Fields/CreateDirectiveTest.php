@@ -346,7 +346,6 @@ class CreateDirectiveTest extends DBTestCase
      */
     public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods()
     {
-
         $schema = '
         type Task {
             id: ID!
@@ -402,6 +401,5 @@ class CreateDirectiveTest extends DBTestCase
         $result = $this->execute($schema, $query);
 
         $this->assertSame('api', Arr::get($result, 'data.createUser.tasks.0.guard'));
-
     }
 }

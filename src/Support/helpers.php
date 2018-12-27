@@ -68,16 +68,16 @@ if (! function_exists('namespace_classname')) {
      */
     function namespace_classname(string $classCandidate, array $namespacesToTry = [])
     {
-        if(\class_exists($classCandidate)){
+        if (\class_exists($classCandidate)) {
             return $classCandidate;
         }
 
         // Stop if the class is found or we are out of namespaces to try
-        while(!empty($namespacesToTry)){
+        while (! empty($namespacesToTry)) {
             // Pop off the first namespace and try it
-            $className = \array_shift($namespacesToTry) . '\\' . $classCandidate;
+            $className = \array_shift($namespacesToTry).'\\'.$classCandidate;
 
-            if(\class_exists($className)){
+            if (\class_exists($className)) {
                 return $className;
             }
         }
@@ -99,7 +99,7 @@ if (! function_exists('construct_resolver')) {
      */
     function construct_resolver(string $className, string $methodName): \Closure
     {
-        if (!method_exists($className, $methodName)) {
+        if (! method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 

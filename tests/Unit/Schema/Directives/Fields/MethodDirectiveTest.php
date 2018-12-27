@@ -64,6 +64,6 @@ class Foo
 {
     public function foobar($root, array $args = []): string
     {
-        return 'foo' . Arr::get($args, 'baz');
+        return 'foo'.Arr::get($args, 'baz');
     }
 }

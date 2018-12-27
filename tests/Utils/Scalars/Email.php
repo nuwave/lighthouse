@@ -28,7 +28,7 @@ class Email extends ScalarType
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function parseLiteral($valueNode, ?array $variables = null)
     {

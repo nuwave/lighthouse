@@ -14,12 +14,12 @@ class NodeInterfaceTest extends DBTestCase
     protected $testTuples = [
         1 => [
             'id' => 1,
-            'name' => 'foobar'
+            'name' => 'foobar',
         ],
         2 => [
             'id' => 2,
-            'name' => 'barbaz'
-        ]
+            'name' => 'barbaz',
+        ],
     ];
 
     /**
@@ -31,7 +31,7 @@ class NodeInterfaceTest extends DBTestCase
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $firstGlobalId = GlobalId::encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = GlobalId::encode('User', $this->testTuples[2]['id']);
@@ -52,7 +52,7 @@ class NodeInterfaceTest extends DBTestCase
         }
         ';
         $result = $this->execute($schema, $query);
-        
+
         $this->assertSame([
             'first' => [
                 'id' => $firstGlobalId,
@@ -79,7 +79,7 @@ class NodeInterfaceTest extends DBTestCase
         type User @model {
             name: String!
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $user = factory(User::class)->create(
             ['name' => 'Sepp']
@@ -96,7 +96,7 @@ class NodeInterfaceTest extends DBTestCase
         }
         ';
         $result = $this->execute($schema, $query);
-    
+
         $this->assertSame([
             'node' => [
                 'id' => $globalId,

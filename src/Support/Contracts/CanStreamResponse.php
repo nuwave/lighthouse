@@ -13,5 +13,5 @@ interface CanStreamResponse
      *
      * @return mixed
      */
-    public function stream(array $data, array $paths = [], bool $final);
+    public function stream(array $data, array $paths, bool $final);
 }

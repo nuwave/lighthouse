@@ -87,7 +87,7 @@ class DocumentAST implements \Serializable
      *
      * @return DocumentAST
      */
-    public static function fromSource(string $schema): DocumentAST
+    public static function fromSource(string $schema): self
     {
         try {
             return new static(
@@ -295,7 +295,7 @@ class DocumentAST implements \Serializable
      *
      * @return DocumentAST
      */
-    public function addFieldToQueryType(FieldDefinitionNode $field): DocumentAST
+    public function addFieldToQueryType(FieldDefinitionNode $field): self
     {
         $query = $this->queryTypeDefinition();
         $query->fields = ASTHelper::mergeNodeList($query->fields, [$field]);
@@ -310,7 +310,7 @@ class DocumentAST implements \Serializable
      *
      * @return DocumentAST
      */
-    public function setDefinition(DefinitionNode $newDefinition): DocumentAST
+    public function setDefinition(DefinitionNode $newDefinition): self
     {
         if ($newDefinition instanceof TypeExtensionNode) {
             $this->typeExtensionsMap->put(

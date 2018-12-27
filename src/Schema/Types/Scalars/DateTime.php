@@ -23,7 +23,7 @@ class DateTime extends ScalarType
      */
     public function serialize($value): string
     {
-        if ($value instanceof Carbon){
+        if ($value instanceof Carbon) {
             return $value->toAtomString();
         }
 

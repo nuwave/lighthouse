@@ -57,6 +57,6 @@ class SchemaSourceProviderTest extends TestCase
 
         app(SchemaSourceProvider::class)->setRootPath(__DIR__.'/schema/foo');
 
-        $this->assertSame('bar' . PHP_EOL, app(SchemaSourceProvider::class)->getSchemaString());
+        $this->assertSame('bar'.PHP_EOL, app(SchemaSourceProvider::class)->getSchemaString());
     }
 }

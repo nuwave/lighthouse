@@ -119,7 +119,6 @@ class GraphQLTest extends DBTestCase
         }
         ');
 
-
         $expected = [
             'data' => [
                 'user' => [

@@ -78,7 +78,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setResolver(\Closure $resolver): FieldValue
+    public function setResolver(\Closure $resolver): self
     {
         $this->resolver = $resolver;
 
@@ -92,7 +92,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setComplexity(\Closure $complexity): FieldValue
+    public function setComplexity(\Closure $complexity): self
     {
         $this->complexity = $complexity;
 
@@ -106,7 +106,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setDeprecationReason(string $deprecationReason): FieldValue
+    public function setDeprecationReason(string $deprecationReason): self
     {
         $this->deprecationReason = $deprecationReason;
 
@@ -203,7 +203,7 @@ class FieldValue
             case 'Query':
                 return config('lighthouse.namespaces.queries');
             default:
-                return null;
+                return;
         }
     }
 
