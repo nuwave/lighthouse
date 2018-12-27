@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use GraphQL\Executor\Executor;
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -157,32 +159,45 @@ class FieldValue
      */
     protected function defaultResolver(): \Closure
     {
-        if ($namespace = $this->getDefaultNamespaceForParent()) {
-            return construct_resolver(
-                $namespace.'\\'.studly_case($this->getFieldName()),
-                'resolve'
+        if ($this->parentIsRootType()) {
+            $resolverClass = Utils::namespaceClassname(
+                studly_case($this->getFieldName()),
+                $this->defaultNamespacesForParent(),
+                function (string $class): bool {
+                    return method_exists($class, 'resolve');
+                }
+            );
+
+            if (! $resolverClass) {
+                throw new DefinitionException(
+                    "Could not locate a default resolver for the field {$this->field->name->value}"
+                );
+            }
+
+            return \Closure::fromCallable(
+                [app($resolverClass), 'resolve']
             );
         }
 
-         return \Closure::fromCallable(
-             [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
+        return \Closure::fromCallable(
+             [Executor::class, 'defaultFieldResolver']
          );
     }
 
     /**
-     * If a default namespace exists for the parent type, return it.
+     * Return the namespaces configured for the parent type.
      *
-     * @return string|null
+     * @return string[]
      */
-    public function getDefaultNamespaceForParent()
+    public function defaultNamespacesForParent(): array
     {
         switch ($this->getParentName()) {
-            case 'Mutation':
-                return config('lighthouse.namespaces.mutations');
             case 'Query':
-                return config('lighthouse.namespaces.queries');
+                return (array) config('lighthouse.namespaces.queries');
+            case 'Mutation':
+                return (array) config('lighthouse.namespaces.mutations');
             default:
-                return null;
+               return [];
         }
     }
 
@@ -210,5 +225,18 @@ class FieldValue
     public function getFieldName(): string
     {
         return $this->field->name->value;
+    }
+
+    /**
+     * Is the parent of this field one of the root types?
+     *
+     * @return bool
+     */
+    protected function parentIsRootType(): bool
+    {
+        return \in_array(
+            $this->getParentName(),
+            ['Query', 'Mutation']
+        );
     }
 }

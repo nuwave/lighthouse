@@ -1,0 +1,74 @@
+<?php
+
+namespace Tests\Unit\Schema;
+
+use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+
+class FieldValueTest extends TestCase
+{
+    /**
+     * @test
+     */
+    public function itGetsTheWebonyxDefaultResolverForNonRootFields()
+    {
+        $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
+
+        $this->assertInstanceOf(
+            \Closure::class,
+            $fieldValue->getResolver()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itGetsTheConventionBasedDefaultResolverForRootFields()
+    {
+        $fieldValue = $this->constructFieldValue('foo: Int');
+
+        $this->assertInstanceOf(
+            \Closure::class,
+            $fieldValue->getResolver()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers()
+    {
+        $fieldValue = $this->constructFieldValue('baz: Int');
+
+        $this->assertInstanceOf(
+            \Closure::class,
+            $fieldValue->getResolver()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsIfRootFieldHasNoResolver()
+    {
+        $this->expectException(DefinitionException::class);
+
+        $this->constructFieldValue('noFieldClass: Int')->getResolver();
+    }
+
+    protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = 'Query'): FieldValue
+    {
+        $queryType = PartialParser::objectTypeDefinition("
+        type {$parentTypeName} {
+            {$fieldDefinition}
+        }
+        ");
+
+        $nodeValue = new NodeValue($queryType);
+
+        return new FieldValue($nodeValue, $queryType->fields[0]);
+    }
+}

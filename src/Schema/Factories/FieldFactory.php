@@ -84,8 +84,8 @@ class FieldFactory
 
     /**
      * @param DirectiveFactory $directiveFactory
-     * @param ArgumentFactory   $argumentFactory
-     * @param Pipeline          $pipeline
+     * @param ArgumentFactory  $argumentFactory
+     * @param Pipeline         $pipeline
      */
     public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {

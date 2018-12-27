@@ -37,11 +37,10 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
         if ($this->directiveHasArgument('resolver')) {
             list($className, $methodName) = $this->getMethodArgumentParts('resolver');
 
-            if ($parentNamespace = $fieldValue->getDefaultNamespaceForParent()) {
-                $namespacedClassName = $this->namespaceClassName($className, [$parentNamespace]);
-            } else {
-                $namespacedClassName = $this->namespaceClassName($className);
-            }
+            $namespacedClassName = $this->namespaceClassName(
+                $className,
+                $fieldValue->defaultNamespacesForParent()
+            );
 
             $resolver = construct_resolver($namespacedClassName, $methodName);
         } else {
