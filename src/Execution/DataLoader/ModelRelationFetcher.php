@@ -142,7 +142,7 @@ class ModelRelationFetcher
      *
      * @return static
      */
-    public function loadRelationForPage(int $perPage, int $page = 1, string $relationName, \Closure $relationConstraints): self
+    public function loadRelationForPage(int $perPage, int $page, string $relationName, \Closure $relationConstraints): self
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,

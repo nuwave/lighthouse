@@ -17,7 +17,7 @@ abstract class Stream
     protected function chunkError(string $path, array $data)
     {
         if (! isset($data['errors'])) {
-            return null;
+            return;
         }
 
         return collect($data['errors'])->filter(function ($error) use ($path) {

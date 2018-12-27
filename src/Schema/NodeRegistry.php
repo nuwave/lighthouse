@@ -56,7 +56,7 @@ class NodeRegistry
      *
      * @return NodeRegistry
      */
-    public function registerNode(string $typeName, \Closure $resolve): NodeRegistry
+    public function registerNode(string $typeName, \Closure $resolve): self
     {
         $this->nodeResolver[$typeName] = $resolve;
 
@@ -71,7 +71,7 @@ class NodeRegistry
      *
      * @return NodeRegistry
      */
-    public function registerModel(string $typeName, string $modelName): NodeRegistry
+    public function registerModel(string $typeName, string $modelName): self
     {
         $this->nodeResolver[$typeName] = function ($id) use ($modelName) {
             return $modelName::find($id);

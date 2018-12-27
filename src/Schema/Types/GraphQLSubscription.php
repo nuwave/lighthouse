@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 abstract class GraphQLSubscription
 {

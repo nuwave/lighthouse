@@ -28,7 +28,7 @@ class AuthDirective extends BaseDirective implements FieldResolver
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function (){
+            function () {
                 return auth()->user();
             }
         );

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Tests\Utils\Middleware;
 
 use Illuminate\Http\Request;

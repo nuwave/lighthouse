@@ -31,7 +31,7 @@ class AllDirective extends BaseDirective implements FieldResolver
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function ($root, $args, $context = null, ResolveInfo $resolveInfo) {
+            function ($root, $args, $context, ResolveInfo $resolveInfo) {
                 /** @var Model $modelClass */
                 $modelClass = $this->getModelClass();
 

@@ -21,7 +21,7 @@ class CreateTestbenchPostsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::table('posts', function(Blueprint $table) {
+        Schema::table('posts', function (Blueprint $table) {
             $table->foreign('parent_id')
                 ->references('id')
                 ->on('posts');

@@ -282,7 +282,7 @@ class PartialParser
             EnumTypeDefinitionNode::class
         );
     }
-    
+
     /**
      * @param string $typeName
      *
@@ -297,7 +297,7 @@ class PartialParser
             NamedTypeNode::class
         );
     }
-    
+
     /**
      * @param string $definition
      *
@@ -308,7 +308,7 @@ class PartialParser
         // Ignore location since it only bloats the AST
         return Parser::parse($definition, ['noLocation' => true]);
     }
-    
+
     /**
      * @param string $definition
      *
@@ -337,10 +337,10 @@ class PartialParser
         }
 
         $node = $list[0];
-    
+
         return self::validateType($node, $expectedType);
     }
-    
+
     /**
      * @param Node $node
      * @param string $expectedType
@@ -351,10 +351,10 @@ class PartialParser
      */
     protected static function validateType(Node $node, string $expectedType): Node
     {
-        if (!$node instanceof $expectedType) {
+        if (! $node instanceof $expectedType) {
             throw new ParseException("The given definition was not of type: $expectedType");
         }
-        
+
         return $node;
     }
 }

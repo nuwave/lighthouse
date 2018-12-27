@@ -84,8 +84,8 @@ class FieldFactory
 
     /**
      * @param DirectiveFactory $directiveFactory
-     * @param ArgumentFactory   $argumentFactory
-     * @param Pipeline          $pipeline
+     * @param ArgumentFactory  $argumentFactory
+     * @param Pipeline         $pipeline
      */
     public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {
@@ -147,6 +147,7 @@ class FieldFactory
             'resolve' => $resolverWithMiddleware,
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $this->fieldValue->getComplexity(),
+            'deprecationReason' => $this->fieldValue->getDeprecationReason(),
         ];
 
         return $fieldDefinition;
@@ -196,7 +197,7 @@ class FieldFactory
      */
     public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
     {
-        return function ($root, array $args, $context = null, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
+        return function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
             $this->currentValidationErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
 
             $this->setResolverArguments($root, $args, $context, $resolveInfo);

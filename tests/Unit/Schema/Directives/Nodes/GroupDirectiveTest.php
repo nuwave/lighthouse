@@ -22,7 +22,7 @@ class GroupDirectiveTest extends TestCase
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             you: String @field(resolver: "Foo@bar")
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $query = '
         {

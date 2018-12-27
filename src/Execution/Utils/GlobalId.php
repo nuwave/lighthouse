@@ -28,6 +28,7 @@ class GlobalId
     {
         return base64_encode($type.':'.$id);
     }
+
     /**
      * Split a global id into the type and the id it contains.
      *
@@ -50,6 +51,7 @@ class GlobalId
     public static function decodeID(string $globalID): string
     {
         list($type, $id) = self::decode($globalID);
+
         return $id;
     }
 
@@ -63,6 +65,7 @@ class GlobalId
     public static function decodeType(string $globalID): string
     {
         list($type, $id) = self::decode($globalID);
+
         return $type;
     }
 }

@@ -49,7 +49,7 @@ class UnionTest extends DBTestCase
 
     public function schema(bool $withCustomTypeResolver): array
     {
-        $fieldResolver = addslashes(self::class). '@fetchResults';
+        $fieldResolver = addslashes(self::class).'@fetchResults';
 
         $prefix = $withCustomTypeResolver ? 'Custom' : '';
         $customResolver = $withCustomTypeResolver
