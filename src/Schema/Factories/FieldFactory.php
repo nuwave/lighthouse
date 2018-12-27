@@ -85,8 +85,8 @@ class FieldFactory
 
     /**
      * @param DirectiveFactory $directiveFactory
-     * @param ArgumentFactory   $argumentFactory
-     * @param Pipeline          $pipeline
+     * @param ArgumentFactory  $argumentFactory
+     * @param Pipeline         $pipeline
      */
     public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {
@@ -148,6 +148,7 @@ class FieldFactory
             'resolve' => $resolverWithMiddleware,
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $this->fieldValue->getComplexity(),
+            'deprecationReason' => $this->fieldValue->getDeprecationReason(),
         ];
 
         return $fieldDefinition;

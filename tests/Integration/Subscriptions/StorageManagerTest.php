@@ -5,7 +5,6 @@ namespace Tests\Integration\Subscriptions;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Subscriptions\Storage\CacheStorage;
 
 class StorageManagerTest extends TestCase implements GraphQLContext
 {

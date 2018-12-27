@@ -18,7 +18,6 @@ class QueryAST
      * @var Collection
      */
     protected $definitions;
-
     /**
      * @param DocumentNode $documentNode
      */
@@ -26,7 +25,7 @@ class QueryAST
     {
         $this->definitions = collect($documentNode->definitions);
     }
-    
+
     /**
      * Create a new instance from a query string.
      *

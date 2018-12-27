@@ -142,7 +142,7 @@ class QueryFilter
      *
      * @return $this
      */
-    public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): QueryFilter
+    public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): self
     {
         if ($argFilterDirective->combinesMultipleArguments()) {
             $filterKey = "{$columnName}.{$argFilterDirective->name()}";

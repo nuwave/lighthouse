@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Exceptions;
 
 class AuthenticationException extends \Illuminate\Auth\AuthenticationException implements RendersErrorsExtensions
 {
-
     /**
      * Returns true when exception message is safe to be displayed to a client.
      *

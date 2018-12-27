@@ -205,6 +205,5 @@ class BelongsToTest extends DBTestCase
         $this->assertEquals($products[0]->color_id, Arr::get($result, 'data.products.data.0.color.id'));
         $this->assertEquals($products[1]->color_id, Arr::get($result, 'data.products.data.1.color.id'));
         $this->assertEquals($products[2]->color_id, Arr::get($result, 'data.products.data.2.color.id'));
-
     }
 }

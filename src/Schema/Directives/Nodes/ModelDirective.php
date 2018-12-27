@@ -19,7 +19,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      * @var NodeRegistry
      */
     protected $nodeRegistry;
-    
+
     /**
      * @param NodeRegistry $nodeRegistry
      */
@@ -27,7 +27,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     {
         $this->nodeRegistry = $nodeRegistry;
     }
-    
+
     /**
      * Directive name.
      *

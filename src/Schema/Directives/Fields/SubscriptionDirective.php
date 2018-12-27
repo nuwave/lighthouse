@@ -83,8 +83,6 @@ class SubscriptionDirective extends BaseDirective implements FieldResolver
                 $subscriber,
                 $subscription->encodeTopic($subscriber, $fieldName)
             );
-
-            return null;
         });
     }
 

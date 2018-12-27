@@ -51,7 +51,7 @@ class SubscriptionRegistry
      *
      * @return SubscriptionRegistry
      */
-    public function register(GraphQLSubscription $subscription, $field): SubscriptionRegistry
+    public function register(GraphQLSubscription $subscription, $field): self
     {
         $this->subscriptions[$field] = $subscription;
 
@@ -100,7 +100,7 @@ class SubscriptionRegistry
      *
      * @return SubscriptionRegistry
      */
-    public function subscriber(Subscriber $subscriber, $channel): SubscriptionRegistry
+    public function subscriber(Subscriber $subscriber, $channel): self
     {
         if ($subscriber->channel) {
             $this->storage->storeSubscriber($subscriber, $channel);

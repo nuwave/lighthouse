@@ -17,7 +17,7 @@ class MemoryStream extends Stream implements CanStreamResponse
      * @param array $paths
      * @param bool  $final
      */
-    public function stream(array $data, array $paths = [], bool $final)
+    public function stream(array $data, array $paths, bool $final)
     {
         if (! empty($paths)) {
             $data = collect($paths)->mapWithKeys(function ($path) use ($data) {

@@ -58,17 +58,14 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
             return new class() implements Broadcaster {
                 public function authorized(Request $request)
                 {
-                    return;
                 }
 
                 public function unauthorized(Request $request)
                 {
-                    return;
                 }
 
                 public function hook(Request $request)
                 {
-                    return;
                 }
 
                 public function broadcast(Subscriber $subscriber, array $data)

@@ -26,7 +26,7 @@ class PrintSchemaCommand extends Command
      * @var string
      */
     protected $description = 'Print the resulting schema.';
-    
+
     /**
      * Execute the console command.
      *

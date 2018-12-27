@@ -10,7 +10,7 @@ class BuildingAST
      * @var string
      */
     public $userSchema;
-    
+
     /**
      * BuildingAST constructor.
      *

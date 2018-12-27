@@ -31,7 +31,7 @@ class RenameDirective extends BaseDirective implements FieldResolver
     {
         $attribute = $this->directiveArgValue('attribute');
 
-        if (!$attribute) {
+        if (! $attribute) {
             throw new DirectiveException(
                 "The [{$this->name()}] directive requires an `attribute` argument."
             );

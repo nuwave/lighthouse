@@ -29,7 +29,7 @@ abstract class BaseDirective implements Directive
      *
      * @return BaseDirective
      */
-    public function hydrate($definitionNode): BaseDirective
+    public function hydrate($definitionNode): self
     {
         $this->definitionNode = $definitionNode;
 

@@ -4,15 +4,11 @@ namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
 use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
 use Tests\Utils\Directives\FooSubscription;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionDirectiveTest extends TestCase
 {

@@ -194,7 +194,7 @@ class CacheDirectiveTest extends DBTestCase
                 'aggregate',
                 'limit 1',
             ])) {
-                ++$queries;
+                $queries++;
             }
         });
 
@@ -262,7 +262,7 @@ class CacheDirectiveTest extends DBTestCase
                 'aggregate',
                 'limit 1',
             ])) {
-                ++$queries;
+                $queries++;
             }
         });
 

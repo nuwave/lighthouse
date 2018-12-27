@@ -28,7 +28,7 @@ class Cursor
      */
     public static function decode(array $args): int
     {
-        if(!$cursor = Arr::get($args, 'after')){
+        if (! $cursor = Arr::get($args, 'after')) {
             return 0;
         }
 

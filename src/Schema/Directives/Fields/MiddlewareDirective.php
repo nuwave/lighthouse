@@ -127,16 +127,16 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      */
     public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
     {
-        if ( ! $objectType instanceof ObjectTypeDefinitionNode
+        if (! $objectType instanceof ObjectTypeDefinitionNode
             && ! $objectType instanceof ObjectTypeExtensionNode
         ) {
             throw new DirectiveException(
-                'The ' . self::NAME . ' directive may only be placed on fields or object types.'
+                'The '.self::NAME.' directive may only be placed on fields or object types.'
             );
         }
 
         $middlewareArgValue = collect($middlewareArgValue)
-            ->map(function(string $middleware): string{
+            ->map(function (string $middleware) : string {
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
             })
@@ -149,7 +149,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective): FieldDefinitionNode {
                     // If the field already has middleware defined, skip over it
                     // Field middleware are more specific then those defined on a type
-                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
+                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)) {
                         return $fieldDefinition;
                     }
 

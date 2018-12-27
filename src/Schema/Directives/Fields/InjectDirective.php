@@ -49,13 +49,13 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
         }
 
         $previousResolvers = $value->getResolver();
+
         return $next(
             $value->setResolver(
-                function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
-                use ($contextAttributeName, $argumentName, $previousResolvers) {
+                function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolvers) {
                     return $previousResolvers(
                         $rootValue,
-                        Arr::add($args, $argumentName,data_get($context, $contextAttributeName)),
+                        Arr::add($args, $argumentName, data_get($context, $contextAttributeName)),
                         $context,
                         $resolveInfo
                     );

@@ -17,7 +17,7 @@ class BuildingASTTest extends TestCase
 
         app('events')->listen(
             BuildingAST::class,
-            function (BuildingAST $buildingAST) use ($schema){
+            function (BuildingAST $buildingAST) use ($schema) {
                 $this->assertSame($schema, $buildingAST->userSchema);
             }
         );
@@ -80,6 +80,6 @@ class BuildingASTTest extends TestCase
 
     protected function getResolver(string $method): string
     {
-        return addslashes(self::class) . "@{$method}";
+        return addslashes(self::class)."@{$method}";
     }
 }

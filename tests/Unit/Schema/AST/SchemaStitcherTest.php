@@ -70,7 +70,7 @@ class SchemaStitcherTest extends TestCase
     {
         $this->expectException(FileNotFoundException::class);
         $this->expectExceptionMessageRegExp('/does-not-exist.graphql/');
-        $foo = <<<EOT
+        $foo = <<<'EOT'
 #import does-not-exist.graphql
 
 EOT;
@@ -83,7 +83,7 @@ EOT;
      */
     public function itLeavesImportlessFileAsBefore()
     {
-        $foo = <<<EOT
+        $foo = <<<'EOT'
 foo
 
 EOT;
@@ -96,20 +96,20 @@ EOT;
      */
     public function itReplacesImportWithFileContent()
     {
-        $this->putRootSchema(<<<EOT
+        $this->putRootSchema(<<<'EOT'
 foo
 #import bar
 
 EOT
         );
 
-        $this->filesystem->put('bar', <<<EOT
+        $this->filesystem->put('bar', <<<'EOT'
 bar
 
 EOT
         );
 
-        $this->assertSchemaResultIsSame(<<<EOT
+        $this->assertSchemaResultIsSame(<<<'EOT'
 foo
 bar
 
@@ -122,26 +122,26 @@ EOT
      */
     public function itImportsRecursively()
     {
-        $this->putRootSchema(<<<EOT
+        $this->putRootSchema(<<<'EOT'
 foo
 #import bar
 
 EOT
         );
 
-        $this->filesystem->put('bar', <<<EOT
+        $this->filesystem->put('bar', <<<'EOT'
 bar
 #import baz
 EOT
         );
 
-        $this->filesystem->put('baz', <<<EOT
+        $this->filesystem->put('baz', <<<'EOT'
 baz
 
 EOT
         );
 
-        $this->assertSchemaResultIsSame(<<<EOT
+        $this->assertSchemaResultIsSame(<<<'EOT'
 foo
 bar
 baz
@@ -155,7 +155,7 @@ EOT
      */
     public function itImportsFromSubdirectory()
     {
-        $this->putRootSchema(<<<EOT
+        $this->putRootSchema(<<<'EOT'
 foo
 #import subdir/bar
 
@@ -163,13 +163,13 @@ EOT
         );
 
         $this->filesystem->createDir('subdir');
-        $this->filesystem->put('subdir/bar', <<<EOT
+        $this->filesystem->put('subdir/bar', <<<'EOT'
 bar
 
 EOT
         );
 
-        $this->assertSchemaResultIsSame(<<<EOT
+        $this->assertSchemaResultIsSame(<<<'EOT'
 foo
 bar
 
@@ -182,20 +182,20 @@ EOT
      */
     public function itKeepsIndententation()
     {
-        $this->putRootSchema(<<<EOT
+        $this->putRootSchema(<<<'EOT'
     foo
 #import bar
 
 EOT
         );
 
-        $this->filesystem->put('bar', <<<EOT
+        $this->filesystem->put('bar', <<<'EOT'
         bar
 
 EOT
         );
 
-        $this->assertSchemaResultIsSame(<<<EOT
+        $this->assertSchemaResultIsSame(<<<'EOT'
     foo
         bar
 
@@ -208,7 +208,7 @@ EOT
      */
     public function itImportsViaGlob()
     {
-        $this->putRootSchema(<<<EOT
+        $this->putRootSchema(<<<'EOT'
 foo
 #import subdir/*.graphql
 
@@ -216,18 +216,18 @@ EOT
         );
 
         $this->filesystem->createDir('subdir');
-        $this->filesystem->put('subdir/bar.graphql', <<<EOT
+        $this->filesystem->put('subdir/bar.graphql', <<<'EOT'
 bar
 
 EOT
         );
-        $this->filesystem->put('subdir/other.graphql', <<<EOT
+        $this->filesystem->put('subdir/other.graphql', <<<'EOT'
 other
 
 EOT
         );
 
-        $this->assertSchemaResultIsSame(<<<EOT
+        $this->assertSchemaResultIsSame(<<<'EOT'
 foo
 bar
 other
@@ -241,24 +241,24 @@ EOT
      */
     public function itAddsNewlineToTheEndOfImportedFile()
     {
-        $this->putRootSchema(<<<EOT
+        $this->putRootSchema(<<<'EOT'
 foo
 #import bar
 #import foobar
 EOT
         );
 
-        $this->filesystem->put('bar', <<<EOT
+        $this->filesystem->put('bar', <<<'EOT'
 bar
 EOT
         );
 
-        $this->filesystem->put('foobar', <<<EOT
+        $this->filesystem->put('foobar', <<<'EOT'
 foobar
 EOT
         );
 
-        $this->assertSchemaResultIsSame(<<<EOT
+        $this->assertSchemaResultIsSame(<<<'EOT'
 foo
 bar
 foobar

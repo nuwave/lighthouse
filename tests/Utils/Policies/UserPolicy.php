@@ -21,7 +21,7 @@ class UserPolicy
         return null === $user;
     }
 
-    public function dependingOnArg($user = null, bool $pass): bool
+    public function dependingOnArg($user, bool $pass): bool
     {
         return $pass;
     }

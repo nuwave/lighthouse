@@ -10,21 +10,21 @@ class UnionCommand extends LighthouseGeneratorCommand
      * @var string
      */
     protected $name = 'lighthouse:union';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a class for an Union type.';
-    
+
     /**
      * The type of class being generated.
      *
      * @var string
      */
     protected $type = 'Union';
-    
+
     /**
      * Get the default namespace for the class.
      *
@@ -35,7 +35,7 @@ class UnionCommand extends LighthouseGeneratorCommand
     {
         return config('lighthouse.namespaces.unions');
     }
-    
+
     /**
      * Get the stub file for the generator.
      *
@@ -43,6 +43,6 @@ class UnionCommand extends LighthouseGeneratorCommand
      */
     protected function getStub(): string
     {
-        return __DIR__ . '/stubs/typeResolver.stub';
+        return __DIR__.'/stubs/typeResolver.stub';
     }
 }

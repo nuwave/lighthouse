@@ -30,7 +30,6 @@ class ContextFactoryTest extends TestCase
 
                         public function user()
                         {
-                            return null;
                         }
 
                         public function request()

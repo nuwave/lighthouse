@@ -10,21 +10,21 @@ class InterfaceCommand extends LighthouseGeneratorCommand
      * @var string
      */
     protected $name = 'lighthouse:interface';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a class for an Interface type.';
-    
+
     /**
      * The type of class being generated.
      *
      * @var string
      */
     protected $type = 'Interface';
-    
+
     /**
      * Get the default namespace for the class.
      *
@@ -35,7 +35,7 @@ class InterfaceCommand extends LighthouseGeneratorCommand
     {
         return config('lighthouse.namespaces.interfaces');
     }
-    
+
     /**
      * Get the stub file for the generator.
      *
@@ -43,6 +43,6 @@ class InterfaceCommand extends LighthouseGeneratorCommand
      */
     protected function getStub(): string
     {
-        return __DIR__ . '/stubs/typeResolver.stub';
+        return __DIR__.'/stubs/typeResolver.stub';
     }
 }

@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
 use Illuminate\Cache\CacheManager;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
