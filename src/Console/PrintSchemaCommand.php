@@ -6,8 +6,6 @@ use Illuminate\Console\Command;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Exceptions\ParseException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class PrintSchemaCommand extends Command
 {
