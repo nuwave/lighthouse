@@ -5,8 +5,6 @@ namespace Nuwave\Lighthouse\Console;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository;
-use Nuwave\Lighthouse\Exceptions\ParseException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class ValidateSchemaCommand extends Command
 {
@@ -26,13 +24,11 @@ class ValidateSchemaCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param Repository $cache
-     * @param GraphQL $graphQL
-     *
-     * @throws DirectiveException
-     * @throws ParseException
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
+     * @return void
      */
-    public function handle(Repository $cache, GraphQL $graphQL)
+    public function handle(Repository $cache, GraphQL $graphQL): void
     {
         // Clear the cache so this always validates the current schema
         $cache->forget(config('lighthouse.cache.key'));
