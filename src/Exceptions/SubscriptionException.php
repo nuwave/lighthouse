@@ -13,7 +13,7 @@ class SubscriptionException extends \InvalidArgumentException implements ClientA
      *
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
@@ -27,7 +27,7 @@ class SubscriptionException extends \InvalidArgumentException implements ClientA
      *
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'subscription';
     }
