@@ -58,20 +58,34 @@ class TestCase extends BaseTestCase
 
         $app->make('config')->set('lighthouse', [
             'namespaces' => [
-                'scalars' => 'Tests\\Utils\\Scalars',
-                'unions' => 'Tests\\Utils\\Unions',
-                'queries' => 'Tests\\Utils\\Queries',
-                'mutations' => 'Tests\\Utils\\Mutations',
-                'models' => 'Tests\\Utils\\Models',
+                'models' => [
+                    'Tests\\Utils\\Models',
+                    'Tests\\Utils\\ModelsSecondary',
+                ],
+                'queries' => [
+                    'Tests\\Utils\\Queries',
+                    'Tests\\Utils\\QueriesSecondary',
+                ],
+                'mutations' => [
+                    'Tests\\Utils\\Mutations',
+                    'Tests\\Utils\\MutationsSecondary',
+                ],
+                'interfaces' => [
+                    'Tests\\Utils\\Interfaces',
+                    'Tests\\Utils\\InterfacesSecondary',
+                ],
+                'scalars' => [
+                    'Tests\\Utils\\Scalars',
+                    'Tests\\Utils\\ScalarsSecondary',
+                ],
+                'unions' => [
+                    'Tests\\Utils\\Unions',
+                    'Tests\\Utils\\UnionsSecondary',
+                ],
             ],
             'subscriptions' => [
                 'storage' => 'array',
                 'broadcaster' => 'log',
-                'broadcasters' => [
-                    'log' => [
-                        'driver' => 'log',
-                    ],
-                ],
             ],
         ]);
     }

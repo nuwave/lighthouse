@@ -129,6 +129,38 @@ class NodeFactoryTest extends TestCase
     /**
      * @test
      */
+    public function itResolvesInterfaceThoughNamespace()
+    {
+        $interfaceNode = PartialParser::interfaceTypeDefinition('
+        interface Nameable {
+            bar: String
+        }
+        ');
+        $interfaceType = $this->factory->handle($interfaceNode);
+
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
+        $this->assertSame('Nameable', $interfaceType->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolvesInterfaceThoughSecondaryNamespace()
+    {
+        $interfaceNode = PartialParser::interfaceTypeDefinition('
+        interface Bar {
+            bar: String
+        }
+        ');
+        $interfaceType = $this->factory->handle($interfaceNode);
+
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
+        $this->assertSame('Bar', $interfaceType->name);
+    }
+
+    /**
+     * @test
+     */
     public function itCanTransformUnions()
     {
         $unionNode = PartialParser::unionTypeDefinition('

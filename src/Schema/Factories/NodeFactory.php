@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Type\Definition\Type;
+use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\UnionType;
@@ -10,7 +11,6 @@ use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\InterfaceType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -45,10 +45,10 @@ class NodeFactory
     protected $argumentFactory;
 
     /**
-     * @param DirectiveFactory  $directiveFactory
-     * @param TypeRegistry      $typeRegistry
-     * @param Pipeline          $pipeline
-     * @param ArgumentFactory   $argumentFactory
+     * @param DirectiveFactory $directiveFactory
+     * @param TypeRegistry     $typeRegistry
+     * @param Pipeline         $pipeline
+     * @param ArgumentFactory  $argumentFactory
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
@@ -204,13 +204,17 @@ class NodeFactory
             $className = $scalarName;
         }
 
-        $className = \namespace_classname($className, [
-            config('lighthouse.namespaces.scalars'),
-        ]);
+        $className = Utils::namespaceClassname(
+            $className,
+            (array) config('lighthouse.namespaces.scalars'),
+            function (string $className): bool {
+                return is_subclass_of($className, ScalarType::class);
+            }
+        );
 
         if (! $className) {
             throw new DefinitionException(
-                "No class found for the scalar {$scalarName}"
+                "No matching subclass of GraphQL\Type\Definition\ScalarType of found for the scalar {$scalarName}"
             );
         }
 
@@ -319,11 +323,15 @@ class NodeFactory
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
-            $interfaceClass = \namespace_classname($nodeName, [
-                config('lighthouse.namespaces.interfaces'),
-            ]);
+            $interfaceClass = Utils::namespaceClassname(
+                $nodeName,
+                (array) config('lighthouse.namespaces.interfaces'),
+                function (string $className): bool {
+                    return \method_exists($className, 'resolveType');
+                }
+            );
 
-            $typeResolver = \method_exists($interfaceClass, 'resolveType')
+            $typeResolver = $interfaceClass
                 ? [app($interfaceClass), 'resolveType']
                 : static::typeResolverFallback();
         }
@@ -337,16 +345,17 @@ class NodeFactory
     }
 
     /**
-     * If no type resolver is given, use this as a default.
+     * Default type resolver for resolving interfaces or union types.
+     *
+     * We just assume that the rootValue that shall be returned from the
+     * field is a class that is named just like the concrete Object Type
+     * that is supposed to be returned.
      *
      * @return \Closure
      */
     public function typeResolverFallback(): \Closure
     {
-        // The typeResolver receives only 3 arguments by `webonyx/graphql-php` instead of 4
-        return function ($rootValue, $context, ResolveInfo $info) {
-            // Default to getting a type with the same name as the passed in root value
-            // which is usually an Eloquent model
+        return function ($rootValue): Type {
             return $this->typeRegistry->get(
                 class_basename($rootValue)
             );
@@ -370,11 +379,15 @@ class NodeFactory
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
-            $unionClass = \namespace_classname($nodeName, [
-                config('lighthouse.namespaces.unions'),
-            ]);
+            $unionClass = Utils::namespaceClassname(
+                $nodeName,
+                (array) config('lighthouse.namespaces.unions'),
+                function (string $className): bool {
+                    return \method_exists($className, 'resolveType');
+                }
+            );
 
-            $typeResolver = \method_exists($unionClass, 'resolveType')
+            $typeResolver = $unionClass
                 ? [app($unionClass), 'resolveType']
                 : static::typeResolverFallback();
         }

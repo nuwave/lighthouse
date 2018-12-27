@@ -9,6 +9,7 @@ language: php
 php:
 - 7.1
 - 7.2
+- 7.3
 
 env:
   matrix:
@@ -30,7 +31,7 @@ matrix:
   fast_finish: true
 
 before_install:
-- phpenv config-rm xdebug.ini
+- phpenv config-rm xdebug.ini || true
 - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 - composer global require hirak/prestissimo --update-no-dev
 - composer require
