@@ -109,7 +109,7 @@ type User {
 
 ## @bcrypt
 
-**_Directive Type_**: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
 
 Run the `bcrypt` function on the argument it is defined on.
 
@@ -121,7 +121,7 @@ type Mutation {
 
 ## @trim
 
-**_Directive Type_**: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
 
 Run the `trim` function on the argument it is defined on.
 
