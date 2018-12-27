@@ -11,9 +11,9 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\ParseClientException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeferrableDirective extends BaseDirective implements Directive, FieldMiddleware
 {

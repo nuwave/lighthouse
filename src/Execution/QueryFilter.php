@@ -93,12 +93,12 @@ class QueryFilter
         $valuesGroupedByFilterKey = [];
 
         /**
-         * @var string $key
+         * @var string
          * @var mixed  $value
          */
         foreach ($args as $key => $value) {
             /**
-             * @var string   $filterKey
+             * @var string  
              * @var string[] $argNames
              */
             foreach ($this->multiArgumentFiltersArgNames as $filterKey => $argNames) {
@@ -119,7 +119,7 @@ class QueryFilter
         }
 
         /**
-         * @var string $filterKey
+         * @var string
          * @var array  $values
          */
         foreach ($valuesGroupedByFilterKey as $filterKey => $values) {

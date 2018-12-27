@@ -28,7 +28,7 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
 {
     /**
-     * todo remove as soon as name() is static itself
+     * todo remove as soon as name() is static itself.
      * @var string
      */
     const NAME = 'middleware';

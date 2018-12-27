@@ -8,11 +8,11 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
 use Nuwave\Lighthouse\Subscriptions\Exceptions\UnauthorizedSubscriber;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class SubscriptionDirective extends BaseDirective implements FieldResolver
 {

@@ -18,6 +18,7 @@ class QueryAST
      * @var Collection
      */
     protected $definitions;
+
     /**
      * @param DocumentNode $documentNode
      */
