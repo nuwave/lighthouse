@@ -63,9 +63,9 @@ class CacheValue
     /**
      * Resolve key from root value.
      *
-     * @return mixed
+     * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         $argKeys = $this->argKeys();
 

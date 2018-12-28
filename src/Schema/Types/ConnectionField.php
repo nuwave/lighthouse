@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -22,8 +23,8 @@ class ConnectionField
         LengthAwarePaginator $paginator,
         array $args,
         $context = null,
-        ResolveInfo $info = null
-    ) {
+        ?ResolveInfo $info = null
+    ): array {
         return [
             'total' => $paginator->total(),
             'count' => $paginator->count(),
@@ -48,14 +49,14 @@ class ConnectionField
      * @param mixed                $context
      * @param ResolveInfo|null     $info
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function edgeResolver(
         LengthAwarePaginator $paginator,
         array $args,
         $context = null,
-        ResolveInfo $info = null
-    ) {
+        ?ResolveInfo $info = null
+    ): Collection {
         $firstItem = $paginator->firstItem();
 
         return $paginator->values()->map(function ($item, $index) use ($firstItem) {

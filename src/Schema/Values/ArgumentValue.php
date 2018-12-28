@@ -30,7 +30,7 @@ class ArgumentValue
      * @param InputValueDefinitionNode $astNode
      * @param FieldValue               $parentField
      */
-    public function __construct(InputValueDefinitionNode $astNode, FieldValue $parentField = null)
+    public function __construct(InputValueDefinitionNode $astNode, ?FieldValue $parentField = null)
     {
         $this->astNode = $astNode;
         $this->parentField = $parentField;
@@ -47,7 +47,7 @@ class ArgumentValue
     /**
      * @return FieldValue|null
      */
-    public function getParentField()
+    public function getParentField(): ?FieldValue
     {
         return $this->parentField;
     }

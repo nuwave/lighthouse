@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Types;
 use Illuminate\Http\Request;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class NotFoundSubscription extends GraphQLSubscription
 {
@@ -16,7 +17,7 @@ class NotFoundSubscription extends GraphQLSubscription
      *
      * @return bool
      */
-    public function authorize(Subscriber $subscriber, Request $request)
+    public function authorize(Subscriber $subscriber, Request $request): bool
     {
         return false;
     }
@@ -29,7 +30,7 @@ class NotFoundSubscription extends GraphQLSubscription
      *
      * @return bool
      */
-    public function filter(Subscriber $subscriber, $root)
+    public function filter(Subscriber $subscriber, $root): bool
     {
         return false;
     }
@@ -37,14 +38,14 @@ class NotFoundSubscription extends GraphQLSubscription
     /**
      * Resolve the subscription.
      *
-     * @param mixed         $root
-     * @param array         $args
-     * @param Context|mixed $context
-     * @param ResolveInfo   $info
+     * @param mixed          $root
+     * @param array          $args
+     * @param GraphQLContext $context
+     * @param ResolveInfo    $info
      *
      * @return mixed
      */
-    public function resolve($root, array $args, $context, ResolveInfo $info)
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info)
     {
     }
 }
