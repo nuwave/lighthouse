@@ -104,8 +104,8 @@ class LighthouseServiceProvider extends ServiceProvider
                 MutationCommand::class,
                 PrintSchemaCommand::class,
                 QueryCommand::class,
-                UnionCommand::class,
                 ScalarCommand::class,
+                UnionCommand::class,
                 ValidateSchemaCommand::class,
             ]);
         }
