@@ -14,7 +14,8 @@ class PrintSchemaCommand extends Command
      *
      * @var string
      */
-    protected $signature = ' lighthouse:print-schema {--W|write : Write the output to a file}';
+    protected $signature = ' lighthouse:print-schema
+        {--W|write : Write the output to a file}';
 
     /**
      * The console command description.
