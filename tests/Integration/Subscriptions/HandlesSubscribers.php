@@ -48,6 +48,5 @@ trait HandlesSubscribers
      */
     public function request()
     {
-        return null;
     }
 }

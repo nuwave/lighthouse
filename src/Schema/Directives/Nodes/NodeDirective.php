@@ -17,7 +17,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
 {
     /** @var NodeRegistry */
     protected $nodeRegistry;
-    
+
     /**
      * @param NodeRegistry $nodeRegistry
      */
@@ -25,7 +25,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     {
         $this->nodeRegistry = $nodeRegistry;
     }
-    
+
     /**
      * Directive name.
      *
@@ -50,7 +50,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {
         $typeName = $value->getTypeDefinitionName();
-        
+
         $this->nodeRegistry->registerNode(
             $typeName,
             $this->getResolverFromArgument('resolver')
@@ -58,7 +58,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
 
         return $next($value);
     }
-    
+
     /**
      * @param Node $node
      * @param DocumentAST $documentAST

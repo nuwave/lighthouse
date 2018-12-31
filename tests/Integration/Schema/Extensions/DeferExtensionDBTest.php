@@ -75,7 +75,7 @@ class DeferExtensionDBTest extends DBTestCase
         }';
 
         \DB::listen(function ($q) use (&$queries) {
-            ++$queries;
+            $queries++;
         });
 
         $this->postJson('/graphql', compact('query'))
@@ -141,7 +141,7 @@ class DeferExtensionDBTest extends DBTestCase
         }';
 
         \DB::listen(function ($q) use (&$queries) {
-            ++$queries;
+            $queries++;
         });
 
         $this->postJson('/graphql', compact('query'))
@@ -220,7 +220,7 @@ class DeferExtensionDBTest extends DBTestCase
         }';
 
         \DB::listen(function ($q) use (&$queries) {
-            ++$queries;
+            $queries++;
         });
 
         $this->postJson('/graphql', compact('query'))

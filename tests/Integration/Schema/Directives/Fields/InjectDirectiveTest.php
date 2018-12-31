@@ -34,7 +34,7 @@ class InjectDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             createTask(input: {

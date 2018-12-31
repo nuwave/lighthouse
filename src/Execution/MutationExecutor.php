@@ -110,7 +110,7 @@ class MutationExecutor
     protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, Relation $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        list($belongsTo, $remaining) = self::partitionArgsByRelationType($reflection, $remaining,BelongsTo::class);
+        list($belongsTo, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
         $model->fill(
@@ -276,16 +276,16 @@ class MutationExecutor
     {
         return $args->partition(
             function ($value, string $key) use ($modelReflection, $relationClass): bool {
-                if(! $modelReflection->hasMethod($key)){
+                if (! $modelReflection->hasMethod($key)) {
                     return false;
                 }
 
                 $relationMethodCandidate = $modelReflection->getMethod($key);
-                if(!$returnType = $relationMethodCandidate->getReturnType()){
+                if (! $returnType = $relationMethodCandidate->getReturnType()) {
                     return false;
                 }
 
-                if(! $returnType instanceof \ReflectionNamedType){
+                if (! $returnType instanceof \ReflectionNamedType) {
                     return false;
                 }
 

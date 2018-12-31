@@ -11,7 +11,6 @@ use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class BroadcastManagerTest extends TestCase implements GraphQLContext
 {
@@ -55,17 +54,14 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
             return new class() implements Broadcaster {
                 public function authorized(Request $request)
                 {
-                    return;
                 }
 
                 public function unauthorized(Request $request)
                 {
-                    return;
                 }
 
                 public function hook(Request $request)
                 {
-                    return;
                 }
 
                 public function broadcast(Subscriber $subscriber, array $data)

@@ -114,7 +114,7 @@ trait HasResolverArguments
      *
      * @return static
      */
-    public function setResolverArguments($root, array $args, $context = null, ResolveInfo $resolveInfo)
+    public function setResolverArguments($root, array $args, $context, ResolveInfo $resolveInfo)
     {
         return $this->setRoot($root)
                     ->setArguments($args)

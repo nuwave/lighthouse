@@ -76,30 +76,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Directives
-    |--------------------------------------------------------------------------
-    |
-    | List directories that will be scanned for custom server-side directives.
-    |
-    */
-    'directives' => [__DIR__.'/../app/GraphQL/Directives'],
-
-    /*
-    |--------------------------------------------------------------------------
     | Namespaces
     |--------------------------------------------------------------------------
     |
     | These are the default namespaces where Lighthouse looks for classes
-    | that extend functionality of the schema.
+    | that extend functionality of the schema. You may pass either a string
+    | or an array, they are tried in order and the first match is used.
     |
     */
     'namespaces' => [
-        'models' => 'App',
+        'models' => ['App', 'App\\Models'],
         'queries' => 'App\\GraphQL\\Queries',
         'mutations' => 'App\\GraphQL\\Mutations',
         'interfaces' => 'App\\GraphQL\\Interfaces',
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
+        'directives' => ['App\\GraphQL\\Directives'],
     ],
 
     /*

@@ -36,7 +36,7 @@ class WithDirective extends RelationDirective implements FieldMiddleware
 
         return $next(
             $value->setResolver(
-                function (Model $parent, array $resolveArgs, $context = null, ResolveInfo $resolveInfo) use ($resolver) {
+                function (Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo) use ($resolver) {
                     $loader = BatchLoader::instance(
                         RelationBatchLoader::class,
                         $resolveInfo->path,

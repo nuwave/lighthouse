@@ -73,7 +73,7 @@ class SecurityTest extends TestCase
 
     protected function assertMaxQueryDepthIs1($schema)
     {
-        $result = $this->execute($schema,'
+        $result = $this->execute($schema, '
         {
             user {
                 user {
@@ -93,7 +93,7 @@ class SecurityTest extends TestCase
      */
     protected function assertIntrospectionIsDisabled(string $schema)
     {
-        $result = $this->execute($schema,'
+        $result = $this->execute($schema, '
         {
             __schema {
                 queryType {

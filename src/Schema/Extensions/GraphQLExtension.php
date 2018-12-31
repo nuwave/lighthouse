@@ -26,7 +26,6 @@ abstract class GraphQLExtension implements \JsonSerializable
      */
     public function requestDidStart(ExtensionRequest $request)
     {
-        return;
     }
 
     /**
@@ -36,7 +35,6 @@ abstract class GraphQLExtension implements \JsonSerializable
      */
     public function batchedQueryDidStart($index)
     {
-        return;
     }
 
     /**
@@ -47,7 +45,6 @@ abstract class GraphQLExtension implements \JsonSerializable
      */
     public function batchedQueryDidEnd(ExecutionResult $result, $index)
     {
-        return;
     }
 
     /**

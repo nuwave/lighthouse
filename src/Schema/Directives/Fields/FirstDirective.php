@@ -37,7 +37,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
         $model = $this->getModelClass();
 
         return $fieldValue->setResolver(
-            function ($root, array $args, $context = null, ResolveInfo $resolveInfo) use ($model) {
+            function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($model) {
                 /** @var Builder $query */
                 $query = QueryFilter::apply(
                     $model::query(),

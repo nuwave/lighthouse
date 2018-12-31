@@ -61,7 +61,7 @@ class ConnectionField
         return $paginator->values()->map(function ($item, $index) use ($firstItem) {
             return [
                 'cursor' => Cursor::encode($firstItem + $index),
-                'node' => $item
+                'node' => $item,
             ];
         });
     }

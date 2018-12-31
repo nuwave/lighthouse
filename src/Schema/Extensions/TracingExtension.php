@@ -64,7 +64,7 @@ class TracingExtension extends GraphQLExtension
      *
      * @return TracingExtension
      */
-    public function requestDidStart(ExtensionRequest $request): TracingExtension
+    public function requestDidStart(ExtensionRequest $request): self
     {
         $this->requestStart = Carbon::now();
 

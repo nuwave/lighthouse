@@ -6,7 +6,6 @@ use GraphQL\Error\ClientAware;
 
 class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationException implements ClientAware
 {
-
     /**
      * Returns true when exception message is safe to be displayed to a client.
      *

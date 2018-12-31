@@ -50,7 +50,7 @@ class MiddlewareDirectiveTest extends TestCase
             fragment Foo_Fragment on Query {
                 foo
             }
-            ']
+            '],
         ];
     }
 
@@ -184,7 +184,7 @@ class MiddlewareDirectiveTest extends TestCase
             [
                 'auth',
                 'Tests\\Utils\\Middleware\\Authenticate',
-                'api'
+                'api',
             ],
             $fieldMiddlewares
         );

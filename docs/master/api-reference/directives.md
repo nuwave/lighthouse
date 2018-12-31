@@ -119,19 +119,6 @@ type Mutation {
 }
 ```
 
-## @trim
-
-***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
-
-Run the `trim` function on the argument it is defined on.
-
-
-```graphql
-type Mutation {
-  createUser(name: String @trim): User
-}
-```
-
 ## @broadcast
 
 Broadcast mutation results to subscribed clients.
@@ -152,33 +139,33 @@ type Mutation {
 ```
 
 ## @cache
- 
+
 Cache the result of a resolver.
- 
+
 The cache is created on the first request and is cached forever by default.
 Use this for values that change seldomly and take long to fetch/compute.
 
 ```graphql
 type Query {
-  highestKnownPrimeNumber: Int! @cache
+    highestKnownPrimeNumber: Int! @cache
 }
 ```
- 
+
 You can set an expiration time in seconds
 if you want to invalidate the cache after a while.
- 
+
 ```graphql
 type Query {
-  temperature: Int! @cache(maxAge: 300)
+    temperature: Int! @cache(maxAge: 300)
 }
 ```
- 
+
 You can limit the cache to the logged in user making the request by marking it as private.
 This makes sense for data that is specific to a certain user.
- 
+
 ```graphql
 type Query {
-  todos: [ToDo!]! @cache(private: true)
+    todos: [ToDo!]! @cache(private: true)
 }
 ```
 
@@ -188,8 +175,8 @@ When generating a cached result for a resolver, Lighthouse produces a unique key
 
 ```graphql
 type GithubProfile {
-  username: String @cacheKey
-  repos: [Repository] @cache
+    username: String @cacheKey
+    repos: [Repository] @cache
 }
 ```
 
@@ -223,7 +210,8 @@ passing the `model` argument.
 
 ```graphql
 type Mutation {
-    createBlogPost(input: PostInput): BlogPost @can(ability: "create", model: "App\\Post")
+    createBlogPost(input: PostInput): BlogPost
+        @can(ability: "create", model: "App\\Post")
 }
 ```
 
@@ -231,7 +219,8 @@ You can pass additional arguments to the policy checks by specifying them as `ar
 
 ```graphql
 type Mutation {
-    createPost(input: PostInput): Post @can(ability: "create", args: ["FROM_GRAPHQL"])
+    createPost(input: PostInput): Post
+        @can(ability: "create", args: ["FROM_GRAPHQL"])
 }
 ```
 
@@ -324,6 +313,19 @@ deleted models.
 ```graphql
 type Mutation {
     deletePosts(id: [ID!]!): [Post!]! @delete
+}
+```
+
+## @deprecated
+
+You can mark fields as deprecated by adding the `@deprecated` directive and providing a
+`reason` (required). Deprecated fields are not included in introspection queries unless
+requested and they can still be queried by clients.
+
+```graphql
+type Query {
+    users: [User] @deprecated(reason: "Use the `allUsers` field")
+    allUsers: [User]
 }
 ```
 
@@ -563,12 +565,11 @@ automatically used for creating new models and can not be manipulated.
 If you are using an Input Object as an argument, you can use dot notation to
 set a nested argument.
 
-
 ```graphql
 type Mutation {
-  createTask(input: CreateTaskInput!): Task
-    @create
-    @inject(context: "user.id", name: "input.user_id")
+    createTask(input: CreateTaskInput!): Task
+        @create
+        @inject(context: "user.id", name: "input.user_id")
 }
 ```
 
@@ -966,6 +967,18 @@ type Subscription {
         @subscription(
             class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
         )
+}
+```
+
+## @trim
+
+***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+
+Run the `trim` function on the argument it is defined on.
+
+```graphql
+type Mutation {
+    createUser(name: String @trim): User
 }
 ```
 

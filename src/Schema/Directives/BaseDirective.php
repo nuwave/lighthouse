@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Language\AST\DirectiveNode;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -29,7 +31,7 @@ abstract class BaseDirective implements Directive
      *
      * @return BaseDirective
      */
-    public function hydrate($definitionNode): BaseDirective
+    public function hydrate($definitionNode): self
     {
         $this->definitionNode = $definitionNode;
 
@@ -129,20 +131,19 @@ abstract class BaseDirective implements Directive
             );
         }
 
-        return $this->namespaceClassName($model, [
-            config('lighthouse.namespaces.models'),
-        ]);
+        return $this->namespaceModelClass($model);
     }
 
     /**
      * @param string   $classCandidate
      * @param string[] $namespacesToTry
+     * @param callable $determineMatch
      *
      * @throws DirectiveException
      *
      * @return string
      */
-    protected function namespaceClassName(string $classCandidate, array $namespacesToTry = []): string
+    protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
     {
         // Always try the explicitly set namespace first
         \array_unshift(
@@ -153,9 +154,19 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if (! $className = \namespace_classname($classCandidate, $namespacesToTry)) {
+        if (! $determineMatch) {
+            $determineMatch = '\class_exists';
+        }
+
+        $className = Utils::namespaceClassname(
+            $classCandidate,
+            $namespacesToTry,
+            $determineMatch
+        );
+
+        if (! $className) {
             throw new DirectiveException(
-                "No class '$classCandidate' was found for directive '{$this->name()}'"
+                "No class '{$classCandidate}' was found for directive '{$this->name()}'"
             );
         }
 
@@ -193,5 +204,25 @@ abstract class BaseDirective implements Directive
         }
 
         return $argumentParts;
+    }
+
+    /**
+     * Try adding the default model namespace and ensure the given class is a model.
+     *
+     * @param string $modelClassCandidate
+     *
+     * @throws DirectiveException
+     *
+     * @return string
+     */
+    protected function namespaceModelClass(string $modelClassCandidate): string
+    {
+        return $this->namespaceClassName(
+            $modelClassCandidate,
+            (array) config('lighthouse.namespaces.models'),
+            function (string $classCandidate): bool {
+                return \is_subclass_of($classCandidate, Model::class);
+            }
+        );
     }
 }

@@ -19,7 +19,7 @@ class ResponseStream extends Stream implements CanStreamResponse
      *
      * @return mixed
      */
-    public function stream(array $data, array $paths = [], bool $final)
+    public function stream(array $data, array $paths, bool $final)
     {
         if (! empty($paths)) {
             $paths = collect($paths);
