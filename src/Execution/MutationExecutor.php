@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class MutationExecutor
 {
     /**
-     * @param Model $model an empty instance of the model that should be created
-     * @param Collection $args the corresponding slice of the input arguments for creating this model
+     * @param Model         $model          an empty instance of the model that should be created
+     * @param Collection    $args           the corresponding slice of the input arguments for creating this model
      * @param Relation|null $parentRelation if we are in a nested create, we can use this to associate the new model to its parent
      *
      * @return Model
@@ -29,7 +29,7 @@ class MutationExecutor
         $reflection = new \ReflectionClass($model);
         list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
-        list($morphMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
+        list($morphMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining,MorphMany::class);
 
         list($hasOne, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
 
@@ -116,9 +116,9 @@ class MutationExecutor
     }
 
     /**
-     * @param Model $model
+     * @param Model      $model
      * @param Collection $remaining
-     * @param Relation $parentRelation
+     * @param Relation   $parentRelation
      *
      * @return Model
      */
@@ -163,7 +163,7 @@ class MutationExecutor
 
     /**
      * @param Collection $multiValues
-     * @param Relation $relation
+     * @param Relation   $relation
      */
     protected static function handleMultiRelationCreate(Collection $multiValues, Relation $relation)
     {
@@ -178,7 +178,7 @@ class MutationExecutor
 
     /**
      * @param Collection $singleValues
-     * @param Relation $relation
+     * @param Relation   $relation
      */
     protected static function handleSingleRelationCreate(Collection $singleValues, Relation $relation)
     {
@@ -186,8 +186,8 @@ class MutationExecutor
     }
 
     /**
-     * @param Model $model an empty instance of the model that should be updated
-     * @param Collection $args the corresponding slice of the input arguments for updating this model
+     * @param Model        $model          an empty instance of the model that should be updated
+     * @param Collection   $args           the corresponding slice of the input arguments for updating this model
      * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
      *
      * @throws ModelNotFoundException
@@ -256,8 +256,8 @@ class MutationExecutor
      * ]
      *
      * @param \ReflectionClass $modelReflection
-     * @param Collection $args
-     * @param string $relationClass
+     * @param Collection       $args
+     * @param string           $relationClass
      *
      * @return Collection [relationshipArgs, remainingArgs]
      */
@@ -265,16 +265,16 @@ class MutationExecutor
     {
         return $args->partition(
             function ($value, string $key) use ($modelReflection, $relationClass): bool {
-                if (!$modelReflection->hasMethod($key)) {
+                if (! $modelReflection->hasMethod($key)) {
                     return false;
                 }
 
                 $relationMethodCandidate = $modelReflection->getMethod($key);
-                if (!$returnType = $relationMethodCandidate->getReturnType()) {
+                if (! $returnType = $relationMethodCandidate->getReturnType()) {
                     return false;
                 }
 
-                if (!$returnType instanceof \ReflectionNamedType) {
+                if (! $returnType instanceof \ReflectionNamedType) {
                     return false;
                 }
 

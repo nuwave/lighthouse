@@ -69,4 +69,5 @@ class HasManyTest extends DBTestCase
         $this->assertSame('1', Arr::get($result, 'data.createUser.tasks.0.id'));
         $this->assertSame('bar', Arr::get($result, 'data.createUser.tasks.0.name'));
     }
+
 }
