@@ -29,7 +29,7 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ('create' === $operationKey) {
+                if ($operationKey === 'create') {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
             });
@@ -116,11 +116,11 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ('create' === $operationKey) {
+                if ($operationKey === 'create') {
                     self::handleHasManyCreate(collect($values), $relation);
                 }
 
-                if ('update' === $operationKey) {
+                if ($operationKey === 'update') {
                     collect($values)->each(function ($singleValues) use ($relation) {
                         self::executeUpdate(
                             $relation->getModel()->newInstance(),
@@ -130,7 +130,7 @@ class MutationExecutor
                     });
                 }
 
-                if ('delete' === $operationKey) {
+                if ($operationKey === 'delete') {
                     $relation->getModel()::destroy($values);
                 }
             });
@@ -185,7 +185,7 @@ class MutationExecutor
                     return false;
                 }
 
-                return $returnType->getName() === $relationClass;
+                return $relationClass === $returnType->getName();
             }
         );
     }

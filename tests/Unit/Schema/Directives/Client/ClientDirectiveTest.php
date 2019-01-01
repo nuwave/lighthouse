@@ -35,11 +35,11 @@ class ClientDirectiveTest extends TestCase
         $key = collect($info->fieldNodes)->flatMap(function ($node) {
             return collect($node->directives);
         })->filter(function ($directive) {
-            return 'filter' == $directive->name->value;
+            return $directive->name->value == 'filter';
         })->flatMap(function ($directive) {
             return collect($directive->arguments);
         })->filter(function ($arg) {
-            return 'key' == $arg->name->value;
+            return $arg->name->value == 'key';
         })->first();
 
         return $key->value->value;

@@ -248,7 +248,7 @@ class FieldFactory
      */
     protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argValue, InputValueDefinitionNode $astNode, array $argumentPath)
     {
-        if ($argValue instanceof NoValue || null === $argValue) {
+        if ($argValue instanceof NoValue || $argValue === null) {
             // Handle `ListOfType` with associated directives which implement `ArgDirectiveForArray`
             if ($type instanceof ListOfType) {
                 $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath, ArgDirectiveForArray::class);

@@ -83,7 +83,7 @@ class ErrorBuffer
      */
     public function push(string $errorMessage, string $key = null): self
     {
-        if (null === $key) {
+        if ($key === null) {
             $this->errors[] = $errorMessage;
 
             return $this;

@@ -8,7 +8,7 @@ class UserPolicy
 {
     public function adminOnly(User $user): bool
     {
-        return 'admin' === $user->name;
+        return $user->name === 'admin';
     }
 
     public function alwaysTrue(): bool
@@ -18,7 +18,7 @@ class UserPolicy
 
     public function guestOnly($user = null): bool
     {
-        return null === $user;
+        return $user === null;
     }
 
     public function dependingOnArg($user, bool $pass): bool

@@ -52,7 +52,7 @@ abstract class BatchLoader
         // query a uniquely indexed instance
         $currentBatchIndex = app('graphql')->currentBatchIndex();
 
-        if (null !== $currentBatchIndex) {
+        if ($currentBatchIndex !== null) {
             $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
         }
 
