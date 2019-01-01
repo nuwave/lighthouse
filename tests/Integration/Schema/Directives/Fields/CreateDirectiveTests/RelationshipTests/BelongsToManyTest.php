@@ -132,5 +132,4 @@ class BelongsToManyTest extends DBTestCase
         $this->assertSame('2', Arr::get($result, 'data.createRole.users.1.id'));
         $this->assertSame('user_two', Arr::get($result, 'data.createRole.users.1.name'));
     }
-
 }

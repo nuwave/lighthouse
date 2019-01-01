@@ -71,5 +71,4 @@ class MorphManyTest extends DBTestCase
         $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
         $this->assertSame(3, Arr::get($result, 'data.createTask.hours.0.weekday'));
     }
-
 }

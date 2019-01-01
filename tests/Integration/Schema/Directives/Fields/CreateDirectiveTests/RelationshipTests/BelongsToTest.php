@@ -118,5 +118,4 @@ class BelongsToTest extends DBTestCase
         $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
         $this->assertSame('1', Arr::get($result, 'data.createTask.user.id'));
     }
-
 }
