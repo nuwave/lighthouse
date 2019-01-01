@@ -25,11 +25,10 @@ class MutationExecutor
      */
     public static function executeCreate(Model $model, Collection $args, Relation $parentRelation = null): Model
     {
-
         $reflection = new \ReflectionClass($model);
         list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
-        list($morphMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining,MorphMany::class);
+        list($morphMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
 
         list($hasOne, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
 
@@ -38,7 +37,6 @@ class MutationExecutor
         list($morphOne, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
 
         list($morphToMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
-
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
@@ -282,5 +280,4 @@ class MutationExecutor
             }
         );
     }
-
 }

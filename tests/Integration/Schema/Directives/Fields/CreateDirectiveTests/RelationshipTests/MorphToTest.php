@@ -64,5 +64,4 @@ class MorphToTest extends DBTestCase
         $this->assertSame('1', Arr::get($result, 'data.createHour.hourable.id'));
         $this->assertSame('first_task', Arr::get($result, 'data.createHour.hourable.name'));
     }
-    
 }

@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class CreateTest extends DBTestCase
+class CoreTest extends DBTestCase
 {
     /**
      * @test
