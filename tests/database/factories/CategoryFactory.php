@@ -1,8 +1,10 @@
 <?php
 
 use Faker\Generator as Faker;
+use Tests\Utils\Models\Category;
 
-$factory->define(Tests\Utils\Models\Category::class, function (Faker $faker) {
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(Category::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
         'created_at' => now(),

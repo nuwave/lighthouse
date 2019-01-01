@@ -9,7 +9,7 @@ class CreateTestbenchRoleUserTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('role_user', function (Blueprint $table) {
             $table->unsignedInteger('user_id');
@@ -21,7 +21,7 @@ class CreateTestbenchRoleUserTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('role_user');
     }

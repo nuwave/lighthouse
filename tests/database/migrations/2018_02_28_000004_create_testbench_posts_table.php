@@ -9,7 +9,7 @@ class CreateTestbenchPostsTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
@@ -31,7 +31,7 @@ class CreateTestbenchPostsTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('posts');
     }
