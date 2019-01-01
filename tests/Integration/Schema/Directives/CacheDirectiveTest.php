@@ -201,7 +201,7 @@ class CacheDirectiveTest extends DBTestCase
         $cache = $this->execute($schema, $query)['data'];
 
         // Get the the original user and the `find` directive checks the count
-        $this->assertEquals(0, $queries);
+        $this->assertSame(0, $queries);
         $this->assertEquals($result, $cache);
     }
 
@@ -269,7 +269,7 @@ class CacheDirectiveTest extends DBTestCase
         $cache = $this->execute($schema, $query)['data'];
 
         // Get the the original user and the `find` directive checks the count
-        $this->assertEquals(0, $queries);
+        $this->assertSame(0, $queries);
         $this->assertEquals($result, $cache);
     }
 

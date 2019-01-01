@@ -22,9 +22,6 @@ class WithDirectiveTest extends DBTestCase
      */
     protected $tasks;
 
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();

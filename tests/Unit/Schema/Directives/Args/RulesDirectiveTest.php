@@ -139,8 +139,8 @@ class RulesDirectiveTest extends TestCase
         ';
         $result = $this->executeWithoutDebug($this->schema(), $mutation);
 
-        $this->assertEquals('John', Arr::get($result, 'data.foo.first_name'));
-        $this->assertEquals('Doe', Arr::get($result, 'data.foo.last_name'));
+        $this->assertSame('John', Arr::get($result, 'data.foo.first_name'));
+        $this->assertSame('Doe', Arr::get($result, 'data.foo.last_name'));
         $this->assertNull(Arr::get($result, 'data.foo.full_name'));
         $this->assertCount(1, Arr::get($result, 'errors'));
 

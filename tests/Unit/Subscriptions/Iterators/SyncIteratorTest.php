@@ -16,7 +16,7 @@ class SyncIteratorTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

@@ -57,9 +57,6 @@ class GraphQLTest extends DBTestCase
         $app['config']->set('lighthouse.route_enable_get', true);
     }
 
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();

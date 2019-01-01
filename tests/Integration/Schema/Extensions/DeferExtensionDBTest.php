@@ -83,7 +83,7 @@ class DeferExtensionDBTest extends DBTestCase
             ->send();
 
         $chunks = $this->stream->chunks;
-        $this->assertEquals(1, $queries);
+        $this->assertSame(1, $queries);
         $this->assertCount(2, $chunks);
 
         $deferredUser = $chunks[0];
@@ -149,7 +149,7 @@ class DeferExtensionDBTest extends DBTestCase
             ->send();
 
         $chunks = $this->stream->chunks;
-        $this->assertEquals(2, $queries);
+        $this->assertSame(2, $queries);
         $this->assertCount(3, $chunks);
 
         $deferredUser = $chunks[0];
@@ -228,7 +228,7 @@ class DeferExtensionDBTest extends DBTestCase
             ->send();
 
         $chunks = $this->stream->chunks;
-        $this->assertEquals(2, $queries);
+        $this->assertSame(2, $queries);
         $this->assertCount(3, $chunks);
 
         $deferredCompanies = $chunks[0];

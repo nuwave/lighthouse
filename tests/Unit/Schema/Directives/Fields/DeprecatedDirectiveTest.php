@@ -72,6 +72,6 @@ class DeprecatedDirectiveTest extends TestCase
         ';
 
         $data = $this->execute($schema, $query);
-        $this->assertEquals('foo.bar', Arr::get($data, 'data.foo'));
+        $this->assertSame('foo.bar', Arr::get($data, 'data.foo'));
     }
 }
