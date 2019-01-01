@@ -71,5 +71,4 @@ class MorphOneTest extends DBTestCase
         $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
         $this->assertSame(3, Arr::get($result, 'data.createTask.hour.weekday'));
     }
-
 }
