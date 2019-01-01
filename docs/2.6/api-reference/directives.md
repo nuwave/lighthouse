@@ -904,6 +904,7 @@ class Person
         return $this->typeRegistry->get(class_basename($rootValue));
     }
 }
+```
 
 ## @where
 
