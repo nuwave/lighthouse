@@ -1,8 +1,8 @@
 <?php
 
 use Tests\Utils\Models\Hour;
-use Faker\Generator as Faker;
 use Tests\Utils\Models\Task;
+use Faker\Generator as Faker;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Hour::class, function (Faker $faker) {

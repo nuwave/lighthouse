@@ -2,15 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests\RelationshipTests;
 
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Arr;
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
 
 class MorphToTest extends DBTestCase
 {
-
     /**
      * @test
      */
@@ -66,6 +63,5 @@ class MorphToTest extends DBTestCase
         $this->assertSame(2, Arr::get($result, 'data.createHour.weekday'));
         $this->assertSame('1', Arr::get($result, 'data.createHour.hourable.id'));
         $this->assertSame('first_task', Arr::get($result, 'data.createHour.hourable.name'));
-
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class CreateDirectiveTest extends DBTestCase
+class CreateTest extends DBTestCase
 {
     /**
      * @test
@@ -72,7 +72,6 @@ class CreateDirectiveTest extends DBTestCase
         $this->assertSame('1', Arr::get($result, 'data.createCompany.id'));
         $this->assertSame('foo', Arr::get($result, 'data.createCompany.name'));
     }
-
 
     /**
      * @test
@@ -293,5 +292,4 @@ class CreateDirectiveTest extends DBTestCase
 
         $this->assertSame('api', Arr::get($result, 'data.createUser.tasks.0.guard'));
     }
-
 }

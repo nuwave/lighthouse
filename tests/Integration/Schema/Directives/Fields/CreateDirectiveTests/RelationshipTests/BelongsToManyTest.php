@@ -8,7 +8,6 @@ use Tests\Utils\Models\User;
 
 class BelongsToManyTest extends DBTestCase
 {
-
     /**
      * @test
      */

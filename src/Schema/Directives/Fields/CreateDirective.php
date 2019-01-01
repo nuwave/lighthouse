@@ -53,11 +53,9 @@ class CreateDirective extends BaseDirective implements FieldResolver
                     ? reset($args)
                     : $args;
 
-
-                if (! config('lighthouse.transactional_mutations', true)) {
+                if (!config('lighthouse.transactional_mutations', true)) {
                     return MutationExecutor::executeCreate($model, collect($args))->refresh();
                 }
-
 
                 return $this->db->connection()->transaction(function () use ($model, $args) {
                     return MutationExecutor::executeCreate($model, collect($args))->refresh();
