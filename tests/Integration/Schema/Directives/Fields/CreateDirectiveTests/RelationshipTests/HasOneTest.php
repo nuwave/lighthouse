@@ -52,7 +52,7 @@ class HasOneTest extends DBTestCase
             user_id: ID!
             body: String!
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createTask(input: {
@@ -81,4 +81,5 @@ class HasOneTest extends DBTestCase
         $this->assertSame('1', Arr::get($result, 'data.createTask.post.id'));
         $this->assertSame('foobar', Arr::get($result, 'data.createTask.post.body'));
     }
+
 }
