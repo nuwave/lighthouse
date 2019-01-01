@@ -171,7 +171,7 @@ If any of the nested operations fail, the whole mutation is aborted
 and no changes are written to the database.
 You can change this setting [in the configuration](../getting-started/configuration.md).
 
-### Belongs To
+### Belongs To One
 
 You can allow the user to attach a `BelongsTo` relationship by defining
 an argument that is named just like the underlying relationship method.
@@ -181,9 +181,18 @@ type Mutation {
   createPost(input: CreatePostInput!): Post @create(flatten: true)
 }
 
+input CreateAuthorRelation {
+  connect: ID
+  create: CreateAuthorInput
+}
+
+input CreateAuthorInput {
+  name: String!
+}
+
 input CreatePostInput {
   title: String!
-  author: ID
+  author: CreateAuthorRelation
 }
 ```
 
@@ -193,7 +202,9 @@ Just pass the ID of the model you want to associate.
 mutation {
   createPost(input: {
     title: "My new Post"
-    author: 123
+    author: {
+      connect: 123
+    }
   }){
     id
     author {
@@ -203,7 +214,27 @@ mutation {
 }
 ```
 
-Lighthouse will detect the relationship and attach it.
+Or create a new one.
+
+```graphql
+mutation {
+  createPost(input: {
+    title: "My new Post"
+    author: {
+      create: {
+        name: "Herbert"
+      }  
+    }
+  }){
+    id
+    author {
+      name
+    }
+  }
+}
+```
+
+Lighthouse will detect the relationship and attach/create it.
 
 ```json
 {
@@ -254,6 +285,133 @@ mutation {
       "title": "An updated title",
       "author": null
     }
+  }
+}
+```
+
+### Belongs To Many
+
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput!): Post @create(flatten: true)
+}
+
+input CreateAuthorRelation {
+  connect: [ID]
+  create: [CreateAuthorInput]
+}
+
+input CreateAuthorInput {
+  name: String!
+}
+
+input CreatePostInput {
+  title: String!
+  authors: CreateAuthorRelation
+}
+```
+
+Just pass the ID of the models you want to associate.
+
+```graphql
+mutation {
+  createPost(input: {
+    title: "My new Post"
+    authors: {
+      connect: [123,124]
+    }
+  }){
+    id
+    authors {
+      name
+    }
+  }
+}
+```
+
+Or create a new ones.
+
+```graphql
+mutation {
+  createPost(input: {
+    title: "My new Post"
+    author: {
+      create: [{
+        name: "Herbert"
+      },
+      {
+        name: "Bro"
+      }]  
+    }
+  }){
+    id
+    authors {
+      name
+    }
+  }
+}
+```
+
+Lighthouse will detect the relationship and attach/create it.
+
+```json
+{
+  "data": {
+    "createPost": {
+      "id": 456,
+      "authors": [{
+        "name": "Herbert"
+      },
+      {
+        "name": "Bro"
+      }]
+    }
+  }
+}
+```
+
+### MorphTo
+
+```graphql
+type Task {
+  id: ID
+  name: String
+  hour: Hour
+}
+
+type Hour {
+  id: ID
+  weekday: Int
+  hourable: Task
+}
+
+type Mutation {
+  createHour(input: CreateHourInput!): Hour @create(flatten: true)
+}
+
+input CreateHourInput {
+  hourable_type: String!
+  hourable_id: Int!
+  from: String
+  to: String
+  weekday: Int
+}
+```
+
+```graphql
+mutation {
+  createHour(input: {
+      hourable_type: "App\\\Task"
+      hourable_id: 1
+      weekday: 2
+  }) {
+      id
+      weekday
+      hourable {
+          id
+          name
+      }
   }
 }
 ```

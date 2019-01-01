@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Hour extends Model
 {
-    protected $fillable = ['from', 'to', 'weekday'];
+    protected $guarded = [];
 
     public function hourable(): MorphTo
     {
