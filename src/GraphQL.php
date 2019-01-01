@@ -160,8 +160,7 @@ class GraphQL
             $variables,
             $operationName,
             null,
-            $this->getValidationRules() + DocumentValidator::defaultRules())
-        ;
+            $this->getValidationRules() + DocumentValidator::defaultRules());
 
         $result->extensions = $this->extensionRegistry->jsonSerialize();
 
@@ -181,7 +180,7 @@ class GraphQL
                 return $this->pipeline->send($error)
                                       ->through($handlers)
                                       ->then(function (Error $error) use ($formatter) {
-                                            return $formatter($error);
+                                          return $formatter($error);
                                       });
             }, $errors);
         });
@@ -229,8 +228,8 @@ class GraphQL
         if (empty($this->documentAST)) {
             $this->documentAST = config('lighthouse.cache.enable') ? app('cache')->rememberForever(config('lighthouse.cache.key'), function (
                 ) {
-                    return $this->buildAST();
-                }) : $this->buildAST();
+                return $this->buildAST();
+            }) : $this->buildAST();
         }
 
         return $this->documentAST;
