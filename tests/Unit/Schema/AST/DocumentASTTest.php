@@ -100,8 +100,8 @@ class DocumentASTTest extends TestCase
         }
         ');
 
-        $reserialized = \unserialize(
-            \serialize($documentAST)
+        $reserialized = unserialize(
+            serialize($documentAST)
         );
 
         $this->assertInstanceOf(

@@ -144,7 +144,7 @@ class DirectiveFactory
     {
         // Bail to respect the priority of namespaces, the first
         // resolved directive is kept
-        if (\in_array($directiveName, $this->resolved, true)) {
+        if (in_array($directiveName, $this->resolved, true)) {
             return $this;
         }
 

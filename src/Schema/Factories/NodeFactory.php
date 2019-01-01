@@ -138,7 +138,7 @@ class NodeFactory
     protected function resolveTypeDefault(TypeDefinitionNode $typeDefinition): Type
     {
         // Ignore TypeExtensionNode since they are merged before we get here
-        switch (\get_class($typeDefinition)) {
+        switch (get_class($typeDefinition)) {
             case EnumTypeDefinitionNode::class:
                 return $this->resolveEnumType($typeDefinition);
             case ScalarTypeDefinitionNode::class:
@@ -327,7 +327,7 @@ class NodeFactory
                 $nodeName,
                 (array) config('lighthouse.namespaces.interfaces'),
                 function (string $className): bool {
-                    return \method_exists($className, 'resolveType');
+                    return method_exists($className, 'resolveType');
                 }
             );
 
@@ -383,7 +383,7 @@ class NodeFactory
                 $nodeName,
                 (array) config('lighthouse.namespaces.unions'),
                 function (string $className): bool {
-                    return \method_exists($className, 'resolveType');
+                    return method_exists($className, 'resolveType');
                 }
             );
 
