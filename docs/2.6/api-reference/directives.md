@@ -327,7 +327,7 @@ type Query {
 }
 ```
 
-This throws when more then one result is returned.
+This throws an error when more than one result is returned.
 Use [@first](#first) if you can not ensure that.
 
 ## @first
@@ -340,7 +340,7 @@ type Query {
 }
 ```
 
-Other then [@find](#find), this will not throw an error if more then one items are in the collection.
+Other than [@find](#find), this will not throw an error if more than one items are in the collection.
 
 ## @enum
 
@@ -599,7 +599,7 @@ extend type Query {
 }
 ```
 
-Other then global middleware defined in the [configuration](../getting-started/configuration.md), field middleware
+Other than global middleware defined in the [configuration](../getting-started/configuration.md), field middleware
 only applies to the specific field it is defined on. This has the benefit of limiting errors
 to particular fields and not failing an entire request if a middleware fails.
 
