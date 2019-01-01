@@ -187,7 +187,7 @@ class RulesDirectiveTest extends TestCase
         $queryResult = $this->executeWithoutDebug($this->schema(), $query);
 
         $this->assertSame('John', Arr::get($queryResult, 'data.foo.first_name'));
-        $this->assertEquals([
+        $this->assertSame([
             'input.emails.0' => [
                 'Not an email',
             ],
@@ -241,7 +241,7 @@ class RulesDirectiveTest extends TestCase
         $queryResult = $this->executeWithoutDebug($this->schema(), $query);
 
         $this->assertSame('John', Arr::get($queryResult, 'data.foo.first_name'));
-        $this->assertEquals([
+        $this->assertSame([
             'input.email' => [
                 'Not an email',
             ],

@@ -87,12 +87,12 @@ class DeferExtensionDBTest extends DBTestCase
         $this->assertCount(2, $chunks);
 
         $deferredUser = $chunks[0];
-        $this->assertEquals($user->email, Arr::get($deferredUser, 'data.user.email'));
+        $this->assertSame($user->email, Arr::get($deferredUser, 'data.user.email'));
         $this->assertNull(Arr::get($deferredUser, 'data.user.company'));
 
         $deferredCompany = $chunks[1];
         $this->assertArrayHasKey('user.company', $deferredCompany);
-        $this->assertEquals($company->name, Arr::get($deferredCompany['user.company']['data'], 'name'));
+        $this->assertSame($company->name, Arr::get($deferredCompany['user.company']['data'], 'name'));
     }
 
     /**
@@ -153,18 +153,18 @@ class DeferExtensionDBTest extends DBTestCase
         $this->assertCount(3, $chunks);
 
         $deferredUser = $chunks[0];
-        $this->assertEquals($user->email, Arr::get($deferredUser, 'data.user.email'));
+        $this->assertSame($user->email, Arr::get($deferredUser, 'data.user.email'));
         $this->assertNull(Arr::get($deferredUser, 'data.user.company'));
 
         $deferredCompany = $chunks[1];
         $this->assertArrayHasKey('user.company', $deferredCompany);
-        $this->assertEquals($company->name, Arr::get($deferredCompany['user.company']['data'], 'name'));
+        $this->assertSame($company->name, Arr::get($deferredCompany['user.company']['data'], 'name'));
         $this->assertNull(Arr::get($deferredCompany['user.company'], 'users'));
 
         $deferredUsers = $chunks[2];
         $this->assertArrayHasKey('user.company.users', $deferredUsers);
         $this->assertCount(5, $deferredUsers['user.company.users']['data']);
-        $this->assertEquals(
+        $this->assertSame(
             $users->map(function ($user) {
                 return ['email' => $user->email];
             })->values()->toArray(),
@@ -232,8 +232,8 @@ class DeferExtensionDBTest extends DBTestCase
         $this->assertCount(3, $chunks);
 
         $deferredCompanies = $chunks[0];
-        $this->assertEquals($companies[0]->name, Arr::get($deferredCompanies, 'data.companies.0.name'));
-        $this->assertEquals($companies[1]->name, Arr::get($deferredCompanies, 'data.companies.1.name'));
+        $this->assertSame($companies[0]->name, Arr::get($deferredCompanies, 'data.companies.0.name'));
+        $this->assertSame($companies[1]->name, Arr::get($deferredCompanies, 'data.companies.1.name'));
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.0.users'));
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.1.users'));
 
@@ -241,7 +241,7 @@ class DeferExtensionDBTest extends DBTestCase
         $companies->each(function ($company, $i) use ($deferredUsers) {
             $key = "companies.{$i}.users";
             $this->assertArrayHasKey($key, $deferredUsers);
-            $this->assertEquals(
+            $this->assertSame(
                 $company->users->map(function ($user) {
                     return [
                         'email' => $user->email,

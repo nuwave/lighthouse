@@ -46,7 +46,7 @@ class DirectiveFactoryTest extends TestCase
         ');
 
         $fieldDirective = $this->directiveFactory->create('field', $fieldDefinition);
-        $this->assertAttributeEquals($fieldDefinition, 'definitionNode', $fieldDirective);
+        $this->assertAttributeSame($fieldDefinition, 'definitionNode', $fieldDirective);
     }
 
     /**

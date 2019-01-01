@@ -96,7 +96,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -127,7 +127,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -162,7 +162,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -196,6 +196,6 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 }
