@@ -9,7 +9,7 @@ class CreateTestbenchCompaniesTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->increments('id');
@@ -21,7 +21,7 @@ class CreateTestbenchCompaniesTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('companies');
     }

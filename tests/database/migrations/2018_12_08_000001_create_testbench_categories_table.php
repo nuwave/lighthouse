@@ -9,7 +9,7 @@ class CreateTestbenchCategoriesTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('category_id');
@@ -21,7 +21,7 @@ class CreateTestbenchCategoriesTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('categories');
     }
