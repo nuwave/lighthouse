@@ -99,7 +99,7 @@ abstract class BaseDirective implements Directive
 
         $namespacedClassName = $this->namespaceClassName($className);
 
-        return \construct_resolver($namespacedClassName, $methodName);
+        return construct_resolver($namespacedClassName, $methodName);
     }
 
     /**
@@ -146,7 +146,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
     {
         // Always try the explicitly set namespace first
-        \array_unshift(
+        array_unshift(
             $namespacesToTry,
             ASTHelper::getNamespaceForDirective(
                 $this->definitionNode,
@@ -194,7 +194,7 @@ abstract class BaseDirective implements Directive
         );
 
         if (
-            2 !== count($argumentParts)
+            count($argumentParts) !== 2
             || empty($argumentParts[0])
             || empty($argumentParts[1])
         ) {
@@ -221,7 +221,7 @@ abstract class BaseDirective implements Directive
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),
             function (string $classCandidate): bool {
-                return \is_subclass_of($classCandidate, Model::class);
+                return is_subclass_of($classCandidate, Model::class);
             }
         );
     }

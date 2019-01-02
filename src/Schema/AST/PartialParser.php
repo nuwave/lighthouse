@@ -344,7 +344,7 @@ class PartialParser
      */
     protected static function getFirstAndValidateType(NodeList $list, string $expectedType): Node
     {
-        if (1 !== $list->count()) {
+        if ($list->count() !== 1) {
             throw new ParseException('More than one definition was found in the passed in schema.');
         }
 

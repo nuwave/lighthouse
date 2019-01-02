@@ -31,9 +31,6 @@ class BelongsToTest extends DBTestCase
      */
     protected $company;
 
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();

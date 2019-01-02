@@ -25,9 +25,6 @@ class HasManyDirectiveTest extends DBTestCase
      */
     protected $tasks;
 
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -158,8 +155,8 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertEquals(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertEquals(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertSame(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertSame(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
         $this->assertTrue(Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
         $this->assertCount(2, Arr::get($result->data, 'user.tasks.data'));
     }
@@ -198,8 +195,8 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $this->assertEquals(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertEquals(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
+        $this->assertSame(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
+        $this->assertSame(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
         $this->assertTrue(Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
         $this->assertCount(2, Arr::get($result->data, 'user.tasks.data'));
     }

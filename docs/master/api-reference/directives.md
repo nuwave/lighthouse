@@ -119,18 +119,6 @@ type Mutation {
 }
 ```
 
-## @trim
-
-***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
-
-Run the `trim` function on the argument it is defined on.
-
-```graphql
-type Mutation {
-    createUser(name: String @trim): User
-}
-```
-
 ## @broadcast
 
 Broadcast mutation results to subscribed clients.
@@ -979,6 +967,18 @@ type Subscription {
         @subscription(
             class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
         )
+}
+```
+
+## @trim
+
+***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+
+Run the `trim` function on the argument it is defined on.
+
+```graphql
+type Mutation {
+    createUser(name: String @trim): User
 }
 ```
 

@@ -28,14 +28,14 @@ class SearchDirective extends BaseDirective implements ArgFilterDirective
     {
         $within = $this->directiveArgValue('within');
 
-        $modelClass = \get_class(
+        $modelClass = get_class(
             $builder->getModel()
         );
 
         /** @var \Laravel\Scout\Builder $builder */
         $builder = $modelClass::search($value);
 
-        if (null !== $within) {
+        if ($within !== null) {
             $builder->within($within);
         }
 

@@ -34,11 +34,11 @@ class PaginationManipulator
      */
     public static function assertValidPaginationType(string $paginationType): string
     {
-        if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
+        if ($paginationType === self::PAGINATION_ALIAS_RELAY) {
             return self::PAGINATION_TYPE_CONNECTION;
         }
 
-        if (self::PAGINATION_ALIAS_DEFAULT === $paginationType) {
+        if ($paginationType === self::PAGINATION_ALIAS_DEFAULT) {
             return self::PAGINATION_TYPE_PAGINATOR;
         }
 

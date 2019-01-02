@@ -6,8 +6,6 @@ use Illuminate\Console\Command;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Nuwave\Lighthouse\Exceptions\ParseException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class PrintSchemaCommand extends Command
 {
@@ -20,6 +18,7 @@ class PrintSchemaCommand extends Command
         lighthouse:print-schema
         {--W|write : Write the output to a file}
     ';
+
     /**
      * The console command description.
      *
@@ -30,11 +29,9 @@ class PrintSchemaCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param Repository $cache
-     * @param Filesystem $storage
-     *
-     * @throws DirectiveException
-     * @throws ParseException
+     * @param  \Illuminate\Cache\Repository  $cache
+     * @param  \Illuminate\Contracts\Filesystem\Filesystem  $storage
+     * @return void
      */
     public function handle(Repository $cache, Filesystem $storage): void
     {

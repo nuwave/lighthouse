@@ -2,9 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
-use Pusher\Pusher;
 use Illuminate\Support\Arr;
-use Pusher\PusherException;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -16,19 +14,20 @@ class PusherBroadcaster implements Broadcaster
     const EVENT_NAME = 'lighthouse-subscription';
 
     /**
-     * @var Pusher
+     * @var \Pusher\Pusher
      */
     protected $pusher;
 
     /**
-     * @var StoresSubscriptions
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
      */
     protected $storage;
 
     /**
      * Create instance of pusher broadcaster.
      *
-     * @param Pusher $pusher
+     * @param  \Pusher\Pusher $pusher
+     * @return void
      */
     public function __construct($pusher)
     {
@@ -39,11 +38,8 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Authorize subscription request.
      *
-     * @param Request $request
-     *
-     * @throws PusherException
-     *
-     * @return JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function authorized(Request $request): JsonResponse
     {
@@ -60,9 +56,8 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Handle unauthorized subscription request.
      *
-     * @param Request $request
-     *
-     * @return JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function unauthorized(Request $request): JsonResponse
     {
@@ -72,15 +67,15 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Handle subscription web hook.
      *
-     * @param Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
-     * @return JsonResponse
+     * @return \Illuminate\Support\Response
      */
     public function hook(Request $request): JsonResponse
     {
         collect($request->input('events', []))
-            ->filter(function ($event) {
-                return 'channel_vacated' == array_get($event, 'name');
+            ->filter(function ($event): bool {
+                return Arr::get($event, 'name') === 'channel_vacated';
             })->each(function (array $event): void {
                 $this->storage->deleteSubscriber(
                     Arr::get($event, 'channel')
@@ -93,11 +88,8 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param Subscriber $subscriber
-     * @param mixed[] $data
-     *
-     * @throws PusherException
-     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  mixed[]  $data
      * @return void
      */
     public function broadcast(Subscriber $subscriber, array $data): void

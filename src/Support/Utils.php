@@ -25,7 +25,7 @@ class Utils
         // Stop if the class is found or we are out of namespaces to try
         while (! empty($namespacesToTry)) {
             // Pop off the first namespace and try it
-            $className = \array_shift($namespacesToTry).'\\'.$classCandidate;
+            $className = array_shift($namespacesToTry).'\\'.$classCandidate;
 
             if ($determineMatch($className)) {
                 return $className;

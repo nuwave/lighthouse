@@ -205,7 +205,7 @@ class MiddlewareDirectiveTest extends TestCase
         $this->assertSame(
             [
                 'auth',
-                'Tests\\Utils\\Middleware\\Authenticate',
+                Authenticate::class,
                 'api',
             ],
             $fieldMiddlewares

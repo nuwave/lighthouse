@@ -5,15 +5,21 @@ namespace DummyNamespace;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DummyClass
 {
-    /** @var TypeRegistry */
+    /**
+     * The type registry.
+     *
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * Constructor.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -23,11 +29,10 @@ class DummyClass
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param mixed          $rootValue   The value that was resolved by the field. Usually an Eloquent model.
-     * @param GraphQLContext $context     Arbitrary data that is shared between all fields of a single query.
-     * @param ResolveInfo    $resolveInfo Information about the query itself, such as the execution state, the field name, path to the field from the root, and more.
-     *
-     * @return Type
+     * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @return \GraphQL\Type\Definition\Type
      */
     public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {

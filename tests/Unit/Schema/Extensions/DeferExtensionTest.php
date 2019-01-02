@@ -129,18 +129,18 @@ class DeferExtensionTest extends TestCase
         $chunks = $this->stream->chunks;
 
         $this->assertCount(3, $chunks);
-        $this->assertEquals(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
+        $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
         $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
 
         $deferred = Arr::get($chunks[1], 'user.parent');
         $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertEquals(self::$data['parent']['name'], $deferred['data']['name']);
+        $this->assertSame(self::$data['parent']['name'], $deferred['data']['name']);
         $this->assertArrayHasKey('parent', $deferred['data']);
         $this->assertNull($deferred['data']['parent']);
 
         $nestedDeferred = Arr::get($chunks[2], 'user.parent.parent');
         $this->assertArrayHasKey('name', $nestedDeferred['data']);
-        $this->assertEquals(self::$data['parent']['parent']['name'], $nestedDeferred['data']['name']);
+        $this->assertSame(self::$data['parent']['parent']['name'], $nestedDeferred['data']['name']);
     }
 
     /**
@@ -196,10 +196,10 @@ class DeferExtensionTest extends TestCase
         $this->assertNull(Arr::get($chunks[0], 'data.posts.1.author'));
 
         $deferredPost1 = $chunks[1]['posts.0.author']['data'];
-        $this->assertEquals(self::$data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
+        $this->assertSame(self::$data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
 
         $deferredPost2 = $chunks[1]['posts.1.author']['data'];
-        $this->assertEquals(self::$data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
+        $this->assertSame(self::$data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
     }
 
     /**
@@ -268,18 +268,18 @@ class DeferExtensionTest extends TestCase
         $this->assertNull(Arr::get($chunks[0], 'data.posts.1.author'));
 
         $deferredPost1 = $chunks[1]['posts.0.author']['data'];
-        $this->assertEquals(self::$data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
+        $this->assertSame(self::$data[0]['author']['name'], Arr::get($deferredPost1, 'name'));
 
         $deferredComment1 = $chunks[1]['posts.0.comments']['data'];
         $this->assertCount(1, $deferredComment1);
-        $this->assertEquals(self::$data[0]['comments'][0]['message'], Arr::get($deferredComment1[0], 'message'));
+        $this->assertSame(self::$data[0]['comments'][0]['message'], Arr::get($deferredComment1[0], 'message'));
 
         $deferredPost2 = $chunks[1]['posts.1.author']['data'];
-        $this->assertEquals(self::$data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
+        $this->assertSame(self::$data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
 
         $deferredComment2 = $chunks[1]['posts.1.comments']['data'];
         $this->assertCount(1, $deferredComment2);
-        $this->assertEquals(self::$data[1]['comments'][0]['message'], Arr::get($deferredComment2[0], 'message'));
+        $this->assertSame(self::$data[1]['comments'][0]['message'], Arr::get($deferredComment2[0], 'message'));
     }
 
     /**
@@ -334,14 +334,14 @@ class DeferExtensionTest extends TestCase
         // If we didn't hit the max execution time we would have 3 items in the array
         $this->assertCount(2, $chunks);
 
-        $this->assertEquals(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
+        $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
         $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
 
         $deferred = Arr::get($chunks[1], 'user.parent');
         $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertEquals(self::$data['parent']['name'], $deferred['data']['name']);
+        $this->assertSame(self::$data['parent']['name'], $deferred['data']['name']);
         $this->assertArrayHasKey('parent', $deferred['data']);
-        $this->assertEquals(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
+        $this->assertSame(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
     }
 
     /**
@@ -394,14 +394,14 @@ class DeferExtensionTest extends TestCase
         $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
 
-        $this->assertEquals(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
+        $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
         $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
 
         $deferred = Arr::get($chunks[1], 'user.parent');
         $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertEquals(self::$data['parent']['name'], $deferred['data']['name']);
+        $this->assertSame(self::$data['parent']['name'], $deferred['data']['name']);
         $this->assertArrayHasKey('parent', $deferred['data']);
-        $this->assertEquals(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
+        $this->assertSame(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
     }
 
     /**
@@ -492,7 +492,7 @@ class DeferExtensionTest extends TestCase
 
         $response = $this->postJson('/graphql', compact('query'))->json();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'name' => 'John Doe',
                 'parent' => ['name' => 'Jane Doe'],
@@ -542,7 +542,7 @@ class DeferExtensionTest extends TestCase
 
         $response = $this->postJson('/graphql', compact('query'))->json();
 
-        $this->assertEquals(self::$data, Arr::get($response, 'data.user'));
+        $this->assertSame(self::$data, Arr::get($response, 'data.user'));
     }
 
     /**
@@ -588,7 +588,7 @@ class DeferExtensionTest extends TestCase
         }';
 
         $response = $this->postJson('/graphql', compact('query'))->json();
-        $this->assertEquals(self::$data, Arr::get($response, 'data.updateUser'));
+        $this->assertSame(self::$data, Arr::get($response, 'data.updateUser'));
     }
 
     /**
@@ -624,7 +624,7 @@ class DeferExtensionTest extends TestCase
         }';
 
         $response = $this->postJson('/graphql', compact('query'))->json();
-        $this->assertEquals(self::$data, Arr::get($response, 'data.user'));
+        $this->assertSame(self::$data, Arr::get($response, 'data.user'));
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Pusher\Pusher;
 use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Support\DriverManager;
+use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 
@@ -43,7 +44,7 @@ class BroadcastManager extends DriverManager
      */
     protected function interface(): string
     {
-        return 'Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster';
+        return Broadcaster::class;
     }
 
     /**

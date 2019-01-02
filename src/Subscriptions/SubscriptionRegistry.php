@@ -140,7 +140,7 @@ class SubscriptionRegistry
                 return $node instanceof OperationDefinitionNode;
             })
             ->filter(function (OperationDefinitionNode $node): bool {
-                return 'subscription' === $node->operation;
+                return $node->operation === 'subscription';
             })
             ->flatMap(function (OperationDefinitionNode $node) {
                 return collect($node->selectionSet->selections)

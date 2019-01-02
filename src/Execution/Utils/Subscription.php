@@ -36,7 +36,7 @@ class Subscription
             throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
 
-        $queue = null === $queue ? config('lighthouse.subscriptions.queue_broadcasts', false) : $queue;
+        $queue = $queue === null ? config('lighthouse.subscriptions.queue_broadcasts', false) : $queue;
         $method = $queue ? 'queueBroadcast' : 'broadcast';
         $subscription = $registry->subscription($subscriptionField);
 

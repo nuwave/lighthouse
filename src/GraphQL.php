@@ -11,50 +11,80 @@ use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
-use GraphQL\Validator\Rules\ValidationRule;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
-    /** @var Schema */
+    /**
+     * The executable schema.
+     *
+     * @var \GraphQL\Type\Schema
+     */
     protected $executableSchema;
 
-    /** @var DocumentAST */
+    /**
+     * The parsed schema AST.
+     *
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     */
     protected $documentAST;
 
-    /** @var ExtensionRegistry */
+    /**
+     * Th extension registry.
+     *
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
+     */
     protected $extensionRegistry;
 
-    /** @var SchemaBuilder */
+    /**
+     * The schema builder.
+     *
+     * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
+     */
     protected $schemaBuilder;
 
-    /** @var SchemaSourceProvider */
+    /**
+     * The schema source provider.
+     *
+     * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
+     */
     protected $schemaSourceProvider;
 
-    /** @var Pipeline */
+    /**
+     * The pipeline.
+     *
+     * @var \Nuwave\Lighthouse\Support\Pipeline
+     */
     protected $pipeline;
 
-    /** @var int|null */
+    /**
+     * The current batch index.
+     *
+     * @var int|null
+     */
     protected $currentBatchIndex = null;
 
     /**
-     * @param ExtensionRegistry    $extensionRegistry
-     * @param SchemaBuilder        $schemaBuilder
-     * @param SchemaSourceProvider $schemaSourceProvider
-     * @param Pipeline             $pipeline
+     * GraphQL constructor.
+     *
+     * @param \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry
+     * @param \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder
+     * @param \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider $schemaSourceProvider
+     * @param \Nuwave\Lighthouse\Support\Pipeline $pipeline
+     * @retutn void
      */
-    public function __construct(ExtensionRegistry $extensionRegistry, SchemaBuilder $schemaBuilder, SchemaSourceProvider $schemaSourceProvider, Pipeline $pipeline)
-    {
+    public function __construct(
+        ExtensionRegistry $extensionRegistry,
+        SchemaBuilder $schemaBuilder,
+        SchemaSourceProvider $schemaSourceProvider,
+        Pipeline $pipeline
+    ) {
         $this->extensionRegistry = $extensionRegistry;
         $this->schemaBuilder = $schemaBuilder;
         $this->schemaSourceProvider = $schemaSourceProvider;
@@ -76,11 +106,10 @@ class GraphQL
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
-     * @param array          $requests
-     * @param GraphQLContext $context
-     * @param mixed|null     $rootValue
-     *
-     * @return ExecutionResult[]
+     * @param  array  $requests
+     * @param  GraphQLContext  $context
+     * @param  mixed|null  $rootValue
+     * @return \GraphQL\Executor\ExecutionResult[]
      */
     public function executeBatchedQueries(array $requests, GraphQLContext $context, $rootValue = null): array
     {
@@ -109,20 +138,20 @@ class GraphQL
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
-     * @param string         $query
-     * @param GraphQLContext $context
-     * @param array|null     $variables
-     * @param mixed|null     $rootValue
-     * @param string|null    $operationName
-     *
-     * @throws DirectiveException
-     * @throws ParseException
-     * @throws DefinitionException
-     *
-     * @return ExecutionResult
+     * @param  string  $query
+     * @param  GraphQLContext  $context
+     * @param  mixed[]  $variables
+     * @param  mixed|null  $rootValue
+     * @param  string|null  $operationName
+     * @return \GraphQL\Executor\ExecutionResult
      */
-    public function executeQuery(string $query, ?GraphQLContext $context, ?array $variables = [], $rootValue = null, ?string $operationName = null): ExecutionResult
-    {
+    public function executeQuery(
+        string $query,
+        GraphQLContext $context,
+        ?array $variables = [],
+        $rootValue = null,
+        ?string $operationName = null
+    ): ExecutionResult {
         $operationName = $operationName ?: app('request')->input('operationName');
 
         $result = GraphQLBase::executeQuery(
@@ -171,11 +200,7 @@ class GraphQL
     /**
      * Ensure an executable GraphQL schema is present.
      *
-     * @throws DirectiveException
-     * @throws ParseException
-     * @throws DefinitionException
-     *
-     * @return Schema
+     * @return \GraphQL\Type\Schema
      */
     public function prepSchema(): Schema
     {
@@ -191,7 +216,7 @@ class GraphQL
     /**
      * Construct the validation rules with values given in the config.
      *
-     * @return ValidationRule[]
+     * @return \GraphQL\Validator\Rules\ValidationRule[]
      */
     protected function getValidationRules(): array
     {
@@ -205,9 +230,7 @@ class GraphQL
     /**
      * Get instance of DocumentAST.
      *
-     * @throws ParseException
-     *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function documentAST(): DocumentAST
     {
@@ -229,9 +252,7 @@ class GraphQL
     /**
      * Get the schema string and build an AST out of it.
      *
-     * @throws ParseException
-     *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected function buildAST(): DocumentAST
     {
@@ -241,11 +262,9 @@ class GraphQL
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
         $additionalSchemas = collect(
-            event(
-                new BuildingAST($schemaString)
-            )
-        )->implode("\n");
+            event(new BuildingAST($schemaString))
+        )->implode(PHP_EOL);
 
-        return ASTBuilder::generate($schemaString."\n".$additionalSchemas);
+        return ASTBuilder::generate($schemaString.PHP_EOL.$additionalSchemas);
     }
 }

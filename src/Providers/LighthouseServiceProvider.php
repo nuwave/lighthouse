@@ -5,13 +5,23 @@ namespace Nuwave\Lighthouse\Providers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Nuwave\Lighthouse\GraphQL;
+use Illuminate\Validation\Factory;
+use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Console\QueryCommand;
+use Nuwave\Lighthouse\Console\UnionCommand;
+use Nuwave\Lighthouse\Console\ScalarCommand;
+use Nuwave\Lighthouse\Console\MutationCommand;
+use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
+use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Support\Http\Responses\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
@@ -83,23 +93,20 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
         $this->app->singleton(GraphQLResponse::class, Response::class);
 
-        $this->app->singleton(
-            SchemaSourceProvider::class,
-            function () {
-                return new SchemaStitcher(config('lighthouse.schema.register', ''));
-            }
-        );
+        $this->app->singleton(SchemaSourceProvider::class, function () {
+            return new SchemaStitcher(config('lighthouse.schema.register', ''));
+        });
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Nuwave\Lighthouse\Console\ClearCacheCommand::class,
-                \Nuwave\Lighthouse\Console\InterfaceCommand::class,
-                \Nuwave\Lighthouse\Console\MutationCommand::class,
-                \Nuwave\Lighthouse\Console\PrintSchemaCommand::class,
-                \Nuwave\Lighthouse\Console\QueryCommand::class,
-                \Nuwave\Lighthouse\Console\UnionCommand::class,
-                \Nuwave\Lighthouse\Console\ScalarCommand::class,
-                \Nuwave\Lighthouse\Console\ValidateSchemaCommand::class,
+                ClearCacheCommand::class,
+                InterfaceCommand::class,
+                MutationCommand::class,
+                PrintSchemaCommand::class,
+                QueryCommand::class,
+                ScalarCommand::class,
+                UnionCommand::class,
+                ValidateSchemaCommand::class,
             ]);
         }
 
@@ -113,20 +120,14 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     protected function registerValidator(): void
     {
-        $this->app->make(\Illuminate\Validation\Factory::class)->resolver(
-            function (
-                $translator,
-                array $data,
-                array $rules,
-                array $messages,
-                array $customAttributes
-            ): \Illuminate\Validation\Validator {
+        $this->app->make(Factory::class)->resolver(
+            function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {
                 // This determines whether we are resolving a GraphQL field
                 $resolveInfo = Arr::get($customAttributes, 'resolveInfo');
 
                 return $resolveInfo instanceof ResolveInfo
                     ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
-                    : new \Illuminate\Validation\Validator($translator, $data, $rules, $messages, $customAttributes);
+                    : new Validator($translator, $data, $rules, $messages, $customAttributes);
             }
         );
     }

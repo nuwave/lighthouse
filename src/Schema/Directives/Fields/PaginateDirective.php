@@ -99,7 +99,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                 $first = $args['count'];
                 $page = $args['page'] ?? 1;
 
-                return $this->getPaginatedResults(\func_get_args(), $page, $first);
+                return $this->getPaginatedResults(func_get_args(), $page, $first);
             }
         );
     }
@@ -123,7 +123,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                     Cursor::decode($args)
                 );
 
-                return $this->getPaginatedResults(\func_get_args(), $page, $first);
+                return $this->getPaginatedResults(func_get_args(), $page, $first);
             }
         );
     }
@@ -141,7 +141,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     protected function getPaginatedResults(array $resolveArgs, int $page, int $first): LengthAwarePaginator
     {
         if ($this->directiveHasArgument('builder')) {
-            $query = \call_user_func_array(
+            $query = call_user_func_array(
                 $this->getResolverFromArgument('builder'),
                 $resolveArgs
             );

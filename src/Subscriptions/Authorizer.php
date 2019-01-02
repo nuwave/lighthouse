@@ -67,7 +67,7 @@ class Authorizer implements AuthorizesSubscriptions
 
             $authorized = $subscriptions->reduce(
                 function ($authorized, GraphQLSubscription $subscription) use ($subscriber, $request): bool {
-                    return false === $authorized
+                    return $authorized === false
                         ? false
                         : $subscription->authorize($subscriber, $request);
                 }

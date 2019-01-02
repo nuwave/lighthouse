@@ -26,7 +26,6 @@ We also have a website over at [lighthouse-php.com](https://lighthouse-php.com/)
 If you have an existing Laravel project, all you really need is two steps:
 
 1. Install via `composer require nuwave/lighthouse`
-
 2. Define your schema in `graphql/schema.graphql`
 
 ## Get involved

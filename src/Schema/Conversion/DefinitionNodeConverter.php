@@ -43,7 +43,7 @@ class DefinitionNodeConverter
     protected function convertWrappedDefinitionNode($node, array $wrappers = []): Type
     {
         // Recursively unwrap the type and save the wrappers
-        if (NodeKind::NON_NULL_TYPE === $node->kind || NodeKind::LIST_TYPE === $node->kind) {
+        if ($node->kind === NodeKind::NON_NULL_TYPE || $node->kind === NodeKind::LIST_TYPE) {
             $wrappers[] = $node->kind;
 
             return $this->convertWrappedDefinitionNode(
@@ -57,9 +57,9 @@ class DefinitionNodeConverter
             ->reverse()
             ->reduce(
                 function (Type $type, string $kind): Type {
-                    if (NodeKind::NON_NULL_TYPE === $kind) {
+                    if ($kind === NodeKind::NON_NULL_TYPE) {
                         return Type::nonNull($type);
-                    } elseif (NodeKind::LIST_TYPE === $kind) {
+                    } elseif ($kind === NodeKind::LIST_TYPE) {
                         return Type::listOf($type);
                     }
 

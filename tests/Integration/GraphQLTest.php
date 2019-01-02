@@ -5,7 +5,6 @@ namespace Tests\Integration;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Support\Collection;
 
 class GraphQLTest extends DBTestCase
 {
@@ -42,16 +41,11 @@ class GraphQLTest extends DBTestCase
     /**
      * Tasks associated with the current user.
      *
-     * @var Collection<Task>
+     * @var \Illuminate\Support\Collection<Task>
      */
     protected $tasks;
 
-    /**
-     * Setup test environment.
-     *
-     * @return void
-     */
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

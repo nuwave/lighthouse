@@ -194,7 +194,7 @@ class ModelRelationFetcher
             ->whereKey($ids)
             ->get()
             ->filter(function (Model $model) use ($ids) {
-                return \in_array(
+                return in_array(
                     $model->getKey(),
                     $ids,
                     true
@@ -240,13 +240,13 @@ class ModelRelationFetcher
                 $relationConstraints($relation, $model);
 
                 if (method_exists($relation, 'shouldSelect')) {
-                    $shouldSelect = new ReflectionMethod(\get_class($relation), 'shouldSelect');
+                    $shouldSelect = new ReflectionMethod(get_class($relation), 'shouldSelect');
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
 
                     $relation->addSelect($select);
                 } elseif (method_exists($relation, 'getSelectColumns')) {
-                    $getSelectColumns = new ReflectionMethod(\get_class($relation), 'getSelectColumns');
+                    $getSelectColumns = new ReflectionMethod(get_class($relation), 'getSelectColumns');
                     $getSelectColumns->setAccessible(true);
                     $select = $getSelectColumns->invoke($relation, ['*']);
 
@@ -410,8 +410,8 @@ class ModelRelationFetcher
     {
         $relation = $this->getRelationInstance($relationName);
 
-        if ($relationModels->isNotEmpty() && \method_exists($relation, 'hydratePivotRelation')) {
-            $hydrationMethod = new ReflectionMethod(\get_class($relation), 'hydratePivotRelation');
+        if ($relationModels->isNotEmpty() && method_exists($relation, 'hydratePivotRelation')) {
+            $hydrationMethod = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
             $hydrationMethod->setAccessible(true);
             $hydrationMethod->invoke($relation, $relationModels->all());
         }

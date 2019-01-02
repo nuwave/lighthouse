@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
+use Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController;
 
 class SubscriptionRouter
 {
@@ -33,7 +34,7 @@ class SubscriptionRouter
         $router = config("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes");
         $routerParts = explode('@', $router);
 
-        if (2 == count($routerParts) && ! empty($routerParts[0]) && ! empty($routerParts[1])) {
+        if (count($routerParts) == 2 && ! empty($routerParts[0]) && ! empty($routerParts[1])) {
             $routerInstance = app($routerParts[0]);
             $method = $routerParts[1];
 
@@ -50,12 +51,12 @@ class SubscriptionRouter
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
-            'uses' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@authorize',
+            'uses' => SubscriptionController::class.'@authorize',
         ]);
 
         $router->post('graphql/subscriptions/webhook', [
             'as' => 'lighthouse.subscriptions.auth',
-            'uses' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@webhook',
+            'uses' => SubscriptionController::class.'@webhook',
         ]);
     }
 

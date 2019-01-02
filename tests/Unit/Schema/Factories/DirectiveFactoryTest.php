@@ -46,7 +46,7 @@ class DirectiveFactoryTest extends TestCase
         ');
 
         $fieldDirective = $this->directiveFactory->create('field', $fieldDefinition);
-        $this->assertAttributeEquals($fieldDefinition, 'definitionNode', $fieldDirective);
+        $this->assertAttributeSame($fieldDefinition, 'definitionNode', $fieldDirective);
     }
 
     /**
@@ -70,7 +70,7 @@ class DirectiveFactoryTest extends TestCase
             }
         };
 
-        $this->directiveFactory->setResolved('foo', \get_class($directive));
+        $this->directiveFactory->setResolved('foo', get_class($directive));
         $directive = $this->directiveFactory->create('foo', $fieldDefinition);
 
         $this->assertObjectNotHasAttribute('definitionNode', $directive);
