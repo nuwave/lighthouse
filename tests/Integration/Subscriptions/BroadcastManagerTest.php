@@ -74,8 +74,8 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
         $data = ['foo' => 'bar'];
         $broadcaster = $this->broadcastManager->driver('foo');
 
-        $this->assertEquals(['driver' => 'foo'], $broadcasterConfig);
-        $this->assertEquals($data, $broadcaster->broadcast($this->subscriber(), $data));
+        $this->assertSame(['driver' => 'foo'], $broadcasterConfig);
+        $this->assertSame($data, $broadcaster->broadcast($this->subscriber(), $data));
     }
 
     /**

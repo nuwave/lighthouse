@@ -27,7 +27,7 @@ class ClientDirectiveTest extends TestCase
         ';
         $result = $this->executeQuery($schema, $query);
 
-        $this->assertEquals(['foo' => 'baz'], $result->data);
+        $this->assertSame(['foo' => 'baz'], $result->data);
     }
 
     public function resolve($root, array $args, $context, ResolveInfo $info)

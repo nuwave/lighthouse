@@ -57,9 +57,6 @@ class GraphQLTest extends DBTestCase
         $app['config']->set('lighthouse.route_enable_get', true);
     }
 
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -99,7 +96,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -130,7 +127,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -165,7 +162,7 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -199,6 +196,6 @@ class GraphQLTest extends DBTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 }

@@ -10,9 +10,6 @@ use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderPolymorphicTest extends DBTestCase
 {
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();

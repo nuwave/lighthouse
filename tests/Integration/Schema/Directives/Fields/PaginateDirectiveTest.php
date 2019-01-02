@@ -47,9 +47,9 @@ class PaginateDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertEquals(5, Arr::get($result->data, 'users.paginatorInfo.count'));
-        $this->assertEquals(10, Arr::get($result->data, 'users.paginatorInfo.total'));
-        $this->assertEquals(1, Arr::get($result->data, 'users.paginatorInfo.currentPage'));
+        $this->assertSame(5, Arr::get($result->data, 'users.paginatorInfo.count'));
+        $this->assertSame(10, Arr::get($result->data, 'users.paginatorInfo.total'));
+        $this->assertSame(1, Arr::get($result->data, 'users.paginatorInfo.currentPage'));
         $this->assertCount(5, Arr::get($result->data, 'users.data'));
     }
 
@@ -375,8 +375,8 @@ class PaginateDirectiveTest extends DBTestCase
         ';
 
         $result = $this->executeQuery($schema, $query);
-        $this->assertEquals(5, Arr::get($result->data, 'users.paginatorInfo.count'));
-        $this->assertEquals(10, Arr::get($result->data, 'users.paginatorInfo.total'));
+        $this->assertSame(5, Arr::get($result->data, 'users.paginatorInfo.count'));
+        $this->assertSame(10, Arr::get($result->data, 'users.paginatorInfo.total'));
         $this->assertCount(5, Arr::get($result->data, 'users.data'));
     }
 }

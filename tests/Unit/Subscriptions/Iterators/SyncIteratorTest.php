@@ -16,7 +16,7 @@ class SyncIteratorTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -51,7 +51,7 @@ class SyncIteratorTest extends TestCase
         });
 
         $this->assertInstanceOf(\Exception::class, $exception);
-        $this->assertEquals(self::EXCEPTION_MESSAGE, $exception->getMessage());
+        $this->assertSame(self::EXCEPTION_MESSAGE, $exception->getMessage());
     }
 
     protected function items(): Collection

@@ -35,7 +35,7 @@ class SubscriptionDirectiveTest extends TestCase
         $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
-        $this->assertEquals(
+        $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
             $data
         );
@@ -76,7 +76,7 @@ class SubscriptionDirectiveTest extends TestCase
             $this->buildResponse('OnPostCreatedV2', $subscribers[1]->channel),
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
@@ -100,7 +100,7 @@ class SubscriptionDirectiveTest extends TestCase
 
         $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
-        $this->assertEquals(['body' => 'Foobar'], $broadcasted['onPostCreated']);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostCreated']);
     }
 
     /**

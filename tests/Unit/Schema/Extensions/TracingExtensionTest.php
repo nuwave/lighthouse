@@ -60,12 +60,12 @@ SCHEMA;
         $this->assertArrayHasKey('tracing', Arr::get($result[1], 'extensions'));
         $this->assertArrayHasKey('resolvers', Arr::get($result[1], 'extensions.tracing.execution'));
 
-        $this->assertEquals(
+        $this->assertSame(
             Arr::get($result[0], 'extensions.tracing.startTime'),
             Arr::get($result[1], 'extensions.tracing.startTime')
         );
 
-        $this->assertNotEquals(
+        $this->assertNotSame(
             Arr::get($result[0], 'extensions.tracing.endTime'),
             Arr::get($result[1], 'extensions.tracing.endTime')
         );
