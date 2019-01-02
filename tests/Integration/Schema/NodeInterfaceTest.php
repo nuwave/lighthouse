@@ -27,7 +27,7 @@ class NodeInterfaceTest extends DBTestCase
      */
     public function itCanResolveNodes()
     {
-        $schema = '
+        $this->schema = '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
             name: String!
         }
@@ -51,7 +51,7 @@ class NodeInterfaceTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertSame([
             'first' => [
@@ -75,7 +75,7 @@ class NodeInterfaceTest extends DBTestCase
      */
     public function itCanResolveModelsNodes()
     {
-        $schema = '
+        $this->schema = '
         type User @model {
             name: String!
         }
@@ -95,7 +95,7 @@ class NodeInterfaceTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertSame([
             'node' => [

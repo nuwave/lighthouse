@@ -50,7 +50,7 @@ abstract class DriverManager
      *
      * @return mixed
      */
-    public function driver($name = null)
+    public function driver(?string $name = null)
     {
         $name = $name ?: $this->getDefaultDriver();
 
@@ -74,7 +74,7 @@ abstract class DriverManager
      *
      * @return string
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
         return $this->app['config'][$this->driverKey()];
     }
@@ -83,8 +83,10 @@ abstract class DriverManager
      * Set the default driver name.
      *
      * @param string $name
+     *
+     * @return void
      */
-    public function setDefaultDriver($name)
+    public function setDefaultDriver(string $name): void
     {
         $this->app['config'][$this->driverKey()] = $name;
     }
@@ -96,7 +98,7 @@ abstract class DriverManager
      *
      * @return array
      */
-    protected function getConfig($name)
+    protected function getConfig(string $name): array
     {
         return $this->app['config']->get(
             $this->configKey().".{$name}",
@@ -110,9 +112,9 @@ abstract class DriverManager
      * @param string   $driver
      * @param \Closure $callback
      *
-     * @return self
+     * @return $this
      */
-    public function extend($driver, \Closure $callback)
+    public function extend(string $driver, \Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -125,18 +127,17 @@ abstract class DriverManager
      * @param string $name
      *
      * @throws \InvalidArgumentException
+     * @throws InvalidDriverException
      *
      * @return mixed
      */
-    protected function resolve($name)
+    protected function resolve(string $name)
     {
         $config = $this->getConfig($name);
 
         if (is_null($config)) {
             throw new \InvalidArgumentException("Driver [{$name}] is not defined.");
         }
-
-        $interface = $this->interface();
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->validateDriver($this->callCustomCreator($config));
@@ -169,6 +170,7 @@ abstract class DriverManager
      * @param mixed $driver
      *
      * @throws InvalidDriverException
+     * @throws \ReflectionException
      *
      * @return mixed
      */
@@ -191,7 +193,7 @@ abstract class DriverManager
      *
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters)
     {
         return $this->driver()->$method(...$parameters);
     }

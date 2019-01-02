@@ -7,7 +7,9 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class ResponseStream extends Stream implements CanStreamResponse
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     const EOL = "\r\n";
 
     /**
@@ -17,19 +19,24 @@ class ResponseStream extends Stream implements CanStreamResponse
      * @param array $paths
      * @param bool  $final
      *
-     * @return mixed
+     * @return void
      */
-    public function stream(array $data, array $paths, bool $final)
+    public function stream(array $data, array $paths, bool $final): void
     {
         if (! empty($paths)) {
             $paths = collect($paths);
             $lastKey = $paths->count() - 1;
-            $paths->map(function ($path, $i) use ($data, $final, $lastKey) {
+
+            $paths->map(function (string $path, int $i) use ($data, $final, $lastKey): string {
                 $terminating = $final && ($i == $lastKey);
                 $chunk['data'] = Arr::get($data, "data.{$path}");
-                $chunk['path'] = collect(explode('.', $path))->map(function ($partial) {
-                    return is_numeric($partial) ? intval($partial) : $partial;
-                })->toArray();
+                $chunk['path'] = collect(explode('.', $path))
+                    ->map(function ($partial) {
+                        return is_numeric($partial)
+                            ? intval($partial)
+                            : $partial;
+                    })
+                    ->toArray();
 
                 $errors = $this->chunkError($path, $data);
                 if (! empty($errors)) {
@@ -37,7 +44,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                 }
 
                 return $this->chunk($chunk, $terminating);
-            })->each(function ($chunk) {
+            })->each(function (string $chunk) {
                 $this->emit($chunk);
             });
         } else {
@@ -76,7 +83,9 @@ class ResponseStream extends Stream implements CanStreamResponse
     protected function chunk(array $data, bool $terminating): string
     {
         $json = json_encode($data, 0);
-        $length = $terminating ? strlen($json) : strlen($json.self::EOL);
+        $length = $terminating
+            ? strlen($json)
+            : strlen($json.self::EOL);
 
         $chunk = implode(self::EOL, [
             'Content-Type: application/json',
@@ -94,7 +103,7 @@ class ResponseStream extends Stream implements CanStreamResponse
      *
      * @param string $chunk
      */
-    protected function emit(string $chunk)
+    protected function emit(string $chunk): void
     {
         echo $chunk;
 
@@ -106,16 +115,15 @@ class ResponseStream extends Stream implements CanStreamResponse
      * Flush buffer cache.
      * Note: We can run into exceptions when flushing the buffer,
      * these should be safe to ignore.
-     *
      * @todo Investigate exceptions that occur on Apache
+     *
+     * @param \Closure $flush
      */
     protected function flush(\Closure $flush)
     {
         try {
             $flush();
         } catch (\Exception $e) {
-            // buffer error, do nothing...
-        } catch (\Error $e) {
             // buffer error, do nothing...
         }
     }

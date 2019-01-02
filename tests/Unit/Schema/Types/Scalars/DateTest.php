@@ -15,6 +15,8 @@ class DateTest extends TestCase
     /**
      * @test
      * @dataProvider invalidDateValues
+     *
+     * @param mixed $value
      */
     public function itThrowsIfSerializingNonString($value)
     {
@@ -26,6 +28,8 @@ class DateTest extends TestCase
     /**
      * @test
      * @dataProvider invalidDateValues
+     *
+     * @param mixed $value
      */
     public function itThrowsIfParseValueNonString($value)
     {
@@ -34,6 +38,11 @@ class DateTest extends TestCase
         (new Date())->parseValue($value);
     }
 
+    /**
+     * Those values should fail passing as a date.
+     *
+     * @return mixed[]
+     */
     public function invalidDateValues(): array
     {
         return [

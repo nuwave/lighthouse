@@ -16,7 +16,7 @@ class AllDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -34,7 +34,7 @@ class AllDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(2, Arr::get($result, 'data.users'));
     }
@@ -49,7 +49,7 @@ class AllDirectiveTest extends DBTestCase
             'task_id' => 1,
         ]);
 
-        $schema = '
+        $this->schema = '
         type User {
             posts: [Post!]! @all
         }
@@ -71,7 +71,7 @@ class AllDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertSame([
             'users' => [
@@ -89,7 +89,7 @@ class AllDirectiveTest extends DBTestCase
         $users = factory(User::class, 3)->create();
         $userName = $users->first()->name;
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -107,7 +107,7 @@ class AllDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(2, Arr::get($result, 'data.users'));
     }

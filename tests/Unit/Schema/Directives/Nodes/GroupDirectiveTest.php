@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Nodes;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Middleware\Authenticate;
 
 class GroupDirectiveTest extends TestCase
@@ -14,7 +13,7 @@ class GroupDirectiveTest extends TestCase
      */
     public function itCanSetNamespaces()
     {
-        $schema = '
+        $this->schema = '
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
             me: String @field(resolver: "Foo@bar")
         }
@@ -24,21 +23,25 @@ class GroupDirectiveTest extends TestCase
         }
         '.$this->placeholderQuery();
 
-        $query = '
+        $this->query('
         {
             me
         }
-        ';
-        $result = $this->executeQuery($schema, $query);
-        $this->assertSame('foo.bar', $result->data['me']);
+        ')->assertJson([
+            'data' => [
+                'me' => 'foo.bar'
+            ]
+        ]);
 
-        $query = '
+        $this->query('
         {
             you
         }
-        ';
-        $result = $this->executeQuery($schema, $query);
-        $this->assertSame('foo.bar', $result->data['you']);
+        ')->assertJson([
+            'data' => [
+                'you' => 'foo.bar'
+            ]
+        ]);
     }
 
     /**
@@ -51,14 +54,16 @@ class GroupDirectiveTest extends TestCase
             me: Int @field(resolver: "Tests\\\Utils\\\Middleware\\\CountRuns@resolve")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             me
         }
-        ';
-        $result = $this->queryViaHttp($query);
-
-        $this->assertSame(1, Arr::get($result, 'data.me'));
+        ')->assertJson([
+            'data' => [
+                'me' => 1
+            ]
+        ]);
     }
 
     /**
@@ -77,19 +82,27 @@ class GroupDirectiveTest extends TestCase
             foo: Int
         }
         ';
-        $query = '
+
+        $this->query('
         {
             withFoo
             withNothing
             foo
         }
-        ';
-        $result = $this->queryViaHttp($query);
-
-        $this->assertSame(1, Arr::get($result, 'data.withFoo'));
-        $this->assertSame(1, Arr::get($result, 'data.withNothing'));
-        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
-        $this->assertSame('foo', Arr::get($result, 'errors.0.path.0'));
-        $this->assertNull(Arr::get($result, 'data.foo'));
+        ')->assertJson([
+            'data' => [
+                'withFoo' => 1,
+                'withNothing' => 1,
+                'foo' => null,
+            ],
+            'errors' => [
+                [
+                    'message' => Authenticate::MESSAGE,
+                    'path' => [
+                        'foo'
+                    ]
+                ]
+            ]
+        ]);
     }
 }

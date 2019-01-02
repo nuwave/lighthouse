@@ -13,7 +13,7 @@ class ClientDirectiveTest extends TestCase
     public function itCanDefineAClientDirective()
     {
         $resolver = addslashes(self::class).'@resolve';
-        $schema = '
+        $this->schema = '
         directive @filter(key: String = "default value") on FIELD
         
         type Query {
@@ -25,7 +25,7 @@ class ClientDirectiveTest extends TestCase
             foo @filter(key: "baz")
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
 
         $this->assertEquals(['foo' => 'baz'], $result->data);
     }

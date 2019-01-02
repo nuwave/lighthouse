@@ -17,7 +17,7 @@ class CacheDirectiveTest extends DBTestCase
     public function itCanStoreResolverResultInCache()
     {
         $resolver = addslashes(self::class).'@resolve';
-        $schema = "
+        $this->schema = "
         type User {
             id: ID!
             name: String @cache
@@ -34,7 +34,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
         $this->assertSame('foobar', app('cache')->get('user:1:name'));
@@ -46,7 +46,7 @@ class CacheDirectiveTest extends DBTestCase
     public function itCanPlaceCacheKeyOnAnyField()
     {
         $resolver = addslashes(self::class).'@resolve';
-        $schema = "
+        $this->schema = "
         type User {
             id: ID!
             name: String @cache
@@ -64,7 +64,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
         $this->assertSame('foobar', app('cache')->get('user:foo@bar.com:name'));
@@ -80,7 +80,7 @@ class CacheDirectiveTest extends DBTestCase
         $cacheKey = "auth:{$user->getKey()}:user:1:name";
 
         $resolver = addslashes(self::class).'@resolve';
-        $schema = "
+        $this->schema = "
         type User {
             id: ID!
             name: String @cache(private: true)
@@ -97,7 +97,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
         $this->assertSame('foobar', app('cache')->get($cacheKey));
@@ -110,7 +110,7 @@ class CacheDirectiveTest extends DBTestCase
     {
         factory(User::class, 5)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -130,7 +130,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $this->execute($schema, $query);
+        $this->query($query);
 
         $result = app('cache')->get('query:users:count:5');
 
@@ -149,7 +149,7 @@ class CacheDirectiveTest extends DBTestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $schema = '
+        $this->schema = '
         type Post {
             id: ID!
             title: String
@@ -178,7 +178,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query)['data'];
+        $result = $this->query($query)['data'];
 
         $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
@@ -198,7 +198,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $cache = $this->execute($schema, $query)['data'];
+        $cache = $this->query($query)['data'];
 
         // Get the the original user and the `find` directive checks the count
         $this->assertEquals(0, $queries);
@@ -219,7 +219,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $tags = ['graphql:user:1', 'graphql:user:1:posts'];
 
-        $schema = '
+        $this->schema = '
         type Post {
             id: ID!
             title: String
@@ -246,7 +246,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query)['data'];
+        $result = $this->query($query)['data'];
 
         $posts = app('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
@@ -266,7 +266,7 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $cache = $this->execute($schema, $query)['data'];
+        $cache = $this->query($query)['data'];
 
         // Get the the original user and the `find` directive checks the count
         $this->assertEquals(0, $queries);

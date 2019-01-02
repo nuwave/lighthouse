@@ -8,16 +8,18 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class StorageManagerTest extends TestCase implements GraphQLContext
 {
-    const TOPIC = 'lighthouse';
-
     use HandlesSubscribers;
 
-    /** @var StorageManager */
-    protected $storage;
+    /**
+     * @var string
+     */
+    const TOPIC = 'lighthouse';
 
     /**
-     * Set up test environment.
+     * @var StorageManager
      */
+    protected $storage;
+
     protected function setUp()
     {
         parent::setUp();
@@ -28,7 +30,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
     /**
      * @test
      */
-    public function itCanStoreSubscribersInCache()
+    public function itCanStoreSubscribersInCache(): void
     {
         $subscriber1 = $this->subscriber('{ me }');
         $subscriber2 = $this->subscriber('{ viewer }');

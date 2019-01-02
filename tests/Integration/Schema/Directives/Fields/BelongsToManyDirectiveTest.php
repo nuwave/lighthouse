@@ -51,7 +51,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
      */
     public function itCanQueryBelongsToManyRelationship()
     {
-        $schema = '
+        $this->schema = '
         type User {
             roles: [Role!]! @belongsToMany
         }
@@ -66,7 +66,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 roles {
@@ -90,7 +90,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
      */
     public function itCanQueryBelongsToManyPaginator()
     {
-        $schema = '
+        $this->schema = '
         type User {
             roles: [Role!]! @belongsToMany(type: "paginator")
         }
@@ -105,7 +105,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 roles(count: 2) {
@@ -133,7 +133,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
      */
     public function itCanQueryBelongsToManyRelayConnection()
     {
-        $schema = '
+        $this->schema = '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay")
         }
@@ -148,7 +148,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 roles(first: 2) {
@@ -174,7 +174,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
      */
     public function itCanQueryBelongsToManyNestedRelationships()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: Int!
             roles: [Role!]! @belongsToMany(type: "relay")
@@ -200,7 +200,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         { 
             user { 
                 roles(first: 2) { 

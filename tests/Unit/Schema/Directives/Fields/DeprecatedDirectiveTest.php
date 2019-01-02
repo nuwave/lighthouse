@@ -15,7 +15,7 @@ class DeprecatedDirectiveTest extends TestCase
     {
         $reason = 'Use `bar` field';
         $resolver = addslashes(Foo::class).'@bar';
-        $schema = "
+        $this->schema = "
         type Query {
             foo: String 
                 @deprecated(reason: \"{$reason}\") 
@@ -37,7 +37,7 @@ class DeprecatedDirectiveTest extends TestCase
         }
         ';
 
-        $data = $this->execute($schema, $introspectionQuery);
+        $data = $this->query($introspectionQuery);
         $fields = Arr::get($data, 'data.__schema.queryType.fields');
         $this->assertCount(1, $fields);
 
@@ -55,7 +55,7 @@ class DeprecatedDirectiveTest extends TestCase
         }
         ';
 
-        $data = $this->execute($schema, $includeDeprecatedIntrospectionQuery);
+        $data = $this->query($includeDeprecatedIntrospectionQuery);
         $deprecatedFields = Arr::where(
             Arr::get($data, 'data.__schema.queryType.fields'),
             function ($field) {
@@ -71,7 +71,7 @@ class DeprecatedDirectiveTest extends TestCase
         }
         ';
 
-        $data = $this->execute($schema, $query);
+        $data = $this->query($query);
         $this->assertEquals('foo.bar', Arr::get($data, 'data.foo'));
     }
 }

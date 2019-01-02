@@ -38,7 +38,7 @@ class GraphQLExtensionTest extends TestCase
             foo: String
         }';
 
-        $data = $this->queryViaHttp('
+        $data = $this->query('
         {
             foo
         }

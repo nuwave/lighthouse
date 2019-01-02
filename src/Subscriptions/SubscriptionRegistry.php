@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use GraphQL\Error\SyntaxError;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
@@ -24,12 +25,16 @@ class SubscriptionRegistry
     protected $storage;
 
     /**
-     * @var array
+     * A map from operation names to channel names.
+     *
+     * @var string[]
      */
     protected $subscribers = [];
 
     /**
-     * @var array
+     * Active subscription fields of the schema.
+     *
+     * @var GraphQLSubscription[]
      */
     protected $subscriptions = [];
 
@@ -51,7 +56,7 @@ class SubscriptionRegistry
      *
      * @return SubscriptionRegistry
      */
-    public function register(GraphQLSubscription $subscription, $field): self
+    public function register(GraphQLSubscription $subscription, string $field): self
     {
         $this->subscriptions[$field] = $subscription;
 
@@ -65,15 +70,15 @@ class SubscriptionRegistry
      *
      * @return bool
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return isset($this->subscriptions[$key]);
     }
 
     /**
-     * get subscription keys.
+     * Get subscription keys.
      *
-     * @return array
+     * @return string[]
      */
     public function keys(): array
     {
@@ -87,7 +92,7 @@ class SubscriptionRegistry
      *
      * @return GraphQLSubscription
      */
-    public function subscription($key): GraphQLSubscription
+    public function subscription(string $key): GraphQLSubscription
     {
         return $this->subscriptions[$key];
     }
@@ -98,9 +103,9 @@ class SubscriptionRegistry
      * @param Subscriber $subscriber
      * @param string     $channel
      *
-     * @return SubscriptionRegistry
+     * @return $this
      */
-    public function subscriber(Subscriber $subscriber, $channel): self
+    public function subscriber(Subscriber $subscriber, string $channel): self
     {
         if ($subscriber->channel) {
             $this->storage->storeSubscriber($subscriber, $channel);
@@ -116,6 +121,8 @@ class SubscriptionRegistry
      *
      * @param Subscriber $subscriber
      *
+     * @throws SyntaxError
+     *
      * @return Collection
      */
     public function subscriptions(Subscriber $subscriber): Collection
@@ -128,25 +135,33 @@ class SubscriptionRegistry
             'noLocation' => true,
         ]);
 
-        return collect($documentNode->definitions)->filter(function (Node $node) {
-            return $node instanceof OperationDefinitionNode;
-        })->filter(function (OperationDefinitionNode $node) {
-            return 'subscription' === $node->operation;
-        })->flatMap(function (OperationDefinitionNode $node) {
-            return collect($node->selectionSet->selections)->map(function (FieldNode $field) {
-                return $field->name->value;
-            })->toArray();
-        })->map(function ($subscriptionField) {
-            return array_get(
-                $this->subscriptions,
-                $subscriptionField,
-                new NotFoundSubscription()
-            );
-        });
+        return collect($documentNode->definitions)
+            ->filter(function (Node $node): bool {
+                return $node instanceof OperationDefinitionNode;
+            })
+            ->filter(function (OperationDefinitionNode $node): bool {
+                return 'subscription' === $node->operation;
+            })
+            ->flatMap(function (OperationDefinitionNode $node) {
+                return collect($node->selectionSet->selections)
+                    ->map(function (FieldNode $field): string {
+                        return $field->name->value;
+                    })
+                    ->toArray();
+            })
+            ->map(function ($subscriptionField): GraphQLSubscription {
+                return array_get(
+                    $this->subscriptions,
+                    $subscriptionField,
+                    new NotFoundSubscription()
+                );
+            });
     }
 
     /**
-     * @return array
+     * Get all current subscribers.
+     *
+     * @return string[]
      */
     public function toArray(): array
     {
@@ -155,8 +170,10 @@ class SubscriptionRegistry
 
     /**
      * Reset collection of subscribers.
+     *
+     * @return void
      */
-    public function reset()
+    public function reset(): void
     {
         $this->subscribers = [];
     }

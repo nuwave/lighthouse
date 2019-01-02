@@ -7,7 +7,9 @@ use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
 
 class SubscriptionRouter
 {
-    /** @var ExtensionRegistry */
+    /**
+     * @var ExtensionRegistry
+     */
     protected $extensions;
 
     /**

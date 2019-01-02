@@ -34,7 +34,7 @@ class DateTime extends ScalarType
     /**
      * Parse a externally provided variable value into a Carbon instance.
      *
-     * @param string $value
+     * @param mixed $value
      *
      * @throws Error
      *
@@ -49,7 +49,7 @@ class DateTime extends ScalarType
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
      * @param Node       $valueNode
-     * @param array|null $variables
+     * @param mixed[]|null $variables
      *
      * @throws Error
      *
@@ -67,14 +67,14 @@ class DateTime extends ScalarType
     /**
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
-     * @param string $value
+     * @param mixed $value
      * @param string $exceptionClass
      *
      * @throws InvariantViolation|Error
      *
      * @return Carbon
      */
-    private function tryParsingDateTime(string $value, string $exceptionClass): Carbon
+    private function tryParsingDateTime($value, string $exceptionClass): Carbon
     {
         try {
             return Carbon::createFromFormat(Carbon::DEFAULT_TO_STRING_FORMAT, $value);

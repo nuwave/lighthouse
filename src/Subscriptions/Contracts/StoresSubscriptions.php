@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface StoresSubscriptions
@@ -23,16 +24,16 @@ interface StoresSubscriptions
      *
      * @return Subscriber|null
      */
-    public function subscriberByChannel($channel);
+    public function subscriberByChannel(string $channel);
 
     /**
      * Get collection of subscribers by topic.
      *
      * @param string $topic
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection<Subscriber>
      */
-    public function subscribersByTopic($topic);
+    public function subscribersByTopic(string $topic);
 
     /**
      * Store subscription.
@@ -40,7 +41,7 @@ interface StoresSubscriptions
      * @param Subscriber $subscriber
      * @param string     $topic
      */
-    public function storeSubscriber(Subscriber $subscriber, $topic);
+    public function storeSubscriber(Subscriber $subscriber, string $topic);
 
     /**
      * Delete subscriber.
@@ -49,5 +50,5 @@ interface StoresSubscriptions
      *
      * @return Subscriber|null
      */
-    public function deleteSubscriber($channel);
+    public function deleteSubscriber(string $channel);
 }

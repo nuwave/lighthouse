@@ -1,14 +1,15 @@
 <?php
 
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 if (! function_exists('graphql')) {
     /**
      * Get instance of graphql container.
      *
-     * @return \Nuwave\Lighthouse\GraphQL
+     * @return GraphQL
      */
-    function graphql()
+    function graphql(): GraphQL
     {
         return app('graphql');
     }
@@ -30,13 +31,18 @@ if (! function_exists('config_path')) {
     /**
      * Get base configuration path.
      *
-     * @param string $path
+     * @param string|null $path
      *
      * @return string
      */
-    function config_path($path = '')
+    function config_path(string $path = ''): string
     {
-        return app()->basePath().'/config'.($path ? '/'.$path : $path);
+        return app()->basePath()
+            .'/config'
+            .($path
+                ? '/'.$path
+                : $path
+            );
     }
 }
 
@@ -44,13 +50,18 @@ if (! function_exists('app_path')) {
     /**
      * Get base app path.
      *
-     * @param string $path
+     * @param string|null $path
      *
      * @return string
      */
-    function app_path($path = '')
+    function app_path(string $path = ''): string
     {
-        return app()->basePath().'/app'.($path ? '/'.$path : $path);
+        return app()->basePath()
+            .'/app'
+            .($path
+                ? '/'.$path
+                : $path
+            );
     }
 }
 

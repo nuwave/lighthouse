@@ -63,16 +63,12 @@ class ContextFactoryTest extends TestCase
             context
         }
         ';
-        $result = $this->queryViaHttp($query);
 
-        $this->assertSame(
-            [
-                'data' => [
-                    'context' => 'custom.context',
-                ],
+        $this->query($query)->assertJson([
+            'data' => [
+                'context' => 'custom.context',
             ],
-            $result
-        );
+        ]);
     }
 
     public function resolve($root, array $args, GraphQLContext $context): string

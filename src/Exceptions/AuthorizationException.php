@@ -7,6 +7,11 @@ use GraphQL\Error\ClientAware;
 class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationException implements ClientAware
 {
     /**
+     * @var string
+     */
+    const CATEGORY = 'authorization';
+
+    /**
      * Returns true when exception message is safe to be displayed to a client.
      *
      * @api
@@ -27,6 +32,6 @@ class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationExcept
      */
     public function getCategory(): string
     {
-        return 'authorization';
+        return self::CATEGORY;
     }
 }

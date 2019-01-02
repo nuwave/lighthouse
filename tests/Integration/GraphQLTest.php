@@ -5,6 +5,7 @@ namespace Tests\Integration;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Support\Collection;
 
 class GraphQLTest extends DBTestCase
 {
@@ -32,35 +33,25 @@ class GraphQLTest extends DBTestCase
     ';
 
     /**
-     * Auth user.
+     * The user that shall make the requests.
      *
      * @var User
      */
     protected $user;
 
     /**
-     * User assigned tasks.
+     * Tasks associated with the current user.
      *
-     * @var \Illuminate\Support\Collection
+     * @var Collection<Task>
      */
     protected $tasks;
 
     /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('lighthouse.route_enable_get', true);
-    }
-
-    /**
      * Setup test environment.
+     *
+     * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -68,14 +59,44 @@ class GraphQLTest extends DBTestCase
         $this->tasks = factory(Task::class, 5)->create([
             'user_id' => $this->user->getKey(),
         ]);
+
+        $this->be($this->user);
     }
 
     /**
      * @test
      */
-    public function itCanResolveQuery()
+    public function itResolvesQueryViaPostRequest()
     {
-        $this->be($this->user);
+        $this->query('
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks
+                        ->map(
+                            function (Task $task): array {
+                                return ['name' => $task->name];
+                            }
+                        )->toArray(),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolvesQueryViaGetRequest()
+    {
         $query = '
         query UserWithTasks {
             user {
@@ -86,75 +107,9 @@ class GraphQLTest extends DBTestCase
             }
         }
         ';
-
-        $data = graphql()->executeQuery($query)->toArray();
-        $expected = [
-            'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                    'tasks' => $this->tasks->map(function ($task) {
-                        return ['name' => $task->name];
-                    })->toArray(),
-                ],
-            ],
-        ];
-
-        $this->assertEquals($expected, $data);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanResolveQueryThroughController()
-    {
-        $this->be($this->user);
-        $data = $this->queryViaHttp('
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ');
-
-        $expected = [
-            'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                    'tasks' => $this->tasks->map(function ($task) {
-                        return ['name' => $task->name];
-                    })->toArray(),
-                ],
-            ],
-        ];
-
-        $this->assertEquals($expected, $data);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanResolveQueryThroughControllerViaGetRequest()
-    {
-        $this->be($this->user);
-        $query = '
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ';
-
         $uri = 'graphql?'.http_build_query(['query' => $query]);
 
-        $data = $this->getJson($uri)->json();
-
-        $expected = [
+        $this->getJson($uri)->assertExactJson([
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
@@ -163,9 +118,7 @@ class GraphQLTest extends DBTestCase
                     })->toArray(),
                 ],
             ],
-        ];
-
-        $this->assertEquals($expected, $data);
+        ]);
     }
 
     /**
@@ -173,16 +126,10 @@ class GraphQLTest extends DBTestCase
      */
     public function itCanResolveBatchedQueries()
     {
-        $this->be($this->user);
-
-        $queries = [
+        $this->postGraphQL([
             ['query' => '{ user { email } }'],
             ['query' => '{ user { name } }'],
-        ];
-
-        $data = $this->postJson('/graphql', $queries)->json();
-
-        $expected = [
+        ])->assertExactJson([
             [
                 'data' => [
                     'user' => [
@@ -197,8 +144,51 @@ class GraphQLTest extends DBTestCase
                     ],
                 ],
             ],
-        ];
+        ]);
+    }
 
-        $this->assertEquals($expected, $data);
+    /**
+     * @test
+     */
+    public function itResolvesNamedOperation()
+    {
+        $this->postGraphQL([
+            'query' => '
+                query User {
+                    user {
+                        email
+                    }
+                }
+                query User2 {
+                    user {
+                        name
+                    }
+                }
+            ',
+            'operationName' => 'User'
+        ])->assertExactJson([
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itRejectsInvalidQuery()
+    {
+        $result = $this->query('
+        {
+            nonExistingField
+        }
+        ');
+
+        $this->assertContains(
+            'nonExistingField',
+            $result->json('errors.0.message')
+        );
     }
 }

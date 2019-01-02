@@ -14,7 +14,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
         }
@@ -30,9 +30,14 @@ class DeleteDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertEquals(1, Arr::get($result, 'data.deleteUser.id'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'deleteUser' => [
+                    'id' => 1
+                ]
+            ]
+        ]);
         $this->assertCount(0, User::all());
     }
 
@@ -41,7 +46,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -58,9 +63,8 @@ class DeleteDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertCount(2, Arr::get($result, 'data.deleteUsers'));
+        $this->query($query)->assertJsonCount(2, 'data.deleteUsers');
         $this->assertCount(0, User::all());
     }
 
@@ -68,7 +72,7 @@ class DeleteDirectiveTest extends DBTestCase
     public function itRejectsDefinitionWithNullableArgument()
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -85,14 +89,14 @@ class DeleteDirectiveTest extends DBTestCase
             }
         }
         ';
-        $this->execute($schema, $query);
+        $this->query($query);
     }
 
     /** @test */
     public function itRejectsDefinitionWithNoArgument()
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -109,14 +113,14 @@ class DeleteDirectiveTest extends DBTestCase
             }
         }
         ';
-        $this->execute($schema, $query);
+        $this->query($query);
     }
 
     /** @test */
     public function itRejectsDefinitionWithMultipleArguments()
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -133,6 +137,6 @@ class DeleteDirectiveTest extends DBTestCase
             }
         }
         ';
-        $this->execute($schema, $query);
+        $this->query($query);
     }
 }

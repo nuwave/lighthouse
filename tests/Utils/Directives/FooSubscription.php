@@ -16,7 +16,7 @@ class FooSubscription extends GraphQLSubscription
      *
      * @return bool
      */
-    public function authorize(Subscriber $subscriber, Request $request)
+    public function authorize(Subscriber $subscriber, Request $request): bool
     {
         return true;
     }
@@ -29,7 +29,7 @@ class FooSubscription extends GraphQLSubscription
      *
      * @return bool
      */
-    public function filter(Subscriber $subscriber, $root)
+    public function filter(Subscriber $subscriber, $root): bool
     {
         return true;
     }

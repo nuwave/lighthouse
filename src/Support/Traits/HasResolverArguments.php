@@ -3,21 +3,22 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait HasResolverArguments
 {
     /**
-     * @var mixed
+     * @var mixed|null
      */
     protected $root;
 
     /**
-     * @var mixed
+     * @var GraphQLContext
      */
     protected $context;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     protected $arguments;
 
@@ -27,7 +28,7 @@ trait HasResolverArguments
     protected $resolveInfo;
 
     /**
-     * @return mixed
+     * @return mixed|null
      */
     public function root()
     {
@@ -37,9 +38,9 @@ trait HasResolverArguments
     /**
      * @param mixed $root
      *
-     * @return static
+     * @return $this
      */
-    public function setRoot($root)
+    public function setRoot($root): self
     {
         $this->root = $root;
 
@@ -47,19 +48,19 @@ trait HasResolverArguments
     }
 
     /**
-     * @return mixed
+     * @return GraphQLContext
      */
-    public function context()
+    public function context(): GraphQLContext
     {
         return $this->context;
     }
 
     /**
-     * @param mixed $context
+     * @param GraphQLContext $context
      *
-     * @return static
+     * @return $this
      */
-    public function setContext($context)
+    public function setContext(GraphQLContext $context): self
     {
         $this->context = $context;
 
@@ -67,7 +68,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function arguments(): array
     {
@@ -75,11 +76,11 @@ trait HasResolverArguments
     }
 
     /**
-     * @param array $arguments
+     * @param mixed[] $arguments
      *
-     * @return static
+     * @return $this
      */
-    public function setArguments(array $arguments)
+    public function setArguments(array $arguments): self
     {
         $this->arguments = $arguments;
 
@@ -97,9 +98,9 @@ trait HasResolverArguments
     /**
      * @param ResolveInfo $resolveInfo
      *
-     * @return static
+     * @return $this
      */
-    public function setResolveInfo(ResolveInfo $resolveInfo)
+    public function setResolveInfo(ResolveInfo $resolveInfo): self
     {
         $this->resolveInfo = $resolveInfo;
 
@@ -107,14 +108,14 @@ trait HasResolverArguments
     }
 
     /**
-     * @param mixed|null  $root
-     * @param array       $args
-     * @param null        $context
-     * @param ResolveInfo $resolveInfo
+     * @param mixed|null     $root
+     * @param array          $args
+     * @param GraphQLContext $context
+     * @param ResolveInfo    $resolveInfo
      *
-     * @return static
+     * @return $this
      */
-    public function setResolverArguments($root, array $args, $context, ResolveInfo $resolveInfo)
+    public function setResolverArguments($root, array $args, $context, ResolveInfo $resolveInfo): self
     {
         return $this->setRoot($root)
                     ->setArguments($args)

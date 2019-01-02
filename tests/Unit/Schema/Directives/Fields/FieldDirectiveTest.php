@@ -14,7 +14,7 @@ class FieldDirectiveTest extends TestCase
      */
     public function itAssignsResolverFromCombinedDefinition()
     {
-        $schema = '
+        $this->schema = '
         type Query {
             bar: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
@@ -24,9 +24,12 @@ class FieldDirectiveTest extends TestCase
             bar
         }        
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo.bar', Arr::get($result, 'data.bar'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'bar' => 'foo.bar'
+            ]
+        ]);
     }
 
     /**
@@ -34,7 +37,7 @@ class FieldDirectiveTest extends TestCase
      */
     public function itCanResolveFieldWithMergedArgs()
     {
-        $schema = '
+        $this->schema = '
         type Query {
             bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args:["foo.baz"])
         }
@@ -44,9 +47,12 @@ class FieldDirectiveTest extends TestCase
             bar
         }        
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('foo.baz', Arr::get($result, 'data.bar'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'bar' => 'foo.baz'
+            ]
+        ]);
     }
 
     /**
@@ -54,7 +60,7 @@ class FieldDirectiveTest extends TestCase
      */
     public function itUsesDefaultFieldNamespace()
     {
-        $schema = '
+        $this->schema = '
         type Query {
             bar: String! @field(resolver: "FooBar@customResolve")
         }
@@ -64,9 +70,12 @@ class FieldDirectiveTest extends TestCase
             bar
         }        
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame(FooBar::CUSTOM_RESOLVE_RESULT, Arr::get($result, 'data.bar'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'bar' => FooBar::CUSTOM_RESOLVE_RESULT
+            ]
+        ]);
     }
 
     /**
@@ -75,7 +84,7 @@ class FieldDirectiveTest extends TestCase
     public function itThrowsAnErrorOnlyOnePartIsDefined()
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+        $this->schema = '
         type Query {
             bar: String! @field(resolver: "bar")
         }
@@ -85,6 +94,6 @@ class FieldDirectiveTest extends TestCase
             bar
         }        
         ';
-        $this->execute($schema, $query);
+        $this->query($query);
     }
 }

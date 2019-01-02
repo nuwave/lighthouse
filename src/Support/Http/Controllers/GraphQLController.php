@@ -3,12 +3,13 @@
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use GraphQL\Executor\ExecutionResult;
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
@@ -17,16 +18,24 @@ use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQLController extends Controller
 {
-    /** @var GraphQL */
+    /**
+     * @var GraphQL
+     */
     protected $graphQL;
 
-    /** @var CreatesContext */
+    /**
+     * @var CreatesContext
+     */
     protected $createsContext;
 
-    /** @var ExtensionRegistry */
+    /**
+     * @var ExtensionRegistry
+     */
     protected $extensionRegistry;
 
-    /** @var GraphQLResponse */
+    /**
+     * @var GraphQLResponse
+     */
     protected $graphQLResponse;
 
     /**
@@ -56,10 +65,11 @@ class GraphQLController extends Controller
      *
      * @throws DirectiveException
      * @throws ParseException
+     * @throws DefinitionException
      *
      * @return Response
      */
-    public function query(Request $request)
+    public function query(Request $request): Response
     {
         // If the request is a 0-indexed array, we know we are dealing with a batched query
         $batched = isset($request->toArray()[0]) && config('lighthouse.batched_queries', true);
@@ -79,15 +89,16 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param Request        $request
+     * @param Request $request
      * @param GraphQLContext $context
      *
      * @throws DirectiveException
      * @throws ParseException
+     * @throws DefinitionException
      *
-     * @return array
+     * @return mixed[]
      */
-    protected function execute(Request $request, GraphQLContext $context)
+    protected function execute(Request $request, GraphQLContext $context): array
     {
         return $this->graphQL->executeQuery(
             $request->input('query', ''),
@@ -104,9 +115,9 @@ class GraphQLController extends Controller
      * @param Request        $request
      * @param GraphQLContext $context
      *
-     * @return array
+     * @return mixed[]
      */
-    protected function executeBatched(Request $request, GraphQLContext $context)
+    protected function executeBatched(Request $request, GraphQLContext $context): array
     {
         $data = $this->graphQL->executeBatchedQueries(
             $request->toArray(),
@@ -126,7 +137,7 @@ class GraphQLController extends Controller
     /**
      * @param mixed $variables
      *
-     * @return array
+     * @return mixed[]
      */
     protected function ensureVariablesAreArray($variables): array
     {

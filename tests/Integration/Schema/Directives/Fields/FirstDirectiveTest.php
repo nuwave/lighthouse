@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class FirstDirectiveTest extends DBTestCase
@@ -11,7 +10,7 @@ class FirstDirectiveTest extends DBTestCase
     /** @test */
     public function itReturnsASingleUser()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -32,14 +31,19 @@ class FirstDirectiveTest extends DBTestCase
             }
         }
         ";
-        $result = $this->execute($schema, $query);
-        $this->assertSame('B', Arr::get($result, 'data.user.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'B'
+                ]
+            ]
+        ]);
     }
 
     /** @test */
-    public function can_return_single_user_when_multiple_match()
+    public function itReturnsASingleUserWhenMultiplesMatch()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -53,7 +57,18 @@ class FirstDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'A']);
         $userC = factory(User::class)->create(['name' => 'B']);
 
-        $result = $this->executeQuery($schema, '{ user(name: "A") { id } }');
-        $this->assertEquals($userA->id, $result->data['user']['id']);
+        $this->query('
+        {
+            user(name: "A") {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $userA->id
+                ]
+            ]
+        ]);
     }
 }

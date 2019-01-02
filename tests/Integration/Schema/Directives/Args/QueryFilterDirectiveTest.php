@@ -27,7 +27,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachEqFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -47,7 +47,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(1, Arr::get($result, 'data.users.data'));
     }
@@ -57,7 +57,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachNeqFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -77,7 +77,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(4, Arr::get($result->data, 'users.data'));
     }
@@ -87,7 +87,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachInFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -111,7 +111,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(2, Arr::get($result, 'data.users.data'));
     }
@@ -121,7 +121,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachNotInFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -145,7 +145,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(3, Arr::get($result->data, 'users.data'));
     }
@@ -155,7 +155,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -179,7 +179,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
         $this->assertCount(4, Arr::get($result->data, 'users.data'));
     }
 
@@ -188,7 +188,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachTwoWhereFilterWithTheSameKeyToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -215,7 +215,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
         $this->assertCount(3, Arr::get($result, 'data.users.data'));
     }
 
@@ -224,7 +224,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereBetweenFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -259,7 +259,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(2, Arr::get($result->data, 'users.data'));
     }
@@ -269,7 +269,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereNotBetweenFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -304,7 +304,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(3, Arr::get($result->data, 'users.data'));
     }
@@ -314,7 +314,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereClauseFilterToQuery()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -347,7 +347,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
         $this->assertCount(2, Arr::get($result->data, 'users.data'));
     }
 
@@ -356,7 +356,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itOnlyProcessesFilledArguments()
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -377,7 +377,7 @@ class QueryFilterDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->executeQuery($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(1, Arr::get($result->data, 'users.data'));
     }

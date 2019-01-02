@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Tests\DBTestCase;
 use Illuminate\Support\Arr;
+use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -14,7 +14,7 @@ class CreateDirectiveTest extends DBTestCase
      */
     public function itCanCreateFromFieldArguments()
     {
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -23,7 +23,7 @@ class CreateDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createCompany(name: "foo") {
@@ -32,10 +32,15 @@ class CreateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createCompany.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'createCompany' => [
+                    'id' => '1',
+                    'name' => 'foo'
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -43,7 +48,7 @@ class CreateDirectiveTest extends DBTestCase
      */
     public function itCanCreateFromInputObject()
     {
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -56,7 +61,7 @@ class CreateDirectiveTest extends DBTestCase
         input CreateCompanyInput {
             name: String
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createCompany(input: {
@@ -67,10 +72,15 @@ class CreateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createCompany.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'createCompany' => [
+                    'id' => '1',
+                    'name' => 'foo'
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -80,7 +90,7 @@ class CreateDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -99,7 +109,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createTask(input: {
@@ -114,11 +124,18 @@ class CreateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createTask.user.id'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1'
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -126,7 +143,7 @@ class CreateDirectiveTest extends DBTestCase
      */
     public function itCanCreateWithHasMany()
     {
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -155,7 +172,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createUser(input: {
@@ -175,12 +192,21 @@ class CreateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.createUser.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createUser.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createUser.tasks.0.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.createUser.tasks.0.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**
@@ -188,7 +214,7 @@ class CreateDirectiveTest extends DBTestCase
      */
     public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately()
     {
-        $schema = '
+        $this->schema = '
         type Mutation {
             createTag(name: String): Tag @create
         }
@@ -197,7 +223,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String!
             default_string: String!
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createTag(name: "foobar"){
@@ -206,12 +232,15 @@ class CreateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame([
-            'name' => 'foobar',
-            'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
-        ], Arr::get($result, 'data.createTag'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'createTag' => [
+                    'name' => 'foobar',
+                    'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -221,7 +250,7 @@ class CreateDirectiveTest extends DBTestCase
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -250,7 +279,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createUser(input: {
@@ -271,11 +300,15 @@ class CreateDirectiveTest extends DBTestCase
         }
         ';
 
-        try {
-            $this->execute($schema, $query);
-        } catch (\Exception $err) {
-            $this->assertCount(1, User::all());
-        }
+        $this->query($query)
+            ->assertJson([
+                'data' => [
+                    'createUser' => null,
+                ],
+            ])
+            ->assertJsonCount(1, 'errors');
+
+        $this->assertCount(1, User::all());
     }
 
     /**
@@ -285,7 +318,7 @@ class CreateDirectiveTest extends DBTestCase
     {
         factory(Task::class)->create(['name' => 'Uniq']);
         config(['lighthouse.transactional_mutations' => false]);
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -314,7 +347,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createUser(input: {
@@ -334,11 +367,20 @@ class CreateDirectiveTest extends DBTestCase
             }
         }
         ';
-        try {
-            $this->execute($schema, $query);
-        } catch (\Exception $err) {
-            $this->assertCount(2, User::all());
-        }
+
+        $this->query($query)
+            // TODO allow partial success
+//            ->assertJson([
+//                'data' => [
+//                    'createUser' => [
+//                        'name' => 'foo',
+//                        'tasks' => null,
+//                    ],
+//                ],
+//            ])
+            ->assertJsonCount(1, 'errors');
+
+        $this->assertCount(2, User::all());
     }
 
     /**
@@ -346,7 +388,7 @@ class CreateDirectiveTest extends DBTestCase
      */
     public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods()
     {
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -376,7 +418,7 @@ class CreateDirectiveTest extends DBTestCase
             name: String
             guard: String
         }
-        '.$this->placeholderQuery();
+        ' . $this->placeholderQuery();
         $query = '
         mutation {
             createUser(input: {
@@ -388,18 +430,23 @@ class CreateDirectiveTest extends DBTestCase
                     }]
                 }
             }) {
-                id
-                name
                 tasks {
-                    id
-                    name
                     guard
                 }
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('api', Arr::get($result, 'data.createUser.tasks.0.guard'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'createUser' => [
+                    'tasks' => [
+                        [
+                            'guard' => 'api'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 }

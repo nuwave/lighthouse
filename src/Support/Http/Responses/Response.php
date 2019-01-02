@@ -5,10 +5,13 @@ namespace Nuwave\Lighthouse\Support\Http\Responses;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class Response implements GraphQLResponse
 {
-    /** @var ExtensionRegistry */
+    /**
+     * @var ExtensionRegistry
+     */
     protected $extensionRegistry;
 
     /**
@@ -24,9 +27,9 @@ class Response implements GraphQLResponse
      *
      * @param array $data
      *
-     * @return \Illuminate\Http\Response
+     * @return SymfonyResponse
      */
-    public function create(array $data)
+    public function create(array $data): SymfonyResponse
     {
         if ($deferExtension = $this->extensionRegistry->get(DeferExtension::name())) {
             return $deferExtension->response($data);

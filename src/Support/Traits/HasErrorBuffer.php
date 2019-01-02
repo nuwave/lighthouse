@@ -26,9 +26,9 @@ trait HasErrorBuffer
      *
      * @param ErrorBuffer $errorBuffer
      *
-     * @return static
+     * @return $this
      */
-    public function setErrorBuffer(ErrorBuffer $errorBuffer)
+    public function setErrorBuffer(ErrorBuffer $errorBuffer): self
     {
         $this->errorBuffer = $errorBuffer;
 

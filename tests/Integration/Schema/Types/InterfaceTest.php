@@ -20,7 +20,7 @@ class InterfaceTest extends DBTestCase
         // This creates one team with it
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         interface Nameable {
             name: String!
         }
@@ -48,7 +48,7 @@ class InterfaceTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(2, Arr::get($result, 'data.namedThings'));
         $this->assertArrayHasKey('name', Arr::get($result, 'data.namedThings.0'));
@@ -62,7 +62,7 @@ class InterfaceTest extends DBTestCase
      */
     public function itCanUseCustomTypeResolver()
     {
-        $schema = '
+        $this->schema = '
         interface Nameable @interface(resolveType: "'.addslashes(self::class).'@resolveType"){
             name: String!
         }
@@ -86,7 +86,7 @@ class InterfaceTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertSame($this->fetchGuy(), $result['data']['namedThings']);
     }
@@ -99,7 +99,7 @@ class InterfaceTest extends DBTestCase
         // This creates one team with it
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         interface Nameable {
             name: String!
         }
@@ -129,7 +129,7 @@ class InterfaceTest extends DBTestCase
             }
         }';
 
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
         $interface = collect(Arr::get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);

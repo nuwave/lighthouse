@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class AuthDirectiveTest extends TestCase
@@ -14,10 +13,9 @@ class AuthDirectiveTest extends TestCase
     public function itCanResolveAuthenticatedUser()
     {
         $user = new User(['foo' => 'bar']);
-
         $this->be($user);
 
-        $schema = '
+        $this->schema = '
         type User {
             foo: String!
         }
@@ -26,15 +24,19 @@ class AuthDirectiveTest extends TestCase
             user: User! @auth
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user {
                 foo
             }
         }           
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('bar', Arr::get($result, 'data.user.foo'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'foo' => 'bar'
+                ]
+            ]
+        ]);
     }
 }

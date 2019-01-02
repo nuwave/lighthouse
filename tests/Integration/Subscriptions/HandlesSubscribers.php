@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Subscriptions;
 
+use Illuminate\Http\Request;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -44,9 +45,10 @@ trait HandlesSubscribers
     /**
      * @see GraphQLContext::request()
      *
-     * @return null
+     * @return Request
      */
-    public function request()
+    public function request(): Request
     {
+        return new Request();
     }
 }

@@ -12,7 +12,7 @@ class ComplexityDirectiveTest extends TestCase
      */
     public function itCanSetDefaultComplexityOnField()
     {
-        $schema = $this->buildSchemaWithPlaceholderQuery('
+        $this->schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             posts: [Post!]! @complexity @hasMany
         }

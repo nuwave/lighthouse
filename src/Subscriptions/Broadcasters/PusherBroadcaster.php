@@ -2,31 +2,38 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
+use Pusher\Pusher;
+use Illuminate\Support\Arr;
+use Pusher\PusherException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class PusherBroadcaster implements Broadcaster
 {
     const EVENT_NAME = 'lighthouse-subscription';
 
-    /** @var \Pusher\Pusher */
+    /**
+     * @var Pusher
+     */
     protected $pusher;
 
-    /** @var Storage */
+    /**
+     * @var StoresSubscriptions
+     */
     protected $storage;
 
     /**
      * Create instance of pusher broadcaster.
      *
-     * @param \Pusher\Pusher $pusher
+     * @param Pusher $pusher
      */
     public function __construct($pusher)
     {
         $this->pusher = $pusher;
-        $this->storage = app(Storage::class);
+        $this->storage = app(StoresSubscriptions::class);
     }
 
     /**
@@ -34,9 +41,11 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @throws PusherException
+     *
+     * @return JsonResponse
      */
-    public function authorized(Request $request)
+    public function authorized(Request $request): JsonResponse
     {
         $channel = $request->input('channel_name');
         $socketId = $request->input('socket_id');
@@ -53,9 +62,9 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function unauthorized(Request $request)
+    public function unauthorized(Request $request): JsonResponse
     {
         return response()->json(['error' => 'unauthorized'], 403);
     }
@@ -65,16 +74,16 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param Request $request
      *
-     * @return \Illuminate\Support\Response
+     * @return JsonResponse
      */
-    public function hook(Request $request)
+    public function hook(Request $request): JsonResponse
     {
         collect($request->input('events', []))
             ->filter(function ($event) {
                 return 'channel_vacated' == array_get($event, 'name');
-            })->each(function ($event) {
+            })->each(function (array $event): void {
                 $this->storage->deleteSubscriber(
-                    array_get($event, 'channel')
+                    Arr::get($event, 'channel')
                 );
             });
 
@@ -85,9 +94,13 @@ class PusherBroadcaster implements Broadcaster
      * Send data to subscriber.
      *
      * @param Subscriber $subscriber
-     * @param array      $data
+     * @param mixed[] $data
+     *
+     * @throws PusherException
+     *
+     * @return void
      */
-    public function broadcast(Subscriber $subscriber, array $data)
+    public function broadcast(Subscriber $subscriber, array $data): void
     {
         $this->pusher->trigger(
             $subscriber->channel,

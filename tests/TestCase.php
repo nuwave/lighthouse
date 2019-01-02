@@ -2,17 +2,19 @@
 
 namespace Tests;
 
+use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use GraphQL\Executor\ExecutionResult;
-use Tests\Utils\Middleware\CountRuns;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
-use Tests\Utils\Policies\AuthServiceProvider;
+use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
+use Tests\Utils\Middleware\CountRuns;
+use Tests\Utils\Policies\AuthServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -32,7 +34,7 @@ class TestCase extends BaseTestCase
      *
      * @return string[]
      */
-    protected function getPackageProviders($app): array
+    protected function getPackageProviders($app)
     {
         return [
             ScoutServiceProvider::class,
@@ -47,7 +49,7 @@ class TestCase extends BaseTestCase
      *
      * @param Application $app
      */
-    protected function getEnvironmentSetUp($app): void
+    protected function getEnvironmentSetUp($app)
     {
         $app->bind(
             SchemaSourceProvider::class,
@@ -83,14 +85,79 @@ class TestCase extends BaseTestCase
                     'Tests\\Utils\\UnionsSecondary',
                 ],
             ],
+            'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE /*| Debug::RETHROW_INTERNAL_EXCEPTIONS*/ | Debug::RETHROW_UNSAFE_EXCEPTIONS,
             'subscriptions' => [
                 'storage' => 'array',
                 'broadcaster' => 'log',
             ],
         ]);
+
+        TestResponse::macro(
+            'assertErrorCategory',
+            function(string $category): void {
+                $this->assertJson([
+                    'errors' => [
+                        [
+                            'extensions' => [
+                                'category' => $category
+                            ]
+                        ]
+                    ]
+                ]);
+            }
+        );
     }
 
-    protected function tearDown(): void
+    /**
+     * Rethrow all errors that are not handled by GraphQL.
+     *
+     * This makes debugging the tests much simpler as Exceptions
+     * are fully dumped to the console when making requests.
+     *
+     * @param Application $app
+     */
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton(ExceptionHandler::class, function () {
+            return new class implements ExceptionHandler
+            {
+                /**
+                 * Report or log an exception.
+                 *
+                 * @param  \Exception $e
+                 * @return void
+                 */
+                public function report(Exception $e)
+                {
+                }
+
+                /**
+                 * Render an exception into an HTTP response.
+                 *
+                 * @param  \Illuminate\Http\Request $request
+                 * @param  \Exception $e
+                 * @return void
+                 */
+                public function render($request, Exception $e): void
+                {
+                    throw $e;
+                }
+
+                /**
+                 * Render an exception to the console.
+                 *
+                 * @param  \Symfony\Component\Console\Output\OutputInterface $output
+                 * @param  \Exception $e
+                 * @return void
+                 */
+                public function renderForConsole($output, Exception $e)
+                {
+                }
+            };
+        });
+    }
+
+    protected function tearDown()
     {
         parent::tearDown();
 
@@ -98,49 +165,49 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * Execute query/mutation.
-     *
      * @param string $schema
      * @param string $query
-     * @param array  $variables
-     *
-     * @return \GraphQL\Executor\ExecutionResult
-     */
-    protected function executeQuery(string $schema, string $query, array $variables = []): ExecutionResult
-    {
-        // The schema is injected into the runtime during execution of the query
-        $this->schema = $schema;
-
-        return graphql()->executeQuery($query, null, $variables);
-    }
-
-    /**
-     * @param string $schema
-     * @param string $query
-     * @param array  $variables
+     * @param array $variables
      *
      * @return array
      */
     protected function executeWithoutDebug(string $schema, string $query, array $variables = []): array
     {
-        return $this->executeQuery($schema, $query, $variables)
+        return $this->query($query, $variables)
             ->toArray();
     }
 
     /**
-     * Execute and get the result as an array.
+     * Execute a query as if it was sent as a request to the server.
      *
-     * @param string $schema
      * @param string $query
-     * @param array  $variables
      *
-     * @return array
+     * @return TestResponse
      */
-    protected function execute(string $schema, string $query, array $variables = []): array
+    protected function query(string $query): TestResponse
     {
-        // For test execution, it is more convenient to throw Exceptions so they show up in the PHPUnit command line
-        return $this->executeQuery($schema, $query, $variables)
-            ->toArray(Debug::RETHROW_INTERNAL_EXCEPTIONS);
+        return $this->postGraphQL(
+            [
+                'query' => $query
+            ]
+        );
+    }
+
+    /**
+     * Execute a query as if it was sent as a request to the server.
+     *
+     * @param array $data
+     * @param array $headers
+     *
+     * @return TestResponse
+     */
+    protected function postGraphQL(array $data, array $headers = []): TestResponse
+    {
+        return $this->postJson(
+            'graphql',
+            $data,
+            $headers
+        );
     }
 
     /**
@@ -154,23 +221,8 @@ class TestCase extends BaseTestCase
     {
         return $this->buildSchema(
             $schema
-            .$this->placeholderQuery()
+            . $this->placeholderQuery()
         );
-    }
-
-    /**
-     * Convenience method to get a default Query, sometimes needed
-     * because the Schema is invalid without it.
-     *
-     * @return string
-     */
-    protected function placeholderQuery(): string
-    {
-        return '
-        type Query {
-            foo: Int
-        }
-        ';
     }
 
     /**
@@ -188,17 +240,17 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * Execute a query as if it was sent as a request to the server.
+     * Convenience method to get a default Query, sometimes needed
+     * because the Schema is invalid without it.
      *
-     * @param string $query
-     *
-     * @return array
+     * @return string
      */
-    protected function queryViaHttp(string $query): array
+    protected function placeholderQuery(): string
     {
-        return $this->postJson(
-            'graphql',
-            ['query' => $query]
-        )->json();
+        return '
+        type Query {
+            foo: Int
+        }
+        ';
     }
 }

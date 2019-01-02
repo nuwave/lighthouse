@@ -4,10 +4,14 @@ namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Exceptions\ParseException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DeferExtension extends GraphQLExtension
 {
@@ -75,7 +79,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @param DocumentAST $documentAST
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
+     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -130,6 +134,8 @@ class DeferExtension extends GraphQLExtension
         }
 
         $this->deferred[$path] = $resolver;
+
+        return null;
     }
 
     /**
@@ -196,46 +202,50 @@ class DeferExtension extends GraphQLExtension
     /**
      * @param array $data
      *
-     * @return Response
+     * @return StreamedResponse
      */
-    public function response(array $data): Response
+    public function response(array $data): StreamedResponse
     {
         if (empty($this->deferred)) {
             return response($data);
         }
 
-        return response()->stream(function () use ($data) {
-            $nested = 1;
-            $this->data = $data;
-            $this->streaming = true;
-            $this->stream->stream($data, [], empty($this->deferred));
+        return response()->stream(
+            function () use ($data): void {
+                $nested = 1;
+                $this->data = $data;
+                $this->streaming = true;
+                $this->stream->stream($data, [], empty($this->deferred));
 
-            if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
-                $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
-            }
+                if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
+                    $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
+                }
 
-            // TODO: Allow nested_levels to be set in config
-            // to break out of loop early.
-            while (
-                count($this->deferred) &&
-                ! $this->executionTimeExpired() &&
-                ! $this->maxNestedFieldsResolved($nested)
-            ) {
-                $nested++;
-                $this->executeDeferred();
-            }
+                // TODO: Allow nested_levels to be set in config
+                // to break out of loop early.
+                while (
+                    count($this->deferred) &&
+                    ! $this->executionTimeExpired() &&
+                    ! $this->maxNestedFieldsResolved($nested)
+                ) {
+                    $nested++;
+                    $this->executeDeferred();
+                }
 
-            // We've hit the max execution time or max nested levels of deferred fields.
-            // Process remaining deferred fields.
-            if (count($this->deferred)) {
-                $this->defer = false;
-                $this->executeDeferred();
-            }
-        }, 200, [
-            // TODO: Allow headers to be set in config
-            'X-Accel-Buffering' => 'no',
-            'Content-Type' => 'multipart/mixed; boundary="-"',
-        ]);
+                // We've hit the max execution time or max nested levels of deferred fields.
+                // Process remaining deferred fields.
+                if (count($this->deferred)) {
+                    $this->defer = false;
+                    $this->executeDeferred();
+                }
+            },
+            200,
+            [
+                // TODO: Allow headers to be set in config
+                'X-Accel-Buffering' => 'no',
+                'Content-Type' => 'multipart/mixed; boundary="-"',
+            ]
+        );
     }
 
     /**
@@ -289,23 +299,29 @@ class DeferExtension extends GraphQLExtension
     /**
      * Execute deferred fields.
      *
+     * @throws DirectiveException
+     * @throws ParseException
+     * @throws DefinitionException
+     *
      * @return void
      */
     protected function executeDeferred(): void
     {
         // TODO: Properly parse variables array
         // TODO: Get debug setting
-        $this->data = graphql()->executeQuery(
+        $this->data = graphql()
+            ->executeQuery(
                 $this->request->request()->input('query', ''),
                 $this->request->context(),
                 $this->request->request()->input('variables', [])
-            )->toArray(config('lighthouse.debug'));
+            )
+            ->toArray(config('lighthouse.debug'));
 
         $this->stream->stream(
-                $this->data,
-                $this->resolved,
-                empty($this->deferred)
-            );
+            $this->data,
+            $this->resolved,
+            empty($this->deferred)
+        );
 
         $this->resolved = [];
     }

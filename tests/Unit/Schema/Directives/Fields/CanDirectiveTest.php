@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
@@ -15,11 +14,11 @@ class CanDirectiveTest extends TestCase
      *
      * @param string $argumentName
      */
-    public function itThrowsIfNotAuthorized(string $argumentName)
+    public function itThrowsIfNotAuthorized(string $argumentName): void
     {
         $this->be(new User());
 
-        $schema = '
+        $this->schema = '
         type Query {
             user: User!
                 @can('.$argumentName.': "adminOnly")
@@ -31,16 +30,13 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-
-        $this->expectException(AuthorizationException::class);
-        $this->execute($schema, $query);
+        ')->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
     /**
@@ -49,13 +45,13 @@ class CanDirectiveTest extends TestCase
      *
      * @param string $argumentName
      */
-    public function itPassesAuthIfAuthorized(string $argumentName)
+    public function itPassesAuthIfAuthorized(string $argumentName): void
     {
         $user = new User();
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = '
+        $this->schema = '
         type Query {
             user: User!
                 @can('.$argumentName.': "adminOnly")
@@ -67,17 +63,19 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('foo', array_get($result, 'data.user.name'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo'
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -86,13 +84,13 @@ class CanDirectiveTest extends TestCase
      *
      * @param string $argumentName
      */
-    public function itAcceptsGuestUser(string $argumentName)
+    public function itAcceptsGuestUser(string $argumentName): void
     {
         if ((float) $this->app->version() < 5.7) {
             $this->markTestSkipped('Version less than 5.7 do not support guest user.');
         }
 
-        $schema = '
+        $this->schema = '
         type Query {
             user: User!
                 @can('.$argumentName.': "guestOnly")
@@ -104,17 +102,19 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('foo', Arr::get($result, 'data.user.name'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo'
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -123,13 +123,13 @@ class CanDirectiveTest extends TestCase
      *
      * @param string $argumentName
      */
-    public function itPassesMultiplePolicies(string $argumentName)
+    public function itPassesMultiplePolicies(string $argumentName): void
     {
         $user = new User();
         $user->name = 'admin';
         $this->be($user);
 
-        $schema = '
+        $this->schema = '
         type Query {
             user: User!
                 @can('.$argumentName.': ["adminOnly", "alwaysTrue"])
@@ -141,17 +141,19 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('foo', Arr::get($result, 'data.user.name'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foo'
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -160,9 +162,9 @@ class CanDirectiveTest extends TestCase
      *
      * @param string $argumentName
      */
-    public function itProcessesTheArgsArgument(string $argumentName)
+    public function itProcessesTheArgsArgument(string $argumentName): void
     {
-        $schema = '
+        $this->schema = '
         type Query {
             user: User!
                 @can('.$argumentName.': "dependingOnArg", args: [false])
@@ -174,16 +176,13 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-
-        $this->expectException(AuthorizationException::class);
-        $this->execute($schema, $query);
+        ')->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
     public function resolveUser(): User
@@ -194,6 +193,9 @@ class CanDirectiveTest extends TestCase
         return $user;
     }
 
+    /**
+     * @return array[]
+     */
     public function provideAcceptableArgumentNames(): array
     {
         return [

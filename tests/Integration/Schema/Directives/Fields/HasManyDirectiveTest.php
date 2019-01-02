@@ -50,7 +50,7 @@ class HasManyDirectiveTest extends DBTestCase
      */
     public function itCanQueryHasManyRelationship()
     {
-        $schema = '
+        $this->schema = '
         type User {
             tasks: [Task!]! @hasMany
         }
@@ -65,7 +65,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 tasks {
@@ -104,7 +104,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 tasks(foo: 2) {
@@ -141,7 +141,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 tasks(count: 2) {
@@ -181,7 +181,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 tasks {
@@ -223,7 +223,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 tasks(first: 2) {
@@ -263,7 +263,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         {
             user {
                 tasks {
@@ -304,7 +304,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         { 
             user { 
                 tasks(first: 2) { 
@@ -365,7 +365,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         { 
             posts {
                 id

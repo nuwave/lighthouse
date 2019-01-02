@@ -13,10 +13,12 @@ class SyncIterator implements SubscriptionIterator
      * @param Collection    $items
      * @param \Closure      $cb
      * @param \Closure|null $error
+     *
+     * @return void
      */
-    public function process(Collection $items, \Closure $cb, \Closure $error = null)
+    public function process(Collection $items, \Closure $cb, \Closure $error = null): void
     {
-        $items->each(function ($item) use ($cb, $error) {
+        $items->each(function ($item) use ($cb, $error): void {
             try {
                 $cb($item);
             } catch (\Exception $e) {

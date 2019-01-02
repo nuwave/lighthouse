@@ -22,9 +22,9 @@ trait HasRootArgumentValue
     /**
      * @param ArgumentValue $rootArgumentValue
      *
-     * @return static
+     * @return $this
      */
-    public function setRootArgumentValue(ArgumentValue $rootArgumentValue)
+    public function setRootArgumentValue(ArgumentValue $rootArgumentValue): self
     {
         $this->rootArgumentValue = $rootArgumentValue;
 

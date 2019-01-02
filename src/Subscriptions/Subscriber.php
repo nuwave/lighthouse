@@ -54,7 +54,7 @@ class Subscriber
         GraphQLContext $context,
         ResolveInfo $info,
         string $queryString
-    ) {
+    ): self {
         if (null === $info->operation->name) {
             throw new SubscriptionException('An operation name must be present on a subscription request.');
         }
@@ -77,7 +77,7 @@ class Subscriber
      *
      * @return static
      */
-    public static function unserialize($subscription)
+    public static function unserialize(string $subscription): self
     {
         $data = json_decode($subscription, true);
         $instance = new static();
@@ -135,7 +135,7 @@ class Subscriber
     /**
      * @return ContextSerializer
      */
-    protected function serializer()
+    protected function serializer(): ContextSerializer
     {
         return app(ContextSerializer::class);
     }

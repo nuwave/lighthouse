@@ -58,7 +58,10 @@ class Date extends ScalarType
     public function parseLiteral($valueNode, ?array $variables = null): Carbon
     {
         if (! $valueNode instanceof StringValueNode) {
-            throw new Error('Query error: Can only parse strings got: '.$valueNode->kind, [$valueNode]);
+            throw new Error(
+                "Query error: Can only parse strings, got {$valueNode->kind}",
+                [$valueNode]
+            );
         }
 
         return $this->tryParsingDate($valueNode->value, Error::class);
@@ -74,7 +77,7 @@ class Date extends ScalarType
      *
      * @return Carbon
      */
-    private function tryParsingDate(string $value, string $exceptionClass): Carbon
+    private function tryParsingDate($value, string $exceptionClass): Carbon
     {
         try {
             return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();

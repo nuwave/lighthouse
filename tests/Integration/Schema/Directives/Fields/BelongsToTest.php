@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -54,7 +53,7 @@ class BelongsToTest extends DBTestCase
     {
         $this->be($this->user);
 
-        $schema = '
+        $this->schema = '
         type Company {
             name: String!
         }
@@ -76,9 +75,16 @@ class BelongsToTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => [
+                        'name' => $this->company->name
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -88,7 +94,7 @@ class BelongsToTest extends DBTestCase
     {
         $this->be($this->user);
 
-        $schema = '
+        $this->schema = '
         type Company {
             name: String!
         }
@@ -110,9 +116,16 @@ class BelongsToTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.account.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'user' => [
+                    'account' => [
+                        'name' => $this->company->name
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -122,7 +135,7 @@ class BelongsToTest extends DBTestCase
     {
         $this->be($this->user);
 
-        $schema = '
+        $this->schema = '
         type Company {
             name: String!
         }
@@ -152,10 +165,19 @@ class BelongsToTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
-        $this->assertEquals($this->team->name, Arr::get($result, 'data.user.team.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'user' => [
+                    'company' => [
+                        'name' => $this->company->name
+                    ],
+                    'team' => [
+                        'name' => $this->team->name
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -165,9 +187,9 @@ class BelongsToTest extends DBTestCase
     {
         $this->be($this->user);
 
-        $products = factory(Product::class, 3)->create();
+        $products = factory(Product::class, 2)->create();
 
-        $schema = '
+        $this->schema = '
         type Color {
             id: ID!
             name: String
@@ -187,7 +209,7 @@ class BelongsToTest extends DBTestCase
         ';
         $query = '
         {
-            products(count: 3) {     
+            products(count: 2) {     
                 data{
                     barcode
                     uuid
@@ -200,10 +222,24 @@ class BelongsToTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertEquals($products[0]->color_id, Arr::get($result, 'data.products.data.0.color.id'));
-        $this->assertEquals($products[1]->color_id, Arr::get($result, 'data.products.data.1.color.id'));
-        $this->assertEquals($products[2]->color_id, Arr::get($result, 'data.products.data.2.color.id'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'products' => [
+                    'data' => [
+                        [
+                            'color' => [
+                                'id' => $products[0]->color_id,
+                            ]
+                        ],
+                        [
+                            'color' => [
+                                'id' => $products[1]->color_id,
+                            ]
+                        ],
+                    ]
+                ]
+            ]
+        ]);
     }
 }

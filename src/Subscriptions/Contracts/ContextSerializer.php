@@ -2,23 +2,25 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
 interface ContextSerializer
 {
     /**
      * Serialize the context.
      *
-     * @param mixed $context
+     * @param GraphQLContext $context
      *
      * @return string
      */
-    public function serialize($context);
+    public function serialize(GraphQLContext $context);
 
     /**
      * Unserialize the context.
      *
      * @param string $context
      *
-     * @return mixed
+     * @return GraphQLContext
      */
-    public function unserialize($context);
+    public function unserialize(string $context);
 }

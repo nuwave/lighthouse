@@ -5,30 +5,35 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry as Registry;
-use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
-use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
+use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
+use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 
-class Authorizer implements Auth
+class Authorizer implements AuthorizesSubscriptions
 {
-    /** @var StoresSubscriptions */
+    /**
+     * @var StoresSubscriptions
+     */
     protected $storage;
 
-    /** @var Registry */
+    /**
+     * @var SubscriptionRegistry
+     */
     protected $registry;
 
-    /** @var ExceptionHandler */
+    /**
+     * @var SubscriptionExceptionHandler
+     */
     protected $exceptionHandler;
 
     /**
      * @param StoresSubscriptions $storage
-     * @param Registry            $registry
-     * @param ExceptionHandler    $exceptionHandler
+     * @param SubscriptionRegistry $registry
+     * @param SubscriptionExceptionHandler $exceptionHandler
      */
     public function __construct(
         StoresSubscriptions $storage,
-        Registry $registry,
-        ExceptionHandler $exceptionHandler
+        SubscriptionRegistry $registry,
+        SubscriptionExceptionHandler $exceptionHandler
     ) {
         $this->storage = $storage;
         $this->registry = $registry;
@@ -42,7 +47,7 @@ class Authorizer implements Auth
      *
      * @return bool
      */
-    public function authorize(Request $request)
+    public function authorize(Request $request): bool
     {
         try {
             $subscriber = $this->storage->subscriberByRequest(
@@ -61,8 +66,10 @@ class Authorizer implements Auth
             }
 
             $authorized = $subscriptions->reduce(
-                function ($authorized, GraphQLSubscription $subscription) use ($subscriber, $request) {
-                    return false === $authorized ? false : $subscription->authorize($subscriber, $request);
+                function ($authorized, GraphQLSubscription $subscription) use ($subscriber, $request): bool {
+                    return false === $authorized
+                        ? false
+                        : $subscription->authorize($subscriber, $request);
                 }
             );
 

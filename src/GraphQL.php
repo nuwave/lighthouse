@@ -11,6 +11,7 @@ use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
+use GraphQL\Validator\Rules\ValidationRule;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -18,6 +19,8 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -64,7 +67,7 @@ class GraphQL
      *
      * @return int|null
      */
-    public function currentBatchIndex()
+    public function currentBatchIndex(): ?int
     {
         return $this->currentBatchIndex;
     }
@@ -73,29 +76,31 @@ class GraphQL
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
-     * @param array      $requests
-     * @param mixed|null $context
-     * @param mixed|null $rootValue
+     * @param array          $requests
+     * @param GraphQLContext $context
+     * @param mixed|null     $rootValue
      *
      * @return ExecutionResult[]
      */
-    public function executeBatchedQueries(array $requests, $context = null, $rootValue = null): array
+    public function executeBatchedQueries(array $requests, GraphQLContext $context, $rootValue = null): array
     {
-        return collect($requests)->map(function ($request, $index) use ($context, $rootValue) {
-            $this->currentBatchIndex = $index;
-            $this->extensionRegistry->batchedQueryDidStart($index);
+        return collect($requests)
+            ->map(function (array $request, int $index) use ($context, $rootValue) {
+                $this->currentBatchIndex = $index;
+                $this->extensionRegistry->batchedQueryDidStart($index);
 
-            $result = $this->executeQuery(
-                Arr::get($request, 'query', ''),
-                $context,
-                Arr::get($request, 'variables', []),
-                $rootValue
-            );
+                $result = $this->executeQuery(
+                    Arr::get($request, 'query', ''),
+                    $context,
+                    Arr::get($request, 'variables', []),
+                    $rootValue
+                );
 
-            $this->extensionRegistry->batchedQueryDidEnd($result, $index);
+                $this->extensionRegistry->batchedQueryDidEnd($result, $index);
 
-            return $result;
-        })->all();
+                return $result;
+            })
+            ->all();
     }
 
     /**
@@ -104,18 +109,19 @@ class GraphQL
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
-     * @param string $query
-     * @param null   $context
-     * @param array  $variables
-     * @param null   $rootValue
-     * @param string $operationName
+     * @param string         $query
+     * @param GraphQLContext $context
+     * @param array|null     $variables
+     * @param mixed|null     $rootValue
+     * @param string|null    $operationName
      *
      * @throws DirectiveException
      * @throws ParseException
+     * @throws DefinitionException
      *
      * @return ExecutionResult
      */
-    public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null, $operationName = null): ExecutionResult
+    public function executeQuery(string $query, ?GraphQLContext $context, ?array $variables = [], $rootValue = null, ?string $operationName = null): ExecutionResult
     {
         $operationName = $operationName ?: app('request')->input('operationName');
 
@@ -136,7 +142,7 @@ class GraphQL
             function (array $errors, callable $formatter): array {
                 // Do report: Errors that are not client safe, schema definition errors
                 // Do not report: Validation, Errors that are meant for the final user
-                // Misformed Queries: Log if you are dog-fooding your app
+                // Malformed Queries: Log if you are dog-fooding your app
 
                 /**
                  * Handlers are defined as classes in the config.
@@ -165,8 +171,9 @@ class GraphQL
     /**
      * Ensure an executable GraphQL schema is present.
      *
-     * @throws Exceptions\DirectiveException
-     * @throws Exceptions\ParseException
+     * @throws DirectiveException
+     * @throws ParseException
+     * @throws DefinitionException
      *
      * @return Schema
      */
@@ -182,9 +189,9 @@ class GraphQL
     }
 
     /**
-     * Construct the validation rules from the config.
+     * Construct the validation rules with values given in the config.
      *
-     * @return array
+     * @return ValidationRule[]
      */
     protected function getValidationRules(): array
     {
@@ -198,7 +205,7 @@ class GraphQL
     /**
      * Get instance of DocumentAST.
      *
-     * @throws Exceptions\ParseException
+     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -209,7 +216,7 @@ class GraphQL
                 ? app('cache')
                     ->rememberForever(
                         config('lighthouse.cache.key'),
-                        function () {
+                        function (): DocumentAST {
                             return $this->buildAST();
                         }
                     )
@@ -222,7 +229,7 @@ class GraphQL
     /**
      * Get the schema string and build an AST out of it.
      *
-     * @throws Exceptions\ParseException
+     * @throws ParseException
      *
      * @return DocumentAST
      */

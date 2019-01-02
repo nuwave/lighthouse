@@ -18,7 +18,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -42,10 +42,15 @@ class UpdateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'updateCompany' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                ]
+            ]
+        ]);
         $this->assertSame('bar', Company::first()->name);
     }
 
@@ -56,7 +61,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -84,10 +89,15 @@ class UpdateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'updateCompany' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                ]
+            ]
+        ]);
         $this->assertSame('bar', Company::first()->name);
     }
 
@@ -102,7 +112,7 @@ class UpdateDirectiveTest extends DBTestCase
             'user_id' => 1,
         ]);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -138,11 +148,18 @@ class UpdateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.updateTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.updateTask.name'));
-        $this->assertSame('2', Arr::get($result, 'data.updateTask.user.id'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '2'
+                    ]
+                ]
+            ]
+        ]);
 
         $task = Task::first();
         $this->assertSame('2', $task->user_id);
@@ -156,7 +173,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Category::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Category {
             category_id: ID!
             name: String!
@@ -180,10 +197,15 @@ class UpdateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertSame('1', Arr::get($result, 'data.updateCategory.category_id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCategory.name'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'updateCategory' => [
+                    'category_id' => '1',
+                    'name' => 'bar',
+                ]
+            ]
+        ]);
         $this->assertSame('bar', Category::first()->name);
     }
 
@@ -194,7 +216,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -245,9 +267,8 @@ class UpdateDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query);
 
-        $this->assertEquals('Original', User::first()->name);
-        $this->assertTrue(Arr::has($result, 'errors'));
+        $this->query($query)->assertJsonCount(1, 'errors');
+        $this->assertSame('Original', User::first()->name);
     }
 }

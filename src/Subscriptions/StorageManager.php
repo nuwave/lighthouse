@@ -5,14 +5,28 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Support\Arr;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions
 {
+    /**
+     * The cache key for topics.
+     *
+     * @var string
+     */
     const TOPIC_KEY = 'graphql.topic';
+
+    /**
+     * The cache key for subscribers.
+     *
+     * @var string
+     */
     const SUBSCRIBER_KEY = 'graphql.subscriber';
 
-    /** @var Cache */
+    /**
+     * @var Cache
+     */
     protected $cache;
 
     /**
@@ -33,11 +47,13 @@ class StorageManager implements StoresSubscriptions
      *
      * @return Subscriber|null
      */
-    public function subscriberByRequest(array $input, array $headers)
+    public function subscriberByRequest(array $input, array $headers): ?Subscriber
     {
         $channel = Arr::get($input, 'channel_name');
 
-        return $channel ? $this->subscriberByChannel($channel) : null;
+        return $channel
+            ? $this->subscriberByChannel($channel)
+            : null;
     }
 
     /**
@@ -47,7 +63,7 @@ class StorageManager implements StoresSubscriptions
      *
      * @return Subscriber|null
      */
-    public function subscriberByChannel($channel)
+    public function subscriberByChannel(string $channel): ?Subscriber
     {
         $key = self::SUBSCRIBER_KEY.".{$channel}";
 
@@ -61,9 +77,9 @@ class StorageManager implements StoresSubscriptions
      *
      * @param string $topic
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection<Subscriber>
      */
-    public function subscribersByTopic($topic)
+    public function subscribersByTopic(string $topic)
     {
         $key = self::TOPIC_KEY.".{$topic}";
 
@@ -73,9 +89,12 @@ class StorageManager implements StoresSubscriptions
 
         $channels = json_decode($this->cache->get($key), true);
 
-        return collect($channels)->map(function ($channel) {
-            return $this->subscriberByChannel($channel);
-        })->filter()->values();
+        return collect($channels)
+            ->map(function (string $channel): ?Subscriber {
+                return $this->subscriberByChannel($channel);
+            })
+            ->filter()
+            ->values();
     }
 
     /**
@@ -83,8 +102,10 @@ class StorageManager implements StoresSubscriptions
      *
      * @param Subscriber $subscriber
      * @param string     $topic
+     *
+     * @return void
      */
-    public function storeSubscriber(Subscriber $subscriber, $topic)
+    public function storeSubscriber(Subscriber $subscriber, string $topic): void
     {
         $topicKey = self::TOPIC_KEY.".{$topic}";
         $subscriberKey = self::SUBSCRIBER_KEY.".{$subscriber->channel}";
@@ -106,7 +127,7 @@ class StorageManager implements StoresSubscriptions
      *
      * @return Subscriber|null
      */
-    public function deleteSubscriber($channel)
+    public function deleteSubscriber(string $channel): ?Subscriber
     {
         $key = self::SUBSCRIBER_KEY.".{$channel}";
         $hasSubscriber = $this->cache->has($key);

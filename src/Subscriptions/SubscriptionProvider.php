@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Container\Container as Application;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
-use Nuwave\Lighthouse\Subscriptions\Contracts\RegistersRoutes;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
@@ -20,9 +19,11 @@ class SubscriptionProvider
     /**
      * Register subscription services.
      *
-     * @param Application
+     * @param Application $app
+     *
+     * @return void
      */
-    public static function register(Application $app)
+    public static function register(Application $app): void
     {
         $app->singleton(BroadcastManager::class);
         $app->singleton(SubscriptionRegistry::class);
@@ -32,7 +33,6 @@ class SubscriptionProvider
         $app->bind(AuthorizesSubscriptions::class, Authorizer::class);
         $app->bind(SubscriptionIterator::class, SyncIterator::class);
         $app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
-        $app->bind(RegistersRoutes::class, Routes::class);
         $app->bind(BroadcastsSubscriptions::class, SubscriptionBroadcaster::class);
 
         $app->make('events')->listen(
@@ -46,8 +46,11 @@ class SubscriptionProvider
      *
      * @return bool
      */
-    public static function enabled()
+    public static function enabled(): bool
     {
-        return in_array(SubscriptionExtension::class, config('lighthouse.extensions', []));
+        return in_array(
+            SubscriptionExtension::class,
+            config('lighthouse.extensions', [])
+        );
     }
 }

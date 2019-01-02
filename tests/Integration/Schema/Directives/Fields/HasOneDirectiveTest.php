@@ -18,7 +18,7 @@ class HasOneDirectiveTest extends DBTestCase
         // Creates a task with id 2 and assigns it to this post
         factory(Post::class)->create();
 
-        $schema = '
+        $this->schema = '
         type Post {
             id: Int
         }
@@ -32,7 +32,7 @@ class HasOneDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->execute($schema, '
+        $result = $this->query('
         {
             tasks {
                 post {

@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PaginatorField
 {
@@ -12,18 +11,10 @@ class PaginatorField
      * Resolve paginator info for connection.
      *
      * @param LengthAwarePaginator $root
-     * @param array                $args
-     * @param mixed                $context
-     * @param ResolveInfo|null     $info
      *
      * @return array
      */
-    public function paginatorInfoResolver(
-        LengthAwarePaginator $root,
-        array $args,
-        $context = null,
-        ?ResolveInfo $info = null
-    ): array {
+    public function paginatorInfoResolver(LengthAwarePaginator $root): array {
         $count = $root->count();
         $currentPage = $root->currentPage();
         $firstItem = $root->firstItem();
@@ -49,18 +40,10 @@ class PaginatorField
      * Resolve data for connection.
      *
      * @param LengthAwarePaginator $root
-     * @param array                $args
-     * @param mixed                $context
-     * @param ResolveInfo|null     $info
      *
      * @return Collection
      */
-    public function dataResolver(
-        LengthAwarePaginator $root,
-        array $args,
-        $context = null,
-        ?ResolveInfo $info = null
-    ): Collection {
+    public function dataResolver(LengthAwarePaginator $root): Collection {
         return $root->values();
     }
 }

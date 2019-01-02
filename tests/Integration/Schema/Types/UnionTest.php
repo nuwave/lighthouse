@@ -22,7 +22,7 @@ class UnionTest extends DBTestCase
             ['task_id' => 1]
         );
 
-        $result = $this->execute($schema, $query);
+        $result = $this->query($query);
 
         $this->assertCount(2, Arr::get($result, 'data.stuff'));
         $this->assertArrayHasKey('name', Arr::get($result, 'data.stuff.0'));

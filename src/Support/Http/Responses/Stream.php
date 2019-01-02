@@ -14,14 +14,17 @@ abstract class Stream
      *
      * @return array|null
      */
-    protected function chunkError(string $path, array $data)
+    protected function chunkError(string $path, array $data): ?array
     {
         if (! isset($data['errors'])) {
-            return;
+            return null;
         }
 
-        return collect($data['errors'])->filter(function ($error) use ($path) {
-            return Str::startsWith(implode('.', $error['path']), $path);
-        })->values()->toArray();
+        return collect($data['errors'])
+            ->filter(function (array $error) use ($path): bool {
+                return Str::startsWith(implode('.', $error['path']), $path);
+            })
+            ->values()
+            ->toArray();
     }
 }

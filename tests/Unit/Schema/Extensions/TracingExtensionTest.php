@@ -31,7 +31,7 @@ SCHEMA;
      */
     public function itCanAddTracingExtensionMetaToResult()
     {
-        $result = $this->queryViaHttp('
+        $result = $this->query('
         {
             foo
         }

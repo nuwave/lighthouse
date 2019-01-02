@@ -17,5 +17,10 @@ interface ArgManipulator extends Directive
      *
      * @return DocumentAST
      */
-    public function manipulateSchema(InputValueDefinitionNode $argDefinition, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current);
+    public function manipulateSchema(
+        InputValueDefinitionNode $argDefinition,
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $current
+    );
 }

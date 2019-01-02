@@ -2,21 +2,22 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Http\Request;
 
 interface GraphQLContext
 {
     /**
-     * Get instance of authorized user.
+     * Get an instance of the authenticated user.
      *
-     * @return Authenticatable|null
+     * @return User|null
      */
     public function user();
 
     /**
-     * Get instance of request.
+     * Get an instance of the current HTTP request.
      *
-     * @return \Illuminate\Http\Request
+     * @return Request
      */
     public function request();
 }
