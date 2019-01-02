@@ -63,8 +63,6 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Resolve the keys.
      *
-     * @throws \Exception
-     *
      * @return array
      */
     public function resolve(): array

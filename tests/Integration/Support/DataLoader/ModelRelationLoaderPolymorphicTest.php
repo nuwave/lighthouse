@@ -28,7 +28,6 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
     public function itGetsPolymorphicRelationship()
     {

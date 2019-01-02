@@ -99,8 +99,6 @@ class FieldFactory
      *
      * @param FieldValue $fieldValue
      *
-     * @throws DirectiveException
-     *
      * @return array Configuration array for a FieldDefinition
      */
     public function handle(FieldValue $fieldValue): array
@@ -469,8 +467,6 @@ class FieldFactory
      * @param array       $args
      * @param mixed       $context
      * @param ResolveInfo $resolveInfo
-     *
-     * @throws \Exception
      */
     protected function validateArgumentsBeforeValidationDirectives($root, array $args, $context, ResolveInfo $resolveInfo)
     {
@@ -507,7 +503,7 @@ class FieldFactory
     }
 
     /**
-     * @throws \Exception
+     * @return void
      */
     protected function flushErrorBufferIfHasErrors()
     {
@@ -523,8 +519,6 @@ class FieldFactory
      * @param array       $args
      * @param mixed       $context
      * @param ResolveInfo $resolveInfo
-     *
-     * @throws \Exception
      */
     protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, $context, ResolveInfo $resolveInfo)
     {

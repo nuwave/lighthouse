@@ -88,9 +88,6 @@ abstract class BaseDirective implements Directive
      *
      * @param string $argumentName
      *
-     * @throws DefinitionException
-     * @throws DirectiveException
-     *
      * @return \Closure
      */
     public function getResolverFromArgument(string $argumentName): \Closure
@@ -106,9 +103,6 @@ abstract class BaseDirective implements Directive
      * Get the model class from the `model` argument of the field.
      *
      * @param string $argumentName The default argument name "model" may be overwritten
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return string
      */
@@ -210,8 +204,6 @@ abstract class BaseDirective implements Directive
      * Try adding the default model namespace and ensure the given class is a model.
      *
      * @param string $modelClassCandidate
-     *
-     * @throws DirectiveException
      *
      * @return string
      */

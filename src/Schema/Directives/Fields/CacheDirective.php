@@ -29,8 +29,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      * @param FieldValue $value
      * @param \Closure   $next
      *
-     * @throws DirectiveException
-     *
      * @return FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next)

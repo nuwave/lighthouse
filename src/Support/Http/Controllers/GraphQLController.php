@@ -54,8 +54,6 @@ class GraphQLController extends Controller
      *
      * @param Request $request
      *
-     * @throws DirectiveException
-     * @throws ParseException
      *
      * @return Response
      */
@@ -81,9 +79,6 @@ class GraphQLController extends Controller
     /**
      * @param Request        $request
      * @param GraphQLContext $context
-     *
-     * @throws DirectiveException
-     * @throws ParseException
      *
      * @return array
      */

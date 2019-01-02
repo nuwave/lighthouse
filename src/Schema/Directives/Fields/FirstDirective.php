@@ -27,9 +27,6 @@ class FirstDirective extends BaseDirective implements FieldResolver
      *
      * @param FieldValue $fieldValue
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue

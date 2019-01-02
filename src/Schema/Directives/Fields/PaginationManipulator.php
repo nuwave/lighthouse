@@ -64,10 +64,6 @@ class PaginationManipulator
      * @param DocumentAST              $current
      * @param int|null                 $defaultCount
      *
-     * @throws DefinitionException
-     * @throws DirectiveException
-     * @throws ParseException
-     *
      * @return DocumentAST
      */
     public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null): DocumentAST
@@ -88,9 +84,6 @@ class PaginationManipulator
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $documentAST
      * @param int|null                 $defaultCount
-     *
-     * @throws DefinitionException
-     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -144,9 +137,6 @@ class PaginationManipulator
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $documentAST
      * @param int|null                 $defaultCount
-     *
-     * @throws DefinitionException
-     * @throws ParseException
      *
      * @return DocumentAST
      */

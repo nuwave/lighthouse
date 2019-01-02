@@ -67,9 +67,6 @@ class NodeFactory
      *
      * @param TypeDefinitionNode $definition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return Type
      */
     public function handle(TypeDefinitionNode $definition): Type
@@ -98,8 +95,6 @@ class NodeFactory
      *
      * @param TypeDefinitionNode $definition
      *
-     * @throws DirectiveException
-     *
      * @return bool
      */
     protected function hasTypeResolver(TypeDefinitionNode $definition): bool
@@ -111,8 +106,6 @@ class NodeFactory
      * Use directive resolver to transform type.
      *
      * @param TypeDefinitionNode $definition
-     *
-     * @throws DirectiveException
      *
      * @return Type
      */
@@ -129,9 +122,6 @@ class NodeFactory
      * Transform value to type.
      *
      * @param TypeDefinitionNode $typeDefinition
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return Type
      */
@@ -309,9 +299,6 @@ class NodeFactory
     /**
      * @param InterfaceTypeDefinitionNode $interfaceDefinition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return InterfaceType
      */
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
@@ -364,9 +351,6 @@ class NodeFactory
 
     /**
      * @param UnionTypeDefinitionNode $unionDefinition
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return UnionType
      */

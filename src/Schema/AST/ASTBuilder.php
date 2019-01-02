@@ -22,8 +22,6 @@ class ASTBuilder
      *
      * @param string $schema
      *
-     * @throws ParseException
-     *
      * @return DocumentAST
      */
     public static function generate(string $schema): DocumentAST
@@ -178,8 +176,6 @@ class ASTBuilder
     /**
      * @param DocumentAST $document
      *
-     * @throws ParseException
-     *
      * @return DocumentAST
      */
     protected static function addPaginationInfoTypes(DocumentAST $document): DocumentAST
@@ -249,8 +245,6 @@ class ASTBuilder
      * Inject the node type and a node field into Query.
      *
      * @param DocumentAST $document
-     *
-     * @throws ParseException
      *
      * @return DocumentAST
      */

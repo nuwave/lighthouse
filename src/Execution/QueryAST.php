@@ -37,8 +37,6 @@ class QueryAST
      *
      * @param string $schema
      *
-     * @throws SyntaxError
-     *
      * @return QueryAST
      */
     public static function fromSource(string $schema): self

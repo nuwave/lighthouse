@@ -93,8 +93,6 @@ class MutationExecutor
      * @param Collection   $args           the corresponding slice of the input arguments for updating this model
      * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
      *
-     * @throws ModelNotFoundException
-     *
      * @return Model
      */
     public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model

@@ -12,8 +12,6 @@ class ArgumentFactory
      *
      * @param ArgumentValue $argumentValue
      *
-     * @throws \Exception
-     *
      * @return array
      */
     public function handle(ArgumentValue $argumentValue): array

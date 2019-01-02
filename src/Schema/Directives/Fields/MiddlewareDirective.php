@@ -93,8 +93,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      * @param Node $node
      * @param DocumentAST $documentAST
      *
-     * @throws ParseException
-     * @throws DirectiveException
      *
      * @return DocumentAST
      */
@@ -112,7 +110,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
      * @param array $middlewareArgValue
      *
-     * @throws ParseException
      * @throws DirectiveException
      *
      * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode

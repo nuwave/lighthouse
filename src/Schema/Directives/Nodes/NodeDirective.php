@@ -42,9 +42,6 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      * @param NodeValue $value
      * @param \Closure $next
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
@@ -62,8 +59,6 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     /**
      * @param Node $node
      * @param DocumentAST $documentAST
-     *
-     * @throws \Exception
      *
      * @return DocumentAST
      */

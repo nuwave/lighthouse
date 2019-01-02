@@ -98,8 +98,6 @@ class ErrorBuffer
      * Flush the errors.
      *
      * @param string $errorMessage
-     *
-     * @throws \Exception
      */
     public function flush(string $errorMessage)
     {

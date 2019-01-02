@@ -41,8 +41,6 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
      * @param NodeValue $value
      * @param \Closure $next
      *
-     * @throws DirectiveException
-     *
      * @return NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next)
@@ -57,8 +55,6 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     /**
      * @param Node $node
      * @param DocumentAST $documentAST
-     *
-     * @throws \Exception
      *
      * @return DocumentAST
      */

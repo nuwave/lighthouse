@@ -71,8 +71,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     /**
      * Get additional arguments that are passed to `Gate::check`.
      *
-     * @throws \Exception
-     *
      * @return array
      */
     protected function getGateArguments(): array

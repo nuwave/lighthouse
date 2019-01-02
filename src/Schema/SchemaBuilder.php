@@ -47,9 +47,6 @@ class SchemaBuilder
      *
      * @param DocumentAST $documentAST
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return Schema
      */
     public function build($documentAST)
