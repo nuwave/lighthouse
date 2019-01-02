@@ -160,7 +160,8 @@ class GraphQL
             $variables,
             $operationName,
             null,
-            $this->getValidationRules() + DocumentValidator::defaultRules());
+            $this->getValidationRules() + DocumentValidator::defaultRules()
+        );
 
         $result->extensions = $this->extensionRegistry->jsonSerialize();
 
