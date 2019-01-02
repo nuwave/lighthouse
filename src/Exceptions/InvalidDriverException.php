@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-class InvalidDriverException extends \Exception
+use Exception;
+
+class InvalidDriverException extends Exception
 {
+    //
 }

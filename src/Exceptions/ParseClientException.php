@@ -11,7 +11,7 @@ class ParseClientException extends ParseException
      *
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
