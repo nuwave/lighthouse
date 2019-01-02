@@ -47,7 +47,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                         }
                     );
 
-                    return \call_user_func_array($resolver, \func_get_args());
+                    return call_user_func_array($resolver, func_get_args());
                 }
             )
         );

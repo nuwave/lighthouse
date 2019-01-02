@@ -28,7 +28,7 @@ class SearchDirective extends BaseDirective implements ArgFilterDirective
     {
         $within = $this->directiveArgValue('within');
 
-        $modelClass = \get_class(
+        $modelClass = get_class(
             $builder->getModel()
         );
 

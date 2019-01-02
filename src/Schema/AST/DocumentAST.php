@@ -113,7 +113,7 @@ class DocumentAST implements \Serializable
      */
     public function serialize(): string
     {
-        return \serialize(
+        return serialize(
             $this->definitionMap
                 ->mapWithKeys(function (DefinitionNode $node, string $key) {
                     return [$key => AST::toArray($node)];
@@ -128,7 +128,7 @@ class DocumentAST implements \Serializable
      */
     public function unserialize($serialized)
     {
-        $this->definitionMap = \unserialize($serialized)
+        $this->definitionMap = unserialize($serialized)
             ->mapWithKeys(function (array $node, string $key) {
                 return [$key => AST::fromArray($node)];
             });

@@ -263,7 +263,7 @@ class FieldValue
      */
     protected function parentIsRootType(): bool
     {
-        return \in_array(
+        return in_array(
             $this->getParentName(),
             ['Query', 'Mutation']
         );
