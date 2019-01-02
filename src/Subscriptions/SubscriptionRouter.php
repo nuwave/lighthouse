@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
+use Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController;
 
 class SubscriptionRouter
 {
@@ -48,12 +49,12 @@ class SubscriptionRouter
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
-            'uses' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@authorize',
+            'uses' => SubscriptionController::class.'@authorize',
         ]);
 
         $router->post('graphql/subscriptions/webhook', [
             'as' => 'lighthouse.subscriptions.auth',
-            'uses' => 'Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController@webhook',
+            'uses' => SubscriptionController::class.'@webhook',
         ]);
     }
 
