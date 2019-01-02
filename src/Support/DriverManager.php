@@ -140,15 +140,15 @@ abstract class DriverManager
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->validateDriver($this->callCustomCreator($config));
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->validateDriver($this->{$driverMethod}($config));
-            } else {
-                throw new \InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
-            }
         }
+
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->validateDriver($this->{$driverMethod}($config));
+        }
+
+        throw new \InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
     }
 
     /**
