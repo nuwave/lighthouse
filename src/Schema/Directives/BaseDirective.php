@@ -95,7 +95,7 @@ abstract class BaseDirective implements Directive
      */
     public function getResolverFromArgument(string $argumentName): \Closure
     {
-        list($className, $methodName) = $this->getMethodArgumentParts($argumentName);
+        [$className, $methodName] = $this->getMethodArgumentParts($argumentName);
 
         $namespacedClassName = $this->namespaceClassName($className);
 

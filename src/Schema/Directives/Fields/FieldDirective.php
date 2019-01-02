@@ -32,7 +32,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        list($className, $methodName) = $this->getMethodArgumentParts('resolver');
+        [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
         $namespacedClassName = $this->namespaceClassName(
             $className,

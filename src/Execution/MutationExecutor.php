@@ -20,7 +20,7 @@ class MutationExecutor
     public static function executeCreate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
+        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
@@ -48,7 +48,7 @@ class MutationExecutor
     protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, ?HasMany $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        list($belongsTo, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
+        [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
         $model->fill(
@@ -107,7 +107,7 @@ class MutationExecutor
         $model = $model->newQuery()->findOrFail($id);
 
         $reflection = new \ReflectionClass($model);
-        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
+        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
