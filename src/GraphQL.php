@@ -113,21 +113,23 @@ class GraphQL
      */
     public function executeBatchedQueries(array $requests, $context = null, $rootValue = null): array
     {
-        return collect($requests)->map(function ($request, $index) use ($context, $rootValue) {
-            $this->currentBatchIndex = $index;
-            $this->extensionRegistry->batchedQueryDidStart($index);
+        return collect($requests)
+            ->map(function ($request, $index) use ($context, $rootValue) {
+                $this->currentBatchIndex = $index;
+                $this->extensionRegistry->batchedQueryDidStart($index);
 
-            $result = $this->executeQuery(
-                Arr::get($request, 'query', ''),
-                $context,
-                Arr::get($request, 'variables', []),
-                $rootValue
-            );
+                $result = $this->executeQuery(
+                    Arr::get($request, 'query', ''),
+                    $context,
+                    Arr::get($request, 'variables', []),
+                    $rootValue
+                );
 
-            $this->extensionRegistry->batchedQueryDidEnd($result, $index);
+                $this->extensionRegistry->batchedQueryDidEnd($result, $index);
 
-            return $result;
-        })->all();
+                return $result;
+            })
+            ->all();
     }
 
     /**
@@ -165,26 +167,31 @@ class GraphQL
 
         $result->extensions = $this->extensionRegistry->jsonSerialize();
 
-        $result->setErrorsHandler(function (array $errors, callable $formatter): array {
-            // Do report: Errors that are not client safe, schema definition errors
-            // Do not report: Validation, Errors that are meant for the final user
-            // Misformed Queries: Log if you are dog-fooding your app
+        $result->setErrorsHandler(
+            function (array $errors, callable $formatter): array {
+                // Do report: Errors that are not client safe, schema definition errors
+                // Do not report: Validation, Errors that are meant for the final user
+                // Misformed Queries: Log if you are dog-fooding your app
 
-            /**
-             * Handlers are defined as classes in the config.
-             * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
-             * This allows the user to register multiple handlers and pipe the errors through.
-             */
-            $handlers = config('lighthouse.error_handlers', []);
+                /**
+                 * Handlers are defined as classes in the config.
+                 * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
+                 * This allows the user to register multiple handlers and pipe the errors through.
+                 */
+                $handlers = config('lighthouse.error_handlers', []);
 
-            return array_map(function (Error $error) use ($handlers, $formatter) {
-                return $this->pipeline->send($error)
-                                      ->through($handlers)
-                                      ->then(function (Error $error) use ($formatter) {
-                                          return $formatter($error);
-                                      });
-            }, $errors);
-        });
+                return array_map(
+                    function (Error $error) use ($handlers, $formatter) {
+                        return $this->pipeline
+                            ->send($error)
+                            ->through($handlers)
+                            ->then(function (Error $error) use ($formatter) {
+                                return $formatter($error);
+                            });
+                    },
+                    $errors
+                );
+            });
 
         return $result;
     }
@@ -227,10 +234,15 @@ class GraphQL
     public function documentAST(): DocumentAST
     {
         if (empty($this->documentAST)) {
-            $this->documentAST = config('lighthouse.cache.enable') ? app('cache')->rememberForever(config('lighthouse.cache.key'), function (
-                ) {
-                return $this->buildAST();
-            }) : $this->buildAST();
+            $this->documentAST = config('lighthouse.cache.enable')
+                ? app('cache')
+                    ->rememberForever(
+                        config('lighthouse.cache.key'),
+                        function () {
+                            return $this->buildAST();
+                        }
+                    )
+                : $this->buildAST();
         }
 
         return $this->documentAST;
