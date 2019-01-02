@@ -132,7 +132,7 @@ abstract class DriverManager
     {
         $config = $this->getConfig($name);
 
-        if (is_null($config)) {
+        if ($config === null) {
             throw new \InvalidArgumentException("Driver [{$name}] is not defined.");
         }
 
