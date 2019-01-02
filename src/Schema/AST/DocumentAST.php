@@ -44,7 +44,7 @@ class DocumentAST implements \Serializable
     public function __construct(DocumentNode $documentNode)
     {
         // We can not store type extensions in the map, since they do not have unique names
-        list($typeExtensions, $definitionNodes) = collect($documentNode->definitions)
+        [$typeExtensions, $definitionNodes] = collect($documentNode->definitions)
             ->partition(function (DefinitionNode $definitionNode) {
                 return $definitionNode instanceof TypeExtensionNode;
             });

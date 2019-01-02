@@ -94,7 +94,7 @@ class NodeRegistry
      */
     public function resolve($rootValue, $args, $context, ResolveInfo $resolveInfo)
     {
-        list($decodedType, $decodedId) = $args['id'];
+        [$decodedType, $decodedId] = $args['id'];
 
         // Check if we have a resolver registered for the given type
         if (! $resolver = Arr::get($this->nodeResolver, $decodedType)) {

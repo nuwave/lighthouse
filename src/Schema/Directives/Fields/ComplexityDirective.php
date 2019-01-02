@@ -35,7 +35,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
     public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {
         if ($this->directiveHasArgument('resolver')) {
-            list($className, $methodName) = $this->getMethodArgumentParts('resolver');
+            [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
             $namespacedClassName = $this->namespaceClassName(
                 $className,
