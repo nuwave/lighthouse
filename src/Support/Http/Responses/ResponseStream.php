@@ -25,7 +25,7 @@ class ResponseStream extends Stream implements CanStreamResponse
             $paths = collect($paths);
             $lastKey = $paths->count() - 1;
             $paths->map(function ($path, $i) use ($data, $final, $lastKey) {
-                $terminating = $final && ($i == $lastKey);
+                $terminating = $final && ($i === $lastKey);
                 $chunk['data'] = Arr::get($data, "data.{$path}");
                 $chunk['path'] = collect(explode('.', $path))->map(function ($partial) {
                     return is_numeric($partial) ? intval($partial) : $partial;
