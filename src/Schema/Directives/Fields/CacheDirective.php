@@ -142,7 +142,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $hasCacheKey = collect(data_get($field, 'directives', []))
                 ->contains(function (DirectiveNode $directive) {
-                    return 'cacheKey' === $directive->name->value;
+                    return $directive->name->value === 'cacheKey';
                 });
 
             return $hasCacheKey ? data_get($field, 'name.value') : $key;
@@ -159,13 +159,13 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                     $type = data_get($type, 'type');
                 }
 
-                return 'ID' === data_get($type, 'name.value')
+                return data_get($type, 'name.value') === 'ID'
                     ? data_get($field, 'name.value')
                     : $key;
             });
         }
 
-        if (! $nodeKey && 'Query' !== $nodeValue->getTypeDefinitionName()) {
+        if (! $nodeKey && $nodeValue->getTypeDefinitionName() !== 'Query') {
             $message = sprintf(
                 'No @cacheKey or ID field defined on %s',
                 $nodeValue->getTypeDefinitionName()

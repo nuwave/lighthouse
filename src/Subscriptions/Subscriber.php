@@ -55,7 +55,7 @@ class Subscriber
         ResolveInfo $info,
         string $queryString
     ) {
-        if (null === $info->operation->name) {
+        if ($info->operation->name === null) {
             throw new SubscriptionException('An operation name must be present on a subscription request.');
         }
 

@@ -83,7 +83,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $info): bool
     {
-        if ('mutation' === strtolower($info->operation->operation)) {
+        if (strtolower($info->operation->operation) === 'mutation') {
             return false;
         }
 
