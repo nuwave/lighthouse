@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -10,12 +11,13 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 class Serializer implements ContextSerializer
 {
     /**
-     * @var CreatesContext
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
     protected $createsContext;
 
     /**
-     * @param CreatesContext $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @return void
      */
     public function __construct(CreatesContext $createsContext)
     {
@@ -25,8 +27,7 @@ class Serializer implements ContextSerializer
     /**
      * Serialize the context.
      *
-     * @param GraphQLContext $context
-     *
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @return string
      */
     public function serialize(GraphQLContext $context): string
@@ -40,7 +41,7 @@ class Serializer implements ContextSerializer
                 'attributes' => $request->attributes->all(),
                 'cookies' => [],
                 'files' => [],
-                'server' => array_except($request->server->all(), ['HTTP_AUTHORIZATION']),
+                'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
                 'content' => $request->getContent(),
             ],
             'user' => serialize($context->user()),
@@ -50,27 +51,29 @@ class Serializer implements ContextSerializer
     /**
      * Unserialize the context.
      *
-     * @param string $context
-     *
-     * @return GraphQLContext
+     * @param  string $context
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function unserialize(string $context): GraphQLContext
     {
-        $context = unserialize($context);
+        [
+            'request' => $rawRequest,
+            'user' => $rawUser
+        ] = unserialize($context);
 
         $request = new Request(
-            $context['query'],
-            $context['request'],
-            $context['attributes'],
-            $context['cookies'],
-            $context['files'],
-            $context['server'],
-            $context['content']
+            $rawRequest['query'],
+            $rawRequest['request'],
+            $rawRequest['attributes'],
+            $rawRequest['cookies'],
+            $rawRequest['files'],
+            $rawRequest['server'],
+            $rawRequest['content']
         );
 
         $request->setUserResolver(
-            function () use ($context) {
-                return unserialize($context['user']);
+            function () use ($rawUser) {
+                return unserialize($rawUser);
             }
         );
 
