@@ -41,7 +41,7 @@ For example, the field `postUpdated` should have a corresponding class at
 `App\GraphQL\Subscriptions\PostUpdated`.
 
 All subscription field classes **must** implement the abstract class
-`Nuwave\Lighthouse\Schema\Fields\SubscriptionField` and implement two methods:
+`Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement two methods:
 `authorize` and `filter`.
 
 
@@ -98,7 +98,7 @@ class PostUpdated extends GraphQLSubscription
      * @param  string  $fieldName
      * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, string $fieldName)
+    public function encodeTopic(Subscriber $subscriber, string $fieldName): string
     {
         // Optionally create a unique topic name based on the
         // `author` argument.
