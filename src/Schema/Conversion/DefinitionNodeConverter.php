@@ -59,7 +59,9 @@ class DefinitionNodeConverter
                 function (Type $type, string $kind) {
                     if ($kind === NodeKind::NON_NULL_TYPE) {
                         return Type::nonNull($type);
-                    } elseif ($kind === NodeKind::LIST_TYPE) {
+                    }
+
+                    if ($kind === NodeKind::LIST_TYPE) {
                         return Type::listOf($type);
                     }
 
