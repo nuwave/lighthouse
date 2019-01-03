@@ -12,7 +12,7 @@ Install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php) for 
 composer require pusher/pusher-php-server
 ```
 
-Enable the extension in the lighthouse.php config file
+Enable the extension in the `lighthouse.php` config file
 
 ```php
 'extensions' => [
@@ -58,7 +58,7 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class PostUpdatedSubscription extends GraphQLSubscription
+class PostUpdated extends GraphQLSubscription
 {
     /**
      * Check if subscriber is allowed to listen to the subscription.
@@ -98,7 +98,7 @@ class PostUpdatedSubscription extends GraphQLSubscription
      * @param  string  $fieldName
      * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, $fieldName)
+    public function encodeTopic(Subscriber $subscriber, string $fieldName)
     {
         // Optionally create a unique topic name based on the
         // `author` argument.
@@ -126,7 +126,7 @@ class PostUpdatedSubscription extends GraphQLSubscription
      * Resolve the subscription.
      *
      * @param  \App\Post  $root
-     * @param  array  $args
+     * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo $info
      *
@@ -176,7 +176,7 @@ It accepts three parameters:
 
 - `string $subscriptionField` The name of the subscription field you want to trigger
 - `mixed $root` The result object you want to pass through
-- `bool $shouldQuere = null` Optional, overrides the default configuration `lighthouse.subscriptions.queue_broadcasts`
+- `bool $queue = null` Optional, overrides the default configuration `lighthouse.subscriptions.queue_broadcasts`
 
 The following example shows how to trigger a subscription after an update
 to the `Post` model.
