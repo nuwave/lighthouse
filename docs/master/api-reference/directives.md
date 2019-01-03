@@ -109,7 +109,7 @@ type User {
 
 ## @bcrypt
 
-***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+**_Directive Type_**: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
 
 Run the `bcrypt` function on the argument it is defined on.
 
@@ -972,7 +972,7 @@ type Subscription {
 
 ## @trim
 
-***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+**_Directive Type_**: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
 
 Run the `trim` function on the argument it is defined on.
 
