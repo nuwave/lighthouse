@@ -959,13 +959,16 @@ type Query {
 
 ## @subscription
 
-Declare a [class](../extensions/subscriptions.md#the-subscription-class) to handle the broadcasting of a subscription to clients.
+Declare a class to handle the broadcasting of a subscription to clients.
+
+If you follow the default naming conventions for [defining subscription fields]([class](../extensions/subscriptions.md#defining-fields) )
+you do not need this directive. It is only useful if you need to override the default namespace.
 
 ```graphql
 type Subscription {
     postUpdated(author: ID!): Post
         @subscription(
-            class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
+            class: "App\\GraphQL\\Blog\\PostUpdatedSubscription"
         )
 }
 ```
