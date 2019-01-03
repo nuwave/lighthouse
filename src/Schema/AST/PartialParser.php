@@ -39,8 +39,6 @@ class PartialParser
     /**
      * @param string $definition
      *
-     * @throws ParseException
-     *
      * @return ObjectTypeDefinitionNode
      */
     public static function objectTypeDefinition(string $definition): ObjectTypeDefinitionNode
@@ -53,8 +51,6 @@ class PartialParser
 
     /**
      * @param string $inputValueDefinition
-     *
-     * @throws ParseException
      *
      * @return InputValueDefinitionNode
      */
@@ -84,8 +80,6 @@ class PartialParser
     /**
      * @param string $argumentDefinition
      *
-     * @throws ParseException
-     *
      * @return ArgumentNode
      */
     public static function argument(string $argumentDefinition): ArgumentNode
@@ -114,8 +108,6 @@ class PartialParser
     /**
      * @param string $field
      *
-     * @throws ParseException
-     *
      * @return FieldNode
      */
     public static function field(string $field): FieldNode
@@ -128,8 +120,6 @@ class PartialParser
 
     /**
      * @param string $operation
-     *
-     * @throws ParseException
      *
      * @return OperationDefinitionNode
      */
@@ -144,8 +134,6 @@ class PartialParser
     /**
      * @param string $fieldDefinition
      *
-     * @throws ParseException
-     *
      * @return FieldDefinitionNode
      */
     public static function fieldDefinition(string $fieldDefinition): FieldDefinitionNode
@@ -158,8 +146,6 @@ class PartialParser
 
     /**
      * @param string $directive
-     *
-     * @throws ParseException
      *
      * @return DirectiveNode
      */
@@ -193,8 +179,6 @@ class PartialParser
     /**
      * @param string $directiveDefinition
      *
-     * @throws ParseException
-     *
      * @return DirectiveDefinitionNode
      */
     public static function directiveDefinition(string $directiveDefinition): DirectiveDefinitionNode
@@ -223,8 +207,6 @@ class PartialParser
     /**
      * @param string $interfaceDefinition
      *
-     * @throws ParseException
-     *
      * @return InterfaceTypeDefinitionNode
      */
     public static function interfaceTypeDefinition(string $interfaceDefinition): InterfaceTypeDefinitionNode
@@ -237,8 +219,6 @@ class PartialParser
 
     /**
      * @param string $unionDefinition
-     *
-     * @throws ParseException
      *
      * @return UnionTypeDefinitionNode
      */
@@ -253,8 +233,6 @@ class PartialParser
     /**
      * @param string $inputTypeDefinition
      *
-     * @throws ParseException
-     *
      * @return InputObjectTypeDefinitionNode
      */
     public static function inputObjectTypeDefinition(string $inputTypeDefinition): InputObjectTypeDefinitionNode
@@ -268,8 +246,6 @@ class PartialParser
     /**
      * @param string $scalarDefinition
      *
-     * @throws ParseException
-     *
      * @return ScalarTypeDefinitionNode
      */
     public static function scalarTypeDefinition(string $scalarDefinition): ScalarTypeDefinitionNode
@@ -282,8 +258,6 @@ class PartialParser
 
     /**
      * @param string $enumDefinition
-     *
-     * @throws ParseException
      *
      * @return EnumTypeDefinitionNode
      */

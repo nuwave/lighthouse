@@ -27,26 +27,28 @@ class ResponseStream extends Stream implements CanStreamResponse
             $paths = collect($paths);
             $lastKey = $paths->count() - 1;
 
-            $paths->map(function (string $path, int $i) use ($data, $final, $lastKey): string {
-                $terminating = $final && ($i == $lastKey);
-                $chunk['data'] = Arr::get($data, "data.{$path}");
-                $chunk['path'] = collect(explode('.', $path))
-                    ->map(function ($partial) {
-                        return is_numeric($partial)
-                            ? intval($partial)
-                            : $partial;
-                    })
-                    ->toArray();
+            $paths
+                ->map(function (string $path, int $i) use ($data, $final, $lastKey): string {
+                    $terminating = $final && ($i === $lastKey);
+                    $chunk['data'] = Arr::get($data, "data.{$path}");
+                    $chunk['path'] = collect(explode('.', $path))
+                        ->map(function ($partial) {
+                            return is_numeric($partial)
+                                ? intval($partial)
+                                : $partial;
+                        })
+                        ->toArray();
 
-                $errors = $this->chunkError($path, $data);
-                if (! empty($errors)) {
-                    $chunk['errors'] = $errors;
-                }
+                    $errors = $this->chunkError($path, $data);
+                    if (! empty($errors)) {
+                        $chunk['errors'] = $errors;
+                    }
 
-                return $this->chunk($chunk, $terminating);
-            })->each(function (string $chunk) {
-                $this->emit($chunk);
-            });
+                    return $this->chunk($chunk, $terminating);
+                })
+                ->each(function (string $chunk) {
+                    $this->emit($chunk);
+                });
         } else {
             $this->emit($this->chunk($data, $final));
         }
@@ -102,6 +104,8 @@ class ResponseStream extends Stream implements CanStreamResponse
      * Stream chunked data to client.
      *
      * @param string $chunk
+     *
+     * @return void
      */
     protected function emit(string $chunk): void
     {
@@ -118,8 +122,10 @@ class ResponseStream extends Stream implements CanStreamResponse
      * @todo Investigate exceptions that occur on Apache
      *
      * @param \Closure $flush
+     *
+     * @return void
      */
-    protected function flush(\Closure $flush)
+    protected function flush(\Closure $flush): void
     {
         try {
             $flush();

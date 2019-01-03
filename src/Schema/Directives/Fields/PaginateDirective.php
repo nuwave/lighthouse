@@ -13,7 +13,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -36,8 +35,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $current
      *
-     * @throws \Exception
-     *
      * @return DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
@@ -56,8 +53,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * @param FieldValue $fieldValue
      *
-     * @throws \Exception
-     *
      * @return FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -72,8 +67,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
-     * @throws DirectiveException
-     *
      * @return string
      */
     protected function getPaginationType(): string
@@ -87,8 +80,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * Create a paginator resolver.
      *
      * @param FieldValue $value
-     *
-     * @throws \Exception
      *
      * @return FieldValue
      */
@@ -108,8 +99,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * Create a connection resolver.
      *
      * @param FieldValue $value
-     *
-     * @throws \Exception
      *
      * @return FieldValue
      */
@@ -132,9 +121,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * @param array $resolveArgs
      * @param int   $page
      * @param int   $first
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return LengthAwarePaginator
      */
@@ -167,7 +153,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * This works differently as in other directives, so we define a seperate function for it.
      *
      * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return string
      */

@@ -41,8 +41,6 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      * @param Node $node
      * @param DocumentAST $documentAST
      *
-     * @throws \Exception
-     *
      * @return DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
@@ -61,7 +59,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     /**
      * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
      *
-     * @throws \Exception
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      */

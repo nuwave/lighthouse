@@ -39,8 +39,6 @@ class SchemaStitcher implements SchemaSourceProvider
     /**
      * Stitch together schema documents and return the result as a string.
      *
-     * @throws FileNotFoundException
-     *
      * @return string
      */
     public function getSchemaString(): string
@@ -52,8 +50,6 @@ class SchemaStitcher implements SchemaSourceProvider
      * Get the schema, starting from a root schema, following the imports recursively.
      *
      * @param string $path
-     *
-     * @throws FileNotFoundException
      *
      * @return string
      */

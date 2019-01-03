@@ -26,7 +26,6 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
     public function itCanLoadRelationshipsWithLimitsOnCollection()
     {
@@ -60,7 +59,6 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
     public function itCanPaginateRelationshipOnCollection()
     {
@@ -81,7 +79,6 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
     public function itCanHandleSoftDeletes()
     {

@@ -63,11 +63,7 @@ class GraphQLController extends Controller
      *
      * @param Request $request
      *
-     * @throws DirectiveException
-     * @throws ParseException
-     * @throws DefinitionException
-     *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function query(Request $request): Response
     {
@@ -89,12 +85,8 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param GraphQLContext $context
-     *
-     * @throws DirectiveException
-     * @throws ParseException
-     * @throws DefinitionException
+     * @param  Request  $request
+     * @param  GraphQLContext  $context
      *
      * @return mixed[]
      */
@@ -143,7 +135,7 @@ class GraphQLController extends Controller
     {
         return is_string($variables)
             ? json_decode($variables, true)
-            : is_null($variables) ? [] : $variables;
+            : $variables === null ? [] : $variables;
     }
 
     /**

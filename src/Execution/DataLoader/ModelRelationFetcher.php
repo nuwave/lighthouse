@@ -117,8 +117,6 @@ class ModelRelationFetcher
      * @param int $perPage
      * @param int $page
      *
-     * @throws \Exception
-     *
      * @return $this
      */
     public function loadRelationsForPage(int $perPage, int $page = 1): self
@@ -139,8 +137,6 @@ class ModelRelationFetcher
      * @param int      $page
      * @param string   $relationName
      * @param \Closure $relationConstraints
-     *
-     * @throws \Exception
      *
      * @return $this
      */
@@ -224,8 +220,6 @@ class ModelRelationFetcher
      * @param string   $relationName
      * @param \Closure $relationConstraints
      *
-     * @throws \Exception
-     *
      * @return Collection<Relation>
      */
     protected function buildRelationsFromModels(string $relationName, \Closure $relationConstraints): Collection
@@ -264,8 +258,6 @@ class ModelRelationFetcher
      * Load default eager loads.
      *
      * @param EloquentCollection<Model> $collection
-     *
-     * @throws \ReflectionException
      *
      * @return static
      */
@@ -401,8 +393,6 @@ class ModelRelationFetcher
      *
      * @param string                    $relationName
      * @param EloquentCollection<Model> $relationModels
-     *
-     * @throws \ReflectionException
      *
      * @return $this
      */

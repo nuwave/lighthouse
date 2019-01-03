@@ -33,8 +33,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
      * @param FieldValue $value
      * @param \Closure   $next
      *
-     * @throws DirectiveException
-     *
      * @return FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
@@ -163,7 +161,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                 }
 
                 $type = $field->type;
-                while (! is_null(data_get($type, 'type'))) {
+                while (data_get($type, 'type') !== null) {
                     $type = data_get($type, 'type');
                 }
 

@@ -18,7 +18,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
@@ -99,8 +98,6 @@ class FieldFactory
      * Convert a FieldValue to an executable FieldDefinition.
      *
      * @param FieldValue $fieldValue
-     *
-     * @throws DirectiveException
      *
      * @return array Configuration array for a FieldDefinition
      */
@@ -483,8 +480,6 @@ class FieldFactory
      * @param GraphQLContext $context
      * @param ResolveInfo    $resolveInfo
      *
-     * @throws \Exception
-     *
      * @return void
      */
     protected function validateArgumentsBeforeValidationDirectives($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
@@ -522,8 +517,6 @@ class FieldFactory
     }
 
     /**
-     * @throws \Exception
-     *
      * @return void
      */
     protected function flushErrorBufferIfHasErrors(): void
@@ -540,8 +533,6 @@ class FieldFactory
      * @param array          $args
      * @param GraphQLContext $context
      * @param ResolveInfo    $resolveInfo
-     *
-     * @throws \Exception
      *
      * @return void
      */

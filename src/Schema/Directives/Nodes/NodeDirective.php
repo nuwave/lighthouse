@@ -7,8 +7,6 @@ use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
@@ -44,9 +42,6 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      * @param NodeValue $value
      * @param \Closure $next
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
@@ -64,8 +59,6 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     /**
      * @param Node $node
      * @param DocumentAST $documentAST
-     *
-     * @throws \Exception
      *
      * @return DocumentAST
      */

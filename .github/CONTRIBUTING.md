@@ -50,7 +50,8 @@ Prefer direct usage of Illuminate classes instead of helpers.
 array_get($foo, 'bar');
 
 # CORRECT
-\Illuminate\Support\Arr::get($foo, 'bar');
+use \Illuminate\Support\Arr;
+Arr::get($foo, 'bar');
 ```
 
 ### Type definitions
@@ -76,14 +77,15 @@ by PHPStorm and most other editors.
 /**
  * Hint at the contents of the Collection.
  *
- * @return Collection<string>
+ * @return \Illuminate\Support\Collection<string>
  */
 function foo(): Collection
 ```
 
 Use `self` to annotate that a class returns an instance of itself (or its child).
 Use [PHPDoc type hints](http://docs.phpdoc.org/guides/types.html#keywords) to
-differentiate between:
+differentiate between cases where you return the original object instance and
+other cases where you instantiate a new class.
 
 ```php
 <?php
@@ -123,6 +125,27 @@ class Foo
 
         return $instance;
     }
+}
+```
+
+### Annotating Exception Throwing
+
+Only annotate `@throws` for Exceptions that are thrown in the function itself.
+
+```php
+/**
+ * @throws \Exception
+ */
+function foo(){
+  throw Excection();
+}
+
+/**
+ * No need to annotate the Exception here, even though
+ * it is thrown indirectly. 
+ */
+function bar(){
+  foo();
 }
 ```
 

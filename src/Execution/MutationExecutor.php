@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class MutationExecutor
 {
@@ -20,7 +19,7 @@ class MutationExecutor
     public static function executeCreate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
+        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
@@ -48,7 +47,7 @@ class MutationExecutor
     protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, ?HasMany $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        list($belongsTo, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
+        [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
         $model->fill(
@@ -93,8 +92,6 @@ class MutationExecutor
      * @param Collection   $args           the corresponding slice of the input arguments for updating this model
      * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
      *
-     * @throws ModelNotFoundException
-     *
      * @return Model
      */
     public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
@@ -107,7 +104,7 @@ class MutationExecutor
         $model = $model->newQuery()->findOrFail($id);
 
         $reflection = new \ReflectionClass($model);
-        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
+        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 

@@ -15,7 +15,6 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -101,8 +100,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      * @param Node $node
      * @param DocumentAST $documentAST
      *
-     * @throws ParseException
-     * @throws DirectiveException
      *
      * @return DocumentAST
      */
@@ -120,7 +117,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
      * @param array $middlewareArgValue
      *
-     * @throws ParseException
      * @throws DirectiveException
      *
      * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode

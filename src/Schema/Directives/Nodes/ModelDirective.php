@@ -7,8 +7,6 @@ use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
@@ -41,11 +39,8 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     /**
      * Handle type construction.
      *
-     * @param NodeValue $value
-     * @param \Closure  $next
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
+     * @param  NodeValue  $value
+     * @param  \Closure  $next
      *
      * @return NodeValue
      */
@@ -59,10 +54,8 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     }
 
     /**
-     * @param Node        $node
-     * @param DocumentAST $documentAST
-     *
-     * @throws \Exception
+     * @param  Node  $node
+     * @param  DocumentAST  $documentAST
      *
      * @return DocumentAST
      */

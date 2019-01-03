@@ -47,10 +47,6 @@ abstract class RelationDirective extends BaseDirective
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST $current
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     * @throws ParseException
-     *
      * @return DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
@@ -70,13 +66,11 @@ abstract class RelationDirective extends BaseDirective
 
     /**
      * @param Model          $parent
-     * @param array          $args
+     * @param mixed[]        $args
      * @param GraphQLContext $context
      * @param ResolveInfo    $resolveInfo
      *
-     * @throws DirectiveException
-     *
-     * @return array
+     * @return mixed[]
      */
     protected function getLoaderConstructorArguments(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {

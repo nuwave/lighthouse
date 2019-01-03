@@ -36,8 +36,6 @@ class Date extends ScalarType
      *
      * @param string $value
      *
-     * @throws Error
-     *
      * @return Carbon
      */
     public function parseValue($value): Carbon

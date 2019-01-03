@@ -50,7 +50,7 @@ class GlobalId
      */
     public static function decodeID(string $globalID): string
     {
-        list($type, $id) = self::decode($globalID);
+        [$type, $id] = self::decode($globalID);
 
         return $id;
     }
@@ -64,7 +64,7 @@ class GlobalId
      */
     public static function decodeType(string $globalID): string
     {
-        list($type, $id) = self::decode($globalID);
+        [$type, $id] = self::decode($globalID);
 
         return $type;
     }

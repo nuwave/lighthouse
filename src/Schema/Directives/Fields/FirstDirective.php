@@ -6,8 +6,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -28,9 +26,6 @@ class FirstDirective extends BaseDirective implements FieldResolver
      * Resolve the field directive.
      *
      * @param FieldValue $fieldValue
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return FieldValue
      */

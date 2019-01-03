@@ -3,15 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Illuminate\Support\Arr;
-use Illuminate\Http\Response;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Exceptions\ParseException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class DeferExtension extends GraphQLExtension
 {
@@ -78,8 +74,6 @@ class DeferExtension extends GraphQLExtension
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
      * @param DocumentAST $documentAST
-     *
-     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -200,9 +194,9 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param array $data
+     * @param mixed[] $data
      *
-     * @return StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function response(array $data): StreamedResponse
     {
@@ -298,10 +292,6 @@ class DeferExtension extends GraphQLExtension
 
     /**
      * Execute deferred fields.
-     *
-     * @throws DirectiveException
-     * @throws ParseException
-     * @throws DefinitionException
      *
      * @return void
      */
