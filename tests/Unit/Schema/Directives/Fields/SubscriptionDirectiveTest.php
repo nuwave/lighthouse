@@ -21,9 +21,12 @@ class SubscriptionDirectiveTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set(['lighthouse.extensions' => [
-            \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
-        ]]);
+        $app['config']->set([
+            'lighthouse.namespaces.subscriptions' => 'Tests\\Utils\\Directives',
+            'lighthouse.extensions' => [
+                \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+            ],
+        ]);
     }
 
     /**
@@ -135,14 +138,13 @@ class SubscriptionDirectiveTest extends TestCase
     protected function schema()
     {
         $resolver = addslashes(self::class).'@resolve';
-        $subscription = addslashes(FooSubscription::class);
 
         return "
             type Post {
                 body: String
             }
             type Subscription {
-                onPostCreated: Post @subscription(class: \"{$subscription}\")
+                onPostCreated: Post @subscription(class: \"FooSubscription\")
             }
             type Mutation {
                 createPost(post: String!): Post

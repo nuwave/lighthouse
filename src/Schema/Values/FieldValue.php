@@ -217,6 +217,8 @@ class FieldValue
                 return (array) config('lighthouse.namespaces.queries');
             case 'Mutation':
                 return (array) config('lighthouse.namespaces.mutations');
+            case 'Subscription':
+                return (array) config('lighthouse.namespaces.subscriptions');
             default:
                return [];
         }

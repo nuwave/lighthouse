@@ -28,9 +28,12 @@ To fire a subscription from the server down to the client you must create a `Sub
 ```graphql
 type Subscription {
     postUpdated(author: ID): Post
-        @subscription(
-            class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
-        )
+        @subscription(class: "PostUpdatedSubscription")
+    # If you are note using the default namespace defined in the
+    # `lighthouse.php` file you can override it by providing the full
+    # namespace for the `class` argument.
+    postLiked(author: ID): Post
+        @subscription(class: "App\\GraphQL\\Post\\PostLikedSubscription")
 }
 
 type Mutation {
