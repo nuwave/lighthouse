@@ -51,7 +51,7 @@ class SubscriptionDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $value)
     {
-        $subscription = $this->getSubscription();
+        $subscription = $this->getSubscription($value);
         $fieldName = $value->getFieldName();
 
         $this->registry->register(
@@ -83,10 +83,15 @@ class SubscriptionDirective extends BaseDirective implements FieldResolver
     }
 
     /**
+     * @param FieldValue $value
+     *
      * @return GraphQLSubscription
      */
-    protected function getSubscription(): GraphQLSubscription
+    protected function getSubscription(FieldValue $value): GraphQLSubscription
     {
-        return app($this->directiveArgValue('class'));
+        $className = $this->directiveArgValue('class');
+        $parentNamespaces = $value->defaultNamespacesForParent();
+
+        return app($this->namespaceClassName($className, $parentNamespaces));
     }
 }
