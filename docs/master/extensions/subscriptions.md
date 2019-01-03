@@ -8,9 +8,7 @@ Much of the credit should be given to the [Ruby implementation](https://github.c
 
 Install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php) for interacting with the Pusher HTTP API.
 
-```bash
-composer require pusher/pusher-php-server
-```
+    composer require pusher/pusher-php-server
 
 Enable the extension in the `lighthouse.php` config file
 
@@ -43,7 +41,6 @@ For example, the field `postUpdated` should have a corresponding class at
 All subscription field classes **must** implement the abstract class
 `Nuwave\Lighthouse\Schema\Types\GraphQLSubscription` and implement two methods:
 `authorize` and `filter`.
-
 
 ```php
 <?php

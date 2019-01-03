@@ -226,7 +226,7 @@ class FieldValue
         if ($directive = ASTHelper::directiveDefinition($this->field, 'subscription')) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
-            $className = $this->getFieldName();
+            $className = studly_case($this->getFieldName());
         }
 
         $className = Utils::namespaceClassname(

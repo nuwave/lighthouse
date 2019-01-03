@@ -47,14 +47,16 @@ class SubscriptionTest extends TestCase
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $subscription2 = '
         subscription OnPostCreatedV2 {
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $json = [
             ['query' => $subscription1],
@@ -85,7 +87,8 @@ class SubscriptionTest extends TestCase
             createPost(post: "Foobar") {
                 body
             }
-        }';
+        }
+        ';
 
         $this->subscribe();
         $this->postJson('/graphql', ['query' => $mutation])->json();
@@ -160,7 +163,8 @@ class SubscriptionTest extends TestCase
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $json = [
             'query' => $subscription,
