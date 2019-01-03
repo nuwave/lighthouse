@@ -5,16 +5,16 @@ namespace Tests;
 use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Testing\TestResponse;
-use Laravel\Scout\ScoutServiceProvider;
-use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Orchestra\Database\ConsoleServiceProvider;
-use Orchestra\Testbench\TestCase as BaseTestCase;
 use Tests\Utils\Middleware\CountRuns;
+use Illuminate\Foundation\Application;
+use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
+use Orchestra\Database\ConsoleServiceProvider;
+use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Orchestra\Testbench\TestCase as BaseTestCase;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -94,7 +94,7 @@ class TestCase extends BaseTestCase
 
         TestResponse::macro(
             'assertErrorCategory',
-            function(string $category): void {
+            function(string $category): TestResponse {
                 $this->assertJson([
                     'errors' => [
                         [
@@ -104,6 +104,8 @@ class TestCase extends BaseTestCase
                         ]
                     ]
                 ]);
+
+                return $this;
             }
         );
     }

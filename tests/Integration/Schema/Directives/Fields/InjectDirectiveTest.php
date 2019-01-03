@@ -35,7 +35,8 @@ class InjectDirectiveTest extends DBTestCase
             name: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -47,12 +48,16 @@ class InjectDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $this->schema = $schema;
-        $result = $this->query($query);
-
-        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createTask.user.id'));
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1'
+                    ]
+                ]
+            ]
+        ]);
     }
 }

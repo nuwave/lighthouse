@@ -11,7 +11,7 @@ class HasOneDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanQueryHasOneRelationship()
+    public function itCanQueryHasOneRelationship(): void
     {
         // Task with id 1, no post
         factory(Task::class)->create();
@@ -32,7 +32,7 @@ class HasOneDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         {
             tasks {
                 post {
@@ -40,16 +40,19 @@ class HasOneDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(
-            [
+        ')->assertJson([
+            'data' => [
                 'tasks' => [
-                    ['post' => null],
-                    ['post' => ['id' => 1]],
+                    [
+                        'post' => null
+                    ],
+                    [
+                        'post' => [
+                            'id' => 1
+                        ]
+                    ],
                 ],
             ],
-            $result['data']
-        );
+        ]);
     }
 }

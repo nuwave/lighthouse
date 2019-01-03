@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Types;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Illuminate\Support\Collection;
@@ -13,22 +12,36 @@ class UnionTest extends DBTestCase
     /**
      * @test
      * @dataProvider withAndWithoutCustomTypeResolver
+     * @param  string  $schema
+     * @param  string  $query
      */
     public function itCanResolveUnionTypes(string $schema, string $query)
     {
         // This creates a user with it
         factory(Post::class)->create(
-        // Prevent creating more users through nested factory
+            // Prevent creating more users through nested factory
             ['task_id' => 1]
         );
 
-        $result = $this->query($query);
+        $this->schema = $schema;
 
-        $this->assertCount(2, Arr::get($result, 'data.stuff'));
-        $this->assertArrayHasKey('name', Arr::get($result, 'data.stuff.0'));
-        $this->assertArrayHasKey('title', Arr::get($result, 'data.stuff.1'));
+        $this->query($query)->assertJsonStructure([
+            'data' => [
+                'stuff' => [
+                    [
+                        'name'
+                    ],
+                    [
+                        'title'
+                    ]
+                ]
+            ]
+        ]);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function fetchResults(): Collection
     {
         $users = User::all();
@@ -37,21 +50,31 @@ class UnionTest extends DBTestCase
         return $users->concat($posts);
     }
 
+    /**
+     * @return array[]
+     */
     public function withAndWithoutCustomTypeResolver(): array
     {
         return [
             // This uses the default type resolver
-            $this->schema(false),
+            $this->schemaAndQuery(false),
             // This scenario requires a custom resolver, since the types User and Post do not match
-            $this->schema(true),
+            $this->schemaAndQuery(true),
         ];
     }
 
-    public function schema(bool $withCustomTypeResolver): array
+    /**
+     * @param  bool  $withCustomTypeResolver
+     * @return string[] [string $schema, string $query]
+     */
+    public function schemaAndQuery(bool $withCustomTypeResolver): array
     {
         $fieldResolver = addslashes(self::class).'@fetchResults';
 
-        $prefix = $withCustomTypeResolver ? 'Custom' : '';
+        $prefix = $withCustomTypeResolver
+            ? 'Custom'
+            : '';
+
         $customResolver = $withCustomTypeResolver
             ? '@union(resolveType: "Tests\\\\Utils\\\\Unions\\\\CustomStuff@resolveType")'
             : '';
@@ -69,7 +92,7 @@ class UnionTest extends DBTestCase
             }
             
             type Query {
-                stuff: [Stuff!]! @field(resolver: \"$fieldResolver\")
+                stuff: [Stuff!]! @field(resolver: \"{$fieldResolver}\")
             }
             ",
             "

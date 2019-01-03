@@ -3,11 +3,9 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Builder;
 
 class PaginateDirectiveTest extends DBTestCase
@@ -15,7 +13,7 @@ class PaginateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateQueryPaginators()
+    public function itCanCreateQueryPaginators(): void
     {
         factory(User::class, 10)->create();
 
@@ -30,7 +28,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             users(count: 5) {
                 paginatorInfo {
@@ -44,9 +42,7 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
@@ -63,7 +59,7 @@ class PaginateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanSpecifyCustomBuilder()
+    public function itCanSpecifyCustomBuilder(): void
     {
         factory(User::class, 2)->create();
 
@@ -110,7 +106,7 @@ class PaginateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateQueryPaginatorsWithDifferentPages()
+    public function itCanCreateQueryPaginatorsWithDifferentPages(): void
     {
         $users = factory(User::class, 10)->create();
         $posts = factory(Post::class, 10)->create([
@@ -140,7 +136,8 @@ class PaginateDirectiveTest extends DBTestCase
             users: [User!]! @paginate
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(count:3 page: 1) {
                 paginatorInfo {
@@ -168,12 +165,9 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)
-            ->assertJsonCount(1, 'data.users.paginatorInfo.currentPage')
-            ->assertJsonCount(1, 'data.users.data.0.posts.paginatorInfo.currentPage')
-            ->assertJsonCount(1, 'data.users.data.0.posts.data.comments.paginatorInfo.currentPage');
+        ')->assertJsonCount(1, 'data.users.paginatorInfo.currentPage')
+          ->assertJsonCount(1, 'data.users.data.0.posts.paginatorInfo.currentPage')
+          ->assertJsonCount(1, 'data.users.data.0.posts.data.comments.paginatorInfo.currentPage');
     }
 
     /**
@@ -194,7 +188,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             users(first: 5) {
                 pageInfo {
@@ -208,9 +202,7 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'users' => [
                     'pageInfo' => [
@@ -237,7 +229,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             users(first: 5) {
                 pageInfo {
@@ -258,25 +250,22 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)
-            ->assertJson([
-                'data' => [
-                    'users' => [
-                        'pageInfo' => [
-                            'count' => 0,
-                            'currentPage' => 1,
-                            'endCursor' => null,
-                            'hasNextPage' => false,
-                            'hasPreviousPage' => false,
-                            'lastPage' => 1,
-                            'startCursor' => null,
-                            'total' => 0,
-                        ]
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'pageInfo' => [
+                        'count' => 0,
+                        'currentPage' => 1,
+                        'endCursor' => null,
+                        'hasNextPage' => false,
+                        'hasPreviousPage' => false,
+                        'lastPage' => 1,
+                        'startCursor' => null,
+                        'total' => 0,
                     ]
                 ]
-            ])->assertJsonCount(0, 'data.users.edges');
+            ]
+        ])->assertJsonCount(0, 'data.users.edges');
     }
 
     /**
@@ -294,7 +283,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             users(count: 5) {
                 paginatorInfo {
@@ -312,25 +301,22 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)
-            ->assertJson([
-                'data' => [
-                    'users' => [
-                        'paginatorInfo' => [
-                            'count' => 0,
-                            'currentPage' => 1,
-                            'firstItem' => null,
-                            'hasMorePages' => false,
-                            'lastItem' => null,
-                            'lastPage' => 1,
-                            'perPage' => 5,
-                            'total' => 0,
-                        ]
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'count' => 0,
+                        'currentPage' => 1,
+                        'firstItem' => null,
+                        'hasMorePages' => false,
+                        'lastItem' => null,
+                        'lastPage' => 1,
+                        'perPage' => 5,
+                        'total' => 0,
                     ]
                 ]
-            ])->assertJsonCount(0, 'data.users.data');
+            ]
+        ])->assertJsonCount(0, 'data.users.data');
     }
 
     /**
@@ -351,7 +337,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $query = '
+        $this->query('
         {
             users(count: 1) {
                 data {
@@ -360,9 +346,7 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJsonCount(1, 'data.users.data');
+        ')->assertJsonCount(1, 'data.users.data');
     }
 
     /** @test */
@@ -381,7 +365,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $query = '
+        $this->query('
         {
             users {
                 paginatorInfo {
@@ -395,9 +379,7 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'users' => [
                     'paginatorInfo' => [

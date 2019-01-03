@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -12,14 +11,14 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 class HasManyDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The authenticated user.
      *
      * @var User
      */
     protected $user;
 
     /**
-     * User's tasks.
+     * The authenticated user's tasks.
      *
      * @var \Illuminate\Support\Collection
      */
@@ -45,7 +44,7 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanQueryHasManyRelationship()
+    public function itCanQueryHasManyRelationship(): void
     {
         $this->schema = '
         type User {
@@ -62,7 +61,14 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $tasksWithoutGlobalScope = $this->user
+            ->tasks()
+            ->withoutGlobalScope('no_cleaning')
+            ->count();
+        $this->assertSame(4, $tasksWithoutGlobalScope);
+
+        // Ensure global scopes are respected here
+        $this->query('
         {
             user {
                 tasks {
@@ -70,23 +76,17 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $tasksWithoutGlobalScope = auth()->user()->tasks()->withoutGlobalScope('no_cleaning')->count();
-        $this->assertSame(4, $tasksWithoutGlobalScope);
-
-        // Ensure global scopes are respected here
-        $this->assertCount(3, Arr::get($result->data, 'user.tasks'));
+        ')->assertJsonCount(3, 'data.user.tasks');
     }
 
     /**
      * @test
      */
-    public function itCallsScopeWithResolverArgs()
+    public function itCallsScopeWithResolverArgs(): void
     {
         $this->assertCount(3, $this->user->tasks);
 
-        $schema = '
+        $this->schema = '
         type User {
             tasks(foo: Int): [Task!]! @hasMany(scopes: ["foo"])
         }
@@ -101,7 +101,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         {
             user {
                 tasks(foo: 2) {
@@ -109,17 +109,15 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertCount(2, Arr::get($result->data, 'user.tasks'));
+        ')->assertJsonCount(2, 'data.user.tasks');
     }
 
     /**
      * @test
      */
-    public function itCanQueryHasManyPaginator()
+    public function itCanQueryHasManyPaginator(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator")
             posts: [Post!]! @hasMany(type: "paginator")
@@ -138,14 +136,14 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         {
             user {
                 tasks(count: 2) {
                     paginatorInfo {
-                        total
                         count
                         hasMorePages
+                        total
                     }
                     data {
                         id
@@ -153,18 +151,27 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertSame(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
-        $this->assertTrue(Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, Arr::get($result->data, 'user.tasks.data'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'paginatorInfo' => [
+                            'count' => 2,
+                            'hasMorePages' => true,
+                            'total' => 3,
+                        ]
+                    ]
+                ]
+            ]
+        ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
-    /** @test */
-    public function itCanQueryHasManyPaginatorWithADefaultCount()
+    /**
+     * @test
+     */
+    public function itCanQueryHasManyPaginatorWithADefaultCount(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator", defaultCount: 2)
         }
@@ -178,14 +185,14 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         {
             user {
                 tasks {
                     paginatorInfo {
-                        total
                         count
                         hasMorePages
+                        total
                     }
                     data {
                         id
@@ -193,20 +200,27 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(2, Arr::get($result->data, 'user.tasks.paginatorInfo.count'));
-        $this->assertSame(3, Arr::get($result->data, 'user.tasks.paginatorInfo.total'));
-        $this->assertTrue(Arr::get($result->data, 'user.tasks.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, Arr::get($result->data, 'user.tasks.data'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'paginatorInfo' => [
+                            'count' => 2,
+                            'hasMorePages' => true,
+                            'total' => 3,
+                        ]
+                    ]
+                ]
+            ]
+        ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
     /**
      * @test
      */
-    public function itCanQueryHasManyRelayConnection()
+    public function itCanQueryHasManyRelayConnection(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             tasks: [Task!]! @hasMany(type: "relay")
         }
@@ -220,7 +234,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         {
             user {
                 tasks(first: 2) {
@@ -235,18 +249,25 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertTrue(Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'pageInfo' => [
+                            'hasNextPage' => true
+                        ]
+                    ]
+                ]
+            ]
+        ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
     /**
      * @test
      */
-    public function itCanQueryHasManyRelayConnectionWithADefaultCount()
+    public function itCanQueryHasManyRelayConnectionWithADefaultCount(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             tasks: [Task!]! @hasMany(type: "relay", defaultCount: 2)
         }
@@ -260,7 +281,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         {
             user {
                 tasks {
@@ -275,18 +296,25 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertTrue(Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'pageInfo' => [
+                            'hasNextPage' => true
+                        ]
+                    ]
+                ]
+            ]
+        ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
     /**
      * @test
      */
-    public function itCanQueryHasManyNestedRelationships()
+    public function itCanQueryHasManyNestedRelationships(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             tasks: [Task!]! @hasMany(type: "relay")
         }
@@ -301,7 +329,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         { 
             user { 
                 tasks(first: 2) { 
@@ -325,17 +353,24 @@ class HasManyDirectiveTest extends DBTestCase
                 } 
             } 
         }
-        ');
-
-        $this->assertTrue(Arr::get($result->data, 'user.tasks.pageInfo.hasNextPage'));
-        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges'));
-        $this->assertCount(2, Arr::get($result->data, 'user.tasks.edges.0.node.user.tasks.edges'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'tasks' => [
+                        'pageInfo' => [
+                            'hasNextPage' => true
+                        ]
+                    ]
+                ]
+            ]
+        ])->assertJsonCount(2, 'data.user.tasks.edges')
+        ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
     }
 
     /**
      * @test
      */
-    public function itCanQueryHasManySelfReferencingRelationships()
+    public function itCanQueryHasManySelfReferencingRelationships(): void
     {
         $post1 = factory(Post::class)->create([
             'id' => 1,
@@ -351,7 +386,7 @@ class HasManyDirectiveTest extends DBTestCase
             'parent_id' => $post2->getKey(),
         ]);
 
-        $schema = '
+        $this->schema = '
         type Post {
             id: Int!
             parent: Post @belongsTo
@@ -362,7 +397,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         { 
             posts {
                 id
@@ -374,23 +409,38 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             } 
         }
-        ');
-
-        $posts = $result->data['posts'];
-
-        $this->assertNull($posts[0]['parent']);
-
-        $this->assertNotNull($posts[1]['parent']);
-        $this->assertNull($posts[1]['parent']['parent']);
-
-        $this->assertNotNull($posts[2]['parent']);
-        $this->assertNotNull($posts[2]['parent']['parent']);
+        ')->assertJson([
+            'data' => [
+                'posts' => [
+                    [
+                        'id' => 1,
+                        'parent' => null,
+                    ],
+                    [
+                        'id' => 2,
+                        'parent' => [
+                            'id' => 1,
+                            'parent' => null,
+                        ]
+                    ],
+                    [
+                        'id' => 3,
+                        'parent' => [
+                            'id' => 2,
+                            'parent' => [
+                                'id' => 1,
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
      * @test
      */
-    public function itThrowsErrorWithUnknownTypeArg()
+    public function itThrowsErrorWithUnknownTypeArg(): void
     {
         $this->expectException(DirectiveException::class);
 

@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 class NodeInterfaceTest extends DBTestCase
 {
     /**
-     * @var array
+     * @var mixed[]
      */
     protected $testTuples = [
         1 => [
@@ -25,7 +25,7 @@ class NodeInterfaceTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveNodes()
+    public function itCanResolveNodes(): void
     {
         $this->schema = '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
@@ -35,7 +35,8 @@ class NodeInterfaceTest extends DBTestCase
 
         $firstGlobalId = GlobalId::encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = GlobalId::encode('User', $this->testTuples[2]['id']);
-        $query = '
+
+        $this->query('
         {
             first: node(id: "'.$firstGlobalId.'") {
                 id
@@ -50,22 +51,25 @@ class NodeInterfaceTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertSame([
-            'first' => [
-                'id' => $firstGlobalId,
-                'name' => $this->testTuples[1]['name'],
-            ],
-            'second' => [
-                'id' => $secondGlobalId,
-                'name' => $this->testTuples[2]['name'],
-            ],
-        ], $result['data']);
+        ')->assertExactJson([
+            'data' => [
+                'first' => [
+                    'id' => $firstGlobalId,
+                    'name' => $this->testTuples[1]['name'],
+                ],
+                'second' => [
+                    'id' => $secondGlobalId,
+                    'name' => $this->testTuples[2]['name'],
+                ],
+            ]
+        ]);
     }
 
-    public function resolveNode($id)
+    /**
+     * @param  int  $id
+     * @return mixed[]
+     */
+    public function resolveNode(int $id): array
     {
         return $this->testTuples[$id];
     }
@@ -73,7 +77,7 @@ class NodeInterfaceTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveModelsNodes()
+    public function itCanResolveModelsNodes(): void
     {
         $this->schema = '
         type User @model {
@@ -85,7 +89,8 @@ class NodeInterfaceTest extends DBTestCase
             ['name' => 'Sepp']
         );
         $globalId = GlobalId::encode('User', $user->getKey());
-        $query = '
+
+        $this->query('
         {
             node(id: "'.$globalId.'") {
                 id
@@ -94,14 +99,13 @@ class NodeInterfaceTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertSame([
-            'node' => [
-                'id' => $globalId,
-                'name' => 'Sepp',
-            ],
-        ], $result['data']);
+        ')->assertExactJson([
+            'data' => [
+                'node' => [
+                    'id' => $globalId,
+                    'name' => 'Sepp',
+                ],
+            ]
+        ]);
     }
 }
