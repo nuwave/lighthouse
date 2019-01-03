@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class MutationExecutor
 {
@@ -92,8 +91,6 @@ class MutationExecutor
      * @param Model        $model          an empty instance of the model that should be updated
      * @param Collection   $args           the corresponding slice of the input arguments for updating this model
      * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
-     *
-     * @throws ModelNotFoundException
      *
      * @return Model
      */

@@ -72,8 +72,6 @@ class DeferExtension extends GraphQLExtension
      *
      * @param DocumentAST $documentAST
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
-     *
      * @return DocumentAST
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST

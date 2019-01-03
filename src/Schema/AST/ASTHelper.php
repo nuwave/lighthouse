@@ -50,8 +50,6 @@ class ASTHelper
      * @param bool           $overwriteDuplicates By default this throws if a collision occurs. If
      *                                            this is set to true, the fields of the original list will be overwritten.
      *
-     * @throws DefinitionException
-     *
      * @return NodeList
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
@@ -99,8 +97,6 @@ class ASTHelper
 
     /**
      * @param Node $definition
-     *
-     * @throws DefinitionException
      *
      * @return string
      */
@@ -285,8 +281,6 @@ class ASTHelper
      *
      * @param ObjectTypeDefinitionNode $objectType
      * @param DocumentAST              $documentAST
-     *
-     * @throws \Exception
      *
      * @return DocumentAST
      */

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Language\Parser;
-use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
@@ -36,8 +35,6 @@ class QueryAST
      * Create a new DocumentAST instance from a schema.
      *
      * @param string $schema
-     *
-     * @throws SyntaxError
      *
      * @return QueryAST
      */

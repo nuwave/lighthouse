@@ -26,7 +26,6 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -67,9 +66,6 @@ class NodeFactory
      *
      * @param TypeDefinitionNode $definition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return Type
      */
     public function handle(TypeDefinitionNode $definition): Type
@@ -98,8 +94,6 @@ class NodeFactory
      *
      * @param TypeDefinitionNode $definition
      *
-     * @throws DirectiveException
-     *
      * @return bool
      */
     protected function hasTypeResolver(TypeDefinitionNode $definition): bool
@@ -111,8 +105,6 @@ class NodeFactory
      * Use directive resolver to transform type.
      *
      * @param TypeDefinitionNode $definition
-     *
-     * @throws DirectiveException
      *
      * @return Type
      */
@@ -129,9 +121,6 @@ class NodeFactory
      * Transform value to type.
      *
      * @param TypeDefinitionNode $typeDefinition
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return Type
      */
@@ -309,9 +298,6 @@ class NodeFactory
     /**
      * @param InterfaceTypeDefinitionNode $interfaceDefinition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return InterfaceType
      */
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
@@ -364,9 +350,6 @@ class NodeFactory
 
     /**
      * @param UnionTypeDefinitionNode $unionDefinition
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return UnionType
      */

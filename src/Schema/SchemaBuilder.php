@@ -14,8 +14,6 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class SchemaBuilder
@@ -46,9 +44,6 @@ class SchemaBuilder
      * Build an executable schema from AST.
      *
      * @param DocumentAST $documentAST
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return Schema
      */
