@@ -16,6 +16,7 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -107,7 +108,7 @@ class GraphQL
      * collection of ExecutionResults.
      *
      * @param  array  $requests
-     * @param  GraphQLContext  $context
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  mixed|null  $rootValue
      * @return \GraphQL\Executor\ExecutionResult[]
      */
@@ -138,11 +139,11 @@ class GraphQL
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
-     * @param  string  $query
-     * @param  GraphQLContext  $context
-     * @param  mixed[]  $variables
-     * @param  mixed|null  $rootValue
-     * @param  string|null  $operationName
+     * @param  string $query
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  mixed[] $variables
+     * @param  mixed|null $rootValue
+     * @param  string|null $operationName
      * @return \GraphQL\Executor\ExecutionResult
      */
     public function executeQuery(
