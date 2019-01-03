@@ -218,7 +218,7 @@ class ModelRelationFetcher
      * @param string   $relationName
      * @param \Closure $relationConstraints
      *
-     * @return Collection|Relation[]
+     * @return Collection<Relation>
      */
     protected function buildRelationsFromModels(string $relationName, \Closure $relationConstraints): Collection
     {
@@ -285,7 +285,7 @@ class ModelRelationFetcher
     /**
      * This is the name that Eloquent gives to the attribute that contains the count.
      *
-     * @see Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
+     * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
      *
      * @param string $relationName
      *
