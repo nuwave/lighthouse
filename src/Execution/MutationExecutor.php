@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class MutationExecutor
@@ -45,7 +44,6 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-
                 if ('create' === $operationKey) {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
@@ -210,7 +208,6 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
