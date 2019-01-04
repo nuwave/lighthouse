@@ -120,7 +120,7 @@ class UpdateDirectiveTest extends DBTestCase
         input UpdateTaskInput {
             id: ID!
             name: String
-            user: ID
+            user_id: ID
         }
         '.$this->placeholderQuery();
         $query = '
@@ -128,7 +128,7 @@ class UpdateDirectiveTest extends DBTestCase
             updateTask(input: {
                 id: 1
                 name: "foo"
-                user: 2
+                user_id: 2
             }) {
                 id
                 name

@@ -13,7 +13,7 @@ class CreateTestbenchRolesTable extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('acl_id');
+            $table->unsignedInteger('acl_id')->nullable();
             $table->string('name');
         });
     }
