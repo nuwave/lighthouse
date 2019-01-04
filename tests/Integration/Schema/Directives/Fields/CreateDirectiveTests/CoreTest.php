@@ -1,13 +1,14 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests;
 
+use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
-class CreateDirectiveTest extends DBTestCase
+class CoreTest extends DBTestCase
 {
     /**
      * @test
@@ -80,132 +81,6 @@ class CreateDirectiveTest extends DBTestCase
                     'name' => 'foo'
                 ]
             ]
-        ]);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanCreateWithBelongsTo()
-    {
-        factory(User::class)->create();
-
-        $this->schema = '
-        type Task {
-            id: ID!
-            name: String!
-            user: User @belongsTo
-        }
-        
-        type User {
-            id: ID
-        }
-        
-        type Mutation {
-            createTask(input: CreateTaskInput!): Task @create(flatten: true)
-        }
-        
-        input CreateTaskInput {
-            name: String
-            user: ID
-        }
-        ' . $this->placeholderQuery();
-        $query = '
-        mutation {
-            createTask(input: {
-                name: "foo"
-                user: 1
-            }) {
-                id
-                name
-                user {
-                    id
-                }
-            }
-        }
-        ';
-
-        $this->query($query)->assertJson([
-            'data' => [
-                'createTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'user' => [
-                        'id' => '1'
-                    ]
-                ]
-            ]
-        ]);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanCreateWithHasMany()
-    {
-        $this->schema = '
-        type Task {
-            id: ID!
-            name: String!
-        }
-        
-        type User {
-            id: ID!
-            name: String
-            tasks: [Task!]! @hasMany
-        }
-        
-        type Mutation {
-            createUser(input: CreateUserInput!): User @create(flatten: true)
-        }
-        
-        input CreateUserInput {
-            name: String
-            tasks: CreateTaskRelation
-        }
-        
-        input CreateTaskRelation {
-            create: [CreateTaskInput!]
-        }
-        
-        input CreateTaskInput {
-            name: String
-            user: ID
-        }
-        ' . $this->placeholderQuery();
-        $query = '
-        mutation {
-            createUser(input: {
-                name: "foo"
-                tasks: {
-                    create: [{
-                        name: "bar"
-                    }]
-                }
-            }) {
-                id
-                name
-                tasks {
-                    id
-                    name
-                }
-            }
-        }
-        ';
-
-        $this->query($query)->assertJson([
-            'data' => [
-                'createUser' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'tasks' => [
-                        [
-                            'id' => '1',
-                            'name' => 'bar',
-                        ],
-                    ],
-                ],
-            ],
         ]);
     }
 

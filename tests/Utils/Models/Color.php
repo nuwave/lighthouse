@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Color extends Model
 {
-    public function products() : HasMany
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
