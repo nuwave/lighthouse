@@ -93,6 +93,10 @@ class TestCase extends BaseTestCase
             ],
         ]);
 
+        $app->make('config')->set('app', [
+            'debug' => true,
+        ]);
+
         TestResponse::macro(
             'assertErrorCategory',
             function(string $category): TestResponse {

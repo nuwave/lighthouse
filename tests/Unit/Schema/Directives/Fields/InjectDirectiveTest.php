@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class InjectDirectiveTest extends DBTestCase
@@ -11,7 +10,7 @@ class InjectDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanInjectDataFromContextIntoArgs()
+    public function itCanInjectDataFromContextIntoArgs(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
