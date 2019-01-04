@@ -4,8 +4,4 @@ services:
   php:
     image: spawnia/php7.1-fpm:dev-1.3.1
     volumes:
-      - ./:/var/www
-    environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      - APP_KEY=base64:w+nUc1ZQlOX4JI4PfIp1TZORaju1JfAxnsJ0SLT1A+4=
+    - ./:/var/www

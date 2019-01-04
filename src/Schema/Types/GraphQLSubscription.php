@@ -12,11 +12,10 @@ abstract class GraphQLSubscription
     /**
      * Check if subscriber can listen to this subscription.
      *
-     * @param Subscriber $subscriber
-     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return bool
      */
-    public function can(Subscriber $subscriber): bool
+    public function can(Subscriber $subscriber)
     {
         return true;
     }
@@ -24,12 +23,11 @@ abstract class GraphQLSubscription
     /**
      * Encode topic name.
      *
-     * @param Subscriber $subscriber
-     * @param string     $fieldName
-     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  string  $fieldName
      * @return string
      */
-    public function encodeTopic(Subscriber $subscriber, string $fieldName): string
+    public function encodeTopic(Subscriber $subscriber, string $fieldName)
     {
         return strtoupper(snake_case($fieldName));
     }
@@ -37,12 +35,11 @@ abstract class GraphQLSubscription
     /**
      * Decode topic name.
      *
-     * @param string $fieldName
-     * @param mixed  $root
-     *
+     * @param  string  $fieldName
+     * @param  mixed  $root
      * @return string
      */
-    public function decodeTopic(string $fieldName, $root): string
+    public function decodeTopic(string $fieldName, $root)
     {
         return strtoupper(snake_case($fieldName));
     }
@@ -50,11 +47,10 @@ abstract class GraphQLSubscription
     /**
      * Resolve the subscription.
      *
-     * @param mixed          $root
-     * @param array          $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $info
-     *
+     * @param  mixed $root
+     * @param  mixed[] $args
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
      * @return mixed
      */
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info)
@@ -63,22 +59,20 @@ abstract class GraphQLSubscription
     }
 
     /**
-     * Authorize subscriber request.
+     * Check if subscriber is allowed to listen to the subscription.
      *
-     * @param Subscriber $subscriber
-     * @param Request    $request
-     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    abstract public function authorize(Subscriber $subscriber, Request $request): bool;
+    abstract public function authorize(Subscriber $subscriber, Request $request);
 
     /**
      * Filter subscribers who should receive subscription.
      *
-     * @param Subscriber $subscriber
-     * @param mixed      $root
-     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  mixed  $root
      * @return bool
      */
-    abstract public function filter(Subscriber $subscriber, $root): bool;
+    abstract public function filter(Subscriber $subscriber, $root);
 }

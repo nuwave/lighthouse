@@ -20,6 +20,7 @@ use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
+use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Support\Http\Responses\Response;
@@ -105,6 +106,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 PrintSchemaCommand::class,
                 QueryCommand::class,
                 ScalarCommand::class,
+                SubscriptionCommand::class,
                 UnionCommand::class,
                 ValidateSchemaCommand::class,
             ]);

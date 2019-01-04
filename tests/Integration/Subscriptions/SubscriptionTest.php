@@ -1,30 +1,26 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives\Fields;
+namespace Tests\Integration\Subscriptions;
 
 use Tests\TestCase;
 use Illuminate\Support\Arr;
-use Tests\Utils\Directives\FooSubscription;
 use Illuminate\Foundation\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 
-class SubscriptionDirectiveTest extends TestCase
+class SubscriptionTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set(['lighthouse.extensions' => [
-            \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
-        ]]);
+        $app['config']->set([
+            'lighthouse.extensions' => [
+                \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+            ],
+        ]);
     }
 
     protected function setUp()
@@ -32,23 +28,25 @@ class SubscriptionDirectiveTest extends TestCase
         parent::setUp();
 
         $resolver = addslashes(self::class).'@resolve';
-        $subscription = addslashes(FooSubscription::class);
 
         $this->schema = "
-            type Post {
-                body: String
-            }
-            type Subscription {
-                onPostCreated: Post @subscription(class: \"{$subscription}\")
-            }
-            type Mutation {
-                createPost(post: String!): Post
-                    @field(resolver: \"{$resolver}\")
-                    @broadcast(subscription: \"onPostCreated\")
-            }
-            type Query {
-                foo: String
-            }
+        type Post {
+            body: String
+        }
+        
+        type Subscription {
+            onPostCreated: Post
+        }
+        
+        type Mutation {
+            createPost(post: String!): Post
+                @field(resolver: \"{$resolver}\")
+                @broadcast(subscription: \"onPostCreated\")
+        }
+        
+        type Query {
+            foo: String
+        }
         ";
     }
 
@@ -77,14 +75,16 @@ class SubscriptionDirectiveTest extends TestCase
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $subscription2 = '
         subscription OnPostCreatedV2 {
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $response = $this->postGraphQL([
             ['query' => $subscription1],

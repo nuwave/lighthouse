@@ -1,36 +1,34 @@
 <?php
 
-namespace Tests\Utils\Directives;
+namespace DummyNamespace;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 
-class FooSubscription extends GraphQLSubscription
+class DummyClass extends GraphQLSubscription
 {
     /**
-     * Authorize subscriber request.
+     * Check if subscriber is allowed to listen to the subscription.
      *
-     * @param Subscriber $subscriber
-     * @param Request    $request
-     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorize(Subscriber $subscriber, Request $request): bool
     {
-        return true;
+        // TODO implement authorize
     }
 
     /**
      * Filter subscribers who should receive subscription.
      *
-     * @param Subscriber $subscriber
-     * @param mixed      $root
-     *
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  mixed  $root
      * @return bool
      */
     public function filter(Subscriber $subscriber, $root): bool
     {
-        return true;
+        // TODO implement filter
     }
 }
