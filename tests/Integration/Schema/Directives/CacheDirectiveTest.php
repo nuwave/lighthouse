@@ -2,19 +2,32 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class CacheDirectiveTest extends DBTestCase
 {
     /**
+     * @var \Illuminate\Cache\CacheManager|\Illuminate\Contracts\Cache\Repository
+     */
+    private $cache;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $this->cache = $app->make('cache');
+    }
+
+    /**
      * @test
      */
-    public function itCanStoreResolverResultInCache()
+    public function itCanStoreResolverResultInCache(): void
     {
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
@@ -27,17 +40,22 @@ class CacheDirectiveTest extends DBTestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-        $result = $this->query($query);
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar'
+                ]
+            ]
+        ]);
 
-        $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
-        $this->assertSame('foobar', app('cache')->get('user:1:name'));
+        $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
     /**
@@ -57,17 +75,22 @@ class CacheDirectiveTest extends DBTestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-        $result = $this->query($query);
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar'
+                ]
+            ]
+        ]);
 
-        $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
-        $this->assertSame('foobar', app('cache')->get('user:foo@bar.com:name'));
+        $this->assertSame('foobar', $this->cache->get('user:foo@bar.com:name'));
     }
 
     /**
@@ -90,17 +113,22 @@ class CacheDirectiveTest extends DBTestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-        $result = $this->query($query);
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar'
+                ]
+            ]
+        ]);
 
-        $this->assertSame('foobar', Arr::get($result, 'data.user.name'));
-        $this->assertSame('foobar', app('cache')->get($cacheKey));
+        $this->assertSame('foobar', $this->cache->get($cacheKey));
     }
 
     /**
@@ -120,7 +148,8 @@ class CacheDirectiveTest extends DBTestCase
             users: [User] @paginate(type: "paginator", model: "User") @cache
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(count: 5) {
                 data {
@@ -129,10 +158,9 @@ class CacheDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $this->query($query);
+        ');
 
-        $result = app('cache')->get('query:users:count:5');
+        $result = $this->cache->get('query:users:count:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
@@ -165,9 +193,10 @@ class CacheDirectiveTest extends DBTestCase
             user(id: ID! @eq): User @find(model: "User")
         }
         ';
+
         $query = '
         {
-            user(id: '.$user->getKey().') {
+            user(id: ' . $user->getKey() . ') {
                 id
                 name
                 posts(count: 3) {
@@ -178,14 +207,15 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->query($query)['data'];
 
-        $posts = app('cache')->get("user:{$user->getKey()}:posts:count:3");
+        $firstResponse = $this->query($query);
+
+        $posts = $this->cache->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
         $queries = 0;
-        \DB::listen(function ($query) use (&$queries) {
+        \DB::listen(function (QueryExecuted $query) use (&$queries): void {
             // TODO: Find a better way of doing this
             if (! Str::contains($query->sql, [
                 'drop',
@@ -198,11 +228,14 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $cache = $this->query($query)['data'];
+        $cachedResponse = $this->query($query);
 
         // Get the the original user and the `find` directive checks the count
         $this->assertSame(0, $queries);
-        $this->assertSame($result, $cache);
+        $this->assertSame(
+            $firstResponse->json(),
+            $cachedResponse->json()
+        );
     }
 
     /**
@@ -246,14 +279,15 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->query($query)['data'];
 
-        $posts = app('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
+        $firstResponse = $this->query($query);
+
+        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
         $queries = 0;
-        \DB::listen(function ($query) use (&$queries) {
+        \DB::listen(function (QueryExecuted $query) use (&$queries): void {
             // TODO: Find a better way of doing this
             if (! Str::contains($query->sql, [
                 'drop',
@@ -266,13 +300,19 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $cache = $this->query($query)['data'];
+        $cachedResponse = $this->query($query);
 
         // Get the the original user and the `find` directive checks the count
         $this->assertSame(0, $queries);
-        $this->assertSame($result, $cache);
+        $this->assertSame(
+            $firstResponse->json(),
+            $cachedResponse->json()
+        );
     }
 
+    /**
+     * @return mixed[]
+     */
     public function resolve(): array
     {
         return [

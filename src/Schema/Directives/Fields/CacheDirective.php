@@ -2,11 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Carbon\Carbon;
 use GraphQL\Deferred;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Cache\CacheManager;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -30,12 +33,11 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $this->setNodeKey(
             $value->getParent()
@@ -47,8 +49,6 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         $privateCache = $this->directiveArgValue('private', false);
 
         return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($value, $resolver, $maxAge, $privateCache) {
-            /** @var Cache $cache */
-            $cache = app('cache');
             $cacheValue = new CacheValue([
                 'field_value' => $value,
                 'root' => $root,
@@ -58,12 +58,13 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                 'private_cache' => $privateCache,
             ]);
 
-            $useTags = $this->useTags();
-            $cacheExp = $maxAge
-                ? Carbon::now()->addSeconds($maxAge)
-                : null;
             $cacheKey = $cacheValue->getKey();
             $cacheTags = $cacheValue->getTags();
+
+            /** @var CacheManager $cache */
+            $cache = app('cache');
+            $useTags = $this->useTags($cache);
+
             $cacheHas = $useTags
                 ? $cache->tags($cacheTags)->has($cacheKey)
                 : $cache->has($cacheKey);
@@ -75,6 +76,10 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             }
 
             $resolvedValue = $resolver($root, $args, $context, $info);
+
+            $cacheExp = $maxAge
+                ? Carbon::now()->addSeconds($maxAge)
+                : null;
 
             ($resolvedValue instanceof Deferred)
                 ? $resolvedValue->then(function ($result) use ($cache, $cacheKey, $cacheExp, $cacheTags): void {
@@ -89,17 +94,16 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     /**
      * Store value in cache.
      *
-     * @param Cache       $cache
-     * @param string      $key
-     * @param mixed       $value
-     * @param Carbon|null $expiration
-     * @param array       $tags
-     *
+     * @param  \Illuminate\Cache\CacheManager  $cache
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  \Carbon\Carbon|null  $expiration
+     * @param  mixed[]  $tags
      * @return void
      */
-    protected function store(Cache $cache, string $key, $value, ?Carbon $expiration, array $tags): void
+    protected function store(CacheManager $cache, string $key, $value, ?Carbon $expiration, array $tags): void
     {
-        $supportsTags = $this->useTags();
+        $supportsTags = $this->useTags($cache);
 
         if ($expiration) {
             $supportsTags
@@ -117,22 +121,22 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     /**
      * Check if tags should be used.
      *
+     * @param  \Illuminate\Cache\CacheManager  $cache
      * @return bool
      */
-    protected function useTags(): bool
+    protected function useTags(CacheManager $cache): bool
     {
         return config('lighthouse.cache.tags', false)
-            && method_exists(app('cache')->store(), 'tags');
+            && method_exists($cache->store(), 'tags');
     }
 
     /**
      * Set node's cache key.
      *
-     * @param NodeValue $nodeValue
-     *
-     * @throws DirectiveException
-     *
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $nodeValue
      * @return void
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function setNodeKey(NodeValue $nodeValue): void
     {
@@ -141,32 +145,31 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         }
 
         $fields = data_get($nodeValue->getTypeDefinition(), 'fields', []);
-        $nodeKey = collect($fields)->reduce(function ($key, $field): ?string {
+        $nodeKey = collect($fields)->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
             if ($key) {
                 return $key;
             }
 
-            $hasCacheKey = collect(data_get($field, 'directives', []))
+            $hasCacheKey = collect($field->directives)
                 ->contains(function (DirectiveNode $directive): bool {
                     return $directive->name->value === 'cacheKey';
                 });
 
-            return $hasCacheKey ? data_get($field, 'name.value') : $key;
+            return $hasCacheKey
+                ? $field->name->value
+                : $key;
         });
 
         if (! $nodeKey) {
-            $nodeKey = collect($fields)->reduce(function ($key, $field): ?string {
+            $nodeKey = collect($fields)->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
                 if ($key) {
                     return $key;
                 }
 
-                $type = $field->type;
-                while (data_get($type, 'type') !== null) {
-                    $type = data_get($type, 'type');
-                }
+                $typeName = ASTHelper::getUnderlyingTypeName($field);
 
-                return data_get($type, 'name.value') === 'ID'
-                    ? data_get($field, 'name.value')
+                return $typeName === 'ID'
+                    ? $field->name->value
                     : $key;
             });
         }
