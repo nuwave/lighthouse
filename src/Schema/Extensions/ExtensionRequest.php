@@ -58,7 +58,7 @@ class ExtensionRequest
      */
     public function queryString($index = null): string
     {
-        return is_null($index)
+        return $index === null
             ? $this->request->input('query', '')
             : Arr::get($this->request, "{$index}.query");
     }
@@ -72,7 +72,7 @@ class ExtensionRequest
      */
     public function variables($index = null)
     {
-        $variables = is_null($index)
+        $variables = $index === null
             ? $this->request->input('variables')
             : Arr::get($this->request, "{$index}.variables");
 

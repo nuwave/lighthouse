@@ -24,7 +24,9 @@ class Nameable
     {
         if ($value instanceof User) {
             return $this->typeRegistry->get('User');
-        } elseif ($value instanceof Team) {
+        }
+
+        if ($value instanceof Team) {
             return $this->typeRegistry->get('Team');
         }
     }

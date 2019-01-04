@@ -6,12 +6,10 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginationManipulator
 {
@@ -34,11 +32,11 @@ class PaginationManipulator
      */
     public static function assertValidPaginationType(string $paginationType): string
     {
-        if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
+        if ($paginationType === self::PAGINATION_ALIAS_RELAY) {
             return self::PAGINATION_TYPE_CONNECTION;
         }
 
-        if (self::PAGINATION_ALIAS_DEFAULT === $paginationType) {
+        if ($paginationType === self::PAGINATION_ALIAS_DEFAULT) {
             return self::PAGINATION_TYPE_PAGINATOR;
         }
 
@@ -64,10 +62,6 @@ class PaginationManipulator
      * @param DocumentAST              $current
      * @param int|null                 $defaultCount
      *
-     * @throws DefinitionException
-     * @throws DirectiveException
-     * @throws ParseException
-     *
      * @return DocumentAST
      */
     public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null): DocumentAST
@@ -88,9 +82,6 @@ class PaginationManipulator
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $documentAST
      * @param int|null                 $defaultCount
-     *
-     * @throws DefinitionException
-     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -144,9 +135,6 @@ class PaginationManipulator
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $documentAST
      * @param int|null                 $defaultCount
-     *
-     * @throws DefinitionException
-     * @throws ParseException
      *
      * @return DocumentAST
      */

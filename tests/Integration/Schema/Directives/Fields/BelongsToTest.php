@@ -32,9 +32,6 @@ class BelongsToTest extends DBTestCase
      */
     protected $company;
 
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -78,7 +75,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
+        $this->assertSame($this->company->name, Arr::get($result, 'data.user.company.name'));
     }
 
     /**
@@ -112,7 +109,7 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.account.name'));
+        $this->assertSame($this->company->name, Arr::get($result, 'data.user.account.name'));
     }
 
     /**
@@ -154,8 +151,8 @@ class BelongsToTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals($this->company->name, Arr::get($result, 'data.user.company.name'));
-        $this->assertEquals($this->team->name, Arr::get($result, 'data.user.team.name'));
+        $this->assertSame($this->company->name, Arr::get($result, 'data.user.company.name'));
+        $this->assertSame($this->team->name, Arr::get($result, 'data.user.team.name'));
     }
 
     /**

@@ -26,7 +26,6 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
@@ -67,9 +66,6 @@ class NodeFactory
      *
      * @param TypeDefinitionNode $definition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return Type
      */
     public function handle(TypeDefinitionNode $definition): Type
@@ -98,8 +94,6 @@ class NodeFactory
      *
      * @param TypeDefinitionNode $definition
      *
-     * @throws DirectiveException
-     *
      * @return bool
      */
     protected function hasTypeResolver(TypeDefinitionNode $definition): bool
@@ -111,8 +105,6 @@ class NodeFactory
      * Use directive resolver to transform type.
      *
      * @param TypeDefinitionNode $definition
-     *
-     * @throws DirectiveException
      *
      * @return Type
      */
@@ -130,15 +122,12 @@ class NodeFactory
      *
      * @param TypeDefinitionNode $typeDefinition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return Type
      */
     protected function resolveTypeDefault(TypeDefinitionNode $typeDefinition): Type
     {
         // Ignore TypeExtensionNode since they are merged before we get here
-        switch (\get_class($typeDefinition)) {
+        switch (get_class($typeDefinition)) {
             case EnumTypeDefinitionNode::class:
                 return $this->resolveEnumType($typeDefinition);
             case ScalarTypeDefinitionNode::class:
@@ -309,9 +298,6 @@ class NodeFactory
     /**
      * @param InterfaceTypeDefinitionNode $interfaceDefinition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return InterfaceType
      */
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
@@ -327,7 +313,7 @@ class NodeFactory
                 $nodeName,
                 (array) config('lighthouse.namespaces.interfaces'),
                 function (string $className): bool {
-                    return \method_exists($className, 'resolveType');
+                    return method_exists($className, 'resolveType');
                 }
             );
 
@@ -365,9 +351,6 @@ class NodeFactory
     /**
      * @param UnionTypeDefinitionNode $unionDefinition
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return UnionType
      */
     protected function resolveUnionType(UnionTypeDefinitionNode $unionDefinition): UnionType
@@ -383,7 +366,7 @@ class NodeFactory
                 $nodeName,
                 (array) config('lighthouse.namespaces.unions'),
                 function (string $className): bool {
-                    return \method_exists($className, 'resolveType');
+                    return method_exists($className, 'resolveType');
                 }
             );
 

@@ -131,7 +131,7 @@ class SubscriptionRegistry
         return collect($documentNode->definitions)->filter(function (Node $node) {
             return $node instanceof OperationDefinitionNode;
         })->filter(function (OperationDefinitionNode $node) {
-            return 'subscription' === $node->operation;
+            return $node->operation === 'subscription';
         })->flatMap(function (OperationDefinitionNode $node) {
             return collect($node->selectionSet->selections)->map(function (FieldNode $field) {
                 return $field->name->value;

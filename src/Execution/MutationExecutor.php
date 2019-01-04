@@ -26,7 +26,7 @@ class MutationExecutor
     public static function executeCreate(Model $model, Collection $args, Relation $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
+        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         list($morphMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
 
@@ -45,6 +45,7 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
+
                 if ('create' === $operationKey) {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
@@ -104,7 +105,7 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ('create' === $operationKey) {
+                if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
             });
@@ -123,7 +124,7 @@ class MutationExecutor
     protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, Relation $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        list($belongsTo, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
+        [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
         $model->fill(
@@ -188,8 +189,6 @@ class MutationExecutor
      * @param Collection   $args           the corresponding slice of the input arguments for updating this model
      * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
      *
-     * @throws ModelNotFoundException
-     *
      * @return Model
      */
     public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
@@ -202,7 +201,7 @@ class MutationExecutor
         $model = $model->newQuery()->findOrFail($id);
 
         $reflection = new \ReflectionClass($model);
-        list($hasMany, $remaining) = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
+        [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
@@ -211,17 +210,18 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ('create' === $operationKey) {
+
+                if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
 
-                if ('update' === $operationKey) {
+                if ($operationKey === 'update') {
                     collect($values)->each(function ($singleValues) use ($relation) {
                         self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
                     });
                 }
 
-                if ('delete' === $operationKey) {
+                if ($operationKey === 'delete') {
                     $relation->getModel()::destroy($values);
                 }
             });
@@ -276,7 +276,7 @@ class MutationExecutor
                     return false;
                 }
 
-                return $returnType->getName() === $relationClass;
+                return $relationClass === $returnType->getName();
             }
         );
     }

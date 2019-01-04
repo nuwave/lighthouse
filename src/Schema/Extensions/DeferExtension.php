@@ -72,8 +72,6 @@ class DeferExtension extends GraphQLExtension
      *
      * @param DocumentAST $documentAST
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
-     *
      * @return DocumentAST
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST
@@ -258,11 +256,11 @@ class DeferExtension extends GraphQLExtension
      */
     protected function executionTimeExpired(): bool
     {
-        if (0 === $this->maxExecutionTime) {
+        if ($this->maxExecutionTime === 0) {
             return false;
         }
 
-        return microtime(true) >= $this->maxExecutionTime;
+        return $this->maxExecutionTime <= microtime(true);
     }
 
     /**
@@ -272,7 +270,7 @@ class DeferExtension extends GraphQLExtension
      */
     protected function maxNestedFieldsResolved(int $nested): bool
     {
-        if (0 === $this->maxNestedFields) {
+        if ($this->maxNestedFields === 0) {
             return false;
         }
 

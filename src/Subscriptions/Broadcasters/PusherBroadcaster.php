@@ -71,7 +71,7 @@ class PusherBroadcaster implements Broadcaster
     {
         collect($request->input('events', []))
             ->filter(function ($event) {
-                return 'channel_vacated' == array_get($event, 'name');
+                return array_get($event, 'name') === 'channel_vacated';
             })->each(function ($event) {
                 $this->storage->deleteSubscriber(
                     array_get($event, 'channel')

@@ -47,7 +47,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                         }
                     );
 
-                    return \call_user_func_array($resolver, \func_get_args());
+                    return call_user_func_array($resolver, func_get_args());
                 }
             )
         );
@@ -70,8 +70,6 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
     /**
      * Get additional arguments that are passed to `Gate::check`.
-     *
-     * @throws \Exception
      *
      * @return array
      */

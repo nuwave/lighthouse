@@ -13,7 +13,7 @@ class DefinitionException extends Exception implements ClientAware
      * @api
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return false;
     }
@@ -26,7 +26,7 @@ class DefinitionException extends Exception implements ClientAware
      * @api
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'schema';
     }

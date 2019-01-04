@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\AST;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -21,8 +20,6 @@ class ASTBuilder
      * Convert the base schema string into an AST by applying different manipulations.
      *
      * @param string $schema
-     *
-     * @throws ParseException
      *
      * @return DocumentAST
      */
@@ -178,8 +175,6 @@ class ASTBuilder
     /**
      * @param DocumentAST $document
      *
-     * @throws ParseException
-     *
      * @return DocumentAST
      */
     protected static function addPaginationInfoTypes(DocumentAST $document): DocumentAST
@@ -250,8 +245,6 @@ class ASTBuilder
      *
      * @param DocumentAST $document
      *
-     * @throws ParseException
-     *
      * @return DocumentAST
      */
     protected static function addNodeSupport(DocumentAST $document): DocumentAST
@@ -260,7 +253,7 @@ class ASTBuilder
             ->contains(function (ObjectTypeDefinitionNode $objectType) {
                 return collect($objectType->interfaces)
                     ->contains(function (NamedTypeNode $interface) {
-                        return 'Node' === $interface->name->value;
+                        return $interface->name->value === 'Node';
                     });
             });
 

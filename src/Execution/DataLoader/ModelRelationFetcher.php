@@ -115,8 +115,6 @@ class ModelRelationFetcher
      * @param int $perPage
      * @param int $page
      *
-     * @throws \Exception
-     *
      * @return ModelRelationFetcher
      */
     public function loadRelationsForPage(int $perPage, int $page = 1): self
@@ -137,8 +135,6 @@ class ModelRelationFetcher
      * @param int      $page
      * @param string   $relationName
      * @param \Closure $relationConstraints
-     *
-     * @throws \Exception
      *
      * @return static
      */
@@ -192,7 +188,7 @@ class ModelRelationFetcher
             ->whereKey($ids)
             ->get()
             ->filter(function (Model $model) use ($ids) {
-                return \in_array(
+                return in_array(
                     $model->getKey(),
                     $ids,
                     true
@@ -222,9 +218,7 @@ class ModelRelationFetcher
      * @param string   $relationName
      * @param \Closure $relationConstraints
      *
-     * @throws \Exception
-     *
-     * @return Collection Relation[]
+     * @return Collection<Relation>
      */
     protected function buildRelationsFromModels(string $relationName, \Closure $relationConstraints): Collection
     {
@@ -238,13 +232,13 @@ class ModelRelationFetcher
                 $relationConstraints($relation, $model);
 
                 if (method_exists($relation, 'shouldSelect')) {
-                    $shouldSelect = new ReflectionMethod(\get_class($relation), 'shouldSelect');
+                    $shouldSelect = new ReflectionMethod(get_class($relation), 'shouldSelect');
                     $shouldSelect->setAccessible(true);
                     $select = $shouldSelect->invoke($relation, ['*']);
 
                     $relation->addSelect($select);
                 } elseif (method_exists($relation, 'getSelectColumns')) {
-                    $getSelectColumns = new ReflectionMethod(\get_class($relation), 'getSelectColumns');
+                    $getSelectColumns = new ReflectionMethod(get_class($relation), 'getSelectColumns');
                     $getSelectColumns->setAccessible(true);
                     $select = $getSelectColumns->invoke($relation, ['*']);
 
@@ -262,8 +256,6 @@ class ModelRelationFetcher
      * Load default eager loads.
      *
      * @param EloquentCollection $collection
-     *
-     * @throws \ReflectionException
      *
      * @return static
      */
@@ -293,7 +285,7 @@ class ModelRelationFetcher
     /**
      * This is the name that Eloquent gives to the attribute that contains the count.
      *
-     * @see Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
+     * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
      *
      * @param string $relationName
      *
@@ -397,15 +389,13 @@ class ModelRelationFetcher
      *
      * @param string $relationName
      * @param $relationModels
-     *
-     * @throws \ReflectionException
      */
     protected function hydratePivotRelation(string $relationName, EloquentCollection $relationModels)
     {
         $relation = $this->getRelationInstance($relationName);
 
-        if ($relationModels->isNotEmpty() && \method_exists($relation, 'hydratePivotRelation')) {
-            $hydrationMethod = new ReflectionMethod(\get_class($relation), 'hydratePivotRelation');
+        if ($relationModels->isNotEmpty() && method_exists($relation, 'hydratePivotRelation')) {
+            $hydrationMethod = new ReflectionMethod(get_class($relation), 'hydratePivotRelation');
             $hydrationMethod->setAccessible(true);
             $hydrationMethod->invoke($relation, $relationModels->all());
         }

@@ -88,6 +88,7 @@ return [
         'models' => ['App', 'App\\Models'],
         'queries' => 'App\\GraphQL\\Queries',
         'mutations' => 'App\\GraphQL\\Mutations',
+        'subscriptions' => 'App\\GraphQL\\Subscriptions',
         'interfaces' => 'App\\GraphQL\\Interfaces',
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
@@ -156,7 +157,7 @@ return [
     | Specify which controller (and method) you want to handle GraphQL requests.
     |
     */
-    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
+    'controller' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class.'@query',
 
     /*
     |--------------------------------------------------------------------------
@@ -227,7 +228,7 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => 'Nuwave\Lighthouse\Subscriptions\SubscriptionRouter@pusher',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
             ],
         ],
     ],

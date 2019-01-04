@@ -44,7 +44,7 @@ class DocumentAST implements \Serializable
     public function __construct(DocumentNode $documentNode)
     {
         // We can not store type extensions in the map, since they do not have unique names
-        list($typeExtensions, $definitionNodes) = collect($documentNode->definitions)
+        [$typeExtensions, $definitionNodes] = collect($documentNode->definitions)
             ->partition(function (DefinitionNode $definitionNode) {
                 return $definitionNode instanceof TypeExtensionNode;
             });
@@ -113,7 +113,7 @@ class DocumentAST implements \Serializable
      */
     public function serialize(): string
     {
-        return \serialize(
+        return serialize(
             $this->definitionMap
                 ->mapWithKeys(function (DefinitionNode $node, string $key) {
                     return [$key => AST::toArray($node)];
@@ -128,7 +128,7 @@ class DocumentAST implements \Serializable
      */
     public function unserialize($serialized)
     {
-        $this->definitionMap = \unserialize($serialized)
+        $this->definitionMap = unserialize($serialized)
             ->mapWithKeys(function (array $node, string $key) {
                 return [$key => AST::fromArray($node)];
             });

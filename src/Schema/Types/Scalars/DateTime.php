@@ -17,8 +17,6 @@ class DateTime extends ScalarType
      *
      * @param Carbon|string $value
      *
-     * @throws InvariantViolation
-     *
      * @return string
      */
     public function serialize($value): string
@@ -35,8 +33,6 @@ class DateTime extends ScalarType
      * Parse a externally provided variable value into a Carbon instance.
      *
      * @param mixed $value
-     *
-     * @throws Error
      *
      * @return Carbon
      */

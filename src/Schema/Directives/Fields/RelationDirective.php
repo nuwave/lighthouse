@@ -19,8 +19,6 @@ abstract class RelationDirective extends BaseDirective
      *
      * @param FieldValue $value
      *
-     * @throws \Exception
-     *
      * @return FieldValue
      */
     public function resolveField(FieldValue $value): FieldValue
@@ -44,8 +42,6 @@ abstract class RelationDirective extends BaseDirective
      * @param ObjectTypeDefinitionNode $parentType
      * @param DocumentAST              $current
      *
-     * @throws \Exception
-     *
      * @return DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
@@ -68,8 +64,6 @@ abstract class RelationDirective extends BaseDirective
      * @param array       $args
      * @param null        $context
      * @param ResolveInfo $resolveInfo
-     *
-     * @throws \Exception
      *
      * @return array
      */

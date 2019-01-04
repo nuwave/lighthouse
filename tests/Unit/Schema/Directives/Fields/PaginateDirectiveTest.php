@@ -15,7 +15,7 @@ class PaginateDirectiveTest extends TestCase
         $connection = $this->getConnectionQueryField('connection');
         $relay = $this->getConnectionQueryField('relay');
 
-        $this->assertEquals($connection, $relay);
+        $this->assertSame($connection, $relay);
     }
 
     protected function getConnectionQueryField(string $type): FieldDefinition

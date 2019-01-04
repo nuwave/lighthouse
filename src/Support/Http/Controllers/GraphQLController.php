@@ -7,8 +7,6 @@ use Illuminate\Http\Response;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use GraphQL\Executor\ExecutionResult;
-use Nuwave\Lighthouse\Exceptions\ParseException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
@@ -54,8 +52,6 @@ class GraphQLController extends Controller
      *
      * @param Request $request
      *
-     * @throws DirectiveException
-     * @throws ParseException
      *
      * @return Response
      */
@@ -81,9 +77,6 @@ class GraphQLController extends Controller
     /**
      * @param Request        $request
      * @param GraphQLContext $context
-     *
-     * @throws DirectiveException
-     * @throws ParseException
      *
      * @return array
      */
@@ -132,7 +125,7 @@ class GraphQLController extends Controller
     {
         return is_string($variables)
             ? json_decode($variables, true)
-            : is_null($variables) ? [] : $variables;
+            : $variables === null ? [] : $variables;
     }
 
     /**

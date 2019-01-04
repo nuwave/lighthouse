@@ -10,9 +10,6 @@ use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderTest extends DBTestCase
 {
-    /**
-     * Setup test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -29,7 +26,6 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
     public function itCanLoadRelationshipsWithLimitsOnCollection()
     {
@@ -63,7 +59,6 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
     public function itCanPaginateRelationshipOnCollection()
     {
@@ -84,7 +79,6 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
     public function itCanHandleSoftDeletes()
     {

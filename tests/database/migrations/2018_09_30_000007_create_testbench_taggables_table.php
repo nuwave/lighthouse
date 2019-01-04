@@ -9,7 +9,7 @@ class CreateTestbenchTaggablesTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('taggables', function (Blueprint $table) {
             $table->unsignedInteger('tag_id');
@@ -22,7 +22,7 @@ class CreateTestbenchTaggablesTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('taggables');
     }

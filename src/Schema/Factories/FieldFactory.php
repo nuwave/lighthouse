@@ -18,7 +18,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
@@ -98,8 +97,6 @@ class FieldFactory
      * Convert a FieldValue to an executable FieldDefinition.
      *
      * @param FieldValue $fieldValue
-     *
-     * @throws DirectiveException
      *
      * @return array Configuration array for a FieldDefinition
      */
@@ -248,7 +245,7 @@ class FieldFactory
      */
     protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argValue, InputValueDefinitionNode $astNode, array $argumentPath)
     {
-        if ($argValue instanceof NoValue || null === $argValue) {
+        if ($argValue instanceof NoValue || $argValue === null) {
             // Handle `ListOfType` with associated directives which implement `ArgDirectiveForArray`
             if ($type instanceof ListOfType) {
                 $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath, ArgDirectiveForArray::class);
@@ -469,8 +466,6 @@ class FieldFactory
      * @param array       $args
      * @param mixed       $context
      * @param ResolveInfo $resolveInfo
-     *
-     * @throws \Exception
      */
     protected function validateArgumentsBeforeValidationDirectives($root, array $args, $context, ResolveInfo $resolveInfo)
     {
@@ -507,7 +502,7 @@ class FieldFactory
     }
 
     /**
-     * @throws \Exception
+     * @return void
      */
     protected function flushErrorBufferIfHasErrors()
     {
@@ -523,8 +518,6 @@ class FieldFactory
      * @param array       $args
      * @param mixed       $context
      * @param ResolveInfo $resolveInfo
-     *
-     * @throws \Exception
      */
     protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, $context, ResolveInfo $resolveInfo)
     {

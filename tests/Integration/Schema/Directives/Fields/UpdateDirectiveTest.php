@@ -247,7 +247,7 @@ class UpdateDirectiveTest extends DBTestCase
         ';
         $result = $this->execute($schema, $query);
 
-        $this->assertEquals('Original', User::first()->name);
+        $this->assertSame('Original', User::first()->name);
         $this->assertTrue(Arr::has($result, 'errors'));
     }
 }

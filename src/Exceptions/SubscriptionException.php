@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
+use InvalidArgumentException;
 use GraphQL\Error\ClientAware;
 
-class SubscriptionException extends \InvalidArgumentException implements ClientAware
+class SubscriptionException extends InvalidArgumentException implements ClientAware
 {
     /**
      * Returns true when exception message is safe to be displayed to a client.
@@ -13,7 +14,7 @@ class SubscriptionException extends \InvalidArgumentException implements ClientA
      *
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
@@ -27,7 +28,7 @@ class SubscriptionException extends \InvalidArgumentException implements ClientA
      *
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'subscription';
     }

@@ -62,7 +62,7 @@ class ASTHelperTest extends TestCase
         $this->assertCount(3, $objectType1->fields);
 
         $firstNameField = collect($objectType1->fields)->first(function ($field) {
-            return 'first_name' === $field->name->value;
+            return $field->name->value === 'first_name';
         });
 
         $this->assertCount(1, $firstNameField->directives);
@@ -74,7 +74,7 @@ class ASTHelperTest extends TestCase
     public function itCanExtractStringArguments()
     {
         $directive = PartialParser::directive('@foo(bar: "baz")');
-        $this->assertEquals(
+        $this->assertSame(
             'baz',
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -86,8 +86,7 @@ class ASTHelperTest extends TestCase
     public function itCanExtractBooleanArguments()
     {
         $directive = PartialParser::directive('@foo(bar: true)');
-        $this->assertEquals(
-            true,
+        $this->assertTrue(
             ASTHelper::directiveArgValue($directive, 'bar')
         );
     }
@@ -98,7 +97,7 @@ class ASTHelperTest extends TestCase
     public function itCanExtractArrayArguments()
     {
         $directive = PartialParser::directive('@foo(bar: ["one", "two"])');
-        $this->assertEquals(
+        $this->assertSame(
             ['one', 'two'],
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -110,7 +109,7 @@ class ASTHelperTest extends TestCase
     public function itCanExtractObjectArguments()
     {
         $directive = PartialParser::directive('@foo(bar: { baz: "foobar" })');
-        $this->assertEquals(
+        $this->assertSame(
             ['baz' => 'foobar'],
             ASTHelper::directiveArgValue($directive, 'bar')
         );

@@ -1,41 +1,37 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives\Fields;
+namespace Tests\Integration\Subscriptions;
 
 use Tests\TestCase;
 use Illuminate\Support\Arr;
-use Tests\Utils\Directives\FooSubscription;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 
-class SubscriptionDirectiveTest extends TestCase
+class SubscriptionTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set(['lighthouse.extensions' => [
-            \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
-        ]]);
+        $app['config']->set([
+            'lighthouse.extensions' => [
+                \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itSendsSubscriptionChannelInResponse()
+    public function itSendsSubscriptionChannelInResponse(): void
     {
         $data = $this->subscribe();
         $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
-        $this->assertEquals(
+        $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
             $data
         );
@@ -44,21 +40,23 @@ class SubscriptionDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itSendsSubscriptionChannelInBatchedResponse()
+    public function itSendsSubscriptionChannelInBatchedResponse(): void
     {
         $subscription1 = '
         subscription OnPostCreatedV1 {
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $subscription2 = '
         subscription OnPostCreatedV2 {
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $json = [
             ['query' => $subscription1],
@@ -76,20 +74,21 @@ class SubscriptionDirectiveTest extends TestCase
             $this->buildResponse('OnPostCreatedV2', $subscribers[1]->channel),
         ];
 
-        $this->assertEquals($expected, $data);
+        $this->assertSame($expected, $data);
     }
 
     /**
      * @test
      */
-    public function itCanBroadcastSubscriptions()
+    public function itCanBroadcastSubscriptions(): void
     {
         $mutation = '
         mutation {
             createPost(post: "Foobar") {
                 body
             }
-        }';
+        }
+        ';
 
         $this->subscribe();
         $this->postJson('/graphql', ['query' => $mutation])->json();
@@ -100,13 +99,13 @@ class SubscriptionDirectiveTest extends TestCase
 
         $broadcasted = Arr::get(Arr::first($log->broadcasts()), 'data', []);
         $this->assertArrayHasKey('onPostCreated', $broadcasted);
-        $this->assertEquals(['body' => 'Foobar'], $broadcasted['onPostCreated']);
+        $this->assertSame(['body' => 'Foobar'], $broadcasted['onPostCreated']);
     }
 
     /**
      * @test
      */
-    public function itThrowsWithMissingOperationName()
+    public function itThrowsWithMissingOperationName(): void
     {
         $subscription = '
         subscription {
@@ -127,42 +126,45 @@ class SubscriptionDirectiveTest extends TestCase
         $this->assertEmpty($data['extensions']['lighthouse_subscriptions']['channels']);
     }
 
-    public function resolve($root, array $args)
+    public function resolve($root, array $args): array
     {
         return ['body' => $args['post']];
     }
 
-    protected function schema()
+    protected function schema(): string
     {
         $resolver = addslashes(self::class).'@resolve';
-        $subscription = addslashes(FooSubscription::class);
 
         return "
-            type Post {
-                body: String
-            }
-            type Subscription {
-                onPostCreated: Post @subscription(class: \"{$subscription}\")
-            }
-            type Mutation {
-                createPost(post: String!): Post
-                    @field(resolver: \"{$resolver}\")
-                    @broadcast(subscription: \"onPostCreated\")
-            }
-            type Query {
-                foo: String
-            }
+        type Post {
+            body: String
+        }
+
+        type Subscription {
+            onPostCreated: Post
+        }
+
+        type Mutation {
+            createPost(post: String!): Post
+                @field(resolver: \"{$resolver}\")
+                @broadcast(subscription: \"onPostCreated\")
+        }
+
+        type Query {
+            foo: String
+        }
         ";
     }
 
-    protected function subscribe()
+    protected function subscribe(): array
     {
         $subscription = '
         subscription OnPostCreated {
             onPostCreated {
                 body
             }
-        }';
+        }
+        ';
 
         $json = [
             'query' => $subscription,
@@ -174,7 +176,7 @@ class SubscriptionDirectiveTest extends TestCase
         return $this->postJson('/graphql', $json)->json();
     }
 
-    protected function buildResponse($channelName, $channel)
+    protected function buildResponse(string $channelName, string $channel): array
     {
         return [
             'data' => [

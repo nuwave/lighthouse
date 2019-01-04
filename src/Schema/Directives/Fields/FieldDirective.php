@@ -3,8 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
@@ -25,14 +23,11 @@ class FieldDirective extends BaseDirective implements FieldResolver
      *
      * @param FieldValue $fieldValue
      *
-     * @throws DirectiveException
-     * @throws DefinitionException
-     *
      * @return FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        list($className, $methodName) = $this->getMethodArgumentParts('resolver');
+        [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
         $namespacedClassName = $this->namespaceClassName(
             $className,

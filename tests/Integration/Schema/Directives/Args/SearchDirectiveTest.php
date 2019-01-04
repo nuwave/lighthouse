@@ -90,7 +90,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->engine->shouldReceive('paginate')->with(
             Mockery::on(function ($argument) {
-                return 'my.index' == $argument->index;
+                return $argument->index === 'my.index';
             }), Mockery::any(), Mockery::any()
         )
             ->andReturn(collect([$postA, $postB]))

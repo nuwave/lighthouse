@@ -34,7 +34,7 @@ class Pipeline extends BasePipeline
     {
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
-                if (! is_null($this->always)) {
+                if ($this->always !== null) {
                     $passable = ($this->always)($passable, $pipe);
                 }
                 $slice = parent::carry();

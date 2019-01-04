@@ -11,7 +11,6 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 abstract class BaseDirective implements Directive
 {
@@ -88,27 +87,21 @@ abstract class BaseDirective implements Directive
      *
      * @param string $argumentName
      *
-     * @throws DefinitionException
-     * @throws DirectiveException
-     *
      * @return \Closure
      */
     public function getResolverFromArgument(string $argumentName): \Closure
     {
-        list($className, $methodName) = $this->getMethodArgumentParts($argumentName);
+        [$className, $methodName] = $this->getMethodArgumentParts($argumentName);
 
         $namespacedClassName = $this->namespaceClassName($className);
 
-        return \construct_resolver($namespacedClassName, $methodName);
+        return construct_resolver($namespacedClassName, $methodName);
     }
 
     /**
      * Get the model class from the `model` argument of the field.
      *
      * @param string $argumentName The default argument name "model" may be overwritten
-     *
-     * @throws DirectiveException
-     * @throws DefinitionException
      *
      * @return string
      */
@@ -146,7 +139,7 @@ abstract class BaseDirective implements Directive
     protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
     {
         // Always try the explicitly set namespace first
-        \array_unshift(
+        array_unshift(
             $namespacesToTry,
             ASTHelper::getNamespaceForDirective(
                 $this->definitionNode,
@@ -194,7 +187,7 @@ abstract class BaseDirective implements Directive
         );
 
         if (
-            2 !== count($argumentParts)
+            count($argumentParts) !== 2
             || empty($argumentParts[0])
             || empty($argumentParts[1])
         ) {
@@ -211,8 +204,6 @@ abstract class BaseDirective implements Directive
      *
      * @param string $modelClassCandidate
      *
-     * @throws DirectiveException
-     *
      * @return string
      */
     protected function namespaceModelClass(string $modelClassCandidate): string
@@ -221,7 +212,7 @@ abstract class BaseDirective implements Directive
             $modelClassCandidate,
             (array) config('lighthouse.namespaces.models'),
             function (string $classCandidate): bool {
-                return \is_subclass_of($classCandidate, Model::class);
+                return is_subclass_of($classCandidate, Model::class);
             }
         );
     }

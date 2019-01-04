@@ -78,8 +78,6 @@ class DirectiveFactory
      * @param string                        $directiveName
      * @param TypeSystemDefinitionNode|null $definitionNode
      *
-     * @throws DirectiveException
-     *
      * @return Directive
      */
     public function create(string $directiveName, $definitionNode = null): Directive
@@ -144,7 +142,7 @@ class DirectiveFactory
     {
         // Bail to respect the priority of namespaces, the first
         // resolved directive is kept
-        if (\in_array($directiveName, $this->resolved, true)) {
+        if (in_array($directiveName, $this->resolved, true)) {
             return $this;
         }
 
@@ -273,8 +271,6 @@ class DirectiveFactory
      *
      * @param TypeDefinitionNode $node
      *
-     * @throws DirectiveException
-     *
      * @return NodeResolver|null
      */
     public function createNodeResolver(TypeDefinitionNode $node): ?NodeResolver
@@ -288,8 +284,6 @@ class DirectiveFactory
      *
      * @param TypeDefinitionNode $typeDefinition
      *
-     * @throws DirectiveException
-     *
      * @return bool
      */
     public function hasNodeResolver(TypeDefinitionNode $typeDefinition): bool
@@ -301,8 +295,6 @@ class DirectiveFactory
      * Check if the given field has a field resolver directive handler assigned to it.
      *
      * @param FieldDefinitionNode $fieldDefinition
-     *
-     * @throws DirectiveException
      *
      * @return bool
      */
@@ -327,8 +319,6 @@ class DirectiveFactory
      * Get handler for field.
      *
      * @param FieldDefinitionNode $field
-     *
-     * @throws DirectiveException
      *
      * @return FieldResolver|null
      */

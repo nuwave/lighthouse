@@ -83,7 +83,7 @@ class ErrorBuffer
      */
     public function push(string $errorMessage, string $key = null): self
     {
-        if (null === $key) {
+        if ($key === null) {
             $this->errors[] = $errorMessage;
 
             return $this;
@@ -98,8 +98,6 @@ class ErrorBuffer
      * Flush the errors.
      *
      * @param string $errorMessage
-     *
-     * @throws \Exception
      */
     public function flush(string $errorMessage)
     {
@@ -153,6 +151,6 @@ class ErrorBuffer
      */
     public function hasErrors(): bool
     {
-        return \count($this->errors) > 0;
+        return count($this->errors) > 0;
     }
 }

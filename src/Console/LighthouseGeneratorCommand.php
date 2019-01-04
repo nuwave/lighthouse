@@ -15,7 +15,7 @@ abstract class LighthouseGeneratorCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getNameInput()
+    protected function getNameInput(): string
     {
         return ucfirst(trim($this->argument('name')));
     }

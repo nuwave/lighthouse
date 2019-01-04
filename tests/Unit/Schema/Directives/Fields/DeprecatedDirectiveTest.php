@@ -63,7 +63,7 @@ class DeprecatedDirectiveTest extends TestCase
             }
         );
         $this->assertCount(1, $deprecatedFields);
-        $this->assertEquals($reason, $deprecatedFields[0]['deprecationReason']);
+        $this->assertSame($reason, $deprecatedFields[0]['deprecationReason']);
 
         $query = '
         {
@@ -72,6 +72,6 @@ class DeprecatedDirectiveTest extends TestCase
         ';
 
         $data = $this->execute($schema, $query);
-        $this->assertEquals('foo.bar', Arr::get($data, 'data.foo'));
+        $this->assertSame('foo.bar', Arr::get($data, 'data.foo'));
     }
 }

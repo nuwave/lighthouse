@@ -109,7 +109,7 @@ type User {
 
 ## @bcrypt
 
-***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
 
 Run the `bcrypt` function on the argument it is defined on.
 
@@ -121,18 +121,23 @@ type Mutation {
 
 ## @broadcast
 
-Broadcast mutation results to subscribed clients.
-[Read More](../extensions/subscriptions.md#requirements)
+Broadcast the results of a mutation to subscribed clients.
+[Read more about subscriptions](../extensions/subscriptions.md)
 
-_Note: There should be a subscription with a field with the same name as the `subscription` argument._
+The `subscription` argument must reference the name of a subscription field. 
 
 ```graphql
 type Mutation {
     createPost(input: CreatePostInput!): Post
         @broadcast(subscription: "postCreated")
+}
+```
 
-    # The `@broadcast` directive also takes an optional `queue` argument
-    # to determine if this broadcast should go through Laravel's queue.
+You may override the default queueing behaviour from the configuration by
+passing the `queue` argument. 
+
+```graphql
+type Mutation {
     updatePost(input: UpdatePostInput!): Post
         @broadcast(subscription: "postUpdated", queue: false)
 }
@@ -959,20 +964,23 @@ type Query {
 
 ## @subscription
 
-Declare a [class](../extensions/subscriptions.md#the-subscription-class) to handle the broadcasting of a subscription to clients.
+Declare a class to handle the broadcasting of a subscription to clients.
+
+If you follow the default naming conventions for [defining subscription fields]([class](../extensions/subscriptions.md#defining-fields) )
+you do not need this directive. It is only useful if you need to override the default namespace.
 
 ```graphql
 type Subscription {
     postUpdated(author: ID!): Post
         @subscription(
-            class: "App\\GraphQL\\Subscriptions\\PostUpdatedSubscription"
+            class: "App\\GraphQL\\Blog\\PostUpdatedSubscription"
         )
 }
 ```
 
 ## @trim
 
-***Directive Type***: [ArgTransformerDirective](../guides/defining-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
 
 Run the `trim` function on the argument it is defined on.
 
