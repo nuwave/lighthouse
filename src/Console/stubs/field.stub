@@ -16,7 +16,7 @@ class DummyClass
      * @param  \GraphQL\Type\Definition\ResolveInfo|null  $resolveInfo Information about the query itself, such as the execution state, the field name, path to the field from the root, and more.
      * @return mixed
      */
-    public function resolve($rootValue, array $args, GraphQLContext $context = null, ResolveInfo $resolveInfo null)
+    public function resolve($rootValue, array $args, GraphQLContext $context = null, ResolveInfo $resolveInfo = null)
     {
         // TODO implement the resolver
     }
