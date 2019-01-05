@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Directives\Fields\UpdateDirectiveTests;
 
 use Tests\DBTestCase;
 use Illuminate\Support\Arr;
@@ -9,7 +9,7 @@ use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Category;
 
-class UpdateDirectiveTest extends DBTestCase
+class CoreTest extends DBTestCase
 {
     /**
      * @test
@@ -89,64 +89,6 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
         $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanUpdateWithBelongsTo()
-    {
-        factory(User::class, 2)->create();
-        factory(Task::class)->create([
-            'name' => 'bar',
-            'user_id' => 1,
-        ]);
-
-        $schema = '
-        type Task {
-            id: ID!
-            name: String!
-            user: User @belongsTo
-        }
-        
-        type User {
-            id: ID
-        }
-        
-        type Mutation {
-            updateTask(input: UpdateTaskInput!): Task @update(flatten: true)
-        }
-        
-        input UpdateTaskInput {
-            id: ID!
-            name: String
-            user_id: ID
-        }
-        '.$this->placeholderQuery();
-        $query = '
-        mutation {
-            updateTask(input: {
-                id: 1
-                name: "foo"
-                user_id: 2
-            }) {
-                id
-                name
-                user {
-                    id
-                }
-            }
-        }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.updateTask.name'));
-        $this->assertSame('2', Arr::get($result, 'data.updateTask.user.id'));
-
-        $task = Task::first();
-        $this->assertSame('2', $task->user_id);
-        $this->assertSame('foo', $task->name);
     }
 
     /**
