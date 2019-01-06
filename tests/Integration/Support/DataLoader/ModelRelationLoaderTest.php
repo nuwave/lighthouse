@@ -27,7 +27,7 @@ class ModelRelationLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanLoadRelationshipsWithLimitsOnCollection()
+    public function itCanLoadRelationshipsWithLimitsOnCollection(): void
     {
         // TODO refactor this as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
 
@@ -46,7 +46,7 @@ class ModelRelationLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanLoadCountOnCollection()
+    public function itCanLoadCountOnCollection(): void
     {
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->reloadModelsWithRelationCount()
@@ -60,7 +60,7 @@ class ModelRelationLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanPaginateRelationshipOnCollection()
+    public function itCanPaginateRelationshipOnCollection(): void
     {
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage(2)
@@ -80,7 +80,7 @@ class ModelRelationLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanHandleSoftDeletes()
+    public function itCanHandleSoftDeletes(): void
     {
         $user = User::first();
         $count = $user->tasks()->count();

@@ -12,7 +12,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsWhenMergingUniqueNodeListWithCollision()
+    public function itThrowsWhenMergingUniqueNodeListWithCollision(): void
     {
         $objectType1 = PartialParser::objectTypeDefinition('
         type User {
@@ -37,7 +37,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itMergesUniqueNodeListsWithOverwrite()
+    public function itMergesUniqueNodeListsWithOverwrite(): void
     {
         $objectType1 = PartialParser::objectTypeDefinition('
         type User {
@@ -71,7 +71,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractStringArguments()
+    public function itCanExtractStringArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: "baz")');
         $this->assertSame(
@@ -83,7 +83,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractBooleanArguments()
+    public function itCanExtractBooleanArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: true)');
         $this->assertTrue(
@@ -94,7 +94,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractArrayArguments()
+    public function itCanExtractArrayArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: ["one", "two"])');
         $this->assertSame(
@@ -106,7 +106,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractObjectArguments()
+    public function itCanExtractObjectArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: { baz: "foobar" })');
         $this->assertSame(
@@ -118,7 +118,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itReturnsNullForNonexistingArgumentOnDirective()
+    public function itReturnsNullForNonexistingArgumentOnDirective(): void
     {
         $directive = PartialParser::directive('@foo');
         $this->assertNull(

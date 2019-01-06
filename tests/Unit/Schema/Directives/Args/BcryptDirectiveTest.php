@@ -26,26 +26,25 @@ class BcryptDirectiveTest extends TestCase
             bar: String
         }
         ';
-        $mutationQuery = '
+
+        $passwordFromMutation = $this->query('
         mutation {
             foo(bar: "password"){
                 bar
             }
         }
-        ';
-        $passwordFromMutation = $this->query($mutationQuery)->json('data.foo.bar');
+        ')->json('data.foo.bar');
 
         $this->assertNotSame('password', $passwordFromMutation);
         $this->assertTrue(password_verify('password', $passwordFromMutation));
 
-        $query = '
+        $passwordFromQuery = $this->query('
         {
             foo(bar: "123"){
                 bar
             }
         }
-        ';
-        $passwordFromQuery = $this->query($query)->json('data.foo.bar');
+        ')->json('data.foo.bar');
 
         $this->assertNotSame('123', $passwordFromQuery);
         $this->assertTrue(password_verify('123', $passwordFromQuery));
@@ -75,7 +74,7 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $query = '
+        $result = $this->query('
         query {
             user(input: {
                 password: "password"
@@ -101,9 +100,7 @@ class BcryptDirectiveTest extends TestCase
                 }
             }
         }
-        ';
-
-        $result = $this->query($query);
+        ');
 
         $password = $result->json('data.user.password');
         $this->assertNotSame('password', $password);

@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-
 use Tests\DBTestCase;
 use Illuminate\Support\Str;
 use Tests\Utils\Models\Post;
@@ -96,7 +95,7 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanStoreResolverResultInPrivateCache()
+    public function itCanStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
@@ -134,7 +133,7 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanStorePaginateResolverInCache()
+    public function itCanStorePaginateResolverInCache(): void
     {
         factory(User::class, 5)->create();
 
@@ -169,7 +168,7 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCacheHasManyResolver()
+    public function itCanCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
 
@@ -241,7 +240,7 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanAttachTagsToCache()
+    public function itCanAttachTagsToCache(): void
     {
         config(['lighthouse.cache.tags' => true]);
 

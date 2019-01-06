@@ -11,7 +11,7 @@ class DeprecatedDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanRemoveDeprecatedFieldsFromIntrospection()
+    public function itCanRemoveDeprecatedFieldsFromIntrospection(): void
     {
         $reason = 'Use `bar` field';
         $resolver = addslashes(Foo::class).'@bar';

@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
+use Closure;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
@@ -16,8 +18,8 @@ class GraphQLExtensionTest extends TestCase
             return new class() extends ExtensionRegistry {
                 public function __construct()
                 {
-                    $this->pipeline = app(\Nuwave\Lighthouse\Support\Pipeline::class);
-                    $this->extensions = collect(GraphQLExtensionTest::getExtension());
+                    $this->pipeline = app(Pipeline::class);
+                    $this->extensions = collect([GraphQLExtensionTest::getExtension()]);
                 }
             };
         });
@@ -50,7 +52,7 @@ class GraphQLExtensionTest extends TestCase
                 return 'foo';
             }
 
-            public function willSendResponse(array $response, \Closure $next)
+            public function willSendResponse(array $response, Closure $next)
             {
                 return $next(array_merge($response, [
                     'meta' => 'data',

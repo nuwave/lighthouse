@@ -16,9 +16,9 @@ class DateTest extends TestCase
      * @test
      * @dataProvider invalidDateValues
      *
-     * @param mixed $value
+     * @param  mixed  $value
      */
-    public function itThrowsIfSerializingNonString($value)
+    public function itThrowsIfSerializingNonString($value): void
     {
         $this->expectException(InvariantViolation::class);
 
@@ -29,9 +29,9 @@ class DateTest extends TestCase
      * @test
      * @dataProvider invalidDateValues
      *
-     * @param mixed $value
+     * @param  mixed  $value
      */
-    public function itThrowsIfParseValueNonString($value)
+    public function itThrowsIfParseValueNonString($value): void
     {
         $this->expectException(Error::class);
 
@@ -58,7 +58,7 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itParsesValueString()
+    public function itParsesValueString(): void
     {
         $date = '2018-10-01';
         $this->assertEquals(
@@ -70,7 +70,7 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itParsesLiteral()
+    public function itParsesLiteral(): void
     {
         $dateLiteral = new StringValueNode(
             ['value' => '2018-10-01']
@@ -86,7 +86,7 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfParseLiteralNonString()
+    public function itThrowsIfParseLiteralNonString(): void
     {
         $this->expectException(Error::class);
 
@@ -98,7 +98,7 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itSerializesCarbonInstance()
+    public function itSerializesCarbonInstance(): void
     {
         $now = now();
         $result = (new Date())->serialize($now);
@@ -112,7 +112,7 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itSerializesValidDateString()
+    public function itSerializesValidDateString(): void
     {
         $date = '2018-10-01';
         $result = (new Date())->serialize($date);

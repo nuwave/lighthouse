@@ -26,15 +26,14 @@ class InjectDirectiveTest extends DBTestCase
                 @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             me {
                 id
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'me' => [
                     'id' => 1

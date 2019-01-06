@@ -11,7 +11,7 @@ class GroupDirectiveTest extends TestCase
      * @test
      * @group fixing
      */
-    public function itCanSetNamespaces()
+    public function itCanSetNamespaces(): void
     {
         $this->schema = '
         extend type Query @group(namespace: "Tests\\\Utils\\\Resolvers") {
@@ -47,7 +47,7 @@ class GroupDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetMiddleware()
+    public function itCanSetMiddleware(): void
     {
         $this->schema = '
         type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\CountRuns"]) {
@@ -69,7 +69,7 @@ class GroupDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanOverrideGroupMiddlewareInField()
+    public function itCanOverrideGroupMiddlewareInField(): void
     {
         $this->schema = '
         type Query @group(middleware: ["Tests\\\Utils\\\Middleware\\\Authenticate"]) {

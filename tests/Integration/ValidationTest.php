@@ -2,10 +2,9 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Foundation\Testing\TestResponse;
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Queries\Foo;
+use Illuminate\Foundation\Testing\TestResponse;
 
 class ValidationTest extends TestCase
 {
@@ -56,9 +55,8 @@ class ValidationTest extends TestCase
     ';
 
     /**
-     * @param mixed $root
-     * @param array $args
-     *
+     * @param  mixed  $root
+     * @param  mixed[]  $args
      * @return string
      */
     public function resolvePassword($root, array $args): string
@@ -67,20 +65,19 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @param mixed $root
-     * @param array $args
-     *
+     * @param  mixed  $root
+     * @param  mixed[]  $args
      * @return string
      */
     public function resolveEmail($root, array $args): string
     {
-        return array_get($args, 'email.emailAddress', 'no-email');
+        return $args['email.emailAddress'] ?? 'no-email';
     }
 
     /**
      * @test
      */
-    public function itValidatesDifferentPathsIndividually()
+    public function itValidatesDifferentPathsIndividually(): void
     {
         $result = $this->query('
         {
@@ -116,7 +113,7 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itValidatesList()
+    public function itValidatesList(): void
     {
         $result = $this->query('
         {
@@ -141,7 +138,7 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itValidatesInputCount()
+    public function itValidatesInputCount(): void
     {
         $result = $this->query('
         {
@@ -162,9 +159,8 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itPassesIfNothingRequiredIsMissing()
+    public function itPassesIfNothingRequiredIsMissing(): void
     {
-
         $this->query('
         {
             foo(required: "foo")
@@ -179,7 +175,7 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itEvaluatesArgDirectivesInDefinitionOrder()
+    public function itEvaluatesArgDirectivesInDefinitionOrder(): void
     {
         $validPasswordResult = $this->query('
         {
@@ -207,7 +203,7 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itEvaluatesConditionalValidation()
+    public function itEvaluatesConditionalValidation(): void
     {
         $validPasswordResult = $this->query('
         {
@@ -233,7 +229,7 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itEvaluatesInputArgValidation()
+    public function itEvaluatesInputArgValidation(): void
     {
         $result = $this->query('
         {
@@ -251,9 +247,9 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itEvaluatesNonNullInputArgValidation()
+    public function itEvaluatesNonNullInputArgValidation(): void
     {
-        $validEmailResult = $this->query('
+        $this->query('
         {
             email(
                 userId: 1
@@ -292,7 +288,7 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itErrorsIfSomethingRequiredIsMissing()
+    public function itErrorsIfSomethingRequiredIsMissing(): void
     {
         $result = $this->query('
         {
@@ -304,7 +300,9 @@ class ValidationTest extends TestCase
             ],
         ]);
 
-        $this->assertValidationKeysSame(['required'], $result);
+        $this->assertValidationKeysSame([
+            'required'
+        ], $result);
     }
 
     /**

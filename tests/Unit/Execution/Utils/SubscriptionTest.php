@@ -15,17 +15,21 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionTest extends TestCase
 {
+    /**
+     * @var string
+     */
     const SUBSCRIPTION_FIELD = 'postCreated';
 
-    /** @var SubscriptionRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
+     */
     protected $registry;
 
-    /** @var ObjectProphecy */
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
     protected $broadcaster;
 
-    /**
-     * Set up test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -49,7 +53,11 @@ class SubscriptionTest extends TestCase
      */
     public function itCanSendSubscriptionToBroadcaster(): void
     {
-        $root = ['post' => ['id' => 1]];
+        $root = [
+            'post' => [
+                'id' => 1
+            ]
+        ];
 
         $this->broadcaster->broadcast(
             Argument::type(GraphQLSubscription::class),
@@ -63,7 +71,7 @@ class SubscriptionTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsOnInvalidSubscriptionField()
+    public function itThrowsOnInvalidSubscriptionField(): void
     {
         $this->broadcaster->broadcast(Argument::any())->shouldNotBeCalled();
         $this->expectException(\InvalidArgumentException::class);

@@ -12,7 +12,9 @@ use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
 class DeferExtensionDBTest extends DBTestCase
 {
-    /** @var \Closure */
+    /**
+     * @var \Closure
+     */
     protected static $resolver;
 
     /**
@@ -36,7 +38,7 @@ class DeferExtensionDBTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanDeferBelongsToFields()
+    public function itCanDeferBelongsToFields(): void
     {
         $queries = 0;
         $resolver = addslashes(self::class).'@resolve';
@@ -61,9 +63,14 @@ class DeferExtensionDBTest extends DBTestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        \DB::listen(function ($q) use (&$queries) {
+            $queries++;
+        });
+
+        $this->query('
         {
             user {
                 email
@@ -71,17 +78,10 @@ class DeferExtensionDBTest extends DBTestCase
                     name
                 }
             }
-        }';
-
-        \DB::listen(function ($q) use (&$queries) {
-            $queries++;
-        });
-
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
+        }')->baseResponse->send();
 
         $chunks = $this->stream->chunks;
+
         $this->assertSame(1, $queries);
         $this->assertCount(2, $chunks);
 
@@ -97,7 +97,7 @@ class DeferExtensionDBTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanDeferNestedRelationshipFields()
+    public function itCanDeferNestedRelationshipFields(): void
     {
         $queries = 0;
         $resolver = addslashes(self::class).'@resolve';
@@ -126,7 +126,11 @@ class DeferExtensionDBTest extends DBTestCase
             user: User @field(resolver: \"{$resolver}\")
         }";
 
-        $query = '
+        \DB::listen(function ($q) use (&$queries) {
+            $queries++;
+        });
+
+        $this->query('
         {
             user {
                 email
@@ -137,17 +141,10 @@ class DeferExtensionDBTest extends DBTestCase
                     }
                 }
             }
-        }';
-
-        \DB::listen(function ($q) use (&$queries) {
-            $queries++;
-        });
-
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
+        }')->baseResponse->send();
 
         $chunks = $this->stream->chunks;
+
         $this->assertSame(2, $queries);
         $this->assertCount(3, $chunks);
 
@@ -174,7 +171,7 @@ class DeferExtensionDBTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanDeferNestedListFields()
+    public function itCanDeferNestedListFields(): void
     {
         $queries = 0;
         $resolver = addslashes(self::class).'@resolve';
@@ -205,7 +202,12 @@ class DeferExtensionDBTest extends DBTestCase
             companies: [Company] @field(resolver: \"{$resolver}\")
         }";
 
-        $query = '
+
+        \DB::listen(function ($q) use (&$queries) {
+            $queries++;
+        });
+
+        $this->query('
         {
             companies {
                 name
@@ -216,17 +218,11 @@ class DeferExtensionDBTest extends DBTestCase
                     }
                 }
             }
-        }';
-
-        \DB::listen(function ($q) use (&$queries) {
-            $queries++;
-        });
-
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
+        }
+        ')->baseResponse->send();
 
         $chunks = $this->stream->chunks;
+
         $this->assertSame(2, $queries);
         $this->assertCount(3, $chunks);
 

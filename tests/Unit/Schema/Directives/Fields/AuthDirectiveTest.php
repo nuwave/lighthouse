@@ -10,7 +10,7 @@ class AuthDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanResolveAuthenticatedUser()
+    public function itCanResolveAuthenticatedUser(): void
     {
         $user = new User(['foo' => 'bar']);
         $this->be($user);

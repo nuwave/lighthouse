@@ -34,14 +34,14 @@ class GraphQLTest extends DBTestCase
     /**
      * The user that shall make the requests.
      *
-     * @var User
+     * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
      * Tasks associated with the current user.
      *
-     * @var \Illuminate\Support\Collection<Task>
+     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Task>
      */
     protected $tasks;
 
@@ -60,7 +60,7 @@ class GraphQLTest extends DBTestCase
     /**
      * @test
      */
-    public function itResolvesQueryViaPostRequest()
+    public function itResolvesQueryViaPostRequest(): void
     {
         $this->query('
         query UserWithTasks {
@@ -89,7 +89,7 @@ class GraphQLTest extends DBTestCase
     /**
      * @test
      */
-    public function itResolvesQueryViaGetRequest()
+    public function itResolvesQueryViaGetRequest(): void
     {
         $query = '
         query UserWithTasks {
@@ -118,7 +118,7 @@ class GraphQLTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveBatchedQueries()
+    public function itCanResolveBatchedQueries(): void
     {
         $this->postGraphQL([
             ['query' => '{ user { email } }'],
@@ -144,7 +144,7 @@ class GraphQLTest extends DBTestCase
     /**
      * @test
      */
-    public function itResolvesNamedOperation()
+    public function itResolvesNamedOperation(): void
     {
         $this->postGraphQL([
             'query' => '
@@ -172,7 +172,7 @@ class GraphQLTest extends DBTestCase
     /**
      * @test
      */
-    public function itRejectsInvalidQuery()
+    public function itRejectsInvalidQuery(): void
     {
         $result = $this->query('
         {

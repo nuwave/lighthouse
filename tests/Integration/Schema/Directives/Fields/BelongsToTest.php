@@ -13,21 +13,21 @@ class BelongsToTest extends DBTestCase
     /**
      * Auth user.
      *
-     * @var User
+     * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
      * User's team.
      *
-     * @var Team
+     * @var \Tests\Utils\Models\Team
      */
     protected $team;
 
     /**
      * User's company.
      *
-     * @var Company
+     * @var \Tests\Utils\Models\Company
      */
     protected $company;
 
@@ -46,7 +46,7 @@ class BelongsToTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveBelongsToRelationship()
+    public function itCanResolveBelongsToRelationship(): void
     {
         $this->be($this->user);
 
@@ -63,7 +63,8 @@ class BelongsToTest extends DBTestCase
             user: User @auth
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user {
                 company {
@@ -71,9 +72,7 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'user' => [
                     'company' => [
@@ -87,7 +86,7 @@ class BelongsToTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveBelongsToWithCustomName()
+    public function itCanResolveBelongsToWithCustomName(): void
     {
         $this->be($this->user);
 
@@ -104,7 +103,8 @@ class BelongsToTest extends DBTestCase
             user: User @auth
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user {
                 account {
@@ -112,9 +112,7 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'user' => [
                     'account' => [
@@ -128,7 +126,7 @@ class BelongsToTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveBelongsToRelationshipWithTwoRelation()
+    public function itCanResolveBelongsToRelationshipWithTwoRelation(): void
     {
         $this->be($this->user);
 
@@ -150,7 +148,8 @@ class BelongsToTest extends DBTestCase
             user: User @auth
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user {
                 company {
@@ -161,9 +160,7 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'user' => [
                     'company' => [
@@ -180,7 +177,7 @@ class BelongsToTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveBelongsToRelationshipWhenMainModelhasCompositePrimaryKey()
+    public function itCanResolveBelongsToRelationshipWhenMainModelhasCompositePrimaryKey(): void
     {
         $this->be($this->user);
 
@@ -204,7 +201,8 @@ class BelongsToTest extends DBTestCase
             products: [Product] @paginate
         }
         ';
-        $query = '
+
+        $this->query('
         {
             products(count: 2) {     
                 data{
@@ -218,9 +216,7 @@ class BelongsToTest extends DBTestCase
                 }                           
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'products' => [
                     'data' => [

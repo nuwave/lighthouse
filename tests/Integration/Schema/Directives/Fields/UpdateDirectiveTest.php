@@ -30,7 +30,8 @@ class UpdateDirectiveTest extends DBTestCase
             ): Company @update
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCompany(
                 id: 1
@@ -40,9 +41,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateCompany' => [
                     'id' => '1',
@@ -56,7 +55,7 @@ class UpdateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanUpdateFromInputObject()
+    public function itCanUpdateFromInputObject(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
@@ -77,7 +76,8 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCompany(input: {
                 id: 1
@@ -87,9 +87,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateCompany' => [
                     'id' => '1',
@@ -103,7 +101,7 @@ class UpdateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanUpdateWithBelongsTo()
+    public function itCanUpdateWithBelongsTo(): void
     {
         factory(User::class, 2)->create();
         factory(Task::class)->create([
@@ -132,7 +130,8 @@ class UpdateDirectiveTest extends DBTestCase
             user_id: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateTask(input: {
                 id: 1
@@ -146,9 +145,7 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateTask' => [
                     'id' => '1',
@@ -168,7 +165,7 @@ class UpdateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanUpdateWithCustomPrimaryKey()
+    public function itCanUpdateWithCustomPrimaryKey(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
@@ -185,7 +182,8 @@ class UpdateDirectiveTest extends DBTestCase
             ): Category @update
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCategory(
                 category_id: 1
@@ -195,9 +193,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'updateCategory' => [
                     'category_id' => '1',
@@ -211,7 +207,7 @@ class UpdateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itDoesNotUpdateWithFailingRelationship()
+    public function itDoesNotUpdateWithFailingRelationship(): void
     {
         factory(User::class)->create(['name' => 'Original']);
 
@@ -246,7 +242,8 @@ class UpdateDirectiveTest extends DBTestCase
             user: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateUser(input: {
                 id: 1
@@ -265,9 +262,7 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJsonCount(1, 'errors');
+        ')->assertJsonCount(1, 'errors');
         $this->assertSame('Original', User::first()->name);
     }
 }

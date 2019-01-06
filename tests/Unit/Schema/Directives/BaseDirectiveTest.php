@@ -26,7 +26,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itDefaultsToFieldTypeForTheModelClass()
+    public function itDefaultsToFieldTypeForTheModelClass(): void
     {
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
@@ -39,7 +39,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfTheClassIsNotAModel()
+    public function itThrowsIfTheClassIsNotAModel(): void
     {
         $directive = $this->constructFieldDirective('foo: Exception @dummy');
 
@@ -50,7 +50,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itResolvesAModelThatIsNamedLikeABaseClass()
+    public function itResolvesAModelThatIsNamedLikeABaseClass(): void
     {
         $directive = $this->constructFieldDirective('foo: Closure @dummy');
 
@@ -63,7 +63,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itPrefersThePrimaryModelNamespace()
+    public function itPrefersThePrimaryModelNamespace(): void
     {
         $directive = $this->constructFieldDirective('foo: Category @dummy');
 
@@ -76,7 +76,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itAllowsOverwritingTheDefaultModel()
+    public function itAllowsOverwritingTheDefaultModel(): void
     {
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy(model: "Tests\\\Utils\\\ModelsSecondary\\\Category")');
 
@@ -89,7 +89,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itResolvesFromTheSecondaryModelNamespace()
+    public function itResolvesFromTheSecondaryModelNamespace(): void
     {
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy');
 

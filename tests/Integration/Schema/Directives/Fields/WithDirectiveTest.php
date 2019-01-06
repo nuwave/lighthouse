@@ -12,14 +12,14 @@ class WithDirectiveTest extends DBTestCase
     /**
      * The currently authenticated user.
      *
-     * @var User
+     * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
      * The user's tasks.
      *
-     * @var Collection<Task>
+     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Task>
      */
     protected $tasks;
 
@@ -38,7 +38,7 @@ class WithDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanQueryARelationship()
+    public function itCanQueryARelationship(): void
     {
         $this->schema = '
         type User {

@@ -5,16 +5,15 @@ namespace Tests\Integration\Subscriptions;
 use Illuminate\Http\Request;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 trait HandlesSubscribers
 {
     /**
      * Construct a dummy subscriber for testing.
      *
-     * @param string|null $queryString
+     * @param  string|null  $queryString
      *
-     * @return Subscriber
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
      */
     protected function subscriber(?string $queryString = null): Subscriber
     {
@@ -29,9 +28,9 @@ trait HandlesSubscribers
     }
 
     /**
-     * @see GraphQLContext::user()
+     * @see \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::user()
      *
-     * @return User
+     * @return \Tests\Utils\Models\User
      */
     public function user(): User
     {
@@ -43,9 +42,9 @@ trait HandlesSubscribers
     }
 
     /**
-     * @see GraphQLContext::request()
+     * @see \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::request()
      *
-     * @return Request
+     * @return \Illuminate\Http\Request
      */
     public function request(): Request
     {

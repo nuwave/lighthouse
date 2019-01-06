@@ -13,7 +13,7 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * The authenticated user.
      *
-     * @var User
+     * @var \Tests\Utils\Models\User
      */
     protected $user;
 

@@ -20,7 +20,7 @@ class MethodDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itWillCallAMethodToResolveField()
+    public function itWillCallAMethodToResolveField(): void
     {
         $this->query('
         {
@@ -40,7 +40,7 @@ class MethodDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itWillCallAMethodWithArgsToResolveField()
+    public function itWillCallAMethodWithArgsToResolveField(): void
     {
         $this->query('
         {
@@ -57,7 +57,7 @@ class MethodDirectiveTest extends TestCase
         ]);
     }
 
-    public function resolve()
+    public function resolve(): Foo
     {
         return new Foo();
     }

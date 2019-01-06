@@ -17,7 +17,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
     use HandlesSubscribers;
 
     /**
-     * @var BroadcastManager
+     * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcastManager;
 
@@ -52,7 +52,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
     {
         $broadcasterConfig = [];
 
-        $this->broadcastManager->extend('foo', function ($app, $config) use (&$broadcasterConfig) {
+        $this->broadcastManager->extend('foo', function ($app, array $config) use (&$broadcasterConfig): Broadcaster {
             $broadcasterConfig = $config;
 
             return new class() implements Broadcaster {
@@ -79,7 +79,10 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
         $broadcaster = $this->broadcastManager->driver('foo');
 
         $this->assertSame(['driver' => 'foo'], $broadcasterConfig);
-        $this->assertSame($data, $broadcaster->broadcast($this->subscriber(), $data));
+        $this->assertSame(
+            $data,
+            $broadcaster->broadcast($this->subscriber(), $data)
+        );
     }
 
     /**

@@ -10,7 +10,7 @@ class RenameDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanRenameAField()
+    public function itCanRenameAField(): void
     {
         $resolver = addslashes(self::class).'@resolve';
 
@@ -23,15 +23,14 @@ class RenameDirectiveTest extends TestCase
             bar: String! @rename(attribute: \"baz\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             bar {
                 bar
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'bar' => [
                     'bar' => 'asdf'
@@ -40,7 +39,7 @@ class RenameDirectiveTest extends TestCase
         ]);
     }
 
-    public function resolve()
+    public function resolve(): Bar
     {
         return new Bar;
     }
@@ -48,7 +47,7 @@ class RenameDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsAnExceptionIfNoAttributeDefined()
+    public function itThrowsAnExceptionIfNoAttributeDefined(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -57,6 +56,7 @@ class RenameDirectiveTest extends TestCase
             foo: String! @rename
         }
         ';
+
         $this->query('
         {
             fooBar

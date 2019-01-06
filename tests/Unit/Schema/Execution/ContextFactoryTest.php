@@ -9,16 +9,11 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ContextFactoryTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->singleton(CreatesContext::class, function () {
+        $app->singleton(CreatesContext::class, function (): CreatesContext {
             return new class() implements CreatesContext {
                 public function generate(Request $request)
                 {
@@ -50,7 +45,7 @@ class ContextFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itCanGenerateCustomContext()
+    public function itCanGenerateCustomContext(): void
     {
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
@@ -58,13 +53,12 @@ class ContextFactoryTest extends TestCase
             context: String @field(resolver:\"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             context
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'context' => 'custom.context',
             ],

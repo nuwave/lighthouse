@@ -12,7 +12,7 @@ class CanDirectiveTest extends TestCase
      * @test
      * @dataProvider provideAcceptableArgumentNames
      *
-     * @param string $argumentName
+     * @param  string  $argumentName
      */
     public function itThrowsIfNotAuthorized(string $argumentName): void
     {
@@ -43,7 +43,7 @@ class CanDirectiveTest extends TestCase
      * @test
      * @dataProvider provideAcceptableArgumentNames
      *
-     * @param string $argumentName
+     * @param  string  $argumentName
      */
     public function itPassesAuthIfAuthorized(string $argumentName): void
     {
@@ -82,7 +82,7 @@ class CanDirectiveTest extends TestCase
      * @test
      * @dataProvider provideAcceptableArgumentNames
      *
-     * @param string $argumentName
+     * @param  string  $argumentName
      */
     public function itAcceptsGuestUser(string $argumentName): void
     {
@@ -121,7 +121,7 @@ class CanDirectiveTest extends TestCase
      * @test
      * @dataProvider provideAcceptableArgumentNames
      *
-     * @param string $argumentName
+     * @param  string  $argumentName
      */
     public function itPassesMultiplePolicies(string $argumentName): void
     {
@@ -160,7 +160,7 @@ class CanDirectiveTest extends TestCase
      * @test
      * @dataProvider provideAcceptableArgumentNames
      *
-     * @param string $argumentName
+     * @param  string  $argumentName
      */
     public function itProcessesTheArgsArgument(string $argumentName): void
     {

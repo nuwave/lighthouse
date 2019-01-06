@@ -15,7 +15,7 @@ class UnionTest extends DBTestCase
      * @param  string  $schema
      * @param  string  $query
      */
-    public function itCanResolveUnionTypes(string $schema, string $query)
+    public function itCanResolveUnionTypes(string $schema, string $query): void
     {
         // This creates a user with it
         factory(Post::class)->create(

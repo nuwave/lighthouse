@@ -7,8 +7,10 @@ use Tests\Utils\Models\User;
 
 class FirstDirectiveTest extends DBTestCase
 {
-    /** @test */
-    public function itReturnsASingleUser()
+    /**
+     * @test
+     */
+    public function itReturnsASingleUser(): void
     {
         $this->schema = '
         type User {
@@ -24,14 +26,13 @@ class FirstDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
 
-        $query = "
+        $this->query("
         {
             user(id: {$userB->id}){
                 name
             }
         }
-        ";
-        $this->query($query)->assertJson([
+        ")->assertJson([
             'data' => [
                 'user' => [
                     'name' => 'B'
@@ -41,7 +42,7 @@ class FirstDirectiveTest extends DBTestCase
     }
 
     /** @test */
-    public function itReturnsASingleUserWhenMultiplesMatch()
+    public function itReturnsASingleUserWhenMultiplesMatch(): void
     {
         $this->schema = '
         type User {

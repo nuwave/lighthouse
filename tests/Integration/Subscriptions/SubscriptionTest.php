@@ -66,25 +66,25 @@ class SubscriptionTest extends TestCase
      */
     public function itSendsSubscriptionChannelInBatchedResponse(): void
     {
-        $subscription1 = '
-        subscription OnPostCreatedV1 {
-            onPostCreated {
-                body
-            }
-        }
-        ';
-
-        $subscription2 = '
-        subscription OnPostCreatedV2 {
-            onPostCreated {
-                body
-            }
-        }
-        ';
-
         $response = $this->postGraphQL([
-            ['query' => $subscription1],
-            ['query' => $subscription2],
+            [
+                'query' => '
+                    subscription OnPostCreatedV1 {
+                        onPostCreated {
+                            body
+                        }
+                    }
+                    '
+            ],
+            [
+                'query' => '
+                    subscription OnPostCreatedV2 {
+                        onPostCreated {
+                            body
+                        }
+                    }
+                    '
+            ],
         ]);
 
         $subscribers = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED');
@@ -124,18 +124,13 @@ class SubscriptionTest extends TestCase
      */
     public function itThrowsWithMissingOperationName(): void
     {
-        $subscription = '
+        $this->query('
         subscription {
             onPostCreated {
                 body
             }
         }
-        ';
-
-        $json = ['query' => $subscription];
-
-        $this->postGraphQL($json)
-            ->assertErrorCategory('subscription')
+        ')->assertErrorCategory('subscription')
             ->assertJson([
                 'data' => [
                     'onPostCreated' => null,

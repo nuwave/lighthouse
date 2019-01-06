@@ -13,7 +13,7 @@ class FieldValueTest extends TestCase
     /**
      * @test
      */
-    public function itGetsTheWebonyxDefaultResolverForNonRootFields()
+    public function itGetsTheWebonyxDefaultResolverForNonRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
 
@@ -26,7 +26,7 @@ class FieldValueTest extends TestCase
     /**
      * @test
      */
-    public function itGetsTheConventionBasedDefaultResolverForRootFields()
+    public function itGetsTheConventionBasedDefaultResolverForRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('foo: Int');
 
@@ -39,7 +39,7 @@ class FieldValueTest extends TestCase
     /**
      * @test
      */
-    public function itLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers()
+    public function itLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
 
@@ -52,7 +52,7 @@ class FieldValueTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfRootFieldHasNoResolver()
+    public function itThrowsIfRootFieldHasNoResolver(): void
     {
         $this->expectException(DefinitionException::class);
 

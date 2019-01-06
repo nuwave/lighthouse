@@ -23,7 +23,7 @@ SCHEMA;
     /**
      * @test
      */
-    public function itCanAddTracingExtensionMetaToResult()
+    public function itCanAddTracingExtensionMetaToResult(): void
     {
         $this->query('
         {

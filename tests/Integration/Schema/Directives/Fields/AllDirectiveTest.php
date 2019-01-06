@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
@@ -40,7 +39,7 @@ class AllDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanGetAllAsNestedField()
+    public function itCanGetAllAsNestedField(): void
     {
         factory(Post::class, 2)->create([
             // Do not create those, as they would create more users

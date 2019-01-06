@@ -16,7 +16,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
     const TOPIC = 'lighthouse';
 
     /**
-     * @var StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
      */
     protected $storage;
 

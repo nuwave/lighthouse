@@ -16,7 +16,7 @@ class MiddlewareDirectiveTest extends TestCase
      * @test
      * @dataProvider fooMiddlewareQueries
      *
-     * @param string $query
+     * @param  string  $query
      */
     public function itCallsFooMiddleware(string $query): void
     {

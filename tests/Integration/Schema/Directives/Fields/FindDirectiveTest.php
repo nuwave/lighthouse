@@ -11,7 +11,7 @@ class FindDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itReturnsSingleUser()
+    public function itReturnsSingleUser(): void
     {
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
@@ -27,15 +27,14 @@ class FindDirectiveTest extends DBTestCase
             user(id: ID @eq): User @find(model: "User")
         }
         ';
-        $query = "
+
+        $this->query("
         {
             user(id:{$userB->id}) {
                 name
             }
         }
-        ";
-
-        $this->query($query)->assertJsonFragment([
+        ")->assertJsonFragment([
             'user' => [
                 'name' => 'B'
             ]
@@ -45,7 +44,7 @@ class FindDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itDefaultsToFieldTypeIfNoModelIsSupplied()
+    public function itDefaultsToFieldTypeIfNoModelIsSupplied(): void
     {
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
@@ -60,15 +59,14 @@ class FindDirectiveTest extends DBTestCase
             user(id: ID @eq): User @find
         }
         ';
-        $query = "
+
+        $this->query("
         {
             user(id:{$userA->id}) {
                 name
             }
         }
-        ";
-
-        $this->query($query)->assertJsonFragment([
+        ")->assertJsonFragment([
             'name' => 'A'
         ]);
     }
@@ -76,7 +74,7 @@ class FindDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCannotFetchIfMultipleModelsMatch()
+    public function itCannotFetchIfMultipleModelsMatch(): void
     {
         factory(User::class)->create(['name' => 'A']);
         factory(User::class)->create(['name' => 'A']);
@@ -92,21 +90,20 @@ class FindDirectiveTest extends DBTestCase
             user(name: String @eq): User @find(model: "User")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user(name: "A") {
                 name
             }
         }
-        ';
-
-        $this->query($query)->assertJsonCount(1, 'errors');
+        ')->assertJsonCount(1, 'errors');
     }
 
     /**
      * @test
      */
-    public function itCanUseScopes()
+    public function itCanUseScopes(): void
     {
         $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
         $companyB = factory(Company::class)->create(['name' => 'CompanyB']);
@@ -128,16 +125,15 @@ class FindDirectiveTest extends DBTestCase
             user(name: String @eq, company: String!): User @find(model: "User" scopes: [companyName])
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user(name: "A" company: "CompanyA") {
                 id
                 name
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'user' => [
                     'id' => $userA->id,

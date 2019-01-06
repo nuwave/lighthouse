@@ -29,7 +29,7 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
     /**
      * @test
      */
-    public function itGetsPolymorphicRelationship()
+    public function itGetsPolymorphicRelationship(): void
     {
         /** @var Task $task */
         $task = Task::first();
