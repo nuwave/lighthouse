@@ -12,11 +12,11 @@ class SecurityTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetMaxComplexityThroughConfig()
+    public function itCanSetMaxComplexityThroughConfig(): void
     {
         config(['lighthouse.security.max_query_complexity' => 1]);
 
-        $this->assertMaxQueryComplexityIs1('
+        $this->schema = '
         type Query {
             user: User @first
         }
@@ -24,17 +24,19 @@ class SecurityTest extends TestCase
         type User {
             name: String
         }
-        ');
+        ';
+
+        $this->assertMaxQueryComplexityIs1();
     }
 
     /**
      * @test
      */
-    public function itCanSetMaxDepthThroughConfig()
+    public function itCanSetMaxDepthThroughConfig(): void
     {
         config(['lighthouse.security.max_query_depth' => 1]);
 
-        $this->assertMaxQueryDepthIs1('
+        $this->schema = '
         type Query {
             user: User @first
         }
@@ -43,22 +45,24 @@ class SecurityTest extends TestCase
             name: String
             user: User
         }
-        ');
+        ';
+
+        $this->assertMaxQueryDepthIs1();
     }
 
     /**
      * @test
      */
-    public function itCanDisableIntrospectionThroughConfig()
+    public function itCanDisableIntrospectionThroughConfig(): void
     {
         config(['lighthouse.security.disable_introspection' => true]);
 
-        $this->assertIntrospectionIsDisabled(
-            $this->placeholderQuery()
-        );
+        $this->schema = $this->placeholderQuery();
+
+        $this->assertIntrospectionIsDisabled();
     }
 
-    protected function assertMaxQueryComplexityIs1(string $schema)
+    protected function assertMaxQueryComplexityIs1(): void
     {
         $result = $this->query('
         {
@@ -68,10 +72,13 @@ class SecurityTest extends TestCase
         }
         ');
 
-        $this->assertSame(QueryComplexity::maxQueryComplexityErrorMessage(1, 2), $result['errors'][0]['message']);
+        $this->assertSame(
+            QueryComplexity::maxQueryComplexityErrorMessage(1, 2),
+            $result->json('errors.0.message')
+        );
     }
 
-    protected function assertMaxQueryDepthIs1($schema)
+    protected function assertMaxQueryDepthIs1(): void
     {
         $result = $this->query('
         {
@@ -85,13 +92,14 @@ class SecurityTest extends TestCase
         }
         ');
 
-        $this->assertSame(QueryDepth::maxQueryDepthErrorMessage(1, 2), $result['errors'][0]['message']);
+        $this->assertSame(
+            QueryDepth::maxQueryDepthErrorMessage(1, 2),
+            $result->json('errors.0.message')
+        );
     }
 
-    /**
-     * @param $schema
-     */
-    protected function assertIntrospectionIsDisabled(string $schema)
+
+    protected function assertIntrospectionIsDisabled(): void
     {
         $result = $this->query('
         {
@@ -103,6 +111,9 @@ class SecurityTest extends TestCase
         }
         ');
 
-        $this->assertSame(DisableIntrospection::introspectionDisabledMessage(), $result['errors'][0]['message']);
+        $this->assertSame(
+            DisableIntrospection::introspectionDisabledMessage(),
+            $result->json('errors.0.message')
+        );
     }
 }

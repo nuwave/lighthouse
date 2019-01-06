@@ -31,7 +31,6 @@ class DeferExtensionDBTest extends DBTestCase
         });
 
         $app['config']->set('lighthouse.extensions', [DeferExtension::class]);
-        $app['config']->set('app.debug', true);
     }
 
     /**

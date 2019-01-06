@@ -10,7 +10,7 @@ class UserTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanInsertRecordsIntoTestDB()
+    public function itCanInsertRecordsIntoTestDB(): void
     {
         factory(User::class, 2)->create();
 
@@ -20,7 +20,7 @@ class UserTest extends DBTestCase
     /**
      * @test
      */
-    public function itRefreshesDB()
+    public function itRefreshesDB(): void
     {
         $this->assertCount(0, \DB::table('users')->get());
     }

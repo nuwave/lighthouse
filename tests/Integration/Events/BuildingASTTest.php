@@ -3,7 +3,6 @@
 namespace Tests\Integration\Events;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildingAST;
 
 class BuildingASTTest extends TestCase
@@ -11,7 +10,7 @@ class BuildingASTTest extends TestCase
     /**
      * @test
      */
-    public function itInjectsSourceSchemaIntoEvent()
+    public function itInjectsSourceSchemaIntoEvent(): void
     {
         $schema = $this->placeholderQuery();
 
@@ -28,7 +27,7 @@ class BuildingASTTest extends TestCase
     /**
      * @test
      */
-    public function itCanAddAdditionalSchemaThroughEvent()
+    public function itCanAddAdditionalSchemaThroughEvent(): void
     {
         app('events')->listen(
             BuildingAST::class,

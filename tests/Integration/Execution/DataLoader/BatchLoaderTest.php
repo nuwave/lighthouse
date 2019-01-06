@@ -11,7 +11,7 @@ class BatchLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveBatchedFieldsFromBatchedRequests()
+    public function itCanResolveBatchedFieldsFromBatchedRequests(): void
     {
         $users = factory(User::class, 2)
             ->create()
@@ -47,14 +47,21 @@ class BatchLoaderTest extends DBTestCase
         }
         ';
 
-        $batchedQueries = [
-            ['query' => $query, 'variables' => ['id' => $users[0]->getKey()]],
-            ['query' => $query, 'variables' => ['id' => $users[1]->getKey()]],
-        ];
-
-        $data = $this->postJson('/graphql', $batchedQueries)->json();
-        $this->assertCount(2, $data);
-        $this->assertCount(3, array_get($data, '0.data.user.tasks'));
-        $this->assertCount(3, array_get($data, '1.data.user.tasks'));
+        $this->postGraphQL([
+            [
+                'query' => $query,
+                'variables' => [
+                    'id' => $users[0]->getKey()
+                ]
+            ],
+            [
+                'query' => $query,
+                'variables' => [
+                    'id' => $users[1]->getKey()
+                ]
+            ],
+        ])->assertJsonCount(2)
+        ->assertJsonCount(3, '0.data.users.tasks')
+        ->assertJsonCount(3, '1.data.users.tasks');
     }
 }

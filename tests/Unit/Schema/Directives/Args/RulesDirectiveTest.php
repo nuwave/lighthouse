@@ -3,272 +3,24 @@
 namespace Tests\Unit\Schema\Directives\Args;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 
 class RulesDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanValidateQueryRootFieldArguments()
+    protected function getEnvironmentSetUp($app)
     {
-        $query = '
-        {
-            foo {
-                first_name
-            }
-        }
-        ';
+        parent::getEnvironmentSetUp($app);
 
-        $result = $this->executeWithoutDebug($this->schema(), $query);
-        $this->assertEquals([
-            'data' => ['foo' => null],
-            'errors' => [
-                [
-                    'path' => ['foo'],
-                    'locations' => [['line' => 3, 'column' => 13]],
-                    'message' => 'Validation failed for the field [foo].',
-                    'extensions' => [
-                        'category' => 'validation',
-                        'validation' => [
-                            'bar' => [
-                                'The bar field is required.',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ], $result);
-
-        $mutation = '
-        mutation {
-            foo {
-                first_name
-            }
-        }
-        ';
-        $mutationResult = $this->executeWithoutDebug($this->schema(), $mutation);
-        $this->assertSame($result, $mutationResult);
+        // Ensure we test for the result the end user receives
+        $app['config']->set('app.debug', false);
     }
 
-    /**
-     * @test
-     */
-    public function itCanReturnValidFieldsAndErrorMessagesForInvalidFields()
+    protected function setUp(): void
     {
-        $query = '
-        {
-            foo(bar: "foo") {
-                first_name
-                last_name
-                full_name
-            }
-        }
-        ';
+        parent::setUp();
 
-        $result = $this->executeWithoutDebug($this->schema(), $query);
-
-        $this->assertSame('John', Arr::get($result, 'data.foo.first_name'));
-        $this->assertSame('Doe', Arr::get($result, 'data.foo.last_name'));
-
-        $this->assertNull(Arr::get($result, 'data.foo.full_name'));
-        $this->assertCount(1, Arr::get($result, 'errors'));
-        $this->assertSame('Validation failed for the field [foo.full_name].', Arr::get($result, 'errors.0.message'));
-        $this->assertSame(['formatted' => ['foobar']], Arr::get($result, 'errors.0.extensions.validation'));
-
-        $mutation = '
-        mutation {
-            foo(bar: "foo") {
-                first_name
-                last_name
-                full_name
-            }
-        }
-        ';
-
-        $mutationResult = $this->executeWithoutDebug($this->schema(), $mutation);
-        $this->assertSame($result, $mutationResult);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanValidateRootMutationFieldArgs()
-    {
-        $mutation = '
-        mutation {
-            foo {
-                first_name
-                last_name
-                full_name
-            }
-        }
-        ';
-        $result = $this->executeWithoutDebug($this->schema(), $mutation);
-
-        $this->assertNull(Arr::get($result, 'data.foo'));
-        $this->assertCount(1, Arr::get($result, 'errors'));
-
-        $query = '
-        {
-            foo {
-                first_name
-                last_name
-                full_name
-            }
-        }
-        ';
-        $queryResult = $this->executeWithoutDebug($this->schema(), $query);
-
-        $this->assertSame($result, $queryResult);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanProcessMutationsWithInvalidReturnObjectFields()
-    {
-        $mutation = '
-        mutation {
-            foo(bar: "foo") {
-                first_name
-                last_name
-                full_name
-            }
-        }
-        ';
-        $result = $this->executeWithoutDebug($this->schema(), $mutation);
-
-        $this->assertSame('John', Arr::get($result, 'data.foo.first_name'));
-        $this->assertSame('Doe', Arr::get($result, 'data.foo.last_name'));
-        $this->assertNull(Arr::get($result, 'data.foo.full_name'));
-        $this->assertCount(1, Arr::get($result, 'errors'));
-
-        $query = '
-        {
-            foo(bar: "foo") {
-                first_name
-                last_name
-                full_name
-            }
-        }
-        ';
-        $queryResult = $this->executeWithoutDebug($this->schema(), $query);
-
-        $this->assertSame($result, $queryResult);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanValidateArrayType()
-    {
-        $query = '
-        {
-            foo(bar: "got it") {
-                input_object(
-                    input: {
-                        emails: ["not-email", "not-email_2"]
-                        self: {
-                            emails: ["nested-not-email", "nested-not-email_2"]
-                            self: {
-                                emails: ["finally@valid.email", "not-email", "finally@valid.email", "not-email"]
-                                self: {
-                                    emails: ["this-would-be-valid-but-is@too.long"]
-                                }
-                            }
-                        }
-                    }
-                )
-                first_name
-            }
-        }
-        ';
-        $queryResult = $this->executeWithoutDebug($this->schema(), $query);
-
-        $this->assertSame('John', Arr::get($queryResult, 'data.foo.first_name'));
-        $this->assertSame([
-            'input.emails.0' => [
-                'Not an email',
-            ],
-            'input.emails.1' => [
-                'Not an email',
-            ],
-            'input.self.emails.0' => [
-                'Not an email',
-            ],
-            'input.self.emails.1' => [
-                'Not an email',
-            ],
-            'input.self.self.emails.1' => [
-                'Not an email',
-            ],
-            'input.self.self.emails.3' => [
-                'Not an email',
-            ],
-            'input.self.self.self.emails.0' => [
-                'The input.self.self.self.emails.0 may not be greater than 20 characters.',
-            ],
-        ], Arr::get($queryResult, 'errors.0.extensions.validation'));
-    }
-
-    /**
-     * @test
-     */
-    public function itCanReturnCorrectValidationForInputObjects()
-    {
-        $query = '
-        {
-            foo(bar: "got it") {
-                input_object(
-                    input: {
-                        email: "not-email"
-                        self: {
-                            email: "nested-not-email"
-                            self: {
-                                email: "finally@valid.email"
-                                self: {
-                                    email: "this-would-be-valid-but-is@too.long"
-                                }
-                            }
-                        }
-                    }
-                )
-                first_name
-            }
-        }
-        ';
-        $queryResult = $this->executeWithoutDebug($this->schema(), $query);
-
-        $this->assertSame('John', Arr::get($queryResult, 'data.foo.first_name'));
-        $this->assertSame([
-            'input.email' => [
-                'Not an email',
-            ],
-            'input.self.email' => [
-                'Not an email',
-            ],
-            'input.self.self.self.email' => [
-                'The input.self.self.self.email may not be greater than 20 characters.',
-            ],
-        ], Arr::get($queryResult, 'errors.0.extensions.validation'));
-    }
-
-    public function resolve(): array
-    {
-        return [
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'full_name' => 'John Doe',
-            'input_object' => true,
-        ];
-    }
-
-    protected function schema(): string
-    {
         $resolver = addslashes(self::class).'@resolve';
 
-        return "
+        $this->schema = "
         type Query {
             foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
@@ -314,5 +66,255 @@ class RulesDirectiveTest extends TestCase
             self: UserInput
         }
         ";
+    }
+
+    /**
+     * @test
+     */
+    public function itCanValidateQueryRootFieldArguments(): void
+    {
+        $this->query('
+        {
+            foo {
+                first_name
+            }
+        }
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => 'Validation failed for the field [foo].',
+                    'extensions' => [
+                        'category' => 'validation',
+                        'validation' => [
+                            'bar' => [
+                                'The bar field is required.',
+                            ],
+                        ],
+                    ],
+                    'locations' => [
+                        [
+                            'line' => 2,
+                            'column' => 13
+                        ]
+                    ],
+                    'path' => ['foo'],
+                ],
+            ],
+            'data' => [
+                'foo' => null
+            ],
+        ])->assertJson(
+            $this->query('
+        mutation {
+            foo {
+                first_name
+            }
+        }
+            ')->json()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCanReturnValidFieldsAndErrorMessagesForInvalidFields(): void
+    {
+        $this->query('
+        {
+            foo(bar: "foo") {
+                first_name
+                last_name
+                full_name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => [
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'full_name' => null,
+                ]
+            ],
+            'errors' => [
+                [
+                    'path' => ['foo'],
+                    'message' => 'Validation failed for the field [foo.full_name].',
+                    'extensions' => [
+                        'validation' => [
+                            'formatted' => [
+                                'foobar'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ])->assertJson(
+            $this->query('
+        mutation {
+            foo(bar: "foo") {
+                first_name
+                last_name
+                full_name
+            }
+        }
+            ')->json()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCanValidateRootMutationFieldArgs(): void
+    {
+        $this->query('
+        mutation {
+            foo {
+                first_name
+                last_name
+                full_name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => null,
+            ]
+        ])->assertJsonCount(1, 'errors')
+        ->assertJson(
+            $this->query('
+        {
+            foo {
+                first_name
+                last_name
+                full_name
+            }
+        }
+            ')->json()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCanValidateArrayType(): void
+    {
+        $this->query('
+        {
+            foo(bar: "got it") {
+                input_object(
+                    input: {
+                        emails: ["not-email", "not-email_2"]
+                        self: {
+                            emails: ["nested-not-email", "nested-not-email_2"]
+                            self: {
+                                emails: ["finally@valid.email", "not-email", "finally@valid.email", "not-email"]
+                                self: {
+                                    emails: ["this-would-be-valid-but-is@too.long"]
+                                }
+                            }
+                        }
+                    }
+                )
+                first_name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => [
+                    'first_name' => 'John',
+                    'input_object' => null,
+                ]
+            ],
+            'errors' => [
+                [
+                    'extensions' => [
+                        'validation' => [
+                            'input.emails.0' => [
+                                'Not an email',
+                            ],
+                            'input.emails.1' => [
+                                'Not an email',
+                            ],
+                            'input.self.emails.0' => [
+                                'Not an email',
+                            ],
+                            'input.self.emails.1' => [
+                                'Not an email',
+                            ],
+                            'input.self.self.emails.1' => [
+                                'Not an email',
+                            ],
+                            'input.self.self.emails.3' => [
+                                'Not an email',
+                            ],
+                            'input.self.self.self.emails.0' => [
+                                'The input.self.self.self.emails.0 may not be greater than 20 characters.',
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanReturnCorrectValidationForInputObjects(): void
+    {
+        $this->query('
+        {
+            foo(bar: "got it") {
+                input_object(
+                    input: {
+                        email: "not-email"
+                        self: {
+                            email: "nested-not-email"
+                            self: {
+                                email: "finally@valid.email"
+                                self: {
+                                    email: "this-would-be-valid-but-is@too.long"
+                                }
+                            }
+                        }
+                    }
+                )
+                first_name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => [
+                    'first_name' => 'John',
+                    'input_object' => null,
+                ]
+            ],
+            'errors' => [
+                [
+                    'extensions' => [
+                        'validation' => [
+                            'input.email' => [
+                                'Not an email',
+                            ],
+                            'input.self.email' => [
+                                'Not an email',
+                            ],
+                            'input.self.self.self.email' => [
+                                'The input.self.self.self.email may not be greater than 20 characters.',
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    public function resolve(): array
+    {
+        return [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'full_name' => 'John Doe',
+            'input_object' => true,
+        ];
     }
 }

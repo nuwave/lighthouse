@@ -3,18 +3,15 @@
 namespace Tests\Integration\Schema\Directives\Args;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 
 class QueryFilterDirectiveTest extends DBTestCase
 {
-    /** @var Collection|User[] */
+    /**
+     * @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User>
+     */
     protected $users;
 
-    /**
-     * Set up test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -25,7 +22,7 @@ class QueryFilterDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanAttachEqFilterToQuery()
+    public function itCanAttachEqFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -38,7 +35,8 @@ class QueryFilterDirectiveTest extends DBTestCase
             users(id: ID @eq): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(count: 5 id: '.$this->users->first()->getKey().') {
                 data {
@@ -46,16 +44,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(1, Arr::get($result, 'data.users.data'));
+        ')->assertJsonCount(1, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachNeqFilterToQuery()
+    public function itCanAttachNeqFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -68,7 +63,8 @@ class QueryFilterDirectiveTest extends DBTestCase
             users(id: ID @neq): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(count: 5 id: '.$this->users->first()->getKey().') {
                 data {
@@ -76,16 +72,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(4, Arr::get($result->data, 'users.data'));
+        ')->assertJsonCount(4, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachInFilterToQuery()
+    public function itCanAttachInFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -102,7 +95,8 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
-        $query = '
+
+        $this->query('
         {
             users(count: 5 include: ['.$user1.', '.$user2.']) {
                 data {
@@ -110,16 +104,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(2, Arr::get($result, 'data.users.data'));
+        ')->assertJsonCount(2, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachNotInFilterToQuery()
+    public function itCanAttachNotInFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -136,7 +127,8 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
-        $query = '
+
+        $this->query('
         {
             users(count: 5 exclude: ['.$user1.', '.$user2.']) {
                 data {
@@ -144,16 +136,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(3, Arr::get($result->data, 'users.data'));
+        ')->assertJsonCount(3, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachWhereFilterToQuery()
+    public function itCanAttachWhereFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -169,7 +158,8 @@ class QueryFilterDirectiveTest extends DBTestCase
         ';
 
         $user1 = $this->users->first()->getKey();
-        $query = '
+
+        $this->query('
         {
             users(count: 5 id: '.$user1.') {
                 data {
@@ -177,16 +167,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $result = $this->query($query);
-        $this->assertCount(4, Arr::get($result->data, 'users.data'));
+        ')->assertJsonCount(4, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachTwoWhereFilterWithTheSameKeyToQuery()
+    public function itCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
     {
         $this->schema = '
         type User {
@@ -205,7 +192,8 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
-        $query = '
+
+        $this->query('
         {
             users(count: 5 start: '.$user1.' end: '.$user2.') {
                 data {
@@ -213,16 +201,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $result = $this->query($query);
-        $this->assertCount(3, Arr::get($result, 'data.users.data'));
+        ')->assertJsonCount(3, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachWhereBetweenFilterToQuery()
+    public function itCanAttachWhereBetweenFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -250,7 +235,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $query = '
+        $this->query('
         {
             users(count: 5 start: "'.$start.'" end: "'.$end.'") {
                 data {
@@ -258,16 +243,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(2, Arr::get($result->data, 'users.data'));
+        ')->assertJsonCount(2, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachWhereNotBetweenFilterToQuery()
+    public function itCanAttachWhereNotBetweenFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -295,7 +277,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $query = '
+        $this->query('
         {
             users(count: 5 start: "'.$start.'" end: "'.$end.'") {
                 data {
@@ -303,16 +285,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(3, Arr::get($result->data, 'users.data'));
+        ')->assertJsonCount(3, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itCanAttachWhereClauseFilterToQuery()
+    public function itCanAttachWhereClauseFilterToQuery(): void
     {
         $this->schema = '
         type User {
@@ -337,7 +316,7 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $year = now()->subYear()->format('Y');
 
-        $query = '
+        $this->query('
         {
             users(count: 5 created_at: "'.$year.'") {
                 data {
@@ -345,16 +324,13 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $result = $this->query($query);
-        $this->assertCount(2, Arr::get($result->data, 'users.data'));
+        ')->assertJsonCount(2, 'data.users.data');
     }
 
     /**
      * @test
      */
-    public function itOnlyProcessesFilledArguments()
+    public function itOnlyProcessesFilledArguments(): void
     {
         $this->schema = '
         type User {
@@ -368,7 +344,8 @@ class QueryFilterDirectiveTest extends DBTestCase
                 @paginate(model: "Tests\\\Utils\\\Models\\\User")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(count: 5 name: "'.$this->users->first()->name.'") {
                 data {
@@ -376,9 +353,6 @@ class QueryFilterDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(1, Arr::get($result->data, 'users.data'));
+        ')->assertJsonCount(1, 'data.users.data');
     }
 }

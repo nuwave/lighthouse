@@ -58,7 +58,7 @@ class TestCase extends BaseTestCase
             }
         );
 
-        $app->make('config')->set('lighthouse', [
+        $app['config']->set('lighthouse', [
             'namespaces' => [
                 'models' => [
                     'Tests\\Utils\\Models',
@@ -93,9 +93,7 @@ class TestCase extends BaseTestCase
             ],
         ]);
 
-        $app->make('config')->set('app', [
-            'debug' => true,
-        ]);
+        $app['config']->set('app.debug', true);
 
         TestResponse::macro(
             'assertErrorCategory',

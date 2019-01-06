@@ -12,7 +12,7 @@ class AllDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanGetAllModelsAsRootField()
+    public function itCanGetAllModelsAsRootField(): void
     {
         factory(User::class, 2)->create();
 
@@ -26,17 +26,15 @@ class AllDirectiveTest extends DBTestCase
             users: [User!]! @all(model: "User")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users {
                 id
                 name
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(2, Arr::get($result, 'data.users'));
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -62,7 +60,8 @@ class AllDirectiveTest extends DBTestCase
             users: [User!]! @all
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users {
                 posts {
@@ -70,21 +69,38 @@ class AllDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertSame([
-            'users' => [
-                ['posts' => [['id' => '1'], ['id' => '2']]],
-                ['posts' => [['id' => '1'], ['id' => '2']]],
-            ],
-        ], $result['data']);
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    [
+                        'posts' => [
+                            [
+                                'id' => '1'
+                            ],
+                            [
+                                'id' => '2'
+                            ]
+                        ]
+                    ],
+                    [
+                        'posts' => [
+                            [
+                                'id' => '1'
+                            ],
+                            [
+                                'id' => '2'
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanGetAllModelsFiltered()
+    public function itCanGetAllModelsFiltered(): void
     {
         $users = factory(User::class, 3)->create();
         $userName = $users->first()->name;
@@ -99,16 +115,14 @@ class AllDirectiveTest extends DBTestCase
             users(name: String @neq): [User!]! @all
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(name: "'.$userName.'") {
                 id
                 name
             }
         }
-        ';
-        $result = $this->query($query);
-
-        $this->assertCount(2, Arr::get($result, 'data.users'));
+        ')->assertJsonCount(2, 'data.users');
     }
 }

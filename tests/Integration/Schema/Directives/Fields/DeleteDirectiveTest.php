@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
@@ -75,6 +76,8 @@ class DeleteDirectiveTest extends DBTestCase
      */
     public function itRejectsDefinitionWithNullableArgument(): void
     {
+        $this->expectException(DirectiveException::class);
+
         $this->schema = '
         type User {
             id: ID!
@@ -92,7 +95,7 @@ class DeleteDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertErrorCategory('schema');
+        ');
     }
 
     /**
@@ -100,6 +103,8 @@ class DeleteDirectiveTest extends DBTestCase
      */
     public function itRejectsDefinitionWithNoArgument(): void
     {
+        $this->expectException(DirectiveException::class);
+
         $this->schema = '
         type User {
             id: ID!
@@ -117,7 +122,7 @@ class DeleteDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertErrorCategory('schema');
+        ');
     }
 
     /**
@@ -125,6 +130,8 @@ class DeleteDirectiveTest extends DBTestCase
      */
     public function itRejectsDefinitionWithMultipleArguments(): void
     {
+        $this->expectException(DirectiveException::class);
+
         $this->schema = '
         type User {
             id: ID!
@@ -142,6 +149,6 @@ class DeleteDirectiveTest extends DBTestCase
                 name
             }
         }
-        ')->assertErrorCategory('schema');
+        ');
     }
 }

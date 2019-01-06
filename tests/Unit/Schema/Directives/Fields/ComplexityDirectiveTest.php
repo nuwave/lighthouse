@@ -10,9 +10,9 @@ class ComplexityDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetDefaultComplexityOnField()
+    public function itCanSetDefaultComplexityOnField(): void
     {
-        $this->schema = $this->buildSchemaWithPlaceholderQuery('
+        $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             posts: [Post!]! @complexity @hasMany
         }
@@ -21,6 +21,7 @@ class ComplexityDirectiveTest extends TestCase
             title: String
         }
         ');
+
         $complexityFn = $schema->getType('User')
             ->getField('posts')
             ->getComplexityFn();
@@ -32,7 +33,7 @@ class ComplexityDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetCustomComplexityResolver()
+    public function itCanSetCustomComplexityResolver(): void
     {
         $resolver = addslashes(self::class);
 
@@ -47,6 +48,7 @@ class ComplexityDirectiveTest extends TestCase
             title: String
         }
         ');
+
         $complexityFn = $schema->getType('User')
             ->getField('posts')
             ->getComplexityFn();
@@ -57,7 +59,7 @@ class ComplexityDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itResolvesComplexityResolverThroughDefaultNamespace()
+    public function itResolvesComplexityResolverThroughDefaultNamespace(): void
     {
         $schema = $this->buildSchema('
         type Query {
@@ -65,6 +67,7 @@ class ComplexityDirectiveTest extends TestCase
                 @complexity(resolver: "Foo@complexity")
         }
         ');
+
         $complexityFn = $schema->getQueryType()
             ->getField('foo')
             ->getComplexityFn();

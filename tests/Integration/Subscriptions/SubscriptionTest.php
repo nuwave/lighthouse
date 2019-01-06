@@ -16,11 +16,7 @@ class SubscriptionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set([
-            'lighthouse.extensions' => [
-                \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
-            ],
-        ]);
+        $app['config']->set('lighthouse.extensions', [\Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class]);
     }
 
     protected function setUp()

@@ -74,7 +74,8 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $query = '
+        // The custom builder is supposed to change the sort order
+        $this->query('
         {
             users(count: 1) {
                 data {
@@ -82,10 +83,7 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        // The custom builder is supposed to change the sort order
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'users' => [
                     'data' => [
@@ -139,21 +137,21 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count:3 page: 1) {
+            users(count: 3, page: 1) {
                 paginatorInfo {
                     count
                     total
                     currentPage
                 }
                 data {
-                    posts(count:2 page: 2) {
+                    posts(count: 2, page: 2) {
                         paginatorInfo {
                             count
                             total
                             currentPage
                         }
                         data {
-                            comments(count:1 page: 3) {
+                            comments(count: 1, page: 3) {
                                 paginatorInfo {
                                     count
                                     total
@@ -165,15 +163,39 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ')->assertJsonCount(1, 'data.users.paginatorInfo.currentPage')
-          ->assertJsonCount(1, 'data.users.data.0.posts.paginatorInfo.currentPage')
-          ->assertJsonCount(1, 'data.users.data.0.posts.data.comments.paginatorInfo.currentPage');
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'paginatorInfo' => [
+                        'currentPage' => 1,
+                    ],
+                    'data' => [
+                        [
+                            'posts' => [
+                                'paginatorInfo' => [
+                                    'currentPage' => 2
+                                ],
+                                'data' => [
+                                    [
+                                        'comments' => [
+                                            'paginatorInfo' => [
+                                                'currentPage' => 3
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanCreateQueryConnections()
+    public function itCanCreateQueryConnections(): void
     {
         factory(User::class, 10)->create();
 
@@ -216,7 +238,7 @@ class PaginateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itQueriesConnectionWithNoData()
+    public function itQueriesConnectionWithNoData(): void
     {
         $this->schema = '
         type User {
@@ -271,7 +293,7 @@ class PaginateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itQueriesPaginationWithNoData()
+    public function itQueriesPaginationWithNoData(): void
     {
         $this->schema = '
         type User {
@@ -322,7 +344,7 @@ class PaginateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itPaginatesWhenDefinedInTypeExtension()
+    public function itPaginatesWhenDefinedInTypeExtension(): void
     {
         factory(User::class, 2)->create();
 
@@ -349,8 +371,10 @@ class PaginateDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users.data');
     }
 
-    /** @test */
-    public function itCanHaveADefaultPaginationCount()
+    /**
+     * @test
+     */
+    public function itCanHaveADefaultPaginationCount(): void
     {
         factory(User::class, 10)->create();
 

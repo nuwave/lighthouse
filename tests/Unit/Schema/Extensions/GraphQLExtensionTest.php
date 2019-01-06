@@ -8,21 +8,16 @@ use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQLExtensionTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->singleton(ExtensionRegistry::class, function () {
+        $app->singleton(ExtensionRegistry::class, function (): ExtensionRegistry {
             return new class() extends ExtensionRegistry {
                 public function __construct()
                 {
                     $this->pipeline = app(\Nuwave\Lighthouse\Support\Pipeline::class);
-                    $this->extensions = collect([GraphQLExtensionTest::getExtension()]);
+                    $this->extensions = collect(GraphQLExtensionTest::getExtension());
                 }
             };
         });
@@ -31,26 +26,22 @@ class GraphQLExtensionTest extends TestCase
     /**
      * @test
      */
-    public function itCanManipulateResponseData()
+    public function itCanManipulateResponseData(): void
     {
         $this->schema = '
         type Query {
             foo: String
         }';
 
-        $data = $this->query('
+        $this->query('
         {
             foo
         }
-        ');
-
-        $this->assertArrayHasKey('meta', $data);
-        $this->assertSame('data', $data['meta']);
+        ')->assertJson([
+            'meta' => 'data'
+        ]);
     }
 
-    /**
-     * @return GraphQLExtension
-     */
     public static function getExtension(): GraphQLExtension
     {
         return new class() extends GraphQLExtension {
@@ -66,7 +57,7 @@ class GraphQLExtensionTest extends TestCase
                 ]));
             }
 
-            public function jsonSerialize()
+            public function jsonSerialize(): array
             {
                 return [];
             }
