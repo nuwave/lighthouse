@@ -11,11 +11,11 @@ class MorphToTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateAndConnectWithMorphTo()
+    public function itCanCreateAndConnectWithMorphTo(): void
     {
         factory(Task::class)->create(['name' => 'first_task']);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID
             name: String
@@ -41,7 +41,8 @@ class MorphToTest extends DBTestCase
         }
         
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createHour(input: {
                 hourable_type: "Tests\\\Utils\\\Models\\\Task"
@@ -56,12 +57,17 @@ class MorphToTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.createHour.id'));
-        $this->assertSame(2, Arr::get($result, 'data.createHour.weekday'));
-        $this->assertSame('1', Arr::get($result, 'data.createHour.hourable.id'));
-        $this->assertSame('first_task', Arr::get($result, 'data.createHour.hourable.name'));
+        ')->assertJson([
+            'data' => [
+                'createHour' => [
+                    'id' => '1',
+                    'weekday' => 2,
+                    'hourable' => [
+                        'id' => '1',
+                        'name' => 'first_task'
+                    ]
+                ]
+            ]
+        ]);
     }
 }

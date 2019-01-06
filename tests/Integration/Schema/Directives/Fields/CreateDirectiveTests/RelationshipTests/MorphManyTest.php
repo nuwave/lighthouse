@@ -11,11 +11,11 @@ class MorphManyTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateWithNewMorphMany()
+    public function itCanCreateWithNewMorphMany(): void
     {
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -29,7 +29,6 @@ class MorphManyTest extends DBTestCase
         type Mutation {
             createTask(input: CreateTaskInput!): Task @create(flatten: true)
         }
-        
         
         input CreateHourRelation {
             create: [CreateHourInput!]!
@@ -47,7 +46,8 @@ class MorphManyTest extends DBTestCase
             weekday: Int
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -65,10 +65,18 @@ class MorphManyTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
-        $this->assertSame(3, Arr::get($result, 'data.createTask.hours.0.weekday'));
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hours' => [
+                        [
+                            'weekday' => 3
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 }

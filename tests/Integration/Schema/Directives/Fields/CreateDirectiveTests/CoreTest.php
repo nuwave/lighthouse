@@ -3,8 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
-use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 

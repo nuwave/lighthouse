@@ -11,9 +11,9 @@ class HasManyTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateWithNewHasMany()
+    public function itCanCreateWithNewHasMany(): void
     {
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -43,7 +43,8 @@ class HasManyTest extends DBTestCase
             user: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -61,12 +62,19 @@ class HasManyTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.createUser.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createUser.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createUser.tasks.0.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.createUser.tasks.0.name'));
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 }

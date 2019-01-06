@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests\RelationshipTests;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class BelongsToManyTest extends DBTestCase
@@ -11,9 +10,9 @@ class BelongsToManyTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateWithNewBelongsToMany()
+    public function itCanCreateWithNewBelongsToMany(): void
     {
-        $schema = '
+        $this->schema = '
         type Role {
             id: ID!
             name: String
@@ -42,7 +41,8 @@ class BelongsToManyTest extends DBTestCase
             name: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -63,23 +63,31 @@ class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-        $this->assertSame('1', Arr::get($result, 'data.createRole.id'));
-        $this->assertSame('foobar', Arr::get($result, 'data.createRole.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createRole.users.0.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.createRole.users.0.name'));
+        ')->assertJson([
+            'data' => [
+                'createRole' => [
+                    'id' => '1',
+                    'name' => 'foobar',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanCreateAndConnectWithBelongsToMany()
+    public function itCanCreateAndConnectWithBelongsToMany(): void
     {
         factory(User::class)->create(['name' => 'user_one']);
         factory(User::class)->create(['name' => 'user_two']);
 
-        $schema = '
+        $this->schema = '
         type Role {
             id: ID!
             name: String
@@ -105,7 +113,8 @@ class BelongsToManyTest extends DBTestCase
         }
         
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -123,13 +132,23 @@ class BelongsToManyTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-        $this->assertSame('1', Arr::get($result, 'data.createRole.id'));
-        $this->assertSame('foobar', Arr::get($result, 'data.createRole.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createRole.users.0.id'));
-        $this->assertSame('user_one', Arr::get($result, 'data.createRole.users.0.name'));
-        $this->assertSame('2', Arr::get($result, 'data.createRole.users.1.id'));
-        $this->assertSame('user_two', Arr::get($result, 'data.createRole.users.1.name'));
+        ')->assertJson([
+            'data' => [
+                'createRole' => [
+                    'id' => '1',
+                    'name' => 'foobar',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'user_one'
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'user_two'
+                        ],
+                    ]
+                ]
+            ]
+        ]);
     }
 }

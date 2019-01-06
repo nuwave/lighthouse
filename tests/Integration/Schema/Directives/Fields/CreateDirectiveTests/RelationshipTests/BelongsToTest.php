@@ -11,11 +11,11 @@ class BelongsToTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateAndConnectWithBelongsTo()
+    public function itCanCreateAndConnectWithBelongsTo(): void
     {
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -39,7 +39,8 @@ class BelongsToTest extends DBTestCase
             user: CreateUserRelation
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -54,20 +55,25 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createTask.user.id'));
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1'
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanCreateWithNewBelongsTo()
+    public function itCanCreateWithNewBelongsTo(): void
     {
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -95,7 +101,8 @@ class BelongsToTest extends DBTestCase
             user: CreateUserRelation
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -112,10 +119,16 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createTask.user.id'));
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1'
+                    ]
+                ]
+            ]
+        ]);
     }
 }
