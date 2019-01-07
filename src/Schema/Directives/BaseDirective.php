@@ -148,7 +148,7 @@ abstract class BaseDirective implements Directive
         );
 
         if (! $determineMatch) {
-            $determineMatch = '\class_exists';
+            $determineMatch = 'class_exists';
         }
 
         $className = Utils::namespaceClassname(

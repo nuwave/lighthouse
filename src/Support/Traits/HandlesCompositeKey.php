@@ -15,7 +15,7 @@ trait HandlesCompositeKey
      */
     protected function buildKey($key): string
     {
-        return \is_array($key)
+        return is_array($key)
             ? implode('___', $key)
             : $key;
     }

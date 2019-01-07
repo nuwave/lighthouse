@@ -3,17 +3,16 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Pusher\Pusher;
-use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Support\DriverManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 
 /**
- * @method void     broadcast(Subscriber $subscriber, array $data)
- * @method Response hook(\Illuminate\Http\Request $request)
- * @method Response authorized(\Illuminate\Http\Request $request)
- * @method Response unauthorized(\Illuminate\Http\Request $request)
+ * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
+ * @method \Illuminate\Http\Response hook(\Illuminate\Http\Request $request)
+ * @method \Illuminate\Http\Response authorized(\Illuminate\Http\Request $request)
+ * @method \Illuminate\Http\Response unauthorized(\Illuminate\Http\Request $request)
  */
 class BroadcastManager extends DriverManager
 {
@@ -54,7 +53,7 @@ class BroadcastManager extends DriverManager
      *
      * @throws \Pusher\PusherException
      *
-     * @return PusherBroadcaster
+     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
     {
@@ -73,7 +72,7 @@ class BroadcastManager extends DriverManager
      *
      * @param  mixed[]  $config
      *
-     * @return LogBroadcaster
+     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster
      */
     protected function createLogDriver(array $config): LogBroadcaster
     {
