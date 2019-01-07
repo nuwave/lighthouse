@@ -58,10 +58,9 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
     /**
      * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
+     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      */
     protected function setNamespaceDirectiveOnFields($objectType)
     {

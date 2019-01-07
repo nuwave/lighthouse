@@ -39,10 +39,9 @@ class TypeRegistry
      * Resolve type instance by name.
      *
      * @param  string $typeName
+     * @return Type
      *
      * @throws \GraphQL\Error\InvariantViolation
-     *
-     * @return Type
      */
     public function get(string $typeName): Type
     {

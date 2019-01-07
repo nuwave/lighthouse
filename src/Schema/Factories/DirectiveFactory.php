@@ -107,10 +107,9 @@ class DirectiveFactory
 
     /**
      * @param  string $directiveName
+     * @return Directive
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return Directive
      */
     protected function createOrFail(string $directiveName): Directive
     {
@@ -216,10 +215,9 @@ class DirectiveFactory
      *
      * @param  Node   $node
      * @param  string $directiveClass
+     * @return Directive|null
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return Directive|null
      */
     protected function createSingleDirectiveOfType(Node $node, string $directiveClass): ?Directive
     {

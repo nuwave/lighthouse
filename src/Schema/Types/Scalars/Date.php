@@ -45,10 +45,9 @@ class Date extends ScalarType
      *
      * @param  \GraphQL\Language\AST\Node  $valueNode
      * @param  mixed[]|null  $variables
+     * @return \Carbon\Carbon
      *
      * @throws \GraphQL\Error\Error
-     *
-     * @return \Carbon\Carbon
      */
     public function parseLiteral($valueNode, ?array $variables = null): Carbon
     {
@@ -67,10 +66,9 @@ class Date extends ScalarType
      *
      * @param  string $value
      * @param  string $exceptionClass
+     * @return Carbon
      *
      * @throws \GraphQL\Error\InvariantViolation|Error
-     *
-     * @return Carbon
      */
     private function tryParsingDate($value, string $exceptionClass): Carbon
     {

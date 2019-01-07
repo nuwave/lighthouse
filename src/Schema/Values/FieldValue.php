@@ -221,6 +221,7 @@ class FieldValue
      * Get the default resolver for a subscription field.
      *
      * @return \Closure
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function defaultSubscriptionResolver(): Closure

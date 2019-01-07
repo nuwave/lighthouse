@@ -119,10 +119,9 @@ class SubscriptionRegistry
      * Get registered subscriptions.
      *
      * @param  Subscriber $subscriber
+     * @return Collection
      *
      * @throws \GraphQL\Error\SyntaxError
-     *
-     * @return Collection
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {

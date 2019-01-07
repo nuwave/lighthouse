@@ -151,9 +151,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * This works differently as in other directives, so we define a separate function for it.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
      * @return string
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getPaginatorModel(): string
     {

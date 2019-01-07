@@ -23,8 +23,8 @@ class RenameDirective extends BaseDirective implements FieldResolver
      * Resolve the field directive.
      *
      * @param  FieldValue $fieldValue
-     *
      * @return FieldValue
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function resolveField(FieldValue $fieldValue): FieldValue

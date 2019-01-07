@@ -82,10 +82,9 @@ class DocumentAST implements \Serializable
      * Create a new DocumentAST instance from a schema.
      *
      * @param  string  $schema
+     * @return static
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
-     *
-     * @return static
      */
     public static function fromSource(string $schema): self
     {

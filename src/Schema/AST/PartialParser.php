@@ -271,10 +271,9 @@ class PartialParser
 
     /**
      * @param  string $typeName
+     * @return NamedTypeNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
-     *
-     * @return NamedTypeNode
      */
     public static function namedType(string $typeName): NamedTypeNode
     {
@@ -311,10 +310,9 @@ class PartialParser
      *
      * @param  NodeList $list
      * @param  string   $expectedType
+     * @return Node
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
-     *
-     * @return Node
      */
     protected static function getFirstAndValidateType(NodeList $list, string $expectedType): Node
     {
@@ -330,10 +328,9 @@ class PartialParser
     /**
      * @param  Node $node
      * @param  string $expectedType
+     * @return Node
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
-     *
-     * @return Node
      */
     protected static function validateType(Node $node, string $expectedType): Node
     {

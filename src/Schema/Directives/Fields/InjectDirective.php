@@ -27,10 +27,9 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
      *
      * @param  FieldValue  $value
      * @param  \Closure   $next
+     * @return FieldValue
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {

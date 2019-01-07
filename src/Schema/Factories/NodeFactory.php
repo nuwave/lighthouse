@@ -132,7 +132,6 @@ class NodeFactory
      * Transform value to type.
      *
      * @param  TypeDefinitionNode $typeDefinition
-     *
      * @return Type
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -191,10 +190,9 @@ class NodeFactory
 
     /**
      * @param  ScalarTypeDefinitionNode $scalarDefinition
+     * @return ScalarType
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
-     * @return ScalarType
      */
     protected function resolveScalarType(ScalarTypeDefinitionNode $scalarDefinition): ScalarType
     {

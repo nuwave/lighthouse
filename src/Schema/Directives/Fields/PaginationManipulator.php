@@ -25,10 +25,9 @@ class PaginationManipulator
      * Apply possible aliases and throw if the given pagination type is invalid.
      *
      * @param  string $paginationType
+     * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return string
      */
     public static function assertValidPaginationType(string $paginationType): string
     {

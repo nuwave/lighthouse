@@ -113,10 +113,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     /**
      * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
      * @param  array $middlewareArgValue
+     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      */
     public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
     {

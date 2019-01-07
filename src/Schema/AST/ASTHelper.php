@@ -112,10 +112,9 @@ class ASTHelper
 
     /**
      * @param  Node $node
+     * @return NamedTypeNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     *
-     * @return NamedTypeNode
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {

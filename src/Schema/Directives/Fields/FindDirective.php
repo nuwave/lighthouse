@@ -26,7 +26,6 @@ class FindDirective extends BaseDirective implements FieldResolver
      * Resolve the field directive.
      *
      * @param  FieldValue $fieldValue
-     *
      * @return FieldValue
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException

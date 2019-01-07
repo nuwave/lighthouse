@@ -124,12 +124,10 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @param  string $name
+     * @param  string  $name
+     * @return mixed
      *
      * @throws \InvalidArgumentException
-     * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
-     *
-     * @return mixed
      */
     protected function resolve(string $name)
     {
@@ -168,11 +166,9 @@ abstract class DriverManager
      * Validate driver implements the proper interface.
      *
      * @param  mixed  $driver
+     * @return mixed
      *
      * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
-     * @throws \ReflectionException
-     *
-     * @return mixed
      */
     protected function validateDriver($driver)
     {

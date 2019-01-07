@@ -91,10 +91,9 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      * @param  Gate  $gate
      * @param  string  $ability
      * @param  array  $args
+     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
-     *
-     * @return void
      */
     protected function authorize($user, Gate $gate, string $ability, array $args): void
     {

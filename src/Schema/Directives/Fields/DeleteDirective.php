@@ -76,9 +76,9 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     /**
      * Ensure there is only a single argument defined on the field.
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
      * @return InputValueDefinitionNode
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getSingleArgumentDefinition(): InputValueDefinitionNode
     {

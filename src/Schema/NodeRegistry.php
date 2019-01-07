@@ -89,10 +89,9 @@ class NodeRegistry
      * @param  array $args
      * @param  $context
      * @param  ResolveInfo $resolveInfo
+     * @return mixed
      *
      * @throws \GraphQL\Error\Error
-     *
-     * @return mixed
      */
     public function resolve($rootValue, $args, $context, ResolveInfo $resolveInfo)
     {

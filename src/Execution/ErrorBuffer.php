@@ -100,10 +100,9 @@ class ErrorBuffer
      * Flush the errors.
      *
      * @param  string  $errorMessage
+     * @return void
      *
      * @throws \Exception
-     *
-     * @return void
      */
     public function flush(string $errorMessage): void
     {

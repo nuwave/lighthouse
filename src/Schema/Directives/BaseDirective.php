@@ -104,6 +104,7 @@ abstract class BaseDirective implements Directive
      * @param  string $argumentName The default argument name "model" may be overwritten
      *
      * @return string
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getModelClass(string $argumentName = 'model'): string
@@ -132,10 +133,9 @@ abstract class BaseDirective implements Directive
      * @param  string   $classCandidate
      * @param  string[] $namespacesToTry
      * @param  callable $determineMatch
+     * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return string
      */
     protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
     {
@@ -174,11 +174,10 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @param  string $argumentName
+     * @param  string  $argumentName
+     * @return string[] Contains two entries: [string $className, string $methodName]
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return string[] Contains two entries: [string $className, string $methodName]
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {

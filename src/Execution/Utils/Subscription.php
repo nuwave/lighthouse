@@ -14,10 +14,9 @@ class Subscription
      * @param  string    $subscriptionField
      * @param  mixed     $root
      * @param  bool|null $queue
+     * @return void
      *
      * @throws \InvalidArgumentException
-     *
-     * @return void
      */
     public static function broadcast(string $subscriptionField, $root, ?bool $queue = null): void
     {

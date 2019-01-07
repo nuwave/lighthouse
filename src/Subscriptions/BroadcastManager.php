@@ -50,10 +50,9 @@ class BroadcastManager extends DriverManager
      * Create instance of pusher driver.
      *
      * @param  mixed[]  $config
+     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster
      *
      * @throws \Pusher\PusherException
-     *
-     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
     {

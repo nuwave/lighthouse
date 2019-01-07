@@ -79,10 +79,9 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      *
      * @param  TypeNode  $fieldType
      * @param  ResolveInfo  $info
+     * @return bool
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseClientException
-     *
-     * @return bool
      */
     protected function shouldDefer(TypeNode $fieldType, ResolveInfo $info): bool
     {

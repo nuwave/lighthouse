@@ -91,10 +91,9 @@ class SchemaStitcher implements SchemaSourceProvider
 
     /**
      * @param  string $path
+     * @return void
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     *
-     * @return void
      */
     protected static function throwFileNotFoundException(string $path): void
     {
