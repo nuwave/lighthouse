@@ -11,7 +11,7 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateFromFieldArguments()
+    public function itCanCreateFromFieldArguments(): void
     {
         $this->schema = '
         type Company {
@@ -23,16 +23,15 @@ class CoreTest extends DBTestCase
             createCompany(name: String): Company @create
         }
         ' . $this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createCompany(name: "foo") {
                 id
                 name
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createCompany' => [
                     'id' => '1',
@@ -45,7 +44,7 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateFromInputObject()
+    public function itCanCreateFromInputObject(): void
     {
         $this->schema = '
         type Company {
@@ -61,7 +60,8 @@ class CoreTest extends DBTestCase
             name: String
         }
         ' . $this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createCompany(input: {
                 name: "foo"
@@ -70,9 +70,7 @@ class CoreTest extends DBTestCase
                 name
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createCompany' => [
                     'id' => '1',
@@ -85,7 +83,7 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately()
+    public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
         $this->schema = '
         type Mutation {
@@ -97,16 +95,15 @@ class CoreTest extends DBTestCase
             default_string: String!
         }
         ' . $this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTag(name: "foobar"){
                 name
                 default_string
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createTag' => [
                     'name' => 'foobar',
@@ -119,9 +116,11 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itDoesNotCreateWithFailingRelationship()
+    public function itDoesNotCreateWithFailingRelationship(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
+
+        $this->app['config']->set('app.debug', false);
 
         $this->schema = '
         type Task {
@@ -153,7 +152,8 @@ class CoreTest extends DBTestCase
             user: ID
         }
         ' . $this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -171,9 +171,7 @@ class CoreTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)
+        ')
             ->assertJson([
                 'data' => [
                     'createUser' => null,
@@ -187,10 +185,13 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itDoesCreateWithFailingRelationshipAndTransactionParam()
+    public function itDoesCreateWithFailingRelationshipAndTransactionParam(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
+
+        $this->app['config']->set('app.debug', false);
         config(['lighthouse.transactional_mutations' => false]);
+
         $this->schema = '
         type Task {
             id: ID!
@@ -221,7 +222,8 @@ class CoreTest extends DBTestCase
             user: ID
         }
         ' . $this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -239,9 +241,7 @@ class CoreTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)
+        ')
             // TODO allow partial success
 //            ->assertJson([
 //                'data' => [
@@ -259,7 +259,7 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods()
+    public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
         $this->schema = '
         type Task {
@@ -292,7 +292,8 @@ class CoreTest extends DBTestCase
             guard: String
         }
         ' . $this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -308,9 +309,7 @@ class CoreTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $this->query($query)->assertJson([
+        ')->assertJson([
             'data' => [
                 'createUser' => [
                     'tasks' => [

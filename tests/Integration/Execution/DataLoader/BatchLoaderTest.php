@@ -61,7 +61,7 @@ class BatchLoaderTest extends DBTestCase
                 ]
             ],
         ])->assertJsonCount(2)
-        ->assertJsonCount(3, '0.data.users.tasks')
-        ->assertJsonCount(3, '1.data.users.tasks');
+        ->assertJsonCount(3, '0.data.user.tasks')
+        ->assertJsonCount(3, '1.data.user.tasks');
     }
 }

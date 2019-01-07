@@ -3,6 +3,7 @@
 namespace Tests\Integration;
 
 use Tests\TestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
 
@@ -71,7 +72,7 @@ class ValidationTest extends TestCase
      */
     public function resolveEmail($root, array $args): string
     {
-        return $args['email.emailAddress'] ?? 'no-email';
+        return Arr::get($args, 'email.emailAddress', 'no-email');
     }
 
     /**

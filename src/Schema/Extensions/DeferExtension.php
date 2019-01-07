@@ -2,44 +2,62 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class DeferExtension extends GraphQLExtension
 {
-    /** @var CanStreamResponse */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse
+     */
     protected $stream;
 
-    /** @var ExtensionRequest */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest
+     */
     protected $request;
 
-    /** @var array */
+    /**
+     * @var mixed[]
+     */
     protected $data = [];
 
-    /** @var array */
+    /**
+     * @var mixed[]
+     */
     protected $deferred = [];
 
-    /** @var array */
+    /**
+     * @var mixed[]
+     */
     protected $resolved = [];
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $defer = true;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $streaming = false;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $maxExecutionTime = 0;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $maxNestedFields = 0;
 
     /**
-     * @param CanStreamResponse $stream
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse  $stream
      */
     public function __construct(CanStreamResponse $stream)
     {
@@ -61,8 +79,7 @@ class DeferExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
-     *
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
      * @return void
      */
     public function requestDidStart(ExtensionRequest $request): void
@@ -73,9 +90,8 @@ class DeferExtension extends GraphQLExtension
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param DocumentAST $documentAST
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST
     {
@@ -94,7 +110,7 @@ class DeferExtension extends GraphQLExtension
     /**
      * Format extension output.
      *
-     * @return array
+     * @return mixed[]
      */
     public function jsonSerialize(): array
     {
@@ -112,12 +128,11 @@ class DeferExtension extends GraphQLExtension
     /**
      * Register deferred field.
      *
-     * @param \Closure $resolver
-     * @param string   $path
-     *
+     * @param  \Closure  $resolver
+     * @param  string  $path
      * @return mixed
      */
-    public function defer(\Closure $resolver, string $path)
+    public function defer(Closure $resolver, string $path)
     {
         if ($data = Arr::get($this->data, "data.{$path}")) {
             return $data;
@@ -133,12 +148,11 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param \Closure $originalResolver
-     * @param string   $path
-     *
+     * @param  \Closure  $originalResolver
+     * @param  string  $path
      * @return mixed
      */
-    public function findOrResolve(\Closure $originalResolver, string $path)
+    public function findOrResolve(Closure $originalResolver, string $path)
     {
         if (! $this->hasData($path)) {
             if (isset($this->deferred[$path])) {
@@ -154,12 +168,11 @@ class DeferExtension extends GraphQLExtension
     /**
      * Resolve field with data or resolver.
      *
-     * @param \Closure $originalResolver
-     * @param string   $path
-     *
+     * @param  \Closure  $originalResolver
+     * @param  string  $path
      * @return mixed
      */
-    public function resolve(\Closure $originalResolver, string $path)
+    public function resolve(Closure $originalResolver, string $path)
     {
         $isDeferred = $this->isDeferred($path);
         $resolver = $isDeferred ? $this->deferred[$path] : $originalResolver;
@@ -174,8 +187,7 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param string $path
-     *
+     * @param  string  $path
      * @return bool
      */
     public function isDeferred(string $path): bool
@@ -184,8 +196,7 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param string $path
-     *
+     * @param  string  $path
      * @return bool
      */
     public function hasData(string $path): bool
@@ -194,11 +205,10 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param mixed[] $data
-     *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @param  mixed[]  $data
+     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function response(array $data): StreamedResponse
+    public function response(array $data)
     {
         if (empty($this->deferred)) {
             return response($data);
@@ -243,8 +253,7 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param int $time
-     *
+     * @param  int  $time
      * @return void
      */
     public function setMaxExecutionTime(int $time): void
@@ -255,8 +264,7 @@ class DeferExtension extends GraphQLExtension
     /**
      * Override max nested fields.
      *
-     * @param int $max
-     *
+     * @param  int  $max
      * @return void
      */
     public function setMaxNestedFields(int $max): void
@@ -265,6 +273,8 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
+     * Check if the maximum execution time has expired.
+     *
      * @return bool
      */
     protected function executionTimeExpired(): bool
@@ -277,8 +287,9 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param int $nested
+     * Check if the maximum number of nested field has been resolved.
      *
+     * @param  int  $nested
      * @return bool
      */
     protected function maxNestedFieldsResolved(int $nested): bool

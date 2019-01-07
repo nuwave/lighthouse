@@ -6,7 +6,6 @@ use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Tests\Utils\Middleware\CountRuns;
-use Illuminate\Foundation\Application;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
@@ -30,8 +29,7 @@ class TestCase extends BaseTestCase
     /**
      * Get package providers.
      *
-     * @param Application $app
-     *
+     * @param  \Illuminate\Foundation\Application  $app
      * @return string[]
      */
     protected function getPackageProviders($app)
@@ -47,7 +45,7 @@ class TestCase extends BaseTestCase
     /**
      * Define environment setup.
      *
-     * @param Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -119,7 +117,7 @@ class TestCase extends BaseTestCase
      * This makes debugging the tests much simpler as Exceptions
      * are fully dumped to the console when making requests.
      *
-     * @param Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function resolveApplicationExceptionHandler($app)
     {
@@ -170,24 +168,10 @@ class TestCase extends BaseTestCase
     }
 
     /**
-     * @param string $schema
-     * @param string $query
-     * @param array $variables
-     *
-     * @return array
-     */
-    protected function executeWithoutDebug(string $schema, string $query, array $variables = []): array
-    {
-        return $this->query($query, $variables)
-            ->toArray();
-    }
-
-    /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param string $query
-     *
-     * @return TestResponse
+     * @param  string  $query
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     protected function query(string $query): TestResponse
     {
@@ -201,10 +185,10 @@ class TestCase extends BaseTestCase
     /**
      * Execute a query as if it was sent as a request to the server.
      *
-     * @param array $data
-     * @param array $headers
+     * @param  mixed[]  $data
+     * @param  mixed[]  $headers
      *
-     * @return TestResponse
+     * @return \Illuminate\Foundation\Testing\TestResponse
      */
     protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
@@ -218,9 +202,8 @@ class TestCase extends BaseTestCase
     /**
      * Build an executable schema from a SDL string, adding on a default Query type.
      *
-     * @param string $schema
-     *
-     * @return Schema
+     * @param  string  $schema
+     * @return \GraphQL\Type\Schema
      */
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
@@ -233,9 +216,8 @@ class TestCase extends BaseTestCase
     /**
      * Build an executable schema from an SDL string.
      *
-     * @param string $schema
-     *
-     * @return Schema
+     * @param  string  $schema
+     * @return \GraphQL\Type\Schema
      */
     protected function buildSchema(string $schema): Schema
     {

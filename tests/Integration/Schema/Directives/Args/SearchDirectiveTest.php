@@ -63,7 +63,7 @@ class SearchDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $this->query('
         {
             posts(count: 10 search: "great") {
                 data {
@@ -103,13 +103,22 @@ class SearchDirectiveTest extends DBTestCase
             'title' => 'bad title',
         ]);
 
-        $this->engine->shouldReceive('map')->andReturn(collect([$postA, $postB]))->once();
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                collect([$postA, $postB])
+            )
+            ->once();
 
-        $this->engine->shouldReceive('paginate')->with(
-            Mockery::on(function ($argument) {
-                return $argument->index === 'my.index';
-            }), Mockery::any(), Mockery::any()
-        )
+        $this->engine->shouldReceive('paginate')
+            ->with(
+                Mockery::on(
+                    function ($argument) {
+                        return $argument->index === 'my.index';
+                    }
+                ),
+                Mockery::any(),
+                Mockery::any()
+            )
             ->andReturn(collect([$postA, $postB]))
             ->once();
 
@@ -141,7 +150,7 @@ class SearchDirectiveTest extends DBTestCase
                             'id' => "$postA->id",
                         ],
                         [
-                            'id' => "$postC->id"
+                            'id' => "$postB->id"
                         ]
                     ]
                 ]

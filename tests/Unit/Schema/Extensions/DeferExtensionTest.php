@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Exception;
+use GraphQL\Error\Error;
 use Tests\TestCase;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
@@ -28,7 +29,7 @@ class DeferExtensionTest extends TestCase
 
         $this->stream = new MemoryStream();
 
-        $app->singleton(CanStreamResponse::class, function () {
+        $app->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->stream;
         });
 
@@ -59,7 +60,7 @@ class DeferExtensionTest extends TestCase
         }
         ";
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -68,18 +69,28 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->baseResponse->send();
+        ');
 
-        $chunks = $this->stream->chunks;
-
-        $this->assertCount(2, $chunks);
-
-        $this->assertSame('John Doe', Arr::get($chunks, '0.data.user.name'));
-        $this->assertNull(Arr::get($chunks, '0.data.user.parent'));
-
-        $deferred = Arr::get($chunks, '1.user.parent');
-        $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertSame('Jane Doe', $deferred['data']['name']);
+        $this->assertSame(
+            [
+                [
+                    'data' => [
+                        'user' => [
+                            'name' => 'John Doe',
+                            'parent' => null,
+                        ]
+                    ]
+                ],
+                [
+                    'user.parent' => [
+                        'data' => [
+                            'name' => 'Jane Doe'
+                        ]
+                    ]
+                ]
+            ],
+            $chunks
+        );
     }
 
     /**
@@ -109,7 +120,7 @@ class DeferExtensionTest extends TestCase
         }
         ";
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -121,9 +132,7 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->baseResponse->send();
-
-        $chunks = $this->stream->chunks;
+        ');
 
         $this->assertCount(3, $chunks);
 
@@ -177,7 +186,7 @@ class DeferExtensionTest extends TestCase
         }
         ";
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         { 
             posts {
                 title
@@ -186,9 +195,8 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->baseResponse->send();
+        ');
 
-        $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
 
         $this->assertNull(Arr::get($chunks[0], 'data.posts.0.author'));
@@ -248,7 +256,7 @@ class DeferExtensionTest extends TestCase
         }
         ";
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         { 
             posts {
                 title
@@ -260,9 +268,8 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->baseResponse->send();
+        ');
 
-        $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
 
         $this->assertNull(Arr::get($chunks[0], 'data.posts.0.author'));
@@ -315,7 +322,7 @@ class DeferExtensionTest extends TestCase
         }
         ";
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -327,9 +334,8 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->baseResponse->send();
+        ');
 
-        $chunks = $this->stream->chunks;
         // If we didn't hit the max execution time we would have 3 items in the array
         $this->assertCount(2, $chunks);
 
@@ -375,7 +381,7 @@ class DeferExtensionTest extends TestCase
         ";
 
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -387,9 +393,8 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->baseResponse->send();
+        ');
 
-        $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
 
         $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
@@ -440,11 +445,10 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->assertJsonStructure([
-            'errors',
-            'category' => [
+        ')->assertJson([
+            'errors' => [
                 [
-                    'extensions'
+                    'message' => 'The @defer directive cannot be placed on a Non-Nullable field.',
                 ]
             ]
         ]);
@@ -497,7 +501,7 @@ class DeferExtensionTest extends TestCase
                 'user' => [
                     'name' => 'John Doe',
                     'parent' => [
-                        'Jane Doe'
+                        'name' => 'Jane Doe'
                     ]
                 ]
             ]
@@ -666,7 +670,7 @@ class DeferExtensionTest extends TestCase
         }
         ";
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         {
             user {
                 name
@@ -675,9 +679,8 @@ class DeferExtensionTest extends TestCase
                 }
             }
         }
-        ')->baseResponse->send();
+        ');
 
-        $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
 
         $parent = $chunks[1];
@@ -693,10 +696,25 @@ class DeferExtensionTest extends TestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws \GraphQL\Error\Error
      */
     public function throw(): void
     {
-        throw new Exception('deferred_exception');
+        throw new Error('deferred_exception');
+    }
+
+    /**
+     * Send the query and capture all chunks of the streamed response.
+     *
+     * @param  string  $query
+     * @return array
+     */
+    protected function getStreamedChunks(string $query): array
+    {
+        $this->query($query)
+            ->baseResponse
+            ->send();
+
+        return $this->stream->chunks;
     }
 }
