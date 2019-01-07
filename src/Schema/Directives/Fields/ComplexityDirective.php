@@ -22,8 +22,8 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
-     * @param \Closure   $next
+     * @param  FieldValue $fieldValue
+     * @param  \Closure   $next
      *
      * @return FieldValue
      */

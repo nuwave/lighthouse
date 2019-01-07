@@ -9,9 +9,9 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 interface FieldManipulator extends Directive
 {
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
+     * @param  FieldDefinitionNode  $fieldDefinition
+     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  DocumentAST  $current
      *
      * @return DocumentAST
      */

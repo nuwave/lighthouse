@@ -10,8 +10,8 @@ interface StoresSubscriptions
     /**
      * Get subscriber by request.
      *
-     * @param array $input
-     * @param array $headers
+     * @param  array  $input
+     * @param  array  $headers
      *
      * @return Subscriber|null
      */
@@ -20,7 +20,7 @@ interface StoresSubscriptions
     /**
      * Find subscriber by channel.
      *
-     * @param string $channel
+     * @param  string  $channel
      *
      * @return Subscriber|null
      */
@@ -29,7 +29,7 @@ interface StoresSubscriptions
     /**
      * Get collection of subscribers by topic.
      *
-     * @param string $topic
+     * @param  string  $topic
      *
      * @return Collection<Subscriber>
      */
@@ -38,15 +38,15 @@ interface StoresSubscriptions
     /**
      * Store subscription.
      *
-     * @param Subscriber $subscriber
-     * @param string     $topic
+     * @param  Subscriber  $subscriber
+     * @param  string  $topic
      */
     public function storeSubscriber(Subscriber $subscriber, string $topic);
 
     /**
      * Delete subscriber.
      *
-     * @param string $channel
+     * @param  string  $channel
      *
      * @return Subscriber|null
      */

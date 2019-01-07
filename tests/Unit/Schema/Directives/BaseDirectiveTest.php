@@ -129,8 +129,8 @@ class BaseDirectiveTest extends TestCase
             /**
              * Allow to call protected methods from the test.
              *
-             * @param string  $method
-             * @param mixed[] $args
+             * @param  string  $method
+             * @param  mixed[] $args
              *
              * @return mixed
              */

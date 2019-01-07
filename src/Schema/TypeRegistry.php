@@ -17,14 +17,14 @@ class TypeRegistry
      *
      * [$typeName => Type]
      *
-     * @var Type[]
+     * @var \GraphQL\Type\Definition\Type[]
      */
     protected $types;
 
     /**
      * Register type with registry.
      *
-     * @param Type $type
+     * @param  Type $type
      *
      * @return TypeRegistry
      */
@@ -38,9 +38,9 @@ class TypeRegistry
     /**
      * Resolve type instance by name.
      *
-     * @param string $typeName
+     * @param  string $typeName
      *
-     * @throws InvariantViolation
+     * @throws \GraphQL\Error\InvariantViolation
      *
      * @return Type
      */

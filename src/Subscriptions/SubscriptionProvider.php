@@ -19,7 +19,7 @@ class SubscriptionProvider
     /**
      * Register subscription services.
      *
-     * @param Application $app
+     * @param  Application  $app
      *
      * @return void
      */

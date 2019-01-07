@@ -61,7 +61,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             $cacheKey = $cacheValue->getKey();
             $cacheTags = $cacheValue->getTags();
 
-            /** @var CacheManager $cache */
+            /** @var \Illuminate\Cache\CacheManager $cache */
             $cache = app('cache');
             $useTags = $this->useTags($cache);
 

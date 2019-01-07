@@ -9,14 +9,18 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class ExtensionRegistry implements \JsonSerializable
 {
-    /** @var Pipeline */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Pipeline
+     */
     protected $pipeline;
 
-    /** @var Collection|GraphQLExtension[] */
+    /**
+     * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension>
+     */
     protected $extensions;
 
     /**
-     * @param Pipeline $pipeline
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      */
     public function __construct(Pipeline $pipeline)
     {
@@ -44,7 +48,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * For example, retrieve the TracingExtension by calling $this->get('tracing')
      *
-     * @param string $shortName
+     * @param  string $shortName
      *
      * @return GraphQLExtension|null
      */
@@ -56,7 +60,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Check if extension is registered by its short name.
      *
-     * @param string $shortName
+     * @param  string $shortName
      *
      * @return bool
      */
@@ -68,7 +72,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a request did start.
      *
-     * @param ExtensionRequest $request
+     * @param  ExtensionRequest $request
      *
      * @return $this
      */
@@ -84,7 +88,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did start.
      *
-     * @param int $index
+     * @param  int $index
      *
      * @return $this
      */
@@ -100,8 +104,8 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did end.
      *
-     * @param ExecutionResult $result
-     * @param int             $index
+     * @param  ExecutionResult $result
+     * @param  int             $index
      *
      * @return $this
      */
@@ -120,7 +124,7 @@ class ExtensionRegistry implements \JsonSerializable
      * Notify all registered extensions that the
      * response will be sent.
      *
-     * @param array $response
+     * @param  array $response
      *
      * @return array
      */
@@ -138,7 +142,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Allow Extensions to manipulate the Schema.
      *
-     * @param DocumentAST $documentAST
+     * @param  DocumentAST $documentAST
      *
      * @return DocumentAST
      */

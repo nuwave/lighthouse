@@ -12,8 +12,8 @@ class ExtensionErrorHandler implements ErrorHandler
      * and add extra content from them to the 'extensions' key of the Error that is rendered
      * to the User.
      *
-     * @param Error    $error
-     * @param \Closure $next
+     * @param  Error  $error
+     * @param  \Closure  $next
      *
      * @return array
      */

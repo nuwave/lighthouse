@@ -26,8 +26,8 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  FieldValue $value
+     * @param  \Closure   $next
      *
      * @return FieldValue
      */
@@ -38,9 +38,9 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
         $resolver = $value->getResolver();
 
         return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver) {
-            /** @var ExtensionRegistry $extensionRegistry */
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry */
             $extensionRegistry = resolve(ExtensionRegistry::class);
-            /** @var TracingExtension $tracingExtension */
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\TracingExtension $tracingExtension */
             $tracingExtension = $extensionRegistry->get(TracingExtension::name());
 
             $start = Carbon::now();

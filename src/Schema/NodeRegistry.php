@@ -9,12 +9,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 
 class NodeRegistry
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
      * NodeRegistry constructor.
-     * @param TypeRegistry $typeRegistry
+     * @param  TypeRegistry $typeRegistry
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -40,12 +42,12 @@ class NodeRegistry
     protected $currentType;
 
     /**
-     * @param string $typeName
+     * @param  string $typeName
      *
      * The name of the ObjectType that can be resolved with the Node interface
      * e.g. "User"
      *
-     * @param \Closure $resolve
+     * @param  \Closure $resolve
      *
      * A function that returns the actual value by ID, e.g.
      *
@@ -66,8 +68,8 @@ class NodeRegistry
     /**
      * Register an Eloquent model that can be resolved as a Node.
      *
-     * @param string $typeName
-     * @param string $modelName
+     * @param  string $typeName
+     * @param  string $modelName
      *
      * @return NodeRegistry
      */
@@ -83,12 +85,12 @@ class NodeRegistry
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param $rootValue
-     * @param array $args
-     * @param $context
-     * @param ResolveInfo $resolveInfo
+     * @param  $rootValue
+     * @param  array $args
+     * @param  $context
+     * @param  ResolveInfo $resolveInfo
      *
-     * @throws Error
+     * @throws \GraphQL\Error\Error
      *
      * @return mixed
      */

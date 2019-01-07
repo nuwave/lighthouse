@@ -11,24 +11,24 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 class Authorizer implements AuthorizesSubscriptions
 {
     /**
-     * @var StoresSubscriptions
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
      */
     protected $storage;
 
     /**
-     * @var SubscriptionRegistry
+     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
      */
     protected $registry;
 
     /**
-     * @var SubscriptionExceptionHandler
+     * @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler
      */
     protected $exceptionHandler;
 
     /**
-     * @param StoresSubscriptions $storage
-     * @param SubscriptionRegistry $registry
-     * @param SubscriptionExceptionHandler $exceptionHandler
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions  $storage
+     * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $registry
+     * @param  \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler  $exceptionHandler
      */
     public function __construct(
         StoresSubscriptions $storage,
@@ -43,7 +43,7 @@ class Authorizer implements AuthorizesSubscriptions
     /**
      * Authorize subscription request.
      *
-     * @param Request $request
+     * @param  Request  $request
      *
      * @return bool
      */

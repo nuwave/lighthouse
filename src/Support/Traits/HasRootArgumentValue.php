@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 trait HasRootArgumentValue
 {
     /**
-     * @var ArgumentValue
+     * @var \Nuwave\Lighthouse\Schema\Values\ArgumentValue
      */
     protected $rootArgumentValue;
 
@@ -20,7 +20,7 @@ trait HasRootArgumentValue
     }
 
     /**
-     * @param ArgumentValue $rootArgumentValue
+     * @param  ArgumentValue  $rootArgumentValue
      *
      * @return $this
      */

@@ -12,10 +12,10 @@ class ConnectionField
     /**
      * Resolve page info for connection.
      *
-     * @param LengthAwarePaginator $paginator
-     * @param array                $args
-     * @param mixed                $context
-     * @param ResolveInfo|null     $info
+     * @param  LengthAwarePaginator  $paginator
+     * @param  array  $args
+     * @param  mixed  $context
+     * @param  ResolveInfo|null  $info
      *
      * @return array
      */
@@ -44,10 +44,10 @@ class ConnectionField
     /**
      * Resolve edges for connection.
      *
-     * @param LengthAwarePaginator $paginator
-     * @param array                $args
-     * @param mixed                $context
-     * @param ResolveInfo|null     $info
+     * @param  LengthAwarePaginator  $paginator
+     * @param  array  $args
+     * @param  mixed  $context
+     * @param  ResolveInfo|null  $info
      *
      * @return Collection
      */

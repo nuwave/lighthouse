@@ -14,12 +14,12 @@ class QueryAST
     /**
      * The definitions contained in the AST of an incoming query.
      *
-     * @var Collection
+     * @var \Illuminate\Support\Collection
      */
     protected $definitions;
 
     /**
-     * @param DocumentNode $documentNode
+     * @param  DocumentNode  $documentNode
      */
     public function __construct(DocumentNode $documentNode)
     {
@@ -29,7 +29,7 @@ class QueryAST
     /**
      * Create a new instance from a query string.
      *
-     * @param string $query
+     * @param  string  $query
      *
      * @return static
      */
@@ -63,7 +63,7 @@ class QueryAST
     /**
      * Get all definitions of a given type.
      *
-     * @param string $typeClassName
+     * @param  string  $typeClassName
      *
      * @return Collection
      */

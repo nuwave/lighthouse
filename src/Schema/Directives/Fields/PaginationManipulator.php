@@ -24,9 +24,9 @@ class PaginationManipulator
     /**
      * Apply possible aliases and throw if the given pagination type is invalid.
      *
-     * @param string $paginationType
+     * @param  string $paginationType
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return string
      */
@@ -56,11 +56,11 @@ class PaginationManipulator
      * This makes either an offset-based Paginator or a cursor-based Connection.
      * The types in between are automatically generated and applied to the schema.
      *
-     * @param string                   $paginationType
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
-     * @param int|null                 $defaultCount
+     * @param  string                   $paginationType
+     * @param  FieldDefinitionNode      $fieldDefinition
+     * @param  ObjectTypeDefinitionNode $parentType
+     * @param  DocumentAST              $current
+     * @param  int|null                 $defaultCount
      *
      * @return DocumentAST
      */
@@ -78,10 +78,10 @@ class PaginationManipulator
     /**
      * Register connection w/ schema.
      *
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $documentAST
-     * @param int|null                 $defaultCount
+     * @param  FieldDefinitionNode      $fieldDefinition
+     * @param  ObjectTypeDefinitionNode $parentType
+     * @param  DocumentAST              $documentAST
+     * @param  int|null                 $defaultCount
      *
      * @return DocumentAST
      */
@@ -131,10 +131,10 @@ class PaginationManipulator
     /**
      * Register paginator w/ schema.
      *
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $documentAST
-     * @param int|null                 $defaultCount
+     * @param  FieldDefinitionNode      $fieldDefinition
+     * @param  ObjectTypeDefinitionNode $parentType
+     * @param  DocumentAST              $documentAST
+     * @param  int|null                 $defaultCount
      *
      * @return DocumentAST
      */

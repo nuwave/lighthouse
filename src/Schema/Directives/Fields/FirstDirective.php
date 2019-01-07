@@ -25,7 +25,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue $fieldValue
      *
      * @return FieldValue
      */
@@ -35,7 +35,7 @@ class FirstDirective extends BaseDirective implements FieldResolver
 
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model) {
-                /** @var Builder $query */
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
                 $query = QueryFilter::apply(
                     $model::query(),
                     $args,

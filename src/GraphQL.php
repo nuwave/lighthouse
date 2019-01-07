@@ -74,10 +74,10 @@ class GraphQL
     /**
      * GraphQL constructor.
      *
-     * @param \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry
-     * @param \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder
-     * @param \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider $schemaSourceProvider
-     * @param \Nuwave\Lighthouse\Support\Pipeline $pipeline
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry
+     * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder
+     * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider $schemaSourceProvider
+     * @param  \Nuwave\Lighthouse\Support\Pipeline $pipeline
      * @retutn void
      */
     public function __construct(

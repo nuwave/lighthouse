@@ -26,7 +26,7 @@ trait HasArgumentPath
     }
 
     /**
-     * @param mixed[] $argumentPath
+     * @param  mixed[]  $argumentPath
      *
      * @return $this
      */

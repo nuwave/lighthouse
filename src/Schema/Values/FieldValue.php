@@ -243,9 +243,9 @@ class FieldValue
             );
         }
 
-        /** @var GraphQLSubscription $subscription */
+        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
         $subscription = app($className);
-        /** @var SubscriptionRegistry $subscriptionRegistry */
+        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $subscriptionRegistry */
         $subscriptionRegistry = app(SubscriptionRegistry::class);
 
         // Subscriptions can only be placed on a single field on the root
@@ -260,9 +260,9 @@ class FieldValue
                 return $subscription->resolve($root->root, $args, $context, $resolveInfo);
             }
 
-            /** @var ExtensionRegistry $extensionRegistry */
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry */
             $extensionRegistry = app(ExtensionRegistry::class);
-            /** @var SubscriptionExtension $subscriptionExtension */
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension $subscriptionExtension */
             $subscriptionExtension = $extensionRegistry->get(SubscriptionExtension::name());
 
             $subscriber = Subscriber::initialize(

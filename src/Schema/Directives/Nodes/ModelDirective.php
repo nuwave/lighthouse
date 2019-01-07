@@ -14,12 +14,12 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
     /**
-     * @var NodeRegistry
+     * @var \Nuwave\Lighthouse\Schema\NodeRegistry
      */
     protected $nodeRegistry;
 
     /**
-     * @param NodeRegistry $nodeRegistry
+     * @param  NodeRegistry $nodeRegistry
      */
     public function __construct(NodeRegistry $nodeRegistry)
     {

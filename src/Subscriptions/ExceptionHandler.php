@@ -9,7 +9,7 @@ class ExceptionHandler implements SubscriptionExceptionHandler
     /**
      * Handle authentication error.
      *
-     * @param \Throwable $e
+     * @param  \Throwable  $e
      *
      * @return void
      */
@@ -21,7 +21,7 @@ class ExceptionHandler implements SubscriptionExceptionHandler
     /**
      * Handle broadcast error.
      *
-     * @param \Throwable $e
+     * @param  \Throwable  $e
      *
      * @return void
      */

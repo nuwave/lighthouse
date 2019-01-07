@@ -75,8 +75,8 @@ class DirectiveFactory
     /**
      * Create a directive by the given directive name.
      *
-     * @param string                        $directiveName
-     * @param TypeSystemDefinitionNode|null $definitionNode
+     * @param  string                        $directiveName
+     * @param  TypeSystemDefinitionNode|null $definitionNode
      *
      * @return Directive
      */
@@ -92,7 +92,7 @@ class DirectiveFactory
     /**
      * Create a directive from resolved directive classes.
      *
-     * @param string $directiveName
+     * @param  string $directiveName
      *
      * @return Directive|null
      */
@@ -106,9 +106,9 @@ class DirectiveFactory
     }
 
     /**
-     * @param string $directiveName
+     * @param  string $directiveName
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return Directive
      */
@@ -133,8 +133,8 @@ class DirectiveFactory
     }
 
     /**
-     * @param string $directiveName
-     * @param string $className
+     * @param  string $directiveName
+     * @param  string $className
      *
      * @return $this
      */
@@ -152,8 +152,8 @@ class DirectiveFactory
     }
 
     /**
-     * @param string $directiveName
-     * @param string $className
+     * @param  string $directiveName
+     * @param  string $className
      *
      * @return $this
      */
@@ -177,8 +177,8 @@ class DirectiveFactory
     /**
      * Set the given definition on the directive.
      *
-     * @param Directive                $directive
-     * @param TypeSystemDefinitionNode $definitionNode
+     * @param  Directive                $directive
+     * @param  TypeSystemDefinitionNode $definitionNode
      *
      * @return Directive
      */
@@ -192,8 +192,8 @@ class DirectiveFactory
     /**
      * Get all directives of a certain type that are associated with an AST node.
      *
-     * @param Node   $node
-     * @param string $directiveClass
+     * @param  Node   $node
+     * @param  string $directiveClass
      *
      * @return Collection<$directiveClass>
      */
@@ -214,10 +214,10 @@ class DirectiveFactory
      * Use this for directives types that can only occur once, such as field resolvers.
      * This throws if more than one such directive is found.
      *
-     * @param Node   $node
-     * @param string $directiveClass
+     * @param  Node   $node
+     * @param  string $directiveClass
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return Directive|null
      */
@@ -237,7 +237,7 @@ class DirectiveFactory
     }
 
     /**
-     * @param Node $node
+     * @param  Node $node
      *
      * @return Collection<NodeManipulator>
      */
@@ -247,7 +247,7 @@ class DirectiveFactory
     }
 
     /**
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param  FieldDefinitionNode $fieldDefinition
      *
      * @return Collection<FieldManipulator>
      */
@@ -257,7 +257,7 @@ class DirectiveFactory
     }
 
     /**
-     * @param $inputValueDefinition
+     * @param  $inputValueDefinition
      *
      * @return Collection<ArgManipulator>
      */
@@ -269,7 +269,7 @@ class DirectiveFactory
     /**
      * Get the node resolver directive for the given type definition.
      *
-     * @param TypeDefinitionNode $node
+     * @param  TypeDefinitionNode $node
      *
      * @return NodeResolver|null
      */
@@ -282,7 +282,7 @@ class DirectiveFactory
     /**
      * Check if the given node has a type resolver directive handler assigned to it.
      *
-     * @param TypeDefinitionNode $typeDefinition
+     * @param  TypeDefinitionNode $typeDefinition
      *
      * @return bool
      */
@@ -294,7 +294,7 @@ class DirectiveFactory
     /**
      * Check if the given field has a field resolver directive handler assigned to it.
      *
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param  FieldDefinitionNode $fieldDefinition
      *
      * @return bool
      */
@@ -306,7 +306,7 @@ class DirectiveFactory
     /**
      * Check if field has one or more FieldMiddleware directives associated with it.
      *
-     * @param FieldDefinitionNode $field
+     * @param  FieldDefinitionNode $field
      *
      * @return bool
      */
@@ -318,7 +318,7 @@ class DirectiveFactory
     /**
      * Get handler for field.
      *
-     * @param FieldDefinitionNode $field
+     * @param  FieldDefinitionNode $field
      *
      * @return FieldResolver|null
      */
@@ -330,7 +330,7 @@ class DirectiveFactory
     /**
      * Get all middleware directive for a type definitions.
      *
-     * @param Node $typeDefinition
+     * @param  Node $typeDefinition
      *
      * @return Collection<NodeMiddleware>
      */
@@ -342,7 +342,7 @@ class DirectiveFactory
     /**
      * Get middleware for field.
      *
-     * @param FieldDefinitionNode $fieldDefinition
+     * @param  FieldDefinitionNode $fieldDefinition
      *
      * @return Collection<FieldMiddleware>
      */
@@ -354,7 +354,7 @@ class DirectiveFactory
     /**
      * Create `ArgTransformerDirective` instances from `InputValueDefinitionNode`.
      *
-     * @param InputValueDefinitionNode $arg
+     * @param  InputValueDefinitionNode $arg
      *
      * @return Collection<ArgTransformerDirective>
      */
@@ -366,7 +366,7 @@ class DirectiveFactory
     /**
      * Create `ArgDirective` instances from `InputValueDefinitionNode`.
      *
-     * @param InputValueDefinitionNode $arg
+     * @param  InputValueDefinitionNode $arg
      *
      * @return Collection<ArgDirective>
      */
@@ -378,7 +378,7 @@ class DirectiveFactory
     /**
      * Get middleware for array arguments.
      *
-     * @param InputValueDefinitionNode $arg
+     * @param  InputValueDefinitionNode $arg
      *
      * @return Collection<ArgDirectiveForArray>
      */
@@ -390,7 +390,7 @@ class DirectiveFactory
     /**
      * Get filters for arguments.
      *
-     * @param InputValueDefinitionNode $arg
+     * @param  InputValueDefinitionNode $arg
      *
      * @return Collection<ArgFilterDirective>
      */

@@ -8,19 +8,25 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ExtensionRequest
 {
-    /** @var Request */
+    /**
+     * @var \Illuminate\Http\Request
+     */
     protected $request;
 
-    /** @var GraphQLContext */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
+     */
     protected $context;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $batched;
 
     /**
-     * @param Request        $request
-     * @param GraphQLContext $context
-     * @param bool           $batched
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  bool  $batched
      */
     public function __construct(Request $request, GraphQLContext $context, $batched = false)
     {
@@ -32,7 +38,7 @@ class ExtensionRequest
     /**
      * Get request instance.
      *
-     * @return Request
+     * @return \Illuminate\Http\Request
      */
     public function request(): Request
     {
@@ -52,7 +58,7 @@ class ExtensionRequest
     /**
      * Get GraphQL query string.
      *
-     * @param int|null $index
+     * @param  int|null $index
      *
      * @return string
      */
@@ -66,7 +72,7 @@ class ExtensionRequest
     /**
      * Get request variables.
      *
-     * @param int|null $index
+     * @param  int|null $index
      *
      * @return array|null
      */

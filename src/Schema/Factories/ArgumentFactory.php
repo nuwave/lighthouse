@@ -10,7 +10,7 @@ class ArgumentFactory
     /**
      * Convert argument definition to type.
      *
-     * @param ArgumentValue $argumentValue
+     * @param  ArgumentValue  $argumentValue
      *
      * @return array
      */

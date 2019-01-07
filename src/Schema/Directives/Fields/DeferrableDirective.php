@@ -18,12 +18,12 @@ use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 class DeferrableDirective extends BaseDirective implements Directive, FieldMiddleware
 {
     /**
-     * @var ExtensionRegistry
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
      */
     protected $extensions;
 
     /**
-     * @param ExtensionRegistry $extensions
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensions
      */
     public function __construct(ExtensionRegistry $extensions)
     {
@@ -43,8 +43,8 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  FieldValue $value
+     * @param  \Closure   $next
      *
      * @return FieldValue
      */
@@ -77,10 +77,10 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     /**
      * Determine of field should be deferred.
      *
-     * @param TypeNode    $fieldType
-     * @param ResolveInfo $info
+     * @param  TypeNode  $fieldType
+     * @param  ResolveInfo  $info
      *
-     * @throws ParseClientException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseClientException
      *
      * @return bool
      */

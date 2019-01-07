@@ -14,12 +14,12 @@ class CreateDirective extends BaseDirective implements FieldResolver
     /**
      * The policy mappings for the application.
      *
-     * @var DatabaseManager
+     * @var \Illuminate\Database\DatabaseManager
      */
     private $db;
 
     /**
-     * @param DatabaseManager $database
+     * @param  \Illuminate\Database\DatabaseManager  $database
      */
     public function __construct(DatabaseManager $database)
     {
@@ -39,7 +39,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue $fieldValue
      *
      * @return FieldValue
      */
@@ -48,7 +48,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
         return $fieldValue->setResolver(
             function ($root, array $args): Model {
                 $modelClassName = $this->getModelClass();
-                /** @var Model $model */
+                /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName();
 
                 $flatten = $this->directiveArgValue('flatten', false);

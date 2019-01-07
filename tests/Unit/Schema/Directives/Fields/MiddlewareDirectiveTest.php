@@ -87,7 +87,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itRunsAliasedMiddleware(): void
     {
-        /** @var Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
         $router->aliasMiddleware('foo', CountRuns::class);
 
@@ -115,7 +115,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itRunsMiddlewareGroup(): void
     {
-        /** @var Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
         $router->middlewareGroup('bar', [Authenticate::class]);
 

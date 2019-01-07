@@ -20,20 +20,20 @@ class ModelRelationFetcher
     /**
      * The parent models that relations should be loaded for.
      *
-     * @var EloquentCollection<Model>
+     * @var \Illuminate\Database\Eloquent\Collection
      */
     protected $models;
 
     /**
      * The relations to be loaded. Same format as the `with` method in Eloquent builder.
      *
-     * @var array
+     * @var mixed[]
      */
     protected $relations;
 
     /**
-     * @param mixed $models    the parent models that relations should be loaded for
-     * @param array $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
+     * @param  mixed  $models The parent models that relations should be loaded for
+     * @param  mixed[]  $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
      */
     public function __construct($models, array $relations)
     {
@@ -44,7 +44,7 @@ class ModelRelationFetcher
     /**
      * Set the relations to be loaded.
      *
-     * @param array $relations
+     * @param  array  $relations
      *
      * @return $this
      */
@@ -83,7 +83,7 @@ class ModelRelationFetcher
     /**
      * Set one or more Model instances as an EloquentCollection.
      *
-     * @param mixed $models
+     * @param  mixed  $models
      *
      * @return $this
      */
@@ -113,8 +113,8 @@ class ModelRelationFetcher
     /**
      * Load all relations for the model, but constrain the query to the current page.
      *
-     * @param int $perPage
-     * @param int $page
+     * @param  int $perPage
+     * @param  int $page
      *
      * @return $this
      */
@@ -132,10 +132,10 @@ class ModelRelationFetcher
      *
      * The relation will be converted to a `Paginator` instance.
      *
-     * @param int      $perPage
-     * @param int      $page
-     * @param string   $relationName
-     * @param \Closure $relationConstraints
+     * @param  int      $perPage
+     * @param  int      $page
+     * @param  string   $relationName
+     * @param  \Closure $relationConstraints
      *
      * @return $this
      */
@@ -154,7 +154,7 @@ class ModelRelationFetcher
                 }
             );
 
-        /** @var EloquentCollection $relationModels */
+        /** @var \Illuminate\Database\Eloquent\Collection $relationModels */
         $relationModels = $this
             ->unionAllRelationQueries($relations)
             ->get();
@@ -177,7 +177,7 @@ class ModelRelationFetcher
      */
     public function reloadModelsWithRelationCount(): self
     {
-        /** @var EloquentBuilder $query */
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = $this->models()
             ->first()
             ->newQuery()
@@ -216,8 +216,8 @@ class ModelRelationFetcher
     /**
      * Get queries to fetch relationships.
      *
-     * @param string   $relationName
-     * @param \Closure $relationConstraints
+     * @param  string   $relationName
+     * @param  \Closure $relationConstraints
      *
      * @return Collection<Relation>
      */
@@ -256,7 +256,7 @@ class ModelRelationFetcher
     /**
      * Load default eager loads.
      *
-     * @param EloquentCollection<Model> $collection
+     * @param  EloquentCollection<Model> $collection
      *
      * @return static
      */
@@ -288,7 +288,7 @@ class ModelRelationFetcher
      *
      * @see \Illuminate\Database\Eloquent\Concerns\QueriesRelationships->withCount()
      *
-     * @param string $relationName
+     * @param  string $relationName
      *
      * @return string
      */
@@ -300,7 +300,7 @@ class ModelRelationFetcher
     /**
      * Get an associative array of relations, keyed by the models primary key.
      *
-     * @param string $relationName
+     * @param  string $relationName
      *
      * @return mixed[]
      */
@@ -317,7 +317,7 @@ class ModelRelationFetcher
     /**
      * Merge all the relation queries into a single query with UNION ALL.
      *
-     * @param Collection $relations
+     * @param  Collection $relations
      *
      * @return EloquentBuilder
      */
@@ -336,9 +336,9 @@ class ModelRelationFetcher
     }
 
     /**
-     * @param int    $perPage
-     * @param int    $page
-     * @param string $relationName
+     * @param  int    $perPage
+     * @param  int    $page
+     * @param  string $relationName
      *
      * @return $this
      */
@@ -369,8 +369,8 @@ class ModelRelationFetcher
     /**
      * Associate the collection of all fetched relationModels back with their parents.
      *
-     * @param string                    $relationName
-     * @param EloquentCollection<Model> $relationModels
+     * @param  string                    $relationName
+     * @param  EloquentCollection<Model> $relationModels
      *
      * @return $this
      */
@@ -390,8 +390,8 @@ class ModelRelationFetcher
     /**
      * Ensure the pivot relation is hydrated too, if it exists.
      *
-     * @param string                    $relationName
-     * @param EloquentCollection<Model> $relationModels
+     * @param  string                    $relationName
+     * @param  EloquentCollection<Model> $relationModels
      *
      * @return $this
      */
@@ -411,7 +411,7 @@ class ModelRelationFetcher
     /**
      * Use the underlying model to instantiate a relation by name.
      *
-     * @param string $relationName
+     * @param  string $relationName
      *
      * @return Relation
      */

@@ -26,23 +26,23 @@ class DocumentAST implements \Serializable
     /**
      * A map from definition name to the definition node.
      *
-     * @var Collection<DefinitionNode>
+     * @var \GraphQL\Type\Definition\ObjectType<\GraphQL\Language\AST\DefinitionNode>
      */
     protected $definitionMap;
     /**
      * A collection of type extensions.
      *
-     * @var Collection<TypeExtensionNode>
+     * @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
      */
     protected $typeExtensionsMap;
 
     /**
-     * @param DocumentNode $documentNode
+     * @param  DocumentNode  $documentNode
      */
     public function __construct(DocumentNode $documentNode)
     {
-        /** @var Collection<TypeExtensionNode> $typeExtensions */
-        /** @var Collection<DefinitionNode> $definitionNodes */
+        /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode> $typeExtensions */
+        /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\DefinitionNode> $definitionNodes */
         // We can not store type extensions in the map, since they do not have unique names
         [$typeExtensions, $definitionNodes] = collect($documentNode->definitions)
             ->partition(function (DefinitionNode $definitionNode): bool {
@@ -63,7 +63,7 @@ class DocumentAST implements \Serializable
     /**
      * Return a unique key that identifies a type extension.
      *
-     * @param TypeExtensionNode $typeExtensionNode
+     * @param  TypeExtensionNode  $typeExtensionNode
      *
      * @return string
      */
@@ -81,9 +81,9 @@ class DocumentAST implements \Serializable
     /**
      * Create a new DocumentAST instance from a schema.
      *
-     * @param string $schema
+     * @param  string  $schema
      *
-     * @throws ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return static
      */
@@ -124,7 +124,7 @@ class DocumentAST implements \Serializable
     /**
      * Construct from the string representation.
      *
-     * @param string $serialized
+     * @param  string  $serialized
      *
      * @return void
      */
@@ -167,7 +167,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all extensions that apply to a named type.
      *
-     * @param string $extendedTypeName
+     * @param  string  $extendedTypeName
      *
      * @return Collection<TypeExtensionNode>
      */
@@ -202,7 +202,7 @@ class DocumentAST implements \Serializable
     /**
      * Get a single object type definition by name.
      *
-     * @param string $name
+     * @param  string  $name
      *
      * @return ObjectTypeDefinitionNode|null
      */
@@ -223,7 +223,7 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * @param string $name
+     * @param  string  $name
      *
      * @return InputObjectTypeDefinitionNode|null
      */
@@ -278,7 +278,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions of a given type.
      *
-     * @param string $typeClassName
+     * @param  string  $typeClassName
      *
      * @return Collection
      */
@@ -293,7 +293,7 @@ class DocumentAST implements \Serializable
     /**
      * Add a single field to the query type.
      *
-     * @param FieldDefinitionNode $field
+     * @param  FieldDefinitionNode  $field
      *
      * @return $this
      */
@@ -308,7 +308,7 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * @param DefinitionNode $newDefinition
+     * @param  DefinitionNode  $newDefinition
      *
      * @return $this
      */

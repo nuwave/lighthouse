@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 class TracingExtension extends GraphQLExtension
 {
     /**
-     * @var Carbon
+     * @var \Carbon\Carbon
      */
     protected $requestStart;
 
@@ -43,7 +43,7 @@ class TracingExtension extends GraphQLExtension
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param DocumentAST $documentAST
+     * @param  DocumentAST $documentAST
      *
      * @return DocumentAST
      */
@@ -58,7 +58,7 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
+     * @param  ExtensionRequest $request
      *
      * @return $this
      */
@@ -72,7 +72,7 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle batch request start.
      *
-     * @param int $index
+     * @param  int $index
      *
      * @return void
      */
@@ -84,9 +84,9 @@ class TracingExtension extends GraphQLExtension
     /**
      * Record resolver execution time.
      *
-     * @param ResolveInfo $info
-     * @param Carbon      $start
-     * @param Carbon      $end
+     * @param  ResolveInfo $info
+     * @param  Carbon      $start
+     * @param  Carbon      $end
      *
      * @return void
      */

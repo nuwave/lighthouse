@@ -43,7 +43,7 @@ class MutationExecutor
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
         $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var HasMany $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -54,7 +54,7 @@ class MutationExecutor
         });
 
         $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var HasOne $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -65,7 +65,7 @@ class MutationExecutor
         });
 
         $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var MorphMany $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -76,7 +76,7 @@ class MutationExecutor
         });
 
         $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var MorphOne $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -87,7 +87,7 @@ class MutationExecutor
         });
 
         $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var BelongsToMany $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -102,7 +102,7 @@ class MutationExecutor
         });
 
         $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var HasMany $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -132,7 +132,7 @@ class MutationExecutor
         );
 
         $belongsTo->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var BelongsTo $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation, $model, $relationName): void {
@@ -143,7 +143,7 @@ class MutationExecutor
 
                 if ($operationKey === 'connect') {
                     // Inverse can be hasOne or hasMany
-                    /** @var BelongsTo $belongsTo */
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
                     $belongsTo = $model->{$relationName}();
                     $belongsTo->associate($values);
                 }
@@ -215,7 +215,7 @@ class MutationExecutor
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
         $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var HasMany $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {

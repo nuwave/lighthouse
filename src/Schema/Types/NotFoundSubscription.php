@@ -12,8 +12,8 @@ class NotFoundSubscription extends GraphQLSubscription
     /**
      * Authorize subscriber request.
      *
-     * @param Subscriber $subscriber
-     * @param Request    $request
+     * @param  Subscriber $subscriber
+     * @param  Request    $request
      *
      * @return bool
      */
@@ -25,8 +25,8 @@ class NotFoundSubscription extends GraphQLSubscription
     /**
      * Filter subscribers who should receive subscription.
      *
-     * @param Subscriber $subscriber
-     * @param mixed      $root
+     * @param  Subscriber $subscriber
+     * @param  mixed      $root
      *
      * @return bool
      */
@@ -38,10 +38,10 @@ class NotFoundSubscription extends GraphQLSubscription
     /**
      * Resolve the subscription.
      *
-     * @param mixed          $root
-     * @param array          $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $info
+     * @param  mixed          $root
+     * @param  array          $args
+     * @param  GraphQLContext $context
+     * @param  ResolveInfo    $info
      *
      * @return mixed
      */

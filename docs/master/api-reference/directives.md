@@ -604,14 +604,17 @@ namespace App\GraphQL\Interfaces;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Commentable
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -621,13 +624,12 @@ class Commentable
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param $context
-     * @param ResolveInfo $info
-     *
+     * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
      * @return Type
      */
-    public function resolveType($rootValue, $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
@@ -1056,14 +1058,17 @@ namespace App\GraphQL\Unions;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Person
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -1073,13 +1078,13 @@ class Person
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param $context
-     * @param ResolveInfo $info
+     * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
      *
-     * @return Type
+     * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveType($rootValue, $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class

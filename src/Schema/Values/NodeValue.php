@@ -10,14 +10,14 @@ class NodeValue
     /**
      * Current GraphQL type.
      *
-     * @var Type
+     * @var \GraphQL\Type\Definition\Type
      */
     protected $type;
 
     /**
      * Current definition node.
      *
-     * @var TypeDefinitionNode
+     * @var \GraphQL\Language\AST\TypeDefinitionNode
      */
     protected $typeDefinition;
 
@@ -29,7 +29,7 @@ class NodeValue
     protected $cacheKey;
 
     /**
-     * @param TypeDefinitionNode $typeDefinition
+     * @param  TypeDefinitionNode  $typeDefinition
      */
     public function __construct(TypeDefinitionNode $typeDefinition)
     {
@@ -49,7 +49,7 @@ class NodeValue
     /**
      * Set the executable type.
      *
-     * @param Type $type
+     * @param  Type  $type
      *
      * @return self
      */
@@ -103,7 +103,7 @@ class NodeValue
     /**
      * Set node cache key.
      *
-     * @param string $key
+     * @param  string  $key
      *
      * @return NodeValue
      */

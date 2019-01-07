@@ -26,8 +26,8 @@ class WithDirective extends RelationDirective implements FieldMiddleware
     /**
      * Eager load a relation on the parent instance.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  FieldValue  $value
+     * @param  \Closure  $next
      *
      * @return FieldValue
      */

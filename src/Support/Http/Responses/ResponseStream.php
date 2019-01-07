@@ -15,9 +15,9 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * Stream graphql response.
      *
-     * @param array $data
-     * @param array $paths
-     * @param bool  $final
+     * @param  array $data
+     * @param  array $paths
+     * @param  bool  $final
      *
      * @return void
      */
@@ -77,8 +77,8 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * Format chunked data.
      *
-     * @param array $data
-     * @param bool  $terminating
+     * @param  array $data
+     * @param  bool  $terminating
      *
      * @return string
      */
@@ -103,7 +103,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     /**
      * Stream chunked data to client.
      *
-     * @param string $chunk
+     * @param  string $chunk
      *
      * @return void
      */
@@ -121,7 +121,7 @@ class ResponseStream extends Stream implements CanStreamResponse
      * these should be safe to ignore.
      * @todo Investigate exceptions that occur on Apache
      *
-     * @param \Closure $flush
+     * @param  \Closure $flush
      *
      * @return void
      */

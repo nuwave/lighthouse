@@ -9,8 +9,8 @@ interface NodeMiddleware extends Directive
     /**
      * Handle node value.
      *
-     * @param NodeValue $value
-     * @param \Closure   $next
+     * @param  NodeValue  $value
+     * @param  \Closure  $next
      *
      * @return NodeValue
      */

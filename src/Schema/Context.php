@@ -11,21 +11,21 @@ class Context implements GraphQLContext
     /**
      * An instance of the incoming HTTP request.
      *
-     * @var Request
+     * @var \Illuminate\Http\Request
      */
     public $request;
 
     /**
      * An instance of the currently authenticated user.
      *
-     * @var Authenticatable|null
+     * @var \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public $user;
 
     /**
      * Create new context.
      *
-     * @param Request $request
+     * @param  Request $request
      */
     public function __construct(Request $request)
     {

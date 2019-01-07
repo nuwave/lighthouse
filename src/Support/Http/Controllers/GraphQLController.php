@@ -16,32 +16,32 @@ use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 class GraphQLController extends Controller
 {
     /**
-     * @var GraphQL
+     * @var \Nuwave\Lighthouse\GraphQL
      */
     protected $graphQL;
 
     /**
-     * @var CreatesContext
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
     protected $createsContext;
 
     /**
-     * @var ExtensionRegistry
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
      */
     protected $extensionRegistry;
 
     /**
-     * @var GraphQLResponse
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
      */
     protected $graphQLResponse;
 
     /**
      * Inject middleware into request.
      *
-     * @param ExtensionRegistry $extensionRegistry
-     * @param GraphQL           $graphQL
-     * @param CreatesContext    $createsContext
-     * @param GraphQLResponse   $graphQLResponse
+     * @param  ExtensionRegistry  $extensionRegistry
+     * @param  GraphQL  $graphQL
+     * @param  CreatesContext  $createsContext
+     * @param  GraphQLResponse  $graphQLResponse
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,
@@ -58,7 +58,7 @@ class GraphQLController extends Controller
     /**
      * Execute GraphQL query.
      *
-     * @param Request $request
+     * @param  Request  $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -101,8 +101,8 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param Request        $request
-     * @param GraphQLContext $context
+     * @param  Request  $request
+     * @param  GraphQLContext  $context
      *
      * @return mixed[]
      */
@@ -124,7 +124,7 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param mixed $variables
+     * @param  mixed  $variables
      *
      * @return mixed[]
      */

@@ -12,7 +12,7 @@ interface FieldResolver extends Directive
      * This must call $fieldValue->setResolver() before returning
      * the FieldValue.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue  $fieldValue
      *
      * @return FieldValue
      */

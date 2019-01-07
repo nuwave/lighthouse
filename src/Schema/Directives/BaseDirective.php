@@ -17,7 +17,7 @@ abstract class BaseDirective implements Directive
     /**
      * The node the directive is defined on.
      *
-     * @var TypeSystemDefinitionNode
+     * @var \GraphQL\Language\AST\TypeSystemDefinitionNode
      */
     protected $definitionNode;
 
@@ -26,7 +26,7 @@ abstract class BaseDirective implements Directive
      *
      * @todo Make this type annotation a hard requirement as soon as the underlying implementation is fixed
      *
-     * @param TypeSystemDefinitionNode $definitionNode
+     * @param  TypeSystemDefinitionNode $definitionNode
      *
      * @return BaseDirective
      */
@@ -53,8 +53,8 @@ abstract class BaseDirective implements Directive
     /**
      * Get directive argument value.
      *
-     * @param string     $name
-     * @param mixed|null $default
+     * @param  string     $name
+     * @param  mixed|null $default
      *
      * @return mixed|null
      */
@@ -70,7 +70,7 @@ abstract class BaseDirective implements Directive
     /**
      * Does the current directive have an argument with the given name?
      *
-     * @param string $name
+     * @param  string $name
      *
      * @return bool
      */
@@ -85,7 +85,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get a Closure that is defined through an argument on the directive.
      *
-     * @param string $argumentName
+     * @param  string $argumentName
      *
      * @return \Closure
      */
@@ -101,7 +101,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param string $argumentName The default argument name "model" may be overwritten
+     * @param  string $argumentName The default argument name "model" may be overwritten
      *
      * @return string
      */
@@ -128,11 +128,11 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * @param string   $classCandidate
-     * @param string[] $namespacesToTry
-     * @param callable $determineMatch
+     * @param  string   $classCandidate
+     * @param  string[] $namespacesToTry
+     * @param  callable $determineMatch
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return string
      */
@@ -173,9 +173,9 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @param string $argumentName
+     * @param  string $argumentName
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return string[] Contains two entries: [string $className, string $methodName]
      */
@@ -202,7 +202,7 @@ abstract class BaseDirective implements Directive
     /**
      * Try adding the default model namespace and ensure the given class is a model.
      *
-     * @param string $modelClassCandidate
+     * @param  string $modelClassCandidate
      *
      * @return string
      */

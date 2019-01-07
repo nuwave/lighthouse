@@ -38,7 +38,7 @@ class RelationBatchLoader extends BatchLoader
      * The ResolveInfo of the currently executing field. Used for retrieving
      * the QueryFilter.
      *
-     * @var ResolveInfo
+     * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
@@ -50,11 +50,11 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationType;
 
     /**
-     * @param string      $relationName
-     * @param array       $args
-     * @param string[]    $scopes
-     * @param ResolveInfo $resolveInfo
-     * @param string|null $paginationType
+     * @param  string      $relationName
+     * @param  array       $args
+     * @param  string[]    $scopes
+     * @param  ResolveInfo $resolveInfo
+     * @param  string|null $paginationType
      */
     public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null)
     {

@@ -13,7 +13,7 @@ trait HasResolverArguments
     protected $root;
 
     /**
-     * @var GraphQLContext
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     protected $context;
 
@@ -23,7 +23,7 @@ trait HasResolverArguments
     protected $arguments;
 
     /**
-     * @var ResolveInfo
+     * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
@@ -36,7 +36,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @param mixed $root
+     * @param  mixed  $root
      *
      * @return $this
      */
@@ -56,7 +56,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @param GraphQLContext $context
+     * @param  GraphQLContext  $context
      *
      * @return $this
      */
@@ -76,7 +76,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @param mixed[] $arguments
+     * @param  mixed[]  $arguments
      *
      * @return $this
      */
@@ -96,7 +96,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @param ResolveInfo $resolveInfo
+     * @param  ResolveInfo  $resolveInfo
      *
      * @return $this
      */
@@ -108,10 +108,10 @@ trait HasResolverArguments
     }
 
     /**
-     * @param mixed|null     $root
-     * @param array          $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $resolveInfo
+     * @param  mixed|null     $root
+     * @param  array          $args
+     * @param  GraphQLContext  $context
+     * @param  ResolveInfo    $resolveInfo
      *
      * @return $this
      */

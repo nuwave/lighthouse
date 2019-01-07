@@ -12,7 +12,7 @@ class Pipeline extends BasePipeline
     /**
      * Set the array of pipes.
      *
-     * @param Collection|array $pipes
+     * @param  Collection|array  $pipes
      *
      * @return $this
      */
@@ -49,7 +49,7 @@ class Pipeline extends BasePipeline
     /**
      * Set always variable.
      *
-     * @param \Closure $always
+     * @param  \Closure  $always
      *
      * @return $this
      */

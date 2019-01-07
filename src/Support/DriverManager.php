@@ -15,7 +15,7 @@ abstract class DriverManager
     /**
      * The application instance.
      *
-     * @var Application
+     * @var \Illuminate\Container\Container
      */
     protected $app;
 
@@ -36,7 +36,7 @@ abstract class DriverManager
     /**
      * Create a new driver manager instance.
      *
-     * @param Application $app
+     * @param  Application $app
      */
     public function __construct(Application $app)
     {
@@ -46,7 +46,7 @@ abstract class DriverManager
     /**
      * Get a driver instance by name.
      *
-     * @param string|null $name
+     * @param  string|null $name
      *
      * @return mixed
      */
@@ -60,7 +60,7 @@ abstract class DriverManager
     /**
      * Attempt to get the driver from the local cache.
      *
-     * @param string $name
+     * @param  string $name
      *
      * @return mixed
      */
@@ -82,7 +82,7 @@ abstract class DriverManager
     /**
      * Set the default driver name.
      *
-     * @param string $name
+     * @param  string $name
      *
      * @return void
      */
@@ -94,7 +94,7 @@ abstract class DriverManager
     /**
      * Get the driver configuration.
      *
-     * @param string $name
+     * @param  string $name
      *
      * @return array
      */
@@ -109,8 +109,8 @@ abstract class DriverManager
     /**
      * Register a custom driver creator Closure.
      *
-     * @param string   $driver
-     * @param \Closure $callback
+     * @param  string   $driver
+     * @param  \Closure $callback
      *
      * @return $this
      */
@@ -124,10 +124,10 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @param string $name
+     * @param  string $name
      *
      * @throws \InvalidArgumentException
-     * @throws InvalidDriverException
+     * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
      *
      * @return mixed
      */
@@ -155,7 +155,7 @@ abstract class DriverManager
     /**
      * Call a custom driver creator.
      *
-     * @param array $config
+     * @param  array $config
      *
      * @return mixed
      */
@@ -167,9 +167,9 @@ abstract class DriverManager
     /**
      * Validate driver implements the proper interface.
      *
-     * @param mixed $driver
+     * @param  mixed  $driver
      *
-     * @throws InvalidDriverException
+     * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
      * @throws \ReflectionException
      *
      * @return mixed
@@ -188,8 +188,8 @@ abstract class DriverManager
     /**
      * Dynamically call the default driver instance.
      *
-     * @param string $method
-     * @param array  $parameters
+     * @param  string $method
+     * @param  array  $parameters
      *
      * @return mixed
      */

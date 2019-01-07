@@ -23,8 +23,8 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  FieldValue $value
+     * @param  \Closure   $next
      *
      * @return FieldValue
      */
@@ -50,7 +50,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
     /**
      * Return an array containing the type name and id.
      *
-     * @param string $argumentValue
+     * @param  string $argumentValue
      *
      * @return string[]
      */

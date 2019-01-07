@@ -10,7 +10,7 @@ interface SchemaSourceProvider
     /**
      * Set schema root path.
      *
-     * @param string $path
+     * @param  string $path
      *
      * @return SchemaSourceProvider
      */

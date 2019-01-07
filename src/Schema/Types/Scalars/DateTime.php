@@ -15,7 +15,7 @@ class DateTime extends ScalarType
     /**
      * Serialize an internal value, ensuring it is a valid datetime string.
      *
-     * @param Carbon|string $value
+     * @param  Carbon|string $value
      *
      * @return string
      */
@@ -32,7 +32,7 @@ class DateTime extends ScalarType
     /**
      * Parse a externally provided variable value into a Carbon instance.
      *
-     * @param mixed $value
+     * @param  mixed $value
      *
      * @return Carbon
      */
@@ -44,10 +44,10 @@ class DateTime extends ScalarType
     /**
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
-     * @param Node       $valueNode
-     * @param mixed[]|null $variables
+     * @param  Node       $valueNode
+     * @param  mixed[]|null $variables
      *
-     * @throws Error
+     * @throws \GraphQL\Error\Error
      *
      * @return Carbon
      */
@@ -63,10 +63,10 @@ class DateTime extends ScalarType
     /**
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
-     * @param mixed $value
-     * @param string $exceptionClass
+     * @param  mixed $value
+     * @param  string $exceptionClass
      *
-     * @throws InvariantViolation|Error
+     * @throws \GraphQL\Error\InvariantViolation|Error
      *
      * @return Carbon
      */

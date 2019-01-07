@@ -7,9 +7,9 @@ class Pagination
     /**
      * Calculate the current page to inform the user about the pagination state.
      *
-     * @param int $first
-     * @param int $after
-     * @param int $defaultPage
+     * @param  int  $first
+     * @param  int  $after
+     * @param  int  $defaultPage
      *
      * @return int
      */

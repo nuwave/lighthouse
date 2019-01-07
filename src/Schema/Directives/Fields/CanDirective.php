@@ -27,8 +27,8 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     /**
      * Ensure the user is authorized to access this field.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  FieldValue $value
+     * @param  \Closure   $next
      *
      * @return FieldValue
      */
@@ -87,12 +87,12 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * @param Authenticatable|null $user
-     * @param Gate                 $gate
-     * @param string               $ability
-     * @param array                $args
+     * @param  Authenticatable|null  $user
+     * @param  Gate  $gate
+     * @param  string  $ability
+     * @param  array  $args
      *
-     * @throws AuthorizationException
+     * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      *
      * @return void
      */

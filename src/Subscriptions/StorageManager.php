@@ -25,12 +25,12 @@ class StorageManager implements StoresSubscriptions
     const SUBSCRIBER_KEY = 'graphql.subscriber';
 
     /**
-     * @var Cache
+     * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
 
     /**
-     * @param CacheManager $cache
+     * @param  CacheManager  $cache
      */
     public function __construct(CacheManager $cache)
     {
@@ -42,8 +42,8 @@ class StorageManager implements StoresSubscriptions
     /**
      * Get subscriber by request.
      *
-     * @param array $input
-     * @param array $headers
+     * @param  array  $input
+     * @param  array  $headers
      *
      * @return Subscriber|null
      */
@@ -59,7 +59,7 @@ class StorageManager implements StoresSubscriptions
     /**
      * Find subscriber by channel.
      *
-     * @param string $channel
+     * @param  string  $channel
      *
      * @return Subscriber|null
      */
@@ -75,7 +75,7 @@ class StorageManager implements StoresSubscriptions
     /**
      * Get collection of subscribers by channel.
      *
-     * @param string $topic
+     * @param  string  $topic
      *
      * @return Collection<Subscriber>
      */
@@ -100,8 +100,8 @@ class StorageManager implements StoresSubscriptions
     /**
      * Store subscription.
      *
-     * @param Subscriber $subscriber
-     * @param string     $topic
+     * @param  Subscriber  $subscriber
+     * @param  string     $topic
      *
      * @return void
      */
@@ -123,7 +123,7 @@ class StorageManager implements StoresSubscriptions
     /**
      * Delete subscriber.
      *
-     * @param string $channel
+     * @param  string  $channel
      *
      * @return Subscriber|null
      */

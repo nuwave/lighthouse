@@ -31,9 +31,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
+     * @param  FieldDefinitionNode      $fieldDefinition
+     * @param  ObjectTypeDefinitionNode $parentType
+     * @param  DocumentAST              $current
      *
      * @return DocumentAST
      */
@@ -51,7 +51,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue $fieldValue
      *
      * @return FieldValue
      */
@@ -79,7 +79,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Create a paginator resolver.
      *
-     * @param FieldValue $value
+     * @param  FieldValue $value
      *
      * @return FieldValue
      */
@@ -98,7 +98,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Create a connection resolver.
      *
-     * @param FieldValue $value
+     * @param  FieldValue $value
      *
      * @return FieldValue
      */
@@ -118,9 +118,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
-     * @param array $resolveArgs
-     * @param int   $page
-     * @param int   $first
+     * @param  array $resolveArgs
+     * @param  int   $page
+     * @param  int   $first
      *
      * @return LengthAwarePaginator
      */
@@ -132,7 +132,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                 $resolveArgs
             );
         } else {
-            /** @var Model $model */
+            /** @var \Illuminate\Database\Eloquent\Model $model */
             $model = $this->getPaginatorModel();
             $query = $model::query();
         }
@@ -152,7 +152,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      *
      * This works differently as in other directives, so we define a seperate function for it.
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return string
      */

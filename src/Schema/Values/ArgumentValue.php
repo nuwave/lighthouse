@@ -15,20 +15,26 @@ use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
  */
 class ArgumentValue
 {
-    /** @var InputValueDefinitionNode */
+    /**
+     * @var \GraphQL\Language\AST\InputValueDefinitionNode
+     */
     protected $astNode;
 
-    /** @var FieldValue|null */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue|null
+     */
     protected $parentField;
 
-    /** @var Type */
+    /**
+     * @var \GraphQL\Type\Definition\Type
+     */
     protected $type;
 
     /**
      * ArgumentValue constructor.
      *
-     * @param InputValueDefinitionNode $astNode
-     * @param FieldValue               $parentField
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $parentField
      */
     public function __construct(InputValueDefinitionNode $astNode, ?FieldValue $parentField = null)
     {

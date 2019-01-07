@@ -15,12 +15,12 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 class SubscriptionRegistry
 {
     /**
-     * @var ContextSerializer
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer
      */
     protected $serializer;
 
     /**
-     * @var StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
      */
     protected $storage;
 
@@ -34,13 +34,13 @@ class SubscriptionRegistry
     /**
      * Active subscription fields of the schema.
      *
-     * @var GraphQLSubscription[]
+     * @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription[]
      */
     protected $subscriptions = [];
 
     /**
-     * @param ContextSerializer $serializer
-     * @param StorageManager    $storage
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
+     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
      */
     public function __construct(ContextSerializer $serializer, StorageManager $storage)
     {
@@ -51,8 +51,8 @@ class SubscriptionRegistry
     /**
      * Add subscription to registry.
      *
-     * @param GraphQLSubscription $subscription
-     * @param string              $field
+     * @param  GraphQLSubscription $subscription
+     * @param  string              $field
      *
      * @return SubscriptionRegistry
      */
@@ -66,7 +66,7 @@ class SubscriptionRegistry
     /**
      * Check if subscription is registered.
      *
-     * @param string $key
+     * @param  string $key
      *
      * @return bool
      */
@@ -88,7 +88,7 @@ class SubscriptionRegistry
     /**
      * Get instance of subscription.
      *
-     * @param string $key
+     * @param  string $key
      *
      * @return GraphQLSubscription
      */
@@ -100,8 +100,8 @@ class SubscriptionRegistry
     /**
      * Add subscription to registry.
      *
-     * @param Subscriber $subscriber
-     * @param string     $channel
+     * @param  Subscriber $subscriber
+     * @param  string     $channel
      *
      * @return $this
      */
@@ -119,9 +119,9 @@ class SubscriptionRegistry
     /**
      * Get registered subscriptions.
      *
-     * @param Subscriber $subscriber
+     * @param  Subscriber $subscriber
      *
-     * @throws SyntaxError
+     * @throws \GraphQL\Error\SyntaxError
      *
      * @return Collection
      */

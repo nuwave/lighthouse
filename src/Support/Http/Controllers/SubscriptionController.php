@@ -11,18 +11,18 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 class SubscriptionController extends Controller
 {
     /**
-     * @var BroadcastsSubscriptions
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions
      */
     protected $broadcaster;
 
     /**
-     * @var BroadcastManager
+     * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcasterManager;
 
     /**
-     * @param BroadcastsSubscriptions $broadcaster
-     * @param BroadcastManager        $broadcastManager
+     * @param  BroadcastsSubscriptions $broadcaster
+     * @param  BroadcastManager        $broadcastManager
      */
     public function __construct(BroadcastsSubscriptions $broadcaster, BroadcastManager $broadcastManager)
     {
@@ -33,7 +33,7 @@ class SubscriptionController extends Controller
     /**
      * Authenticate subscriber.
      *
-     * @param Request $request
+     * @param  Request $request
      *
      * @return Response
      */
@@ -45,7 +45,7 @@ class SubscriptionController extends Controller
     /**
      * Handle pusher webhook.
      *
-     * @param Request $request
+     * @param  Request $request
      *
      * @return Response
      */

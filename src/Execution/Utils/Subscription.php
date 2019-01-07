@@ -11,9 +11,9 @@ class Subscription
     /**
      * Broadcast subscription to client(s).
      *
-     * @param string    $subscriptionField
-     * @param mixed     $root
-     * @param bool|null $queue
+     * @param  string    $subscriptionField
+     * @param  mixed     $root
+     * @param  bool|null $queue
      *
      * @throws \InvalidArgumentException
      *
@@ -25,11 +25,11 @@ class Subscription
         // in the event we are calling this method in code.
         app('graphql')->prepSchema();
 
-        /** @var SubscriptionRegistry $registry */
+        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
-        /** @var BroadcastsSubscriptions $broadcaster */
+        /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
         $broadcaster = app(BroadcastsSubscriptions::class);
-        /** @var ExceptionHandler $exceptionHandler */
+        /** @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler $exceptionHandler */
         $exceptionHandler = app(ExceptionHandler::class);
 
         if (! $registry->has($subscriptionField)) {

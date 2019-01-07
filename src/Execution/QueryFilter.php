@@ -25,7 +25,7 @@ class QueryFilter
      * A map from a composite key consisting of the columnName and type of key
      * to the Closure that will resolve the key.
      *
-     * @var ArgFilterDirective[]
+     * @var \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective[]
      */
     protected $multiArgumentFilters = [];
 
@@ -40,7 +40,7 @@ class QueryFilter
     /**
      * Get the single instance of the query filter for a field.
      *
-     * @param FieldValue $value
+     * @param  FieldValue $value
      *
      * @return static
      */
@@ -59,16 +59,16 @@ class QueryFilter
     /**
      * Check if the ResolveInfo contains a QueryFilter instance and apply it to the query if given.
      *
-     * @param Builder|EloquentBuilder $query
-     * @param array                   $args
-     * @param string[]                $scopes
-     * @param ResolveInfo             $resolveInfo
+     * @param  Builder|EloquentBuilder $query
+     * @param  array                   $args
+     * @param  string[]                $scopes
+     * @param  ResolveInfo             $resolveInfo
      *
      * @return Builder|EloquentBuilder
      */
     public static function apply($query, array $args, array $scopes, ResolveInfo $resolveInfo)
     {
-        /** @var QueryFilter $queryFilter */
+        /** @var \Nuwave\Lighthouse\Execution\QueryFilter $queryFilter */
         if ($queryFilter = $resolveInfo->queryFilter ?? false) {
             $query = $queryFilter->filter($query, $args);
         }
@@ -83,8 +83,8 @@ class QueryFilter
     /**
      * Apply all registered filters to the query.
      *
-     * @param Builder|EloquentBuilder $query
-     * @param array                   $args
+     * @param  Builder|EloquentBuilder $query
+     * @param  array                   $args
      *
      * @return Builder|EloquentBuilder
      */
@@ -110,7 +110,7 @@ class QueryFilter
 
             // Filters that only take a single argument can be applied directly
             if ($filterInfo = Arr::get($this->singleArgumentFilters, $key)) {
-                /** @var ArgFilterDirective $argFilterDirective */
+                /** @var \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective $argFilterDirective */
                 $argFilterDirective = $filterInfo['filter'];
                 $columnName = $filterInfo['columnName'];
 
@@ -136,9 +136,9 @@ class QueryFilter
     }
 
     /**
-     * @param string             $argumentName
-     * @param string             $columnName
-     * @param ArgFilterDirective $argFilterDirective
+     * @param  string             $argumentName
+     * @param  string             $columnName
+     * @param  ArgFilterDirective $argFilterDirective
      *
      * @return $this
      */

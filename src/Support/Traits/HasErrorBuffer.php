@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Execution\ErrorBuffer;
 trait HasErrorBuffer
 {
     /**
-     * @var ErrorBuffer
+     * @var \Nuwave\Lighthouse\Execution\ErrorBuffer
      */
     protected $errorBuffer;
 
@@ -24,7 +24,7 @@ trait HasErrorBuffer
     /**
      * Set the ErrorBuffer instance.
      *
-     * @param ErrorBuffer $errorBuffer
+     * @param  ErrorBuffer  $errorBuffer
      *
      * @return $this
      */

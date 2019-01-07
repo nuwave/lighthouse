@@ -19,7 +19,7 @@ abstract class RelationDirective extends BaseDirective
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
+     * @param  FieldValue $value
      *
      * @return FieldValue
      */
@@ -40,9 +40,9 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param FieldDefinitionNode $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST $current
+     * @param  FieldDefinitionNode $fieldDefinition
+     * @param  ObjectTypeDefinitionNode $parentType
+     * @param  DocumentAST $current
      *
      * @return DocumentAST
      */
@@ -62,10 +62,10 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param Model          $parent
-     * @param mixed[]        $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $resolveInfo
+     * @param  Model          $parent
+     * @param  mixed[]        $args
+     * @param  GraphQLContext $context
+     * @param  ResolveInfo    $resolveInfo
      *
      * @return mixed[]
      */

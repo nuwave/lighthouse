@@ -28,8 +28,8 @@ class ASTHelper
      * This issue is brought up here https://github.com/webonyx/graphql-php/issues/285
      * Remove this method (and possibly the entire class) once it is resolved.
      *
-     * @param NodeList|array $original
-     * @param NodeList|array $addition
+     * @param  NodeList|array $original
+     * @param  NodeList|array $addition
      *
      * @return NodeList
      */
@@ -45,9 +45,9 @@ class ASTHelper
     /**
      * This function will merge two lists uniquely by name.
      *
-     * @param NodeList|array $original
-     * @param NodeList|array $addition
-     * @param bool           $overwriteDuplicates By default this throws if a collision occurs. If
+     * @param  NodeList|array $original
+     * @param  NodeList|array $addition
+     * @param  bool           $overwriteDuplicates By default this throws if a collision occurs. If
      *                                            this is set to true, the fields of the original list will be overwritten.
      *
      * @return NodeList
@@ -84,7 +84,7 @@ class ASTHelper
     /**
      * Create a clone of the original node.
      *
-     * @param Node $node
+     * @param  Node $node
      *
      * @return Node
      */
@@ -96,7 +96,7 @@ class ASTHelper
     }
 
     /**
-     * @param Node $definition
+     * @param  Node $definition
      *
      * @return string
      */
@@ -111,9 +111,9 @@ class ASTHelper
     }
 
     /**
-     * @param Node $node
+     * @param  Node $node
      *
-     * @throws DefinitionException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
      * @return NamedTypeNode
      */
@@ -137,8 +137,8 @@ class ASTHelper
     /**
      * Does the given directive have an argument of the given name?
      *
-     * @param DirectiveNode $directiveDefinition
-     * @param string        $name
+     * @param  DirectiveNode $directiveDefinition
+     * @param  string        $name
      *
      * @return bool
      */
@@ -151,9 +151,9 @@ class ASTHelper
     }
 
     /**
-     * @param DirectiveNode $directive
-     * @param string        $name
-     * @param mixed|null    $default
+     * @param  DirectiveNode $directive
+     * @param  string        $name
+     * @param  mixed|null    $default
      *
      * @return mixed|null
      */
@@ -172,8 +172,8 @@ class ASTHelper
     /**
      * Get argument's value.
      *
-     * @param ArgumentNode $arg
-     * @param mixed        $default
+     * @param  ArgumentNode $arg
+     * @param  mixed        $default
      *
      * @return mixed
      */
@@ -191,8 +191,8 @@ class ASTHelper
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *
-     * @param Node   $definitionNode
-     * @param string $name
+     * @param  Node   $definitionNode
+     * @param  string $name
      *
      * @return DirectiveNode|null
      */
@@ -207,8 +207,8 @@ class ASTHelper
     /**
      * Check if a node has a particular directive defined upon it.
      *
-     * @param Node   $definitionNode
-     * @param string $name
+     * @param  Node   $definitionNode
+     * @param  string $name
      *
      * @return bool
      */
@@ -223,8 +223,8 @@ class ASTHelper
     /**
      * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
      *
-     * @param Node   $definitionNode
-     * @param string $directiveName
+     * @param  Node   $definitionNode
+     * @param  string $directiveName
      *
      * @return string
      */
@@ -246,8 +246,8 @@ class ASTHelper
     /**
      * Attach directive to all registered object type fields.
      *
-     * @param DocumentAST   $documentAST
-     * @param DirectiveNode $directive
+     * @param  DocumentAST   $documentAST
+     * @param  DirectiveNode $directive
      *
      * @return DocumentAST
      */
@@ -279,8 +279,8 @@ class ASTHelper
     /**
      * This adds an Interface called "Node" to an ObjectType definition.
      *
-     * @param ObjectTypeDefinitionNode $objectType
-     * @param DocumentAST              $documentAST
+     * @param  ObjectTypeDefinitionNode $objectType
+     * @param  DocumentAST              $documentAST
      *
      * @return DocumentAST
      */

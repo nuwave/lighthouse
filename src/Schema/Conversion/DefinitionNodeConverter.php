@@ -9,11 +9,13 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class DefinitionNodeConverter
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  TypeRegistry $typeRegistry
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -23,7 +25,7 @@ class DefinitionNodeConverter
     /**
      * Convert a definition node to an executable Type.
      *
-     * @param mixed $node
+     * @param  mixed $node
      *
      * @return Type
      */
@@ -35,8 +37,8 @@ class DefinitionNodeConverter
     /**
      * Unwrap the node if needed and convert to type.
      *
-     * @param mixed $node
-     * @param string[] $wrappers
+     * @param  mixed $node
+     * @param  string[] $wrappers
      *
      * @return Type
      */
@@ -74,7 +76,7 @@ class DefinitionNodeConverter
     /**
      * Converted named node to type.
      *
-     * @param NamedTypeNode $node
+     * @param  NamedTypeNode $node
      *
      * @return Type
      */

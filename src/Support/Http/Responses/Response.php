@@ -10,12 +10,12 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class Response implements GraphQLResponse
 {
     /**
-     * @var ExtensionRegistry
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
      */
     protected $extensionRegistry;
 
     /**
-     * @param ExtensionRegistry $extensionRegistry
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
      */
     public function __construct(ExtensionRegistry $extensionRegistry)
     {
@@ -25,7 +25,7 @@ class Response implements GraphQLResponse
     /**
      * Create GraphQL response.
      *
-     * @param array $data
+     * @param  array $data
      *
      * @return SymfonyResponse
      */

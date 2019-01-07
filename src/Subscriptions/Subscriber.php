@@ -42,10 +42,10 @@ class Subscriber
     /**
      * Create new subscription instance.
      *
-     * @param array          $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $info
-     * @param string         $queryString
+     * @param  array          $args
+     * @param  GraphQLContext $context
+     * @param  ResolveInfo    $info
+     * @param  string         $queryString
      *
      * @return static
      */
@@ -73,7 +73,7 @@ class Subscriber
     /**
      * Unserialize subscription.
      *
-     * @param string $subscription
+     * @param  string $subscription
      *
      * @return static
      */
@@ -95,7 +95,7 @@ class Subscriber
     /**
      * Set root data.
      *
-     * @param mixed $root
+     * @param  mixed $root
      *
      * @return $this
      */

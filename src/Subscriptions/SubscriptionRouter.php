@@ -9,12 +9,12 @@ use Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController;
 class SubscriptionRouter
 {
     /**
-     * @var ExtensionRegistry
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
      */
     protected $extensions;
 
     /**
-     * @param ExtensionRegistry $extensions
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensions
      */
     public function __construct(ExtensionRegistry $extensions)
     {
@@ -45,7 +45,7 @@ class SubscriptionRouter
     /**
      * Register subscription routes.
      *
-     * @param \Illuminate\Routing\Router $router
+     * @param  \Illuminate\Routing\Router  $router
      */
     public function pusher($router)
     {

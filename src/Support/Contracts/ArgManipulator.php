@@ -10,10 +10,10 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 interface ArgManipulator extends Directive
 {
     /**
-     * @param InputValueDefinitionNode $argDefinition
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
+     * @param  InputValueDefinitionNode  $argDefinition
+     * @param  FieldDefinitionNode  $fieldDefinition
+     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  DocumentAST  $current
      *
      * @return DocumentAST
      */

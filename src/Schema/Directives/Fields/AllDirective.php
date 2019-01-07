@@ -25,7 +25,7 @@ class AllDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue $fieldValue
      *
      * @return FieldValue
      */
@@ -33,7 +33,7 @@ class AllDirective extends BaseDirective implements FieldResolver
     {
         return $fieldValue->setResolver(
             function ($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                /** @var Model $modelClass */
+                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
                 $modelClass = $this->getModelClass();
 
                 $query = QueryFilter::apply(

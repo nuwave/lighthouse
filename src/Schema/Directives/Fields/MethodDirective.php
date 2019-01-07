@@ -23,7 +23,7 @@ class MethodDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue $fieldValue
      *
      * @return FieldValue
      */

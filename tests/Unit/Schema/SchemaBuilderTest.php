@@ -197,7 +197,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var ObjectType $type */
+        /** @var \GraphQL\Type\Definition\ObjectType $type */
         $type = $schema->getType('Foo');
 
         $this->assertSame('yo?', $type->getField('bar')->description);

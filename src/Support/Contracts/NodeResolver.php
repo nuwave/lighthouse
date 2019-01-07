@@ -10,7 +10,7 @@ interface NodeResolver extends Directive
     /**
      * Resolve the NodeValue to a GraphQL Type.
      *
-     * @param NodeValue $value
+     * @param  NodeValue  $value
      *
      * @return Type
      */

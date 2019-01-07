@@ -13,30 +13,30 @@ use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 class SubscriptionBroadcaster implements BroadcastsSubscriptions
 {
     /**
-     * @var AuthorizesSubscriptions
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions
      */
     protected $auth;
 
     /**
-     * @var StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
      */
     protected $storage;
 
     /**
-     * @var SubscriptionIterator
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator
      */
     protected $iterator;
 
     /**
-     * @var BroadcastManager
+     * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcastManager;
 
     /**
-     * @param AuthorizesSubscriptions $auth
-     * @param StorageManager   $storage
-     * @param SubscriptionIterator $iterator
-     * @param BroadcastManager $broadcastManager
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions  $auth
+     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator  $iterator
+     * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
      */
     public function __construct(
         AuthorizesSubscriptions $auth,
@@ -53,9 +53,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Queue pushing subscription data to subscribers.
      *
-     * @param GraphQLSubscription $subscription
-     * @param string              $fieldName
-     * @param mixed               $root
+     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
+     * @param  string  $fieldName
+     * @param  mixed  $root
      *
      * @return void
      */
@@ -67,9 +67,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Push subscription data to subscribers.
      *
-     * @param GraphQLSubscription $subscription
-     * @param string              $fieldName
-     * @param mixed               $root
+     * @param  GraphQLSubscription $subscription
+     * @param  string              $fieldName
+     * @param  mixed               $root
      *
      * @return void
      */
@@ -105,7 +105,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Authorize the subscription.
      *
-     * @param Request $request
+     * @param  Request $request
      *
      * @return Response
      */

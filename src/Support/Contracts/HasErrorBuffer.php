@@ -16,7 +16,7 @@ interface HasErrorBuffer
     /**
      * Set the ErrorBuffer instance.
      *
-     * @param ErrorBuffer $errorBuffer
+     * @param  ErrorBuffer  $errorBuffer
      *
      * @return $this
      */

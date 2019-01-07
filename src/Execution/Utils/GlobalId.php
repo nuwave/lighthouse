@@ -19,8 +19,8 @@ class GlobalId
     /**
      * Glue together a type and an id to create a global id.
      *
-     * @param string     $type
-     * @param string|int $id
+     * @param  string     $type
+     * @param  string|int  $id
      *
      * @return string
      */
@@ -32,7 +32,7 @@ class GlobalId
     /**
      * Split a global id into the type and the id it contains.
      *
-     * @param string $globalID
+     * @param  string  $globalID
      *
      * @return array Contains [$type, $id], e.g. ['User', '123']
      */
@@ -44,7 +44,7 @@ class GlobalId
     /**
      * Decode the Global ID and get just the ID.
      *
-     * @param string $globalID
+     * @param  string  $globalID
      *
      * @return string
      */
@@ -58,7 +58,7 @@ class GlobalId
     /**
      * Decode the Global ID and get just the type.
      *
-     * @param string $globalID
+     * @param  string  $globalID
      *
      * @return string
      */

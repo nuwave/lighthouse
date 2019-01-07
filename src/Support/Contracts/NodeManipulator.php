@@ -8,8 +8,8 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 interface NodeManipulator extends Directive
 {
     /**
-     * @param Node        $node
-     * @param DocumentAST $documentAST
+     * @param  Node  $node
+     * @param  DocumentAST  $documentAST
      *
      * @return DocumentAST
      */

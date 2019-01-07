@@ -22,7 +22,7 @@ class Cursor
      * this will return 0. That will effectively reset pagination, so the user gets the
      * first slice.
      *
-     * @param array $args
+     * @param  array  $args
      *
      * @return int
      */
@@ -38,7 +38,7 @@ class Cursor
     /**
      * Encode the given offset to make the implementation opaque.
      *
-     * @param int $offset
+     * @param  int  $offset
      *
      * @return string
      */

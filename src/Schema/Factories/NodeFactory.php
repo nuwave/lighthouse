@@ -34,20 +34,31 @@ use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
 
 class NodeFactory
 {
-    /** @var DirectiveFactory */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     */
     protected $directiveFactory;
-    /** @var TypeRegistry */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
-    /** @var Pipeline */
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Pipeline
+     */
     protected $pipeline;
-    /** @var ArgumentFactory */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
+     */
     protected $argumentFactory;
 
     /**
-     * @param DirectiveFactory $directiveFactory
-     * @param TypeRegistry     $typeRegistry
-     * @param Pipeline         $pipeline
-     * @param ArgumentFactory  $argumentFactory
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
@@ -64,7 +75,7 @@ class NodeFactory
     /**
      * Transform node to type.
      *
-     * @param TypeDefinitionNode $definition
+     * @param  TypeDefinitionNode $definition
      *
      * @return Type
      */
@@ -92,7 +103,7 @@ class NodeFactory
     /**
      * Check if node has a type resolver directive.
      *
-     * @param TypeDefinitionNode $definition
+     * @param  TypeDefinitionNode $definition
      *
      * @return bool
      */
@@ -104,7 +115,7 @@ class NodeFactory
     /**
      * Use directive resolver to transform type.
      *
-     * @param TypeDefinitionNode $definition
+     * @param  TypeDefinitionNode $definition
      *
      * @return Type
      */
@@ -120,7 +131,7 @@ class NodeFactory
     /**
      * Transform value to type.
      *
-     * @param TypeDefinitionNode $typeDefinition
+     * @param  TypeDefinitionNode $typeDefinition
      *
      * @return Type
      */
@@ -148,7 +159,7 @@ class NodeFactory
     }
 
     /**
-     * @param EnumTypeDefinitionNode $enumDefinition
+     * @param  EnumTypeDefinitionNode $enumDefinition
      *
      * @return EnumType
      */
@@ -177,9 +188,9 @@ class NodeFactory
     }
 
     /**
-     * @param ScalarTypeDefinitionNode $scalarDefinition
+     * @param  ScalarTypeDefinitionNode $scalarDefinition
      *
-     * @throws DefinitionException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
      * @return ScalarType
      */
@@ -214,7 +225,7 @@ class NodeFactory
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $objectDefinition
+     * @param  ObjectTypeDefinitionNode $objectDefinition
      *
      * @return ObjectType
      */
@@ -237,7 +248,7 @@ class NodeFactory
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode $definition
+     * @param  ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode $definition
      *
      * @return \Closure
      */
@@ -260,7 +271,7 @@ class NodeFactory
     }
 
     /**
-     * @param InputObjectTypeDefinitionNode $inputDefinition
+     * @param  InputObjectTypeDefinitionNode $inputDefinition
      *
      * @return InputObjectType
      */
@@ -276,7 +287,7 @@ class NodeFactory
     /**
      * Returns a closure that lazy loads the Input Fields for a constructed type.
      *
-     * @param InputObjectTypeDefinitionNode $definition
+     * @param  InputObjectTypeDefinitionNode $definition
      *
      * @return \Closure
      */
@@ -296,7 +307,7 @@ class NodeFactory
     }
 
     /**
-     * @param InterfaceTypeDefinitionNode $interfaceDefinition
+     * @param  InterfaceTypeDefinitionNode $interfaceDefinition
      *
      * @return InterfaceType
      */
@@ -349,7 +360,7 @@ class NodeFactory
     }
 
     /**
-     * @param UnionTypeDefinitionNode $unionDefinition
+     * @param  UnionTypeDefinitionNode $unionDefinition
      *
      * @return UnionType
      */

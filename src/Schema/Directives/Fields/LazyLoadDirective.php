@@ -22,8 +22,8 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure    $next
+     * @param  FieldValue $value
+     * @param  \Closure    $next
      *
      * @return FieldValue
      */

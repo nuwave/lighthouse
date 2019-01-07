@@ -35,9 +35,9 @@ abstract class BatchLoader
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
-     * @param string  $loaderClass     the class name of the concrete BatchLoader to instantiate
-     * @param mixed[] $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param mixed[] $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
+     * @param  string  $loaderClass     the class name of the concrete BatchLoader to instantiate
+     * @param  mixed[] $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param  mixed[] $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
      *
      * @throws \Exception
      *
@@ -76,7 +76,7 @@ abstract class BatchLoader
     /**
      * Generate a unique key for the instance, using the path in the query.
      *
-     * @param mixed[] $path
+     * @param  mixed[] $path
      *
      * @return string
      */
@@ -94,8 +94,8 @@ abstract class BatchLoader
     /**
      * Load object by key.
      *
-     * @param mixed $key
-     * @param array $metaInfo
+     * @param  mixed $key
+     * @param  array $metaInfo
      *
      * @return Deferred
      */

@@ -38,8 +38,8 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param Node $node
-     * @param DocumentAST $documentAST
+     * @param  Node $node
+     * @param  DocumentAST $documentAST
      *
      * @return DocumentAST
      */
@@ -57,7 +57,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
+     * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
@@ -100,8 +100,8 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param string $namespaceValue
-     * @param DirectiveNode $directive
+     * @param  string $namespaceValue
+     * @param  DirectiveNode $directive
      *
      * @return DirectiveNode
      */

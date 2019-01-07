@@ -9,7 +9,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 class CacheValue
 {
     /**
-     * @var FieldValue
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected $fieldValue;
 
@@ -29,7 +29,7 @@ class CacheValue
     protected $context;
 
     /**
-     * @var ResolveInfo
+     * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
@@ -46,7 +46,7 @@ class CacheValue
     /**
      * Create instance of cache value.
      *
-     * @param array $arguments
+     * @param  array  $arguments
      */
     public function __construct(array $arguments = [])
     {
@@ -147,7 +147,7 @@ class CacheValue
     /**
      * Implode value to create string.
      *
-     * @param array $items
+     * @param  array  $items
      *
      * @return string
      */

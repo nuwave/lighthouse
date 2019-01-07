@@ -25,7 +25,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 class PartialParser
 {
     /**
-     * @param string[] $objectTypes
+     * @param  string[] $objectTypes
      *
      * @return ObjectTypeDefinitionNode[]
      */
@@ -37,7 +37,7 @@ class PartialParser
     }
 
     /**
-     * @param string $definition
+     * @param  string $definition
      *
      * @return ObjectTypeDefinitionNode
      */
@@ -50,7 +50,7 @@ class PartialParser
     }
 
     /**
-     * @param string $inputValueDefinition
+     * @param  string $inputValueDefinition
      *
      * @return InputValueDefinitionNode
      */
@@ -63,7 +63,7 @@ class PartialParser
     }
 
     /**
-     * @param string[] $inputValueDefinitions
+     * @param  string[] $inputValueDefinitions
      *
      * @return InputValueDefinitionNode[]
      */
@@ -78,7 +78,7 @@ class PartialParser
     }
 
     /**
-     * @param string $argumentDefinition
+     * @param  string $argumentDefinition
      *
      * @return ArgumentNode
      */
@@ -91,7 +91,7 @@ class PartialParser
     }
 
     /**
-     * @param string[] $argumentDefinitions
+     * @param  string[] $argumentDefinitions
      *
      * @return ArgumentNode[]
      */
@@ -106,7 +106,7 @@ class PartialParser
     }
 
     /**
-     * @param string $field
+     * @param  string $field
      *
      * @return FieldNode
      */
@@ -119,7 +119,7 @@ class PartialParser
     }
 
     /**
-     * @param string $operation
+     * @param  string $operation
      *
      * @return OperationDefinitionNode
      */
@@ -132,7 +132,7 @@ class PartialParser
     }
 
     /**
-     * @param string $fieldDefinition
+     * @param  string $fieldDefinition
      *
      * @return FieldDefinitionNode
      */
@@ -145,7 +145,7 @@ class PartialParser
     }
 
     /**
-     * @param string $directive
+     * @param  string $directive
      *
      * @return DirectiveNode
      */
@@ -162,7 +162,7 @@ class PartialParser
     }
 
     /**
-     * @param string[] $directives
+     * @param  string[] $directives
      *
      * @return DirectiveNode[]
      */
@@ -177,7 +177,7 @@ class PartialParser
     }
 
     /**
-     * @param string $directiveDefinition
+     * @param  string $directiveDefinition
      *
      * @return DirectiveDefinitionNode
      */
@@ -190,7 +190,7 @@ class PartialParser
     }
 
     /**
-     * @param string[] $directiveDefinitions
+     * @param  string[] $directiveDefinitions
      *
      * @return DirectiveDefinitionNode[]
      */
@@ -205,7 +205,7 @@ class PartialParser
     }
 
     /**
-     * @param string $interfaceDefinition
+     * @param  string $interfaceDefinition
      *
      * @return InterfaceTypeDefinitionNode
      */
@@ -218,7 +218,7 @@ class PartialParser
     }
 
     /**
-     * @param string $unionDefinition
+     * @param  string $unionDefinition
      *
      * @return UnionTypeDefinitionNode
      */
@@ -231,7 +231,7 @@ class PartialParser
     }
 
     /**
-     * @param string $inputTypeDefinition
+     * @param  string $inputTypeDefinition
      *
      * @return InputObjectTypeDefinitionNode
      */
@@ -244,7 +244,7 @@ class PartialParser
     }
 
     /**
-     * @param string $scalarDefinition
+     * @param  string $scalarDefinition
      *
      * @return ScalarTypeDefinitionNode
      */
@@ -257,7 +257,7 @@ class PartialParser
     }
 
     /**
-     * @param string $enumDefinition
+     * @param  string $enumDefinition
      *
      * @return EnumTypeDefinitionNode
      */
@@ -270,9 +270,9 @@ class PartialParser
     }
 
     /**
-     * @param string $typeName
+     * @param  string $typeName
      *
-     * @throws ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return NamedTypeNode
      */
@@ -285,7 +285,7 @@ class PartialParser
     }
 
     /**
-     * @param string $definition
+     * @param  string $definition
      *
      * @return DocumentNode
      */
@@ -296,7 +296,7 @@ class PartialParser
     }
 
     /**
-     * @param string $definition
+     * @param  string $definition
      *
      * @return Node
      */
@@ -309,10 +309,10 @@ class PartialParser
     /**
      * Get the first Node from a given NodeList and validate it.
      *
-     * @param NodeList $list
-     * @param string   $expectedType
+     * @param  NodeList $list
+     * @param  string   $expectedType
      *
-     * @throws ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return Node
      */
@@ -328,10 +328,10 @@ class PartialParser
     }
 
     /**
-     * @param Node $node
-     * @param string $expectedType
+     * @param  Node $node
+     * @param  string $expectedType
      *
-     * @throws ParseException
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      *
      * @return Node
      */

@@ -8,12 +8,12 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions as Broadca
 class BroadcastSubscriptionListener implements ShouldQueue
 {
     /**
-     * @var Broadcaster
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions
      */
     protected $broadcaster;
 
     /**
-     * @param Broadcaster $broadcaster
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions  $broadcaster
      */
     public function __construct(Broadcaster $broadcaster)
     {
@@ -23,7 +23,7 @@ class BroadcastSubscriptionListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param BroadcastSubscriptionEvent $event
+     * @param  BroadcastSubscriptionEvent  $event
      */
     public function handle(BroadcastSubscriptionEvent $event)
     {

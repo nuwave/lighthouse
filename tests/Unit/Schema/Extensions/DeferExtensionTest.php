@@ -283,7 +283,7 @@ class DeferExtensionTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxExecutionTime(): void
     {
-        /** @var DeferExtension $deferExtension */
+        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
         $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
         // Set max execution time to now so we immediately resolve deferred fields
         $deferExtension->setMaxExecutionTime(microtime(true));
@@ -342,7 +342,7 @@ class DeferExtensionTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxNestedFields(): void
     {
-        /** @var DeferExtension $deferExtension */
+        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
         $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
         $deferExtension->setMaxNestedFields(1);
 

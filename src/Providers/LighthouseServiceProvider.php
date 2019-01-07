@@ -62,7 +62,7 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * Load routes from provided path.
      *
-     * @param string $path
+     * @param  string $path
      * @return void
      */
     protected function loadRoutesFrom($path): void

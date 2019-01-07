@@ -31,7 +31,7 @@ if (! function_exists('config_path')) {
     /**
      * Get base configuration path.
      *
-     * @param string|null $path
+     * @param  string|null  $path
      *
      * @return string
      */
@@ -50,7 +50,7 @@ if (! function_exists('app_path')) {
     /**
      * Get base app path.
      *
-     * @param string|null $path
+     * @param  string|null  $path
      *
      * @return string
      */
@@ -69,10 +69,10 @@ if (! function_exists('construct_resolver')) {
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param string $className This class is resolved through the container.
-     * @param string $methodName The method that gets passed the arguments of the closure.
+     * @param  string $className This class is resolved through the container.
+     * @param  string $methodName The method that gets passed the arguments of the closure.
      *
-     * @throws DefinitionException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      *
      * @return \Closure
      */

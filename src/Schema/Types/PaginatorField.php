@@ -10,7 +10,7 @@ class PaginatorField
     /**
      * Resolve paginator info for connection.
      *
-     * @param LengthAwarePaginator $root
+     * @param  LengthAwarePaginator  $root
      *
      * @return array
      */
@@ -40,7 +40,7 @@ class PaginatorField
     /**
      * Resolve data for connection.
      *
-     * @param LengthAwarePaginator $root
+     * @param  LengthAwarePaginator  $root
      *
      * @return Collection
      */

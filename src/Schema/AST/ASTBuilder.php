@@ -19,7 +19,7 @@ class ASTBuilder
     /**
      * Convert the base schema string into an AST by applying different manipulations.
      *
-     * @param string $schema
+     * @param  string $schema
      *
      * @return DocumentAST
      */
@@ -42,7 +42,7 @@ class ASTBuilder
     }
 
     /**
-     * @param DocumentAST $document
+     * @param  DocumentAST $document
      *
      * @return DocumentAST
      */
@@ -72,7 +72,7 @@ class ASTBuilder
     /**
      * The final schema must not contain type extensions, so we merge them here.
      *
-     * @param DocumentAST $document
+     * @param  DocumentAST $document
      *
      * @return DocumentAST
      */
@@ -105,7 +105,7 @@ class ASTBuilder
     }
 
     /**
-     * @param DocumentAST $document
+     * @param  DocumentAST $document
      *
      * @return DocumentAST
      */
@@ -132,7 +132,7 @@ class ASTBuilder
     }
 
     /**
-     * @param DocumentAST $document
+     * @param  DocumentAST $document
      *
      * @return DocumentAST
      */
@@ -173,7 +173,7 @@ class ASTBuilder
     }
 
     /**
-     * @param DocumentAST $document
+     * @param  DocumentAST $document
      *
      * @return DocumentAST
      */
@@ -243,7 +243,7 @@ class ASTBuilder
     /**
      * Inject the node type and a node field into Query.
      *
-     * @param DocumentAST $document
+     * @param  DocumentAST $document
      *
      * @return DocumentAST
      */

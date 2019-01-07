@@ -7,7 +7,7 @@ interface GraphQLResponse
     /**
      * Create GraphQL response.
      *
-     * @param array $data
+     * @param  array $data
      *
      * @return \Illuminate\Http\Response
      */

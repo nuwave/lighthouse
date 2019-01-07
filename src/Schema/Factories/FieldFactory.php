@@ -18,7 +18,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
@@ -33,27 +32,27 @@ class FieldFactory
     use HasResolverArguments;
 
     /**
-     * @var FieldValue
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected $fieldValue;
 
     /**
-     * @var QueryFilter
+     * @var \Nuwave\Lighthouse\Execution\QueryFilter
      */
     protected $queryFilter;
 
     /**
-     * @var DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
     protected $directiveFactory;
 
     /**
-     * @var ArgumentFactory
+     * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
      */
     protected $argumentFactory;
 
     /**
-     * @var Pipeline
+     * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
 
@@ -68,24 +67,24 @@ class FieldFactory
     protected $currentMessages = [];
 
     /**
-     * @var ErrorBuffer
+     * @var \Nuwave\Lighthouse\Execution\ErrorBuffer
      */
     protected $currentValidationErrorBuffer;
 
     /**
-     * @var ArgumentValue
+     * @var \Nuwave\Lighthouse\Schema\Values\ArgumentValue
      */
     protected $currentArgumentValueInstance;
 
     /**
-     * @var ArgDirective[]
+     * @var \Nuwave\Lighthouse\Support\Contracts\ArgDirective[]
      */
     protected $currentHandlerArgsOfArgDirectivesAfterValidationDirective = [];
 
     /**
-     * @param DirectiveFactory $directiveFactory
-     * @param ArgumentFactory  $argumentFactory
-     * @param Pipeline         $pipeline
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      */
     public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {
@@ -97,7 +96,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue  $fieldValue
      *
      * @return array Configuration array for a FieldDefinition
      */
@@ -154,7 +153,7 @@ class FieldFactory
     /**
      * Transform the ArgumentValues into the final InputValueDefinitions.
      *
-     * @param Collection<ArgumentValue> $argumentValues
+     * @param  Collection<ArgumentValue>  $argumentValues
      *
      * @return InputValueDefinitionNode[]
      */
@@ -188,8 +187,8 @@ class FieldFactory
      * This may be used to transform the arguments, log them or do anything else
      * before they reach the final resolver.
      *
-     * @param \Closure                  $resolver
-     * @param Collection<ArgumentValue> $argumentValues
+     * @param  \Closure                  $resolver
+     * @param  Collection<ArgumentValue> $argumentValues
      *
      * @return \Closure
      */
@@ -239,10 +238,10 @@ class FieldFactory
     /**
      * Handle the ArgMiddleware.
      *
-     * @param InputType                $type
-     * @param mixed                    $argValue
-     * @param InputValueDefinitionNode $astNode
-     * @param mixed[]                  $argumentPath
+     * @param  InputType                $type
+     * @param  mixed                    $argValue
+     * @param  InputValueDefinitionNode $astNode
+     * @param  mixed[]                  $argumentPath
      *
      * @return void
      */
@@ -318,10 +317,10 @@ class FieldFactory
     }
 
     /**
-     * @param InputValueDefinitionNode $astNode
-     * @param mixed                    $argValue
-     * @param mixed[]                  $argumentPath
-     * @param string                   $mustImplementClass
+     * @param  InputValueDefinitionNode $astNode
+     * @param  mixed                    $argValue
+     * @param  mixed[]                  $argumentPath
+     * @param  string                   $mustImplementClass
      *
      * @return mixed
      */
@@ -343,10 +342,10 @@ class FieldFactory
     }
 
     /**
-     * @param InputValueDefinitionNode $astNode
-     * @param mixed                    $argumentValue
-     * @param mixed[]                  $argumentPath
-     * @param Collection               $directives
+     * @param  InputValueDefinitionNode $astNode
+     * @param  mixed                    $argumentValue
+     * @param  mixed[]                  $argumentPath
+     * @param  Collection               $directives
      *
      * @return mixed
      */
@@ -394,9 +393,9 @@ class FieldFactory
     }
 
     /**
-     * @param InputValueDefinitionNode $astNode
-     * @param mixed[]                  $argumentPath
-     * @param Collection               $directives
+     * @param  InputValueDefinitionNode $astNode
+     * @param  mixed[]                  $argumentPath
+     * @param  Collection               $directives
      *
      * @return void
      */
@@ -414,8 +413,8 @@ class FieldFactory
     }
 
     /**
-     * @param ArgValidationDirective $directive
-     * @param mixed[]                $argumentPath
+     * @param  ArgValidationDirective $directive
+     * @param  mixed[]                $argumentPath
      *
      * @return void
      */
@@ -426,8 +425,8 @@ class FieldFactory
     }
 
     /**
-     * @param ArgFilterDirective       $argFilterDirective
-     * @param InputValueDefinitionNode $inputValueDefinition
+     * @param  ArgFilterDirective       $argFilterDirective
+     * @param  InputValueDefinitionNode $inputValueDefinition
      *
      * @return void
      */
@@ -447,8 +446,8 @@ class FieldFactory
     /**
      * Append a path to the base path to create a new path.
      *
-     * @param mixed[]    $basePath
-     * @param string|int $pathToBeAdded
+     * @param  mixed[]    $basePath
+     * @param  string|int $pathToBeAdded
      *
      * @return mixed[]
      */
@@ -475,10 +474,10 @@ class FieldFactory
     }
 
     /**
-     * @param mixed          $root
-     * @param array          $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $resolveInfo
+     * @param  mixed          $root
+     * @param  array          $args
+     * @param  GraphQLContext $context
+     * @param  ResolveInfo    $resolveInfo
      *
      * @return void
      */
@@ -529,10 +528,10 @@ class FieldFactory
     }
 
     /**
-     * @param mixed          $root
-     * @param array          $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $resolveInfo
+     * @param  mixed          $root
+     * @param  array          $args
+     * @param  GraphQLContext $context
+     * @param  ResolveInfo    $resolveInfo
      *
      * @return void
      */

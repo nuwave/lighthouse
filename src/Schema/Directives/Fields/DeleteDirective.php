@@ -27,7 +27,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  FieldValue  $fieldValue
      *
      * @return FieldValue
      */
@@ -76,7 +76,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     /**
      * Ensure there is only a single argument defined on the field.
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return InputValueDefinitionNode
      */

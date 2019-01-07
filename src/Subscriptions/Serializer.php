@@ -51,7 +51,7 @@ class Serializer implements ContextSerializer
     /**
      * Unserialize the context.
      *
-     * @param  string $context
+     * @param  string  $context
      * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function unserialize(string $context): GraphQLContext

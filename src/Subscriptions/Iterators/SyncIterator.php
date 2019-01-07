@@ -10,9 +10,9 @@ class SyncIterator implements SubscriptionIterator
     /**
      * Process collection of items.
      *
-     * @param Collection    $items
-     * @param \Closure      $cb
-     * @param \Closure|null $error
+     * @param  Collection    $items
+     * @param  \Closure      $cb
+     * @param  \Closure|null $error
      *
      * @return void
      */

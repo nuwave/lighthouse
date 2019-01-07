@@ -8,12 +8,12 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 class SubscriptionExtension extends GraphQLExtension
 {
     /**
-     * @var SubscriptionRegistry
+     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
      */
     protected $registry;
 
     /**
-     * @var Request
+     * @var \Illuminate\Http\Request
      */
     protected $request;
 
@@ -23,7 +23,7 @@ class SubscriptionExtension extends GraphQLExtension
     protected $currentQuery = '';
 
     /**
-     * @param SubscriptionRegistry $registry
+     * @param  SubscriptionRegistry $registry
      */
     public function __construct(SubscriptionRegistry $registry)
     {
@@ -43,7 +43,7 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
+     * @param  ExtensionRequest $request
      *
      * @return void
      */
@@ -58,7 +58,7 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * Handle batch request start.
      *
-     * @param int index
+     * @param  int index
      *
      * @return void
      */

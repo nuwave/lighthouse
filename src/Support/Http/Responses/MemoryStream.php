@@ -15,9 +15,9 @@ class MemoryStream extends Stream implements CanStreamResponse
     /**
      * Stream graphql response.
      *
-     * @param array $data
-     * @param array $paths
-     * @param bool  $final
+     * @param  array $data
+     * @param  array $paths
+     * @param  bool  $final
      *
      * @return void
      */

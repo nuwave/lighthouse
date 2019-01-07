@@ -33,18 +33,18 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     const NAME = 'middleware';
 
     /**
-     * @var Pipeline
+     * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
 
     /**
-     * @var CreatesContext
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
     protected $createsContext;
 
     /**
-     * @param Pipeline $pipeline
-     * @param CreatesContext $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      */
     public function __construct(Pipeline $pipeline, CreatesContext $createsContext)
     {
@@ -65,8 +65,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  FieldValue $value
+     * @param  \Closure   $next
      *
      * @return FieldValue
      */
@@ -97,8 +97,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param Node $node
-     * @param DocumentAST $documentAST
+     * @param  Node $node
+     * @param  DocumentAST $documentAST
      *
      *
      * @return DocumentAST
@@ -114,10 +114,10 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
-     * @param array $middlewareArgValue
+     * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
+     * @param  array $middlewareArgValue
      *
-     * @throws DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *
      * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      */
@@ -160,13 +160,13 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param mixed $middlewareArgValue
+     * @param  mixed $middlewareArgValue
      *
-     * @return Collection<string>
+     * @return \Illuminate\Support\Collection<string>
      */
     protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
     {
-        /** @var Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = app('router');
         $middleware = $router->getMiddleware();
         $middlewareGroups = $router->getMiddlewareGroups();
