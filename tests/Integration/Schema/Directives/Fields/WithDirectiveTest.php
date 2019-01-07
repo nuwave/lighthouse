@@ -5,7 +5,6 @@ namespace Tests\Integration\Schema\Directives\Fields;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Illuminate\Support\Collection;
 
 class WithDirectiveTest extends DBTestCase
 {
@@ -52,7 +51,7 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var User $user */
+        /** @var \Tests\Utils\Models\User $user */
         $user = auth()->user();
 
         $this->assertFalse(

@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
-use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 
 class SubscriptionTest extends TestCase
 {

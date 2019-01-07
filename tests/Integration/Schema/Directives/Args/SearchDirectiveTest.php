@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives\Args;
 
 use Mockery;
 use Tests\DBTestCase;
+use Mockery\MockInterface;
 use Tests\Utils\Models\Post;
 use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
@@ -27,7 +28,7 @@ class SearchDirectiveTest extends DBTestCase
         $this->engineManager = Mockery::mock();
         $this->engine = Mockery::mock(NullEngine::class)->makePartial();
 
-        app()->singleton(EngineManager::class, function ($app) {
+        $this->app->singleton(EngineManager::class, function (): MockInterface {
             return $this->engineManager;
         });
 

@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
+    /**
+     * @var array
+     */
     protected $guarded = [];
 
     public function getTaskCountAsString(): string
@@ -48,7 +51,7 @@ class User extends Authenticatable
 
     public function scopeCompanyName(Builder $query, array $args): Builder
     {
-        return $query->whereHas('company', function ($q) use ($args) {
+        return $query->whereHas('company', function (Builder $q) use ($args): void {
             $q->where('name', $args['company']);
         });
     }

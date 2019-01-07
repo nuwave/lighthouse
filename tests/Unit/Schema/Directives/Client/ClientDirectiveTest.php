@@ -37,10 +37,10 @@ class ClientDirectiveTest extends TestCase
         ]);
     }
 
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info): string
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
         /** @var ArgumentNode $key */
-        $key = collect($info->fieldNodes)
+        $key = collect($resolveInfo->fieldNodes)
             ->flatMap(function (FieldNode $node): Collection {
                 return collect($node->directives);
             })

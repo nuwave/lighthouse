@@ -16,7 +16,7 @@ class ModelRelationLoaderTest extends DBTestCase
 
         $count = 4;
         $users = factory(User::class, 3)->create();
-        $users->each(function ($user) use (&$count) {
+        $users->each(function (User $user) use (&$count): void {
             factory(Task::class, $count)->create([
                 'user_id' => $user->getKey(),
             ]);
@@ -83,8 +83,8 @@ class ModelRelationLoaderTest extends DBTestCase
     public function itCanHandleSoftDeletes(): void
     {
         $user = User::first();
-        $count = $user->tasks()->count();
-        $task = $user->tasks()->get()->last();
+        $count = $user->tasks->count();
+        $task = $user->tasks->last();
         $task->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))

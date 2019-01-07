@@ -90,7 +90,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
      */
     public function itThrowsIfDriverDoesNotImplementInterface(): void
     {
-        $this->broadcastManager->extend('foo', function ($app, $config) {
+        $this->broadcastManager->extend('foo', function () {
             return new class() {
             };
         });

@@ -5,7 +5,6 @@ namespace Tests\Unit\Execution\Utils;
 use Tests\TestCase;
 use Prophecy\Argument;
 use Illuminate\Http\Request;
-use Prophecy\Prophecy\ObjectProphecy;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;

@@ -134,8 +134,8 @@ class BcryptDirectiveTest extends TestCase
     }
 
     /**
-     * @param  $root
-     * @param  mixed[] $args
+     * @param  mixed  $root
+     * @param  mixed[]  $args
      * @return mixed[]
      */
     public function resolve($root, array $args): array
@@ -144,8 +144,8 @@ class BcryptDirectiveTest extends TestCase
     }
 
     /**
-     * @param  $root
-     * @param  mixed[] $args
+     * @param  mixed  $root
+     * @param  mixed[]  $args
      * @return mixed[]
      */
     public function resolveUser($root, array $args): array
@@ -154,7 +154,7 @@ class BcryptDirectiveTest extends TestCase
     }
 
     /**
-     * @param  string $method
+     * @param  string  $method
      * @return string
      */
     protected function getResolver(string $method = 'resolve'): string
