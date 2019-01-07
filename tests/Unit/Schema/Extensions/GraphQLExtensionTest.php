@@ -41,7 +41,7 @@ class GraphQLExtensionTest extends TestCase
             foo
         }
         ')->assertJson([
-            'meta' => 'data'
+            'meta' => 'data',
         ]);
     }
 

@@ -195,7 +195,7 @@ class ValidationTest extends TestCase
         ')->assertJson([
             'data' => [
                 'password' => null,
-            ]
+            ],
         ]);
 
         $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
@@ -221,7 +221,7 @@ class ValidationTest extends TestCase
         ')->assertJson([
             'data' => [
                 'password' => null,
-            ]
+            ],
         ]);
 
         $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
@@ -239,7 +239,7 @@ class ValidationTest extends TestCase
         ')->assertJson([
             'data' => [
                 'password' => null,
-            ]
+            ],
         ]);
 
         $this->assertValidationKeysSame(['bar'], $result);
@@ -263,7 +263,7 @@ class ValidationTest extends TestCase
         ')->assertJson([
             'data' => [
                 'email' => 'john@doe.com',
-            ]
+            ],
         ]);
 
         $invalidEmailResult = $this->query('
@@ -278,7 +278,7 @@ class ValidationTest extends TestCase
         ')->assertJson([
             'data' => [
                 'email' => null,
-            ]
+            ],
         ]);
         $this->assertValidationKeysSame([
             'email.emailAddress',
@@ -302,7 +302,7 @@ class ValidationTest extends TestCase
         ]);
 
         $this->assertValidationKeysSame([
-            'required'
+            'required',
         ], $result);
     }
 

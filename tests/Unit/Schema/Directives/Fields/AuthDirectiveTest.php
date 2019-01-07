@@ -34,9 +34,9 @@ class AuthDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'foo' => 'bar'
-                ]
-            ]
+                    'foo' => 'bar',
+                ],
+            ],
         ]);
     }
 }

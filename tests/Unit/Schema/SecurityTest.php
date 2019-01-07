@@ -98,7 +98,6 @@ class SecurityTest extends TestCase
         );
     }
 
-
     protected function assertIntrospectionIsDisabled(): void
     {
         $result = $this->query('

@@ -74,25 +74,25 @@ class AllDirectiveTest extends DBTestCase
                     [
                         'posts' => [
                             [
-                                'id' => '1'
+                                'id' => '1',
                             ],
                             [
-                                'id' => '2'
-                            ]
-                        ]
+                                'id' => '2',
+                            ],
+                        ],
                     ],
                     [
                         'posts' => [
                             [
-                                'id' => '1'
+                                'id' => '1',
                             ],
                             [
-                                'id' => '2'
-                            ]
-                        ]
+                                'id' => '2',
+                            ],
+                        ],
                     ],
                 ],
-            ]
+            ],
         ]);
     }
 

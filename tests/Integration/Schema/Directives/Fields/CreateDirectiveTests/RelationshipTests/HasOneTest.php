@@ -80,10 +80,10 @@ class HasOneTest extends DBTestCase
                     'name' => 'foo',
                     'post' => [
                         'id' => '1',
-                        'body' => 'foobar'
-                    ]
-                ]
-            ]
+                        'body' => 'foobar',
+                    ],
+                ],
+            ],
         ]);
     }
 }

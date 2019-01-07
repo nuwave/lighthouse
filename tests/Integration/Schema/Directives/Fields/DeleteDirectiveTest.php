@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class DeleteDirectiveTest extends DBTestCase
 {
@@ -34,9 +34,9 @@ class DeleteDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'deleteUser' => [
-                    'id' => 1
-                ]
-            ]
+                    'id' => 1,
+                ],
+            ],
         ]);
 
         $this->assertCount(0, User::all());

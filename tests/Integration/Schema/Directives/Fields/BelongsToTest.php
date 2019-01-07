@@ -76,10 +76,10 @@ class BelongsToTest extends DBTestCase
             'data' => [
                 'user' => [
                     'company' => [
-                        'name' => $this->company->name
-                    ]
-                ]
-            ]
+                        'name' => $this->company->name,
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -116,10 +116,10 @@ class BelongsToTest extends DBTestCase
             'data' => [
                 'user' => [
                     'account' => [
-                        'name' => $this->company->name
-                    ]
-                ]
-            ]
+                        'name' => $this->company->name,
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -164,13 +164,13 @@ class BelongsToTest extends DBTestCase
             'data' => [
                 'user' => [
                     'company' => [
-                        'name' => $this->company->name
+                        'name' => $this->company->name,
                     ],
                     'team' => [
-                        'name' => $this->team->name
-                    ]
-                ]
-            ]
+                        'name' => $this->team->name,
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -223,16 +223,16 @@ class BelongsToTest extends DBTestCase
                         [
                             'color' => [
                                 'id' => $products[0]->color_id,
-                            ]
+                            ],
                         ],
                         [
                             'color' => [
                                 'id' => $products[1]->color_id,
-                            ]
+                            ],
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }

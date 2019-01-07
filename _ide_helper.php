@@ -2,11 +2,9 @@
 
 namespace Illuminate\Foundation\Testing {
     /**
-     * Class TestResponse
-     *
-     * @package Illuminate\Foundation\Testing
+     * Class TestResponse.
      */
-    class TestResponse
+    class _ide_helper
     {
         /**
          * Asserts that the response contains an error from a given category.

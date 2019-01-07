@@ -53,10 +53,10 @@ class InjectDirectiveTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '1'
-                    ]
-                ]
-            ]
+                        'id' => '1',
+                    ],
+                ],
+            ],
         ]);
     }
 }

@@ -22,7 +22,7 @@ class CoreTest extends DBTestCase
         type Mutation {
             createCompany(name: String): Company @create
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
@@ -35,9 +35,9 @@ class CoreTest extends DBTestCase
             'data' => [
                 'createCompany' => [
                     'id' => '1',
-                    'name' => 'foo'
-                ]
-            ]
+                    'name' => 'foo',
+                ],
+            ],
         ]);
     }
 
@@ -59,7 +59,7 @@ class CoreTest extends DBTestCase
         input CreateCompanyInput {
             name: String
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
@@ -74,9 +74,9 @@ class CoreTest extends DBTestCase
             'data' => [
                 'createCompany' => [
                     'id' => '1',
-                    'name' => 'foo'
-                ]
-            ]
+                    'name' => 'foo',
+                ],
+            ],
         ]);
     }
 
@@ -94,7 +94,7 @@ class CoreTest extends DBTestCase
             name: String!
             default_string: String!
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
@@ -108,8 +108,8 @@ class CoreTest extends DBTestCase
                 'createTag' => [
                     'name' => 'foobar',
                     'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -151,7 +151,7 @@ class CoreTest extends DBTestCase
             name: String
             user: ID
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
@@ -221,7 +221,7 @@ class CoreTest extends DBTestCase
             name: String
             user: ID
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
@@ -291,7 +291,7 @@ class CoreTest extends DBTestCase
             name: String
             guard: String
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
@@ -314,11 +314,11 @@ class CoreTest extends DBTestCase
                 'createUser' => [
                     'tasks' => [
                         [
-                            'guard' => 'api'
-                        ]
-                    ]
-                ]
-            ]
+                            'guard' => 'api',
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

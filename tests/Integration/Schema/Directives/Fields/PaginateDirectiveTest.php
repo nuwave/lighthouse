@@ -50,9 +50,9 @@ class PaginateDirectiveTest extends DBTestCase
                         'total' => 10,
                         'currentPage' => 1,
                     ],
-                    'data' => []
-                ]
-            ]
+                    'data' => [],
+                ],
+            ],
         ])->assertJsonCount(5, 'data.users.data');
     }
 
@@ -88,11 +88,11 @@ class PaginateDirectiveTest extends DBTestCase
                 'users' => [
                     'data' => [
                         [
-                            'id' => '2'
-                        ]
-                    ]
-                ]
-            ]
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -173,22 +173,22 @@ class PaginateDirectiveTest extends DBTestCase
                         [
                             'posts' => [
                                 'paginatorInfo' => [
-                                    'currentPage' => 2
+                                    'currentPage' => 2,
                                 ],
                                 'data' => [
                                     [
                                         'comments' => [
                                             'paginatorInfo' => [
-                                                'currentPage' => 3
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                                'currentPage' => 3,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -228,10 +228,10 @@ class PaginateDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     'pageInfo' => [
-                        'hasNextPage' => true
-                    ]
-                ]
-            ]
+                        'hasNextPage' => true,
+                    ],
+                ],
+            ],
         ])->assertJsonCount(5, 'data.users.edges');
     }
 
@@ -284,9 +284,9 @@ class PaginateDirectiveTest extends DBTestCase
                         'lastPage' => 1,
                         'startCursor' => null,
                         'total' => 0,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ])->assertJsonCount(0, 'data.users.edges');
     }
 
@@ -335,9 +335,9 @@ class PaginateDirectiveTest extends DBTestCase
                         'lastPage' => 1,
                         'perPage' => 5,
                         'total' => 0,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ])->assertJsonCount(0, 'data.users.data');
     }
 
@@ -408,9 +408,9 @@ class PaginateDirectiveTest extends DBTestCase
                 'users' => [
                     'paginatorInfo' => [
                         'count' => 5,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ])->assertJsonCount(5, 'data.users.data');
     }
 }

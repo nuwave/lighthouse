@@ -65,7 +65,7 @@ class WithDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonFragment([
-            'task_count_string' => 'User has 3 tasks.'
+            'task_count_string' => 'User has 3 tasks.',
         ]);
 
         $this->assertCount(

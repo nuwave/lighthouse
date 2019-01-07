@@ -36,9 +36,9 @@ class InjectDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'me' => [
-                    'id' => 1
-                ]
-            ]
+                    'id' => 1,
+                ],
+            ],
         ]);
     }
 

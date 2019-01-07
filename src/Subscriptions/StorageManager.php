@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions

@@ -69,8 +69,8 @@ class DeprecatedDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => 'foo.bar'
-            ]
+                'foo' => 'foo.bar',
+            ],
         ]);
     }
 }

@@ -29,8 +29,8 @@ class GroupDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'me' => 'foo.bar'
-            ]
+                'me' => 'foo.bar',
+            ],
         ]);
 
         $this->query('
@@ -39,8 +39,8 @@ class GroupDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'you' => 'foo.bar'
-            ]
+                'you' => 'foo.bar',
+            ],
         ]);
     }
 
@@ -61,8 +61,8 @@ class GroupDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'me' => 1
-            ]
+                'me' => 1,
+            ],
         ]);
     }
 
@@ -99,10 +99,10 @@ class GroupDirectiveTest extends TestCase
                 [
                     'message' => Authenticate::MESSAGE,
                     'path' => [
-                        'foo'
-                    ]
-                ]
-            ]
+                        'foo',
+                    ],
+                ],
+            ],
         ]);
     }
 }

@@ -25,8 +25,8 @@ class FieldDirectiveTest extends TestCase
         }        
         ')->assertJson([
             'data' => [
-                'bar' => 'foo.bar'
-            ]
+                'bar' => 'foo.bar',
+            ],
         ]);
     }
 
@@ -47,8 +47,8 @@ class FieldDirectiveTest extends TestCase
         }        
         ')->assertJson([
             'data' => [
-                'bar' => 'foo.baz'
-            ]
+                'bar' => 'foo.baz',
+            ],
         ]);
     }
 
@@ -69,8 +69,8 @@ class FieldDirectiveTest extends TestCase
         }        
         ')->assertJson([
             'data' => [
-                'bar' => FooBar::CUSTOM_RESOLVE_RESULT
-            ]
+                'bar' => FooBar::CUSTOM_RESOLVE_RESULT,
+            ],
         ]);
     }
 

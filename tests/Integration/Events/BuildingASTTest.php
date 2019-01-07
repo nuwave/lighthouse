@@ -57,8 +57,8 @@ class BuildingASTTest extends TestCase
         ';
         $this->query($queryForBaseSchema)->assertJson([
             'data' => [
-                'foo' => 'foo'
-            ]
+                'foo' => 'foo',
+            ],
         ]);
 
         $queryForAdditionalSchema = '
@@ -68,8 +68,8 @@ class BuildingASTTest extends TestCase
         ';
         $this->query($queryForAdditionalSchema)->assertJson([
             'data' => [
-                'sayHello' => 'hello'
-            ]
+                'sayHello' => 'hello',
+            ],
         ]);
     }
 

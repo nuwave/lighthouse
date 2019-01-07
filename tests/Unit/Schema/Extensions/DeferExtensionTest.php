@@ -66,16 +66,16 @@ class DeferExtensionTest extends TestCase
                         'user' => [
                             'name' => 'John Doe',
                             'parent' => null,
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 [
                     'user.parent' => [
                         'data' => [
-                            'name' => 'Jane Doe'
-                        ]
-                    ]
-                ]
+                            'name' => 'Jane Doe',
+                        ],
+                    ],
+                ],
             ],
             $chunks
         );
@@ -368,7 +368,6 @@ class DeferExtensionTest extends TestCase
         }
         ";
 
-
         $chunks = $this->getStreamedChunks('
         { 
             user {
@@ -437,8 +436,8 @@ class DeferExtensionTest extends TestCase
             'errors' => [
                 [
                     'message' => 'The @defer directive cannot be placed on a Non-Nullable field.',
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -489,10 +488,10 @@ class DeferExtensionTest extends TestCase
                 'user' => [
                     'name' => 'John Doe',
                     'parent' => [
-                        'name' => 'Jane Doe'
-                    ]
-                ]
-            ]
+                        'name' => 'Jane Doe',
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -538,7 +537,7 @@ class DeferExtensionTest extends TestCase
         ')->assertJson([
             'data' => [
                 'user' => self::$data,
-            ]
+            ],
         ]);
     }
 
@@ -589,7 +588,7 @@ class DeferExtensionTest extends TestCase
         ')->assertJson([
             'data' => [
                 'updateUser' => self::$data,
-            ]
+            ],
         ]);
     }
 
@@ -629,7 +628,7 @@ class DeferExtensionTest extends TestCase
         ')->assertJson([
             'data' => [
                 'user' => self::$data,
-            ]
+            ],
         ]);
     }
 

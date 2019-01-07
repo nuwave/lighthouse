@@ -143,8 +143,6 @@ class DeferExtension extends GraphQLExtension
         }
 
         $this->deferred[$path] = $resolver;
-
-        return null;
     }
 
     /**

@@ -14,7 +14,8 @@ class PaginatorField
      *
      * @return array
      */
-    public function paginatorInfoResolver(LengthAwarePaginator $root): array {
+    public function paginatorInfoResolver(LengthAwarePaginator $root): array
+    {
         $count = $root->count();
         $currentPage = $root->currentPage();
         $firstItem = $root->firstItem();
@@ -43,7 +44,8 @@ class PaginatorField
      *
      * @return Collection
      */
-    public function dataResolver(LengthAwarePaginator $root): Collection {
+    public function dataResolver(LengthAwarePaginator $root): Collection
+    {
         return $root->values();
     }
 }

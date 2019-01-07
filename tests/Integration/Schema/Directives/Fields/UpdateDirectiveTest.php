@@ -46,8 +46,8 @@ class UpdateDirectiveTest extends DBTestCase
                 'updateCompany' => [
                     'id' => '1',
                     'name' => 'bar',
-                ]
-            ]
+                ],
+            ],
         ]);
         $this->assertSame('bar', Company::first()->name);
     }
@@ -92,8 +92,8 @@ class UpdateDirectiveTest extends DBTestCase
                 'updateCompany' => [
                     'id' => '1',
                     'name' => 'bar',
-                ]
-            ]
+                ],
+            ],
         ]);
         $this->assertSame('bar', Company::first()->name);
     }
@@ -151,10 +151,10 @@ class UpdateDirectiveTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '2'
-                    ]
-                ]
-            ]
+                        'id' => '2',
+                    ],
+                ],
+            ],
         ]);
 
         $task = Task::first();
@@ -198,8 +198,8 @@ class UpdateDirectiveTest extends DBTestCase
                 'updateCategory' => [
                     'category_id' => '1',
                     'name' => 'bar',
-                ]
-            ]
+                ],
+            ],
         ]);
         $this->assertSame('bar', Category::first()->name);
     }

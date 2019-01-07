@@ -54,8 +54,8 @@ class SubscriptionTest extends TestCase
     {
         $root = [
             'post' => [
-                'id' => 1
-            ]
+                'id' => 1,
+            ],
         ];
 
         $this->broadcaster->broadcast(

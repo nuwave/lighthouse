@@ -123,10 +123,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
                             'count' => 2,
                             'hasMorePages' => true,
                             'total' => $this->rolesCount,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJsonCount(2, 'data.user.roles.data');
     }
 
@@ -171,10 +171,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
                     'roles' => [
                         'pageInfo' => [
                             'hasNextPage' => true,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
@@ -244,8 +244,8 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
         $this->assertTrue($result->json('data.user.roles.pageInfo.hasNextPage'));
 
-        $userRolesEdges =$result->json('data.user.roles.edges');
-        $nestedUserRolesEdges =$result->json('data.user.roles.edges.0.node.users.0.roles.edges');
+        $userRolesEdges = $result->json('data.user.roles.edges');
+        $nestedUserRolesEdges = $result->json('data.user.roles.edges.0.node.users.0.roles.edges');
         $this->assertCount(2, $userRolesEdges);
         $this->assertCount(2, $nestedUserRolesEdges);
         $this->assertSame(Arr::get($userRolesEdges, 'node.0.acl.id'), Arr::get($nestedUserRolesEdges, 'node.0.acl.id'));

@@ -128,7 +128,7 @@ class GraphQLTest extends DBTestCase
                             email
                         }
                     }
-                    '
+                    ',
             ],
             [
                 'query' => '
@@ -137,7 +137,7 @@ class GraphQLTest extends DBTestCase
                             name
                         }
                     }
-                    '
+                    ',
             ],
         ])->assertExactJson([
             [
@@ -175,7 +175,7 @@ class GraphQLTest extends DBTestCase
                     }
                 }
             ',
-            'operationName' => 'User'
+            'operationName' => 'User',
         ])->assertExactJson([
             'data' => [
                 'user' => [

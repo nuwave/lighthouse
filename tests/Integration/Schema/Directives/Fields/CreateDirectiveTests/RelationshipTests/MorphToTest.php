@@ -63,10 +63,10 @@ class MorphToTest extends DBTestCase
                     'weekday' => 2,
                     'hourable' => [
                         'id' => '1',
-                        'name' => 'first_task'
-                    ]
-                ]
-            ]
+                        'name' => 'first_task',
+                    ],
+                ],
+            ],
         ]);
     }
 }

@@ -70,10 +70,10 @@ class MorphOneTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'hour' => [
-                        'weekday' => 3
-                    ]
-                ]
-            ]
+                        'weekday' => 3,
+                    ],
+                ],
+            ],
         ]);
     }
 }

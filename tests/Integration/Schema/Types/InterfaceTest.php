@@ -52,13 +52,13 @@ class InterfaceTest extends DBTestCase
                 'namedThings' => [
                     [
                         'name',
-                        'id'
+                        'id',
                     ],
                     [
                         'name',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
 
         $this->assertArrayNotHasKey('id', $result->json('data.namedThings.1'));
@@ -95,8 +95,8 @@ class InterfaceTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'namedThings' => $this->fetchGuy()
-            ]
+                'namedThings' => $this->fetchGuy(),
+            ],
         ]);
     }
 

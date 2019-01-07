@@ -71,11 +71,11 @@ class MorphManyTest extends DBTestCase
                     'name' => 'foo',
                     'hours' => [
                         [
-                            'weekday' => 3
-                        ]
-                    ]
-                ]
-            ]
+                            'weekday' => 3,
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

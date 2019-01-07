@@ -32,8 +32,8 @@ class ClientDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => 'baz'
-            ]
+                'foo' => 'baz',
+            ],
         ]);
     }
 

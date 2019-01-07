@@ -73,7 +73,7 @@ class SubscriptionTest extends TestCase
                             body
                         }
                     }
-                    '
+                    ',
             ],
             [
                 'query' => '
@@ -82,7 +82,7 @@ class SubscriptionTest extends TestCase
                             body
                         }
                     }
-                    '
+                    ',
             ],
         ]);
 
@@ -136,9 +136,9 @@ class SubscriptionTest extends TestCase
                 ],
                 'extensions' => [
                     'lighthouse_subscriptions' => [
-                        'channels' => []
-                    ]
-                ]
+                        'channels' => [],
+                    ],
+                ],
             ]);
     }
 

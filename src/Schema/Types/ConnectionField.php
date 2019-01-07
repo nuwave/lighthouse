@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 

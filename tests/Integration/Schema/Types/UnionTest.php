@@ -29,13 +29,13 @@ class UnionTest extends DBTestCase
             'data' => [
                 'stuff' => [
                     [
-                        'name'
+                        'name',
                     ],
                     [
-                        'title'
-                    ]
-                ]
-            ]
+                        'title',
+                    ],
+                ],
+            ],
         ]);
     }
 

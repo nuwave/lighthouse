@@ -60,10 +60,10 @@ class BelongsToTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '1'
-                    ]
-                ]
-            ]
+                        'id' => '1',
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -124,10 +124,10 @@ class BelongsToTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '1'
-                    ]
-                ]
-            ]
+                        'id' => '1',
+                    ],
+                ],
+            ],
         ]);
     }
 }

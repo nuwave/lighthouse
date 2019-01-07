@@ -51,14 +51,14 @@ class BatchLoaderTest extends DBTestCase
             [
                 'query' => $query,
                 'variables' => [
-                    'id' => $users[0]->getKey()
-                ]
+                    'id' => $users[0]->getKey(),
+                ],
             ],
             [
                 'query' => $query,
                 'variables' => [
-                    'id' => $users[1]->getKey()
-                ]
+                    'id' => $users[1]->getKey(),
+                ],
             ],
         ])->assertJsonCount(2)
         ->assertJsonCount(3, '0.data.user.tasks')

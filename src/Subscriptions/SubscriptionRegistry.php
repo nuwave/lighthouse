@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use GraphQL\Error\SyntaxError;
 use GraphQL\Language\Parser;
+use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;

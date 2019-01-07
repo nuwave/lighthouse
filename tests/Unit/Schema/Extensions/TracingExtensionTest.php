@@ -33,10 +33,10 @@ SCHEMA;
             'extensions' => [
                 'tracing' => [
                     'execution' => [
-                        'resolvers'
-                    ]
-                ]
-            ]
+                        'resolvers',
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -50,15 +50,15 @@ SCHEMA;
                 {
                     foo
                 }
-                '
+                ',
         ];
         $expectedResponse = [
             'extensions' => [
                 'tracing' => [
                     'execution' => [
-                        'resolvers'
-                    ]
-                ]
+                        'resolvers',
+                    ],
+                ],
             ],
         ];
         $result = $this->postGraphQL([
@@ -71,11 +71,11 @@ SCHEMA;
                     'extensions' => [
                         'tracing' => [
                             'execution' => [
-                                'resolvers'
-                            ]
-                        ]
-                    ]
-                ]
+                                'resolvers',
+                            ],
+                        ],
+                    ],
+                ],
             ]);
 
         $this->assertSame(

@@ -33,9 +33,9 @@ class RenameDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'bar' => [
-                    'bar' => 'asdf'
-                ]
-            ]
+                    'bar' => 'asdf',
+                ],
+            ],
         ]);
     }
 

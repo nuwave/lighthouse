@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\User;
 
 interface GraphQLContext
 {

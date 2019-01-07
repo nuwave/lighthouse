@@ -31,9 +31,9 @@ class MethodDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'foo' => [
-                    'bar' => 'foo'
-                ]
-            ]
+                    'bar' => 'foo',
+                ],
+            ],
         ]);
     }
 
@@ -51,9 +51,9 @@ class MethodDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'foo' => [
-                    'bar' => 'fooasdf'
-                ]
-            ]
+                    'bar' => 'fooasdf',
+                ],
+            ],
         ]);
     }
 

@@ -30,8 +30,8 @@ class MiddlewareDirectiveTest extends TestCase
 
         $this->query($query)->assertJson([
             'data' => [
-                'foo' => 1
-            ]
+                'foo' => 1,
+            ],
         ]);
     }
 
@@ -76,9 +76,9 @@ class MiddlewareDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => Authenticate::MESSAGE
-                ]
-            ]
+                    'message' => Authenticate::MESSAGE,
+                ],
+            ],
         ]);
     }
 
@@ -105,8 +105,8 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => 1
-            ]
+                'foo' => 1,
+            ],
         ]);
     }
 
@@ -133,9 +133,9 @@ class MiddlewareDirectiveTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => Authenticate::MESSAGE
-                ]
-            ]
+                    'message' => Authenticate::MESSAGE,
+                ],
+            ],
         ]);
     }
 
@@ -162,16 +162,16 @@ class MiddlewareDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'foo' => null,
-                'pass' => 1
+                'pass' => 1,
             ],
             'errors' => [
                 [
                     'path' => [
-                        'foo'
+                        'foo',
                     ],
-                    'message' => Authenticate::MESSAGE
-                ]
-            ]
+                    'message' => Authenticate::MESSAGE,
+                ],
+            ],
         ]);
     }
 

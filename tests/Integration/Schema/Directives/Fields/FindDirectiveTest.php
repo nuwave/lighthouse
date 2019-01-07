@@ -36,8 +36,8 @@ class FindDirectiveTest extends DBTestCase
         }
         ")->assertJsonFragment([
             'user' => [
-                'name' => 'B'
-            ]
+                'name' => 'B',
+            ],
         ]);
     }
 
@@ -67,7 +67,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ")->assertJsonFragment([
-            'name' => 'A'
+            'name' => 'A',
         ]);
     }
 
@@ -137,9 +137,9 @@ class FindDirectiveTest extends DBTestCase
             'data' => [
                 'user' => [
                     'id' => $userA->id,
-                    'name' => 'A'
-                ]
-            ]
+                    'name' => 'A',
+                ],
+            ],
         ]);
     }
 }

@@ -95,15 +95,15 @@ abstract class TestCase extends BaseTestCase
 
         TestResponse::macro(
             'assertErrorCategory',
-            function(string $category): TestResponse {
+            function (string $category): TestResponse {
                 $this->assertJson([
                     'errors' => [
                         [
                             'extensions' => [
-                                'category' => $category
-                            ]
-                        ]
-                    ]
+                                'category' => $category,
+                            ],
+                        ],
+                    ],
                 ]);
 
                 return $this;
@@ -122,8 +122,7 @@ abstract class TestCase extends BaseTestCase
     protected function resolveApplicationExceptionHandler($app)
     {
         $app->singleton(ExceptionHandler::class, function () {
-            return new class implements ExceptionHandler
-            {
+            return new class implements ExceptionHandler {
                 /**
                  * Report or log an exception.
                  *
@@ -177,7 +176,7 @@ abstract class TestCase extends BaseTestCase
     {
         return $this->postGraphQL(
             [
-                'query' => $query
+                'query' => $query,
             ]
         );
     }
@@ -209,7 +208,7 @@ abstract class TestCase extends BaseTestCase
     {
         return $this->buildSchema(
             $schema
-            . $this->placeholderQuery()
+            .$this->placeholderQuery()
         );
     }
 

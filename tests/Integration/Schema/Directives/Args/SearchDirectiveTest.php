@@ -81,11 +81,11 @@ class SearchDirectiveTest extends DBTestCase
                             'id' => $postA->id,
                         ],
                         [
-                            'id' => $postC->id
-                        ]
-                    ]
-                ]
-            ]
+                            'id' => $postC->id,
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -151,11 +151,11 @@ class SearchDirectiveTest extends DBTestCase
                             'id' => "$postA->id",
                         ],
                         [
-                            'id' => "$postB->id"
-                        ]
-                    ]
-                ]
-            ]
+                            'id' => "$postB->id",
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

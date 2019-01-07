@@ -50,9 +50,9 @@ class CacheDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foobar'
-                ]
-            ]
+                    'name' => 'foobar',
+                ],
+            ],
         ]);
 
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
@@ -85,9 +85,9 @@ class CacheDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foobar'
-                ]
-            ]
+                    'name' => 'foobar',
+                ],
+            ],
         ]);
 
         $this->assertSame('foobar', $this->cache->get('user:foo@bar.com:name'));
@@ -123,9 +123,9 @@ class CacheDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foobar'
-                ]
-            ]
+                    'name' => 'foobar',
+                ],
+            ],
         ]);
 
         $this->assertSame('foobar', $this->cache->get($cacheKey));
@@ -196,7 +196,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $query = '
         {
-            user(id: ' . $user->getKey() . ') {
+            user(id: '.$user->getKey().') {
                 id
                 name
                 posts(count: 3) {

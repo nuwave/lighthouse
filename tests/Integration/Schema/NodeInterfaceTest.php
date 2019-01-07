@@ -61,7 +61,7 @@ class NodeInterfaceTest extends DBTestCase
                     'id' => $secondGlobalId,
                     'name' => $this->testTuples[2]['name'],
                 ],
-            ]
+            ],
         ]);
     }
 
@@ -105,7 +105,7 @@ class NodeInterfaceTest extends DBTestCase
                     'id' => $globalId,
                     'name' => 'Sepp',
                 ],
-            ]
+            ],
         ]);
     }
 }

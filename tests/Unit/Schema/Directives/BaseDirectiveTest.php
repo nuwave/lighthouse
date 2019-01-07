@@ -8,7 +8,6 @@ use Tests\Utils\Models\Closure;
 use Tests\Utils\Models\Category;
 use Tests\Utils\ModelsSecondary\OnlyHere;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Tests\Utils\ModelsSecondary\Category as CategorySecondary;

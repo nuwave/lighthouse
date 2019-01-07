@@ -72,9 +72,9 @@ class CanDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foo'
-                ]
-            ]
+                    'name' => 'foo',
+                ],
+            ],
         ]);
     }
 
@@ -111,9 +111,9 @@ class CanDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foo'
-                ]
-            ]
+                    'name' => 'foo',
+                ],
+            ],
         ]);
     }
 
@@ -150,9 +150,9 @@ class CanDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'foo'
-                ]
-            ]
+                    'name' => 'foo',
+                ],
+            ],
         ]);
     }
 

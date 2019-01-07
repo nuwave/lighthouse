@@ -36,9 +36,9 @@ class FirstDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'user' => [
-                    'name' => 'B'
-                ]
-            ]
+                    'name' => 'B',
+                ],
+            ],
         ]);
     }
 
@@ -69,9 +69,9 @@ class FirstDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'id' => $userA->id
-                ]
-            ]
+                    'id' => $userA->id,
+                ],
+            ],
         ]);
     }
 }

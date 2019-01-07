@@ -68,11 +68,11 @@ class HasManyTest extends DBTestCase
                     'tasks' => [
                         [
                             'id' => '1',
-                            'name' => 'bar'
-                        ]
-                    ]
-                ]
-            ]
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

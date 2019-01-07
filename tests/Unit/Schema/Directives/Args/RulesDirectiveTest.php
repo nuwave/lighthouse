@@ -94,14 +94,14 @@ class RulesDirectiveTest extends TestCase
                     'locations' => [
                         [
                             'line' => 2,
-                            'column' => 13
-                        ]
+                            'column' => 13,
+                        ],
                     ],
                     'path' => ['foo'],
                 ],
             ],
             'data' => [
-                'foo' => null
+                'foo' => null,
             ],
         ])->assertJson(
             $this->query('
@@ -133,7 +133,7 @@ class RulesDirectiveTest extends TestCase
                     'first_name' => 'John',
                     'last_name' => 'Doe',
                     'full_name' => null,
-                ]
+                ],
             ],
             'errors' => [
                 [
@@ -142,12 +142,12 @@ class RulesDirectiveTest extends TestCase
                     'extensions' => [
                         'validation' => [
                             'formatted' => [
-                                'foobar'
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'foobar',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJson(
             $this->query('
         mutation {
@@ -177,7 +177,7 @@ class RulesDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'foo' => null,
-            ]
+            ],
         ])->assertJsonCount(1, 'errors')
         ->assertJson(
             $this->query('
@@ -222,7 +222,7 @@ class RulesDirectiveTest extends TestCase
                 'foo' => [
                     'first_name' => 'John',
                     'input_object' => null,
-                ]
+                ],
             ],
             'errors' => [
                 [
@@ -249,10 +249,10 @@ class RulesDirectiveTest extends TestCase
                             'input.self.self.self.emails.0' => [
                                 'The input.self.self.self.emails.0 may not be greater than 20 characters.',
                             ],
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -286,7 +286,7 @@ class RulesDirectiveTest extends TestCase
                 'foo' => [
                     'first_name' => 'John',
                     'input_object' => null,
-                ]
+                ],
             ],
             'errors' => [
                 [
@@ -301,10 +301,10 @@ class RulesDirectiveTest extends TestCase
                             'input.self.self.self.email' => [
                                 'The input.self.self.self.email may not be greater than 20 characters.',
                             ],
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 

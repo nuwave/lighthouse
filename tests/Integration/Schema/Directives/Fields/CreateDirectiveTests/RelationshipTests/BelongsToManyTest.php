@@ -71,11 +71,11 @@ class BelongsToManyTest extends DBTestCase
                     'users' => [
                         [
                             'id' => '1',
-                            'name' => 'bar'
-                        ]
-                    ]
-                ]
-            ]
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -140,15 +140,15 @@ class BelongsToManyTest extends DBTestCase
                     'users' => [
                         [
                             'id' => '1',
-                            'name' => 'user_one'
+                            'name' => 'user_one',
                         ],
                         [
                             'id' => '2',
-                            'name' => 'user_two'
+                            'name' => 'user_two',
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }

@@ -44,12 +44,12 @@ class HasOneDirectiveTest extends DBTestCase
             'data' => [
                 'tasks' => [
                     [
-                        'post' => null
+                        'post' => null,
                     ],
                     [
                         'post' => [
-                            'id' => 1
-                        ]
+                            'id' => 1,
+                        ],
                     ],
                 ],
             ],

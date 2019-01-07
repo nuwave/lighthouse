@@ -159,10 +159,10 @@ class HasManyDirectiveTest extends DBTestCase
                             'count' => 2,
                             'hasMorePages' => true,
                             'total' => 3,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
@@ -208,10 +208,10 @@ class HasManyDirectiveTest extends DBTestCase
                             'count' => 2,
                             'hasMorePages' => true,
                             'total' => 3,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
@@ -254,11 +254,11 @@ class HasManyDirectiveTest extends DBTestCase
                 'user' => [
                     'tasks' => [
                         'pageInfo' => [
-                            'hasNextPage' => true
-                        ]
-                    ]
-                ]
-            ]
+                            'hasNextPage' => true,
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
@@ -301,11 +301,11 @@ class HasManyDirectiveTest extends DBTestCase
                 'user' => [
                     'tasks' => [
                         'pageInfo' => [
-                            'hasNextPage' => true
-                        ]
-                    ]
-                ]
-            ]
+                            'hasNextPage' => true,
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
@@ -358,11 +358,11 @@ class HasManyDirectiveTest extends DBTestCase
                 'user' => [
                     'tasks' => [
                         'pageInfo' => [
-                            'hasNextPage' => true
-                        ]
-                    ]
-                ]
-            ]
+                            'hasNextPage' => true,
+                        ],
+                    ],
+                ],
+            ],
         ])->assertJsonCount(2, 'data.user.tasks.edges')
         ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
     }
@@ -421,7 +421,7 @@ class HasManyDirectiveTest extends DBTestCase
                         'parent' => [
                             'id' => 1,
                             'parent' => null,
-                        ]
+                        ],
                     ],
                     [
                         'id' => 3,
@@ -430,10 +430,10 @@ class HasManyDirectiveTest extends DBTestCase
                             'parent' => [
                                 'id' => 1,
                             ],
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
