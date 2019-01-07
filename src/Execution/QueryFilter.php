@@ -98,7 +98,7 @@ class QueryFilter
          */
         foreach ($args as $key => $value) {
             /**
-             * @var string  
+             * @var string
              * @var string[] $argNames
              */
             foreach ($this->multiArgumentFiltersArgNames as $filterKey => $argNames) {

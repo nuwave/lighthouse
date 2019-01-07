@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 use Carbon\Carbon;
 use GraphQL\Error\Error;
 use GraphQL\Utils\Utils;
-use GraphQL\Language\AST\Node;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Language\AST\StringValueNode;
