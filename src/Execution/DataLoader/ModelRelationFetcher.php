@@ -51,8 +51,7 @@ class ModelRelationFetcher
     public function setRelations(array $relations): self
     {
         // Parse and set the relations.
-        $this->relations =
-            $this->newModelQuery()
+        $this->relations = $this->newModelQuery()
             ->with($relations)
             ->getEagerLoads();
 

@@ -23,7 +23,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * The arguments that were passed to the field.
      *
-     * @var array
+     * @var mixed[]
      */
     protected $args;
 

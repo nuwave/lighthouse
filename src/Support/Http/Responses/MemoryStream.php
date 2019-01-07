@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 class MemoryStream extends Stream implements CanStreamResponse
 {
     /**
-     * @var array
+     * @var mixed[]
      */
     public $chunks = [];
 
