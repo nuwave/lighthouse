@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -29,6 +28,8 @@ class FindDirective extends BaseDirective implements FieldResolver
      * @param  FieldValue $fieldValue
      *
      * @return FieldValue
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {

@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Illuminate\Support\Collection;
 use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;

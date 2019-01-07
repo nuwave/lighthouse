@@ -318,7 +318,7 @@ class DirectiveFactory
     /**
      * Get handler for field.
      *
-     * @param  FieldDefinitionNode $field
+     * @param  FieldDefinitionNode  $field
      *
      * @return FieldResolver|null
      */

@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Http\Request;
 use GraphQL\Language\AST\Node;
-use Illuminate\Routing\Router;
 use GraphQL\Language\AST\NodeList;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
@@ -97,11 +96,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param  Node $node
-     * @param  DocumentAST $documentAST
-     *
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {

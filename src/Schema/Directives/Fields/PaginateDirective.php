@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -150,7 +149,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * This works differently as in other directives, so we define a seperate function for it.
+     * This works differently as in other directives, so we define a separate function for it.
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      *

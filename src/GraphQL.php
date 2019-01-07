@@ -172,7 +172,7 @@ class GraphQL
             function (array $errors, callable $formatter): array {
                 // Do report: Errors that are not client safe, schema definition errors
                 // Do not report: Validation, Errors that are meant for the final user
-                // Malformed Queries: Log if you are dog-fooding your app
+                // Malformed Queries: Log if you are dogfooding your app
 
                 /**
                  * Handlers are defined as classes in the config.

@@ -183,6 +183,8 @@ class FieldValue
      * Get default field resolver.
      *
      * @return \Closure
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function defaultResolver(): Closure
     {

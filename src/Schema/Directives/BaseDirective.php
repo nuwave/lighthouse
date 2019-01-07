@@ -104,6 +104,7 @@ abstract class BaseDirective implements Directive
      * @param  string $argumentName The default argument name "model" may be overwritten
      *
      * @return string
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {

@@ -22,10 +22,11 @@ class DeprecatedDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param  FieldValue $value
-     * @param  \Closure   $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      *
-     * @return FieldValue
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function handleField(FieldValue $value, \Closure $next)
     {
@@ -33,7 +34,6 @@ class DeprecatedDirective extends BaseDirective implements FieldMiddleware
 
         if (! $reason) {
             $parentName = $value->getParentName();
-            $fieldName = $value->getFieldName();
             $message = "The @{$this->name()} directive requires a `reason` argument [defined on {$parentName}]";
 
             throw new DirectiveException($message);

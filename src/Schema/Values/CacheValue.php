@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use GraphQL\Type\Definition\ResolveInfo;
 
 class CacheValue
 {

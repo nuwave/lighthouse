@@ -195,7 +195,7 @@ class MutationExecutor
      *         An empty instance of the model that should be updated
      * @param  \Illuminate\Support\Collection  $args
      *         The corresponding slice of the input arguments for updating this model
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @param  \Illuminate\Database\Eloquent\Relations\HasMany|null  $parentRelation
      *         If we are in a nested update, we can use this to associate the new model to its parent
      * @return \Illuminate\Database\Eloquent\Model
      */

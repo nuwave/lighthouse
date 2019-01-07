@@ -30,7 +30,7 @@ such as the execution state, the field name, path to the field from the root, an
 ## Complexity function signature
 
 The complexity function is used to calculate a query complexity score for a field.
-You can define your own complexity function with the [@complexity](../api-reference/directives#complexity) directive.
+You can define your own complexity function with the [@complexity](../api-reference/directives.md#complexity) directive.
 
 ```php
 <?php

@@ -109,7 +109,7 @@ type User {
 
 ## @bcrypt
 
-***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.md#argtransformerdirective).
 
 Run the `bcrypt` function on the argument it is defined on.
 
@@ -340,9 +340,9 @@ Specify a custom resolver function for a single field.
 
 In most cases, you do not even need this directive. Make sure you read about
 the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data),
-as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolver).
+as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolvers).
 
-Pass a class and a method to the `resolver` argument and seperate them with an `@` symbol.
+Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
 
 ```graphql
 type Mutation {
@@ -968,7 +968,7 @@ type Query {
 
 Declare a class to handle the broadcasting of a subscription to clients.
 
-If you follow the default naming conventions for [defining subscription fields]([class](../extensions/subscriptions.md#defining-fields) )
+If you follow the default naming conventions for [defining subscription fields](../extensions/subscriptions.md#defining-fields)
 you do not need this directive. It is only useful if you need to override the default namespace.
 
 ```graphql
@@ -982,7 +982,7 @@ type Subscription {
 
 ## @trim
 
-***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.md#argtransformerdirective).
 
 Run the `trim` function on the argument it is defined on.
 

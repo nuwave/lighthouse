@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
 class SubscriptionExtension extends GraphQLExtension

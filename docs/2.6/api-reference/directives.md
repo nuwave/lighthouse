@@ -286,9 +286,9 @@ Specify a custom resolver function for a single field.
 
 In most cases, you do not even need this directive. Make sure you read about
 the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data),
-as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolver).
+as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolvers).
 
-Pass a class and a method to the `resolver` argument and seperate them with an `@` symbol.
+Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
 
 ```graphql
 type Mutation {
@@ -345,7 +345,7 @@ Other than [@find](#find), this will not throw an error if more than one items a
 ## @enum
 
 Map the underlying value to an enum key. When dealing with the Enum type in your code,
-you will recieve the defined value instead of the string key.
+you will receive the defined value instead of the string key.
 
 ```graphql
 enum Role {

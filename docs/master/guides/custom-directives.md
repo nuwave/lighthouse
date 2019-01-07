@@ -105,7 +105,7 @@ class CreateUser
     public function resolve($root, array $args)
     {
         return User::create([
-            // This will be the "trimed" value of the `name` argument
+            // This will be the trimmed value of the `name` argument
             'name' => $args['name']
         ]);
     }

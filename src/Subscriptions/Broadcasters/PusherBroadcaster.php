@@ -69,7 +69,7 @@ class PusherBroadcaster implements Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      *
-     * @return \Illuminate\Support\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function hook(Request $request): JsonResponse
     {

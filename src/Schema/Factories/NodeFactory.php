@@ -134,6 +134,8 @@ class NodeFactory
      * @param  TypeDefinitionNode $typeDefinition
      *
      * @return Type
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function resolveTypeDefault(TypeDefinitionNode $typeDefinition): Type
     {

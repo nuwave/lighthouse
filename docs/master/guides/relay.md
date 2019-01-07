@@ -16,7 +16,7 @@ This automatically converts the type definition into a relay connection and cons
 the appropriate queries via the underlying Eloquent model.
 
 Connections can also be used for sub-fields of a type, given they are defined as a HasMany-Relationship
-in Eloquent. Use the [@hasMany](../api-reference/directives.md#hasMany) directive.
+in Eloquent. Use the [@hasMany](../api-reference/directives.md#hasmany) directive.
 
 ```graphql
 type User {

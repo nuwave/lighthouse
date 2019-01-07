@@ -53,7 +53,7 @@ without returning it directly.
 
 ### One To One
 
-Use the [@hasOne](../api-reference/directives.md#hasOne) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one)
+Use the [@hasOne](../api-reference/directives.md#hasone) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one)
 between two types in your schema.
 
 ```graphql
@@ -62,7 +62,7 @@ type User {
 }
 ```
 
-The inverse can be defined through the [@belongsTo](../api-reference/directives#belongsTo) directive.
+The inverse can be defined through the [@belongsTo](../api-reference/directives.md#belongsto) directive.
 
 ```graphql
 type Phone {
@@ -72,7 +72,7 @@ type Phone {
 
 ### One To Many
 
-Use the [@hasMany](../api-reference/directives#hasMany) directive to define a [one-to-many relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
+Use the [@hasMany](../api-reference/directives.md#hasmany) directive to define a [one-to-many relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
 
 ```graphql
 type Post {
@@ -80,7 +80,7 @@ type Post {
 }
 ```
 
-Again, the inverse is defined with the [@belongsTo](../api-reference/directives#belongsTo) directive.
+Again, the inverse is defined with the [@belongsTo](../api-reference/directives.md#belongsto) directive.
 
 ```graphql
 type Comment {
@@ -92,7 +92,7 @@ type Comment {
 
 While [many-to-many relationships](https://laravel.com/docs/5.7/eloquent-relationships#many-to-many)
 are a bit more work to set up in Laravel, defining them in Lighthouse is a breeze.
-Use the [@belongsToMany](../api-reference/directives#belongsToMany) directive to define it.
+Use the [@belongsToMany](../api-reference/directives.md#belongstomany) directive to define it.
 
 ```graphql
 type User {
