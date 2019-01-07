@@ -33,7 +33,8 @@ class GraphQLExtensionTest extends TestCase
         $this->schema = '
         type Query {
             foo: String
-        }';
+        }
+        ';
 
         $this->query('
         {

@@ -36,7 +36,7 @@ class BuildingASTTest extends TestCase
 
                 return "
                 extend type Query {
-                    sayHello: String @field(resolver: \"$resolver\")
+                    sayHello: String @field(resolver: \"{$resolver}\")
                 }
                 ";
             }
@@ -46,7 +46,7 @@ class BuildingASTTest extends TestCase
 
         $this->schema = "
         type Query {
-            foo: String @field(resolver: \"$resolver\")
+            foo: String @field(resolver: \"{$resolver}\")
         }
         ";
 

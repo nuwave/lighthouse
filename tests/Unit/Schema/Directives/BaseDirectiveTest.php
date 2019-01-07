@@ -111,9 +111,8 @@ class BaseDirectiveTest extends TestCase
      *
      * Calls to non-public methods are piped through by the
      *
-     * @param TypeSystemDefinitionNode $definitionNode
-     *
-     * @return BaseDirective
+     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
+     * @return \Nuwave\Lighthouse\Schema\Directives\BaseDirective
      */
     protected function constructTestDirective($definitionNode): BaseDirective
     {

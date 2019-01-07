@@ -6,6 +6,7 @@ use Tests\DBTestCase;
 use Illuminate\Support\Str;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -214,7 +215,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertCount(3, $posts);
 
         $queries = 0;
-        \DB::listen(function (QueryExecuted $query) use (&$queries): void {
+        DB::listen(function (QueryExecuted $query) use (&$queries): void {
             // TODO: Find a better way of doing this
             if (! Str::contains($query->sql, [
                 'drop',
@@ -286,7 +287,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertCount(3, $posts);
 
         $queries = 0;
-        \DB::listen(function (QueryExecuted $query) use (&$queries): void {
+        DB::listen(function (QueryExecuted $query) use (&$queries): void {
             // TODO: Find a better way of doing this
             if (! Str::contains($query->sql, [
                 'drop',

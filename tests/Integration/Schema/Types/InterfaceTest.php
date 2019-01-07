@@ -137,7 +137,8 @@ class InterfaceTest extends DBTestCase
                     }
                 }
             }
-        }');
+        }
+        ');
 
         $interface = collect($result->json('data.__schema.types'))
             ->firstWhere('name', 'Nameable');

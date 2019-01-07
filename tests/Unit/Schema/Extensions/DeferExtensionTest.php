@@ -2,21 +2,15 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
-use Exception;
-use GraphQL\Error\Error;
 use Tests\TestCase;
+use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
 class DeferExtensionTest extends TestCase
 {
-    /**
-     * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream
-     */
-    protected $stream;
+    use RequestsStreamedResponses;
 
     /**
      * @var mixed[]
@@ -27,13 +21,7 @@ class DeferExtensionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->stream = new MemoryStream();
-
-        $app->singleton(CanStreamResponse::class, function (): MemoryStream {
-            return $this->stream;
-        });
-
-        $app['config']->set('lighthouse.extensions', [DeferExtension::class]);
+        $this->setUpInMemoryStream($app);
     }
 
     /**
@@ -701,20 +689,5 @@ class DeferExtensionTest extends TestCase
     public function throw(): void
     {
         throw new Error('deferred_exception');
-    }
-
-    /**
-     * Send the query and capture all chunks of the streamed response.
-     *
-     * @param  string  $query
-     * @return array
-     */
-    protected function getStreamedChunks(string $query): array
-    {
-        $this->query($query)
-            ->baseResponse
-            ->send();
-
-        return $this->stream->chunks;
     }
 }

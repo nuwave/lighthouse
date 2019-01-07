@@ -18,21 +18,26 @@ class ContextFactoryTest extends TestCase
                 public function generate(Request $request)
                 {
                     return new class($request) implements GraphQLContext {
-                        public function __construct($request)
+                        /**
+                         * @var \Illuminate\Http\Request
+                         */
+                        protected $request;
+
+                        public function __construct(Request $request)
                         {
                             $this->request = $request;
                         }
 
-                        public function user()
+                        public function user(): void
                         {
                         }
 
-                        public function request()
+                        public function request(): Request
                         {
                             return $this->request;
                         }
 
-                        public function foo()
+                        public function foo(): string
                         {
                             return 'custom.context';
                         }

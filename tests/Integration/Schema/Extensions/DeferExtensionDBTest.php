@@ -6,33 +6,24 @@ use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
-use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
+use Tests\Unit\Schema\Extensions\RequestsStreamedResponses;
 
 class DeferExtensionDBTest extends DBTestCase
 {
+    use RequestsStreamedResponses;
+
     /**
      * @var \Closure
      */
     protected static $resolver;
 
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->stream = new MemoryStream();
-
-        $app->singleton(CanStreamResponse::class, function () {
-            return $this->stream;
-        });
-
-        $app['config']->set('lighthouse.extensions', [DeferExtension::class]);
+        $this->setUpInMemoryStream($app);
     }
 
     /**
@@ -40,14 +31,13 @@ class DeferExtensionDBTest extends DBTestCase
      */
     public function itCanDeferBelongsToFields(): void
     {
-        $queries = 0;
-        $resolver = addslashes(self::class).'@resolve';
         $company = factory(Company::class)->create();
         $user = factory(User::class)->create([
             'company_id' => $company->getKey(),
         ]);
 
-        self::$resolver = function () use ($user) {
+        $resolver = addslashes(self::class).'@resolve';
+        self::$resolver = function () use ($user): User {
             return $user;
         };
 
@@ -66,11 +56,12 @@ class DeferExtensionDBTest extends DBTestCase
         }
         ";
 
-        \DB::listen(function ($q) use (&$queries) {
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         {
             user {
                 email
@@ -78,9 +69,8 @@ class DeferExtensionDBTest extends DBTestCase
                     name
                 }
             }
-        }')->baseResponse->send();
-
-        $chunks = $this->stream->chunks;
+        }
+        ');
 
         $this->assertSame(1, $queries);
         $this->assertCount(2, $chunks);
@@ -99,15 +89,14 @@ class DeferExtensionDBTest extends DBTestCase
      */
     public function itCanDeferNestedRelationshipFields(): void
     {
-        $queries = 0;
-        $resolver = addslashes(self::class).'@resolve';
         $company = factory(Company::class)->create();
         $users = factory(User::class, 5)->create([
             'company_id' => $company->getKey(),
         ]);
         $user = $users[0];
 
-        self::$resolver = function () use ($user) {
+        $resolver = addslashes(self::class).'@resolve';
+        self::$resolver = function () use ($user): User {
             return $user;
         };
 
@@ -124,13 +113,15 @@ class DeferExtensionDBTest extends DBTestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        \DB::listen(function ($q) use (&$queries) {
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         {
             user {
                 email
@@ -141,9 +132,8 @@ class DeferExtensionDBTest extends DBTestCase
                     }
                 }
             }
-        }')->baseResponse->send();
-
-        $chunks = $this->stream->chunks;
+        }
+        ');
 
         $this->assertSame(2, $queries);
         $this->assertCount(3, $chunks);
@@ -161,9 +151,12 @@ class DeferExtensionDBTest extends DBTestCase
         $this->assertArrayHasKey('user.company.users', $deferredUsers);
         $this->assertCount(5, $deferredUsers['user.company.users']['data']);
         $this->assertSame(
-            $users->map(function ($user) {
-                return ['email' => $user->email];
-            })->values()->toArray(),
+            $users
+                ->map(function (User $user): array {
+                    return ['email' => $user->email];
+                })
+                ->values()
+                ->toArray(),
             $deferredUsers['user.company.users']['data']
         );
     }
@@ -173,17 +166,17 @@ class DeferExtensionDBTest extends DBTestCase
      */
     public function itCanDeferNestedListFields(): void
     {
-        $queries = 0;
-        $resolver = addslashes(self::class).'@resolve';
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Company> $companies */
         $companies = factory(Company::class, 2)
             ->create()
-            ->each(function (Company $company) {
+            ->each(function (Company $company): void {
                 factory(User::class, 3)->create([
                     'company_id' => $company->getKey(),
                 ]);
             });
 
-        self::$resolver = function () use ($companies) {
+        $resolver = addslashes(self::class).'@resolve';
+        self::$resolver = function () use ($companies): Collection {
             return $companies;
         };
 
@@ -200,14 +193,15 @@ class DeferExtensionDBTest extends DBTestCase
 
         type Query {
             companies: [Company] @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-
-        \DB::listen(function ($q) use (&$queries) {
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
             $queries++;
         });
 
-        $this->query('
+        $chunks = $this->getStreamedChunks('
         {
             companies {
                 name
@@ -219,9 +213,7 @@ class DeferExtensionDBTest extends DBTestCase
                 }
             }
         }
-        ')->baseResponse->send();
-
-        $chunks = $this->stream->chunks;
+        ');
 
         $this->assertSame(2, $queries);
         $this->assertCount(3, $chunks);
@@ -233,27 +225,34 @@ class DeferExtensionDBTest extends DBTestCase
         $this->assertNull(Arr::get($deferredCompanies, 'data.companies.1.users'));
 
         $deferredUsers = $chunks[1];
-        $companies->each(function ($company, $i) use ($deferredUsers) {
+        $companies->each(function (Company $company, int $i) use ($deferredUsers): void {
             $key = "companies.{$i}.users";
             $this->assertArrayHasKey($key, $deferredUsers);
+
             $this->assertSame(
-                $company->users->map(function ($user) {
-                    return [
-                        'email' => $user->email,
-                        'company' => null,
-                    ];
-                })->toArray(),
+                $company->users
+                    ->map(function (User $user): array {
+                        return [
+                            'email' => $user->email,
+                            'company' => null,
+                        ];
+                    })
+                    ->toArray(),
                 $deferredUsers[$key]['data']
             );
         });
 
         $deferredCompanies = $chunks[2];
         $this->assertCount(6, $deferredCompanies);
-        collect($deferredCompanies)->each(function ($item) use ($companies) {
+        collect($deferredCompanies)->each(function (array $item) use ($companies): void {
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
+
             $this->assertTrue(
-                in_array($item['name'], $companies->pluck('name')->all())
+                in_array(
+                    $item['name'],
+                    $companies->pluck('name')->all()
+                )
             );
         });
     }

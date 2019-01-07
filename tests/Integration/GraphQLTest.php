@@ -121,8 +121,24 @@ class GraphQLTest extends DBTestCase
     public function itCanResolveBatchedQueries(): void
     {
         $this->postGraphQL([
-            ['query' => '{ user { email } }'],
-            ['query' => '{ user { name } }'],
+            [
+                'query' => '
+                    {
+                        user {
+                            email
+                        }
+                    }
+                    '
+            ],
+            [
+                'query' => '
+                    {
+                        user {
+                            name
+                        }
+                    }
+                    '
+            ],
         ])->assertExactJson([
             [
                 'data' => [

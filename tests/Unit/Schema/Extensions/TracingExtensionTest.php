@@ -45,20 +45,28 @@ SCHEMA;
      */
     public function itCanAddTracingExtensionMetaToBatchedResults(): void
     {
+        $postData = [
+            'query' => '
+                {
+                    foo
+                }
+                '
+        ];
+        $expectedResponse = [
+            'extensions' => [
+                'tracing' => [
+                    'execution' => [
+                        'resolvers'
+                    ]
+                ]
+            ],
+        ];
         $result = $this->postGraphQL([
-            ['query' => '{ foo }'],
-            ['query' => '{ foo }'],
+            $postData,
+            $postData,
         ])->assertJsonCount(2)
             ->assertJsonStructure([
-                [
-                    'extensions' => [
-                        'tracing' => [
-                            'execution' => [
-                                'resolvers'
-                            ]
-                        ]
-                    ],
-                ],
+                $expectedResponse,
                 [
                     'extensions' => [
                         'tracing' => [

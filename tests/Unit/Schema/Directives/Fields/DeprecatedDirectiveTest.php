@@ -36,8 +36,8 @@ class DeprecatedDirectiveTest extends TestCase
             }
         }
         ';
-
-        $this->query($introspectionQuery)->assertJsonCount(1, 'data.__schema.queryType.fields');
+        $this->query($introspectionQuery)
+            ->assertJsonCount(1, 'data.__schema.queryType.fields');
 
         $includeDeprecatedIntrospectionQuery = '
         {
@@ -52,8 +52,8 @@ class DeprecatedDirectiveTest extends TestCase
             }
         }
         ';
-
         $result = $this->query($includeDeprecatedIntrospectionQuery);
+
         $deprecatedFields = Arr::where(
             $result->json('data.__schema.queryType.fields'),
             function (array $field): bool {

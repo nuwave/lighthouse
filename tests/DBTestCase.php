@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-class DBTestCase extends TestCase
+abstract class DBTestCase extends TestCase
 {
     protected function setUp()
     {

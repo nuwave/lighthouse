@@ -17,6 +17,7 @@ class FirstDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
+        
         type Query {
             user(id: ID @eq): User @first(model: "User")
         }
@@ -49,6 +50,7 @@ class FirstDirectiveTest extends DBTestCase
             id: ID!
             name: String!
         }
+        
         type Query {
             user(name: String @eq): User @first(model: "User")
         }

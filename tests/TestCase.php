@@ -15,7 +15,7 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
 
-class TestCase extends BaseTestCase
+abstract class TestCase extends BaseTestCase
 {
     /**
      * This variable is injected the main GraphQL class

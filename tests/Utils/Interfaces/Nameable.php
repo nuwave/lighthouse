@@ -9,18 +9,20 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class Nameable
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
         $this->typeRegistry = $typeRegistry;
     }
 
-    public function resolve($value): ObjectType
+    public function resolve($value): ?ObjectType
     {
         if ($value instanceof User) {
             return $this->typeRegistry->get('User');
@@ -29,5 +31,7 @@ class Nameable
         if ($value instanceof Team) {
             return $this->typeRegistry->get('Team');
         }
+
+        return null;
     }
 }
