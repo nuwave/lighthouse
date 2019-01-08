@@ -14,7 +14,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itGeneratesValidSchema()
+    public function itGeneratesValidSchema(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
@@ -26,7 +26,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itCanResolveEnumTypes()
+    public function itCanResolveEnumTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         "Role description"
@@ -39,20 +39,20 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var EnumType $enum */
-        $enum = $schema->getType('Role');
-        $this->assertInstanceOf(EnumType::class, $enum);
-        $this->assertSame('Role description', $enum->description);
+        /** @var \GraphQL\Type\Definition\EnumType $enumType */
+        $enumType = $schema->getType('Role');
+        $this->assertInstanceOf(EnumType::class, $enumType);
+        $this->assertSame('Role description', $enumType->description);
 
-        $enumValues = $enum->getValues();
+        $enumValues = $enumType->getValues();
         $this->assertCount(2, $enumValues);
-        $this->assertSame('Company administrator.', $enum->getValue('ADMIN')->description);
+        $this->assertSame('Company administrator.', $enumType->getValue('ADMIN')->description);
     }
 
     /**
      * @test
      */
-    public function itCanResolveInterfaceTypes()
+    public function itCanResolveInterfaceTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         """
@@ -64,18 +64,18 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var InterfaceType $interface */
-        $interface = $schema->getType('Foo');
-        $this->assertInstanceOf(InterfaceType::class, $interface);
+        /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
+        $interfaceType = $schema->getType('Foo');
+        $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
-        $this->assertSame('int', $interface->description);
-        $this->assertSame('bar is baz', $interface->getField('bar')->description);
+        $this->assertSame('int', $interfaceType->description);
+        $this->assertSame('bar is baz', $interfaceType->getField('bar')->description);
     }
 
     /**
      * @test
      */
-    public function itCanResolveObjectTypes()
+    public function itCanResolveObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         "asdf"
@@ -88,7 +88,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var ObjectType $foo */
+        /** @var \GraphQL\Type\Definition\ObjectType $foo */
         $foo = $schema->getType('Foo');
         $this->assertInstanceOf(ObjectType::class, $foo);
 
@@ -106,7 +106,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itCanResolveInputObjectTypes()
+    public function itCanResolveInputObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         "bla"
@@ -117,20 +117,20 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var InputObjectType $createFoo */
-        $createFoo = $schema->getType('CreateFoo');
-        $this->assertInstanceOf(InputObjectType::class, $createFoo);
+        /** @var \GraphQL\Type\Definition\InputObjectType $inputObjectType */
+        $inputObjectType = $schema->getType('CreateFoo');
+        $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
 
-        $this->assertSame('CreateFoo', $createFoo->name);
-        $this->assertSame('bla', $createFoo->description);
-        $this->assertSame('xyz', $createFoo->getField('foo')->description);
-        $this->assertSame(123, $createFoo->getField('bar')->defaultValue);
+        $this->assertSame('CreateFoo', $inputObjectType->name);
+        $this->assertSame('bla', $inputObjectType->description);
+        $this->assertSame('xyz', $inputObjectType->getField('foo')->description);
+        $this->assertSame(123, $inputObjectType->getField('bar')->defaultValue);
     }
 
     /**
      * @test
      */
-    public function itCanResolveMutations()
+    public function itCanResolveMutations(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type Mutation {
@@ -138,9 +138,9 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var ObjectType $mutation */
-        $mutation = $schema->getType('Mutation');
-        $foo = $mutation->getField('foo');
+        /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
+        $mutationObjectType = $schema->getType('Mutation');
+        $foo = $mutationObjectType->getField('foo');
 
         $this->assertSame('foo', $foo->name);
     }
@@ -148,13 +148,13 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itCanResolveQueries()
+    public function itCanResolveQueries(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
-        /** @var ObjectType $type */
-        $type = $schema->getType('Query');
-        $field = $type->getField('foo');
+        /** @var \GraphQL\Type\Definition\ObjectType $queryObjectType */
+        $queryObjectType = $schema->getType('Query');
+        $field = $queryObjectType->getField('foo');
 
         $this->assertSame('foo', $field->name);
     }
@@ -162,7 +162,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtendObjectTypes()
+    public function itCanExtendObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type Foo {
@@ -174,15 +174,17 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        $type = $schema->getType('Foo');
-        $fields = $type->config['fields']();
+        /** @var \GraphQL\Type\Definition\ObjectType $objectType */
+        $objectType = $schema->getType('Foo');
+        $fields = $objectType->config['fields']();
+
         $this->assertArrayHasKey('baz', $fields);
     }
 
     /**
      * @test
      */
-    public function itCanExtendTypes()
+    public function itCanExtendTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type Foo {
@@ -195,7 +197,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /** @var ObjectType $type */
+        /** @var \GraphQL\Type\Definition\ObjectType $type */
         $type = $schema->getType('Foo');
 
         $this->assertSame('yo?', $type->getField('bar')->description);

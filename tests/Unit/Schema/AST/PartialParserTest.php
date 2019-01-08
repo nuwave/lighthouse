@@ -15,7 +15,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itParsesObjectType()
+    public function itParsesObjectType(): void
     {
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
@@ -30,7 +30,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsForInvalidDefinition()
+    public function itThrowsForInvalidDefinition(): void
     {
         $this->expectException(SyntaxError::class);
         PartialParser::objectTypeDefinition('
@@ -41,7 +41,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfMultipleDefinitionsAreGiven()
+    public function itThrowsIfMultipleDefinitionsAreGiven(): void
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinition('
@@ -58,7 +58,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfDefinitionIsUnexpectedType()
+    public function itThrowsIfDefinitionIsUnexpectedType(): void
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinition('
@@ -71,7 +71,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itParsesObjectTypesArray()
+    public function itParsesObjectTypesArray(): void
     {
         $objectTypes = PartialParser::objectTypeDefinitions(['
         type Foo {
@@ -91,7 +91,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsOnInvalidTypeInObjectTypesArray()
+    public function itThrowsOnInvalidTypeInObjectTypesArray(): void
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinitions(['
@@ -108,7 +108,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsOnMultipleDefinitionsInArrayItem()
+    public function itThrowsOnMultipleDefinitionsInArrayItem(): void
     {
         $this->expectException(ParseException::class);
         PartialParser::objectTypeDefinitions(['
@@ -125,7 +125,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itParsesOperationDefinition()
+    public function itParsesOperationDefinition(): void
     {
         $this->assertInstanceOf(
             OperationDefinitionNode::class,
@@ -140,7 +140,7 @@ class PartialParserTest extends TestCase
     /**
      * @test
      */
-    public function itParsesArgument()
+    public function itParsesArgument(): void
     {
         $argumentNode = PartialParser::argument('key: "value"');
 

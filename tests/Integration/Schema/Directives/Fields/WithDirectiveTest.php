@@ -9,16 +9,16 @@ use Tests\Utils\Models\User;
 class WithDirectiveTest extends DBTestCase
 {
     /**
-     * Auth user.
+     * The currently authenticated user.
      *
-     * @var User
+     * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
-     * User's tasks.
+     * The user's tasks.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Task>
      */
     protected $tasks;
 
@@ -37,9 +37,9 @@ class WithDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanQueryARelationship()
+    public function itCanQueryARelationship(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             task_count_string: String!
                 @with(relation: "tasks")
@@ -51,29 +51,26 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var User $user */
+        /** @var \Tests\Utils\Models\User $user */
         $user = auth()->user();
 
         $this->assertFalse(
             $user->relationLoaded('tasks')
         );
 
-        $result = $this->execute($schema, '
+        $this->query('
         {
             user {
                 task_count_string
             }
         }
-        ');
+        ')->assertJsonFragment([
+            'task_count_string' => 'User has 3 tasks.',
+        ]);
 
         $this->assertCount(
             3,
             $user->tasks
-        );
-
-        $this->assertSame(
-            'User has 3 tasks.',
-            array_get($result, 'data.user.task_count_string')
         );
     }
 }

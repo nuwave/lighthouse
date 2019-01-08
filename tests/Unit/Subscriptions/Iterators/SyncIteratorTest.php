@@ -2,20 +2,23 @@
 
 namespace Tests\Unit\Subscriptions\Iterators;
 
+use Exception;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 
 class SyncIteratorTest extends TestCase
 {
+    /**
+     * @var string
+     */
     const EXCEPTION_MESSAGE = 'test_exception';
 
-    /** @var SyncIterator */
+    /**
+     * @var \Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator
+     */
     protected $iterator;
 
-    /**
-     * Set up test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -26,13 +29,16 @@ class SyncIteratorTest extends TestCase
     /**
      * @test
      */
-    public function itCanIterateOverItemsWithCallback()
+    public function itCanIterateOverItemsWithCallback(): void
     {
         $items = [];
 
-        $this->iterator->process($this->items(), function ($item) use (&$items) {
-            $items[] = $item;
-        });
+        $this->iterator->process(
+            $this->items(),
+            function ($item) use (&$items): void {
+                $items[] = $item;
+            }
+        );
 
         $this->assertCount(3, $items);
     }
@@ -40,20 +46,27 @@ class SyncIteratorTest extends TestCase
     /**
      * @test
      */
-    public function itCanPassExceptionToHandler()
+    public function itCanPassExceptionToHandler(): void
     {
+        /** @var \Exception|null $exception */
         $exception = null;
 
-        $this->iterator->process($this->items(), function ($item) use (&$items) {
-            throw new \Exception(self::EXCEPTION_MESSAGE);
-        }, function ($e) use (&$exception) {
-            $exception = $e;
-        });
+        $this->iterator->process(
+            $this->items(),
+            function ($item) use (&$items): void {
+                throw new Exception(self::EXCEPTION_MESSAGE);
+            },
+            function (Exception $e) use (&$exception): void {
+                $exception = $e;
+            }
+        );
 
-        $this->assertInstanceOf(\Exception::class, $exception);
         $this->assertSame(self::EXCEPTION_MESSAGE, $exception->getMessage());
     }
 
+    /**
+     * @return \Illuminate\Support\Collection<int>
+     */
     protected function items(): Collection
     {
         return collect([1, 2, 3]);

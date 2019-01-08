@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class InjectDirectiveTest extends DBTestCase
@@ -11,12 +10,12 @@ class InjectDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateFromInputObjectWithDeepInjection()
+    public function itCanCreateFromInputObjectWithDeepInjection(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -35,7 +34,8 @@ class InjectDirectiveTest extends DBTestCase
             name: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -47,12 +47,16 @@ class InjectDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $this->schema = $schema;
-        $result = $this->queryViaHttp($query);
-
-        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createTask.user.id'));
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
     }
 }

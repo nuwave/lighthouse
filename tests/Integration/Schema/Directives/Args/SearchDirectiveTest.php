@@ -3,18 +3,22 @@
 namespace Tests\Integration\Schema\Directives\Args;
 
 use Mockery;
-use Mockery\Mock;
 use Tests\DBTestCase;
+use Mockery\MockInterface;
 use Tests\Utils\Models\Post;
 use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
 
 class SearchDirectiveTest extends DBTestCase
 {
-    /** @var Mockery\MockInterface */
+    /**
+     * @var \Mockery\MockInterface
+     */
     protected $engineManager;
 
-    /** @var Mock */
+    /**
+     * @var \Mockery\Mock
+     */
     protected $engine;
 
     protected function setUp()
@@ -24,7 +28,7 @@ class SearchDirectiveTest extends DBTestCase
         $this->engineManager = Mockery::mock();
         $this->engine = Mockery::mock(NullEngine::class)->makePartial();
 
-        app()->singleton(EngineManager::class, function ($app) {
+        $this->app->singleton(EngineManager::class, function (): MockInterface {
             return $this->engineManager;
         });
 
@@ -32,8 +36,10 @@ class SearchDirectiveTest extends DBTestCase
             ->andReturn($this->engine);
     }
 
-    /** @test */
-    public function canSearch()
+    /**
+     * @test
+     */
+    public function canSearch(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -47,7 +53,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->engine->shouldReceive('map')->andReturn(collect([$postA, $postC]));
 
-        $schema = '     
+        $this->schema = '     
         type Post {
             id: ID!
             title: String!
@@ -57,7 +63,8 @@ class SearchDirectiveTest extends DBTestCase
             posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             posts(count: 10 search: "great") {
                 data {
@@ -66,15 +73,26 @@ class SearchDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->executeQuery($schema, $query);
-
-        $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
-        $this->assertEquals($postC->id, $result->data['posts']['data'][1]['id']);
+        ')->assertJson([
+            'data' => [
+                'posts' => [
+                    'data' => [
+                        [
+                            'id' => $postA->id,
+                        ],
+                        [
+                            'id' => $postC->id,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
-    /** @test */
-    public function canSearchWithCustomIndex()
+    /**
+     * @test
+     */
+    public function canSearchWithCustomIndex(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -86,17 +104,26 @@ class SearchDirectiveTest extends DBTestCase
             'title' => 'bad title',
         ]);
 
-        $this->engine->shouldReceive('map')->andReturn(collect([$postA, $postB]))->once();
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                collect([$postA, $postB])
+            )
+            ->once();
 
-        $this->engine->shouldReceive('paginate')->with(
-            Mockery::on(function ($argument) {
-                return $argument->index === 'my.index';
-            }), Mockery::any(), Mockery::any()
-        )
+        $this->engine->shouldReceive('paginate')
+            ->with(
+                Mockery::on(
+                    function ($argument) {
+                        return $argument->index === 'my.index';
+                    }
+                ),
+                Mockery::any(),
+                Mockery::any()
+            )
             ->andReturn(collect([$postA, $postB]))
             ->once();
 
-        $schema = '     
+        $this->schema = '     
         type Post {
             id: ID!
             title: String!
@@ -106,7 +133,8 @@ class SearchDirectiveTest extends DBTestCase
             posts(search: String @search(within: "my.index")): [Post!]! @paginate(type: "paginator" model: "Post")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             posts(count: 10 search: "great") {
                 data {
@@ -115,10 +143,19 @@ class SearchDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->executeQuery($schema, $query);
-
-        $this->assertEquals($postA->id, $result->data['posts']['data'][0]['id']);
-        $this->assertEquals($postB->id, $result->data['posts']['data'][1]['id']);
+        ')->assertJson([
+            'data' => [
+                'posts' => [
+                    'data' => [
+                        [
+                            'id' => "$postA->id",
+                        ],
+                        [
+                            'id' => "$postB->id",
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

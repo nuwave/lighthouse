@@ -2,26 +2,23 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
+use Closure;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQLExtensionTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->singleton(ExtensionRegistry::class, function () {
+        $app->singleton(ExtensionRegistry::class, function (): ExtensionRegistry {
             return new class() extends ExtensionRegistry {
                 public function __construct()
                 {
-                    $this->pipeline = app(\Nuwave\Lighthouse\Support\Pipeline::class);
+                    $this->pipeline = app(Pipeline::class);
                     $this->extensions = collect([GraphQLExtensionTest::getExtension()]);
                 }
             };
@@ -31,42 +28,39 @@ class GraphQLExtensionTest extends TestCase
     /**
      * @test
      */
-    public function itCanManipulateResponseData()
+    public function itCanManipulateResponseData(): void
     {
         $this->schema = '
         type Query {
             foo: String
-        }';
+        }
+        ';
 
-        $data = $this->queryViaHttp('
+        $this->query('
         {
             foo
         }
-        ');
-
-        $this->assertArrayHasKey('meta', $data);
-        $this->assertSame('data', $data['meta']);
+        ')->assertJson([
+            'meta' => 'data',
+        ]);
     }
 
-    /**
-     * @return GraphQLExtension
-     */
     public static function getExtension(): GraphQLExtension
     {
         return new class() extends GraphQLExtension {
-            public static function name()
+            public static function name(): string
             {
                 return 'foo';
             }
 
-            public function willSendResponse(array $response, \Closure $next)
+            public function willSendResponse(array $response, Closure $next)
             {
                 return $next(array_merge($response, [
                     'meta' => 'data',
                 ]));
             }
 
-            public function jsonSerialize()
+            public function jsonSerialize(): array
             {
                 return [];
             }

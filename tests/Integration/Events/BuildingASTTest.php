@@ -3,7 +3,6 @@
 namespace Tests\Integration\Events;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Events\BuildingAST;
 
 class BuildingASTTest extends TestCase
@@ -11,13 +10,13 @@ class BuildingASTTest extends TestCase
     /**
      * @test
      */
-    public function itInjectsSourceSchemaIntoEvent()
+    public function itInjectsSourceSchemaIntoEvent(): void
     {
         $schema = $this->placeholderQuery();
 
         app('events')->listen(
             BuildingAST::class,
-            function (BuildingAST $buildingAST) use ($schema) {
+            function (BuildingAST $buildingAST) use ($schema): void {
                 $this->assertSame($schema, $buildingAST->userSchema);
             }
         );
@@ -28,16 +27,16 @@ class BuildingASTTest extends TestCase
     /**
      * @test
      */
-    public function itCanAddAdditionalSchemaThroughEvent()
+    public function itCanAddAdditionalSchemaThroughEvent(): void
     {
         app('events')->listen(
             BuildingAST::class,
-            function (BuildingAST $buildingAST) {
+            function (BuildingAST $buildingAST): string {
                 $resolver = $this->getResolver('resolveSayHello');
 
                 return "
                 extend type Query {
-                    sayHello: String @field(resolver: \"$resolver\")
+                    sayHello: String @field(resolver: \"{$resolver}\")
                 }
                 ";
             }
@@ -45,9 +44,9 @@ class BuildingASTTest extends TestCase
 
         $resolver = $this->getResolver('resolveFoo');
 
-        $schema = "
+        $this->schema = "
         type Query {
-            foo: String @field(resolver: \"$resolver\")
+            foo: String @field(resolver: \"{$resolver}\")
         }
         ";
 
@@ -56,16 +55,22 @@ class BuildingASTTest extends TestCase
             foo
         }
         ';
-        $resultForFoo = $this->execute($schema, $queryForBaseSchema);
-        $this->assertSame('foo', Arr::get($resultForFoo, 'data.foo'));
+        $this->query($queryForBaseSchema)->assertJson([
+            'data' => [
+                'foo' => 'foo',
+            ],
+        ]);
 
         $queryForAdditionalSchema = '
         {
             sayHello
         }
         ';
-        $resultForSayHello = $this->execute($schema, $queryForAdditionalSchema);
-        $this->assertSame('hello', Arr::get($resultForSayHello, 'data.sayHello'));
+        $this->query($queryForAdditionalSchema)->assertJson([
+            'data' => [
+                'sayHello' => 'hello',
+            ],
+        ]);
     }
 
     public function resolveSayHello(): string

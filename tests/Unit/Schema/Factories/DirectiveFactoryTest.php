@@ -14,7 +14,7 @@ use Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective;
 class DirectiveFactoryTest extends TestCase
 {
     /**
-     * @var DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
     protected $directiveFactory;
 
@@ -65,7 +65,7 @@ class DirectiveFactoryTest extends TestCase
                 return 'foo';
             }
 
-            public function handleField(FieldValue $value, \Closure $next)
+            public function handleField(FieldValue $value, \Closure $next): void
             {
             }
         };
@@ -82,6 +82,7 @@ class DirectiveFactoryTest extends TestCase
     public function itThrowsIfDirectiveNameCanNotBeResolved(): void
     {
         $this->expectException(DirectiveException::class);
+
         $this->directiveFactory->create('bar');
     }
 

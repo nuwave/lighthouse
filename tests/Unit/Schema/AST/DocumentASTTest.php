@@ -14,7 +14,7 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itParsesSimpleSchema()
+    public function itParsesSimpleSchema(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -31,7 +31,7 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsOnInvalidSchema()
+    public function itThrowsOnInvalidSchema(): void
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessageRegExp('/^Syntax Error/');
@@ -42,7 +42,7 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetDefinition()
+    public function itCanSetDefinition(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -67,7 +67,7 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itOverwritesDefinitionWithSameName()
+    public function itOverwritesDefinitionWithSameName(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -92,7 +92,7 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itCanBeSerialized()
+    public function itCanBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {

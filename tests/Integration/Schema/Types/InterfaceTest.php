@@ -3,24 +3,23 @@
 namespace Tests\Integration\Schema\Types;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Illuminate\Database\Eloquent\Collection;
 
 class InterfaceTest extends DBTestCase
 {
     /**
      * @test
      */
-    public function itCanResolveInterfaceTypes()
+    public function itCanResolveInterfaceTypes(): void
     {
         // This creates one team with it
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         interface Nameable {
             name: String!
         }
@@ -38,7 +37,8 @@ class InterfaceTest extends DBTestCase
             namedThings: [Nameable!]! @field(resolver: "'.addslashes(self::class).'@fetchResults")
         }
         ';
-        $query = '
+
+        $result = $this->query('
         {
             namedThings {
                 name
@@ -47,22 +47,29 @@ class InterfaceTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
+        ')->assertJsonStructure([
+            'data' => [
+                'namedThings' => [
+                    [
+                        'name',
+                        'id',
+                    ],
+                    [
+                        'name',
+                    ],
+                ],
+            ],
+        ]);
 
-        $this->assertCount(2, Arr::get($result, 'data.namedThings'));
-        $this->assertArrayHasKey('name', Arr::get($result, 'data.namedThings.0'));
-        $this->assertArrayHasKey('id', Arr::get($result, 'data.namedThings.0'));
-        $this->assertArrayHasKey('name', Arr::get($result, 'data.namedThings.1'));
-        $this->assertArrayNotHasKey('id', Arr::get($result, 'data.namedThings.1'));
+        $this->assertArrayNotHasKey('id', $result->jsonGet('data.namedThings.1'));
     }
 
     /**
      * @test
      */
-    public function itCanUseCustomTypeResolver()
+    public function itCanUseCustomTypeResolver(): void
     {
-        $schema = '
+        $this->schema = '
         interface Nameable @interface(resolveType: "'.addslashes(self::class).'@resolveType"){
             name: String!
         }
@@ -76,7 +83,8 @@ class InterfaceTest extends DBTestCase
             namedThings: Nameable @field(resolver: "'.addslashes(self::class).'@fetchGuy")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             namedThings {
                 name
@@ -85,21 +93,22 @@ class InterfaceTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame($this->fetchGuy(), $result['data']['namedThings']);
+        ')->assertJson([
+            'data' => [
+                'namedThings' => $this->fetchGuy(),
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanListPossibleTypes()
+    public function itCanListPossibleTypes(): void
     {
         // This creates one team with it
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         interface Nameable {
             name: String!
         }
@@ -117,7 +126,8 @@ class InterfaceTest extends DBTestCase
             namedThings: [Nameable!]! @field(resolver: "'.addslashes(self::class).'@fetchResults")
         }
         ';
-        $query = '{
+
+        $result = $this->query('{
             __schema {
                 types {
                     kind
@@ -127,10 +137,11 @@ class InterfaceTest extends DBTestCase
                     }
                 }
             }
-        }';
+        }
+        ');
 
-        $result = $this->execute($schema, $query);
-        $interface = collect(Arr::get($result, 'data.__schema.types'))->firstWhere('name', 'Nameable');
+        $interface = collect($result->jsonGet('data.__schema.types'))
+            ->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);
     }

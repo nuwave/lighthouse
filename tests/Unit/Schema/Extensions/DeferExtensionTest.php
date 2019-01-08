@@ -3,43 +3,31 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
+use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
-use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
 class DeferExtensionTest extends TestCase
 {
-    /** @var MemoryStream */
-    protected $stream;
-
-    /** @var array */
-    public static $data = [];
+    use RequestsStreamedResponses;
 
     /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
+     * @var mixed[]
      */
+    public static $data = [];
+
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->stream = new MemoryStream();
-
-        $app->singleton(CanStreamResponse::class, function () {
-            return $this->stream;
-        });
-
-        $app['config']->set('lighthouse.extensions', [DeferExtension::class]);
-        $app['config']->set('app.debug', true);
+        $this->setUpInMemoryStream($app);
     }
 
     /**
      * @test
      */
-    public function itCanDeferFields()
+    public function itCanDeferFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -57,9 +45,10 @@ class DeferExtensionTest extends TestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -67,26 +56,35 @@ class DeferExtensionTest extends TestCase
                     name
                 }
             }
-        }';
+        }
+        ');
 
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
-
-        $chunks = $this->stream->chunks;
-
-        $this->assertCount(2, $chunks);
-        $this->assertSame('John Doe', Arr::get($chunks[0], 'data.user.name'));
-        $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
-        $deferred = Arr::get($chunks[1], 'user.parent');
-        $this->assertArrayHasKey('name', $deferred['data']);
-        $this->assertSame('Jane Doe', $deferred['data']['name']);
+        $this->assertSame(
+            [
+                [
+                    'data' => [
+                        'user' => [
+                            'name' => 'John Doe',
+                            'parent' => null,
+                        ],
+                    ],
+                ],
+                [
+                    'user.parent' => [
+                        'data' => [
+                            'name' => 'Jane Doe',
+                        ],
+                    ],
+                ],
+            ],
+            $chunks
+        );
     }
 
     /**
      * @test
      */
-    public function itCanDeferNestedFields()
+    public function itCanDeferNestedFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -107,9 +105,10 @@ class DeferExtensionTest extends TestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -120,15 +119,11 @@ class DeferExtensionTest extends TestCase
                     }
                 }
             }
-        }';
-
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
-
-        $chunks = $this->stream->chunks;
+        }
+        ');
 
         $this->assertCount(3, $chunks);
+
         $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
         $this->assertNull(Arr::get($chunks[0], 'data.user.parent'));
 
@@ -146,7 +141,7 @@ class DeferExtensionTest extends TestCase
     /**
      * @test
      */
-    public function itCanDeferListFields()
+    public function itCanDeferListFields(): void
     {
         self::$data = [
             [
@@ -169,14 +164,17 @@ class DeferExtensionTest extends TestCase
             title: String
             author: User
         }
+        
         type User {
             name: String!
         }
+        
         type Query {
             posts: [Post] @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $chunks = $this->getStreamedChunks('
         { 
             posts {
                 title
@@ -184,14 +182,11 @@ class DeferExtensionTest extends TestCase
                     name
                 }
             }
-        }';
+        }
+        ');
 
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
-
-        $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
+
         $this->assertNull(Arr::get($chunks[0], 'data.posts.0.author'));
         $this->assertNull(Arr::get($chunks[0], 'data.posts.1.author'));
 
@@ -205,7 +200,7 @@ class DeferExtensionTest extends TestCase
     /**
      * @test
      */
-    public function itCanDeferGroupedListFields()
+    public function itCanDeferGroupedListFields(): void
     {
         self::$data = [
             [
@@ -233,19 +228,23 @@ class DeferExtensionTest extends TestCase
         type Comment {
             message: String
         }
+        
         type Post {
             title: String
             author: User
             comments: [Comment]
         }
+        
         type User {
             name: String!
         }
+        
         type Query {
             posts: [Post] @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $chunks = $this->getStreamedChunks('
         { 
             posts {
                 title
@@ -256,14 +255,11 @@ class DeferExtensionTest extends TestCase
                     message
                 }
             }
-        }';
+        }
+        ');
 
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
-
-        $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
+
         $this->assertNull(Arr::get($chunks[0], 'data.posts.0.author'));
         $this->assertNull(Arr::get($chunks[0], 'data.posts.1.author'));
 
@@ -285,9 +281,9 @@ class DeferExtensionTest extends TestCase
     /**
      * @test
      */
-    public function itCancelsDefermentAfterMaxExecutionTime()
+    public function itCancelsDefermentAfterMaxExecutionTime(): void
     {
-        /** @var DeferExtension $deferExtension */
+        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
         $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
         // Set max execution time to now so we immediately resolve deferred fields
         $deferExtension->setMaxExecutionTime(microtime(true));
@@ -311,9 +307,10 @@ class DeferExtensionTest extends TestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -324,13 +321,9 @@ class DeferExtensionTest extends TestCase
                     }
                 }
             }
-        }';
+        }
+        ');
 
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
-
-        $chunks = $this->stream->chunks;
         // If we didn't hit the max execution time we would have 3 items in the array
         $this->assertCount(2, $chunks);
 
@@ -347,9 +340,9 @@ class DeferExtensionTest extends TestCase
     /**
      * @test
      */
-    public function itCancelsDefermentAfterMaxNestedFields()
+    public function itCancelsDefermentAfterMaxNestedFields(): void
     {
-        /** @var DeferExtension $deferExtension */
+        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
         $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
         $deferExtension->setMaxNestedFields(1);
 
@@ -372,9 +365,10 @@ class DeferExtensionTest extends TestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $chunks = $this->getStreamedChunks('
         { 
             user {
                 name
@@ -385,13 +379,9 @@ class DeferExtensionTest extends TestCase
                     }
                 }
             }
-        }';
+        }
+        ');
 
-        $this->postJson('/graphql', compact('query'))
-            ->baseResponse
-            ->send();
-
-        $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
 
         $this->assertSame(self::$data['name'], Arr::get($chunks[0], 'data.user.name'));
@@ -407,7 +397,7 @@ class DeferExtensionTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsExceptionOnNunNullableFields()
+    public function itThrowsExceptionOnNunNullableFields(): void
     {
         config([
             'lighthouse.defer.max_nested_fields' => 1,
@@ -430,9 +420,10 @@ class DeferExtensionTest extends TestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $this->query('
         { 
             user {
                 name
@@ -440,18 +431,20 @@ class DeferExtensionTest extends TestCase
                     name
                 }
             }
-        }';
-
-        $response = $this->postJson('/graphql', compact('query'))->json();
-
-        $this->assertArrayHasKey('errors', $response);
-        $this->assertArrayHaskey('category', $response['errors'][0]['extensions']);
+        }
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => 'The @defer directive cannot be placed on a Non-Nullable field.',
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itSkipsDeferWithIncludeAndSkipDirectives()
+    public function itSkipsDeferWithIncludeAndSkipDirectives(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -475,9 +468,10 @@ class DeferExtensionTest extends TestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $this->query('
         { 
             user {
                 name
@@ -488,23 +482,23 @@ class DeferExtensionTest extends TestCase
                     }
                 }
             }
-        }';
-
-        $response = $this->postJson('/graphql', compact('query'))->json();
-
-        $this->assertSame(
-            [
-                'name' => 'John Doe',
-                'parent' => ['name' => 'Jane Doe'],
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'John Doe',
+                    'parent' => [
+                        'name' => 'Jane Doe',
+                    ],
+                ],
             ],
-            Arr::get($response, 'data.user')
-        );
+        ]);
     }
 
     /**
      * @test
      */
-    public function itRequiresDeferDirectiveOnAllFieldDeclarations()
+    public function itRequiresDeferDirectiveOnAllFieldDeclarations(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -522,9 +516,10 @@ class DeferExtensionTest extends TestCase
 
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $this->query('
         fragment UserWithParent on User {
             name
             parent {
@@ -538,11 +533,12 @@ class DeferExtensionTest extends TestCase
                     name
                 }
             }
-        }';
-
-        $response = $this->postJson('/graphql', compact('query'))->json();
-
-        $this->assertSame(self::$data, Arr::get($response, 'data.user'));
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => self::$data,
+            ],
+        ]);
     }
 
     /**
@@ -554,7 +550,7 @@ class DeferExtensionTest extends TestCase
      *
      * https://www.apollographql.com/docs/react/features/defer-support.html#defer-usage
      */
-    public function itSkipsDeferredFieldsOnMutations()
+    public function itSkipsDeferredFieldsOnMutations(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -569,15 +565,18 @@ class DeferExtensionTest extends TestCase
             name: String!
             parent: User
         }
+        
         type Query {
             user: User @field(resolver: \"{$resolver}\")
         }
+        
         type Mutation {
             updateUser(name: String!): User
                 @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $this->query('
         mutation UpdateUser {
             updateUser(name: "John Doe") {
                 name 
@@ -585,16 +584,18 @@ class DeferExtensionTest extends TestCase
                     name
                 }
             }
-        }';
-
-        $response = $this->postJson('/graphql', compact('query'))->json();
-        $this->assertSame(self::$data, Arr::get($response, 'data.updateUser'));
+        }
+        ')->assertJson([
+            'data' => [
+                'updateUser' => self::$data,
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itDoesNotDeferFieldsIfFalse()
+    public function itDoesNotDeferFieldsIfFalse(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -609,11 +610,13 @@ class DeferExtensionTest extends TestCase
             name: String!
             parent: User
         }
+        
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $this->query('
         {
             user {
                 name
@@ -621,16 +624,18 @@ class DeferExtensionTest extends TestCase
                     name
                 }
             }
-        }';
-
-        $response = $this->postJson('/graphql', compact('query'))->json();
-        $this->assertSame(self::$data, Arr::get($response, 'data.user'));
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => self::$data,
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itIncludesErrorsForDeferredFields()
+    public function itIncludesErrorsForDeferredFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -646,11 +651,13 @@ class DeferExtensionTest extends TestCase
             name: String!
             parent: User @field(resolver: \"{$throw}\")
         }
+        
         type Query {
             user: User @field(resolver: \"{$resolver}\")
-        }";
+        }
+        ";
 
-        $query = '
+        $chunks = $this->getStreamedChunks('
         {
             user {
                 name
@@ -658,11 +665,9 @@ class DeferExtensionTest extends TestCase
                     name
                 }
             }
-        }';
+        }
+        ');
 
-        $this->postJson('/graphql', compact('query'))->baseResponse->send();
-
-        $chunks = $chunks = $this->stream->chunks;
         $this->assertCount(2, $chunks);
 
         $parent = $chunks[1];
@@ -672,13 +677,16 @@ class DeferExtensionTest extends TestCase
         $this->assertCount(1, $parent['user.parent']['errors']);
     }
 
-    public function resolve()
+    public function resolve(): array
     {
         return self::$data;
     }
 
-    public function throw()
+    /**
+     * @throws \GraphQL\Error\Error
+     */
+    public function throw(): void
     {
-        throw new \Exception('deferred_exception');
+        throw new Error('deferred_exception');
     }
 }

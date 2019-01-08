@@ -4,10 +4,10 @@ namespace Tests\Integration\Subscriptions;
 
 use Tests\TestCase;
 use Illuminate\Support\Arr;
+use Illuminate\Foundation\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
-use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 
 class SubscriptionTest extends TestCase
 {
@@ -15,11 +15,34 @@ class SubscriptionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set([
-            'lighthouse.extensions' => [
-                \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
-            ],
-        ]);
+        $app['config']->set('lighthouse.extensions', [\Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class]);
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $resolver = addslashes(self::class).'@resolve';
+
+        $this->schema = "
+        type Post {
+            body: String
+        }
+        
+        type Subscription {
+            onPostCreated: Post
+        }
+        
+        type Mutation {
+            createPost(post: String!): Post
+                @field(resolver: \"{$resolver}\")
+                @broadcast(subscription: \"onPostCreated\")
+        }
+        
+        type Query {
+            foo: String
+        }
+        ";
     }
 
     /**
@@ -27,13 +50,13 @@ class SubscriptionTest extends TestCase
      */
     public function itSendsSubscriptionChannelInResponse(): void
     {
-        $data = $this->subscribe();
+        $response = $this->subscribe();
         $subscriber = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED')->first();
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
-            $data
+            $response->jsonGet()
         );
     }
 
@@ -42,39 +65,34 @@ class SubscriptionTest extends TestCase
      */
     public function itSendsSubscriptionChannelInBatchedResponse(): void
     {
-        $subscription1 = '
-        subscription OnPostCreatedV1 {
-            onPostCreated {
-                body
-            }
-        }
-        ';
+        $response = $this->postGraphQL([
+            [
+                'query' => '
+                    subscription OnPostCreatedV1 {
+                        onPostCreated {
+                            body
+                        }
+                    }
+                    ',
+            ],
+            [
+                'query' => '
+                    subscription OnPostCreatedV2 {
+                        onPostCreated {
+                            body
+                        }
+                    }
+                    ',
+            ],
+        ]);
 
-        $subscription2 = '
-        subscription OnPostCreatedV2 {
-            onPostCreated {
-                body
-            }
-        }
-        ';
-
-        $json = [
-            ['query' => $subscription1],
-            ['query' => $subscription2],
-        ];
-
-        $this->schema = $this->schema();
-        $data = $this->postJson('/graphql', $json)->json();
         $subscribers = app(StorageManager::class)->subscribersByTopic('ON_POST_CREATED');
-
         $this->assertCount(2, $subscribers);
 
-        $expected = [
+        $response->assertExactJson([
             $this->buildResponse('OnPostCreatedV1', $subscribers[0]->channel),
             $this->buildResponse('OnPostCreatedV2', $subscribers[1]->channel),
-        ];
-
-        $this->assertSame($expected, $data);
+        ]);
     }
 
     /**
@@ -82,18 +100,16 @@ class SubscriptionTest extends TestCase
      */
     public function itCanBroadcastSubscriptions(): void
     {
-        $mutation = '
+        $this->subscribe();
+        $this->query('
         mutation {
             createPost(post: "Foobar") {
                 body
             }
         }
-        ';
+        ');
 
-        $this->subscribe();
-        $this->postJson('/graphql', ['query' => $mutation])->json();
-
-        /** @var LogBroadcaster $log */
+        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
         $log = app(BroadcastManager::class)->driver();
         $this->assertCount(1, $log->broadcasts());
 
@@ -107,75 +123,56 @@ class SubscriptionTest extends TestCase
      */
     public function itThrowsWithMissingOperationName(): void
     {
-        $subscription = '
+        $this->query('
         subscription {
             onPostCreated {
                 body
             }
         }
-        ';
-
-        $json = ['query' => $subscription];
-
-        $this->schema = $this->schema();
-        $data = $this->postJson('/graphql', $json)->json();
-        $this->assertArrayHasKey('errors', $data);
-        $this->assertTrue(Arr::has($data, 'data.onPostCreated'));
-        $this->assertTrue(Arr::has($data, 'extensions.lighthouse_subscriptions.channels'));
-        $this->assertNull($data['data']['onPostCreated']);
-        $this->assertEmpty($data['extensions']['lighthouse_subscriptions']['channels']);
+        ')->assertErrorCategory('subscription')
+            ->assertJson([
+                'data' => [
+                    'onPostCreated' => null,
+                ],
+                'extensions' => [
+                    'lighthouse_subscriptions' => [
+                        'channels' => [],
+                    ],
+                ],
+            ]);
     }
 
+    /**
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return mixed[]
+     */
     public function resolve($root, array $args): array
     {
         return ['body' => $args['post']];
     }
 
-    protected function schema(): string
+    protected function subscribe(): TestResponse
     {
-        $resolver = addslashes(self::class).'@resolve';
-
-        return "
-        type Post {
-            body: String
-        }
-
-        type Subscription {
-            onPostCreated: Post
-        }
-
-        type Mutation {
-            createPost(post: String!): Post
-                @field(resolver: \"{$resolver}\")
-                @broadcast(subscription: \"onPostCreated\")
-        }
-
-        type Query {
-            foo: String
-        }
-        ";
-    }
-
-    protected function subscribe(): array
-    {
-        $subscription = '
-        subscription OnPostCreated {
-            onPostCreated {
-                body
-            }
-        }
-        ';
-
-        $json = [
-            'query' => $subscription,
+        return $this->postGraphQL([
+            'query' => '
+                subscription OnPostCreated {
+                    onPostCreated {
+                        body
+                    }
+                }
+            ',
             'operationName' => 'OnPostCreated',
-        ];
-
-        $this->schema = $this->schema();
-
-        return $this->postJson('/graphql', $json)->json();
+        ]);
     }
 
+    /**
+     * Build the expectation for the first subscription reponse.
+     *
+     * @param  string  $channelName
+     * @param  string  $channel
+     * @return mixed[]
+     */
     protected function buildResponse(string $channelName, string $channel): array
     {
         return [

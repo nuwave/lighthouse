@@ -11,7 +11,7 @@ use Tests\Utils\Directives\FieldDirective as TestFieldDirective;
 class RegisteringDirectiveBaseNamespacesTest extends TestCase
 {
     /**
-     * @var DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
     protected $directiveFactory;
 
@@ -32,18 +32,20 @@ class RegisteringDirectiveBaseNamespacesTest extends TestCase
     /**
      * @test
      */
-    public function itCanAddAdditionalDirectiveBaseNamespacesThroughEvent()
+    public function itCanAddAdditionalDirectiveBaseNamespacesThroughEvent(): void
     {
         $directive = $this->directiveFactory->create('foo');
+
         $this->assertInstanceOf(FooDirective::class, $directive);
     }
 
     /**
      * @test
      */
-    public function itCanOverwriteDefaultDirectiveThroughEvent()
+    public function itCanOverwriteDefaultDirectiveThroughEvent(): void
     {
         $directive = $this->directiveFactory->create('field');
+
         $this->assertInstanceOf(TestFieldDirective::class, $directive);
     }
 }

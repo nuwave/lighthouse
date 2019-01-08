@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Illuminate\Routing\Router;
 use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Middleware\Authenticate;
@@ -17,9 +16,9 @@ class MiddlewareDirectiveTest extends TestCase
      * @test
      * @dataProvider fooMiddlewareQueries
      *
-     * @param string $query
+     * @param  string  $query
      */
-    public function itCallsFooMiddleware(string $query)
+    public function itCallsFooMiddleware(string $query): void
     {
         $this->schema = '
         type Query {
@@ -29,12 +28,17 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->queryViaHttp($query);
-
-        $this->assertSame(1, Arr::get($result, 'data.foo'));
+        $this->query($query)->assertJson([
+            'data' => [
+                'foo' => 1,
+            ],
+        ]);
     }
 
-    public function fooMiddlewareQueries()
+    /**
+     * @return array[]
+     */
+    public function fooMiddlewareQueries(): array
     {
         return [
             ['
@@ -57,7 +61,7 @@ class MiddlewareDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itWrapsExceptionFromMiddlewareInResponse()
+    public function itWrapsExceptionFromMiddlewareInResponse(): void
     {
         $this->schema = '
         type Query {
@@ -65,21 +69,25 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->queryViaHttp('
+        $this->query('
         {
             foo
         }
-        ');
-
-        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => Authenticate::MESSAGE,
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itRunsAliasedMiddleware()
+    public function itRunsAliasedMiddleware(): void
     {
-        /** @var Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
         $router->aliasMiddleware('foo', CountRuns::class);
 
@@ -91,21 +99,23 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->queryViaHttp('
+        $this->query('
         {
             foo
         }
-        ');
-
-        $this->assertSame(1, Arr::get($result, 'data.foo'));
+        ')->assertJson([
+            'data' => [
+                'foo' => 1,
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itRunsMiddlewareGroup()
+    public function itRunsMiddlewareGroup(): void
     {
-        /** @var Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
         $router->middlewareGroup('bar', [Authenticate::class]);
 
@@ -116,19 +126,23 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->queryViaHttp('
+        $this->query('
         {
             foo
         }
-        ');
-
-        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
+        ')->assertJson([
+            'errors' => [
+                [
+                    'message' => Authenticate::MESSAGE,
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itPassesOneFieldButThrowsInAnother()
+    public function itPassesOneFieldButThrowsInAnother(): void
     {
         $this->schema = '
         type Query {
@@ -140,23 +154,31 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->queryViaHttp('
+        $this->query('
         {
             foo
             pass
         }
-        ');
-
-        $this->assertSame(1, Arr::get($result, 'data.pass'));
-        $this->assertSame(Authenticate::MESSAGE, Arr::get($result, 'errors.0.message'));
-        $this->assertSame('foo', Arr::get($result, 'errors.0.path.0'));
-        $this->assertNull(Arr::get($result, 'data.foo'));
+        ')->assertJson([
+            'data' => [
+                'foo' => null,
+                'pass' => 1,
+            ],
+            'errors' => [
+                [
+                    'path' => [
+                        'foo',
+                    ],
+                    'message' => Authenticate::MESSAGE,
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itThrowsWhenDefiningMiddlewareOnInvalidTypes()
+    public function itThrowsWhenDefiningMiddlewareOnInvalidTypes(): void
     {
         $this->expectException(DirectiveException::class);
         $this->buildSchemaWithPlaceholderQuery('
@@ -167,7 +189,7 @@ class MiddlewareDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itAddsMiddlewareDirectiveToFields()
+    public function itAddsMiddlewareDirectiveToFields(): void
     {
         $document = ASTBuilder::generate('
         type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {

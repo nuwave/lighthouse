@@ -11,11 +11,11 @@ class DeprecatedDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanRemoveDeprecatedFieldsFromIntrospection()
+    public function itCanRemoveDeprecatedFieldsFromIntrospection(): void
     {
         $reason = 'Use `bar` field';
         $resolver = addslashes(Foo::class).'@bar';
-        $schema = "
+        $this->schema = "
         type Query {
             foo: String 
                 @deprecated(reason: \"{$reason}\") 
@@ -36,10 +36,8 @@ class DeprecatedDirectiveTest extends TestCase
             }
         }
         ';
-
-        $data = $this->execute($schema, $introspectionQuery);
-        $fields = Arr::get($data, 'data.__schema.queryType.fields');
-        $this->assertCount(1, $fields);
+        $this->query($introspectionQuery)
+            ->assertJsonCount(1, 'data.__schema.queryType.fields');
 
         $includeDeprecatedIntrospectionQuery = '
         {
@@ -54,24 +52,25 @@ class DeprecatedDirectiveTest extends TestCase
             }
         }
         ';
+        $result = $this->query($includeDeprecatedIntrospectionQuery);
 
-        $data = $this->execute($schema, $includeDeprecatedIntrospectionQuery);
         $deprecatedFields = Arr::where(
-            Arr::get($data, 'data.__schema.queryType.fields'),
-            function ($field) {
+            $result->jsonGet('data.__schema.queryType.fields'),
+            function (array $field): bool {
                 return $field['isDeprecated'];
             }
         );
         $this->assertCount(1, $deprecatedFields);
         $this->assertSame($reason, $deprecatedFields[0]['deprecationReason']);
 
-        $query = '
+        $this->query('
         {
             foo
         }
-        ';
-
-        $data = $this->execute($schema, $query);
-        $this->assertSame('foo.bar', Arr::get($data, 'data.foo'));
+        ')->assertJson([
+            'data' => [
+                'foo' => 'foo.bar',
+            ],
+        ]);
     }
 }
