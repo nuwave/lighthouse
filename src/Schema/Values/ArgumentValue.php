@@ -35,6 +35,7 @@ class ArgumentValue
      *
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $parentField
+     * @return void
      */
     public function __construct(InputValueDefinitionNode $astNode, ?FieldValue $parentField = null)
     {

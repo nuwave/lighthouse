@@ -24,6 +24,7 @@ class TracingExtension extends GraphQLExtension
 
     /**
      * Create instance of trace extension.
+     * @return void
      */
     public function __construct()
     {

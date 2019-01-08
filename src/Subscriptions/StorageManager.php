@@ -30,6 +30,7 @@ class StorageManager implements StoresSubscriptions
 
     /**
      * @param  \Illuminate\Cache\CacheManager  $cache
+     * @return void
      */
     public function __construct(CacheManager $cache)
     {

@@ -28,6 +28,7 @@ class ErrorBuffer
      *
      * @param  string  $errorType
      * @param  \Closure|null  $exceptionResolver
+     * @return void
      */
     public function __construct(string $errorType = 'generic', ?\Closure $exceptionResolver = null)
     {

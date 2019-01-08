@@ -70,7 +70,6 @@ class BroadcastManager extends DriverManager
      * Create instance of log driver.
      *
      * @param  mixed[]  $config
-     *
      * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster
      */
     protected function createLogDriver(array $config): LogBroadcaster

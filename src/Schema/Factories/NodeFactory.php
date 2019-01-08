@@ -59,6 +59,7 @@ class NodeFactory
      * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
+     * @return void
      */
     public function __construct(
         DirectiveFactory $directiveFactory,

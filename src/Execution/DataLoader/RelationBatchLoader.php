@@ -54,6 +54,7 @@ class RelationBatchLoader extends BatchLoader
      * @param  string[]    $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @param  string|null  $paginationType
+     * @return void
      */
     public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null)
     {

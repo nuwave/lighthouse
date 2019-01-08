@@ -35,6 +35,7 @@ class SchemaBuilder
      * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
      * @param  \Nuwave\Lighthouse\Schema\Factories\NodeFactory  $nodeFactory
      * @param  \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter  $definitionNodeConverter
+     * @return void
      */
     public function __construct(
         TypeRegistry $typeRegistry,

@@ -27,6 +27,7 @@ class ExtensionRequest
      * @param  \Illuminate\Http\Request  $request
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  bool  $batched
+     * @return void
      */
     public function __construct(Request $request, GraphQLContext $context, $batched = false)
     {

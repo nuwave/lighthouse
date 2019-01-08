@@ -16,6 +16,7 @@ class Response implements GraphQLResponse
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
+     * @return void
      */
     public function __construct(ExtensionRegistry $extensionRegistry)
     {
@@ -26,7 +27,6 @@ class Response implements GraphQLResponse
      * Create GraphQL response.
      *
      * @param  array  $data
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function create(array $data): SymfonyResponse

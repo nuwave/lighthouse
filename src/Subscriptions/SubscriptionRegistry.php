@@ -40,6 +40,7 @@ class SubscriptionRegistry
     /**
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
      * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
+     * @return void
      */
     public function __construct(ContextSerializer $serializer, StorageManager $storage)
     {

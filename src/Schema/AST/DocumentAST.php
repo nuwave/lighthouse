@@ -37,6 +37,7 @@ class DocumentAST implements \Serializable
 
     /**
      * @param  \GraphQL\Language\AST\DocumentNode  $documentNode
+     * @return void
      */
     public function __construct(DocumentNode $documentNode)
     {

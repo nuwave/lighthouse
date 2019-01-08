@@ -16,6 +16,7 @@ class Authenticate
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return void
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\AuthenticationException
      */
     public function handle(Request $request, \Closure $next): void

@@ -14,6 +14,7 @@ class BroadcastSubscriptionListener implements ShouldQueue
 
     /**
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions  $broadcaster
+     * @return void
      */
     public function __construct(BroadcastsSubscriptions $broadcaster)
     {

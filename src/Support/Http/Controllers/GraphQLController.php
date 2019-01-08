@@ -42,6 +42,7 @@ class GraphQLController extends Controller
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $graphQLResponse
+     * @return void
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,

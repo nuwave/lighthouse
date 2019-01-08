@@ -44,6 +44,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     /**
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @return void
      */
     public function __construct(Pipeline $pipeline, CreatesContext $createsContext)
     {

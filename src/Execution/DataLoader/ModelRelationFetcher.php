@@ -34,6 +34,7 @@ class ModelRelationFetcher
     /**
      * @param  mixed  $models The parent models that relations should be loaded for
      * @param  mixed[]  $relations The relations to be loaded. Same format as the `with` method in Eloquent builder.
+     * @return void
      */
     public function __construct($models, array $relations)
     {

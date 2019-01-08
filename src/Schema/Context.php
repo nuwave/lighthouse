@@ -25,6 +25,7 @@ class Context implements GraphQLContext
      * Create new context.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @return void
      */
     public function __construct(Request $request)
     {

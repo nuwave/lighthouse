@@ -15,6 +15,7 @@ class SubscriptionRouter
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensions
+     * @return void
      */
     public function __construct(ExtensionRegistry $extensions)
     {

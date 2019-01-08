@@ -53,6 +53,7 @@ class DirectiveFactory
 
     /**
      * DirectiveFactory constructor.
+     * @return void
      */
     public function __construct()
     {

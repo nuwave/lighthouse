@@ -23,6 +23,7 @@ class SubscriptionController extends Controller
     /**
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions  $broadcaster
      * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
+     * @return void
      */
     public function __construct(BroadcastsSubscriptions $broadcaster, BroadcastManager $broadcastManager)
     {

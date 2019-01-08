@@ -16,6 +16,7 @@ class SchemaStitcher implements SchemaSourceProvider
      * SchemaStitcher constructor.
      *
      * @param  string  $rootSchemaPath
+     * @return void
      */
     public function __construct(string $rootSchemaPath)
     {

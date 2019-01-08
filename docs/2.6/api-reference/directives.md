@@ -525,6 +525,7 @@ class Commentable
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -887,6 +888,7 @@ class Person
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {

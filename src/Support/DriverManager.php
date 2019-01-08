@@ -37,6 +37,7 @@ abstract class DriverManager
      * Create a new driver manager instance.
      *
      * @param  \Illuminate\Container\Container  $app
+     * @return void
      */
     public function __construct(Application $app)
     {

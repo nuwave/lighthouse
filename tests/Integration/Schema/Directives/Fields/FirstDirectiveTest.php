@@ -42,7 +42,9 @@ class FirstDirectiveTest extends DBTestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function itReturnsASingleUserWhenMultiplesMatch(): void
     {
         $this->schema = '

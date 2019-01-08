@@ -78,7 +78,7 @@ class GraphQL
      * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
      * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @retutn void
+     * @return void
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,

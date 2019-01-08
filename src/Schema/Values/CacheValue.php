@@ -46,6 +46,7 @@ class CacheValue
      * Create instance of cache value.
      *
      * @param  array  $arguments
+     * @return void
      */
     public function __construct(array $arguments = [])
     {

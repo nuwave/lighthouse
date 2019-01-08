@@ -20,6 +20,7 @@ class ExtensionRegistry implements \JsonSerializable
 
     /**
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @return void
      */
     public function __construct(Pipeline $pipeline)
     {

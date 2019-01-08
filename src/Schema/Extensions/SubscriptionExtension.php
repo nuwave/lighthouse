@@ -23,6 +23,7 @@ class SubscriptionExtension extends GraphQLExtension
 
     /**
      * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $registry
+     * @return void
      */
     public function __construct(SubscriptionRegistry $registry)
     {

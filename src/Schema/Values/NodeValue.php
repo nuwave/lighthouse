@@ -30,6 +30,7 @@ class NodeValue
 
     /**
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return void
      */
     public function __construct(TypeDefinitionNode $typeDefinition)
     {

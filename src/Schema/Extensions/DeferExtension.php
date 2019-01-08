@@ -58,6 +58,7 @@ class DeferExtension extends GraphQLExtension
 
     /**
      * @param  \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse  $stream
+     * @return void
      */
     public function __construct(CanStreamResponse $stream)
     {

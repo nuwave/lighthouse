@@ -18,6 +18,7 @@ class NodeRegistry
     /**
      * NodeRegistry constructor.
      * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {

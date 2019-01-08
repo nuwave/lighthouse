@@ -20,6 +20,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
 
     /**
      * @param  \Illuminate\Database\DatabaseManager  $database
+     * @return void
      */
     public function __construct(DatabaseManager $database)
     {

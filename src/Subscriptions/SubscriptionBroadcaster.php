@@ -37,6 +37,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator  $iterator
      * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
+     * @return void
      */
     public function __construct(
         AuthorizesSubscriptions $auth,

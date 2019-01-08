@@ -20,6 +20,7 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\NodeRegistry  $nodeRegistry
+     * @return void
      */
     public function __construct(NodeRegistry $nodeRegistry)
     {
