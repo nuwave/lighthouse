@@ -59,7 +59,6 @@ class ExtensionRequest
      * Get GraphQL query string.
      *
      * @param  int|null  $index
-     *
      * @return string
      */
     public function queryString(?int $index = null): string
@@ -73,7 +72,6 @@ class ExtensionRequest
      * Get request variables.
      *
      * @param  int|null  $index
-     *
      * @return array|null
      */
     public function variables(?int $index = null)

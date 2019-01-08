@@ -33,7 +33,6 @@ class TestSchemaProvider implements SchemaSourceProvider
      * Set schema root path.
      *
      * @param  string  $path
-     *
      * @return SchemaSourceProvider
      */
     public function setRootPath(string $path)

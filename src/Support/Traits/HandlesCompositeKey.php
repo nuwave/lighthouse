@@ -10,7 +10,6 @@ trait HandlesCompositeKey
      * E.g.: $primaryKey = ['key1', 'key2'];.
      *
      * @param  mixed  $key
-     *
      * @return string
      */
     protected function buildKey($key): string

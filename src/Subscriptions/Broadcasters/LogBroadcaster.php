@@ -36,7 +36,6 @@ class LogBroadcaster implements Broadcaster
      * Authorize subscription request.
      *
      * @param  Request  $request
-     *
      * @return JsonResponse
      */
     public function authorized(Request $request): JsonResponse
@@ -48,7 +47,6 @@ class LogBroadcaster implements Broadcaster
      * Handle unauthorized subscription request.
      *
      * @param  Request  $request
-     *
      * @return JsonResponse
      */
     public function unauthorized(Request $request): JsonResponse
@@ -60,7 +58,6 @@ class LogBroadcaster implements Broadcaster
      * Handle subscription web hook.
      *
      * @param  Request  $request
-     *
      * @return JsonResponse
      */
     public function hook(Request $request): JsonResponse
@@ -83,7 +80,6 @@ class LogBroadcaster implements Broadcaster
      * Get the data that is being broadcast.
      *
      * @param  string|null  $key
-     *
      * @return array|null
      */
     public function broadcasts(?string $key = null): ?array

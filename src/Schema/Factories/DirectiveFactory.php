@@ -77,7 +77,6 @@ class DirectiveFactory
      *
      * @param  string  $directiveName
      * @param  TypeSystemDefinitionNode|null  $definitionNode
-     *
      * @return Directive
      */
     public function create(string $directiveName, $definitionNode = null): Directive
@@ -93,7 +92,6 @@ class DirectiveFactory
      * Create a directive from resolved directive classes.
      *
      * @param  string  $directiveName
-     *
      * @return Directive|null
      */
     protected function resolve(string $directiveName): ?Directive
@@ -175,7 +173,6 @@ class DirectiveFactory
      *
      * @param  Directive  $directive
      * @param  TypeSystemDefinitionNode  $definitionNode
-     *
      * @return Directive
      */
     protected function hydrate(Directive $directive, $definitionNode): Directive
@@ -190,7 +187,6 @@ class DirectiveFactory
      *
      * @param  \GraphQL\Language\AST\Node  $node
      * @param  string  $directiveClass
-     *
      * @return \Illuminate\Support\Collection<$directiveClass>
      */
     protected function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
@@ -233,7 +229,6 @@ class DirectiveFactory
 
     /**
      * @param  \GraphQL\Language\AST\Node  $node
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\NodeManipulator>
      */
     public function createNodeManipulators(Node $node): Collection
@@ -243,7 +238,6 @@ class DirectiveFactory
 
     /**
      * @param  FieldDefinitionNode  $fieldDefinition
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\FieldManipulator>
      */
     public function createFieldManipulators(FieldDefinitionNode $fieldDefinition): Collection
@@ -253,7 +247,6 @@ class DirectiveFactory
 
     /**
      * @param  $inputValueDefinition
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgManipulator>
      */
     public function createArgManipulators(InputValueDefinitionNode $inputValueDefinition): Collection
@@ -265,7 +258,6 @@ class DirectiveFactory
      * Get the node resolver directive for the given type definition.
      *
      * @param  TypeDefinitionNode  $node
-     *
      * @return \GraphQL\Language\AST\NodeResolver|null
      */
     public function createNodeResolver(TypeDefinitionNode $node): ?NodeResolver
@@ -278,7 +270,6 @@ class DirectiveFactory
      * Check if the given node has a type resolver directive handler assigned to it.
      *
      * @param  TypeDefinitionNode  $typeDefinition
-     *
      * @return bool
      */
     public function hasNodeResolver(TypeDefinitionNode $typeDefinition): bool
@@ -290,7 +281,6 @@ class DirectiveFactory
      * Check if the given field has a field resolver directive handler assigned to it.
      *
      * @param  FieldDefinitionNode  $fieldDefinition
-     *
      * @return bool
      */
     public function hasFieldResolver(FieldDefinitionNode $fieldDefinition): bool
@@ -302,7 +292,6 @@ class DirectiveFactory
      * Check if field has one or more FieldMiddleware directives associated with it.
      *
      * @param  FieldDefinitionNode  $field
-     *
      * @return bool
      */
     public function hasFieldMiddleware(FieldDefinitionNode $field): bool
@@ -314,7 +303,6 @@ class DirectiveFactory
      * Get handler for field.
      *
      * @param  FieldDefinitionNode  $field
-     *
      * @return FieldResolver|null
      */
     public function createFieldResolver(FieldDefinitionNode $field): ?FieldResolver
@@ -326,7 +314,6 @@ class DirectiveFactory
      * Get all middleware directive for a type definitions.
      *
      * @param  \GraphQL\Language\AST\Node  $typeDefinition
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\NodeMiddleware>
      */
     public function createNodeMiddleware(Node $typeDefinition): Collection
@@ -338,7 +325,6 @@ class DirectiveFactory
      * Get middleware for field.
      *
      * @param  FieldDefinitionNode  $fieldDefinition
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware>
      */
     public function createFieldMiddleware($fieldDefinition): Collection
@@ -350,7 +336,6 @@ class DirectiveFactory
      * Create `ArgTransformerDirective` instances from `InputValueDefinitionNode`.
      *
      * @param  InputValueDefinitionNode  $arg
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective>
      */
     public function createArgTransformers(InputValueDefinitionNode $arg): Collection
@@ -362,7 +347,6 @@ class DirectiveFactory
      * Create `ArgDirective` instances from `InputValueDefinitionNode`.
      *
      * @param  InputValueDefinitionNode  $arg
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgDirective>
      */
     public function createArgDirectives(InputValueDefinitionNode $arg): Collection
@@ -374,7 +358,6 @@ class DirectiveFactory
      * Get middleware for array arguments.
      *
      * @param  InputValueDefinitionNode  $arg
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray>
      */
     public function createArgDirectivesForArray(InputValueDefinitionNode $arg): Collection
@@ -386,7 +369,6 @@ class DirectiveFactory
      * Get filters for arguments.
      *
      * @param  InputValueDefinitionNode  $arg
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective>
      */
     public function createArgFilterDirective(InputValueDefinitionNode $arg): Collection

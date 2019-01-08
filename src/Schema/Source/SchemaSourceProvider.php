@@ -11,7 +11,6 @@ interface SchemaSourceProvider
      * Set schema root path.
      *
      * @param  string  $path
-     *
      * @return \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
      */
     public function setRootPath(string $path);

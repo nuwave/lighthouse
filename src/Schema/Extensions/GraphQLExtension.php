@@ -11,7 +11,6 @@ abstract class GraphQLExtension implements \JsonSerializable
      * Manipulate the schema.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST
@@ -52,7 +51,6 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @param  array  $response
      * @param  \Closure  $next
-     *
      * @return array
      */
     public function willSendResponse(array $response, \Closure $next)

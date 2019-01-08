@@ -11,7 +11,6 @@ abstract class Stream
      *
      * @param  string  $path
      * @param  array  $data
-     *
      * @return array|null
      */
     protected function chunkError(string $path, array $data): ?array

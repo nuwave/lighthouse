@@ -12,7 +12,6 @@ interface StoresSubscriptions
      *
      * @param  array  $input
      * @param  array  $headers
-     *
      * @return Subscriber|null
      */
     public function subscriberByRequest(array $input, array $headers);
@@ -21,7 +20,6 @@ interface StoresSubscriptions
      * Find subscriber by channel.
      *
      * @param  string  $channel
-     *
      * @return Subscriber|null
      */
     public function subscriberByChannel(string $channel);
@@ -30,7 +28,6 @@ interface StoresSubscriptions
      * Get collection of subscribers by topic.
      *
      * @param  string  $topic
-     *
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic);

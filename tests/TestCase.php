@@ -186,7 +186,6 @@ abstract class TestCase extends BaseTestCase
      *
      * @param  mixed[]  $data
      * @param  mixed[]  $headers
-     *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     protected function postGraphQL(array $data, array $headers = []): TestResponse

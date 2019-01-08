@@ -69,7 +69,6 @@ class TrimDirective implements ArgTransformerDirective
      * Remove whitespace from the beginning and end of a given input.
      *
      * @param  string  $argumentValue
-     *
      * @return mixed
      */
     public function transform($argumentValue): string
@@ -158,7 +157,6 @@ class EqDirective implements ArgFilterDirective
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  string  $columnName
      * @param  mixed  $value
-     *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function applyFilter($builder, string $columnName, $value)

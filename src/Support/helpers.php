@@ -32,7 +32,6 @@ if (! function_exists('config_path')) {
      * Get base configuration path.
      *
      * @param  string|null  $path
-     *
      * @return string
      */
     function config_path(string $path = ''): string
@@ -51,7 +50,6 @@ if (! function_exists('app_path')) {
      * Get base app path.
      *
      * @param  string|null  $path
-     *
      * @return string
      */
     function app_path(string $path = ''): string

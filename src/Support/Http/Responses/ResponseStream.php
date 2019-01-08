@@ -18,7 +18,6 @@ class ResponseStream extends Stream implements CanStreamResponse
      * @param  array  $data
      * @param  array  $paths
      * @param  bool  $final
-     *
      * @return void
      */
     public function stream(array $data, array $paths, bool $final): void
@@ -79,7 +78,6 @@ class ResponseStream extends Stream implements CanStreamResponse
      *
      * @param  array  $data
      * @param  bool  $terminating
-     *
      * @return string
      */
     protected function chunk(array $data, bool $terminating): string
@@ -104,7 +102,6 @@ class ResponseStream extends Stream implements CanStreamResponse
      * Stream chunked data to client.
      *
      * @param  string  $chunk
-     *
      * @return void
      */
     protected function emit(string $chunk): void
@@ -122,7 +119,6 @@ class ResponseStream extends Stream implements CanStreamResponse
      * @todo Investigate exceptions that occur on Apache
      *
      * @param  \Closure  $flush
-     *
      * @return void
      */
     protected function flush(\Closure $flush): void

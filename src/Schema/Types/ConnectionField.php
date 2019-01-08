@@ -16,7 +16,6 @@ class ConnectionField
      * @param  array  $args
      * @param  mixed  $context
      * @param  ResolveInfo|null  $info
-     *
      * @return array
      */
     public function pageInfoResolver(
@@ -48,7 +47,6 @@ class ConnectionField
      * @param  array  $args
      * @param  mixed  $context
      * @param  ResolveInfo|null  $info
-     *
      * @return \Illuminate\Support\Collection
      */
     public function edgeResolver(

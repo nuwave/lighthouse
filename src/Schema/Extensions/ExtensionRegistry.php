@@ -48,7 +48,6 @@ class ExtensionRegistry implements \JsonSerializable
      * For example, retrieve the TracingExtension by calling $this->get('tracing')
      *
      * @param  string  $shortName
-     *
      * @return GraphQLExtension|null
      */
     public function get(string $shortName): ?GraphQLExtension
@@ -60,7 +59,6 @@ class ExtensionRegistry implements \JsonSerializable
      * Check if extension is registered by its short name.
      *
      * @param  string  $shortName
-     *
      * @return bool
      */
     public function has(string $shortName): bool
@@ -121,7 +119,6 @@ class ExtensionRegistry implements \JsonSerializable
      * response will be sent.
      *
      * @param  array  $response
-     *
      * @return array
      */
     public function willSendResponse(array $response): array
@@ -139,7 +136,6 @@ class ExtensionRegistry implements \JsonSerializable
      * Allow Extensions to manipulate the Schema.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulate(DocumentAST $documentAST): DocumentAST

@@ -10,7 +10,6 @@ interface NodeManipulator extends Directive
     /**
      * @param  \GraphQL\Language\AST\Node  $node
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST);

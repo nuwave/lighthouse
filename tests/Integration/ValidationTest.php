@@ -311,7 +311,6 @@ class ValidationTest extends TestCase
      *
      * @param  array  $keys
      * @param  \Illuminate\Foundation\Testing\TestResponse  $result
-     *
      * @return void
      */
     protected function assertValidationKeysSame(array $keys, TestResponse $result): void

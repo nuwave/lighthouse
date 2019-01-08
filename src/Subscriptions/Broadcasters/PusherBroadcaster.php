@@ -68,7 +68,6 @@ class PusherBroadcaster implements Broadcaster
      * Handle subscription web hook.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function hook(Request $request): JsonResponse

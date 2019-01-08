@@ -59,7 +59,6 @@ class GraphQLController extends Controller
      * Execute GraphQL query.
      *
      * @param  Request  $request
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function query(Request $request): Response
@@ -84,7 +83,6 @@ class GraphQLController extends Controller
     /**
      * @param  Request  $request
      * @param  GraphQLContext  $context
-     *
      * @return mixed[]
      */
     protected function execute(Request $request, GraphQLContext $context): array
@@ -103,7 +101,6 @@ class GraphQLController extends Controller
     /**
      * @param  Request  $request
      * @param  GraphQLContext  $context
-     *
      * @return mixed[]
      */
     protected function executeBatched(Request $request, GraphQLContext $context): array
@@ -125,7 +122,6 @@ class GraphQLController extends Controller
 
     /**
      * @param  mixed  $variables
-     *
      * @return mixed[]
      */
     protected function ensureVariablesAreArray($variables): array

@@ -272,7 +272,6 @@ class DocumentAST implements \Serializable
      * Get all definitions of a given type.
      *
      * @param  string  $typeClassName
-     *
      * @return \Illuminate\Support\Collection
      */
     protected function definitionsByType(string $typeClassName): Collection

@@ -10,7 +10,6 @@ interface ContextSerializer
      * Serialize the context.
      *
      * @param  GraphQLContext  $context
-     *
      * @return string
      */
     public function serialize(GraphQLContext $context);
@@ -19,7 +18,6 @@ interface ContextSerializer
      * Unserialize the context.
      *
      * @param  string  $context
-     *
      * @return GraphQLContext
      */
     public function unserialize(string $context);

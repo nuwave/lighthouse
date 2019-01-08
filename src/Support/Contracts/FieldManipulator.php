@@ -12,7 +12,6 @@ interface FieldManipulator extends Directive
      * @param  FieldDefinitionNode  $fieldDefinition
      * @param  ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(

@@ -15,7 +15,6 @@ class DateTime extends ScalarType
      * Serialize an internal value, ensuring it is a valid datetime string.
      *
      * @param  \Carbon\Carbon|string  $value
-     *
      * @return string
      */
     public function serialize($value): string
@@ -32,7 +31,6 @@ class DateTime extends ScalarType
      * Parse a externally provided variable value into a Carbon instance.
      *
      * @param  mixed  $value
-     *
      * @return \Carbon\Carbon
      */
     public function parseValue($value): Carbon

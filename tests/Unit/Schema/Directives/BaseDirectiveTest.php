@@ -131,7 +131,6 @@ class BaseDirectiveTest extends TestCase
              *
              * @param  string  $method
              * @param  mixed[] $args
-             *
              * @return mixed
              */
             public function __call(string $method, $args)

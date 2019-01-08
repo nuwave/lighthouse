@@ -13,7 +13,6 @@ class Utils
      * @param  string  $classCandidate
      * @param  array  $namespacesToTry
      * @param  callable $determineMatch
-     *
      * @return string|null
      */
     public static function namespaceClassname(string $classCandidate, array $namespacesToTry, callable $determineMatch): ?string
