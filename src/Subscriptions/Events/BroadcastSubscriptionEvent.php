@@ -25,7 +25,7 @@ class BroadcastSubscriptionEvent
     public $root;
 
     /**
-     * @param  Subscription  $subscription
+     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $fieldName
      * @param  mixed  $root
      */

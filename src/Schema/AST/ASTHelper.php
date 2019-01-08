@@ -145,7 +145,7 @@ class ASTHelper
     }
 
     /**
-     * @param  DirectiveNode  $directive
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directive
      * @param  string  $name
      * @param  mixed|null  $default
      * @return mixed|null
@@ -236,7 +236,7 @@ class ASTHelper
      * Attach directive to all registered object type fields.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @param  DirectiveNode  $directive
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directive
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): DocumentAST
@@ -267,7 +267,7 @@ class ASTHelper
     /**
      * This adds an Interface called "Node" to an ObjectType definition.
      *
-     * @param  ObjectTypeDefinitionNode  $objectType
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */

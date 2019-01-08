@@ -24,12 +24,12 @@ class NodeValue
     /**
      * Cache key for this type.
      *
-     * @var string
+     * @var string|null
      */
     protected $cacheKey;
 
     /**
-     * @param  TypeDefinitionNode  $typeDefinition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
      */
     public function __construct(TypeDefinitionNode $typeDefinition)
     {
@@ -49,9 +49,8 @@ class NodeValue
     /**
      * Set the executable type.
      *
-     * @param  Type  $type
-     *
-     * @return self
+     * @param  \GraphQL\Type\Definition\Type  $type
+     * @return $this
      */
     public function setType(Type $type): self
     {
@@ -95,7 +94,7 @@ class NodeValue
      *
      * @return string|null
      */
-    public function getCacheKey()
+    public function getCacheKey(): ?string
     {
         return $this->cacheKey;
     }
@@ -103,9 +102,8 @@ class NodeValue
     /**
      * Set node cache key.
      *
-     * @param  string  $key
-     *
-     * @return \GraphQL\Language\AST\NodeValue
+     * @param  string|null  $key
+     * @return $this
      */
     public function setCacheKey(string $key = null): self
     {

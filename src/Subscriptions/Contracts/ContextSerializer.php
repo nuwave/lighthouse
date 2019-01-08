@@ -9,7 +9,7 @@ interface ContextSerializer
     /**
      * Serialize the context.
      *
-     * @param  GraphQLContext  $context
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @return string
      */
     public function serialize(GraphQLContext $context);
@@ -18,7 +18,7 @@ interface ContextSerializer
      * Unserialize the context.
      *
      * @param  string  $context
-     * @return GraphQLContext
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function unserialize(string $context);
 }

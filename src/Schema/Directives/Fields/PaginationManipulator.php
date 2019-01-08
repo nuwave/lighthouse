@@ -56,11 +56,10 @@ class PaginationManipulator
      * The types in between are automatically generated and applied to the schema.
      *
      * @param  string  $paginationType
-     * @param  FieldDefinitionNode  $fieldDefinition
-     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
      * @param  int|null  $defaultCount
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null): DocumentAST
@@ -77,11 +76,10 @@ class PaginationManipulator
     /**
      * Register connection w/ schema.
      *
-     * @param  FieldDefinitionNode  $fieldDefinition
-     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
@@ -130,11 +128,10 @@ class PaginationManipulator
     /**
      * Register paginator w/ schema.
      *
-     * @param  FieldDefinitionNode  $fieldDefinition
-     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST

@@ -52,8 +52,7 @@ class SubscriptionRegistry
      *
      * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $field
-     *
-     * @return SubscriptionRegistry
+     * @return $this
      */
     public function register(GraphQLSubscription $subscription, string $field): self
     {
@@ -66,7 +65,6 @@ class SubscriptionRegistry
      * Check if subscription is registered.
      *
      * @param  string  $key
-     *
      * @return bool
      */
     public function has(string $key): bool
@@ -88,8 +86,7 @@ class SubscriptionRegistry
      * Get instance of subscription.
      *
      * @param  string  $key
-     *
-     * @return GraphQLSubscription
+     * @return \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
      */
     public function subscription(string $key): GraphQLSubscription
     {
@@ -99,7 +96,7 @@ class SubscriptionRegistry
     /**
      * Add subscription to registry.
      *
-     * @param  Subscriber  $subscriber
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  string  $channel
      * @return $this
      */
@@ -117,7 +114,7 @@ class SubscriptionRegistry
     /**
      * Get registered subscriptions.
      *
-     * @param  Subscriber  $subscriber
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return \Illuminate\Support\Collection
      *
      * @throws \GraphQL\Error\SyntaxError

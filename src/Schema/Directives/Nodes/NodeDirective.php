@@ -39,10 +39,10 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     /**
      * Handle type construction.
      *
-     * @param  \GraphQL\Language\AST\NodeValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
      * @param  \Closure  $next
      *
-     * @return \GraphQL\Language\AST\NodeValue
+     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {

@@ -57,7 +57,7 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param  ExtensionRequest  $request
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
      * @return $this
      */
     public function requestDidStart(ExtensionRequest $request): self

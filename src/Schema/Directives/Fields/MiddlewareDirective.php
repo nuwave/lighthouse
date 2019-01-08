@@ -110,9 +110,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode  $objectType
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
      * @param  array  $middlewareArgValue
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */

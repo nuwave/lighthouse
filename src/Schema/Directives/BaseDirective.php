@@ -26,9 +26,9 @@ abstract class BaseDirective implements Directive
      *
      * @todo Make this type annotation a hard requirement as soon as the underlying implementation is fixed
      *
-     * @param  TypeSystemDefinitionNode  $definitionNode
+     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
      *
-     * @return \Nuwave\Lighthouse\Schema\Directives\BaseDirective
+     * @return $this
      */
     public function hydrate($definitionNode): self
     {
@@ -40,7 +40,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the directive definition associated with the current directive.
      *
-     * @return DirectiveNode
+     * @return \GraphQL\Language\AST\DirectiveNode
      */
     protected function directiveDefinition(): DirectiveNode
     {

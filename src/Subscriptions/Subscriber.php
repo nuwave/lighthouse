@@ -132,7 +132,7 @@ class Subscriber
     }
 
     /**
-     * @return ContextSerializer
+     * @return \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer
      */
     protected function serializer(): ContextSerializer
     {

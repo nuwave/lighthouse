@@ -35,8 +35,8 @@ class LogBroadcaster implements Broadcaster
     /**
      * Authorize subscription request.
      *
-     * @param  Request  $request
-     * @return JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function authorized(Request $request): JsonResponse
     {
@@ -46,8 +46,8 @@ class LogBroadcaster implements Broadcaster
     /**
      * Handle unauthorized subscription request.
      *
-     * @param  Request  $request
-     * @return JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function unauthorized(Request $request): JsonResponse
     {
@@ -57,8 +57,8 @@ class LogBroadcaster implements Broadcaster
     /**
      * Handle subscription web hook.
      *
-     * @param  Request  $request
-     * @return JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function hook(Request $request): JsonResponse
     {
@@ -68,7 +68,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  Subscriber  $subscriber
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  array  $data
      */
     public function broadcast(Subscriber $subscriber, array $data)

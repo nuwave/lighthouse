@@ -25,7 +25,7 @@ class TypeRegistry
      * Register type with registry.
      *
      * @param  \GraphQL\Type\Definition\Type  $type
-     * @return \Nuwave\Lighthouse\Schema\TypeRegistry
+     * @return $this
      */
     public function register(Type $type): self
     {

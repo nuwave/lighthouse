@@ -27,7 +27,7 @@ class Response implements GraphQLResponse
      *
      * @param  array  $data
      *
-     * @return SymfonyResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function create(array $data): SymfonyResponse
     {

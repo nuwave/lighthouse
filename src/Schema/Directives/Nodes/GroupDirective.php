@@ -98,9 +98,8 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
     /**
      * @param  string  $namespaceValue
-     * @param  DirectiveNode  $directive
-     *
-     * @return DirectiveNode
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directive
+     * @return \GraphQL\Language\AST\DirectiveNode
      */
     protected function mergeNamespaceOnExistingDirective(string $namespaceValue, DirectiveNode $directive): DirectiveNode
     {

@@ -19,7 +19,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     protected $nodeRegistry;
 
     /**
-     * @param  \GraphQL\Language\AST\NodeRegistry  $nodeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\NodeRegistry  $nodeRegistry
      */
     public function __construct(NodeRegistry $nodeRegistry)
     {
@@ -39,10 +39,9 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     /**
      * Handle type construction.
      *
-     * @param  \GraphQL\Language\AST\NodeValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
      * @param  \Closure  $next
-     *
-     * @return \GraphQL\Language\AST\NodeValue
+     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {

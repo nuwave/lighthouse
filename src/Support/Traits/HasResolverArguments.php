@@ -47,7 +47,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @return GraphQLContext
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function context(): GraphQLContext
     {
@@ -55,7 +55,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @param  GraphQLContext  $context
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @return $this
      */
     public function setContext(GraphQLContext $context): self
@@ -85,7 +85,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @return ResolveInfo
+     * @return \GraphQL\Type\Definition\ResolveInfo
      */
     public function resolveInfo(): ResolveInfo
     {
@@ -93,7 +93,7 @@ trait HasResolverArguments
     }
 
     /**
-     * @param  ResolveInfo  $resolveInfo
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return $this
      */
     public function setResolveInfo(ResolveInfo $resolveInfo): self
@@ -106,8 +106,8 @@ trait HasResolverArguments
     /**
      * @param  mixed|null  $root
      * @param  array  $args
-     * @param  GraphQLContext  $context
-     * @param  ResolveInfo  $resolveInfo
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return $this
      */
     public function setResolverArguments($root, array $args, $context, ResolveInfo $resolveInfo): self

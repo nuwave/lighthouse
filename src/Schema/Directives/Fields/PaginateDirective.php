@@ -30,10 +30,9 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
-     * @param  FieldDefinitionNode  $fieldDefinition
-     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
@@ -51,7 +50,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * Resolve the field directive.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
@@ -79,7 +77,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * Create a paginator resolver.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected function paginatorTypeResolver(FieldValue $value): FieldValue
@@ -98,7 +95,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * Create a connection resolver.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected function connectionTypeResolver(FieldValue $value): FieldValue
@@ -120,8 +116,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * @param  array  $resolveArgs
      * @param  int  $page
      * @param  int  $first
-     *
-     * @return LengthAwarePaginator
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     protected function getPaginatedResults(array $resolveArgs, int $page, int $first): LengthAwarePaginator
     {
@@ -152,7 +147,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      * This works differently as in other directives, so we define a separate function for it.
      *
      * @return string
-     *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getPaginatorModel(): string

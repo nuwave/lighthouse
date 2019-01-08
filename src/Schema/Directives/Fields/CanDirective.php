@@ -87,8 +87,8 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * @param  Authenticatable|null  $user
-     * @param  Gate  $gate
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @param  string  $ability
      * @param  array  $args
      * @return void

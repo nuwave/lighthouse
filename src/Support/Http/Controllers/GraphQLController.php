@@ -38,10 +38,10 @@ class GraphQLController extends Controller
     /**
      * Inject middleware into request.
      *
-     * @param  ExtensionRegistry  $extensionRegistry
-     * @param  GraphQL  $graphQL
-     * @param  CreatesContext  $createsContext
-     * @param  GraphQLResponse  $graphQLResponse
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
+     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $graphQLResponse
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,
@@ -58,7 +58,7 @@ class GraphQLController extends Controller
     /**
      * Execute GraphQL query.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function query(Request $request): Response
@@ -81,8 +81,8 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param  Request  $request
-     * @param  GraphQLContext  $context
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @return mixed[]
      */
     protected function execute(Request $request, GraphQLContext $context): array
@@ -99,8 +99,8 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param  Request  $request
-     * @param  GraphQLContext  $context
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @return mixed[]
      */
     protected function executeBatched(Request $request, GraphQLContext $context): array

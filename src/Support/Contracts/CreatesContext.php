@@ -10,7 +10,7 @@ interface CreatesContext
      * Generate GraphQL context.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return GraphQLContext
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function generate(Request $request);
 }

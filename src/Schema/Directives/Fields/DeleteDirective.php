@@ -76,7 +76,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     /**
      * Ensure there is only a single argument defined on the field.
      *
-     * @return InputValueDefinitionNode
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */

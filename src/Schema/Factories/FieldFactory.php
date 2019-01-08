@@ -238,9 +238,9 @@ class FieldFactory
     /**
      * Handle the ArgMiddleware.
      *
-     * @param  InputType  $type
+     * @param  \GraphQL\Type\Definition\InputType  $type
      * @param  mixed  $argValue
-     * @param  InputValueDefinitionNode  $astNode
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]                  $argumentPath
      *
      * @return void
@@ -317,7 +317,7 @@ class FieldFactory
     }
 
     /**
-     * @param  InputValueDefinitionNode  $astNode
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed  $argValue
      * @param  mixed[]                  $argumentPath
      * @param  string  $mustImplementClass
@@ -342,7 +342,7 @@ class FieldFactory
     }
 
     /**
-     * @param  InputValueDefinitionNode  $astNode
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed  $argumentValue
      * @param  mixed[]                  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
@@ -393,7 +393,7 @@ class FieldFactory
     }
 
     /**
-     * @param  InputValueDefinitionNode  $astNode
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]                  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
      *
@@ -413,7 +413,7 @@ class FieldFactory
     }
 
     /**
-     * @param  ArgValidationDirective  $directive
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective  $directive
      * @param  mixed[]                $argumentPath
      *
      * @return void
@@ -425,8 +425,8 @@ class FieldFactory
     }
 
     /**
-     * @param  ArgFilterDirective  $argFilterDirective
-     * @param  InputValueDefinitionNode  $inputValueDefinition
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
      *
      * @return void
      */
@@ -476,8 +476,8 @@ class FieldFactory
     /**
      * @param  mixed  $root
      * @param  array  $args
-     * @param  GraphQLContext  $context
-     * @param  ResolveInfo  $resolveInfo
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      *
      * @return void
      */
@@ -530,8 +530,8 @@ class FieldFactory
     /**
      * @param  mixed  $root
      * @param  array  $args
-     * @param  GraphQLContext  $context
-     * @param  ResolveInfo  $resolveInfo
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      *
      * @return void
      */

@@ -76,7 +76,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     /**
      * Determine of field should be deferred.
      *
-     * @param  TypeNode  $fieldType
+     * @param  \GraphQL\Language\AST\TypeNode  $fieldType
      * @param  \GraphQL\Type\Definition\ResolveInfo  $info
      * @return bool
      *
@@ -118,7 +118,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     }
 
     /**
-     * @return DeferExtension
+     * @return \Nuwave\Lighthouse\Schema\Extensions\DeferExtension
      */
     protected function getDeferExtension(): DeferExtension
     {

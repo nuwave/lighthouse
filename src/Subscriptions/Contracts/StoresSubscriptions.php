@@ -12,7 +12,7 @@ interface StoresSubscriptions
      *
      * @param  array  $input
      * @param  array  $headers
-     * @return Subscriber|null
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function subscriberByRequest(array $input, array $headers);
 
@@ -20,7 +20,7 @@ interface StoresSubscriptions
      * Find subscriber by channel.
      *
      * @param  string  $channel
-     * @return Subscriber|null
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function subscriberByChannel(string $channel);
 
@@ -35,7 +35,7 @@ interface StoresSubscriptions
     /**
      * Store subscription.
      *
-     * @param  Subscriber  $subscriber
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  string  $topic
      */
     public function storeSubscriber(Subscriber $subscriber, string $topic);
@@ -45,7 +45,7 @@ interface StoresSubscriptions
      *
      * @param  string  $channel
      *
-     * @return Subscriber|null
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function deleteSubscriber(string $channel);
 }

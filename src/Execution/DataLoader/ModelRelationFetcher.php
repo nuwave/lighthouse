@@ -98,6 +98,7 @@ class ModelRelationFetcher
 
     /**
      * Load all the relations of all the models.
+     *
      * @return $this
      */
     public function loadRelations(): self
@@ -167,6 +168,7 @@ class ModelRelationFetcher
 
     /**
      * Reload the models to get the `{relation}_count` attributes of models set.
+     *
      * @return $this
      */
     public function reloadModelsWithRelationCount(): self

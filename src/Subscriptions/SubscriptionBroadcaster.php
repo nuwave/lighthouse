@@ -105,9 +105,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Authorize the subscription.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function authorize(Request $request): Response
     {

@@ -11,7 +11,7 @@ interface BroadcastsSubscriptions
     /**
      * Push subscription data to subscribers.
      *
-     * @param  GraphQLSubscription  $subscription
+     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $fieldName
      * @param  mixed  $root
      */
@@ -20,7 +20,7 @@ interface BroadcastsSubscriptions
     /**
      * Queue pushing subscription data to subscribers.
      *
-     * @param  GraphQLSubscription  $subscription
+     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $fieldName
      * @param  mixed  $root
      */
@@ -29,9 +29,9 @@ interface BroadcastsSubscriptions
     /**
      * Authorize the subscription.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function authorize(Request $request);
 }

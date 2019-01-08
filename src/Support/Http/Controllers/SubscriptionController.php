@@ -21,8 +21,8 @@ class SubscriptionController extends Controller
     protected $broadcasterManager;
 
     /**
-     * @param  BroadcastsSubscriptions  $broadcaster
-     * @param  BroadcastManager  $broadcastManager
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions  $broadcaster
+     * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
      */
     public function __construct(BroadcastsSubscriptions $broadcaster, BroadcastManager $broadcastManager)
     {
@@ -33,9 +33,9 @@ class SubscriptionController extends Controller
     /**
      * Authenticate subscriber.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function authorize(Request $request): Response
     {
@@ -45,9 +45,9 @@ class SubscriptionController extends Controller
     /**
      * Handle pusher webhook.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function webhook(Request $request): Response
     {

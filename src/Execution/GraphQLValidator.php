@@ -22,7 +22,7 @@ class GraphQLValidator extends Validator
     /**
      * Get the context that was passed to the field that is being validated.
      *
-     * @return GraphQLContext
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function getContext(): GraphQLContext
     {
@@ -32,7 +32,7 @@ class GraphQLValidator extends Validator
     /**
      * Get the resolve info that was passed to the field that is being validated.
      *
-     * @return ResolveInfo
+     * @return \GraphQL\Type\Definition\ResolveInfo
      */
     public function getResolveInfo(): ResolveInfo
     {

@@ -63,7 +63,7 @@ If known, add additional type information in the PHPDoc.
 /**
  * We know we get an array of strings here.
  *
- * @param  string[] $bar
+ * @param  string[]  $bar
  * @return string
  */
 function foo(array $bar): string

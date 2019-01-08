@@ -57,7 +57,7 @@ class NodeRegistry
      *   return $this->db->getUserById($id)
      * }
      *
-     * @return \Nuwave\Lighthouse\Schema\NodeRegistry
+     * @return $this
      */
     public function registerNode(string $typeName, \Closure $resolve): self
     {
@@ -71,7 +71,7 @@ class NodeRegistry
      *
      * @param  string  $typeName
      * @param  string  $modelName
-     * @return \Nuwave\Lighthouse\Schema\NodeRegistry
+     * @return $this
      */
     public function registerModel(string $typeName, string $modelName): self
     {

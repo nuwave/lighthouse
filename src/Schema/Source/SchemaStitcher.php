@@ -26,7 +26,7 @@ class SchemaStitcher implements SchemaSourceProvider
      * Set schema root path.
      *
      * @param  string  $path
-     * @return \Nuwave\Lighthouse\Schema\Source\SchemaStitcher
+     * @return $this
      */
     public function setRootPath(string $path): self
     {

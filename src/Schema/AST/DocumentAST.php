@@ -36,7 +36,7 @@ class DocumentAST implements \Serializable
     protected $typeExtensionsMap;
 
     /**
-     * @param  DocumentNode  $documentNode
+     * @param  \GraphQL\Language\AST\DocumentNode  $documentNode
      */
     public function __construct(DocumentNode $documentNode)
     {
@@ -62,7 +62,7 @@ class DocumentAST implements \Serializable
     /**
      * Return a unique key that identifies a type extension.
      *
-     * @param  TypeExtensionNode  $typeExtensionNode
+     * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtensionNode
      * @return string
      */
     protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
@@ -218,7 +218,7 @@ class DocumentAST implements \Serializable
 
     /**
      * @param  string  $name
-     * @return InputObjectTypeDefinitionNode|null
+     * @return \GraphQL\Language\AST\InputObjectTypeDefinitionNode|null
      */
     public function inputObjectTypeDefinition(string $name): ?InputObjectTypeDefinitionNode
     {
@@ -251,7 +251,7 @@ class DocumentAST implements \Serializable
     /**
      * Get the root mutation type definition.
      *
-     * @return ObjectTypeDefinitionNode|null
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
     public function mutationTypeDefinition(): ?ObjectTypeDefinitionNode
     {
@@ -285,7 +285,7 @@ class DocumentAST implements \Serializable
     /**
      * Add a single field to the query type.
      *
-     * @param  FieldDefinitionNode  $field
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
      * @return $this
      */
     public function addFieldToQueryType(FieldDefinitionNode $field): self
@@ -299,7 +299,7 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * @param  DefinitionNode  $newDefinition
+     * @param  \GraphQL\Language\AST\DefinitionNode  $newDefinition
      * @return $this
      */
     public function setDefinition(DefinitionNode $newDefinition): self

@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions\Events;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions as Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class BroadcastSubscriptionListener implements ShouldQueue
 {
@@ -15,7 +15,7 @@ class BroadcastSubscriptionListener implements ShouldQueue
     /**
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions  $broadcaster
      */
-    public function __construct(Broadcaster $broadcaster)
+    public function __construct(BroadcastsSubscriptions $broadcaster)
     {
         $this->broadcaster = $broadcaster;
     }
@@ -23,7 +23,7 @@ class BroadcastSubscriptionListener implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  BroadcastSubscriptionEvent  $event
+     * @param  \Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent  $event
      */
     public function handle(BroadcastSubscriptionEvent $event)
     {

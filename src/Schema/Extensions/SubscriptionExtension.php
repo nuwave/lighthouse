@@ -22,7 +22,7 @@ class SubscriptionExtension extends GraphQLExtension
     protected $currentQuery = '';
 
     /**
-     * @param  SubscriptionRegistry  $registry
+     * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $registry
      */
     public function __construct(SubscriptionRegistry $registry)
     {
@@ -42,8 +42,7 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param  ExtensionRequest  $request
-     *
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
      * @return void
      */
     public function requestDidStart(ExtensionRequest $request): void

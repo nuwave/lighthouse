@@ -48,7 +48,7 @@ class ExtensionRequest
     /**
      * Get request context.
      *
-     * @return GraphQLContext
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function context(): GraphQLContext
     {

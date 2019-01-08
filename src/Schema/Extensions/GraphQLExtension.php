@@ -21,7 +21,7 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Handle request start.
      *
-     * @param  ExtensionRequest  $request
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
      */
     public function requestDidStart(ExtensionRequest $request)
     {
@@ -39,7 +39,7 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Handle batch request end.
      *
-     * @param  ExecutionResult  $result
+     * @param  \GraphQL\Executor\ExecutionResult  $result
      * @param  int  $index
      */
     public function batchedQueryDidEnd(ExecutionResult $result, int $index)

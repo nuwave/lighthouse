@@ -7,7 +7,7 @@ if (! function_exists('graphql')) {
     /**
      * Get instance of graphql container.
      *
-     * @return GraphQL
+     * @return \Nuwave\Lighthouse\GraphQL
      */
     function graphql(): GraphQL
     {

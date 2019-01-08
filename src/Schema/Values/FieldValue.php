@@ -74,8 +74,8 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param  \GraphQL\Language\AST\NodeValue  $parent
-     * @param  FieldDefinitionNode  $field
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $parent
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
      * @return void
      */
     public function __construct(NodeValue $parent, FieldDefinitionNode $field)

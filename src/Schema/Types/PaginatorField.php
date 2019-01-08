@@ -10,7 +10,7 @@ class PaginatorField
     /**
      * Resolve paginator info for connection.
      *
-     * @param  LengthAwarePaginator  $root
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $root
      * @return array
      */
     public function paginatorInfoResolver(LengthAwarePaginator $root): array
@@ -39,7 +39,7 @@ class PaginatorField
     /**
      * Resolve data for connection.
      *
-     * @param  LengthAwarePaginator  $root
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $root
      * @return \Illuminate\Support\Collection
      */
     public function dataResolver(LengthAwarePaginator $root): Collection

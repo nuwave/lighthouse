@@ -37,7 +37,7 @@ class PartialParser
 
     /**
      * @param  string  $definition
-     * @return ObjectTypeDefinitionNode
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode
      */
     public static function objectTypeDefinition(string $definition): ObjectTypeDefinitionNode
     {
@@ -61,7 +61,7 @@ class PartialParser
 
     /**
      * @param  string[] $inputValueDefinitions
-     * @return InputValueDefinitionNode[]
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode[]
      */
     public static function inputValueDefinitions(array $inputValueDefinitions): array
     {
@@ -87,7 +87,7 @@ class PartialParser
 
     /**
      * @param  string[] $argumentDefinitions
-     * @return ArgumentNode[]
+     * @return \GraphQL\Language\AST\ArgumentNode[]
      */
     public static function arguments(array $argumentDefinitions): array
     {
@@ -113,7 +113,7 @@ class PartialParser
 
     /**
      * @param  string  $operation
-     * @return OperationDefinitionNode
+     * @return \GraphQL\Language\AST\OperationDefinitionNode
      */
     public static function operationDefinition(string $operation): OperationDefinitionNode
     {
@@ -137,7 +137,7 @@ class PartialParser
 
     /**
      * @param  string  $directive
-     * @return DirectiveNode
+     * @return \GraphQL\Language\AST\DirectiveNode
      */
     public static function directive(string $directive): DirectiveNode
     {
@@ -167,7 +167,7 @@ class PartialParser
 
     /**
      * @param  string  $directiveDefinition
-     * @return DirectiveDefinitionNode
+     * @return \GraphQL\Language\AST\DirectiveDefinitionNode
      */
     public static function directiveDefinition(string $directiveDefinition): DirectiveDefinitionNode
     {
@@ -193,7 +193,7 @@ class PartialParser
 
     /**
      * @param  string  $interfaceDefinition
-     * @return InterfaceTypeDefinitionNode
+     * @return \GraphQL\Language\AST\InterfaceTypeDefinitionNode
      */
     public static function interfaceTypeDefinition(string $interfaceDefinition): InterfaceTypeDefinitionNode
     {
@@ -217,7 +217,7 @@ class PartialParser
 
     /**
      * @param  string  $inputTypeDefinition
-     * @return InputObjectTypeDefinitionNode
+     * @return \GraphQL\Language\AST\InputObjectTypeDefinitionNode
      */
     public static function inputObjectTypeDefinition(string $inputTypeDefinition): InputObjectTypeDefinitionNode
     {
@@ -241,7 +241,7 @@ class PartialParser
 
     /**
      * @param  string  $enumDefinition
-     * @return EnumTypeDefinitionNode
+     * @return \GraphQL\Language\AST\EnumTypeDefinitionNode
      */
     public static function enumTypeDefinition(string $enumDefinition): EnumTypeDefinitionNode
     {
