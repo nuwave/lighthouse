@@ -50,11 +50,11 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationType;
 
     /**
-     * @param  string      $relationName
-     * @param  array       $args
+     * @param  string  $relationName
+     * @param  array  $args
      * @param  string[]    $scopes
-     * @param  ResolveInfo $resolveInfo
-     * @param  string|null $paginationType
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @param  string|null  $paginationType
      */
     public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null)
     {
@@ -102,7 +102,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Construct a new instance of a relation fetcher.
      *
-     * @return ModelRelationFetcher
+     * @return \Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher
      */
     protected function getRelationFetcher(): ModelRelationFetcher
     {
@@ -122,7 +122,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @return Collection<Model>
+     * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Model>
      */
     protected function getParentModels(): Collection
     {

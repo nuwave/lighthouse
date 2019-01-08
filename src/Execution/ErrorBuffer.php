@@ -26,7 +26,7 @@ class ErrorBuffer
     /**
      * ErrorBuffer constructor.
      *
-     * @param  string        $errorType
+     * @param  string  $errorType
      * @param  \Closure|null  $exceptionResolver
      */
     public function __construct(string $errorType = 'generic', ?\Closure $exceptionResolver = null)
@@ -53,7 +53,6 @@ class ErrorBuffer
      * Set the Exception resolver.
      *
      * @param  \Closure  $exceptionResolver
-     *
      * @return $this
      */
     public function setExceptionResolver(\Closure $exceptionResolver): self
@@ -78,9 +77,8 @@ class ErrorBuffer
     /**
      * Push an error message into the buffer.
      *
-     * @param  string      $errorMessage
+     * @param  string  $errorMessage
      * @param  string|null  $key
-     *
      * @return $this
      */
     public function push(string $errorMessage, ?string $key = null): self
@@ -141,7 +139,6 @@ class ErrorBuffer
      * Set the error type.
      *
      * @param  string  $errorType
-     *
      * @return $this
      */
     public function setErrorType(string $errorType): self

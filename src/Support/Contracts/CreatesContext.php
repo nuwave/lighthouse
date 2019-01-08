@@ -9,7 +9,7 @@ interface CreatesContext
     /**
      * Generate GraphQL context.
      *
-     * @param  Request $request
+     * @param  \Illuminate\Http\Request $request
      *
      * @return GraphQLContext
      */

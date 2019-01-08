@@ -21,8 +21,8 @@ class SubscriptionController extends Controller
     protected $broadcasterManager;
 
     /**
-     * @param  BroadcastsSubscriptions $broadcaster
-     * @param  BroadcastManager        $broadcastManager
+     * @param  BroadcastsSubscriptions  $broadcaster
+     * @param  BroadcastManager  $broadcastManager
      */
     public function __construct(BroadcastsSubscriptions $broadcaster, BroadcastManager $broadcastManager)
     {
@@ -33,7 +33,7 @@ class SubscriptionController extends Controller
     /**
      * Authenticate subscriber.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return Response
      */
@@ -45,7 +45,7 @@ class SubscriptionController extends Controller
     /**
      * Handle pusher webhook.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return Response
      */

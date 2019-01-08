@@ -11,7 +11,7 @@ interface Broadcaster
     /**
      * Handle authorized subscription request.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return Response
      */
@@ -20,7 +20,7 @@ interface Broadcaster
     /**
      * Handle unauthorized subscription request.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return Response
      */
@@ -29,7 +29,7 @@ interface Broadcaster
     /**
      * Handle subscription web hook.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return Response
      */
@@ -38,7 +38,7 @@ interface Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  Subscriber $subscriber
+     * @param  Subscriber  $subscriber
      * @param  mixed[]    $data
      */
     public function broadcast(Subscriber $subscriber, array $data);

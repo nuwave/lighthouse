@@ -7,8 +7,8 @@ interface CanStreamResponse
     /**
      * Stream graphql response.
      *
-     * @param  array $data
-     * @param  array $paths
+     * @param  array  $data
+     * @param  array  $paths
      * @param  bool  $final
      *
      * @return mixed

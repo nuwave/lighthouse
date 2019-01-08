@@ -43,7 +43,7 @@ class ArgumentValue
     }
 
     /**
-     * @return InputValueDefinitionNode
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode
      */
     public function getAstNode(): InputValueDefinitionNode
     {
@@ -51,7 +51,7 @@ class ArgumentValue
     }
 
     /**
-     * @return FieldValue|null
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue|null
      */
     public function getParentField(): ?FieldValue
     {
@@ -59,7 +59,7 @@ class ArgumentValue
     }
 
     /**
-     * @return Type
+     * @return \GraphQL\Type\Definition\Type
      */
     public function getType(): Type
     {

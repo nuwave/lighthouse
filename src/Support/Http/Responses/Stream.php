@@ -9,7 +9,7 @@ abstract class Stream
     /**
      * Get error from chunk if it exists.
      *
-     * @param  string $path
+     * @param  string  $path
      * @param  array  $data
      *
      * @return array|null

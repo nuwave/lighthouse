@@ -12,8 +12,7 @@ class Pipeline extends BasePipeline
     /**
      * Set the array of pipes.
      *
-     * @param  Collection|array  $pipes
-     *
+     * @param  \Illuminate\Support\Collection|array  $pipes
      * @return $this
      */
     public function through($pipes)
@@ -50,7 +49,6 @@ class Pipeline extends BasePipeline
      * Set always variable.
      *
      * @param  \Closure  $always
-     *
      * @return $this
      */
     public function always(\Closure $always): self

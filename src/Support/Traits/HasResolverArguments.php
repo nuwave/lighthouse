@@ -37,7 +37,6 @@ trait HasResolverArguments
 
     /**
      * @param  mixed  $root
-     *
      * @return $this
      */
     public function setRoot($root): self
@@ -57,7 +56,6 @@ trait HasResolverArguments
 
     /**
      * @param  GraphQLContext  $context
-     *
      * @return $this
      */
     public function setContext(GraphQLContext $context): self
@@ -77,7 +75,6 @@ trait HasResolverArguments
 
     /**
      * @param  mixed[]  $arguments
-     *
      * @return $this
      */
     public function setArguments(array $arguments): self
@@ -97,7 +94,6 @@ trait HasResolverArguments
 
     /**
      * @param  ResolveInfo  $resolveInfo
-     *
      * @return $this
      */
     public function setResolveInfo(ResolveInfo $resolveInfo): self
@@ -108,11 +104,10 @@ trait HasResolverArguments
     }
 
     /**
-     * @param  mixed|null     $root
-     * @param  array          $args
+     * @param  mixed|null  $root
+     * @param  array  $args
      * @param  GraphQLContext  $context
-     * @param  ResolveInfo    $resolveInfo
-     *
+     * @param  ResolveInfo  $resolveInfo
      * @return $this
      */
     public function setResolverArguments($root, array $args, $context, ResolveInfo $resolveInfo): self

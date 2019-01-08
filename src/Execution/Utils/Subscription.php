@@ -11,9 +11,9 @@ class Subscription
     /**
      * Broadcast subscription to client(s).
      *
-     * @param  string    $subscriptionField
-     * @param  mixed     $root
-     * @param  bool|null $queue
+     * @param  string  $subscriptionField
+     * @param  mixed  $root
+     * @param  bool|null  $queue
      * @return void
      *
      * @throws \InvalidArgumentException

@@ -627,7 +627,7 @@ class Commentable
      * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $info
-     * @return Type
+     * @return \GraphQL\Type\Definition\Type
      */
     public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
     {

@@ -24,9 +24,9 @@ class FirstDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param  FieldValue $fieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {

@@ -19,7 +19,7 @@ class QueryAST
     protected $definitions;
 
     /**
-     * @param  DocumentNode  $documentNode
+     * @param  \GraphQL\Language\AST\DocumentNode  $documentNode
      */
     public function __construct(DocumentNode $documentNode)
     {
@@ -30,7 +30,6 @@ class QueryAST
      * Create a new instance from a query string.
      *
      * @param  string  $query
-     *
      * @return static
      */
     public static function fromSource(string $query): self
@@ -43,7 +42,7 @@ class QueryAST
     /**
      * Get all operation definitions.
      *
-     * @return Collection<OperationDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\OperationDefinitionNode>
      */
     public function operationDefinitions(): Collection
     {
@@ -53,7 +52,7 @@ class QueryAST
     /**
      * Get all fragment definitions.
      *
-     * @return Collection<FragmentDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\FragmentDefinitionNode>
      */
     public function fragmentDefinitions(): Collection
     {
@@ -64,8 +63,7 @@ class QueryAST
      * Get all definitions of a given type.
      *
      * @param  string  $typeClassName
-     *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function definitionsByType(string $typeClassName): Collection
     {

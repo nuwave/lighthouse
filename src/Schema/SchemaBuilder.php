@@ -49,9 +49,8 @@ class SchemaBuilder
     /**
      * Build an executable schema from AST.
      *
-     * @param  DocumentAST  $documentAST
-     *
-     * @return Schema
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \GraphQL\Type\Schema
      */
     public function build($documentAST)
     {
@@ -113,9 +112,8 @@ class SchemaBuilder
     /**
      * Set custom client directives.
      *
-     * @param  DocumentAST  $document
-     *
-     * @return Collection|Directive[]
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Illuminate\Support\Collection<\GraphQL\Type\Definition\Directive>
      */
     protected function convertDirectives(DocumentAST $document): Collection
     {

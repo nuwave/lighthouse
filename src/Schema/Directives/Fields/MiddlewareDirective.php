@@ -64,10 +64,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     /**
      * Resolve the field directive.
      *
-     * @param  FieldValue $value
-     * @param  \Closure   $next
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -111,8 +110,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
-     * @param  array $middlewareArgValue
+     * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode  $objectType
+     * @param  array  $middlewareArgValue
      * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
@@ -156,7 +155,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param  mixed $middlewareArgValue
+     * @param  mixed  $middlewareArgValue
      *
      * @return \Illuminate\Support\Collection<string>
      */

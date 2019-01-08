@@ -9,7 +9,7 @@ interface AuthorizesSubscriptions
     /**
      * Authorize subscription request.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return bool
      */

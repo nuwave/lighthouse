@@ -74,10 +74,10 @@ class GraphQL
     /**
      * GraphQL constructor.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry
-     * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder $schemaBuilder
-     * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider $schemaSourceProvider
-     * @param  \Nuwave\Lighthouse\Support\Pipeline $pipeline
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
+     * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
+     * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @retutn void
      */
     public function __construct(
@@ -139,11 +139,11 @@ class GraphQL
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
-     * @param  string $query
+     * @param  string  $query
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  mixed[] $variables
-     * @param  mixed|null $rootValue
-     * @param  string|null $operationName
+     * @param  mixed|null  $rootValue
+     * @param  string|null  $operationName
      * @return \GraphQL\Executor\ExecutionResult
      */
     public function executeQuery(

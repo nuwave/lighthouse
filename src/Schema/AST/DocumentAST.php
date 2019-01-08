@@ -64,7 +64,6 @@ class DocumentAST implements \Serializable
      * Return a unique key that identifies a type extension.
      *
      * @param  TypeExtensionNode  $typeExtensionNode
-     *
      * @return string
      */
     protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
@@ -124,7 +123,6 @@ class DocumentAST implements \Serializable
      * Construct from the string representation.
      *
      * @param  string  $serialized
-     *
      * @return void
      */
     public function unserialize($serialized): void
@@ -138,7 +136,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all type definitions from the document.
      *
-     * @return Collection<TypeDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeDefinitionNode>
      */
     public function typeDefinitions(): Collection
     {
@@ -156,7 +154,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions for directives.
      *
-     * @return Collection<DirectiveDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public function directiveDefinitions(): Collection
     {
@@ -167,8 +165,7 @@ class DocumentAST implements \Serializable
      * Get all extensions that apply to a named type.
      *
      * @param  string  $extendedTypeName
-     *
-     * @return Collection<TypeExtensionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
      */
     public function extensionsForType(string $extendedTypeName): Collection
     {
@@ -181,7 +178,7 @@ class DocumentAST implements \Serializable
     /**
      * Return all the type extensions.
      *
-     * @return Collection<TypeExtensionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
      */
     public function typeExtensions(): Collection
     {
@@ -191,7 +188,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions for object types.
      *
-     * @return Collection<ObjectTypeDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\ObjectTypeDefinitionNode>
      */
     public function objectTypeDefinitions(): Collection
     {
@@ -202,8 +199,7 @@ class DocumentAST implements \Serializable
      * Get a single object type definition by name.
      *
      * @param  string  $name
-     *
-     * @return ObjectTypeDefinitionNode|null
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
     public function objectTypeDefinition(string $name): ?ObjectTypeDefinitionNode
     {
@@ -214,7 +210,7 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * @return Collection<InputObjectTypeDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\InputObjectTypeDefinitionNode>
      */
     public function inputObjectTypeDefinitions(): Collection
     {
@@ -223,7 +219,6 @@ class DocumentAST implements \Serializable
 
     /**
      * @param  string  $name
-     *
      * @return InputObjectTypeDefinitionNode|null
      */
     public function inputObjectTypeDefinition(string $name): ?InputObjectTypeDefinitionNode
@@ -237,7 +232,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all interface definitions.
      *
-     * @return Collection<InterfaceTypeDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\InterfaceTypeDefinitionNode>
      */
     public function interfaceDefinitions(): Collection
     {
@@ -247,7 +242,7 @@ class DocumentAST implements \Serializable
     /**
      * Get the root query type definition.
      *
-     * @return ObjectTypeDefinitionNode|null
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
     public function queryTypeDefinition(): ?ObjectTypeDefinitionNode
     {
@@ -267,7 +262,7 @@ class DocumentAST implements \Serializable
     /**
      * Get the root subscription type definition.
      *
-     * @return ObjectTypeDefinitionNode|null
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
     public function subscriptionTypeDefinition(): ?ObjectTypeDefinitionNode
     {
@@ -279,7 +274,7 @@ class DocumentAST implements \Serializable
      *
      * @param  string  $typeClassName
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function definitionsByType(string $typeClassName): Collection
     {
@@ -293,7 +288,6 @@ class DocumentAST implements \Serializable
      * Add a single field to the query type.
      *
      * @param  FieldDefinitionNode  $field
-     *
      * @return $this
      */
     public function addFieldToQueryType(FieldDefinitionNode $field): self
@@ -308,7 +302,6 @@ class DocumentAST implements \Serializable
 
     /**
      * @param  DefinitionNode  $newDefinition
-     *
      * @return $this
      */
     public function setDefinition(DefinitionNode $newDefinition): self

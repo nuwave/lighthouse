@@ -23,7 +23,6 @@ class Cursor
      * first slice.
      *
      * @param  array  $args
-     *
      * @return int
      */
     public static function decode(array $args): int
@@ -39,7 +38,6 @@ class Cursor
      * Encode the given offset to make the implementation opaque.
      *
      * @param  int  $offset
-     *
      * @return string
      */
     public static function encode(int $offset): string

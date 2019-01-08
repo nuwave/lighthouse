@@ -19,9 +19,8 @@ class GlobalId
     /**
      * Glue together a type and an id to create a global id.
      *
-     * @param  string     $type
+     * @param  string  $type
      * @param  string|int  $id
-     *
      * @return string
      */
     public static function encode(string $type, $id): string
@@ -33,7 +32,6 @@ class GlobalId
      * Split a global id into the type and the id it contains.
      *
      * @param  string  $globalID
-     *
      * @return array Contains [$type, $id], e.g. ['User', '123']
      */
     public static function decode(string $globalID): array
@@ -45,7 +43,6 @@ class GlobalId
      * Decode the Global ID and get just the ID.
      *
      * @param  string  $globalID
-     *
      * @return string
      */
     public static function decodeID(string $globalID): string
@@ -59,7 +56,6 @@ class GlobalId
      * Decode the Global ID and get just the type.
      *
      * @param  string  $globalID
-     *
      * @return string
      */
     public static function decodeType(string $globalID): string

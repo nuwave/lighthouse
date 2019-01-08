@@ -74,7 +74,7 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param  NodeValue  $parent
+     * @param  \GraphQL\Language\AST\NodeValue  $parent
      * @param  FieldDefinitionNode  $field
      * @return void
      */

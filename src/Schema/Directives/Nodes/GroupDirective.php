@@ -38,10 +38,10 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param  Node $node
-     * @param  DocumentAST $documentAST
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
@@ -57,8 +57,8 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param  ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
@@ -99,8 +99,8 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param  string $namespaceValue
-     * @param  DirectiveNode $directive
+     * @param  string  $namespaceValue
+     * @param  DirectiveNode  $directive
      *
      * @return DirectiveNode
      */

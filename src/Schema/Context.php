@@ -25,7 +25,7 @@ class Context implements GraphQLContext
     /**
      * Create new context.
      *
-     * @param  Request $request
+     * @param  \Illuminate\Http\Request  $request
      */
     public function __construct(Request $request)
     {
@@ -38,7 +38,7 @@ class Context implements GraphQLContext
      *
      * May be null since some fields may be accessible without authentication.
      *
-     * @return Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function user()
     {

@@ -15,7 +15,7 @@ class SchemaStitcher implements SchemaSourceProvider
     /**
      * SchemaStitcher constructor.
      *
-     * @param  string $rootSchemaPath
+     * @param  string  $rootSchemaPath
      */
     public function __construct(string $rootSchemaPath)
     {
@@ -25,9 +25,9 @@ class SchemaStitcher implements SchemaSourceProvider
     /**
      * Set schema root path.
      *
-     * @param  string $path
+     * @param  string  $path
      *
-     * @return SchemaStitcher
+     * @return \Nuwave\Lighthouse\Schema\Source\SchemaStitcher
      */
     public function setRootPath(string $path): self
     {
@@ -49,7 +49,7 @@ class SchemaStitcher implements SchemaSourceProvider
     /**
      * Get the schema, starting from a root schema, following the imports recursively.
      *
-     * @param  string $path
+     * @param  string  $path
      *
      * @return string
      */
@@ -90,7 +90,7 @@ class SchemaStitcher implements SchemaSourceProvider
     }
 
     /**
-     * @param  string $path
+     * @param  string  $path
      * @return void
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException

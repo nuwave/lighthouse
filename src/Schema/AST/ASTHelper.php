@@ -28,10 +28,9 @@ class ASTHelper
      * This issue is brought up here https://github.com/webonyx/graphql-php/issues/285
      * Remove this method (and possibly the entire class) once it is resolved.
      *
-     * @param  NodeList|array $original
-     * @param  NodeList|array $addition
-     *
-     * @return NodeList
+     * @param  \GraphQL\Language\AST\NodeList|array  $original
+     * @param  \GraphQL\Language\AST\NodeList|array  $addition
+     * @return \GraphQL\Language\AST\NodeList
      */
     public static function mergeNodeList($original, $addition): NodeList
     {
@@ -45,12 +44,11 @@ class ASTHelper
     /**
      * This function will merge two lists uniquely by name.
      *
-     * @param  NodeList|array $original
-     * @param  NodeList|array $addition
-     * @param  bool           $overwriteDuplicates By default this throws if a collision occurs. If
+     * @param  \GraphQL\Language\AST\NodeList|array  $original
+     * @param  \GraphQL\Language\AST\NodeList|array  $addition
+     * @param  bool  $overwriteDuplicates By default this throws if a collision occurs. If
      *                                            this is set to true, the fields of the original list will be overwritten.
-     *
-     * @return NodeList
+     * @return \GraphQL\Language\AST\NodeList
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
     {
@@ -84,9 +82,8 @@ class ASTHelper
     /**
      * Create a clone of the original node.
      *
-     * @param  Node $node
-     *
-     * @return Node
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @return \GraphQL\Language\AST\Node
      */
     public static function cloneNode(Node $node): Node
     {
@@ -96,8 +93,7 @@ class ASTHelper
     }
 
     /**
-     * @param  Node $definition
-     *
+     * @param  \GraphQL\Language\AST\Node  $definition
      * @return string
      */
     public static function getUnderlyingTypeName(Node $definition): string
@@ -111,8 +107,8 @@ class ASTHelper
     }
 
     /**
-     * @param  Node $node
-     * @return NamedTypeNode
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @return \GraphQL\Language\AST\NamedTypeNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
@@ -136,9 +132,8 @@ class ASTHelper
     /**
      * Does the given directive have an argument of the given name?
      *
-     * @param  DirectiveNode $directiveDefinition
-     * @param  string        $name
-     *
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directiveDefinition
+     * @param  string  $name
      * @return bool
      */
     public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
@@ -150,10 +145,9 @@ class ASTHelper
     }
 
     /**
-     * @param  DirectiveNode $directive
-     * @param  string        $name
-     * @param  mixed|null    $default
-     *
+     * @param  DirectiveNode  $directive
+     * @param  string  $name
+     * @param  mixed|null  $default
      * @return mixed|null
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
@@ -171,9 +165,8 @@ class ASTHelper
     /**
      * Get argument's value.
      *
-     * @param  ArgumentNode $arg
-     * @param  mixed        $default
-     *
+     * @param  \GraphQL\Language\AST\ArgumentNode  $arg
+     * @param  mixed  $default
      * @return mixed
      */
     public static function argValue(ArgumentNode $arg, $default = null)
@@ -190,10 +183,9 @@ class ASTHelper
     /**
      * This can be at most one directive, since directives can only be used once per location.
      *
-     * @param  Node   $definitionNode
-     * @param  string $name
-     *
-     * @return DirectiveNode|null
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
+     * @param  string  $name
+     * @return \GraphQL\Language\AST\DirectiveNode|null
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
@@ -206,9 +198,8 @@ class ASTHelper
     /**
      * Check if a node has a particular directive defined upon it.
      *
-     * @param  Node   $definitionNode
-     * @param  string $name
-     *
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
+     * @param  string  $name
      * @return bool
      */
     public static function hasDirectiveDefinition(Node $definitionNode, string $name): bool
@@ -222,9 +213,8 @@ class ASTHelper
     /**
      * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
      *
-     * @param  Node   $definitionNode
-     * @param  string $directiveName
-     *
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
+     * @param  string  $directiveName
      * @return string
      */
     public static function getNamespaceForDirective(Node $definitionNode, string $directiveName): string
@@ -245,10 +235,9 @@ class ASTHelper
     /**
      * Attach directive to all registered object type fields.
      *
-     * @param  DocumentAST   $documentAST
-     * @param  DirectiveNode $directive
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  DirectiveNode  $directive
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): DocumentAST
     {
@@ -278,10 +267,9 @@ class ASTHelper
     /**
      * This adds an Interface called "Node" to an ObjectType definition.
      *
-     * @param  ObjectTypeDefinitionNode $objectType
-     * @param  DocumentAST              $documentAST
-     *
-     * @return DocumentAST
+     * @param  ObjectTypeDefinitionNode  $objectType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST): DocumentAST
     {

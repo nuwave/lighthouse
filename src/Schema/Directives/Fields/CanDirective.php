@@ -27,10 +27,10 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     /**
      * Ensure the user is authorized to access this field.
      *
-     * @param  FieldValue $value
-     * @param  \Closure   $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -59,7 +59,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * For compatibility reasons, the alias "if" will be kept until the next major version.
      *
-     * @return Collection<string>
+     * @return \Illuminate\Support\Collection<string>
      */
     protected function getAbilities(): Collection
     {

@@ -26,10 +26,10 @@ class WithDirective extends RelationDirective implements FieldMiddleware
     /**
      * Eager load a relation on the parent instance.
      *
-     * @param  FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
      * @param  \Closure  $next
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {

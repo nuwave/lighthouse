@@ -19,9 +19,8 @@ abstract class RelationDirective extends BaseDirective
     /**
      * Resolve the field directive.
      *
-     * @param  FieldValue $value
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $value): FieldValue
     {
@@ -40,11 +39,10 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param  FieldDefinitionNode $fieldDefinition
-     * @param  ObjectTypeDefinitionNode $parentType
-     * @param  DocumentAST $current
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
@@ -62,11 +60,10 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param  Model          $parent
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  mixed[]        $args
-     * @param  GraphQLContext $context
-     * @param  ResolveInfo    $resolveInfo
-     *
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed[]
      */
     protected function getLoaderConstructorArguments(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array

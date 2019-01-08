@@ -43,7 +43,7 @@ class Authorizer implements AuthorizesSubscriptions
     /**
      * Authorize subscription request.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @return bool
      */

@@ -21,7 +21,6 @@ trait HasRootArgumentValue
 
     /**
      * @param  ArgumentValue  $rootArgumentValue
-     *
      * @return $this
      */
     public function setRootArgumentValue(ArgumentValue $rootArgumentValue): self

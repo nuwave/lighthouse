@@ -25,7 +25,7 @@ class LogBroadcaster implements Broadcaster
     protected $broadcasts = [];
 
     /**
-     * @param  array $config
+     * @param  array  $config
      */
     public function __construct(array $config = [])
     {
@@ -35,7 +35,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * Authorize subscription request.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return JsonResponse
      */
@@ -47,7 +47,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * Handle unauthorized subscription request.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return JsonResponse
      */
@@ -59,7 +59,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * Handle subscription web hook.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return JsonResponse
      */
@@ -71,8 +71,8 @@ class LogBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param  Subscriber $subscriber
-     * @param  array      $data
+     * @param  Subscriber  $subscriber
+     * @param  array  $data
      */
     public function broadcast(Subscriber $subscriber, array $data)
     {
@@ -82,7 +82,7 @@ class LogBroadcaster implements Broadcaster
     /**
      * Get the data that is being broadcast.
      *
-     * @param  string|null $key
+     * @param  string|null  $key
      *
      * @return array|null
      */

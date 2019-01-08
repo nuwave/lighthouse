@@ -31,7 +31,7 @@ interface StoresSubscriptions
      *
      * @param  string  $topic
      *
-     * @return Collection<Subscriber>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic);
 

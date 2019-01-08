@@ -96,7 +96,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @param  FieldValue  $fieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      *
      * @return array Configuration array for a FieldDefinition
      */
@@ -153,9 +153,9 @@ class FieldFactory
     /**
      * Transform the ArgumentValues into the final InputValueDefinitions.
      *
-     * @param  Collection<ArgumentValue>  $argumentValues
+     * @param  \Illuminate\Support\Collection<ArgumentValue>  $argumentValues
      *
-     * @return InputValueDefinitionNode[]
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode[]
      */
     protected function getInputValueDefinitions(Collection $argumentValues): array
     {
@@ -171,7 +171,7 @@ class FieldFactory
     /**
      * Get a collection of the fields argument definitions.
      *
-     * @return Collection<ArgumentValue>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Values\ArgumentValue>
      */
     protected function getArgumentValues(): Collection
     {
@@ -187,8 +187,8 @@ class FieldFactory
      * This may be used to transform the arguments, log them or do anything else
      * before they reach the final resolver.
      *
-     * @param  \Closure                  $resolver
-     * @param  Collection<ArgumentValue> $argumentValues
+     * @param  \Closure  $resolver
+     * @param  \Illuminate\Support\Collection<ArgumentValue> $argumentValues
      *
      * @return \Closure
      */
@@ -238,9 +238,9 @@ class FieldFactory
     /**
      * Handle the ArgMiddleware.
      *
-     * @param  InputType                $type
-     * @param  mixed                    $argValue
-     * @param  InputValueDefinitionNode $astNode
+     * @param  InputType  $type
+     * @param  mixed  $argValue
+     * @param  InputValueDefinitionNode  $astNode
      * @param  mixed[]                  $argumentPath
      *
      * @return void
@@ -317,10 +317,10 @@ class FieldFactory
     }
 
     /**
-     * @param  InputValueDefinitionNode $astNode
-     * @param  mixed                    $argValue
+     * @param  InputValueDefinitionNode  $astNode
+     * @param  mixed  $argValue
      * @param  mixed[]                  $argumentPath
-     * @param  string                   $mustImplementClass
+     * @param  string  $mustImplementClass
      *
      * @return mixed
      */
@@ -342,10 +342,10 @@ class FieldFactory
     }
 
     /**
-     * @param  InputValueDefinitionNode $astNode
-     * @param  mixed                    $argumentValue
+     * @param  InputValueDefinitionNode  $astNode
+     * @param  mixed  $argumentValue
      * @param  mixed[]                  $argumentPath
-     * @param  Collection               $directives
+     * @param  \Illuminate\Support\Collection  $directives
      *
      * @return mixed
      */
@@ -393,9 +393,9 @@ class FieldFactory
     }
 
     /**
-     * @param  InputValueDefinitionNode $astNode
+     * @param  InputValueDefinitionNode  $astNode
      * @param  mixed[]                  $argumentPath
-     * @param  Collection               $directives
+     * @param  \Illuminate\Support\Collection  $directives
      *
      * @return void
      */
@@ -413,7 +413,7 @@ class FieldFactory
     }
 
     /**
-     * @param  ArgValidationDirective $directive
+     * @param  ArgValidationDirective  $directive
      * @param  mixed[]                $argumentPath
      *
      * @return void
@@ -425,8 +425,8 @@ class FieldFactory
     }
 
     /**
-     * @param  ArgFilterDirective       $argFilterDirective
-     * @param  InputValueDefinitionNode $inputValueDefinition
+     * @param  ArgFilterDirective  $argFilterDirective
+     * @param  InputValueDefinitionNode  $inputValueDefinition
      *
      * @return void
      */
@@ -447,7 +447,7 @@ class FieldFactory
      * Append a path to the base path to create a new path.
      *
      * @param  mixed[]    $basePath
-     * @param  string|int $pathToBeAdded
+     * @param  string|int  $pathToBeAdded
      *
      * @return mixed[]
      */
@@ -474,10 +474,10 @@ class FieldFactory
     }
 
     /**
-     * @param  mixed          $root
-     * @param  array          $args
-     * @param  GraphQLContext $context
-     * @param  ResolveInfo    $resolveInfo
+     * @param  mixed  $root
+     * @param  array  $args
+     * @param  GraphQLContext  $context
+     * @param  ResolveInfo  $resolveInfo
      *
      * @return void
      */
@@ -528,10 +528,10 @@ class FieldFactory
     }
 
     /**
-     * @param  mixed          $root
-     * @param  array          $args
-     * @param  GraphQLContext $context
-     * @param  ResolveInfo    $resolveInfo
+     * @param  mixed  $root
+     * @param  array  $args
+     * @param  GraphQLContext  $context
+     * @param  ResolveInfo  $resolveInfo
      *
      * @return void
      */

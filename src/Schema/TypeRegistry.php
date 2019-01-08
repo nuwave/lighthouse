@@ -24,9 +24,8 @@ class TypeRegistry
     /**
      * Register type with registry.
      *
-     * @param  Type $type
-     *
-     * @return TypeRegistry
+     * @param  \GraphQL\Type\Definition\Type  $type
+     * @return \Nuwave\Lighthouse\Schema\TypeRegistry
      */
     public function register(Type $type): self
     {
@@ -38,8 +37,8 @@ class TypeRegistry
     /**
      * Resolve type instance by name.
      *
-     * @param  string $typeName
-     * @return Type
+     * @param  string  $typeName
+     * @return \GraphQL\Type\Definition\Type
      *
      * @throws \GraphQL\Error\InvariantViolation
      */

@@ -12,7 +12,7 @@ class ContextFactory implements CreatesContext
     /**
      * Generate GraphQL context.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return GraphQLContext
      */

@@ -49,7 +49,7 @@ class ConnectionField
      * @param  mixed  $context
      * @param  ResolveInfo|null  $info
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function edgeResolver(
         LengthAwarePaginator $paginator,

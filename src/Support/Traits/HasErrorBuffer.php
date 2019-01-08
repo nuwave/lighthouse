@@ -25,7 +25,6 @@ trait HasErrorBuffer
      * Set the ErrorBuffer instance.
      *
      * @param  ErrorBuffer  $errorBuffer
-     *
      * @return $this
      */
     public function setErrorBuffer(ErrorBuffer $errorBuffer): self

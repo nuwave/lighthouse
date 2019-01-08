@@ -76,7 +76,6 @@ abstract class BatchLoader
      * Generate a unique key for the instance, using the path in the query.
      *
      * @param  mixed[] $path
-     *
      * @return string
      */
     public static function instanceKey(array $path): string
@@ -93,10 +92,9 @@ abstract class BatchLoader
     /**
      * Load object by key.
      *
-     * @param  mixed $key
-     * @param  array $metaInfo
-     *
-     * @return Deferred
+     * @param  mixed  $key
+     * @param  array  $metaInfo
+     * @return \GraphQL\Deferred
      */
     public function load($key, array $metaInfo = []): Deferred
     {

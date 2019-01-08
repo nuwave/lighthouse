@@ -13,9 +13,9 @@ interface ArgManipulator extends Directive
      * @param  InputValueDefinitionNode  $argDefinition
      * @param  FieldDefinitionNode  $fieldDefinition
      * @param  ObjectTypeDefinitionNode  $parentType
-     * @param  DocumentAST  $current
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(
         InputValueDefinitionNode $argDefinition,

@@ -67,9 +67,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Push subscription data to subscribers.
      *
-     * @param  GraphQLSubscription $subscription
-     * @param  string              $fieldName
-     * @param  mixed               $root
+     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
+     * @param  string  $fieldName
+     * @param  mixed  $root
      *
      * @return void
      */
@@ -105,7 +105,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Authorize the subscription.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return Response
      */

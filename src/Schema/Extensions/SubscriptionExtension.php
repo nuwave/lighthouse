@@ -22,7 +22,7 @@ class SubscriptionExtension extends GraphQLExtension
     protected $currentQuery = '';
 
     /**
-     * @param  SubscriptionRegistry $registry
+     * @param  SubscriptionRegistry  $registry
      */
     public function __construct(SubscriptionRegistry $registry)
     {
@@ -42,7 +42,7 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param  ExtensionRequest $request
+     * @param  ExtensionRequest  $request
      *
      * @return void
      */

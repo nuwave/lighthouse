@@ -19,9 +19,8 @@ class ASTBuilder
     /**
      * Convert the base schema string into an AST by applying different manipulations.
      *
-     * @param  string $schema
-     *
-     * @return DocumentAST
+     * @param  string  $schema
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function generate(string $schema): DocumentAST
     {
@@ -42,9 +41,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  DocumentAST $document
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
     {
@@ -72,9 +70,8 @@ class ASTBuilder
     /**
      * The final schema must not contain type extensions, so we merge them here.
      *
-     * @param  DocumentAST $document
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function mergeTypeExtensions(DocumentAST $document): DocumentAST
     {
@@ -105,9 +102,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  DocumentAST $document
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function applyFieldManipulators(DocumentAST $document): DocumentAST
     {
@@ -132,9 +128,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  DocumentAST $document
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function applyArgManipulators(DocumentAST $document): DocumentAST
     {
@@ -173,9 +168,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  DocumentAST $document
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function addPaginationInfoTypes(DocumentAST $document): DocumentAST
     {
@@ -243,9 +237,8 @@ class ASTBuilder
     /**
      * Inject the node type and a node field into Query.
      *
-     * @param  DocumentAST $document
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function addNodeSupport(DocumentAST $document): DocumentAST
     {

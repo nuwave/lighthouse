@@ -23,7 +23,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     protected $extensions;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensions
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensions
      */
     public function __construct(ExtensionRegistry $extensions)
     {
@@ -43,10 +43,10 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     /**
      * Resolve the field directive.
      *
-     * @param  FieldValue $value
-     * @param  \Closure   $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -78,7 +78,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      * Determine of field should be deferred.
      *
      * @param  TypeNode  $fieldType
-     * @param  ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
      * @return bool
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseClientException

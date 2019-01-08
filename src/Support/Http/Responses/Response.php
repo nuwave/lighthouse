@@ -25,7 +25,7 @@ class Response implements GraphQLResponse
     /**
      * Create GraphQL response.
      *
-     * @param  array $data
+     * @param  array  $data
      *
      * @return SymfonyResponse
      */

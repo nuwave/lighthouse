@@ -19,7 +19,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     protected $nodeRegistry;
 
     /**
-     * @param  NodeRegistry $nodeRegistry
+     * @param  \GraphQL\Language\AST\NodeRegistry  $nodeRegistry
      */
     public function __construct(NodeRegistry $nodeRegistry)
     {
@@ -39,10 +39,10 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     /**
      * Handle type construction.
      *
-     * @param  NodeValue  $value
+     * @param  \GraphQL\Language\AST\NodeValue  $value
      * @param  \Closure  $next
      *
-     * @return NodeValue
+     * @return \GraphQL\Language\AST\NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {
@@ -54,10 +54,10 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     }
 
     /**
-     * @param  Node  $node
-     * @param  DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {

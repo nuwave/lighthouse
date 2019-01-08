@@ -10,9 +10,9 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Manipulate the schema.
      *
-     * @param  DocumentAST $documentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST
     {
@@ -22,7 +22,7 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Handle request start.
      *
-     * @param  ExtensionRequest $request
+     * @param  ExtensionRequest  $request
      */
     public function requestDidStart(ExtensionRequest $request)
     {
@@ -31,7 +31,7 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Handle batch request start.
      *
-     * @param  int $index
+     * @param  int  $index
      */
     public function batchedQueryDidStart(int $index)
     {
@@ -40,8 +40,8 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Handle batch request end.
      *
-     * @param  ExecutionResult $result
-     * @param  int             $index
+     * @param  ExecutionResult  $result
+     * @param  int  $index
      */
     public function batchedQueryDidEnd(ExecutionResult $result, int $index)
     {
@@ -50,8 +50,8 @@ abstract class GraphQLExtension implements \JsonSerializable
     /**
      * Manipulate the GraphQL response.
      *
-     * @param  array    $response
-     * @param  \Closure $next
+     * @param  array  $response
+     * @param  \Closure  $next
      *
      * @return array
      */

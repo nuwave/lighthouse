@@ -69,8 +69,8 @@ if (! function_exists('construct_resolver')) {
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param  string $className This class is resolved through the container.
-     * @param  string $methodName The method that gets passed the arguments of the closure.
+     * @param  string  $className This class is resolved through the container.
+     * @param  string  $methodName The method that gets passed the arguments of the closure.
      * @return \Closure
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException

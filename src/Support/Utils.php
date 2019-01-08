@@ -10,8 +10,8 @@ class Utils
      * If the class itself exists, it is simply returned as is.
      * Else, the given namespaces are tried in order.
      *
-     * @param  string   $classCandidate
-     * @param  array    $namespacesToTry
+     * @param  string  $classCandidate
+     * @param  array  $namespacesToTry
      * @param  callable $determineMatch
      *
      * @return string|null

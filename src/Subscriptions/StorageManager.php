@@ -76,7 +76,7 @@ class StorageManager implements StoresSubscriptions
      *
      * @param  string  $topic
      *
-     * @return Collection<Subscriber>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
     public function subscribersByTopic(string $topic)
     {
@@ -100,7 +100,7 @@ class StorageManager implements StoresSubscriptions
      * Store subscription.
      *
      * @param  Subscriber  $subscriber
-     * @param  string     $topic
+     * @param  string  $topic
      *
      * @return void
      */

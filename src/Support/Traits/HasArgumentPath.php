@@ -27,7 +27,6 @@ trait HasArgumentPath
 
     /**
      * @param  mixed[]  $argumentPath
-     *
      * @return $this
      */
     public function setArgumentPath(array $argumentPath): self

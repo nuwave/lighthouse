@@ -39,9 +39,9 @@ class NodeValue
     /**
      * Get resolved type.
      *
-     * @return Type|null
+     * @return \GraphQL\Type\Definition\Type|null
      */
-    public function getType()
+    public function getType(): ?Type
     {
         return $this->type;
     }
@@ -73,7 +73,7 @@ class NodeValue
     /**
      * Get the underlying type definition.
      *
-     * @return TypeDefinitionNode
+     * @return \GraphQL\Language\AST\TypeDefinitionNode
      */
     public function getTypeDefinition(): TypeDefinitionNode
     {
@@ -105,7 +105,7 @@ class NodeValue
      *
      * @param  string  $key
      *
-     * @return NodeValue
+     * @return \GraphQL\Language\AST\NodeValue
      */
     public function setCacheKey(string $key = null): self
     {

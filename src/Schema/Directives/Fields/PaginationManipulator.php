@@ -24,7 +24,7 @@ class PaginationManipulator
     /**
      * Apply possible aliases and throw if the given pagination type is invalid.
      *
-     * @param  string $paginationType
+     * @param  string  $paginationType
      * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
@@ -55,13 +55,13 @@ class PaginationManipulator
      * This makes either an offset-based Paginator or a cursor-based Connection.
      * The types in between are automatically generated and applied to the schema.
      *
-     * @param  string                   $paginationType
-     * @param  FieldDefinitionNode      $fieldDefinition
-     * @param  ObjectTypeDefinitionNode $parentType
-     * @param  DocumentAST              $current
-     * @param  int|null                 $defaultCount
+     * @param  string  $paginationType
+     * @param  FieldDefinitionNode  $fieldDefinition
+     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @param  int|null  $defaultCount
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null): DocumentAST
     {
@@ -77,12 +77,12 @@ class PaginationManipulator
     /**
      * Register connection w/ schema.
      *
-     * @param  FieldDefinitionNode      $fieldDefinition
-     * @param  ObjectTypeDefinitionNode $parentType
-     * @param  DocumentAST              $documentAST
-     * @param  int|null                 $defaultCount
+     * @param  FieldDefinitionNode  $fieldDefinition
+     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  int|null  $defaultCount
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
     {
@@ -130,12 +130,12 @@ class PaginationManipulator
     /**
      * Register paginator w/ schema.
      *
-     * @param  FieldDefinitionNode      $fieldDefinition
-     * @param  ObjectTypeDefinitionNode $parentType
-     * @param  DocumentAST              $documentAST
-     * @param  int|null                 $defaultCount
+     * @param  FieldDefinitionNode  $fieldDefinition
+     * @param  ObjectTypeDefinitionNode  $parentType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  int|null  $defaultCount
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
     {

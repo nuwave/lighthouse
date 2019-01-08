@@ -27,7 +27,7 @@ class PartialParser
     /**
      * @param  string[] $objectTypes
      *
-     * @return ObjectTypeDefinitionNode[]
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode[]
      */
     public static function objectTypeDefinitions(array $objectTypes): array
     {
@@ -37,7 +37,7 @@ class PartialParser
     }
 
     /**
-     * @param  string $definition
+     * @param  string  $definition
      *
      * @return ObjectTypeDefinitionNode
      */
@@ -50,9 +50,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $inputValueDefinition
+     * @param  string  $inputValueDefinition
      *
-     * @return InputValueDefinitionNode
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode
      */
     public static function inputValueDefinition(string $inputValueDefinition): InputValueDefinitionNode
     {
@@ -78,9 +78,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $argumentDefinition
+     * @param  string  $argumentDefinition
      *
-     * @return ArgumentNode
+     * @return \GraphQL\Language\AST\ArgumentNode
      */
     public static function argument(string $argumentDefinition): ArgumentNode
     {
@@ -106,9 +106,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $field
+     * @param  string  $field
      *
-     * @return FieldNode
+     * @return \GraphQL\Language\AST\FieldNode
      */
     public static function field(string $field): FieldNode
     {
@@ -119,7 +119,7 @@ class PartialParser
     }
 
     /**
-     * @param  string $operation
+     * @param  string  $operation
      *
      * @return OperationDefinitionNode
      */
@@ -132,9 +132,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $fieldDefinition
+     * @param  string  $fieldDefinition
      *
-     * @return FieldDefinitionNode
+     * @return \GraphQL\Language\AST\FieldDefinitionNode
      */
     public static function fieldDefinition(string $fieldDefinition): FieldDefinitionNode
     {
@@ -145,7 +145,7 @@ class PartialParser
     }
 
     /**
-     * @param  string $directive
+     * @param  string  $directive
      *
      * @return DirectiveNode
      */
@@ -164,7 +164,7 @@ class PartialParser
     /**
      * @param  string[] $directives
      *
-     * @return DirectiveNode[]
+     * @return \GraphQL\Language\AST\DirectiveNode[]
      */
     public static function directives(array $directives): array
     {
@@ -177,7 +177,7 @@ class PartialParser
     }
 
     /**
-     * @param  string $directiveDefinition
+     * @param  string  $directiveDefinition
      *
      * @return DirectiveDefinitionNode
      */
@@ -192,7 +192,7 @@ class PartialParser
     /**
      * @param  string[] $directiveDefinitions
      *
-     * @return DirectiveDefinitionNode[]
+     * @return \GraphQL\Language\AST\DirectiveDefinitionNode[]
      */
     public static function directiveDefinitions(array $directiveDefinitions): array
     {
@@ -205,7 +205,7 @@ class PartialParser
     }
 
     /**
-     * @param  string $interfaceDefinition
+     * @param  string  $interfaceDefinition
      *
      * @return InterfaceTypeDefinitionNode
      */
@@ -218,9 +218,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $unionDefinition
+     * @param  string  $unionDefinition
      *
-     * @return UnionTypeDefinitionNode
+     * @return \GraphQL\Language\AST\UnionTypeDefinitionNode
      */
     public static function unionTypeDefinition(string $unionDefinition): UnionTypeDefinitionNode
     {
@@ -231,7 +231,7 @@ class PartialParser
     }
 
     /**
-     * @param  string $inputTypeDefinition
+     * @param  string  $inputTypeDefinition
      *
      * @return InputObjectTypeDefinitionNode
      */
@@ -244,9 +244,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $scalarDefinition
+     * @param  string  $scalarDefinition
      *
-     * @return ScalarTypeDefinitionNode
+     * @return \GraphQL\Language\AST\ScalarTypeDefinitionNode
      */
     public static function scalarTypeDefinition(string $scalarDefinition): ScalarTypeDefinitionNode
     {
@@ -257,7 +257,7 @@ class PartialParser
     }
 
     /**
-     * @param  string $enumDefinition
+     * @param  string  $enumDefinition
      *
      * @return EnumTypeDefinitionNode
      */
@@ -270,8 +270,8 @@ class PartialParser
     }
 
     /**
-     * @param  string $typeName
-     * @return NamedTypeNode
+     * @param  string  $typeName
+     * @return \GraphQL\Language\AST\NamedTypeNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      */
@@ -284,9 +284,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $definition
+     * @param  string  $definition
      *
-     * @return DocumentNode
+     * @return \GraphQL\Language\AST\DocumentNode
      */
     protected static function parse(string $definition): DocumentNode
     {
@@ -295,9 +295,9 @@ class PartialParser
     }
 
     /**
-     * @param  string $definition
+     * @param  string  $definition
      *
-     * @return Node
+     * @return \GraphQL\Language\AST\Node
      */
     protected static function parseType(string $definition): Node
     {
@@ -308,9 +308,9 @@ class PartialParser
     /**
      * Get the first Node from a given NodeList and validate it.
      *
-     * @param  NodeList $list
-     * @param  string   $expectedType
-     * @return Node
+     * @param  \GraphQL\Language\AST\NodeList  $list
+     * @param  string  $expectedType
+     * @return \GraphQL\Language\AST\Node
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      */
@@ -326,9 +326,9 @@ class PartialParser
     }
 
     /**
-     * @param  Node $node
-     * @param  string $expectedType
-     * @return Node
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @param  string  $expectedType
+     * @return \GraphQL\Language\AST\Node
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      */

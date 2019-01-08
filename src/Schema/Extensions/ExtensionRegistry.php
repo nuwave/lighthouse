@@ -47,7 +47,7 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * For example, retrieve the TracingExtension by calling $this->get('tracing')
      *
-     * @param  string $shortName
+     * @param  string  $shortName
      *
      * @return GraphQLExtension|null
      */
@@ -59,7 +59,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Check if extension is registered by its short name.
      *
-     * @param  string $shortName
+     * @param  string  $shortName
      *
      * @return bool
      */
@@ -71,8 +71,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a request did start.
      *
-     * @param  ExtensionRequest $request
-     *
+     * @param  ExtensionRequest  $request
      * @return $this
      */
     public function requestDidStart(ExtensionRequest $request): self
@@ -87,8 +86,7 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did start.
      *
-     * @param  int $index
-     *
+     * @param  int  $index
      * @return $this
      */
     public function batchedQueryDidStart($index): self
@@ -103,9 +101,8 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did end.
      *
-     * @param  ExecutionResult $result
-     * @param  int             $index
-     *
+     * @param  ExecutionResult  $result
+     * @param  int  $index
      * @return $this
      */
     public function batchedQueryDidEnd(ExecutionResult $result, $index): self
@@ -123,7 +120,7 @@ class ExtensionRegistry implements \JsonSerializable
      * Notify all registered extensions that the
      * response will be sent.
      *
-     * @param  array $response
+     * @param  array  $response
      *
      * @return array
      */
@@ -141,9 +138,9 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Allow Extensions to manipulate the Schema.
      *
-     * @param  DocumentAST $documentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulate(DocumentAST $documentAST): DocumentAST
     {

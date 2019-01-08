@@ -11,25 +11,25 @@ interface BroadcastsSubscriptions
     /**
      * Push subscription data to subscribers.
      *
-     * @param  GraphQLSubscription $subscription
-     * @param  string              $fieldName
-     * @param  mixed               $root
+     * @param  GraphQLSubscription  $subscription
+     * @param  string  $fieldName
+     * @param  mixed  $root
      */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root);
 
     /**
      * Queue pushing subscription data to subscribers.
      *
-     * @param  GraphQLSubscription $subscription
-     * @param  string              $fieldName
-     * @param  mixed               $root
+     * @param  GraphQLSubscription  $subscription
+     * @param  string  $fieldName
+     * @param  mixed  $root
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root);
 
     /**
      * Authorize the subscription.
      *
-     * @param  Request $request
+     * @param  Request  $request
      *
      * @return Response
      */

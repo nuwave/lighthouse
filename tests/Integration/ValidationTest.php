@@ -310,7 +310,7 @@ class ValidationTest extends TestCase
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
      * @param  array  $keys
-     * @param  TestResponse  $result
+     * @param  \Illuminate\Foundation\Testing\TestResponse  $result
      *
      * @return void
      */

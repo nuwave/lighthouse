@@ -40,8 +40,7 @@ class QueryFilter
     /**
      * Get the single instance of the query filter for a field.
      *
-     * @param  FieldValue $value
-     *
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
      * @return static
      */
     public static function getInstance(FieldValue $value): self
@@ -59,12 +58,11 @@ class QueryFilter
     /**
      * Check if the ResolveInfo contains a QueryFilter instance and apply it to the query if given.
      *
-     * @param  Builder|EloquentBuilder $query
-     * @param  array                   $args
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
+     * @param  array  $args
      * @param  string[]                $scopes
-     * @param  ResolveInfo             $resolveInfo
-     *
-     * @return Builder|EloquentBuilder
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public static function apply($query, array $args, array $scopes, ResolveInfo $resolveInfo)
     {
@@ -83,10 +81,9 @@ class QueryFilter
     /**
      * Apply all registered filters to the query.
      *
-     * @param  Builder|EloquentBuilder $query
-     * @param  array                   $args
-     *
-     * @return Builder|EloquentBuilder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
+     * @param  array  $args
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function filter($query, array $args = [])
     {
@@ -136,10 +133,9 @@ class QueryFilter
     }
 
     /**
-     * @param  string             $argumentName
-     * @param  string             $columnName
-     * @param  ArgFilterDirective $argFilterDirective
-     *
+     * @param  string  $argumentName
+     * @param  string  $columnName
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
      * @return $this
      */
     public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): self

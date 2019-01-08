@@ -42,7 +42,7 @@ class PaginatorField
      *
      * @param  LengthAwarePaginator  $root
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function dataResolver(LengthAwarePaginator $root): Collection
     {

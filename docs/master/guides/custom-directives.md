@@ -68,7 +68,7 @@ class TrimDirective implements ArgTransformerDirective
     /**
      * Remove whitespace from the beginning and end of a given input.
      *
-     * @param  string $argumentValue
+     * @param  string  $argumentValue
      *
      * @return mixed
      */
@@ -155,9 +155,9 @@ class EqDirective implements ArgFilterDirective
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param  string                                                                   $columnName
-     * @param  mixed                                                                    $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  string  $columnName
+     * @param  mixed  $value
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
