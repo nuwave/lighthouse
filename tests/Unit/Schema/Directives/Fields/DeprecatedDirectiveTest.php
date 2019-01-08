@@ -55,7 +55,7 @@ class DeprecatedDirectiveTest extends TestCase
         $result = $this->query($includeDeprecatedIntrospectionQuery);
 
         $deprecatedFields = Arr::where(
-            $result->json('data.__schema.queryType.fields'),
+            $result->jsonGet('data.__schema.queryType.fields'),
             function (array $field): bool {
                 return $field['isDeprecated'];
             }

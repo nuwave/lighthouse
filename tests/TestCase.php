@@ -109,6 +109,13 @@ abstract class TestCase extends BaseTestCase
                 return $this;
             }
         );
+
+        TestResponse::macro(
+            'jsonGet',
+            function (string $key = null) {
+                return data_get($this->decodeResponseJson(), $key);
+            }
+        );
     }
 
     /**

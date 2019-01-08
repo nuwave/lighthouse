@@ -56,7 +56,7 @@ class SubscriptionTest extends TestCase
         $this->assertInstanceOf(Subscriber::class, $subscriber);
         $this->assertSame(
             $this->buildResponse('OnPostCreated', $subscriber->channel),
-            $response->json()
+            $response->jsonGet()
         );
     }
 

@@ -183,7 +183,7 @@ class ValidationTest extends TestCase
             password(password: " 1234567 ")
         }
         ');
-        $password = $validPasswordResult->json('data.password');
+        $password = $validPasswordResult->jsonGet('data.password');
 
         $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
@@ -212,7 +212,7 @@ class ValidationTest extends TestCase
         }
         ');
 
-        $this->assertSame('no-password', $validPasswordResult->json('data.password'));
+        $this->assertSame('no-password', $validPasswordResult->jsonGet('data.password'));
 
         $invalidPasswordResult = $this->query('
         {
@@ -315,7 +315,7 @@ class ValidationTest extends TestCase
      */
     protected function assertValidationKeysSame(array $keys, TestResponse $result): void
     {
-        $validation = $result->json('errors.0.extensions.validation');
+        $validation = $result->jsonGet('errors.0.extensions.validation');
 
         $this->assertSame($keys, array_keys($validation));
     }

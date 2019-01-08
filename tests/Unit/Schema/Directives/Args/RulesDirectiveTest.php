@@ -110,7 +110,7 @@ class RulesDirectiveTest extends TestCase
                 first_name
             }
         }
-            ')->json()
+            ')->jsonGet()
         );
     }
 
@@ -157,7 +157,7 @@ class RulesDirectiveTest extends TestCase
                 full_name
             }
         }
-            ')->json()
+            ')->jsonGet()
         );
     }
 
@@ -188,7 +188,7 @@ class RulesDirectiveTest extends TestCase
                 full_name
             }
         }
-            ')->json()
+            ')->jsonGet()
         );
     }
 

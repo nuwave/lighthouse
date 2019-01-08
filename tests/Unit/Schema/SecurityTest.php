@@ -74,7 +74,7 @@ class SecurityTest extends TestCase
 
         $this->assertSame(
             QueryComplexity::maxQueryComplexityErrorMessage(1, 2),
-            $result->json('errors.0.message')
+            $result->jsonGet('errors.0.message')
         );
     }
 
@@ -94,7 +94,7 @@ class SecurityTest extends TestCase
 
         $this->assertSame(
             QueryDepth::maxQueryDepthErrorMessage(1, 2),
-            $result->json('errors.0.message')
+            $result->jsonGet('errors.0.message')
         );
     }
 
@@ -112,7 +112,7 @@ class SecurityTest extends TestCase
 
         $this->assertSame(
             DisableIntrospection::introspectionDisabledMessage(),
-            $result->json('errors.0.message')
+            $result->jsonGet('errors.0.message')
         );
     }
 }

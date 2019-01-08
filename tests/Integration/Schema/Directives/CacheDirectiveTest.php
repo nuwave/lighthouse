@@ -233,8 +233,8 @@ class CacheDirectiveTest extends DBTestCase
         // Get the the original user and the `find` directive checks the count
         $this->assertSame(0, $queries);
         $this->assertSame(
-            $firstResponse->json(),
-            $cachedResponse->json()
+            $firstResponse->jsonGet(),
+            $cachedResponse->jsonGet()
         );
     }
 
@@ -305,8 +305,8 @@ class CacheDirectiveTest extends DBTestCase
         // Get the the original user and the `find` directive checks the count
         $this->assertSame(0, $queries);
         $this->assertSame(
-            $firstResponse->json(),
-            $cachedResponse->json()
+            $firstResponse->jsonGet(),
+            $cachedResponse->jsonGet()
         );
     }
 
