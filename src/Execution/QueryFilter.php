@@ -4,11 +4,9 @@ namespace Nuwave\Lighthouse\Execution;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Database\Query\Builder;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class QueryFilter
 {

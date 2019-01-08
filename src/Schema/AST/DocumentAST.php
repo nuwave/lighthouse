@@ -10,7 +10,6 @@ use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
-use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\ParseException;

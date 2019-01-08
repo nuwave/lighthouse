@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;

@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Context implements GraphQLContext
