@@ -14,7 +14,8 @@ class ConnectionField
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
      * @return array
      */
-    public function pageInfoResolver(LengthAwarePaginator $paginator): array {
+    public function pageInfoResolver(LengthAwarePaginator $paginator): array
+    {
         return [
             'total' => $paginator->total(),
             'count' => $paginator->count(),
@@ -37,7 +38,8 @@ class ConnectionField
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
      * @return \Illuminate\Support\Collection
      */
-    public function edgeResolver(LengthAwarePaginator $paginator): Collection {
+    public function edgeResolver(LengthAwarePaginator $paginator): Collection
+    {
         $firstItem = $paginator->firstItem();
 
         return $paginator->values()->map(function ($item, $index) use ($firstItem) {

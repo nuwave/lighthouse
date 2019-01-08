@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface Broadcaster
