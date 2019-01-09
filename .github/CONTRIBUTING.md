@@ -54,6 +54,9 @@ use \Illuminate\Support\Arr;
 Arr::get($foo, 'bar');
 ```
 
+A notable exception is the `response()` helper - using DI for injecting a
+`ResponseFactory` does not work in Lumen, while `response()` works for both.
+
 ### Type definitions
 
 Prefer the strictest possible type annotations wherever possible.
