@@ -13,7 +13,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public function manipulateSchema(DocumentAST $documentAST): DocumentAST
+    public function manipulateSchema(DocumentAST $documentAST)
     {
         return $documentAST;
     }
@@ -63,5 +63,5 @@ abstract class GraphQLExtension implements \JsonSerializable
      *
      * @return string
      */
-    abstract public static function name(): string;
+    abstract public static function name();
 }
