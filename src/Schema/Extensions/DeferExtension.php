@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
@@ -207,7 +208,7 @@ class DeferExtension extends GraphQLExtension
      * @param  mixed[]  $data
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function response(array $data)
+    public function response(array $data): Response
     {
         if (empty($this->deferred)) {
             return response($data);

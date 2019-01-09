@@ -8,7 +8,7 @@ interface GraphQLResponse
      * Create GraphQL response.
      *
      * @param  array  $data
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function create(array $data);
 }

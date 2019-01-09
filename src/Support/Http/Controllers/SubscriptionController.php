@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
@@ -35,8 +35,7 @@ class SubscriptionController extends Controller
      * Authenticate subscriber.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authorize(Request $request): Response
     {
@@ -47,8 +46,7 @@ class SubscriptionController extends Controller
      * Handle pusher webhook.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function webhook(Request $request): Response
     {

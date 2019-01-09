@@ -31,7 +31,7 @@ class GraphQLController extends Controller
     protected $extensionRegistry;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse
      */
     protected $graphQLResponse;
 

@@ -3,7 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
@@ -57,7 +57,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $fieldName
      * @param  mixed  $root
-     *
      * @return void
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
@@ -71,7 +70,6 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $fieldName
      * @param  mixed  $root
-     *
      * @return void
      */
     public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
@@ -107,8 +105,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      * Authorize the subscription.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authorize(Request $request): Response
     {

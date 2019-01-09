@@ -10,9 +10,9 @@ use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 
 /**
  * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
- * @method \Illuminate\Http\Response hook(\Illuminate\Http\Request $request)
- * @method \Illuminate\Http\Response authorized(\Illuminate\Http\Request $request)
- * @method \Illuminate\Http\Response unauthorized(\Illuminate\Http\Request $request)
+ * @method \Symfony\Component\HttpFoundation\Response hook(\Illuminate\Http\Request $request)
+ * @method \Symfony\Component\HttpFoundation\Response authorized(\Illuminate\Http\Request $request)
+ * @method \Symfony\Component\HttpFoundation\Response unauthorized(\Illuminate\Http\Request $request)
  */
 class BroadcastManager extends DriverManager
 {
@@ -51,7 +51,6 @@ class BroadcastManager extends DriverManager
      *
      * @param  mixed[]  $config
      * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster
-     *
      * @throws \Pusher\PusherException
      */
     protected function createPusherDriver(array $config): PusherBroadcaster

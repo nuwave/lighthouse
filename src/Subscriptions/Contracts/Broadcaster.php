@@ -12,7 +12,7 @@ interface Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authorized(Request $request);
 
@@ -21,7 +21,7 @@ interface Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function unauthorized(Request $request);
 
@@ -30,7 +30,7 @@ interface Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function hook(Request $request);
 
