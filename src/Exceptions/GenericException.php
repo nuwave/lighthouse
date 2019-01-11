@@ -17,7 +17,6 @@ class GenericException extends Error
      * Set the contents that will be rendered under the "extensions" key of the error response.
      *
      * @param  mixed  $extensions
-     *
      * @return $this
      */
     public function setExtensions($extensions): self
@@ -31,7 +30,6 @@ class GenericException extends Error
      * Set the category that will be rendered under the "extensions" key of the error response.
      *
      * @param  string  $category
-     *
      * @return $this
      */
     public function setCategory(string $category): self

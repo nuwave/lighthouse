@@ -3,10 +3,10 @@
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use GraphQL\Executor\ExecutionResult;
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
@@ -15,25 +15,34 @@ use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQLController extends Controller
 {
-    /** @var GraphQL */
+    /**
+     * @var \Nuwave\Lighthouse\GraphQL
+     */
     protected $graphQL;
 
-    /** @var CreatesContext */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
+     */
     protected $createsContext;
 
-    /** @var ExtensionRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
+     */
     protected $extensionRegistry;
 
-    /** @var GraphQLResponse */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse
+     */
     protected $graphQLResponse;
 
     /**
      * Inject middleware into request.
      *
-     * @param ExtensionRegistry $extensionRegistry
-     * @param GraphQL           $graphQL
-     * @param CreatesContext    $createsContext
-     * @param GraphQLResponse   $graphQLResponse
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
+     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $graphQLResponse
+     * @return void
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,
@@ -50,12 +59,10 @@ class GraphQLController extends Controller
     /**
      * Execute GraphQL query.
      *
-     * @param Request $request
-     *
-     *
-     * @return Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function query(Request $request)
+    public function query(Request $request): Response
     {
         // If the request is a 0-indexed array, we know we are dealing with a batched query
         $batched = isset($request->toArray()[0]) && config('lighthouse.batched_queries', true);
@@ -75,12 +82,11 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param Request        $request
-     * @param GraphQLContext $context
-     *
-     * @return array
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @return mixed[]
      */
-    protected function execute(Request $request, GraphQLContext $context)
+    protected function execute(Request $request, GraphQLContext $context): array
     {
         return $this->graphQL->executeQuery(
             $request->input('query', ''),
@@ -94,12 +100,11 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param Request        $request
-     * @param GraphQLContext $context
-     *
-     * @return array
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @return mixed[]
      */
-    protected function executeBatched(Request $request, GraphQLContext $context)
+    protected function executeBatched(Request $request, GraphQLContext $context): array
     {
         $data = $this->graphQL->executeBatchedQueries(
             $request->toArray(),
@@ -117,9 +122,8 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param mixed $variables
-     *
-     * @return array
+     * @param  mixed  $variables
+     * @return mixed[]
      */
     protected function ensureVariablesAreArray($variables): array
     {

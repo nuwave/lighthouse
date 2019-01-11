@@ -9,8 +9,14 @@ use GraphQL\Language\AST\StringValueNode;
 
 class Email extends ScalarType
 {
+    /**
+     * @var string
+     */
     public $name = 'Email';
 
+    /**
+     * @var string
+     */
     public $description = 'Email address.';
 
     public function serialize($value)

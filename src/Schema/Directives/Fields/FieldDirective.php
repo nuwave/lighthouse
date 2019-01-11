@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class FieldDirective extends BaseDirective implements FieldResolver
 {
@@ -21,9 +23,8 @@ class FieldDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -39,7 +40,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
         $additionalData = $this->directiveArgValue('args');
 
         return $fieldValue->setResolver(
-            function ($root, array $args, $context = null, $info = null) use ($resolver, $additionalData) {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver, $additionalData) {
                 return $resolver(
                     $root,
                     array_merge($args, ['directive' => $additionalData]),

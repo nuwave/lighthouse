@@ -3,10 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Support\Collection;
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
@@ -25,10 +26,10 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     /**
      * Ensure the user is authorized to access this field.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -36,14 +37,13 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
         return $next(
             $value->setResolver(
-                function () use ($resolver) {
-                    $user = auth()->user();
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
                     $gate = app(Gate::class);
                     $gateArguments = $this->getGateArguments();
 
                     $this->getAbilities()->each(
-                        function (string $ability) use ($gate, $user, $gateArguments) {
-                            $this->authorize($user, $gate, $ability, $gateArguments);
+                        function (string $ability) use ($context, $gate, $gateArguments): void {
+                            $this->authorize($context->user(), $gate, $ability, $gateArguments);
                         }
                     );
 
@@ -58,7 +58,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * For compatibility reasons, the alias "if" will be kept until the next major version.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<string>
      */
     protected function getAbilities(): Collection
     {
@@ -71,7 +71,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     /**
      * Get additional arguments that are passed to `Gate::check`.
      *
-     * @return array
+     * @return mixed[]
      */
     protected function getGateArguments(): array
     {
@@ -86,16 +86,15 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * @param Authenticatable|null $user
-     * @param Gate                 $gate
-     * @param string               $ability
-     * @param array                $args
-     *
-     * @throws AuthorizationException
-     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
+     * @param  string  $ability
+     * @param  array  $args
      * @return void
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\AuthorizationException
      */
-    protected function authorize($user, Gate $gate, string $ability, array $args)
+    protected function authorize($user, Gate $gate, string $ability, array $args): void
     {
         $can = $gate->forUser($user)->check($ability, $args);
 

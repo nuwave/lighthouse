@@ -11,7 +11,7 @@ class UnionDirective extends BaseDirective
      *
      * @return string
      */
-    public function name():string
+    public function name(): string
     {
         return 'union';
     }

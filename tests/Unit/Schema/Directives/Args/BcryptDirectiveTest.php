@@ -3,16 +3,15 @@
 namespace Tests\Unit\Schema\Directives\Args;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 
 class BcryptDirectiveTest extends TestCase
 {
     /**
      * @test
      */
-    public function itCanBcryptAnArgument()
+    public function itCanBcryptAnArgument(): void
     {
-        $schema = '
+        $this->schema = '
         type Mutation {
             foo(bar: String @bcrypt): Foo
                 @field(resolver: "'.$this->getResolver().'")
@@ -27,31 +26,26 @@ class BcryptDirectiveTest extends TestCase
             bar: String
         }
         ';
-        $mutationQuery = '
+
+        $passwordFromMutation = $this->query('
         mutation {
             foo(bar: "password"){
                 bar
             }
         }
-        ';
+        ')->jsonGet('data.foo.bar');
 
-        $resultFromMutation = $this->execute($schema, $mutationQuery);
-
-        $passwordFromMutation = Arr::get($resultFromMutation, 'data.foo.bar');
         $this->assertNotSame('password', $passwordFromMutation);
         $this->assertTrue(password_verify('password', $passwordFromMutation));
 
-        $query = '
+        $passwordFromQuery = $this->query('
         {
             foo(bar: "123"){
                 bar
             }
         }
-        ';
+        ')->jsonGet('data.foo.bar');
 
-        $resultFromQuery = $this->execute($schema, $query);
-
-        $passwordFromQuery = Arr::get($resultFromQuery, 'data.foo.bar');
         $this->assertNotSame('123', $passwordFromQuery);
         $this->assertTrue(password_verify('123', $passwordFromQuery));
     }
@@ -59,9 +53,9 @@ class BcryptDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanBcryptAnArgumentInInputObjectAndArray()
+    public function itCanBcryptAnArgumentInInputObjectAndArray(): void
     {
-        $schema = '
+        $this->schema = '
         type Query {
             user(input: UserInput): User
                 @field(resolver: "'.$this->getResolver('resolveUser').'")
@@ -80,7 +74,7 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $query = '
+        $result = $this->query('
         query {
             user(input: {
                 password: "password"
@@ -106,51 +100,63 @@ class BcryptDirectiveTest extends TestCase
                 }
             }
         }
-        ';
+        ');
 
-        $result = $this->execute($schema, $query);
-
-        $password = Arr::get($result, 'data.user.password');
+        $password = $result->jsonGet('data.user.password');
         $this->assertNotSame('password', $password);
         $this->assertTrue(password_verify('password', $password));
 
         // apply to array
-        $altPasswordOne = Arr::get($result, 'data.user.alt_passwords.0');
+        $altPasswordOne = $result->jsonGet('data.user.alt_passwords.0');
         $this->assertNotSame('alt_password_1', $altPasswordOne);
         $this->assertTrue(password_verify('alt_password_1', $altPasswordOne));
 
-        $altPasswordTwo = Arr::get($result, 'data.user.alt_passwords.1');
+        $altPasswordTwo = $result->jsonGet('data.user.alt_passwords.1');
         $this->assertNotSame('alt_password_2', $altPasswordTwo);
         $this->assertTrue(password_verify('alt_password_2', $altPasswordTwo));
 
         // apply to (nested) input
-        $friendPasswordOne = Arr::get($result, 'data.user.friends.0.password');
+        $friendPasswordOne = $result->jsonGet('data.user.friends.0.password');
         $this->assertNotSame('friend_password_1', $friendPasswordOne);
         $this->assertTrue(password_verify('friend_password_1', $friendPasswordOne));
 
-        $friendPasswordTwo = Arr::get($result, 'data.user.friends.1.password');
+        $friendPasswordTwo = $result->jsonGet('data.user.friends.1.password');
         $this->assertNotSame('friend_password_2', $friendPasswordTwo);
         $this->assertTrue(password_verify('friend_password_2', $friendPasswordTwo));
 
-        $friendPasswordThree = Arr::get($result, 'data.user.friends.2.password');
+        $friendPasswordThree = $result->jsonGet('data.user.friends.2.password');
         $this->assertNotSame('friend_password_3', $friendPasswordThree);
         $this->assertTrue(password_verify('friend_password_3', $friendPasswordThree));
 
-        $friendPasswordFour = Arr::get($result, 'data.user.friends.2.friends.0.password');
+        $friendPasswordFour = $result->jsonGet('data.user.friends.2.friends.0.password');
         $this->assertNotSame('friend_password_4', $friendPasswordFour);
         $this->assertTrue(password_verify('friend_password_4', $friendPasswordFour));
     }
 
-    public function resolve($root, $args): array
+    /**
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return mixed[]
+     */
+    public function resolve($root, array $args): array
     {
         return $args;
     }
 
-    public function resolveUser($root, $args): array
+    /**
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return mixed[]
+     */
+    public function resolveUser($root, array $args): array
     {
         return $args['input'];
     }
 
+    /**
+     * @param  string  $method
+     * @return string
+     */
     protected function getResolver(string $method = 'resolve'): string
     {
         return addslashes(self::class)."@{$method}";

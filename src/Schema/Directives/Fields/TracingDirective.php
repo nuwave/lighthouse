@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
@@ -25,21 +26,20 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
         $value = $next($value);
 
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function ($root, $args, $context, ResolveInfo $info) use ($resolver) {
-            /** @var ExtensionRegistry $extensionRegistry */
+        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver) {
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry */
             $extensionRegistry = resolve(ExtensionRegistry::class);
-            /** @var TracingExtension $tracingExtension */
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\TracingExtension $tracingExtension */
             $tracingExtension = $extensionRegistry->get(TracingExtension::name());
 
             $start = Carbon::now();

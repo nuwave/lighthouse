@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -12,9 +11,9 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateFromFieldArguments()
+    public function itCanCreateFromFieldArguments(): void
     {
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -24,26 +23,30 @@ class CoreTest extends DBTestCase
             createCompany(name: String): Company @create
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createCompany(name: "foo") {
                 id
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createCompany.name'));
+        ')->assertJson([
+            'data' => [
+                'createCompany' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanCreateFromInputObject()
+    public function itCanCreateFromInputObject(): void
     {
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -57,7 +60,8 @@ class CoreTest extends DBTestCase
             name: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createCompany(input: {
                 name: "foo"
@@ -66,19 +70,22 @@ class CoreTest extends DBTestCase
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.createCompany.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createCompany.name'));
+        ')->assertJson([
+            'data' => [
+                'createCompany' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately()
+    public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
-        $schema = '
+        $this->schema = '
         type Mutation {
             createTag(name: String): Tag @create
         }
@@ -88,30 +95,34 @@ class CoreTest extends DBTestCase
             default_string: String!
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTag(name: "foobar"){
                 name
                 default_string
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame([
-            'name' => 'foobar',
-            'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
-        ], Arr::get($result, 'data.createTag'));
+        ')->assertJson([
+            'data' => [
+                'createTag' => [
+                    'name' => 'foobar',
+                    'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itDoesNotCreateWithFailingRelationship()
+    public function itDoesNotCreateWithFailingRelationship(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
-        $schema = '
+        $this->app['config']->set('app.debug', false);
+
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -141,7 +152,8 @@ class CoreTest extends DBTestCase
             user: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -159,23 +171,28 @@ class CoreTest extends DBTestCase
                 }
             }
         }
-        ';
+        ')
+            ->assertJson([
+                'data' => [
+                    'createUser' => null,
+                ],
+            ])
+            ->assertJsonCount(1, 'errors');
 
-        try {
-            $this->execute($schema, $query);
-        } catch (\Exception $err) {
-            $this->assertCount(1, User::all());
-        }
+        $this->assertCount(1, User::all());
     }
 
     /**
      * @test
      */
-    public function itDoesCreateWithFailingRelationshipAndTransactionParam()
+    public function itDoesCreateWithFailingRelationshipAndTransactionParam(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
+
+        $this->app['config']->set('app.debug', false);
         config(['lighthouse.transactional_mutations' => false]);
-        $schema = '
+
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -205,7 +222,8 @@ class CoreTest extends DBTestCase
             user: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -223,20 +241,27 @@ class CoreTest extends DBTestCase
                 }
             }
         }
-        ';
-        try {
-            $this->execute($schema, $query);
-        } catch (\Exception $err) {
-            $this->assertCount(2, User::all());
-        }
+        ')
+            // TODO allow partial success
+//            ->assertJson([
+//                'data' => [
+//                    'createUser' => [
+//                        'name' => 'foo',
+//                        'tasks' => null,
+//                    ],
+//                ],
+//            ])
+            ->assertJsonCount(1, 'errors');
+
+        $this->assertCount(2, User::all());
     }
 
     /**
      * @test
      */
-    public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods()
+    public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -267,7 +292,8 @@ class CoreTest extends DBTestCase
             guard: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -278,18 +304,21 @@ class CoreTest extends DBTestCase
                     }]
                 }
             }) {
-                id
-                name
                 tasks {
-                    id
-                    name
                     guard
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('api', Arr::get($result, 'data.createUser.tasks.0.guard'));
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'tasks' => [
+                        [
+                            'guard' => 'api',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

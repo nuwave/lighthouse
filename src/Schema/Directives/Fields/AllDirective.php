@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class AllDirective extends BaseDirective implements FieldResolver
 {
@@ -24,15 +24,15 @@ class AllDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function ($root, $args, $context, ResolveInfo $resolveInfo) {
-                /** @var Model $modelClass */
+            function ($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
+                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
                 $modelClass = $this->getModelClass();
 
                 $query = QueryFilter::apply(

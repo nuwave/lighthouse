@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
@@ -12,11 +11,11 @@ class AllDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanGetAllModelsAsRootField()
+    public function itCanGetAllModelsAsRootField(): void
     {
         factory(User::class, 2)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -26,30 +25,28 @@ class AllDirectiveTest extends DBTestCase
             users: [User!]! @all(model: "User")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users {
                 id
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertCount(2, Arr::get($result, 'data.users'));
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
      * @test
      */
-    public function itCanGetAllAsNestedField()
+    public function itCanGetAllAsNestedField(): void
     {
         factory(Post::class, 2)->create([
             // Do not create those, as they would create more users
             'task_id' => 1,
         ]);
 
-        $schema = '
+        $this->schema = '
         type User {
             posts: [Post!]! @all
         }
@@ -62,7 +59,8 @@ class AllDirectiveTest extends DBTestCase
             users: [User!]! @all
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users {
                 posts {
@@ -70,26 +68,43 @@ class AllDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame([
-            'users' => [
-                ['posts' => [['id' => '1'], ['id' => '2']]],
-                ['posts' => [['id' => '1'], ['id' => '2']]],
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    [
+                        'posts' => [
+                            [
+                                'id' => '1',
+                            ],
+                            [
+                                'id' => '2',
+                            ],
+                        ],
+                    ],
+                    [
+                        'posts' => [
+                            [
+                                'id' => '1',
+                            ],
+                            [
+                                'id' => '2',
+                            ],
+                        ],
+                    ],
+                ],
             ],
-        ], $result['data']);
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanGetAllModelsFiltered()
+    public function itCanGetAllModelsFiltered(): void
     {
         $users = factory(User::class, 3)->create();
         $userName = $users->first()->name;
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -99,16 +114,14 @@ class AllDirectiveTest extends DBTestCase
             users(name: String @neq): [User!]! @all
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(name: "'.$userName.'") {
                 id
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertCount(2, Arr::get($result, 'data.users'));
+        ')->assertJsonCount(2, 'data.users');
     }
 }

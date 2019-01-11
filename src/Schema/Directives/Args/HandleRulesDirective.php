@@ -8,6 +8,9 @@ trait HandleRulesDirective
 {
     use HasArgumentPath;
 
+    /**
+     * @return mixed[]
+     */
     public function getRules(): array
     {
         $rules = $this->directiveArgValue('apply');
@@ -15,10 +18,13 @@ trait HandleRulesDirective
         return [$this->argumentPathAsDotNotation() => $rules];
     }
 
+    /**
+     * @return string[]
+     */
     public function getMessages(): array
     {
         return collect($this->directiveArgValue('messages'))
-            ->mapWithKeys(function (string $message, string $rule) {
+            ->mapWithKeys(function (string $message, string $rule): array {
                 $argumentPath = $this->argumentPathAsDotNotation();
 
                 return ["{$argumentPath}.{$rule}" => $message];

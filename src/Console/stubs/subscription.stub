@@ -15,7 +15,7 @@ class DummyClass extends GraphQLSubscription
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    public function authorize(Subscriber $subscriber, Request $request)
+    public function authorize(Subscriber $subscriber, Request $request): bool
     {
         // TODO implement authorize
     }
@@ -27,7 +27,7 @@ class DummyClass extends GraphQLSubscription
      * @param  mixed  $root
      * @return bool
      */
-    public function filter(Subscriber $subscriber, $root)
+    public function filter(Subscriber $subscriber, $root): bool
     {
         // TODO implement filter
     }

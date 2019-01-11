@@ -2,21 +2,25 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Illuminate\Support\Collection;
 use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class ExtensionRegistry implements \JsonSerializable
 {
-    /** @var Pipeline */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Pipeline
+     */
     protected $pipeline;
 
-    /** @var Collection|GraphQLExtension[] */
+    /**
+     * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension>
+     */
     protected $extensions;
 
     /**
-     * @param Pipeline $pipeline
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @return void
      */
     public function __construct(Pipeline $pipeline)
     {
@@ -24,7 +28,7 @@ class ExtensionRegistry implements \JsonSerializable
 
         $this->extensions = collect(
             config('lighthouse.extensions', [])
-        )->mapWithKeys(function (string $extension) {
+        )->mapWithKeys(function (string $extension): array {
             $extensionInstance = app($extension);
 
             if (! $extensionInstance instanceof GraphQLExtension) {
@@ -44,11 +48,10 @@ class ExtensionRegistry implements \JsonSerializable
      *
      * For example, retrieve the TracingExtension by calling $this->get('tracing')
      *
-     * @param string $shortName
-     *
-     * @return GraphQLExtension|null
+     * @param  string  $shortName
+     * @return \Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension|null
      */
-    public function get(string $shortName)
+    public function get(string $shortName): ?GraphQLExtension
     {
         return $this->extensions->get($shortName);
     }
@@ -56,11 +59,10 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Check if extension is registered by its short name.
      *
-     * @param string $shortName
-     *
+     * @param  string  $shortName
      * @return bool
      */
-    public function has(string $shortName)
+    public function has(string $shortName): bool
     {
         return $this->extensions->has($shortName);
     }
@@ -68,9 +70,8 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a request did start.
      *
-     * @param ExtensionRequest $request
-     *
-     * @return ExtensionRegistry
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
+     * @return $this
      */
     public function requestDidStart(ExtensionRequest $request): self
     {
@@ -84,11 +85,10 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did start.
      *
-     * @param int $index
-     *
-     * @return ExtensionRegistry
+     * @param  int  $index
+     * @return $this
      */
-    public function batchedQueryDidStart($index)
+    public function batchedQueryDidStart($index): self
     {
         $this->extensions->each(function (GraphQLExtension $extension) use ($index) {
             $extension->batchedQueryDidStart($index);
@@ -100,12 +100,11 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Notify all registered extensions that a batched query did end.
      *
-     * @param ExecutionResult $result
-     * @param int             $index
-     *
-     * @return ExtensionRegistry
+     * @param  \GraphQL\Executor\ExecutionResult  $result
+     * @param  int  $index
+     * @return $this
      */
-    public function batchedQueryDidEnd(ExecutionResult $result, $index)
+    public function batchedQueryDidEnd(ExecutionResult $result, $index): self
     {
         $this->extensions->each(
             function (GraphQLExtension $extension) use ($result, $index) {
@@ -120,11 +119,10 @@ class ExtensionRegistry implements \JsonSerializable
      * Notify all registered extensions that the
      * response will be sent.
      *
-     * @param array $response
-     *
+     * @param  array  $response
      * @return array
      */
-    public function willSendResponse(array $response)
+    public function willSendResponse(array $response): array
     {
         return $this->pipeline
             ->send($response)
@@ -138,9 +136,8 @@ class ExtensionRegistry implements \JsonSerializable
     /**
      * Allow Extensions to manipulate the Schema.
      *
-     * @param DocumentAST $documentAST
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulate(DocumentAST $documentAST): DocumentAST
     {

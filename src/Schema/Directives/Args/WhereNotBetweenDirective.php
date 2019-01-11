@@ -17,9 +17,9 @@ class WhereNotBetweenDirective implements ArgFilterDirective
     }
 
     /**
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                                                   $columnName
-     * @param mixed                                                                    $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  string  $columnName
+     * @param  mixed  $value
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */

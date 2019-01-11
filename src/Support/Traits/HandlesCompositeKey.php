@@ -2,22 +2,19 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-/**
- * Trait HandlesCompositeKey.
- */
 trait HandlesCompositeKey
 {
     /**
-     * Build the model key. Support composite primary keys.
-     * Ex: $primaryKey = ['key1', 'key2'];.
+     * Build a key out of one or more given keys, supporting composite keys.
      *
-     * @param mixed $key
+     * E.g.: $primaryKey = ['key1', 'key2'];.
      *
+     * @param  mixed  $key
      * @return string
      */
-    protected function buildKey($key)
+    protected function buildKey($key): string
     {
-        return (is_array($key))
+        return is_array($key)
             ? implode('___', $key)
             : $key;
     }

@@ -75,7 +75,7 @@ Each subfolder in `docs/` will represent a documentation version,
 except `docs/pages/` that will remain the same for all docs versions. 
 
 This ensures that the docs are always in sync with the released version of Lighthouse.
-Version specific changes are handled by keeping the docs for each version seperate.
+Version specific changes are handled by keeping the docs for each version separate.
 
 | Path                                    | Web route                                           |
 |-----------------------------------------|-----------------------------------------------------|
@@ -83,12 +83,12 @@ Version specific changes are handled by keeping the docs for each version sepera
 | `docs/2.6/guides/installation.md`       | `http://mysite.com/2.6/guides/installation.html`    |
 | `docs/pages/users.md`                   | `http://mysite.com/pages/users.html`    |
 
-### Updating existing verions
+### Updating existing versions
 
 When you improve the docs, consider if the change you are making applies to
 multiple versions of Lighthouse.
 
-Just change the relevant parts of each seperate docs folder and commit it all
+Just change the relevant parts of each separate docs folder and commit it all
 in a single PR.
 
 ### Tagging a new version

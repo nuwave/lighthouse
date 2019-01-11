@@ -11,23 +11,24 @@ class Subscription
     /**
      * Broadcast subscription to client(s).
      *
-     * @param string $subscriptionField
-     * @param string $root
-     * @param bool|null
+     * @param  string  $subscriptionField
+     * @param  mixed  $root
+     * @param  bool|null  $queue
+     * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public static function broadcast(string $subscriptionField, $root, $queue = null)
+    public static function broadcast(string $subscriptionField, $root, ?bool $queue = null): void
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
         app('graphql')->prepSchema();
 
-        /** @var SubscriptionRegistry $registry */
+        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
-        /** @var BroadcastsSubscriptions $broadcaster */
+        /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
         $broadcaster = app(BroadcastsSubscriptions::class);
-        /** @var ExceptionHandler $exceptionHandler */
+        /** @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler $exceptionHandler */
         $exceptionHandler = app(ExceptionHandler::class);
 
         if (! $registry->has($subscriptionField)) {

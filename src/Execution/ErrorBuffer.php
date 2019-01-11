@@ -7,7 +7,9 @@ use Nuwave\Lighthouse\Exceptions\GenericException;
 class ErrorBuffer
 {
     /**
-     * @var array
+     * The gathered error messages.
+     *
+     * @var string[]
      */
     protected $errors = [];
 
@@ -24,10 +26,11 @@ class ErrorBuffer
     /**
      * ErrorBuffer constructor.
      *
-     * @param string        $errorType
-     * @param \Closure|null $exceptionResolver
+     * @param  string  $errorType
+     * @param  \Closure|null  $exceptionResolver
+     * @return void
      */
-    public function __construct(string $errorType = 'generic', \Closure $exceptionResolver = null)
+    public function __construct(string $errorType = 'generic', ?\Closure $exceptionResolver = null)
     {
         $this->errorType = $errorType;
         $this->exceptionResolver = $exceptionResolver ?? $this->defaultExceptionResolver();
@@ -50,9 +53,8 @@ class ErrorBuffer
     /**
      * Set the Exception resolver.
      *
-     * @param \Closure $exceptionResolver
-     *
-     * @return static
+     * @param  \Closure  $exceptionResolver
+     * @return $this
      */
     public function setExceptionResolver(\Closure $exceptionResolver): self
     {
@@ -64,8 +66,7 @@ class ErrorBuffer
     /**
      * Resolve the exception by calling the exception handler with the given args.
      *
-     * @param mixed ...$args
-     *
+     * @param  mixed ...$args
      * @return mixed
      */
     protected function resolveException(...$args)
@@ -76,12 +77,11 @@ class ErrorBuffer
     /**
      * Push an error message into the buffer.
      *
-     * @param $key
-     * @param $errorMessage
-     *
-     * @return static
+     * @param  string  $errorMessage
+     * @param  string|null  $key
+     * @return $this
      */
-    public function push(string $errorMessage, string $key = null): self
+    public function push(string $errorMessage, ?string $key = null): self
     {
         if ($key === null) {
             $this->errors[] = $errorMessage;
@@ -97,9 +97,12 @@ class ErrorBuffer
     /**
      * Flush the errors.
      *
-     * @param string $errorMessage
+     * @param  string  $errorMessage
+     * @return void
+     *
+     * @throws \Exception
      */
-    public function flush(string $errorMessage)
+    public function flush(string $errorMessage): void
     {
         if (! $this->hasErrors()) {
             return;
@@ -114,8 +117,10 @@ class ErrorBuffer
 
     /**
      * Reset the errors to an empty array.
+     *
+     * @return void
      */
-    public function clearErrors()
+    public function clearErrors(): void
     {
         $this->errors = [];
     }
@@ -133,9 +138,8 @@ class ErrorBuffer
     /**
      * Set the error type.
      *
-     * @param string $errorType
-     *
-     * @return static
+     * @param  string  $errorType
+     * @return $this
      */
     public function setErrorType(string $errorType): self
     {
@@ -145,7 +149,7 @@ class ErrorBuffer
     }
 
     /**
-     * Do we have any errors yet?
+     * Have we encountered any errors yet?
      *
      * @return bool
      */

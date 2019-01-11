@@ -15,7 +15,7 @@ abstract class DriverManager
     /**
      * The application instance.
      *
-     * @var Application
+     * @var \Illuminate\Container\Container
      */
     protected $app;
 
@@ -36,7 +36,8 @@ abstract class DriverManager
     /**
      * Create a new driver manager instance.
      *
-     * @param Application $app
+     * @param  \Illuminate\Container\Container  $app
+     * @return void
      */
     public function __construct(Application $app)
     {
@@ -46,11 +47,11 @@ abstract class DriverManager
     /**
      * Get a driver instance by name.
      *
-     * @param string|null $name
+     * @param  string|null  $name
      *
      * @return mixed
      */
-    public function driver($name = null)
+    public function driver(?string $name = null)
     {
         $name = $name ?: $this->getDefaultDriver();
 
@@ -60,7 +61,7 @@ abstract class DriverManager
     /**
      * Attempt to get the driver from the local cache.
      *
-     * @param string $name
+     * @param  string  $name
      *
      * @return mixed
      */
@@ -74,7 +75,7 @@ abstract class DriverManager
      *
      * @return string
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
         return $this->app['config'][$this->driverKey()];
     }
@@ -82,9 +83,11 @@ abstract class DriverManager
     /**
      * Set the default driver name.
      *
-     * @param string $name
+     * @param  string  $name
+     *
+     * @return void
      */
-    public function setDefaultDriver($name)
+    public function setDefaultDriver(string $name): void
     {
         $this->app['config'][$this->driverKey()] = $name;
     }
@@ -92,11 +95,11 @@ abstract class DriverManager
     /**
      * Get the driver configuration.
      *
-     * @param string $name
+     * @param  string  $name
      *
      * @return array
      */
-    protected function getConfig($name)
+    protected function getConfig(string $name): array
     {
         return $this->app['config']->get(
             $this->configKey().".{$name}",
@@ -107,12 +110,11 @@ abstract class DriverManager
     /**
      * Register a custom driver creator Closure.
      *
-     * @param string   $driver
-     * @param \Closure $callback
-     *
-     * @return self
+     * @param  string  $driver
+     * @param  \Closure  $callback
+     * @return $this
      */
-    public function extend($driver, \Closure $callback)
+    public function extend(string $driver, \Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
 
@@ -122,21 +124,18 @@ abstract class DriverManager
     /**
      * Resolve the given driver.
      *
-     * @param string $name
+     * @param  string  $name
+     * @return mixed
      *
      * @throws \InvalidArgumentException
-     *
-     * @return mixed
      */
-    protected function resolve($name)
+    protected function resolve(string $name)
     {
         $config = $this->getConfig($name);
 
         if ($config === null) {
             throw new \InvalidArgumentException("Driver [{$name}] is not defined.");
         }
-
-        $interface = $this->interface();
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->validateDriver($this->callCustomCreator($config));
@@ -154,7 +153,7 @@ abstract class DriverManager
     /**
      * Call a custom driver creator.
      *
-     * @param array $config
+     * @param  array  $config
      *
      * @return mixed
      */
@@ -166,11 +165,10 @@ abstract class DriverManager
     /**
      * Validate driver implements the proper interface.
      *
-     * @param mixed $driver
-     *
-     * @throws InvalidDriverException
-     *
+     * @param  mixed  $driver
      * @return mixed
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\InvalidDriverException
      */
     protected function validateDriver($driver)
     {
@@ -186,12 +184,12 @@ abstract class DriverManager
     /**
      * Dynamically call the default driver instance.
      *
-     * @param string $method
-     * @param array  $parameters
+     * @param  string  $method
+     * @param  array  $parameters
      *
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters)
     {
         return $this->driver()->$method(...$parameters);
     }

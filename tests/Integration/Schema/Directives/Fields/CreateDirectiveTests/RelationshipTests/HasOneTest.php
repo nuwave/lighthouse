@@ -3,8 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests\RelationshipTests;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
-use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 
 class HasOneTest extends DBTestCase
@@ -12,11 +10,11 @@ class HasOneTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateWithNewHasOne()
+    public function itCanCreateWithNewHasOne(): void
     {
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -53,7 +51,8 @@ class HasOneTest extends DBTestCase
             body: String!
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -74,11 +73,17 @@ class HasOneTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-        $this->assertSame('1', Arr::get($result, 'data.createTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.createTask.name'));
-        $this->assertSame('1', Arr::get($result, 'data.createTask.post.id'));
-        $this->assertSame('foobar', Arr::get($result, 'data.createTask.post.body'));
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'body' => 'foobar',
+                    ],
+                ],
+            ],
+        ]);
     }
 }

@@ -3,44 +3,56 @@
 namespace Tests\Unit\Schema\Directives\Client;
 
 use Tests\TestCase;
+use Illuminate\Support\Collection;
+use GraphQL\Language\AST\FieldNode;
+use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ClientDirectiveTest extends TestCase
 {
     /**
      * @test
      */
-    public function itCanDefineAClientDirective()
+    public function itCanDefineAClientDirective(): void
     {
         $resolver = addslashes(self::class).'@resolve';
-        $schema = '
+        $this->schema = '
         directive @filter(key: String = "default value") on FIELD
         
         type Query {
             foo: String @field(resolver: "'.$resolver.'")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             foo @filter(key: "baz")
         }
-        ';
-        $result = $this->executeQuery($schema, $query);
-
-        $this->assertSame(['foo' => 'baz'], $result->data);
+        ')->assertJson([
+            'data' => [
+                'foo' => 'baz',
+            ],
+        ]);
     }
 
-    public function resolve($root, array $args, $context, ResolveInfo $info)
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
-        $key = collect($info->fieldNodes)->flatMap(function ($node) {
-            return collect($node->directives);
-        })->filter(function ($directive) {
-            return $directive->name->value === 'filter';
-        })->flatMap(function ($directive) {
-            return collect($directive->arguments);
-        })->filter(function ($arg) {
-            return $arg->name->value === 'key';
-        })->first();
+        /** @var \GraphQL\Language\AST\ArgumentNode $key */
+        $key = collect($resolveInfo->fieldNodes)
+            ->flatMap(function (FieldNode $node): Collection {
+                return collect($node->directives);
+            })
+            ->filter(function (DirectiveNode $directive): bool {
+                return $directive->name->value === 'filter';
+            })
+            ->flatMap(function (DirectiveNode $directive): Collection {
+                return collect($directive->arguments);
+            })
+            ->first(function (ArgumentNode $arg): bool {
+                return $arg->name->value === 'key';
+            });
 
         return $key->value->value;
     }

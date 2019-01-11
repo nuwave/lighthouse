@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 
@@ -25,10 +26,10 @@ class WithDirective extends RelationDirective implements FieldMiddleware
     /**
      * Eager load a relation on the parent instance.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -36,7 +37,7 @@ class WithDirective extends RelationDirective implements FieldMiddleware
 
         return $next(
             $value->setResolver(
-                function (Model $parent, array $resolveArgs, $context, ResolveInfo $resolveInfo) use ($resolver) {
+                function (Model $parent, array $resolveArgs, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
                     $loader = BatchLoader::instance(
                         RelationBatchLoader::class,
                         $resolveInfo->path,

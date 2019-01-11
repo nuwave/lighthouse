@@ -13,7 +13,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     /**
      * Auth user.
      *
-     * @var User
+     * @var \Tests\Utils\Models\User
      */
     protected $user;
 
@@ -46,9 +46,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanQueryBelongsToManyRelationship()
+    public function itCanQueryBelongsToManyRelationship(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             roles: [Role!]! @belongsToMany
         }
@@ -63,7 +63,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $this->query('
         {
             user {
                 roles {
@@ -71,23 +71,21 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
+        ')->assertJsonCount($this->rolesCount, 'data.user.roles');
 
         $rolesCount = auth()
             ->user()
             ->roles()
             ->count();
-
         $this->assertSame($this->rolesCount, $rolesCount);
-        $this->assertCount($this->rolesCount, Arr::get($result->data, 'user.roles'));
     }
 
     /**
      * @test
      */
-    public function itCanQueryBelongsToManyPaginator()
+    public function itCanQueryBelongsToManyPaginator(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             roles: [Role!]! @belongsToMany(type: "paginator")
         }
@@ -102,14 +100,14 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $this->query('
         {
             user {
                 roles(count: 2) {
                     paginatorInfo {
-                        total
                         count
                         hasMorePages
+                        total
                     }
                     data {
                         id
@@ -117,20 +115,27 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertSame(2, Arr::get($result->data, 'user.roles.paginatorInfo.count'));
-        $this->assertSame($this->rolesCount, Arr::get($result->data, 'user.roles.paginatorInfo.total'));
-        $this->assertTrue(Arr::get($result->data, 'user.roles.paginatorInfo.hasMorePages'));
-        $this->assertCount(2, Arr::get($result->data, 'user.roles.data'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'paginatorInfo' => [
+                            'count' => 2,
+                            'hasMorePages' => true,
+                            'total' => $this->rolesCount,
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.data');
     }
 
     /**
      * @test
      */
-    public function itCanQueryBelongsToManyRelayConnection()
+    public function itCanQueryBelongsToManyRelayConnection(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             roles: [Role!]! @belongsToMany(type: "relay")
         }
@@ -145,7 +150,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $this->query('
         {
             user {
                 roles(first: 2) {
@@ -160,18 +165,25 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-
-        $this->assertTrue(Arr::get($result->data, 'user.roles.pageInfo.hasNextPage'));
-        $this->assertCount(2, Arr::get($result->data, 'user.roles.edges'));
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'pageInfo' => [
+                            'hasNextPage' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
     /**
      * @test
      */
-    public function itCanQueryBelongsToManyNestedRelationships()
+    public function itCanQueryBelongsToManyNestedRelationships(): void
     {
-        $schema = '
+        $this->schema = '
         type User {
             id: Int!
             roles: [Role!]! @belongsToMany(type: "relay")
@@ -197,7 +209,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->executeQuery($schema, '
+        $result = $this->query('
         { 
             user { 
                 roles(first: 2) { 
@@ -230,10 +242,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ');
 
-        $userRolesEdges = Arr::get($result->data, 'user.roles.edges');
-        $nestedUserRolesEdges = Arr::get($result->data, 'user.roles.edges.0.node.users.0.roles.edges');
+        $this->assertTrue($result->jsonGet('data.user.roles.pageInfo.hasNextPage'));
 
-        $this->assertTrue(Arr::get($result->data, 'user.roles.pageInfo.hasNextPage'));
+        $userRolesEdges = $result->jsonGet('data.user.roles.edges');
+        $nestedUserRolesEdges = $result->jsonGet('data.user.roles.edges.0.node.users.0.roles.edges');
         $this->assertCount(2, $userRolesEdges);
         $this->assertCount(2, $nestedUserRolesEdges);
         $this->assertSame(Arr::get($userRolesEdges, 'node.0.acl.id'), Arr::get($nestedUserRolesEdges, 'node.0.acl.id'));
@@ -243,7 +255,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itThrowsErrorWithUnknownTypeArg()
+    public function itThrowsErrorWithUnknownTypeArg(): void
     {
         $this->expectException(DirectiveException::class);
 

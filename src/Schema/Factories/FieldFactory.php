@@ -18,7 +18,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
@@ -32,27 +32,27 @@ class FieldFactory
     use HasResolverArguments;
 
     /**
-     * @var FieldValue
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected $fieldValue;
 
     /**
-     * @var QueryFilter
+     * @var \Nuwave\Lighthouse\Execution\QueryFilter
      */
     protected $queryFilter;
 
     /**
-     * @var DirectiveFactory
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
     protected $directiveFactory;
 
     /**
-     * @var ArgumentFactory
+     * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
      */
     protected $argumentFactory;
 
     /**
-     * @var Pipeline
+     * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
 
@@ -67,24 +67,25 @@ class FieldFactory
     protected $currentMessages = [];
 
     /**
-     * @var ErrorBuffer
+     * @var \Nuwave\Lighthouse\Execution\ErrorBuffer
      */
     protected $currentValidationErrorBuffer;
 
     /**
-     * @var ArgumentValue
+     * @var \Nuwave\Lighthouse\Schema\Values\ArgumentValue
      */
     protected $currentArgumentValueInstance;
 
     /**
-     * @var ArgDirective[]
+     * @var \Nuwave\Lighthouse\Support\Contracts\ArgDirective[]
      */
     protected $currentHandlerArgsOfArgDirectivesAfterValidationDirective = [];
 
     /**
-     * @param DirectiveFactory $directiveFactory
-     * @param ArgumentFactory  $argumentFactory
-     * @param Pipeline         $pipeline
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @return void
      */
     public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
     {
@@ -96,7 +97,7 @@ class FieldFactory
     /**
      * Convert a FieldValue to an executable FieldDefinition.
      *
-     * @param FieldValue $fieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      *
      * @return array Configuration array for a FieldDefinition
      */
@@ -153,14 +154,14 @@ class FieldFactory
     /**
      * Transform the ArgumentValues into the final InputValueDefinitions.
      *
-     * @param Collection<ArgumentValue> $argumentValues
+     * @param  \Illuminate\Support\Collection<ArgumentValue>  $argumentValues
      *
-     * @return InputValueDefinitionNode[]
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode[]
      */
     protected function getInputValueDefinitions(Collection $argumentValues): array
     {
         return $argumentValues
-            ->mapWithKeys(function (ArgumentValue $argumentValue) {
+            ->mapWithKeys(function (ArgumentValue $argumentValue): array {
                 return [
                     $argumentValue->getName() => $this->argumentFactory->handle($argumentValue),
                 ];
@@ -171,12 +172,12 @@ class FieldFactory
     /**
      * Get a collection of the fields argument definitions.
      *
-     * @return Collection<ArgumentValue>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Values\ArgumentValue>
      */
     protected function getArgumentValues(): Collection
     {
         return collect($this->fieldValue->getField()->arguments)
-            ->map(function (InputValueDefinitionNode $inputValueDefinition) {
+            ->map(function (InputValueDefinitionNode $inputValueDefinition): ArgumentValue {
                 return new ArgumentValue($inputValueDefinition, $this->fieldValue);
             });
     }
@@ -187,20 +188,20 @@ class FieldFactory
      * This may be used to transform the arguments, log them or do anything else
      * before they reach the final resolver.
      *
-     * @param \Closure                  $resolver
-     * @param Collection<ArgumentValue> $argumentValues
+     * @param  \Closure  $resolver
+     * @param  \Illuminate\Support\Collection<ArgumentValue> $argumentValues
      *
      * @return \Closure
      */
     public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
     {
-        return function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
             $this->currentValidationErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
 
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
 
             $argumentValues->each(
-                function (ArgumentValue $argumentValue) use (&$args) {
+                function (ArgumentValue $argumentValue) use (&$args): void {
                     $this->currentArgumentValueInstance = $argumentValue;
 
                     $noValuePassedForThisArgument = ! array_key_exists($argumentValue->getName(), $args);
@@ -238,13 +239,19 @@ class FieldFactory
     /**
      * Handle the ArgMiddleware.
      *
-     * @param InputType                     $type
-     * @param mixed                         $argValue
-     * @param InputValueDefinitionNode|null $astNode
-     * @param array                         $argumentPath
+     * @param  \GraphQL\Type\Definition\InputType  $type
+     * @param  mixed  $argValue
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  mixed[]                  $argumentPath
+     *
+     * @return void
      */
-    protected function handleArgWithAssociatedDirectivesRecursively(InputType $type, &$argValue, InputValueDefinitionNode $astNode, array $argumentPath)
-    {
+    protected function handleArgWithAssociatedDirectivesRecursively(
+        InputType $type,
+        &$argValue,
+        InputValueDefinitionNode $astNode,
+        array $argumentPath
+    ): void {
         if ($argValue instanceof NoValue || $argValue === null) {
             // Handle `ListOfType` with associated directives which implement `ArgDirectiveForArray`
             if ($type instanceof ListOfType) {
@@ -268,7 +275,7 @@ class FieldFactory
         if ($type instanceof InputObjectType) {
             collect($type->getFields())
                 ->each(
-                    function (InputObjectField $field) use ($argumentPath, &$argValue) {
+                    function (InputObjectField $field) use ($argumentPath, &$argValue): void {
                         $noValuePassedForThisArgument = ! array_key_exists($field->name, $argValue);
 
                         // because we are passing by reference, we need a variable to contain the null value.
@@ -311,10 +318,10 @@ class FieldFactory
     }
 
     /**
-     * @param InputValueDefinitionNode $astNode
-     * @param mixed                    $argValue
-     * @param array                    $argumentPath
-     * @param string                   $mustImplementClass
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  mixed  $argValue
+     * @param  mixed[]                  $argumentPath
+     * @param  string  $mustImplementClass
      *
      * @return mixed
      */
@@ -322,12 +329,12 @@ class FieldFactory
         InputValueDefinitionNode $astNode,
         $argValue,
         array $argumentPath,
-        string $mustImplementClass = null
+        ?string $mustImplementClass = null
     ) {
         $directives = $this->directiveFactory->createArgDirectives($astNode);
 
         if ($mustImplementClass) {
-            $directives = $directives->filter(function ($directive) use ($mustImplementClass) {
+            $directives = $directives->filter(function ($directive) use ($mustImplementClass): bool {
                 return $directive instanceof $mustImplementClass;
             });
         }
@@ -336,10 +343,10 @@ class FieldFactory
     }
 
     /**
-     * @param InputValueDefinitionNode $astNode
-     * @param mixed                    $argumentValue
-     * @param array                    $argumentPath
-     * @param Collection|null          $directives
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  mixed  $argumentValue
+     * @param  mixed[]                  $argumentPath
+     * @param  \Illuminate\Support\Collection  $directives
      *
      * @return mixed
      */
@@ -387,13 +394,15 @@ class FieldFactory
     }
 
     /**
-     * @param InputValueDefinitionNode $astNode
-     * @param array                    $argumentPath
-     * @param Collection               $directives
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  mixed[]                  $argumentPath
+     * @param  \Illuminate\Support\Collection  $directives
+     *
+     * @return void
      */
-    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives)
+    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives): void
     {
-        $directives->each(function (Directive $directive) use ($astNode, $argumentPath) {
+        $directives->each(function (Directive $directive) use ($astNode, $argumentPath): void {
             if ($directive instanceof HasErrorBuffer) {
                 $directive->setErrorBuffer($this->currentValidationErrorBuffer);
             }
@@ -405,20 +414,24 @@ class FieldFactory
     }
 
     /**
-     * @param ArgValidationDirective $directive
-     * @param array                  $argumentPath
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective  $directive
+     * @param  mixed[]                $argumentPath
+     *
+     * @return void
      */
-    protected function collectRulesAndMessages(ArgValidationDirective $directive, array $argumentPath)
+    protected function collectRulesAndMessages(ArgValidationDirective $directive, array $argumentPath): void
     {
         $this->currentRules = array_merge($this->currentRules, $directive->getRules());
         $this->currentMessages = array_merge($this->currentMessages, $directive->getMessages());
     }
 
     /**
-     * @param ArgFilterDirective       $argFilterDirective
-     * @param InputValueDefinitionNode $inputValueDefinition
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
+     *
+     * @return void
      */
-    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition)
+    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition): void
     {
         $argumentName = $inputValueDefinition->name->value;
         $directiveDefinition = ASTHelper::directiveDefinition($inputValueDefinition, $argFilterDirective->name());
@@ -434,10 +447,10 @@ class FieldFactory
     /**
      * Append a path to the base path to create a new path.
      *
-     * @param array      $basePath
-     * @param string|int $pathToBeAdded
+     * @param  mixed[]    $basePath
+     * @param  string|int  $pathToBeAdded
      *
-     * @return array
+     * @return mixed[]
      */
     protected function addPath(array $basePath, $pathToBeAdded): array
     {
@@ -462,12 +475,14 @@ class FieldFactory
     }
 
     /**
-     * @param mixed       $root
-     * @param array       $args
-     * @param mixed       $context
-     * @param ResolveInfo $resolveInfo
+     * @param  mixed  $root
+     * @param  array  $args
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     *
+     * @return void
      */
-    protected function validateArgumentsBeforeValidationDirectives($root, array $args, $context, ResolveInfo $resolveInfo)
+    protected function validateArgumentsBeforeValidationDirectives($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         if (! $this->currentRules) {
             return;
@@ -504,7 +519,7 @@ class FieldFactory
     /**
      * @return void
      */
-    protected function flushErrorBufferIfHasErrors()
+    protected function flushErrorBufferIfHasErrors(): void
     {
         if ($this->currentValidationErrorBuffer->hasErrors()) {
             $this->currentValidationErrorBuffer->flush(
@@ -514,12 +529,14 @@ class FieldFactory
     }
 
     /**
-     * @param mixed       $root
-     * @param array       $args
-     * @param mixed       $context
-     * @param ResolveInfo $resolveInfo
+     * @param  mixed  $root
+     * @param  array  $args
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     *
+     * @return void
      */
-    protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, $context, ResolveInfo $resolveInfo)
+    protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, GraphQLContext $context, ResolveInfo $resolveInfo): void
     {
         if (! $this->currentHandlerArgsOfArgDirectivesAfterValidationDirective) {
             return;

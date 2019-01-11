@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -10,6 +11,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 
 abstract class RelationDirective extends BaseDirective
@@ -17,14 +19,13 @@ abstract class RelationDirective extends BaseDirective
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $value): FieldValue
     {
         return $value->setResolver(
-            function (Model $parent, array $args, $context, ResolveInfo $resolveInfo) {
+            function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Deferred {
                 return BatchLoader::instance(
                     RelationBatchLoader::class,
                     $resolveInfo->path,
@@ -38,11 +39,10 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
@@ -60,14 +60,13 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param Model       $parent
-     * @param array       $args
-     * @param null        $context
-     * @param ResolveInfo $resolveInfo
-     *
-     * @return array
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  mixed[]        $args
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @return mixed[]
      */
-    protected function getLoaderConstructorArguments(Model $parent, array $args, $context, ResolveInfo $resolveInfo): array
+    protected function getLoaderConstructorArguments(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         $constructorArgs = [
             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),

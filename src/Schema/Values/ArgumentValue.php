@@ -15,29 +15,36 @@ use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
  */
 class ArgumentValue
 {
-    /** @var InputValueDefinitionNode */
+    /**
+     * @var \GraphQL\Language\AST\InputValueDefinitionNode
+     */
     protected $astNode;
 
-    /** @var FieldValue|null */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue|null
+     */
     protected $parentField;
 
-    /** @var Type */
+    /**
+     * @var \GraphQL\Type\Definition\Type
+     */
     protected $type;
 
     /**
      * ArgumentValue constructor.
      *
-     * @param InputValueDefinitionNode $astNode
-     * @param FieldValue               $parentField
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $parentField
+     * @return void
      */
-    public function __construct(InputValueDefinitionNode $astNode, FieldValue $parentField = null)
+    public function __construct(InputValueDefinitionNode $astNode, ?FieldValue $parentField = null)
     {
         $this->astNode = $astNode;
         $this->parentField = $parentField;
     }
 
     /**
-     * @return InputValueDefinitionNode
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode
      */
     public function getAstNode(): InputValueDefinitionNode
     {
@@ -45,15 +52,15 @@ class ArgumentValue
     }
 
     /**
-     * @return FieldValue|null
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue|null
      */
-    public function getParentField()
+    public function getParentField(): ?FieldValue
     {
         return $this->parentField;
     }
 
     /**
-     * @return Type
+     * @return \GraphQL\Type\Definition\Type
      */
     public function getType(): Type
     {

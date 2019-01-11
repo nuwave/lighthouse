@@ -4,20 +4,29 @@ namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 
 class LogBroadcaster implements Broadcaster
 {
-    /** @var array */
+    /**
+     * The user-defined configuration options.
+     *
+     * @var mixed[]
+     */
     protected $config = [];
 
-    /** @var array */
+    /**
+     * A map from channel names to data.
+     *
+     * @var mixed
+     */
     protected $broadcasts = [];
 
     /**
-     * @param array $config
+     * @param  array  $config
+     * @return void
      */
     public function __construct(array $config = [])
     {
@@ -27,11 +36,10 @@ class LogBroadcaster implements Broadcaster
     /**
      * Authorize subscription request.
      *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function authorized(Request $request): Response
+    public function authorized(Request $request): JsonResponse
     {
         return response()->json(['message' => 'ok'], 200);
     }
@@ -39,11 +47,10 @@ class LogBroadcaster implements Broadcaster
     /**
      * Handle unauthorized subscription request.
      *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function unauthorized(Request $request): Response
+    public function unauthorized(Request $request): JsonResponse
     {
         return response()->json(['error' => 'unauthorized'], 403);
     }
@@ -51,11 +58,10 @@ class LogBroadcaster implements Broadcaster
     /**
      * Handle subscription web hook.
      *
-     * @param Request $request
-     *
-     * @return \Illuminate\Support\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function hook(Request $request): Response
+    public function hook(Request $request): JsonResponse
     {
         return response()->json(['message' => 'okay']);
     }
@@ -63,8 +69,8 @@ class LogBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param Subscriber $subscriber
-     * @param array      $data
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  array  $data
      */
     public function broadcast(Subscriber $subscriber, array $data)
     {
@@ -72,21 +78,22 @@ class LogBroadcaster implements Broadcaster
     }
 
     /**
-     * Get broadcasted data.
+     * Get the data that is being broadcast.
      *
-     * @param string|null $key
-     *
+     * @param  string|null  $key
      * @return array|null
      */
-    public function broadcasts($key = null)
+    public function broadcasts(?string $key = null): ?array
     {
-        return $key ? Arr::get($this->broadcasts, $key) : $this->broadcasts;
+        return $key
+            ? Arr::get($this->broadcasts, $key)
+            : $this->broadcasts;
     }
 
     /**
      * Get configuration options.
      *
-     * @return array
+     * @return mixed[]
      */
     public function config(): array
     {

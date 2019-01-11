@@ -7,6 +7,7 @@ use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class FirstDirective extends BaseDirective implements FieldResolver
 {
@@ -23,17 +24,17 @@ class FirstDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         $model = $this->getModelClass();
 
         return $fieldValue->setResolver(
-            function ($root, array $args, $context, ResolveInfo $resolveInfo) use ($model) {
-                /** @var Builder $query */
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model) {
+                /** @var \Illuminate\Database\Eloquent\Builder $query */
                 $query = QueryFilter::apply(
                     $model::query(),
                     $args,

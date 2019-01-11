@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -14,11 +13,11 @@ class UpdateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanUpdateFromFieldArguments()
+    public function itCanUpdateFromFieldArguments(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -31,7 +30,8 @@ class UpdateDirectiveTest extends DBTestCase
             ): Company @update
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCompany(
                 id: 1
@@ -41,22 +41,25 @@ class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
+        ')->assertJson([
+            'data' => [
+                'updateCompany' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
         $this->assertSame('bar', Company::first()->name);
     }
 
     /**
      * @test
      */
-    public function itCanUpdateFromInputObject()
+    public function itCanUpdateFromInputObject(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -73,7 +76,8 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCompany(input: {
                 id: 1
@@ -83,18 +87,21 @@ class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
+        ')->assertJson([
+            'data' => [
+                'updateCompany' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
         $this->assertSame('bar', Company::first()->name);
     }
 
     /**
      * @test
      */
-    public function itCanUpdateWithBelongsTo()
+    public function itCanUpdateWithBelongsTo(): void
     {
         factory(User::class, 2)->create();
         factory(Task::class)->create([
@@ -102,7 +109,7 @@ class UpdateDirectiveTest extends DBTestCase
             'user_id' => 1,
         ]);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -123,7 +130,8 @@ class UpdateDirectiveTest extends DBTestCase
             user_id: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateTask(input: {
                 id: 1
@@ -137,12 +145,17 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.updateTask.name'));
-        $this->assertSame('2', Arr::get($result, 'data.updateTask.user.id'));
+        ')->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ]);
 
         $task = Task::first();
         $this->assertSame('2', $task->user_id);
@@ -152,11 +165,11 @@ class UpdateDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanUpdateWithCustomPrimaryKey()
+    public function itCanUpdateWithCustomPrimaryKey(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Category {
             category_id: ID!
             name: String!
@@ -169,7 +182,8 @@ class UpdateDirectiveTest extends DBTestCase
             ): Category @update
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCategory(
                 category_id: 1
@@ -179,22 +193,25 @@ class UpdateDirectiveTest extends DBTestCase
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateCategory.category_id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCategory.name'));
+        ')->assertJson([
+            'data' => [
+                'updateCategory' => [
+                    'category_id' => '1',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
         $this->assertSame('bar', Category::first()->name);
     }
 
     /**
      * @test
      */
-    public function itDoesNotUpdateWithFailingRelationship()
+    public function itDoesNotUpdateWithFailingRelationship(): void
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -225,7 +242,8 @@ class UpdateDirectiveTest extends DBTestCase
             user: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateUser(input: {
                 id: 1
@@ -244,10 +262,7 @@ class UpdateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
+        ')->assertJsonCount(1, 'errors');
         $this->assertSame('Original', User::first()->name);
-        $this->assertTrue(Arr::has($result, 'errors'));
     }
 }

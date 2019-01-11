@@ -16,93 +16,96 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class MutationExecutor
 {
     /**
-     * @param Model         $model          an empty instance of the model that should be created
-     * @param Collection    $args           the corresponding slice of the input arguments for creating this model
-     * @param Relation|null $parentRelation if we are in a nested create, we can use this to associate the new model to its parent
-     *
-     * @return Model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     *         An empty instance of the model that should be created
+     * @param  \Illuminate\Support\Collection  $args
+     *         The corresponding slice of the input arguments for creating this model
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     *         If we are in a nested create, we can use this to associate the new model to its parent
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public static function executeCreate(Model $model, Collection $args, Relation $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
+
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
-        list($morphMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
+        [$morphMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
 
-        list($hasOne, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
+        [$hasOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
 
-        list($belongsToMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
+        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
 
-        list($morphOne, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
+        [$morphOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
 
-        list($morphToMany, $remaining) = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
+        [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
-        $hasMany->each(function ($nestedOperations, string $relationName) use ($model): void {
-            /** @var HasMany $relation */
+        $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ('create' === $operationKey) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
             });
         });
 
-        $hasOne->each(function ($nestedOperations, string $relationName) use ($model) {
-            /** @var HasOne $relation */
+        $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ('create' === $operationKey) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
                     self::handleSingleRelationCreate(collect($values), $relation);
                 }
             });
         });
 
-        $morphMany->each(function ($nestedOperations, string $relationName) use ($model) {
-            /** @var MorphMany $relation */
+        $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ('create' === $operationKey) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
             });
         });
 
-        $morphOne->each(function ($nestedOperations, string $relationName) use ($model) {
-            /** @var MorphOne $relation */
+        $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ('create' === $operationKey) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
                     self::handleSingleRelationCreate(collect($values), $relation);
                 }
             });
         });
 
-        $belongsToMany->each(function ($nestedOperations, string $relationName) use ($model) {
-            /** @var BelongsToMany $relation */
+        $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
-                if ('create' === $operationKey) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
 
-                if ('connect' === $operationKey) {
+                if ($operationKey === 'connect') {
                     $relation->attach($values);
                 }
             });
         });
 
-        $morphToMany->each(function ($nestedOperations, string $relationName) use ($model): void {
-            /** @var HasMany $relation */
+        $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
@@ -113,35 +116,34 @@ class MutationExecutor
     }
 
     /**
-     * @param Model      $model
-     * @param Collection $remaining
-     * @param Relation   $parentRelation
-     *
-     * @return Model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $args
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    protected static function saveModelWithBelongsTo(Model $model, Collection $remaining, Relation $parentRelation = null): Model
+    protected static function saveModelWithBelongsTo(Model $model, Collection $args, Relation $parentRelation = null): Model
     {
         $reflection = new \ReflectionClass($model);
-        [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsTo::class);
+        [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $args, BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
         $model->fill(
             $remaining->all()
         );
 
-        $belongsTo->each(function ($nestedOperations, string $relationName) use ($model): void {
-            /** @var BelongsTo $belongsTo */
+        $belongsTo->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation, $model, $relationName) {
-                if ('create' === $operationKey) {
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation, $model, $relationName): void {
+                if ($operationKey === 'create') {
                     $belongsToModel = self::executeCreate($relation->getModel()->newInstance(), collect($values));
                     $relation->associate($belongsToModel);
                 }
 
-                if ('connect' === $operationKey) {
+                if ($operationKey === 'connect') {
                     // Inverse can be hasOne or hasMany
-                    /** @var BelongsTo $belongsTo */
+                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
                     $belongsTo = $model->{$relationName}();
                     $belongsTo->associate($values);
                 }
@@ -159,10 +161,11 @@ class MutationExecutor
     }
 
     /**
-     * @param Collection $multiValues
-     * @param Relation   $relation
+     * @param  \Illuminate\Support\Collection  $multiValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
      */
-    protected static function handleMultiRelationCreate(Collection $multiValues, Relation $relation)
+    protected static function handleMultiRelationCreate(Collection $multiValues, Relation $relation): void
     {
         $multiValues->each(function ($singleValues) use ($relation): void {
             self::executeCreate(
@@ -174,20 +177,27 @@ class MutationExecutor
     }
 
     /**
-     * @param Collection $singleValues
-     * @param Relation   $relation
+     * @param  \Illuminate\Support\Collection  $singleValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
      */
-    protected static function handleSingleRelationCreate(Collection $singleValues, Relation $relation)
+    protected static function handleSingleRelationCreate(Collection $singleValues, Relation $relation): void
     {
-        self::executeCreate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+        self::executeCreate(
+            $relation->getModel()->newInstance(),
+            collect($singleValues),
+            $relation
+        );
     }
 
     /**
-     * @param Model        $model          an empty instance of the model that should be updated
-     * @param Collection   $args           the corresponding slice of the input arguments for updating this model
-     * @param HasMany|null $parentRelation if we are in a nested update, we can use this to associate the new model to its parent
-     *
-     * @return Model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     *         An empty instance of the model that should be updated
+     * @param  \Illuminate\Support\Collection  $args
+     *         The corresponding slice of the input arguments for updating this model
+     * @param  \Illuminate\Database\Eloquent\Relations\HasMany|null  $parentRelation
+     *         If we are in a nested update, we can use this to associate the new model to its parent
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
     {
@@ -199,12 +209,13 @@ class MutationExecutor
         $model = $model->newQuery()->findOrFail($id);
 
         $reflection = new \ReflectionClass($model);
+
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
-        $hasMany->each(function ($nestedOperations, string $relationName) use ($model): void {
-            /** @var HasMany $relation */
+        $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -213,7 +224,7 @@ class MutationExecutor
                 }
 
                 if ($operationKey === 'update') {
-                    collect($values)->each(function ($singleValues) use ($relation) {
+                    collect($values)->each(function ($singleValues) use ($relation): void {
                         self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
                     });
                 }
@@ -250,11 +261,10 @@ class MutationExecutor
      *   ]
      * ]
      *
-     * @param \ReflectionClass $modelReflection
-     * @param Collection       $args
-     * @param string           $relationClass
-     *
-     * @return Collection [relationshipArgs, remainingArgs]
+     * @param  \ReflectionClass  $modelReflection
+     * @param  \Illuminate\Support\Collection  $args
+     * @param  string  $relationClass
+     * @return \Illuminate\Support\Collection  [relationshipArgs, remainingArgs]
      */
     protected static function partitionArgsByRelationType(\ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
     {

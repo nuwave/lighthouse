@@ -17,16 +17,15 @@ class TypeRegistry
      *
      * [$typeName => Type]
      *
-     * @var Type[]
+     * @var \GraphQL\Type\Definition\Type[]
      */
     protected $types;
 
     /**
      * Register type with registry.
      *
-     * @param Type $type
-     *
-     * @return TypeRegistry
+     * @param  \GraphQL\Type\Definition\Type  $type
+     * @return $this
      */
     public function register(Type $type): self
     {
@@ -38,11 +37,10 @@ class TypeRegistry
     /**
      * Resolve type instance by name.
      *
-     * @param string $typeName
+     * @param  string  $typeName
+     * @return \GraphQL\Type\Definition\Type
      *
-     * @throws InvariantViolation
-     *
-     * @return Type
+     * @throws \GraphQL\Error\InvariantViolation
      */
     public function get(string $typeName): Type
     {

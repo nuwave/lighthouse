@@ -9,9 +9,11 @@ class ExceptionHandler implements SubscriptionExceptionHandler
     /**
      * Handle authentication error.
      *
-     * @param \Throwable $e
+     * @param  \Throwable  $e
+     *
+     * @return void
      */
-    public function handleAuthError(\Throwable $e)
+    public function handleAuthError(\Throwable $e): void
     {
         // Do nothing....
     }
@@ -19,9 +21,11 @@ class ExceptionHandler implements SubscriptionExceptionHandler
     /**
      * Handle broadcast error.
      *
-     * @param \Throwable $e
+     * @param  \Throwable  $e
+     *
+     * @return void
      */
-    public function handleBroadcastError(\Throwable $e)
+    public function handleBroadcastError(\Throwable $e): void
     {
         info('graphql.broadcast.exception', [
             'message' => $e->getMessage(),

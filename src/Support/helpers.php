@@ -1,5 +1,6 @@
 <?php
 
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 if (! function_exists('graphql')) {
@@ -8,7 +9,7 @@ if (! function_exists('graphql')) {
      *
      * @return \Nuwave\Lighthouse\GraphQL
      */
-    function graphql()
+    function graphql(): GraphQL
     {
         return app('graphql');
     }
@@ -30,13 +31,17 @@ if (! function_exists('config_path')) {
     /**
      * Get base configuration path.
      *
-     * @param string $path
-     *
+     * @param  string|null  $path
      * @return string
      */
-    function config_path($path = '')
+    function config_path(string $path = ''): string
     {
-        return app()->basePath().'/config'.($path ? '/'.$path : $path);
+        return app()->basePath()
+            .'/config'
+            .($path
+                ? '/'.$path
+                : $path
+            );
     }
 }
 
@@ -44,13 +49,17 @@ if (! function_exists('app_path')) {
     /**
      * Get base app path.
      *
-     * @param string $path
-     *
+     * @param  string|null  $path
      * @return string
      */
-    function app_path($path = '')
+    function app_path(string $path = ''): string
     {
-        return app()->basePath().'/app'.($path ? '/'.$path : $path);
+        return app()->basePath()
+            .'/app'
+            .($path
+                ? '/'.$path
+                : $path
+            );
     }
 }
 
@@ -58,12 +67,11 @@ if (! function_exists('construct_resolver')) {
     /**
      * Construct a closure that passes through the arguments.
      *
-     * @param string $className This class is resolved through the container.
-     * @param string $methodName The method that gets passed the arguments of the closure.
-     *
-     * @throws DefinitionException
-     *
+     * @param  string  $className This class is resolved through the container.
+     * @param  string  $methodName The method that gets passed the arguments of the closure.
      * @return \Closure
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     function construct_resolver(string $className, string $methodName): \Closure
     {

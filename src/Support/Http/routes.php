@@ -1,6 +1,6 @@
 <?php
 
-app('router')->group(config('lighthouse.route', []), function () {
+app('router')->group(config('lighthouse.route', []), function (): void {
     $routeName = config('lighthouse.route_name', 'graphql');
     $controller = config('lighthouse.controller');
 

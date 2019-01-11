@@ -10,26 +10,27 @@ class NodeValue
     /**
      * Current GraphQL type.
      *
-     * @var Type
+     * @var \GraphQL\Type\Definition\Type
      */
     protected $type;
 
     /**
      * Current definition node.
      *
-     * @var TypeDefinitionNode
+     * @var \GraphQL\Language\AST\TypeDefinitionNode
      */
     protected $typeDefinition;
 
     /**
      * Cache key for this type.
      *
-     * @var string
+     * @var string|null
      */
     protected $cacheKey;
 
     /**
-     * @param TypeDefinitionNode $typeDefinition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return void
      */
     public function __construct(TypeDefinitionNode $typeDefinition)
     {
@@ -39,9 +40,9 @@ class NodeValue
     /**
      * Get resolved type.
      *
-     * @return Type|null
+     * @return \GraphQL\Type\Definition\Type|null
      */
-    public function getType()
+    public function getType(): ?Type
     {
         return $this->type;
     }
@@ -49,9 +50,8 @@ class NodeValue
     /**
      * Set the executable type.
      *
-     * @param Type $type
-     *
-     * @return self
+     * @param  \GraphQL\Type\Definition\Type  $type
+     * @return $this
      */
     public function setType(Type $type): self
     {
@@ -73,7 +73,7 @@ class NodeValue
     /**
      * Get the underlying type definition.
      *
-     * @return TypeDefinitionNode
+     * @return \GraphQL\Language\AST\TypeDefinitionNode
      */
     public function getTypeDefinition(): TypeDefinitionNode
     {
@@ -95,7 +95,7 @@ class NodeValue
      *
      * @return string|null
      */
-    public function getCacheKey()
+    public function getCacheKey(): ?string
     {
         return $this->cacheKey;
     }
@@ -103,9 +103,8 @@ class NodeValue
     /**
      * Set node cache key.
      *
-     * @param string $key
-     *
-     * @return NodeValue
+     * @param  string|null  $key
+     * @return $this
      */
     public function setCacheKey(string $key = null): self
     {

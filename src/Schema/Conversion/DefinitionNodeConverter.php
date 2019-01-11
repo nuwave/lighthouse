@@ -9,11 +9,14 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class DefinitionNodeConverter
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -23,9 +26,8 @@ class DefinitionNodeConverter
     /**
      * Convert a definition node to an executable Type.
      *
-     * @param mixed $node
-     *
-     * @return Type
+     * @param  mixed  $node
+     * @return \GraphQL\Type\Definition\Type
      */
     public function toType($node): Type
     {
@@ -35,10 +37,9 @@ class DefinitionNodeConverter
     /**
      * Unwrap the node if needed and convert to type.
      *
-     * @param mixed $node
-     * @param array $wrappers
-     *
-     * @return Type
+     * @param  mixed  $node
+     * @param  string[] $wrappers
+     * @return \GraphQL\Type\Definition\Type
      */
     protected function convertWrappedDefinitionNode($node, array $wrappers = []): Type
     {
@@ -56,7 +57,7 @@ class DefinitionNodeConverter
         return collect($wrappers)
             ->reverse()
             ->reduce(
-                function (Type $type, string $kind) {
+                function (Type $type, string $kind): Type {
                     if ($kind === NodeKind::NON_NULL_TYPE) {
                         return Type::nonNull($type);
                     }
@@ -74,9 +75,8 @@ class DefinitionNodeConverter
     /**
      * Converted named node to type.
      *
-     * @param NamedTypeNode $node
-     *
-     * @return Type
+     * @param  \GraphQL\Language\AST\NamedTypeNode  $node
+     * @return \GraphQL\Type\Definition\Type
      */
     protected function convertNamedTypeNode(NamedTypeNode $node): Type
     {

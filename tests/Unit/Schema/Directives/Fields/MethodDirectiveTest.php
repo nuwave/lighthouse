@@ -7,56 +7,59 @@ use Illuminate\Support\Arr;
 
 class MethodDirectiveTest extends TestCase
 {
+    protected $schema = '
+    type Query {
+        foo: Foo @field(resolver: "Tests\\\Unit\\\Schema\\\Directives\\\Fields\\\MethodDirectiveTest@resolve")
+    }
+    
+    type Foo {
+        bar(baz: String): String! @method(name: "foobar")
+    }
+    ';
+
     /**
      * @test
      */
-    public function itWillCallAMethodToResolveField()
+    public function itWillCallAMethodToResolveField(): void
     {
-        $result = $this->execute($this->schema(), '
+        $this->query('
         {
             foo {
                 bar
             }
         }
-        ');
-
-        $this->assertSame('foo', Arr::get($result, 'data.foo.bar'));
+        ')->assertJson([
+            'data' => [
+                'foo' => [
+                    'bar' => 'foo',
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itWillCallAMethodWithArgsToResolveField()
+    public function itWillCallAMethodWithArgsToResolveField(): void
     {
-        $result = $this->execute($this->schema(), '
+        $this->query('
         {
             foo {
                 bar(baz: "asdf")
             }
         }
-        ');
-
-        $this->assertSame('fooasdf', Arr::get($result, 'data.foo.bar'));
+        ')->assertJson([
+            'data' => [
+                'foo' => [
+                    'bar' => 'fooasdf',
+                ],
+            ],
+        ]);
     }
 
-    public function resolve()
+    public function resolve(): Foo
     {
         return new Foo();
-    }
-
-    protected function schema()
-    {
-        $resolver = addslashes(self::class).'@resolve';
-
-        return "
-        type Query {
-            foo: Foo @field(resolver: \"{$resolver}\")
-        }
-        
-        type Foo {
-            bar(baz: String): String! @method(name: \"foobar\")
-        }
-        ";
     }
 }
 

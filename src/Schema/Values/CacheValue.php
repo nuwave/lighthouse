@@ -4,12 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use GraphQL\Type\Definition\ResolveInfo;
 
 class CacheValue
 {
     /**
-     * @var FieldValue
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected $fieldValue;
 
@@ -29,7 +28,7 @@ class CacheValue
     protected $context;
 
     /**
-     * @var ResolveInfo
+     * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
@@ -46,7 +45,8 @@ class CacheValue
     /**
      * Create instance of cache value.
      *
-     * @param array $arguments
+     * @param  array  $arguments
+     * @return void
      */
     public function __construct(array $arguments = [])
     {
@@ -63,9 +63,9 @@ class CacheValue
     /**
      * Resolve key from root value.
      *
-     * @return mixed
+     * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         $argKeys = $this->argKeys();
 
@@ -109,7 +109,7 @@ class CacheValue
     /**
      * Convert input arguments to keys.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function argKeys(): Collection
     {
@@ -147,7 +147,7 @@ class CacheValue
     /**
      * Implode value to create string.
      *
-     * @param array $items
+     * @param  array  $items
      *
      * @return string
      */

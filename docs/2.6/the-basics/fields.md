@@ -260,7 +260,7 @@ Sometimes, the built-in directives just don't cut it - you need more control!
 Lighthouse allows you to implement your own resolver function for fields.
 
 By default, Lighthouse looks for a class with the capitalized name of the field in `App\Http\GraphQL\Queries`
-or `App\Http\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers#resolver-function-signature).
+or `App\Http\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
 If you stick to that convention, you will not need to specify a directive at all.
 
 For example, the following field:

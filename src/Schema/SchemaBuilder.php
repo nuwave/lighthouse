@@ -7,9 +7,7 @@ use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Collection;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -18,17 +16,26 @@ use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class SchemaBuilder
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
-    /** @var NodeFactory */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $nodeFactory;
-    /** @var DefinitionNodeConverter */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $definitionNodeConverter;
 
     /**
-     * @param TypeRegistry            $typeRegistry
-     * @param NodeFactory             $nodeFactory
-     * @param DefinitionNodeConverter $definitionNodeConverter
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\Factories\NodeFactory  $nodeFactory
+     * @param  \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter  $definitionNodeConverter
+     * @return void
      */
     public function __construct(
         TypeRegistry $typeRegistry,
@@ -43,28 +50,27 @@ class SchemaBuilder
     /**
      * Build an executable schema from AST.
      *
-     * @param DocumentAST $documentAST
-     *
-     * @return Schema
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \GraphQL\Type\Schema
      */
     public function build($documentAST)
     {
-        /** @var TypeDefinitionNode $typeDefinition */
+        /** @var \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition */
         foreach ($documentAST->typeDefinitions() as $typeDefinition) {
             $type = $this->nodeFactory->handle($typeDefinition);
             $this->typeRegistry->register($type);
 
             switch ($type->name) {
                 case 'Query':
-                    /** @var ObjectType $queryType */
+                    /** @var \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter $queryType */
                     $queryType = $type;
                     continue 2;
                 case 'Mutation':
-                    /** @var ObjectType $mutationType */
+                    /** @var \GraphQL\Type\Definition\ObjectType $mutationType */
                     $mutationType = $type;
                     continue 2;
                 case 'Subscription':
-                    /** @var ObjectType $subscriptionType */
+                    /** @var \GraphQL\Type\Definition\ObjectType $subscriptionType */
                     $subscriptionType = $type;
                     continue 2;
                 default:
@@ -107,9 +113,8 @@ class SchemaBuilder
     /**
      * Set custom client directives.
      *
-     * @param DocumentAST $document
-     *
-     * @return Collection|Directive[]
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Illuminate\Support\Collection<\GraphQL\Type\Definition\Directive>
      */
     protected function convertDirectives(DocumentAST $document): Collection
     {

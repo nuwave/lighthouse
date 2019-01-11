@@ -10,8 +10,7 @@ class ArgumentFactory
     /**
      * Convert argument definition to type.
      *
-     * @param ArgumentValue $argumentValue
-     *
+     * @param  \Nuwave\Lighthouse\Schema\Values\ArgumentValue  $argumentValue
      * @return array
      */
     public function handle(ArgumentValue $argumentValue): array

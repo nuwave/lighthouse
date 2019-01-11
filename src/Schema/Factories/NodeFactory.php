@@ -34,20 +34,32 @@ use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
 
 class NodeFactory
 {
-    /** @var DirectiveFactory */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     */
     protected $directiveFactory;
-    /** @var TypeRegistry */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
-    /** @var Pipeline */
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Pipeline
+     */
     protected $pipeline;
-    /** @var ArgumentFactory */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory
+     */
     protected $argumentFactory;
 
     /**
-     * @param DirectiveFactory $directiveFactory
-     * @param TypeRegistry     $typeRegistry
-     * @param Pipeline         $pipeline
-     * @param ArgumentFactory  $argumentFactory
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
+     * @return void
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
@@ -64,9 +76,8 @@ class NodeFactory
     /**
      * Transform node to type.
      *
-     * @param TypeDefinitionNode $definition
-     *
-     * @return Type
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
+     * @return \GraphQL\Type\Definition\Type
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
@@ -92,8 +103,7 @@ class NodeFactory
     /**
      * Check if node has a type resolver directive.
      *
-     * @param TypeDefinitionNode $definition
-     *
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
      * @return bool
      */
     protected function hasTypeResolver(TypeDefinitionNode $definition): bool
@@ -104,9 +114,8 @@ class NodeFactory
     /**
      * Use directive resolver to transform type.
      *
-     * @param TypeDefinitionNode $definition
-     *
-     * @return Type
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
+     * @return \GraphQL\Type\Definition\Type
      */
     protected function resolveTypeViaDirective(TypeDefinitionNode $definition): Type
     {
@@ -120,9 +129,10 @@ class NodeFactory
     /**
      * Transform value to type.
      *
-     * @param TypeDefinitionNode $typeDefinition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return \GraphQL\Type\Definition\Type
      *
-     * @return Type
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function resolveTypeDefault(TypeDefinitionNode $typeDefinition): Type
     {
@@ -148,9 +158,8 @@ class NodeFactory
     }
 
     /**
-     * @param EnumTypeDefinitionNode $enumDefinition
-     *
-     * @return EnumType
+     * @param  \GraphQL\Language\AST\EnumTypeDefinitionNode  $enumDefinition
+     * @return \GraphQL\Type\Definition\EnumType
      */
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
     {
@@ -177,11 +186,10 @@ class NodeFactory
     }
 
     /**
-     * @param ScalarTypeDefinitionNode $scalarDefinition
+     * @param  \GraphQL\Language\AST\ScalarTypeDefinitionNode  $scalarDefinition
+     * @return \GraphQL\Type\Definition\ScalarType
      *
-     * @throws DefinitionException
-     *
-     * @return ScalarType
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function resolveScalarType(ScalarTypeDefinitionNode $scalarDefinition): ScalarType
     {
@@ -214,9 +222,8 @@ class NodeFactory
     }
 
     /**
-     * @param ObjectTypeDefinitionNode $objectDefinition
-     *
-     * @return ObjectType
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectDefinition
+     * @return \GraphQL\Type\Definition\ObjectType
      */
     protected function resolveObjectType(ObjectTypeDefinitionNode $objectDefinition): ObjectType
     {
@@ -237,15 +244,14 @@ class NodeFactory
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode $definition
-     *
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode  $definition
      * @return \Closure
      */
     protected function resolveFieldsFunction($definition): \Closure
     {
-        return function () use ($definition) {
+        return function () use ($definition): array {
             return collect($definition->fields)
-                ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition) {
+                ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition): array {
                     $fieldValue = new FieldValue(
                         new NodeValue($definition),
                         $fieldDefinition
@@ -260,9 +266,8 @@ class NodeFactory
     }
 
     /**
-     * @param InputObjectTypeDefinitionNode $inputDefinition
-     *
-     * @return InputObjectType
+     * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $inputDefinition
+     * @return \GraphQL\Type\Definition\InputObjectType
      */
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
     {
@@ -276,8 +281,7 @@ class NodeFactory
     /**
      * Returns a closure that lazy loads the Input Fields for a constructed type.
      *
-     * @param InputObjectTypeDefinitionNode $definition
-     *
+     * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      * @return \Closure
      */
     protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): \Closure
@@ -296,9 +300,8 @@ class NodeFactory
     }
 
     /**
-     * @param InterfaceTypeDefinitionNode $interfaceDefinition
-     *
-     * @return InterfaceType
+     * @param  \GraphQL\Language\AST\InterfaceTypeDefinitionNode  $interfaceDefinition
+     * @return \GraphQL\Type\Definition\InterfaceType
      */
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
     {
@@ -349,9 +352,8 @@ class NodeFactory
     }
 
     /**
-     * @param UnionTypeDefinitionNode $unionDefinition
-     *
-     * @return UnionType
+     * @param  \GraphQL\Language\AST\UnionTypeDefinitionNode  $unionDefinition
+     * @return \GraphQL\Type\Definition\UnionType
      */
     protected function resolveUnionType(UnionTypeDefinitionNode $unionDefinition): UnionType
     {

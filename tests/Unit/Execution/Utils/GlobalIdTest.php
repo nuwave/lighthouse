@@ -10,7 +10,7 @@ class GlobalIdTest extends TestCase
     /**
      * @test
      */
-    public function itCanHandleGlobalIds()
+    public function itCanHandleGlobalIds(): void
     {
         $globalId = GlobalId::encode('User', 'asdf');
         $idParts = GlobalId::decode($globalId);
@@ -21,7 +21,7 @@ class GlobalIdTest extends TestCase
     /**
      * @test
      */
-    public function itCanDecodeJustTheId()
+    public function itCanDecodeJustTheId(): void
     {
         $globalId = GlobalId::encode('User', 123);
 
@@ -31,7 +31,7 @@ class GlobalIdTest extends TestCase
     /**
      * @test
      */
-    public function itCanDecodeJustTheType()
+    public function itCanDecodeJustTheType(): void
     {
         $globalId = GlobalId::encode('User', 123);
 

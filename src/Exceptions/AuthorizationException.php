@@ -8,6 +8,11 @@ use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthorizationExce
 class AuthorizationException extends IlluminateAuthorizationException implements ClientAware
 {
     /**
+     * @var string
+     */
+    const CATEGORY = 'authorization';
+
+    /**
      * Returns true when exception message is safe to be displayed to a client.
      *
      * @api
@@ -28,6 +33,6 @@ class AuthorizationException extends IlluminateAuthorizationException implements
      */
     public function getCategory(): string
     {
-        return 'authorization';
+        return self::CATEGORY;
     }
 }

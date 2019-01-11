@@ -10,17 +10,21 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class SchemaStitcherTest extends TestCase
 {
+    /**
+     * @var string
+     */
     const SCHEMA_PATH = __DIR__.'/schema/';
+
+    /**
+     * @var string
+     */
     const ROOT_SCHEMA_FILENAME = 'root-schema';
 
     /**
-     * @var Filesystem
+     * @var \League\Flysystem\Filesystem
      */
     protected $filesystem;
 
-    /**
-     * Set up test case.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -42,13 +46,13 @@ class SchemaStitcherTest extends TestCase
         $currentDir->deleteDir('schema');
     }
 
-    protected function assertSchemaResultIsSame(string $expected)
+    protected function assertSchemaResultIsSame(string $expected): void
     {
         $schema = (new SchemaStitcher(self::SCHEMA_PATH.self::ROOT_SCHEMA_FILENAME))->getSchemaString();
         $this->assertSame($expected, $schema);
     }
 
-    protected function putRootSchema(string $schema)
+    protected function putRootSchema(string $schema): void
     {
         $this->filesystem->put(self::ROOT_SCHEMA_FILENAME, $schema);
     }
@@ -56,45 +60,49 @@ class SchemaStitcherTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfRootSchemaIsNotFound()
+    public function itThrowsIfRootSchemaIsNotFound(): void
     {
         $this->expectException(FileNotFoundException::class);
         $this->expectExceptionMessageRegExp('/'.self::ROOT_SCHEMA_FILENAME.'/');
+
         $this->assertSchemaResultIsSame('');
     }
 
     /**
      * @test
      */
-    public function itThrowsIfSchemaImportIsNotFound()
+    public function itThrowsIfSchemaImportIsNotFound(): void
     {
         $this->expectException(FileNotFoundException::class);
         $this->expectExceptionMessageRegExp('/does-not-exist.graphql/');
+
         $foo = <<<'EOT'
 #import does-not-exist.graphql
 
 EOT;
         $this->putRootSchema($foo);
+
         $this->assertSchemaResultIsSame($foo);
     }
 
     /**
      * @test
      */
-    public function itLeavesImportlessFileAsBefore()
+    public function itLeavesImportlessFileAsBefore(): void
     {
         $foo = <<<'EOT'
 foo
 
 EOT;
         $this->putRootSchema($foo);
+
         $this->assertSchemaResultIsSame($foo);
     }
 
     /**
      * @test
      */
-    public function itReplacesImportWithFileContent()
+    public function itReplacesImportWithFileContent(): void
     {
         $this->putRootSchema(<<<'EOT'
 foo
@@ -120,7 +128,7 @@ EOT
     /**
      * @test
      */
-    public function itImportsRecursively()
+    public function itImportsRecursively(): void
     {
         $this->putRootSchema(<<<'EOT'
 foo
@@ -153,7 +161,7 @@ EOT
     /**
      * @test
      */
-    public function itImportsFromSubdirectory()
+    public function itImportsFromSubdirectory(): void
     {
         $this->putRootSchema(<<<'EOT'
 foo
@@ -180,7 +188,7 @@ EOT
     /**
      * @test
      */
-    public function itKeepsIndententation()
+    public function itKeepsIndententation(): void
     {
         $this->putRootSchema(<<<'EOT'
     foo
@@ -206,7 +214,7 @@ EOT
     /**
      * @test
      */
-    public function itImportsViaGlob()
+    public function itImportsViaGlob(): void
     {
         $this->putRootSchema(<<<'EOT'
 foo
@@ -239,7 +247,7 @@ EOT
     /**
      * @test
      */
-    public function itAddsNewlineToTheEndOfImportedFile()
+    public function itAddsNewlineToTheEndOfImportedFile(): void
     {
         $this->putRootSchema(<<<'EOT'
 foo

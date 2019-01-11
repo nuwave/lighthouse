@@ -14,10 +14,14 @@ class CreateDirective extends BaseDirective implements FieldResolver
     /**
      * The policy mappings for the application.
      *
-     * @var DatabaseManager
+     * @var \Illuminate\Database\DatabaseManager
      */
     private $db;
 
+    /**
+     * @param  \Illuminate\Database\DatabaseManager  $database
+     * @return void
+     */
     public function __construct(DatabaseManager $database)
     {
         $this->db = $database;
@@ -36,16 +40,15 @@ class CreateDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function ($root, array $args) {
+            function ($root, array $args): Model {
                 $modelClassName = $this->getModelClass();
-                /** @var Model $model */
+                /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName();
 
                 $flatten = $this->directiveArgValue('flatten', false);
@@ -57,7 +60,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
                     return MutationExecutor::executeCreate($model, collect($args))->refresh();
                 }
 
-                return $this->db->connection()->transaction(function () use ($model, $args) {
+                return $this->db->connection()->transaction(function () use ($model, $args): Model {
                     return MutationExecutor::executeCreate($model, collect($args))->refresh();
                 });
             }

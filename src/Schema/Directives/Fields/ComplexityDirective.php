@@ -22,10 +22,9 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
-     * @param \Closure   $next
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $fieldValue, \Closure $next): FieldValue
     {

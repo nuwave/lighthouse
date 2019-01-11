@@ -109,7 +109,7 @@ type User {
 
 ## @bcrypt
 
-***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.md#argtransformerdirective).
 
 Run the `bcrypt` function on the argument it is defined on.
 
@@ -340,9 +340,9 @@ Specify a custom resolver function for a single field.
 
 In most cases, you do not even need this directive. Make sure you read about
 the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data),
-as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolver).
+as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolvers).
 
-Pass a class and a method to the `resolver` argument and seperate them with an `@` symbol.
+Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
 
 ```graphql
 type Mutation {
@@ -604,14 +604,18 @@ namespace App\GraphQL\Interfaces;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Commentable
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -621,13 +625,12 @@ class Commentable
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param $context
-     * @param ResolveInfo $info
-     *
-     * @return Type
+     * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveType($rootValue, $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
@@ -966,7 +969,7 @@ type Query {
 
 Declare a class to handle the broadcasting of a subscription to clients.
 
-If you follow the default naming conventions for [defining subscription fields]([class](../extensions/subscriptions.md#defining-fields) )
+If you follow the default naming conventions for [defining subscription fields](../extensions/subscriptions.md#defining-fields)
 you do not need this directive. It is only useful if you need to override the default namespace.
 
 ```graphql
@@ -980,7 +983,7 @@ type Subscription {
 
 ## @trim
 
-***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.html#argtransformerdirective).
+***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.md#argtransformerdirective).
 
 Run the `trim` function on the argument it is defined on.
 
@@ -1023,14 +1026,18 @@ namespace App\GraphQL\Unions;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Person
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -1040,13 +1047,12 @@ class Person
     /**
      * Decide which GraphQL type a resolved value has.
      *
-     * @param $rootValue The value that was resolved by the field. Usually an Eloquent model.
-     * @param $context
-     * @param ResolveInfo $info
-     *
-     * @return Type
+     * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveType($rootValue, $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class

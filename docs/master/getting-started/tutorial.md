@@ -249,7 +249,6 @@ Finally, add the `posts` relation to `app/Users.php`
 namespace App;
 
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
@@ -324,7 +323,7 @@ type Comment{
 ```
 
 Just like in Eloquent, we express the relationship between our types using the
-[`@belongsTo`](../api-reference/directives.md#belongsTo) and [`@hasMany`](../api-reference/directives.md#hasMany) directives.
+[`@belongsTo`](../api-reference/directives.md#belongsto) and [`@hasMany`](../api-reference/directives.md#hasmany) directives.
 
 ## The Final Test
 
