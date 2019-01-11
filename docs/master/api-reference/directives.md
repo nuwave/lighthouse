@@ -990,39 +990,6 @@ type Mutation {
 }
 ```
 
-## @update
-
-Update an Eloquent model.
-
-```graphql
-type Mutation {
-    updatePost(id: ID!, content: String): Post @update
-}
-```
-
-Lighthouse uses the argument `id` to fetch the model by its primary key.
-This will work even if your model has a differently named primary key,
-so you can keep your schema simple and independent of your database structure.
-
-If you want your schema to directly reflect your database schema,
-you can also use the name of the underlying primary key.
-This is not recommended as it makes client-side caching more difficult
-and couples your schema to the underlying implementation.
-
-```graphql
-type Mutation {
-    updatePost(post_id: ID!, content: String): Post @update
-}
-```
-
-If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
-
-```graphql
-type Mutation {
-    updateAuthor(id: ID!, name: String): Author @update(model: "App\\User")
-}
-```
-
 ## @union
 
 Make sure you read the [basics about Unions](../the-basics/types.md#union) before deciding
