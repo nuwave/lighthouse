@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
-use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler as ExceptionHandler;
 
 class Subscription
 {
@@ -22,14 +23,14 @@ class Subscription
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
-        app('graphql')->prepSchema();
+        app(GraphQL::class)->prepSchema();
 
         /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
         /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
         $broadcaster = app(BroadcastsSubscriptions::class);
         /** @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler $exceptionHandler */
-        $exceptionHandler = app(ExceptionHandler::class);
+        $exceptionHandler = app(SubscriptionExceptionHandler::class);
 
         if (! $registry->has($subscriptionField)) {
             throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");

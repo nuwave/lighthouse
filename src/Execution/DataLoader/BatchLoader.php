@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use GraphQL\GraphQL;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
@@ -49,7 +50,7 @@ abstract class BatchLoader
 
         // If we are resolving a batched query, we need to assign each
         // query a uniquely indexed instance
-        $currentBatchIndex = app('graphql')->currentBatchIndex();
+        $currentBatchIndex = app(GraphQL::class)->currentBatchIndex();
 
         if ($currentBatchIndex !== null) {
             $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";

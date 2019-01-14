@@ -11,7 +11,7 @@ if (! function_exists('graphql')) {
      */
     function graphql(): GraphQL
     {
-        return app('graphql');
+        return app(GraphQL::class);
     }
 }
 
