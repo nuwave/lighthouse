@@ -37,16 +37,15 @@ class Subscription
         $shouldQueue = $shouldQueue === null
             ? config('lighthouse.subscriptions.queue_broadcasts', false)
             : $shouldQueue;
+
         $method = $shouldQueue
             ? 'queueBroadcast'
             : 'broadcast';
 
-        $subscription = $registry->subscription($subscriptionField);
-
         try {
             call_user_func(
                 [$broadcaster, $method],
-                $subscription,
+                $registry->subscription($subscriptionField),
                 $subscriptionField,
                 $root
             );
