@@ -7,7 +7,5 @@ use Tests\Utils\Models\Category;
 $factory->define(Category::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
-        'created_at' => now(),
-        'updated_at' => now(),
     ];
 });
