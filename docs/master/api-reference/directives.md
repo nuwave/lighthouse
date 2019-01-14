@@ -134,12 +134,12 @@ type Mutation {
 ```
 
 You may override the default queueing behaviour from the configuration by
-passing the `queue` argument. 
+passing the `shouldQueue` argument. 
 
 ```graphql
 type Mutation {
     updatePost(input: UpdatePostInput!): Post
-        @broadcast(subscription: "postUpdated", queue: false)
+        @broadcast(subscription: "postUpdated", shouldQueue: false)
 }
 ```
 
