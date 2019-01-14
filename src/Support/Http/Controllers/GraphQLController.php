@@ -129,7 +129,9 @@ class GraphQLController extends Controller
     {
         return is_string($variables)
             ? json_decode($variables, true)
-            : $variables === null ? [] : $variables;
+            : $variables === null
+                ? []
+                : $variables;
     }
 
     /**

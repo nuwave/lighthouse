@@ -70,12 +70,18 @@ class CacheValue
         $argKeys = $this->argKeys();
 
         return $this->implode([
-            $this->privateCache ? 'auth' : null,
-            $this->privateCache ? auth()->user()->getKey() : null,
+            $this->privateCache
+                ? 'auth'
+                : null,
+            $this->privateCache
+                ? auth()->user()->getKey()
+                : null,
             strtolower($this->resolveInfo->parentType->name),
             $this->fieldKey,
             strtolower($this->resolveInfo->fieldName),
-            $argKeys->isNotEmpty() ? $argKeys->implode(':') : null,
+            $argKeys->isNotEmpty()
+                ? $argKeys->implode(':')
+                : null,
         ]);
     }
 
