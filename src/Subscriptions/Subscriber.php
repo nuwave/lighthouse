@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -81,13 +83,13 @@ class Subscriber
     {
         $data = json_decode($subscription, true);
         $instance = new static();
-        $instance->channel = array_get($data, 'channel');
+        $instance->channel = Arr::get($data, 'channel');
         $instance->context = $instance->serializer()->unserialize(
-            array_get($data, 'context')
+            Arr::get($data, 'context')
         );
-        $instance->args = array_get($data, 'args', []);
-        $instance->operationName = array_get($data, 'operation_name');
-        $instance->queryString = array_get($data, 'query_string');
+        $instance->args = Arr::get($data, 'args', []);
+        $instance->operationName = Arr::get($data, 'operation_name');
+        $instance->queryString = Arr::get($data, 'query_string');
 
         return $instance;
     }
@@ -128,7 +130,7 @@ class Subscriber
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-'.(string) str_random(32).'-'.time();
+        return 'private-'.Str::random(32).'-'.time();
     }
 
     /**
