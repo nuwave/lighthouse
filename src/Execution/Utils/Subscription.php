@@ -14,12 +14,12 @@ class Subscription
      *
      * @param  string  $subscriptionField
      * @param  mixed  $root
-     * @param  bool|null  $queue
+     * @param  bool|null  $shouldQueue
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public static function broadcast(string $subscriptionField, $root, ?bool $queue = null): void
+    public static function broadcast(string $subscriptionField, $root, ?bool $shouldQueue = null): void
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
@@ -27,27 +27,33 @@ class Subscription
 
         /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
-        /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
-        $broadcaster = app(BroadcastsSubscriptions::class);
-        /** @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler $exceptionHandler */
-        $exceptionHandler = app(SubscriptionExceptionHandler::class);
 
         if (! $registry->has($subscriptionField)) {
             throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
 
-        $queue = $queue === null ? config('lighthouse.subscriptions.queue_broadcasts', false) : $queue;
-        $method = $queue ? 'queueBroadcast' : 'broadcast';
-        $subscription = $registry->subscription($subscriptionField);
+        /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
+        $broadcaster = app(BroadcastsSubscriptions::class);
+
+        $shouldQueue = $shouldQueue === null
+            ? config('lighthouse.subscriptions.queue_broadcasts', false)
+            : $shouldQueue;
+
+        $method = $shouldQueue
+            ? 'queueBroadcast'
+            : 'broadcast';
 
         try {
             call_user_func(
                 [$broadcaster, $method],
-                $subscription,
+                $registry->subscription($subscriptionField),
                 $subscriptionField,
                 $root
             );
         } catch (\Throwable $e) {
+            /** @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler $exceptionHandler */
+            $exceptionHandler = app(SubscriptionExceptionHandler::class);
+
             $exceptionHandler->handleBroadcastError($e);
         }
     }

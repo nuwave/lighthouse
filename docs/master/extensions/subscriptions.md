@@ -172,7 +172,7 @@ It accepts three parameters:
 
 - `string $subscriptionField` The name of the subscription field you want to trigger
 - `mixed $root` The result object you want to pass through
-- `bool $queue = null` Optional, overrides the default configuration `lighthouse.subscriptions.queue_broadcasts`
+- `bool $shouldQueue = null` Optional, overrides the default configuration `lighthouse.subscriptions.queue_broadcasts`
 
 The following example shows how to trigger a subscription after an update
 to the `Post` model.
