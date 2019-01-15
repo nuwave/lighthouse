@@ -129,7 +129,7 @@ The PHP internal value of the field `ADMIN` will be `string('ADMIN')`.
 
 ## Input
 
-Input types can be used to describe complex objects for for field arguments.
+Input types can be used to describe complex objects for field arguments.
 Beware that while they look similar to Object Types, they behave differently:
 The fields of an Input Type are treated similar to arguments.
 
