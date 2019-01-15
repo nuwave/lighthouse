@@ -109,7 +109,7 @@ class PaginationManipulator
             : 'first: Int!';
 
         $inputValueDefinitions = [
-            $countArgumentDescription . $countArgument,
+            $countArgumentDescription.$countArgument,
             'after: String',
         ];
 
@@ -154,7 +154,7 @@ class PaginationManipulator
             : 'count: Int!';
 
         $inputValueDefinitions = [
-            $countArgumentDescription . $countArgument,
+            $countArgumentDescription.$countArgument,
             'page: Int',
         ];
 

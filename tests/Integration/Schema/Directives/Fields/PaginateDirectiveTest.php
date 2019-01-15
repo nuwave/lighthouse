@@ -472,7 +472,7 @@ class PaginateDirectiveTest extends DBTestCase
         );
     }
 
-        /**
+    /**
      * @test
      */
     public function itIsLimitedByMaxCountFromDirective(): void
@@ -519,7 +519,6 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ')->assertJsonCount(10, 'data.users2.data');
     }
-
 
     /**
      * @test
