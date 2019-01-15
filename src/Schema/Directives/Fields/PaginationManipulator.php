@@ -62,14 +62,14 @@ class PaginationManipulator
      * @param  int|null  $defaultCount
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null): DocumentAST
+    public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null, int $maxCount = null): DocumentAST
     {
         switch (self::assertValidPaginationType($paginationType)) {
             case self::PAGINATION_TYPE_CONNECTION:
-                return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount);
+                return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
             case self::PAGINATION_TYPE_PAGINATOR:
             default:
-                return self::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount);
+                return self::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
         }
     }
 
@@ -82,7 +82,7 @@ class PaginationManipulator
      * @param  int|null  $defaultCount
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
+    public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null, int $maxCount = null): DocumentAST
     {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $connectionTypeName = "{$fieldTypeName}Connection";
@@ -103,12 +103,13 @@ class PaginationManipulator
             }
         ");
 
+        $countArgumentDescription = "\"Limits number of fetched elements. Maximum: {$maxCount}\"\n";
         $countArgument = $defaultCount
             ? "first: Int = {$defaultCount}"
             : 'first: Int!';
 
         $inputValueDefinitions = [
-            $countArgument,
+            $countArgumentDescription . $countArgument,
             'after: String',
         ];
 
@@ -134,7 +135,7 @@ class PaginationManipulator
      * @param  int|null  $defaultCount
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null): DocumentAST
+    public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null, int $maxCount = null): DocumentAST
     {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";
@@ -147,12 +148,13 @@ class PaginationManipulator
             }
         ");
 
+        $countArgumentDescription = "\"Limits number of fetched elements. Maximum: {$maxCount}\"\n";
         $countArgument = $defaultCount
             ? "count: Int = {$defaultCount}"
             : 'count: Int!';
 
         $inputValueDefinitions = [
-            $countArgument,
+            $countArgumentDescription . $countArgument,
             'page: Int',
         ];
 

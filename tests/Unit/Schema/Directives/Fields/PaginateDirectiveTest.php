@@ -4,6 +4,8 @@ namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
 use GraphQL\Type\Definition\FieldDefinition;
+use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\FieldArgument;
 
 class PaginateDirectiveTest extends TestCase
 {
@@ -93,5 +95,39 @@ class PaginateDirectiveTest extends TestCase
             'UserPaginatorPaginator',
             $typeMap
         );
+    }
+
+    /**
+     * @test
+     */
+    public function itAddsDescriptionToCountArgument(): void
+    {
+        $schema = $this->buildSchema('
+        type User {
+            name: String
+        }
+        
+        type Query {
+            users1: [User!]! @paginate(maxCount: 10)
+            users2: [User!]! @paginate(maxCount: 10, type: "relay")
+        }
+        ');
+        $typeMap = $schema->getTypeMap();
+
+        // default pagination
+        $argsConnect = $schema->getQueryType('users1')->getField('users1')->args;
+        $countArgConnect = Arr::first($argsConnect, function (FieldArgument $arg) {
+            return $arg->name === 'count';
+        });
+
+        $this->assertSame('Limits number of fetched elements. Maximum: 10', $countArgConnect->description);
+
+        // relay pagination
+        $argsRelay = $schema->getQueryType('users2')->getField('users2')->args;
+        $countArgRelay = Arr::first($argsRelay, function (FieldArgument $arg) {
+            return $arg->name === 'first';
+        });
+
+        $this->assertSame('Limits number of fetched elements. Maximum: 10', $countArgRelay->description);
     }
 }

@@ -16,6 +16,7 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use GraphQL\Error\Error;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
@@ -42,7 +43,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $fieldDefinition,
             $parentType,
             $current,
-            $this->directiveArgValue('defaultCount')
+            $this->directiveArgValue('defaultCount'),
+            $this->directiveArgValue('maxCount')
         );
     }
 
@@ -86,6 +88,12 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                 $first = $args['count'];
                 $page = $args['page'] ?? 1;
 
+                // check against count limit
+                $maxCount = $this->directiveArgValue('maxCount') ?? config('lighthouse.paginate_max_count');
+                if ($maxCount !== null && $first > $maxCount) {
+                    throw new Error("Count parameter limit of {$maxCount} exceeded");
+                }
+
                 return $this->getPaginatedResults(func_get_args(), $page, $first);
             }
         );
@@ -102,6 +110,13 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args): LengthAwarePaginator {
                 $first = $args['first'];
+
+                // check against count limit
+                $maxCount = $this->directiveArgValue('maxCount') ?? config('lighthouse.paginate_max_count');
+                if ($maxCount !== null && $first > $maxCount) {
+                    throw new Error("Count parameter limit of {$maxCount} exceeded");
+                }
+
                 $page = Pagination::calculateCurrentPage(
                     $first,
                     Cursor::decode($args)
