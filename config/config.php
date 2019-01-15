@@ -137,7 +137,7 @@ return [
     |
     | Register error handlers that receive the Errors that occur during execution
     | and handle them. You may use this to log, filter or format the errors.
-    | The classes must implement Nuwave\Lighthouse\Execution\ErrorHandler
+    | The classes must implement \Nuwave\Lighthouse\Execution\ErrorHandler
     |
     */
 
@@ -155,8 +155,9 @@ return [
     */
 
     'extensions' => [
-        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
+        // \Nuwave\Lighthouse\Schema\Extensions\DeferExtension::class,
         // \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
     ],
 
     /*
@@ -225,7 +226,7 @@ return [
         /*
          * Default subscription storage.
          *
-         * Any laravel supported cache driver options are available here.
+         * Any Laravel supported cache driver options are available here.
          */
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
