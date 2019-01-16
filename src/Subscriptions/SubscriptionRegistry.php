@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Support\Arr;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\GraphQL;
@@ -146,7 +147,7 @@ class SubscriptionRegistry
                     ->toArray();
             })
             ->map(function ($subscriptionField): GraphQLSubscription {
-                return array_get(
+                return Arr::get(
                     $this->subscriptions,
                     $subscriptionField,
                     new NotFoundSubscription()
