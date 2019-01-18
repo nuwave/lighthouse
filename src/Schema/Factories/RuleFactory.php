@@ -214,7 +214,7 @@ class RuleFactory
         $resolvedPath = collect();
 
         /** @var InputValueDefinitionNode $input */
-        $input = collect($inputPath)->reduce(function (Node $node, string $path) use ($documentAST, $resolvedPath) {
+        $input = collect($inputPath)->reduce(function (Node $node = null, string $path) use ($documentAST, $resolvedPath) {
             if (is_null($node)) {
                 $resolvedPath->push($path);
 
