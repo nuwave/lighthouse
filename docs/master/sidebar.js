@@ -4,6 +4,7 @@ module.exports = [{
             'getting-started/installation',
             'getting-started/configuration',
             'getting-started/tutorial',
+            'getting-started/migrating-to-lighthouse'
         ]
     },
     {
