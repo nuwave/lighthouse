@@ -32,7 +32,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        if($this->directiveHasArgument('resolver')){
+        if ($this->directiveHasArgument('resolver')) {
             list($className, $methodName) = $this->getMethodArgumentParts('resolver');
         } else {
             /**
@@ -44,7 +44,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
             $methodName = $this->directiveArgValue('method');
         }
 
-        if($parentNamespace = $fieldValue->getDefaultNamespaceForParent()){
+        if ($parentNamespace = $fieldValue->getDefaultNamespaceForParent()) {
             $namespacedClassName = $this->namespaceClassName($className, [$parentNamespace]);
         } else {
             $namespacedClassName = $this->namespaceClassName($className);

@@ -34,7 +34,6 @@ class WhereNotBetweenFilterDirective extends BaseDirective implements ArgMiddlew
         $this->injectMultiArgumentFilter(
             $argument,
             function ($query, string $columnName, array $values) {
-            
                 return $query->whereNotBetween($columnName, $values);
             },
             self::name()

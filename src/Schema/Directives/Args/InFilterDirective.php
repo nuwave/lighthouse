@@ -37,7 +37,7 @@ class InFilterDirective extends BaseDirective implements ArgMiddleware
                 return $query->whereIn($columnName, $values);
             }
         );
-    
+
         return $next($argument);
     }
 }

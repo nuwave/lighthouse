@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use Nuwave\Lighthouse\Schema\Types\ConnectionField;
-use Nuwave\Lighthouse\Schema\Types\PaginatorField;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Schema\Types\PaginatorField;
+use Nuwave\Lighthouse\Schema\Types\ConnectionField;
 
 /**
  * @deprecated Please use the AST to generate/modify the schema.
@@ -43,7 +43,7 @@ trait CreatesPaginators
                     $field = $value->getField();
                     $field->arguments = $connectionField->arguments->merge($field->arguments);
 
-                    return null;
+                    return;
                 }
 
                 return $this->convertNode($node);
@@ -83,7 +83,7 @@ trait CreatesPaginators
                     $field = $value->getField();
                     $field->arguments = $paginatorField->arguments->merge($field->arguments);
 
-                    return null;
+                    return;
                 }
 
                 return $this->convertNode($node);
@@ -110,7 +110,7 @@ trait CreatesPaginators
         $parent = $value->getParentName();
         $child = str_singular($value->getField()->name->value);
 
-        return studly_case($parent . '_' . $child . '_Paginator');
+        return studly_case($parent.'_'.$child.'_Paginator');
     }
 
     /**
@@ -125,7 +125,7 @@ trait CreatesPaginators
         $parent = $value->getParentName();
         $child = str_singular($value->getField()->name->value);
 
-        return studly_case($parent . '_' . $child . '_Connection');
+        return studly_case($parent.'_'.$child.'_Connection');
     }
 
     /**
@@ -140,6 +140,6 @@ trait CreatesPaginators
         $parent = $value->getParentName();
         $child = str_singular($value->getField()->name->value);
 
-        return studly_case($parent . '_' . $child . '_Edge');
+        return studly_case($parent.'_'.$child.'_Edge');
     }
 }

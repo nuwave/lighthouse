@@ -33,7 +33,7 @@ class BcryptDirective extends BaseDirective implements ArgMiddleware
                 return bcrypt($password);
             }
         );
-        
+
         return $next($argumentValue);
     }
 }

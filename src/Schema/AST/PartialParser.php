@@ -6,19 +6,19 @@ use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\FieldNode;
-use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
-use GraphQL\Language\AST\OperationDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
+use GraphQL\Language\AST\OperationDefinitionNode;
+use GraphQL\Language\AST\UnionTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
@@ -282,7 +282,7 @@ class PartialParser
             EnumTypeDefinitionNode::class
         );
     }
-    
+
     /**
      * @param string $typeName
      *
@@ -297,7 +297,7 @@ class PartialParser
             NamedTypeNode::class
         );
     }
-    
+
     /**
      * @param string $definition
      *
@@ -308,7 +308,7 @@ class PartialParser
         // Ignore location since it only bloats the AST
         return Parser::parse($definition, ['noLocation' => true]);
     }
-    
+
     /**
      * @param string $definition
      *
@@ -337,10 +337,10 @@ class PartialParser
         }
 
         $node = $list[0];
-    
+
         return self::validateType($node, $expectedType);
     }
-    
+
     /**
      * @param Node $node
      * @param string $expectedType
@@ -351,10 +351,10 @@ class PartialParser
      */
     protected static function validateType(Node $node, string $expectedType): Node
     {
-        if (!$node instanceof $expectedType) {
+        if (! $node instanceof $expectedType) {
             throw new ParseException("The given definition was not of type: $expectedType");
         }
-        
+
         return $node;
     }
 }

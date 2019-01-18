@@ -27,7 +27,7 @@ trait HandlesQueryFilter
         $query = QueryFilter::getInstance(
             $parentField
         );
-    
+
         $argumentName = $this->definitionNode->name->value;
         $query->addSingleArgumentFilter(
             $argumentName,
@@ -42,7 +42,7 @@ trait HandlesQueryFilter
 
         return $argument;
     }
-    
+
     /**
      * Inject a query filter that takes an array of values into the field.
      *
@@ -65,7 +65,7 @@ trait HandlesQueryFilter
         $query = QueryFilter::getInstance(
             $parentField
         );
-    
+
         $argumentName = $this->definitionNode->name->value;
         $query->addMultiArgumentFilter(
             $argumentName,

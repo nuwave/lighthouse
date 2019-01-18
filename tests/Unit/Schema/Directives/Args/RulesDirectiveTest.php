@@ -31,12 +31,12 @@ class RulesDirectiveTest extends TestCase
                     'extensions' => [
                         'validation' => [
                             'bar' => [
-                                'The bar field is required.'
-                            ]
-                        ]
-                    ]
+                                'The bar field is required.',
+                            ],
+                        ],
+                    ],
                 ],
-            ]
+            ],
         ], $result);
 
         $mutation = '
@@ -200,7 +200,7 @@ class RulesDirectiveTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'full_name' => 'John Doe',
-            'input_object' => true
+            'input_object' => true,
         ];
     }
 

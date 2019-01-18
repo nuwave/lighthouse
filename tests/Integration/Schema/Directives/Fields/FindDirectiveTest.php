@@ -60,7 +60,7 @@ class FindDirectiveTest extends DBTestCase
             }
         }
         ";
- 
+
         $result = $this->executeQuery($schema, $query);
 
         $this->assertEquals('A', $result->data['user']['name']);

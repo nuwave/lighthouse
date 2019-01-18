@@ -3,8 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 /**
- * Trait HandlesGlobalId
- * @package Nuwave\Lighthouse\Support\Traits
+ * Trait HandlesGlobalId.
  *
  * @deprecated in favour of Nuwave\Lighthouse\Execution\Utils\GlobalId and Nuwave\Lighthouse\Execution\Utils\Cursor
  */

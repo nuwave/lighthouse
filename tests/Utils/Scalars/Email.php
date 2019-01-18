@@ -3,9 +3,9 @@
 namespace Tests\Utils\Scalars;
 
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Language\AST\StringValueNode;
 
 class Email extends ScalarType
 {
@@ -28,7 +28,7 @@ class Email extends ScalarType
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function parseLiteral($valueNode, array $variables = null)
     {

@@ -37,7 +37,7 @@ abstract class RelationDirective extends BaseDirective
             }
         );
     }
-    
+
     /**
      * @param FieldDefinitionNode $fieldDefinition
      * @param ObjectTypeDefinitionNode $parentType
@@ -50,16 +50,16 @@ abstract class RelationDirective extends BaseDirective
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
         $paginationType = $this->directiveArgValue('type');
-        
+
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
-        if(! $paginationType) {
+        if (! $paginationType) {
             return $current;
         }
-        
+
         return PaginationManipulator::transformToPaginatedField($paginationType, $fieldDefinition, $parentType, $current);
     }
-    
+
     /**
      * @param Model $parent
      * @param array $args
@@ -72,16 +72,16 @@ abstract class RelationDirective extends BaseDirective
      */
     protected function getLoaderConstructorArguments(Model $parent, array $args, $context, ResolveInfo $resolveInfo): array
     {
-        $constructorArgs =  [
+        $constructorArgs = [
             'scopes' => $this->directiveArgValue('scopes', []),
             'args' => $args,
             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
         ];
-        
-        if($paginationType = $this->directiveArgValue('type')){
+
+        if ($paginationType = $this->directiveArgValue('type')) {
             $constructorArgs += ['paginationType' => PaginationManipulator::assertValidPaginationType($paginationType)];
         }
-        
+
         return $constructorArgs;
     }
 }

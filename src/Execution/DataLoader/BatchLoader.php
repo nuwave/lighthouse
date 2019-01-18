@@ -44,7 +44,7 @@ abstract class BatchLoader
     {
         // The path to the field serves as the unique key for the instance
         $instanceName = static::instanceKey($pathToField);
-        
+
         // Only register a new instance if it is not already bound
         $instance = app()->bound($instanceName)
             ? resolve($instanceName)
@@ -52,11 +52,11 @@ abstract class BatchLoader
                 $instanceName,
                 app()->makeWith($loaderClass, $constructorArgs)
             );
-        
-        if (!$instance instanceof self) {
+
+        if (! $instance instanceof self) {
             throw new \Exception("The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader");
         }
-        
+
         return $instance;
     }
 
@@ -73,7 +73,7 @@ abstract class BatchLoader
             ->filter(function ($path) {
                 // Ignore numeric path entries, as those signify an array of fields
                 // Those are the very purpose for this batch loader, so they must not be included.
-                return !is_numeric($path);
+                return ! is_numeric($path);
             })
             ->implode('_');
     }
@@ -91,7 +91,7 @@ abstract class BatchLoader
         $this->keys[$key] = $metaInfo;
 
         return new Deferred(function () use ($key) {
-            if (!$this->hasLoaded) {
+            if (! $this->hasLoaded) {
                 $this->results = $this->resolve();
                 $this->hasLoaded = true;
             }

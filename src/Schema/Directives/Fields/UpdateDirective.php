@@ -41,7 +41,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                     ? reset($args)
                     : $args;
 
-                if($this->directiveArgValue('globalId', false)){
+                if ($this->directiveArgValue('globalId', false)) {
                     $args['id'] = GlobalId::decodeId($args['id']);
                 }
 

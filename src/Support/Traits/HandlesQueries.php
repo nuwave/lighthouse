@@ -2,13 +2,12 @@
 
 namespace Nuwave\Lighthouse\Support\Traits;
 
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\QueryFilter;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 /**
- * Trait HandlesQueries
- * @package Nuwave\Lighthouse\Support\Traits
+ * Trait HandlesQueries.
  * @deprecated
  */
 trait HandlesQueries

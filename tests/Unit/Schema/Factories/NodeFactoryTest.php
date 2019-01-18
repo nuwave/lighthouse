@@ -125,7 +125,7 @@ class NodeFactoryTest extends TestCase
         $this->assertSame('Foo', $interfaceType->name);
         $this->assertArrayHasKey('bar', $interfaceType->getFields());
     }
-    
+
     /**
      * @test
      */

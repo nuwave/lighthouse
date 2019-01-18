@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Exceptions\AuthenticationException;
 
 class CanDirective extends BaseDirective implements FieldMiddleware
@@ -39,7 +39,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                     /** @var Authorizable $user */
                     $user = auth()->user();
 
-                    if (!$user) {
+                    if (! $user) {
                         throw new AuthenticationException('Not authenticated to access this field.');
                     }
 
@@ -47,7 +47,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                     $policies = $this->directiveArgValue('if');
 
                     collect($policies)->each(function (string $policy) use ($user, $model) {
-                        if (!$user->can($policy, $model)) {
+                        if (! $user->can($policy, $model)) {
                             throw new AuthorizationException('Not authorized to access this field.');
                         }
                     });

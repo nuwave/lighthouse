@@ -10,7 +10,7 @@ class Nameable
 {
     /** @var TypeRegistry */
     protected $typeRegistry;
-    
+
     /**
      * @param TypeRegistry $typeRegistry
      */
@@ -18,12 +18,12 @@ class Nameable
     {
         $this->typeRegistry = $typeRegistry;
     }
-    
+
     public function resolve($value): \GraphQL\Type\Definition\ObjectType
     {
         if ($value instanceof User) {
             return $this->typeRegistry->get('User');
-        } elseif($value instanceof Team){
+        } elseif ($value instanceof Team) {
             return $this->typeRegistry->get('Team');
         }
     }

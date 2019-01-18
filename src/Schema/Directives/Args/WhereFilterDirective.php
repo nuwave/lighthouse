@@ -36,13 +36,13 @@ class WhereFilterDirective extends BaseDirective implements ArgMiddleware
 
         $this->injectFilter(
             $argument,
-            function ($query, string $columnName, $value) use ($operator, $clause){
+            function ($query, string $columnName, $value) use ($operator, $clause) {
                 return $clause
                     ? call_user_func_array([$query, $clause], [$columnName, $operator, $value])
                     : $query->where($columnName, $operator, $value);
             }
         );
-        
+
         return $next($argument);
     }
 }

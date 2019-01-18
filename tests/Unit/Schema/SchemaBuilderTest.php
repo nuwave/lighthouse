@@ -38,12 +38,12 @@ class SchemaBuilderTest extends TestCase
             EMPLOYEE @enum(value:"employee")
         }
         ');
-    
+
         /** @var EnumType $enum */
         $enum = $schema->getType('Role');
         $this->assertInstanceOf(EnumType::class, $enum);
         $this->assertSame('Role description', $enum->description);
-    
+
         $enumValues = $enum->getValues();
         $this->assertCount(2, $enumValues);
         $this->assertSame('Company administrator.', $enum->getValue('ADMIN')->description);
@@ -63,11 +63,11 @@ class SchemaBuilderTest extends TestCase
             bar: String!
         }
         ');
-    
+
         /** @var InterfaceType $interface */
         $interface = $schema->getType('Foo');
         $this->assertInstanceOf(InterfaceType::class, $interface);
-        
+
         $this->assertSame('int', $interface->description);
         $this->assertSame('bar is baz', $interface->getField('bar')->description);
     }
@@ -93,7 +93,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertInstanceOf(ObjectType::class, $foo);
 
         $this->assertSame('Foo', $foo->name);
-    
+
         $bar = $foo->getField('bar');
         $this->assertSame('bar attribute of Foo', $bar->description);
         $this->assertSame('arg', $bar->getArg('baz')->description);
@@ -192,7 +192,7 @@ class SchemaBuilderTest extends TestCase
 
         /** @var ObjectType $type */
         $type = $schema->getType('Foo');
-        
+
         $this->assertSame('yo?', $type->getField('bar')->description);
     }
 }

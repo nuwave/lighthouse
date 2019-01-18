@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
-use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
 class TracingExtensionTest extends TestCase

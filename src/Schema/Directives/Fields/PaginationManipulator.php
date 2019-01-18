@@ -18,11 +18,11 @@ class PaginationManipulator
     // The default is offset-based pagination
     const PAGINATION_TYPE_PAGINATOR = 'paginator';
     const PAGINATION_ALIAS_DEFAULT = 'default';
-    
+
     // Those are both aliases for a Connection style pagination
     const PAGINATION_TYPE_CONNECTION = 'connection';
     const PAGINATION_ALIAS_RELAY = 'relay';
-    
+
     /**
      * Apply possible aliases and throw if the given pagination type is invalid.
      *
@@ -37,18 +37,18 @@ class PaginationManipulator
         if (self::PAGINATION_ALIAS_RELAY === $paginationType) {
             return self::PAGINATION_TYPE_CONNECTION;
         }
-        
+
         if (self::PAGINATION_ALIAS_DEFAULT === $paginationType) {
             return self::PAGINATION_TYPE_PAGINATOR;
         }
-        
-        if(in_array($paginationType, [
+
+        if (in_array($paginationType, [
             self::PAGINATION_TYPE_PAGINATOR,
-            self::PAGINATION_TYPE_CONNECTION
-        ])){
+            self::PAGINATION_TYPE_CONNECTION,
+        ])) {
             return $paginationType;
         }
-        
+
         throw new DirectiveException("Found invalid pagination type: {$paginationType}");
     }
 
@@ -72,11 +72,11 @@ class PaginationManipulator
     public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
         switch (self::assertValidPaginationType($paginationType)) {
-            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                return PaginationManipulator::registerConnection($fieldDefinition, $parentType, $current);
-            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
+            case self::PAGINATION_TYPE_CONNECTION:
+                return self::registerConnection($fieldDefinition, $parentType, $current);
+            case self::PAGINATION_TYPE_PAGINATOR:
             default:
-                return PaginationManipulator::registerPaginator($fieldDefinition, $parentType, $current);
+                return self::registerPaginator($fieldDefinition, $parentType, $current);
         }
     }
 

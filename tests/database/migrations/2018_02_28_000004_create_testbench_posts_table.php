@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateTestbenchPostsTable extends Migration
 {
@@ -21,7 +21,7 @@ class CreateTestbenchPostsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::table('posts', function(Blueprint $table) {
+        Schema::table('posts', function (Blueprint $table) {
             $table->foreign('parent_id')
                 ->references('id')
                 ->on('posts');

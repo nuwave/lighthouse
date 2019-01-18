@@ -9,7 +9,6 @@ use GraphQL\Error\InvariantViolation;
  * Store the executable types of our GraphQL schema.
  *
  * Class TypeRegistry
- * @package Nuwave\Lighthouse\Schema
  */
 class TypeRegistry
 {
@@ -21,7 +20,7 @@ class TypeRegistry
      * @var Type[]
      */
     protected $types;
-    
+
     /**
      * Register type with registry.
      *
@@ -29,10 +28,10 @@ class TypeRegistry
      *
      * @return TypeRegistry
      */
-    public function register(Type $type): TypeRegistry
+    public function register(Type $type): self
     {
         $this->types[$type->name] = $type;
-        
+
         return $this;
     }
 
@@ -47,7 +46,7 @@ class TypeRegistry
      */
     public function get(string $typeName): Type
     {
-        if(!isset($this->types[$typeName])){
+        if (! isset($this->types[$typeName])) {
             throw new InvariantViolation("No type {$typeName} was registered.");
         }
 

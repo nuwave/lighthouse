@@ -29,7 +29,7 @@ abstract class BaseDirective implements Directive
      *
      * @return BaseDirective
      */
-    public function hydrate($definitionNode): BaseDirective
+    public function hydrate($definitionNode): self
     {
         $this->definitionNode = $definitionNode;
 
@@ -115,10 +115,10 @@ abstract class BaseDirective implements Directive
         $model = $this->directiveArgValue($argumentName);
 
         // Fallback to using information from the schema definition as the model name
-        if(! $model){
-            if($this->definitionNode instanceof FieldDefinitionNode) {
+        if (! $model) {
+            if ($this->definitionNode instanceof FieldDefinitionNode) {
                 $model = ASTHelper::getFieldTypeName($this->definitionNode);
-            } elseif($this->definitionNode instanceof ObjectTypeDefinitionNode) {
+            } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
                 $model = $this->definitionNode->name->value;
             }
         }
@@ -130,12 +130,11 @@ abstract class BaseDirective implements Directive
         }
 
         return $this->namespaceClassName($model, [
-            config('lighthouse.namespaces.models')
+            config('lighthouse.namespaces.models'),
         ]);
     }
 
     /**
-     *
      * @param string $classCandidate
      * @param string[] $namespacesToTry
      *
@@ -154,11 +153,11 @@ abstract class BaseDirective implements Directive
             )
         );
 
-        if(!$className = \namespace_classname($classCandidate, $namespacesToTry)){
+        if (! $className = \namespace_classname($classCandidate, $namespacesToTry)) {
             throw new DirectiveException(
                 "No class '$classCandidate' was found for directive '{$this->name()}'"
             );
-        };
+        }
 
         return $className;
     }
@@ -187,7 +186,7 @@ abstract class BaseDirective implements Directive
             count($argumentParts) !== 2
             || empty($argumentParts[0])
             || empty($argumentParts[1])
-        ){
+        ) {
             throw new DirectiveException(
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName'"
             );

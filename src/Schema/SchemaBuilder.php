@@ -56,11 +56,11 @@ class SchemaBuilder
      */
     public function build($documentAST)
     {
-        foreach($documentAST->typeDefinitions() as $typeDefinition){
+        foreach ($documentAST->typeDefinitions() as $typeDefinition) {
             $type = $this->nodeFactory->handle($typeDefinition);
             $this->typeRegistry->register($type);
 
-            switch($type->name){
+            switch ($type->name) {
                 case 'Query':
                     /** @var ObjectType $queryType */
                     $queryType = $type;
@@ -74,12 +74,12 @@ class SchemaBuilder
                     $subscriptionType = $type;
                     continue 2;
                 default:
-                    $types []= $type;
+                    $types [] = $type;
             }
         }
 
-        if(empty($queryType)){
-            throw new InvariantViolation("The root Query type must be present in the schema.");
+        if (empty($queryType)) {
+            throw new InvariantViolation('The root Query type must be present in the schema.');
         }
 
         $config = SchemaConfig::create()

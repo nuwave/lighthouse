@@ -243,7 +243,7 @@ class PaginateDirectiveTest extends DBTestCase
             [
                 'total' => 0,
                 'count' => 0,
-                'currentPage' => 1 ,
+                'currentPage' => 1,
                 'lastPage' => 1,
                 'hasNextPage' => false,
                 'hasPreviousPage' =>false,
@@ -323,7 +323,7 @@ class PaginateDirectiveTest extends DBTestCase
         extend type Query @group {
             users: [User!]! @paginate(model: "User")
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $query = '
         {

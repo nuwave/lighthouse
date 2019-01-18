@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\Node;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -16,7 +16,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
 {
     /** @var NodeRegistry */
     protected $nodeRegistry;
-    
+
     /**
      * @param NodeRegistry $nodeRegistry
      */
@@ -24,7 +24,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     {
         $this->nodeRegistry = $nodeRegistry;
     }
-    
+
     /**
      * Directive name.
      *
@@ -34,7 +34,7 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     {
         return 'model';
     }
-    
+
     /**
      * Handle type construction.
      *

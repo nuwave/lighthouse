@@ -41,7 +41,7 @@ class SearchDirective extends BaseDirective implements ArgMiddleware
                 $modelClass = get_class(
                     $query->getModel()
                 );
-                
+
                 /** @var \Laravel\Scout\Builder $query */
                 $query = $modelClass::search($value);
 

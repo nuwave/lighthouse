@@ -32,14 +32,14 @@ class RulesDirective extends BaseDirective implements ArgMiddleware
             data_get($argumentValue, 'rules', []),
             $this->directiveArgValue('apply', [])
         );
-        
+
         $argumentValue->messages = array_merge(
             data_get($argumentValue, 'messages', []),
             collect($this->directiveArgValue('messages', []))
                 ->mapWithKeys(
                     function (string $message, string $path) use ($argumentValue) {
                         return [
-                            "{$argumentValue->getAstNode()->name->value}.{$path}" => $message
+                            "{$argumentValue->getAstNode()->name->value}.{$path}" => $message,
                         ];
                     }
                 )

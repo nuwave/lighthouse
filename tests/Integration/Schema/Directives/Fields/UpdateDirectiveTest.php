@@ -15,7 +15,7 @@ class UpdateDirectiveTest extends DBTestCase
     public function itCanUpdateFromFieldArguments()
     {
         factory(Company::class)->create(['name' => 'foo']);
-        
+
         $schema = '
         type Company {
             id: ID!
@@ -28,7 +28,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             updateCompany(
@@ -46,13 +46,14 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', array_get($result, 'data.updateCompany.name'));
         $this->assertSame('bar', Company::first()->name);
     }
+
     /**
      * @test
      */
     public function itCanUpdateFromInputObject()
     {
         factory(Company::class)->create(['name' => 'foo']);
-        
+
         $schema = '
         type Company {
             id: ID!
@@ -69,7 +70,7 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             updateCompany(input: {
@@ -119,7 +120,7 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        ' . $this->placeholderQuery();
+        '.$this->placeholderQuery();
         $query = '
         mutation {
             updateTask(input: {

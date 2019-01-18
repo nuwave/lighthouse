@@ -131,7 +131,7 @@ class CacheValue
     protected function setFieldKey()
     {
         if (! $this->fieldValue || ! $this->rootValue) {
-            return null;
+            return;
         }
 
         $cacheFieldKey = $this->fieldValue

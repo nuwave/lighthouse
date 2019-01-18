@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -50,7 +50,7 @@ class FieldFactory
     {
         $fieldDefinition = $fieldValue->getField();
 
-        if($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinition)){
+        if ($fieldResolver = $this->directiveRegistry->fieldResolver($fieldDefinition)) {
             $fieldValue = $fieldResolver->resolveField($fieldValue);
         }
 
@@ -188,12 +188,12 @@ class FieldFactory
     protected function transformArgs(array $inputArguments, Collection $inputValueDefinitions): array
     {
         return collect($inputArguments)
-            ->map(function($value, $key) use ($inputValueDefinitions){
+            ->map(function ($value, $key) use ($inputValueDefinitions) {
                 $definition = $inputValueDefinitions->get($key);
-                
+
                 return collect($definition['transformers'])
                     ->reduce(
-                        function($value, \Closure $transformer){
+                        function ($value, \Closure $transformer) {
                             return $transformer($value);
                         },
                         $value
@@ -229,7 +229,7 @@ class FieldFactory
                 $rules = data_get($inputValueDefinition, 'rules');
 
                 if (! $rules) {
-                    return null;
+                    return;
                 }
 
                 $rules = is_callable($rules)

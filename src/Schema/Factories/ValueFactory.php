@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class ValueFactory
 {
@@ -47,7 +47,7 @@ class ValueFactory
      *
      * @return ValueFactory
      */
-    public function nodeResolver(\Closure $resolver): ValueFactory
+    public function nodeResolver(\Closure $resolver): self
     {
         $this->node = $resolver;
 
@@ -61,7 +61,7 @@ class ValueFactory
      *
      * @return ValueFactory
      */
-    public function fieldResolver(\Closure $resolver): ValueFactory
+    public function fieldResolver(\Closure $resolver): self
     {
         $this->field = $resolver;
 
@@ -75,7 +75,7 @@ class ValueFactory
      *
      * @return ValueFactory
      */
-    public function argResolver(\Closure $resolver): ValueFactory
+    public function argResolver(\Closure $resolver): self
     {
         $this->arg = $resolver;
 
@@ -89,7 +89,7 @@ class ValueFactory
      *
      * @return ValueFactory
      */
-    public function cacheResolver(\Closure $resolver): ValueFactory
+    public function cacheResolver(\Closure $resolver): self
     {
         $this->cache = $resolver;
 

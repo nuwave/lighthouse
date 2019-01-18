@@ -26,7 +26,7 @@ class Cursor
      */
     public static function decode(array $args): int
     {
-        if(!$cursor = array_get($args, 'after')){
+        if (! $cursor = array_get($args, 'after')) {
             return 0;
         }
 
@@ -35,7 +35,6 @@ class Cursor
 
     /**
      * Encode the given offset to make the implementation opaque.
-     *
      */
     public static function encode(int $offset): string
     {

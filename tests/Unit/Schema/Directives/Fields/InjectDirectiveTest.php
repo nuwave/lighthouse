@@ -23,7 +23,7 @@ class InjectDirectiveTest extends DBTestCase
         type Query {
             me: User!
                 @inject(context: "user.id", name: "user_id")
-                @field(resolver: "' . addslashes(self::class) . '@resolveUser")
+                @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         ';
         $query = '
@@ -42,7 +42,7 @@ class InjectDirectiveTest extends DBTestCase
     public function resolveUser($root, array $args): array
     {
         return [
-            'id' => $args['user_id']
+            'id' => $args['user_id'],
         ];
     }
 }

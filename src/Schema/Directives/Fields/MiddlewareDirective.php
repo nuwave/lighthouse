@@ -3,15 +3,15 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
 use GraphQL\Language\AST\Node;
+use Illuminate\Routing\Router;
 use GraphQL\Language\AST\NodeList;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -22,8 +22,8 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
 {
@@ -76,7 +76,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                     return $this->pipeline
                         ->send($context->request())
                         ->through($middleware)
-                        ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo){
+                        ->then(function (Request $request) use ($resolver, $root, $args, $resolveInfo) {
                             return $resolver(
                                 $root,
                                 $args,
@@ -119,16 +119,16 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      */
     public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
     {
-        if ( ! $objectType instanceof ObjectTypeDefinitionNode
+        if (! $objectType instanceof ObjectTypeDefinitionNode
             && ! $objectType instanceof ObjectTypeExtensionNode
         ) {
             throw new DirectiveException(
-                'The ' . self::NAME . ' directive may only be placed on fields or object types.'
+                'The '.self::NAME.' directive may only be placed on fields or object types.'
             );
         }
 
         $middlewareArgValue = collect($middlewareArgValue)
-            ->map(function(string $middleware){
+            ->map(function (string $middleware) {
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
             })
@@ -141,7 +141,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
                     // If the field already has middleware defined, skip over it
                     // Field middleware are more specific then those defined on a type
-                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)){
+                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)) {
                         return $fieldDefinition;
                     }
 

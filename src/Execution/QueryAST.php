@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Language\Parser;
-use GraphQL\Language\AST\Node;
 use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;
@@ -18,12 +18,12 @@ class QueryAST
      * @var Collection
      */
     protected $definitions;
-    
+
     /**
      * @var Collection
      */
     protected $typeExtensions;
-    
+
     /**
      * @param DocumentNode $documentNode
      */
@@ -31,7 +31,7 @@ class QueryAST
     {
         $this->definitions = collect($documentNode->definitions);
     }
-    
+
     /**
      * Create a new DocumentAST instance from a schema.
      *
@@ -41,7 +41,7 @@ class QueryAST
      *
      * @return QueryAST
      */
-    public static function fromSource(string $schema): QueryAST
+    public static function fromSource(string $schema): self
     {
         return new static(
             Parser::parse($schema)

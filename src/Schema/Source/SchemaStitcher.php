@@ -28,7 +28,7 @@ class SchemaStitcher implements SchemaSourceProvider
      *
      * @return SchemaStitcher
      */
-    public function setRootPath(string $path): SchemaStitcher
+    public function setRootPath(string $path): self
     {
         $this->rootSchemaPath = $path;
 

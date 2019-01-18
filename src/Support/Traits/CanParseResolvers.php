@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Support\Traits;
 
 use GraphQL\Language\AST\DirectiveNode;
-use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
 
 /**
  * @deprecated This trait will be removed in a future version of Lighthouse.
@@ -29,7 +29,7 @@ trait CanParseResolvers
             $className = array_get(explode('@', $resolver), '0');
             $namespace = $this->associatedNamespace($value->getField());
 
-            return $namespace ? $namespace . '\\' . $className : $className;
+            return $namespace ? $namespace.'\\'.$className : $className;
         }
 
         return $value
@@ -72,7 +72,7 @@ trait CanParseResolvers
     {
         $class = $this->directiveArgValue($directive, 'class');
 
-        if (!$class && $throw) {
+        if (! $class && $throw) {
             throw new DirectiveException(sprintf(
                 'Directive [%s] must have a `class` argument.',
                 $directive->name->value
@@ -99,7 +99,7 @@ trait CanParseResolvers
 
         $method = $this->directiveArgValue($directive, 'method');
 
-        if (!$method) {
+        if (! $method) {
             throw new DirectiveException(sprintf(
                 'Directive [%s] must have a `method` argument.',
                 $directive->name->value

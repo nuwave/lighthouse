@@ -59,9 +59,10 @@ class MethodDirectiveTest extends TestCase
     }
 }
 
-class Foo {
+class Foo
+{
     public function foobar(array $args = []): string
     {
-        return 'foo' . array_get($args, 'baz');
+        return 'foo'.array_get($args, 'baz');
     }
 }

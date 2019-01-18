@@ -6,14 +6,10 @@ use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\ValueNode;
-use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\ArgumentNode;
+use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\ObjectFieldNode;
-use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -64,7 +60,7 @@ class ASTHelper
             ->pluck('name.value')
             ->filter()
             ->all();
-        
+
         $remainingDefinitions = collect($original)
             ->reject(function ($definition) use ($newNames, $overwriteDuplicates) {
                 $oldName = $definition->name->value;
@@ -73,7 +69,7 @@ class ASTHelper
                     $newNames
                 );
 
-                if($collisionOccured && ! $overwriteDuplicates){
+                if ($collisionOccured && ! $overwriteDuplicates) {
                     throw new DefinitionException("Duplicate definition {$oldName} found when merging.");
                 }
 
@@ -109,11 +105,11 @@ class ASTHelper
     public static function getFieldTypeName(FieldDefinitionNode $field): string
     {
         $type = $field->type;
-        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode){
+        if ($type instanceof ListTypeNode || $type instanceof NonNullTypeNode) {
             $type = self::getUnderlyingNamedTypeNode($type);
         }
-        
-        /** @var NamedTypeNode $type */
+
+        /* @var NamedTypeNode $type */
         return $type->name->value;
     }
 
@@ -126,16 +122,16 @@ class ASTHelper
      */
     public static function getUnderlyingNamedTypeNode(Node $node): NamedTypeNode
     {
-        if($node instanceof NamedTypeNode){
+        if ($node instanceof NamedTypeNode) {
             return $node;
         }
-        
+
         $type = data_get($node, 'type');
 
-        if(!$type){
+        if (! $type) {
             throw new DefinitionException("The node '$node->kind' does not have a type associated with it.");
         }
-        
+
         return self::getUnderlyingNamedTypeNode($type);
     }
 
@@ -150,7 +146,7 @@ class ASTHelper
     public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
     {
         return collect($directiveDefinition->arguments)
-            ->contains(function(ArgumentNode $argumentNode) use ($name){
+            ->contains(function (ArgumentNode $argumentNode) use ($name) {
                 return $argumentNode->name->value === $name;
             });
     }
@@ -208,7 +204,7 @@ class ASTHelper
                 return $directiveDefinitionNode->name->value === $name;
             });
     }
-    
+
     /**
      * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
      *
@@ -223,7 +219,7 @@ class ASTHelper
             $definitionNode,
             (new NamespaceDirective)->name()
         );
-    
+
         return $namespaceDirective
             // The namespace directive can contain an argument with the name of the
             // current directive, in which case it applies here
@@ -231,7 +227,7 @@ class ASTHelper
             // Default to an empty namespace if the namespace directive does not exist
             : '';
     }
-    
+
     /**
      * This adds an Interface called "Node" to an ObjectType definition.
      *
@@ -250,15 +246,15 @@ class ASTHelper
                 Parser::parseType(
                     'Node',
                     ['noLocation' => true]
-                )
+                ),
             ]
         );
-    
+
         $globalIdFieldDefinition = PartialParser::fieldDefinition(
-            config('lighthouse.global_id_field') .': ID! @globalId'
+            config('lighthouse.global_id_field').': ID! @globalId'
         );
         $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
-        
+
         return $documentAST->setDefinition($objectType);
     }
 }

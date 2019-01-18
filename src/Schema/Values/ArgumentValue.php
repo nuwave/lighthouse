@@ -10,16 +10,16 @@ class ArgumentValue
 {
     /** @var InputValueDefinitionNode */
     protected $astNode;
-    
+
     /** @var FieldValue */
     protected $parentField;
 
     /** @var Type */
     protected $type;
-    
+
     /** @var \Closure[] */
     protected $transformers = [];
-    
+
     /**
      * ArgumentValue constructor.
      *
@@ -31,7 +31,7 @@ class ArgumentValue
         $this->parentField = $parentField;
         $this->astNode = $astNode;
     }
-    
+
     /**
      * @return InputValueDefinitionNode
      */
@@ -39,7 +39,7 @@ class ArgumentValue
     {
         return $this->astNode;
     }
-    
+
     /**
      * @return FieldValue
      */
@@ -47,19 +47,19 @@ class ArgumentValue
     {
         return $this->parentField;
     }
-    
+
     /**
      * @return Type
      */
     public function getType(): Type
     {
-        if(!$this->type){
+        if (! $this->type) {
             $this->type = resolve(DefinitionNodeConverter::class)->toType($this->astNode->type);
         }
-        
+
         return $this->type;
     }
-    
+
     /**
      * @return \Closure[]
      */
@@ -67,16 +67,16 @@ class ArgumentValue
     {
         return $this->transformers;
     }
-    
+
     /**
      * @param \Closure $transformer
      *
      * @return ArgumentValue
      */
-    public function addTransformer(\Closure $transformer): ArgumentValue
+    public function addTransformer(\Closure $transformer): self
     {
         $this->transformers[] = $transformer;
-        
+
         return $this;
     }
 }

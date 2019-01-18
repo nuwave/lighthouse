@@ -47,6 +47,7 @@ class FindDirective extends BaseDirective implements FieldResolver
                 if ($total > 1) {
                     throw new Error('Query returned more than one result.');
                 }
+
                 return $query->first();
             }
         );

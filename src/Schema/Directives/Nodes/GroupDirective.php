@@ -6,8 +6,8 @@ use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -47,7 +47,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
-        if($middlewareValues = $this->directiveArgValue('middleware')){
+        if ($middlewareValues = $this->directiveArgValue('middleware')) {
             $node = MiddlewareDirective::addMiddlewareDirectiveToFields($node, $middlewareValues);
         }
 

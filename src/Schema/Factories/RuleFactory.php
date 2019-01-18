@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Language\AST\Node;
-use Illuminate\Support\Collection;
 use GraphQL\Language\AST\NodeList;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NonNullTypeNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
 class RuleFactory
 {
@@ -128,13 +128,13 @@ class RuleFactory
                     return 'rules' === $node->name->value;
                 });
 
-                if (!$directive) {
-                    return null;
+                if (! $directive) {
+                    return;
                 }
 
                 $rules = ASTHelper::directiveArgValue($directive, 'apply', []);
                 $messages = ASTHelper::directiveArgValue($directive, 'messages', []);
-                $path = $list && !empty($path) ? $path . '.*' : $path;
+                $path = $list && ! empty($path) ? $path.'.*' : $path;
                 $path = $path ? "{$path}.{$arg->name->value}" : $arg->name->value;
 
                 return empty($rules) ? null : compact('path', 'rules', 'messages');
@@ -186,8 +186,7 @@ class RuleFactory
         FieldDefinitionNode $fieldDefinition,
         array $keys,
         bool $traverseOne
-    ): Collection
-    {
+    ): Collection {
         $rules = collect();
 
         collect($keys)->sortByDesc(function ($key) {
@@ -228,21 +227,20 @@ class RuleFactory
         FieldDefinitionNode $field,
         string $path,
         bool $traverseOne
-    )
-    {
+    ) {
         // Bail if the path is an empty string.
         // This can happen when arguments are injected from the context,
         // because they do not have a definition associated with them.
-        if(strlen($path) === 0) {
-            return null;
+        if (strlen($path) === 0) {
+            return;
         }
-        
+
         $inputPath = explode('.', $path);
         $pathKey = implode('.', $inputPath);
 
         if (in_array($pathKey, $this->resolved)) {
             // We've already resolved this path so bail out.
-            return null;
+            return;
         }
 
         $resolvedPath = collect();
@@ -252,7 +250,7 @@ class RuleFactory
             if (is_null($node)) {
                 $resolvedPath->push($path);
 
-                return null;
+                return;
             }
 
             if ($this->includesList($node)) {
@@ -274,8 +272,8 @@ class RuleFactory
                 $arguments = data_get($node, 'arguments', data_get($node, 'fields'));
             }
 
-            if (!$arguments) {
-                return null;
+            if (! $arguments) {
+                return;
             }
 
             return collect($arguments)->first(function ($arg) use ($path) {
@@ -283,7 +281,7 @@ class RuleFactory
             });
         }, $field);
 
-        if (!$input) {
+        if (! $input) {
             array_pop($inputPath);
 
             return $this->getRulesForPath(
@@ -320,7 +318,7 @@ class RuleFactory
 
         if ($type instanceof ListTypeNode) {
             return true;
-        } elseif (!is_null($type)) {
+        } elseif (! is_null($type)) {
             return $this->includesList($type);
         }
 
@@ -336,9 +334,9 @@ class RuleFactory
      */
     protected function unwrapType(Node $node): Node
     {
-        if (!data_get($node, 'type')) {
+        if (! data_get($node, 'type')) {
             return $node;
-        } elseif (!data_get($node, 'type.name')) {
+        } elseif (! data_get($node, 'type.name')) {
             return $this->unwrapType($node->type);
         }
 
@@ -358,8 +356,7 @@ class RuleFactory
         DocumentAST $documentAST,
         FieldDefinitionNode $fieldDefinition,
         array $flatInput
-    ): array
-    {
+    ): array {
         return collect($flatInput)
             ->flip()
             ->flatMap(function (string $path) use ($documentAST, $fieldDefinition) {

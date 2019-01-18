@@ -38,7 +38,8 @@ class DateTest extends TestCase
         return [
             [1],
             ['rolf'],
-            [new class(){}],
+            [new class() {
+            }],
             [null],
             [''],
         ];

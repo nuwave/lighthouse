@@ -16,7 +16,7 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanStoreResolverResultInCache()
     {
-        $resolver = addslashes(self::class) . '@resolve';
+        $resolver = addslashes(self::class).'@resolve';
         $schema = "
         type User {
             id: ID!
@@ -45,7 +45,7 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanPlaceCacheKeyOnAnyField()
     {
-        $resolver = addslashes(self::class) . '@resolve';
+        $resolver = addslashes(self::class).'@resolve';
         $schema = "
         type User {
             id: ID!
@@ -79,7 +79,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->be($user);
         $cacheKey = "auth:{$user->getKey()}:user:1:name";
 
-        $resolver = addslashes(self::class) . '@resolve';
+        $resolver = addslashes(self::class).'@resolve';
         $schema = "
         type User {
             id: ID!
@@ -167,7 +167,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $query = '
         {
-            user(id: ' . $user->getKey() . ') {
+            user(id: '.$user->getKey().') {
                 id
                 name
                 posts(count: 3) {
@@ -187,14 +187,14 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (!str_contains($query->sql, [
+            if (! str_contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',
                 'aggregate',
                 'limit 1',
             ])) {
-                ++$queries;
+                $queries++;
             }
         });
 
@@ -213,8 +213,7 @@ class CacheDirectiveTest extends DBTestCase
         /** @var ValueFactory $valueFactory */
         $valueFactory = resolve(ValueFactory::class);
         $valueFactory->cacheResolver(function ($arguments) {
-            return new class($arguments) extends CacheValue
-            {
+            return new class($arguments) extends CacheValue {
                 public function getKey()
                 {
                     return 'foo';
@@ -222,7 +221,7 @@ class CacheDirectiveTest extends DBTestCase
             };
         });
 
-        $resolver = addslashes(self::class) . '@resolve';
+        $resolver = addslashes(self::class).'@resolve';
         $schema = "
         type User {
             id: ID!
@@ -275,7 +274,7 @@ class CacheDirectiveTest extends DBTestCase
         ';
         $query = '
         {
-            user(id: ' . $user->getKey() . ') {
+            user(id: '.$user->getKey().') {
                 id
                 name
                 posts(count: 3) {
@@ -295,14 +294,14 @@ class CacheDirectiveTest extends DBTestCase
         $queries = 0;
         \DB::listen(function ($query) use (&$queries) {
             // TODO: Find a better way of doing this
-            if (!str_contains($query->sql, [
+            if (! str_contains($query->sql, [
                 'drop',
                 'delete',
                 'migrations',
                 'aggregate',
                 'limit 1',
             ])) {
-                ++$queries;
+                $queries++;
             }
         });
 

@@ -15,7 +15,7 @@ class ValidationException extends \Illuminate\Validation\ValidationException imp
      */
     public function __construct(GraphQLValidator $validator, $response = null, $errorBag = 'default')
     {
-        \Exception::__construct('Validation failed for the field [' . $validator->getFieldPath() . ']');
+        \Exception::__construct('Validation failed for the field ['.$validator->getFieldPath().']');
 
         $this->response = $response;
         $this->errorBag = $errorBag;

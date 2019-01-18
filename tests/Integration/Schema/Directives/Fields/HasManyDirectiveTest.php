@@ -38,7 +38,7 @@ class HasManyDirectiveTest extends DBTestCase
         factory(Task::class)->create([
             'user_id' => $this->user->getKey(),
             // This task should be ignored via global scope on the Task model
-            'name' => 'cleaning'
+            'name' => 'cleaning',
         ]);
 
         $this->be($this->user);
@@ -112,7 +112,6 @@ class HasManyDirectiveTest extends DBTestCase
             }
         }
         ');
-
 
         $this->assertCount(2, array_get($result->data, 'user.tasks'));
     }

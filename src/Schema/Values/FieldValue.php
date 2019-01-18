@@ -80,7 +80,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setResolver(\Closure $resolver): FieldValue
+    public function setResolver(\Closure $resolver): self
     {
         $this->resolver = $resolver;
 
@@ -94,7 +94,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function setComplexity(\Closure $complexity): FieldValue
+    public function setComplexity(\Closure $complexity): self
     {
         $this->complexity = $complexity;
 
@@ -109,7 +109,7 @@ class FieldValue
      *
      * @return FieldValue
      */
-    public function injectArg(string $key, $value): FieldValue
+    public function injectArg(string $key, $value): self
     {
         $this->additionalArgs = array_merge(
             $this->additionalArgs,
@@ -134,7 +134,7 @@ class FieldValue
      */
     public function getReturnType(): Type
     {
-        if(! isset($this->returnType)){
+        if (! isset($this->returnType)) {
             $this->returnType = resolve(DefinitionNodeConverter::class)->toType(
                 $this->field->type
             );
@@ -176,7 +176,7 @@ class FieldValue
      */
     public function getResolver(): \Closure
     {
-        if(!isset($this->resolver)){
+        if (! isset($this->resolver)) {
             $this->resolver = $this->defaultResolver();
         }
 
@@ -192,9 +192,9 @@ class FieldValue
      */
     protected function defaultResolver(): \Closure
     {
-        if($namespace = $this->getDefaultNamespaceForParent()){
+        if ($namespace = $this->getDefaultNamespaceForParent()) {
             return construct_resolver(
-                $namespace . '\\' . studly_case($this->getFieldName()),
+                $namespace.'\\'.studly_case($this->getFieldName()),
                 'resolve'
             );
         }
@@ -203,7 +203,7 @@ class FieldValue
         // return \Closure::fromCallable(
         //     [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
         // );
-        return function() {
+        return function () {
             return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
         };
     }
@@ -221,7 +221,7 @@ class FieldValue
             case 'Query':
                 return config('lighthouse.namespaces.queries');
             default:
-                return null;
+                return;
         }
     }
 
@@ -279,7 +279,7 @@ class FieldValue
      * @return FieldValue
      * @deprecated Do this sort of manipulation in the DocumentAST in the future.
      */
-    public function setType($type): FieldValue
+    public function setType($type): self
     {
         $this->returnType = $type;
 

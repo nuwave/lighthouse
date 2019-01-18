@@ -38,7 +38,6 @@ class NotInFilterDirective extends BaseDirective implements ArgMiddleware
             }
         );
 
-
         return $next($argument);
     }
 }

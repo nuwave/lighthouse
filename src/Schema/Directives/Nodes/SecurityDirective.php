@@ -3,17 +3,14 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Validator\Rules\QueryDepth;
-use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 /**
- * Class SecurityDirective
- * @package Nuwave\Lighthouse\Schema\Directives\Nodes
+ * Class SecurityDirective.
  * @deprecated will be defined through the config file as of v3
  */
 class SecurityDirective extends BaseDirective implements NodeMiddleware
@@ -89,7 +86,7 @@ class SecurityDirective extends BaseDirective implements NodeMiddleware
         $enableIntrospection = $this->directiveArgValue('introspection');
 
         if (false === $enableIntrospection) {
-            config(['lighthouse.security.disable_introspection' => !$enableIntrospection]);
+            config(['lighthouse.security.disable_introspection' => ! $enableIntrospection]);
         }
     }
 }

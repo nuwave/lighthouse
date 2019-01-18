@@ -3,8 +3,8 @@
 namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -35,7 +35,7 @@ class DocumentASTTest extends TestCase
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessageRegExp('/^Syntax Error/');
-        
+
         DocumentAST::fromSource('foo');
     }
 
@@ -49,15 +49,15 @@ class DocumentASTTest extends TestCase
             foo: Int
         }
         ');
-        
+
         $objectType = PartialParser::objectTypeDefinition('
         type Mutation {
             bar: Int
         }
         ');
-        
+
         $documentAST->setDefinition($objectType);
-        
+
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $documentAST->mutationTypeDefinition()
@@ -99,16 +99,16 @@ class DocumentASTTest extends TestCase
             foo: Int
         }
         ');
-        
+
         $reserialized = \unserialize(
             \serialize($documentAST)
         );
-    
+
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $reserialized->queryTypeDefinition()
         );
-    
+
         $this->assertInstanceOf(
             FieldDefinitionNode::class,
             $reserialized->queryTypeDefinition()->fields[0]

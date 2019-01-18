@@ -23,7 +23,7 @@ class ModelRelationLoaderTest extends DBTestCase
             factory(Task::class, $count)->create([
                 'user_id' => $user->getKey(),
             ]);
-            ++$count;
+            $count++;
         });
     }
 

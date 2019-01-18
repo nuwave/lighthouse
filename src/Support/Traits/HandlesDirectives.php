@@ -9,8 +9,7 @@ use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 
 /**
- * Trait HandlesDirectives
- * @package Nuwave\Lighthouse\Support\Traits
+ * Trait HandlesDirectives.
  * @deprecated Use the BaseDirective class or the ASTHelper instead
  */
 trait HandlesDirectives

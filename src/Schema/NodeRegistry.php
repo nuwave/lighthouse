@@ -26,7 +26,7 @@ class NodeRegistry
      * @var \Closure[]
      */
     protected $nodeResolver = [];
-    
+
     /**
      * The stashed current type.
      *
@@ -37,7 +37,7 @@ class NodeRegistry
      * @var string
      */
     protected $currentType;
-    
+
     /**
      * @param string $typeName
      *
@@ -55,7 +55,7 @@ class NodeRegistry
      *
      * @return NodeRegistry
      */
-    public function registerNode(string $typeName, \Closure $resolve): NodeRegistry
+    public function registerNode(string $typeName, \Closure $resolve): self
     {
         $this->nodeResolver[$typeName] = $resolve;
 
@@ -70,15 +70,15 @@ class NodeRegistry
      *
      * @return NodeRegistry
      */
-    public function registerModel(string $typeName, string $modelName): NodeRegistry
+    public function registerModel(string $typeName, string $modelName): self
     {
         $this->nodeResolver[$typeName] = function ($id) use ($modelName) {
             return $modelName::find($id);
         };
-        
+
         return $this;
     }
-    
+
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
@@ -99,13 +99,13 @@ class NodeRegistry
         if (! $resolver = array_get($this->nodeResolver, $decodedType)) {
             throw new Error("[{$decodedType}] is not a registered node and cannot be resolved.");
         }
-        
+
         // Stash the decoded type, as it will later be used to determine the correct return type of the node query
         $this->currentType = $decodedType;
-    
+
         return $resolver($decodedId, $context, $resolveInfo);
     }
-    
+
     /**
      * Get the Type for the stashed type.
      *

@@ -13,6 +13,6 @@ $factory->define(Role::class, function (Faker $faker) {
             return factory(ACL::class)
                 ->create()
                 ->getKey();
-        }
+        },
     ];
 });

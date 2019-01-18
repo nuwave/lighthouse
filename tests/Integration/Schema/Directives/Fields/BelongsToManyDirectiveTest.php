@@ -238,8 +238,8 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->assertTrue(array_get($result->data, 'user.roles.pageInfo.hasNextPage'));
         $this->assertCount(2, $userRolesEdges);
         $this->assertCount(2, $nestedUserRolesEdges);
-        $this->assertSame(array_get($userRolesEdges,'node.0.acl.id'), array_get($nestedUserRolesEdges,'node.0.acl.id'));
-        $this->assertSame(array_get($userRolesEdges,'node.1.acl.id'), array_get($nestedUserRolesEdges,'node.1.acl.id'));
+        $this->assertSame(array_get($userRolesEdges, 'node.0.acl.id'), array_get($nestedUserRolesEdges, 'node.0.acl.id'));
+        $this->assertSame(array_get($userRolesEdges, 'node.1.acl.id'), array_get($nestedUserRolesEdges, 'node.1.acl.id'));
     }
 
     /**

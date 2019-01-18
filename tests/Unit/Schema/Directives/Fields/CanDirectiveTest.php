@@ -135,6 +135,7 @@ class CanDirectiveTest extends TestCase
     {
         $user = new User;
         $user->name = 'foo';
+
         return $user;
     }
 }

@@ -42,8 +42,8 @@ class User extends Authenticatable
 
     public function scopeCompanyName(Builder $query, array $args): Builder
     {
-        return $query->whereHas("company", function($q) use ($args){
-            $q->where("name", $args['company']);
+        return $query->whereHas('company', function ($q) use ($args) {
+            $q->where('name', $args['company']);
         });
     }
 }
