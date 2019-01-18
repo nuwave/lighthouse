@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
 class SubscriptionExtension extends GraphQLExtension
@@ -50,7 +51,7 @@ class SubscriptionExtension extends GraphQLExtension
     {
         $this->request = $request->request();
         $this->currentQuery = $request->isBatchedRequest()
-            ? array_get($this->request->toArray(), '0.query', '')
+            ? Arr::get($this->request->toArray(), '0.query', '')
             : $this->request->input('query', '');
     }
 
@@ -64,7 +65,7 @@ class SubscriptionExtension extends GraphQLExtension
     public function batchedQueryDidStart(int $index): void
     {
         $this->registry->reset();
-        $this->currentQuery = array_get($this->request->toArray(), "{$index}.query", '');
+        $this->currentQuery = Arr::get($this->request->toArray(), "{$index}.query", '');
     }
 
     /**

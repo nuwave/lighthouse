@@ -31,7 +31,7 @@ class Response implements GraphQLResponse
      */
     public function create(array $data): SymfonyResponse
     {
-        /** @var DeferExtension|null $deferExtension */
+        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension|null $deferExtension */
         if ($deferExtension = $this->extensionRegistry->get(DeferExtension::name())) {
             return $deferExtension->response($data);
         }

@@ -21,7 +21,7 @@ class OnPostCreated extends GraphQLSubscription
     }
 
     /**
-     * Filter subscribers who should receive subscription.
+     * Filter which subscribers should receive the subscription.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  mixed  $root

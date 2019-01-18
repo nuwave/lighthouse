@@ -2,8 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Support\Arr;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
 use GraphQL\Language\AST\OperationDefinitionNode;
@@ -124,7 +126,7 @@ class SubscriptionRegistry
     {
         // A subscription can be fired w/out a request so we must make
         // sure the schema has been generated.
-        app('graphql')->prepSchema();
+        app(GraphQL::class)->prepSchema();
 
         $documentNode = Parser::parse($subscriber->queryString, [
             'noLocation' => true,
@@ -145,7 +147,7 @@ class SubscriptionRegistry
                     ->toArray();
             })
             ->map(function ($subscriptionField): GraphQLSubscription {
-                return array_get(
+                return Arr::get(
                     $this->subscriptions,
                     $subscriptionField,
                     new NotFoundSubscription()

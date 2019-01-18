@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 abstract class GraphQLSubscription
 {
     /**
-     * Check if subscriber can listen to this subscription.
+     * Check if subscriber is allowed to listen to this subscription.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return bool
@@ -68,7 +68,7 @@ abstract class GraphQLSubscription
     abstract public function authorize(Subscriber $subscriber, Request $request);
 
     /**
-     * Filter subscribers who should receive subscription.
+     * Filter which subscribers should receive the subscription.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  mixed  $root
