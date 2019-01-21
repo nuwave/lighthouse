@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields\UpdateDirectiveTests\RelationshipTests;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -20,7 +19,7 @@ class BelongsToTest extends DBTestCase
             'user_id' => 1,
         ]);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -41,14 +40,13 @@ class BelongsToTest extends DBTestCase
             user_id: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateTask(input: {
                 id: 1
                 name: "foo"
-                user: {
-                    
-                }
+                user_id: 2
             }) {
                 id
                 name
@@ -57,12 +55,17 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateTask.id'));
-        $this->assertSame('foo', Arr::get($result, 'data.updateTask.name'));
-        $this->assertSame('2', Arr::get($result, 'data.updateTask.user.id'));
+        ')->assertJson([
+            'data' => [
+                'updateTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '2'
+                    ]
+                ]
+            ]
+        ]);
 
         $task = Task::first();
         $this->assertSame('2', $task->user_id);
