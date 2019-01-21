@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 class TracingExtension extends GraphQLExtension
 {
     /**
-     * @var Carbon
+     * @var \Carbon\Carbon
      */
     protected $requestStart;
 
@@ -24,6 +24,7 @@ class TracingExtension extends GraphQLExtension
 
     /**
      * Create instance of trace extension.
+     * @return void
      */
     public function __construct()
     {
@@ -43,9 +44,8 @@ class TracingExtension extends GraphQLExtension
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param DocumentAST $documentAST
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST
     {
@@ -58,9 +58,8 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
-     *
-     * @return TracingExtension
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
+     * @return $this
      */
     public function requestDidStart(ExtensionRequest $request): self
     {
@@ -72,9 +71,10 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle batch request start.
      *
-     * @param int $index
+     * @param  int  $index
+     * @return void
      */
-    public function batchedQueryDidStart($index)
+    public function batchedQueryDidStart(int $index): void
     {
         $this->resolvers = collect();
     }
@@ -82,11 +82,12 @@ class TracingExtension extends GraphQLExtension
     /**
      * Record resolver execution time.
      *
-     * @param ResolveInfo $info
-     * @param Carbon      $start
-     * @param Carbon      $end
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \Carbon\Carbon  $start
+     * @param  \Carbon\Carbon  $end
+     * @return void
      */
-    public function record(ResolveInfo $info, Carbon $start, Carbon $end)
+    public function record(ResolveInfo $info, Carbon $start, Carbon $end): void
     {
         $startOffset = abs(($start->micro - $this->requestStart->micro) * 1000);
         $duration = abs(($end->micro - $start->micro) * 1000);

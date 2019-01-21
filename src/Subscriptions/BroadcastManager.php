@@ -2,16 +2,17 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Pusher\Pusher;
 use Nuwave\Lighthouse\Support\DriverManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 
 /**
- * @method void                      broadcast(Subscriber $subscriber, array $data)
- * @method \Illuminate\Http\Response hook(\Illuminate\Http\Request $request)
- * @method \Illuminate\Http\Response authorized(\Illuminate\Http\Request $request)
- * @method \Illuminate\Http\Response unauthorized(\Illuminate\Http\Request $request)
+ * @method void broadcast(\Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber, array $data)
+ * @method \Symfony\Component\HttpFoundation\Response hook(\Illuminate\Http\Request $request)
+ * @method \Symfony\Component\HttpFoundation\Response authorized(\Illuminate\Http\Request $request)
+ * @method \Symfony\Component\HttpFoundation\Response unauthorized(\Illuminate\Http\Request $request)
  */
 class BroadcastManager extends DriverManager
 {
@@ -20,7 +21,7 @@ class BroadcastManager extends DriverManager
      *
      * @return string
      */
-    protected function configKey()
+    protected function configKey(): string
     {
         return 'lighthouse.subscriptions.broadcasters';
     }
@@ -30,7 +31,7 @@ class BroadcastManager extends DriverManager
      *
      * @return string
      */
-    protected function driverKey()
+    protected function driverKey(): string
     {
         return 'lighthouse.subscriptions.broadcaster';
     }
@@ -40,7 +41,7 @@ class BroadcastManager extends DriverManager
      *
      * @return string
      */
-    protected function interface()
+    protected function interface(): string
     {
         return Broadcaster::class;
     }
@@ -48,18 +49,18 @@ class BroadcastManager extends DriverManager
     /**
      * Create instance of pusher driver.
      *
-     * @param array $config
-     *
-     * @return Broadcaster
+     * @param  mixed[]  $config
+     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster
+     * @throws \Pusher\PusherException
      */
-    protected function createPusherDriver(array $config)
+    protected function createPusherDriver(array $config): PusherBroadcaster
     {
         $appKey = config('broadcasting.connections.pusher.key');
         $appSecret = config('broadcasting.connections.pusher.secret');
         $appId = config('broadcasting.connections.pusher.app_id');
         $options = config('broadcasting.connections.pusher.options', []);
 
-        $pusher = new \Pusher\Pusher($appKey, $appSecret, $appId, $options);
+        $pusher = new Pusher($appKey, $appSecret, $appId, $options);
 
         return new PusherBroadcaster($pusher);
     }
@@ -67,11 +68,10 @@ class BroadcastManager extends DriverManager
     /**
      * Create instance of log driver.
      *
-     * @param array $config
-     *
-     * @return LogBroadcaster
+     * @param  mixed[]  $config
+     * @return \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster
      */
-    protected function createLogDriver(array $config)
+    protected function createLogDriver(array $config): LogBroadcaster
     {
         return new LogBroadcaster($config);
     }

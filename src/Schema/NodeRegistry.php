@@ -6,15 +6,19 @@ use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class NodeRegistry
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
      * NodeRegistry constructor.
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -40,21 +44,21 @@ class NodeRegistry
     protected $currentType;
 
     /**
-     * @param string $typeName
+     * @param  string  $typeName
      *
      * The name of the ObjectType that can be resolved with the Node interface
      * e.g. "User"
      *
-     * @param \Closure $resolve
+     * @param  \Closure  $resolve
      *
      * A function that returns the actual value by ID, e.g.
      *
-     * function($id, $context, ResolveInfo $info)
+     * function($id, GraphQLContext $context, ResolveInfo $info)
      * {
      *   return $this->db->getUserById($id)
      * }
      *
-     * @return NodeRegistry
+     * @return $this
      */
     public function registerNode(string $typeName, \Closure $resolve): self
     {
@@ -66,10 +70,9 @@ class NodeRegistry
     /**
      * Register an Eloquent model that can be resolved as a Node.
      *
-     * @param string $typeName
-     * @param string $modelName
-     *
-     * @return NodeRegistry
+     * @param  string  $typeName
+     * @param  string  $modelName
+     * @return $this
      */
     public function registerModel(string $typeName, string $modelName): self
     {
@@ -83,16 +86,15 @@ class NodeRegistry
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param $rootValue
-     * @param array $args
-     * @param $context
-     * @param ResolveInfo $resolveInfo
-     *
-     * @throws Error
-     *
+     * @param  $rootValue
+     * @param  array  $args
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed
+     *
+     * @throws \GraphQL\Error\Error
      */
-    public function resolve($rootValue, $args, $context, ResolveInfo $resolveInfo)
+    public function resolve($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         [$decodedType, $decodedId] = $args['id'];
 
@@ -110,7 +112,7 @@ class NodeRegistry
     /**
      * Get the Type for the stashed type.
      *
-     * @return Type
+     * @return \GraphQL\Type\Definition\Type
      */
     public function resolveType(): Type
     {

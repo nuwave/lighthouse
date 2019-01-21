@@ -16,6 +16,7 @@ use GraphQL\Error\Debug;
 use GraphQL\Validator\Rules\DisableIntrospection;
 
 return [
+
     /*
     |--------------------------------------------------------------------------
     | GraphQL endpoint
@@ -25,6 +26,7 @@ return [
     | The default route endpoint is "yourdomain.com/graphql".
     |
     */
+
     'route_name' => 'graphql',
 
     /*
@@ -35,6 +37,7 @@ return [
     | This setting controls if GET requests to the GraphQL endpoint are allowed.
     |
     */
+
     'route_enable_get' => true,
 
     /*
@@ -42,16 +45,16 @@ return [
     | Route configuration
     |--------------------------------------------------------------------------
     |
-    | Additional configuration for the route group.
-    | Check options here https://lumen.laravel.com/docs/routing#route-groups
+    | Additional configuration for the route group https://lumen.laravel.com/docs/routing#route-groups
     |
     | Beware that middleware defined here runs before the GraphQL execution phase.
     | This means that errors will cause the whole query to abort and return a
     | response that is not spec-compliant. It is preferable to use directives
     | to add middleware to single fields in the schema.
-    | Read more about this in the docs https://lighthouse-php.netlify.com/docs/auth.html#apply-auth-middleware
+    | Read more https://lighthouse-php.com/docs/auth.html#apply-auth-middleware
     |
     */
+
     'route' => [
         'prefix' => '',
         // 'middleware' => ['loghttp']
@@ -67,6 +70,7 @@ return [
     | schema in this file (additional files may be imported).
     |
     */
+
     'schema' => [
         'register' => base_path('graphql/schema.graphql'),
     ],
@@ -76,11 +80,12 @@ return [
     | Schema Cache
     |--------------------------------------------------------------------------
     |
-    | A large part of the Schema generation is parsing into an AST.
+    | A large part of schema generation is parsing the schema into an AST.
     | This operation is pretty expensive so it is recommended to enable
-    | caching in production mode.
+    | caching in production mode, especially for large schemas.
     |
     */
+
     'cache' => [
         'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
@@ -96,10 +101,12 @@ return [
     | or an array, they are tried in order and the first match is used.
     |
     */
+
     'namespaces' => [
         'models' => ['App', 'App\\Models'],
         'queries' => 'App\\GraphQL\\Queries',
         'mutations' => 'App\\GraphQL\\Mutations',
+        'subscriptions' => 'App\\GraphQL\\Subscriptions',
         'interfaces' => 'App\\GraphQL\\Interfaces',
         'unions' => 'App\\GraphQL\\Unions',
         'scalars' => 'App\\GraphQL\\Scalars',
@@ -116,6 +123,7 @@ return [
     | A setting of "0" means that the validation rule is disabled.
     |
     */
+
     'security' => [
         'max_query_complexity' => 0,
         'max_query_depth' => 0,
@@ -131,6 +139,7 @@ return [
     | Debugging is only applied if the global Laravel debug config is set to true.
     |
     */
+
     'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
 
     /*
@@ -138,11 +147,12 @@ return [
     | Error Handlers
     |--------------------------------------------------------------------------
     |
-    | Register error handlers that receive the Errors that occur during execution and
-    | handle them. You may use this to log, filter or format the errors.
-    | The classes must implement Nuwave\Lighthouse\Execution\ErrorHandler
+    | Register error handlers that receive the Errors that occur during execution
+    | and handle them. You may use this to log, filter or format the errors.
+    | The classes must implement \Nuwave\Lighthouse\Execution\ErrorHandler
     |
     */
+
     'error_handlers' => [
         \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class,
     ],
@@ -155,9 +165,11 @@ return [
     | Register extension classes that extend \Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension
     |
     */
+
     'extensions' => [
-        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
+        // \Nuwave\Lighthouse\Schema\Extensions\DeferExtension::class,
         // \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
     ],
 
     /*
@@ -168,7 +180,8 @@ return [
     | Specify which controller (and method) you want to handle GraphQL requests.
     |
     */
-    'controller' => 'Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController@query',
+
+    'controller' => \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class.'@query',
 
     /*
     |--------------------------------------------------------------------------
@@ -179,6 +192,7 @@ return [
     | When creating a Relay compliant server, this must be named "id".
     |
     */
+
     'global_id_field' => 'id',
 
     /*
@@ -187,9 +201,10 @@ return [
     |--------------------------------------------------------------------------
     |
     | GraphQL query batching means sending multiple queries to the server in one request,
-    | You may set this flag to process/deny batched queries.
+    | You may set this flag to either process or deny batched queries.
     |
     */
+
     'batched_queries' => true,
 
     /*
@@ -201,8 +216,9 @@ return [
     | You may set this flag to have @create|@update mutations transactional or not.
     |
     */
+
     'transactional_mutations' => true,
-  
+
     /*
     |--------------------------------------------------------------------------
     | GraphQL Subscriptions
@@ -211,7 +227,8 @@ return [
     | Here you can define GraphQL subscription "broadcasters" and "storage" drivers
     | as well their required configuration options.
     |
-     */
+    */
+
     'subscriptions' => [
         /*
          * Determines if broadcasts should be queued by default.
@@ -221,7 +238,7 @@ return [
         /*
          * Default subscription storage.
          *
-         * NOTE: Any laravel supported cache driver options are available here.
+         * Any Laravel supported cache driver options are available here.
          */
         'storage' => env('LIGHTHOUSE_SUBSCRIPTION_STORAGE', 'redis'),
 
@@ -231,7 +248,7 @@ return [
         'broadcaster' => env('LIGHTHOUSE_BROADCASTER', 'pusher'),
 
         /*
-         * Subscription broadcasting drivers w/ config options.
+         * Subscription broadcasting drivers with config options.
          */
         'broadcasters' => [
             'log' => [
@@ -239,9 +256,10 @@ return [
             ],
             'pusher' => [
                 'driver' => 'pusher',
-                'routes' => 'Nuwave\Lighthouse\Subscriptions\SubscriptionRouter@pusher',
+                'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
             ],
         ],
     ],
+
 ];
 ```

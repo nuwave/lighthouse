@@ -10,7 +10,7 @@ class PaginateDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanAliasRelayToConnection()
+    public function itCanAliasRelayToConnection(): void
     {
         $connection = $this->getConnectionQueryField('connection');
         $relay = $this->getConnectionQueryField('relay');
@@ -37,7 +37,7 @@ class PaginateDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itOnlyRegistersOneTypeForMultiplePaginators()
+    public function itOnlyRegistersOneTypeForMultiplePaginators(): void
     {
         $schema = $this->buildSchema('
         type User {
@@ -69,7 +69,7 @@ class PaginateDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itRegistersPaginatorFromTypeExtensionField()
+    public function itRegistersPaginatorFromTypeExtensionField(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {

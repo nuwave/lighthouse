@@ -3,16 +3,10 @@
 namespace Tests\Unit\Schema\Extensions;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
 class TracingExtensionTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
@@ -29,52 +23,76 @@ SCHEMA;
     /**
      * @test
      */
-    public function itCanAddTracingExtensionMetaToResult()
+    public function itCanAddTracingExtensionMetaToResult(): void
     {
-        $result = $this->queryViaHttp('
+        $this->query('
         {
             foo
         }
-        ');
-
-        $this->assertArrayHasKey('tracing', Arr::get($result, 'extensions'));
-        $this->assertArrayHasKey('resolvers', Arr::get($result, 'extensions.tracing.execution'));
+        ')->assertJsonStructure([
+            'extensions' => [
+                'tracing' => [
+                    'execution' => [
+                        'resolvers',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanAddTracingExtensionMetaToBatchedResults()
+    public function itCanAddTracingExtensionMetaToBatchedResults(): void
     {
-        $json = [
-            ['query' => '{ foo }'],
-            ['query' => '{ foo }'],
+        $postData = [
+            'query' => '
+                {
+                    foo
+                }
+                ',
         ];
-
-        $result = $this->postJson('graphql', $json)->json();
-
-        $this->assertCount(2, $result);
-        $this->assertArrayHasKey('tracing', Arr::get($result[0], 'extensions'));
-        $this->assertArrayHasKey('resolvers', Arr::get($result[0], 'extensions.tracing.execution'));
-
-        $this->assertArrayHasKey('tracing', Arr::get($result[1], 'extensions'));
-        $this->assertArrayHasKey('resolvers', Arr::get($result[1], 'extensions.tracing.execution'));
+        $expectedResponse = [
+            'extensions' => [
+                'tracing' => [
+                    'execution' => [
+                        'resolvers',
+                    ],
+                ],
+            ],
+        ];
+        $result = $this->postGraphQL([
+            $postData,
+            $postData,
+        ])->assertJsonCount(2)
+            ->assertJsonStructure([
+                $expectedResponse,
+                [
+                    'extensions' => [
+                        'tracing' => [
+                            'execution' => [
+                                'resolvers',
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
 
         $this->assertSame(
-            Arr::get($result[0], 'extensions.tracing.startTime'),
-            Arr::get($result[1], 'extensions.tracing.startTime')
+            $result->jsonGet('0.extensions.tracing.startTime'),
+            $result->jsonGet('1.extensions.tracing.startTime')
         );
 
         $this->assertNotSame(
-            Arr::get($result[0], 'extensions.tracing.endTime'),
-            Arr::get($result[1], 'extensions.tracing.endTime')
+            $result->jsonGet('0.extensions.tracing.endTime'),
+            $result->jsonGet('1.extensions.tracing.endTime')
         );
 
-        $this->assertCount(1, Arr::get($result[0], 'extensions.tracing.execution.resolvers'));
-        $this->assertCount(1, Arr::get($result[1], 'extensions.tracing.execution.resolvers'));
+        $this->assertCount(1, $result->jsonGet('0.extensions.tracing.execution.resolvers'));
+        $this->assertCount(1, $result->jsonGet('1.extensions.tracing.execution.resolvers'));
     }
 
-    public function resolve()
+    public function resolve(): string
     {
         usleep(20000); // 20 milliseconds
         return 'bar';

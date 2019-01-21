@@ -5,6 +5,7 @@ namespace Tests\Integration;
 use Tests\TestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Queries\Foo;
+use Illuminate\Foundation\Testing\TestResponse;
 
 class ValidationTest extends TestCase
 {
@@ -54,22 +55,32 @@ class ValidationTest extends TestCase
     }
     ';
 
+    /**
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return string
+     */
     public function resolvePassword($root, array $args): string
     {
         return $args['password'] ?? 'no-password';
     }
 
+    /**
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return string
+     */
     public function resolveEmail($root, array $args): string
     {
-        return array_get($args, 'email.emailAddress', 'no-email');
+        return Arr::get($args, 'email.emailAddress', 'no-email');
     }
 
     /**
      * @test
      */
-    public function itValidatesDifferentPathsIndividually()
+    public function itValidatesDifferentPathsIndividually(): void
     {
-        $query = '
+        $result = $this->query('
         {
             foo(
                 input: [
@@ -89,9 +100,7 @@ class ValidationTest extends TestCase
                 ]
             )
         }
-        ';
-
-        $result = graphql()->executeQuery($query)->toArray();
+        ');
 
         $this->assertValidationKeysSame([
             'required',
@@ -105,9 +114,9 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itValidatesList()
+    public function itValidatesList(): void
     {
-        $query = '
+        $result = $this->query('
         {
             foo(
                 list: [
@@ -117,9 +126,7 @@ class ValidationTest extends TestCase
                 ]
             )
         }
-        ';
-
-        $result = graphql()->executeQuery($query)->toArray();
+        ');
 
         $this->assertValidationKeysSame([
             'required',
@@ -132,9 +139,9 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itValidatesInputCount()
+    public function itValidatesInputCount(): void
     {
-        $query = '
+        $result = $this->query('
         {
             foo(
                 input: [{
@@ -142,9 +149,7 @@ class ValidationTest extends TestCase
                 }]
             )
         }
-        ';
-
-        $result = graphql()->executeQuery($query)->toArray();
+        ');
 
         $this->assertValidationKeysSame([
             'required',
@@ -155,102 +160,97 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itPassesIfNothingRequiredIsMissing()
+    public function itPassesIfNothingRequiredIsMissing(): void
     {
-        $query = '
+        $this->query('
         {
             foo(required: "foo")
         }
-        ';
-
-        $result = graphql()->executeQuery($query)->toArray();
-
-        $expected = [
+        ')->assertJson([
             'data' => [
                 'foo' => Foo::THE_ANSWER,
             ],
-        ];
-
-        $this->assertSame($expected, $result);
+        ]);
     }
 
     /**
      * @test
      */
-    public function itEvaluatesArgDirectivesInDefinitionOrder()
+    public function itEvaluatesArgDirectivesInDefinitionOrder(): void
     {
-        $validPasswordQuery = '
+        $validPasswordResult = $this->query('
         {
             password(password: " 1234567 ")
         }
-        ';
-        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+        ');
+        $password = $validPasswordResult->jsonGet('data.password');
 
-        $password = Arr::get($result, 'data.password');
-        $this->assertNotSame('password', ' 1234567 ');
+        $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
 
-        $invalidPasswordQuery = '
+        $invalidPasswordResult = $this->query('
         {
             password(password: " 1234 ")
         }
-        ';
-        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+        ')->assertJson([
+            'data' => [
+                'password' => null,
+            ],
+        ]);
 
-        $password = Arr::get($result, 'data.password');
-        $this->assertNull($password);
-        $this->assertValidationKeysSame(['password'], $result);
+        $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
     }
 
     /**
      * @test
      */
-    public function itEvaluatesConditionalValidation()
+    public function itEvaluatesConditionalValidation(): void
     {
-        $validPasswordQuery = '
+        $validPasswordResult = $this->query('
         {
             password
         }
-        ';
-        $result = graphql()->executeQuery($validPasswordQuery)->toArray();
+        ');
 
-        $this->assertSame('no-password', Arr::get($result, 'data.password'));
+        $this->assertSame('no-password', $validPasswordResult->jsonGet('data.password'));
 
-        $invalidPasswordQuery = '
+        $invalidPasswordResult = $this->query('
         {
             password(id: "foo")
         }
-        ';
-        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
+        ')->assertJson([
+            'data' => [
+                'password' => null,
+            ],
+        ]);
 
-        $password = Arr::get($result, 'data.password');
-        $this->assertNull($password);
-        $this->assertValidationKeysSame(['password'], $result);
+        $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
     }
 
     /**
      * @test
      */
-    public function itEvaluatesInputArgValidation()
+    public function itEvaluatesInputArgValidation(): void
     {
-        $invalidPasswordQuery = '
+        $result = $this->query('
         {
             password(id: "bar", password: "123456")
         }
-        ';
-        $result = graphql()->executeQuery($invalidPasswordQuery)->toArray();
-        $password = Arr::get($result, 'data.password');
+        ')->assertJson([
+            'data' => [
+                'password' => null,
+            ],
+        ]);
 
-        $this->assertNull($password);
         $this->assertValidationKeysSame(['bar'], $result);
     }
 
     /**
      * @test
      */
-    public function itEvaluatesNonNullInputArgValidation()
+    public function itEvaluatesNonNullInputArgValidation(): void
     {
-        $validEmailQuery = '
+        $this->query('
         {
             email(
                 userId: 1
@@ -260,12 +260,13 @@ class ValidationTest extends TestCase
                 }
             )
         }
-        ';
-        $result = graphql()->executeQuery($validEmailQuery)->toArray();
-        $email = Arr::get($result, 'data.email');
-        $this->assertSame('john@doe.com', $email);
+        ')->assertJson([
+            'data' => [
+                'email' => 'john@doe.com',
+            ],
+        ]);
 
-        $invalidEmailQuery = '
+        $invalidEmailResult = $this->query('
         {
             email(
                 userId: 1
@@ -274,41 +275,48 @@ class ValidationTest extends TestCase
                 }
             )
         }
-        ';
-        $result = graphql()->executeQuery($invalidEmailQuery)->toArray();
-        $email = Arr::get($result, 'data.email');
-        $this->assertNull($email);
+        ')->assertJson([
+            'data' => [
+                'email' => null,
+            ],
+        ]);
         $this->assertValidationKeysSame([
             'email.emailAddress',
             'email.business',
-        ], $result);
+        ], $invalidEmailResult);
     }
 
     /**
      * @test
      */
-    public function itErrorsIfSomethingRequiredIsMissing()
+    public function itErrorsIfSomethingRequiredIsMissing(): void
     {
-        $query = '
+        $result = $this->query('
         {
             foo
         }
-        ';
-
-        $result = graphql()->executeQuery($query)->toArray();
-
-        $expected = [
+        ')->assertJson([
             'data' => [
                 'foo' => null,
             ],
-        ];
-        $this->assertArraySubset($expected, $result);
-        $this->assertValidationKeysSame(['required'], $result);
+        ]);
+
+        $this->assertValidationKeysSame([
+            'required',
+        ], $result);
     }
 
-    protected function assertValidationKeysSame(array $keys, array $result)
+    /**
+     * Assert that the returned result contains an exactly defined array of validation keys.
+     *
+     * @param  array  $keys
+     * @param  \Illuminate\Foundation\Testing\TestResponse  $result
+     * @return void
+     */
+    protected function assertValidationKeysSame(array $keys, TestResponse $result): void
     {
-        $validation = Arr::get($result, 'errors.0.extensions.validation');
+        $validation = $result->jsonGet('errors.0.extensions.validation');
+
         $this->assertSame($keys, array_keys($validation));
     }
 }

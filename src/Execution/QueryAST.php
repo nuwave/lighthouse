@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Nuwave\Lighthouse\Execution;
 
 use GraphQL\Language\Parser;
@@ -14,17 +12,15 @@ use GraphQL\Language\AST\OperationDefinitionNode;
 class QueryAST
 {
     /**
-     * @var Collection
+     * The definitions contained in the AST of an incoming query.
+     *
+     * @var \Illuminate\Support\Collection
      */
     protected $definitions;
 
     /**
-     * @var Collection
-     */
-    protected $typeExtensions;
-
-    /**
-     * @param DocumentNode $documentNode
+     * @param  \GraphQL\Language\AST\DocumentNode  $documentNode
+     * @return void
      */
     public function __construct(DocumentNode $documentNode)
     {
@@ -32,23 +28,22 @@ class QueryAST
     }
 
     /**
-     * Create a new DocumentAST instance from a schema.
+     * Create a new instance from a query string.
      *
-     * @param string $schema
-     *
-     * @return QueryAST
+     * @param  string  $query
+     * @return static
      */
-    public static function fromSource(string $schema): self
+    public static function fromSource(string $query): self
     {
         return new static(
-            Parser::parse($schema)
+            Parser::parse($query)
         );
     }
 
     /**
-     * Get all definitions for operations.
+     * Get all operation definitions.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\OperationDefinitionNode>
      */
     public function operationDefinitions(): Collection
     {
@@ -58,7 +53,7 @@ class QueryAST
     /**
      * Get all fragment definitions.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\FragmentDefinitionNode>
      */
     public function fragmentDefinitions(): Collection
     {
@@ -68,9 +63,8 @@ class QueryAST
     /**
      * Get all definitions of a given type.
      *
-     * @param string $typeClassName
-     *
-     * @return Collection
+     * @param  string  $typeClassName
+     * @return \Illuminate\Support\Collection
      */
     protected function definitionsByType(string $typeClassName): Collection
     {

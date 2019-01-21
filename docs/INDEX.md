@@ -3,7 +3,7 @@ home: true
 actionText: Get Started  →
 actionLink: /docs/latest
 
-footer: Copyright © 2018 Christopher Moore
+footer: Copyright © 2019 Christopher Moore
 ---
 
 <div class="home-container">

@@ -2,20 +2,22 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
 class Serializer implements ContextSerializer
 {
     /**
-     * @var
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
     protected $createsContext;
 
     /**
-     * @param CreatesContext $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @return void
      */
     public function __construct(CreatesContext $createsContext)
     {
@@ -25,93 +27,56 @@ class Serializer implements ContextSerializer
     /**
      * Serialize the context.
      *
-     * @param mixed $context
-     *
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @return string
      */
-    public function serialize($context)
+    public function serialize(GraphQLContext $context): string
     {
-        $user = null;
-        $request = null;
+        $request = $context->request();
 
-        if ($user = data_get($context, 'user')) {
-            $user = serialize($user);
-        }
-
-        if ($request = data_get($context, 'request')) {
-            $request = $this->serializeRequest($request);
-        }
-
-        return json_encode(compact('user', 'request'));
+        return serialize([
+            'request' => [
+                'query' => $request->query->all(),
+                'request' => $request->request->all(),
+                'attributes' => $request->attributes->all(),
+                'cookies' => [],
+                'files' => [],
+                'server' => Arr::except($request->server->all(), ['HTTP_AUTHORIZATION']),
+                'content' => $request->getContent(),
+            ],
+            'user' => serialize($context->user()),
+        ]);
     }
 
     /**
      * Unserialize the context.
      *
-     * @param string $context
-     *
-     * @return mixed
+     * @param  string  $context
+     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
-    public function unserialize($context)
+    public function unserialize(string $context): GraphQLContext
     {
-        $data = json_decode($context, true);
+        [
+            'request' => $rawRequest,
+            'user' => $rawUser
+        ] = unserialize($context);
 
-        if (! $serializedRequest = array_get($data, 'request')) {
-            return;
-        }
-
-        return $this->createsContext->generate(
-            $this->unserializeRequest($serializedRequest)
-        );
-    }
-
-    /**
-     * Serialize the request object.
-     *
-     * @param Request $request
-     *
-     * @return string
-     */
-    protected function serializeRequest(Request $request)
-    {
-        return json_encode([
-            'query' => $request->query->all(),
-            'request' => $request->request->all(),
-            'attributes' => $request->attributes->all(),
-            'cookies' => [],
-            'files' => [],
-            'server' => array_except($request->server->all(), ['HTTP_AUTHORIZATION']),
-            'content' => $request->getContent(),
-            'user' => serialize($request->user()),
-        ]);
-    }
-
-    /**
-     * Unserialize the request object.
-     *
-     * @param string $request
-     *
-     * @return Request
-     */
-    protected function unserializeRequest($request): Request
-    {
-        $data = json_decode($request, true);
         $request = new Request(
-            array_get($data, 'query'),
-            array_get($data, 'request'),
-            array_get($data, 'attributes'),
-            array_get($data, 'cookies'),
-            array_get($data, 'files'),
-            array_get($data, 'server'),
-            array_get($data, 'content')
+            $rawRequest['query'],
+            $rawRequest['request'],
+            $rawRequest['attributes'],
+            $rawRequest['cookies'],
+            $rawRequest['files'],
+            $rawRequest['server'],
+            $rawRequest['content']
         );
 
-        $request->setUserResolver(function () use ($data) {
-            $user = array_get($data, 'user');
+        $request->setUserResolver(
+            function () use ($rawUser) {
+                return unserialize($rawUser);
+            }
+        );
 
-            return ! empty($user) ? unserialize($user) : null;
-        });
-
-        return $request;
+        return $this->createsContext->generate($request);
     }
 }

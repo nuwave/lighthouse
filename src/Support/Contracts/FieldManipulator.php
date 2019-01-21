@@ -9,11 +9,10 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 interface FieldManipulator extends Directive
 {
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(
         FieldDefinitionNode $fieldDefinition,

@@ -18,25 +18,29 @@ class RelationBatchLoader extends BatchLoader
      * @var string
      */
     protected $relationName;
+
     /**
      * The arguments that were passed to the field.
      *
-     * @var array
+     * @var mixed[]
      */
     protected $args;
+
     /**
      * Names of the scopes that have to be called for the query.
      *
      * @var string[]
      */
     protected $scopes;
+
     /**
      * The ResolveInfo of the currently executing field. Used for retrieving
      * the QueryFilter.
      *
-     * @var ResolveInfo
+     * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
+
     /**
      * The pagination type can either be "connection", "paginator" or null, in which case there is no pagination.
      *
@@ -45,11 +49,12 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationType;
 
     /**
-     * @param string      $relationName
-     * @param array       $args
-     * @param array       $scopes
-     * @param ResolveInfo $resolveInfo
-     * @param string|null $paginationType
+     * @param  string  $relationName
+     * @param  array  $args
+     * @param  string[]    $scopes
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @param  string|null  $paginationType
+     * @return void
      */
     public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null)
     {
@@ -63,7 +68,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Resolve the keys.
      *
-     * @return array
+     * @return mixed[]
      */
     public function resolve(): array
     {
@@ -95,7 +100,9 @@ class RelationBatchLoader extends BatchLoader
     }
 
     /**
-     * @return ModelRelationFetcher
+     * Construct a new instance of a relation fetcher.
+     *
+     * @return \Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher
      */
     protected function getRelationFetcher(): ModelRelationFetcher
     {
@@ -115,7 +122,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Model>
      */
     protected function getParentModels(): Collection
     {

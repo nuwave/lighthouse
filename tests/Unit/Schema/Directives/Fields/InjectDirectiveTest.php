@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 
 class InjectDirectiveTest extends DBTestCase
@@ -11,7 +10,7 @@ class InjectDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanInjectDataFromContextIntoArgs()
+    public function itCanInjectDataFromContextIntoArgs(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
@@ -27,17 +26,20 @@ class InjectDirectiveTest extends DBTestCase
                 @field(resolver: "'.addslashes(self::class).'@resolveUser")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             me {
                 id
             }
         }
-        ';
-
-        $result = $this->queryViaHttp($query);
-
-        $this->assertSame(1, Arr::get($result, 'data.me.id'));
+        ')->assertJson([
+            'data' => [
+                'me' => [
+                    'id' => 1,
+                ],
+            ],
+        ]);
     }
 
     public function resolveUser($root, array $args): array

@@ -10,11 +10,11 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 class SchemaSourceProviderTest extends TestCase
 {
+    /**
+     * @var string
+     */
     const SCHEMA_PATH = __DIR__.'/schema/';
 
-    /**
-     * Set up test case.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -36,11 +36,6 @@ class SchemaSourceProviderTest extends TestCase
         $currentDir->deleteDir('schema');
     }
 
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         $app->singleton(SchemaSourceProvider::class, function () {
@@ -51,7 +46,7 @@ class SchemaSourceProviderTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetRootPath()
+    public function itCanSetRootPath(): void
     {
         $this->filesystem->put('foo', 'bar');
 

@@ -8,7 +8,6 @@ use Tests\Utils\Models\Closure;
 use Tests\Utils\Models\Category;
 use Tests\Utils\ModelsSecondary\OnlyHere;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Tests\Utils\ModelsSecondary\Category as CategorySecondary;
@@ -26,7 +25,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itDefaultsToFieldTypeForTheModelClass()
+    public function itDefaultsToFieldTypeForTheModelClass(): void
     {
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
@@ -39,7 +38,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfTheClassIsNotAModel()
+    public function itThrowsIfTheClassIsNotAModel(): void
     {
         $directive = $this->constructFieldDirective('foo: Exception @dummy');
 
@@ -50,7 +49,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itResolvesAModelThatIsNamedLikeABaseClass()
+    public function itResolvesAModelThatIsNamedLikeABaseClass(): void
     {
         $directive = $this->constructFieldDirective('foo: Closure @dummy');
 
@@ -63,7 +62,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itPrefersThePrimaryModelNamespace()
+    public function itPrefersThePrimaryModelNamespace(): void
     {
         $directive = $this->constructFieldDirective('foo: Category @dummy');
 
@@ -76,7 +75,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itAllowsOverwritingTheDefaultModel()
+    public function itAllowsOverwritingTheDefaultModel(): void
     {
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy(model: "Tests\\\Utils\\\ModelsSecondary\\\Category")');
 
@@ -89,7 +88,7 @@ class BaseDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itResolvesFromTheSecondaryModelNamespace()
+    public function itResolvesFromTheSecondaryModelNamespace(): void
     {
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy');
 
@@ -111,9 +110,8 @@ class BaseDirectiveTest extends TestCase
      *
      * Calls to non-public methods are piped through by the
      *
-     * @param TypeSystemDefinitionNode $definitionNode
-     *
-     * @return BaseDirective
+     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
+     * @return \Nuwave\Lighthouse\Schema\Directives\BaseDirective
      */
     protected function constructTestDirective($definitionNode): BaseDirective
     {
@@ -131,9 +129,8 @@ class BaseDirectiveTest extends TestCase
             /**
              * Allow to call protected methods from the test.
              *
-             * @param string  $method
-             * @param mixed[] $args
-             *
+             * @param  string  $method
+             * @param  mixed[] $args
              * @return mixed
              */
             public function __call(string $method, $args)

@@ -68,8 +68,7 @@ class TrimDirective implements ArgTransformerDirective
     /**
      * Remove whitespace from the beginning and end of a given input.
      *
-     * @param string $argumentValue
-     *
+     * @param  string  $argumentValue
      * @return mixed
      */
     public function transform($argumentValue): string
@@ -105,7 +104,7 @@ class CreateUser
     public function resolve($root, array $args)
     {
         return User::create([
-            // This will be the "trimed" value of the `name` argument
+            // This will be the trimmed value of the `name` argument
             'name' => $args['name']
         ]);
     }
@@ -155,10 +154,9 @@ class EqDirective implements ArgFilterDirective
     }
 
     /**
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param string                                                                   $columnName
-     * @param mixed                                                                    $value
-     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  string  $columnName
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function applyFilter($builder, string $columnName, $value)

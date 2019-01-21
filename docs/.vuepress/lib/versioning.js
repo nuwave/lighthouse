@@ -43,7 +43,7 @@ module.exports = {
     console.log('\n')
 
     if (!fs.existsSync(`${path}/.vuepress/versions.json`)) {
-      this.error('File .vupress/versions.json not found')
+      this.error('File .vuepress/versions.json not found')
     }
 
     if (typeof version === 'undefined') {

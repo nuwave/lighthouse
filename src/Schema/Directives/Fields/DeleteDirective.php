@@ -27,9 +27,8 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -76,9 +75,9 @@ class DeleteDirective extends BaseDirective implements FieldResolver
     /**
      * Ensure there is only a single argument defined on the field.
      *
-     * @throws DirectiveException
+     * @return \GraphQL\Language\AST\InputValueDefinitionNode
      *
-     * @return InputValueDefinitionNode
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getSingleArgumentDefinition(): InputValueDefinitionNode
     {

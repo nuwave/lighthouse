@@ -2,18 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 
 class SubscriptionExtension extends GraphQLExtension
 {
     /**
-     * @var SubscriptionRegistry
+     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
      */
     protected $registry;
 
     /**
-     * @var Request
+     * @var \Illuminate\Http\Request
      */
     protected $request;
 
@@ -23,7 +23,8 @@ class SubscriptionExtension extends GraphQLExtension
     protected $currentQuery = '';
 
     /**
-     * @param SubscriptionRegistry $registry
+     * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $registry
+     * @return void
      */
     public function __construct(SubscriptionRegistry $registry)
     {
@@ -43,25 +44,28 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
+     * @return void
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function requestDidStart(ExtensionRequest $request): void
     {
         $this->request = $request->request();
         $this->currentQuery = $request->isBatchedRequest()
-            ? array_get($this->request->toArray(), '0.query', '')
+            ? Arr::get($this->request->toArray(), '0.query', '')
             : $this->request->input('query', '');
     }
 
     /**
      * Handle batch request start.
      *
-     * @param int index
+     * @param  int index
+     *
+     * @return void
      */
-    public function batchedQueryDidStart($index)
+    public function batchedQueryDidStart(int $index): void
     {
         $this->registry->reset();
-        $this->currentQuery = array_get($this->request->toArray(), "{$index}.query", '');
+        $this->currentQuery = Arr::get($this->request->toArray(), "{$index}.query", '');
     }
 
     /**

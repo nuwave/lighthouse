@@ -5,7 +5,6 @@ namespace Tests\Unit\Execution\Utils;
 use Tests\TestCase;
 use Prophecy\Argument;
 use Illuminate\Http\Request;
-use Prophecy\Prophecy\ObjectProphecy;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -15,17 +14,21 @@ use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionTest extends TestCase
 {
+    /**
+     * @var string
+     */
     const SUBSCRIPTION_FIELD = 'postCreated';
 
-    /** @var SubscriptionRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
+     */
     protected $registry;
 
-    /** @var ObjectProphecy */
+    /**
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
     protected $broadcaster;
 
-    /**
-     * Set up test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -47,9 +50,13 @@ class SubscriptionTest extends TestCase
     /**
      * @test
      */
-    public function itCanSendSubscriptionToBroadcaster()
+    public function itCanSendSubscriptionToBroadcaster(): void
     {
-        $root = ['post' => ['id' => 1]];
+        $root = [
+            'post' => [
+                'id' => 1,
+            ],
+        ];
 
         $this->broadcaster->broadcast(
             Argument::type(GraphQLSubscription::class),
@@ -63,7 +70,7 @@ class SubscriptionTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsOnInvalidSubscriptionField()
+    public function itThrowsOnInvalidSubscriptionField(): void
     {
         $this->broadcaster->broadcast(Argument::any())->shouldNotBeCalled();
         $this->expectException(\InvalidArgumentException::class);
@@ -71,7 +78,7 @@ class SubscriptionTest extends TestCase
         Subscription::broadcast('unknownField', []);
     }
 
-    public function resolve()
+    public function resolve(): string
     {
         return self::SUBSCRIPTION_FIELD;
     }
@@ -79,12 +86,12 @@ class SubscriptionTest extends TestCase
     protected function subscription(): GraphQLSubscription
     {
         return new class() extends GraphQLSubscription {
-            public function authorize(Subscriber $subscriber, Request $request)
+            public function authorize(Subscriber $subscriber, Request $request): bool
             {
                 return true;
             }
 
-            public function filter(Subscriber $subscriber, $root)
+            public function filter(Subscriber $subscriber, $root): bool
             {
                 return true;
             }

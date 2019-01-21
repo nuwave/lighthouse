@@ -74,8 +74,8 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param  NodeValue  $parent
-     * @param  FieldDefinitionNode  $field
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $parent
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
      * @return void
      */
     public function __construct(NodeValue $parent, FieldDefinitionNode $field)
@@ -183,6 +183,8 @@ class FieldValue
      * Get default field resolver.
      *
      * @return \Closure
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function defaultResolver(): Closure
     {
@@ -219,6 +221,7 @@ class FieldValue
      * Get the default resolver for a subscription field.
      *
      * @return \Closure
+     *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function defaultSubscriptionResolver(): Closure
@@ -243,9 +246,9 @@ class FieldValue
             );
         }
 
-        /** @var GraphQLSubscription $subscription */
+        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
         $subscription = app($className);
-        /** @var SubscriptionRegistry $subscriptionRegistry */
+        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $subscriptionRegistry */
         $subscriptionRegistry = app(SubscriptionRegistry::class);
 
         // Subscriptions can only be placed on a single field on the root
@@ -260,9 +263,9 @@ class FieldValue
                 return $subscription->resolve($root->root, $args, $context, $resolveInfo);
             }
 
-            /** @var ExtensionRegistry $extensionRegistry */
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry */
             $extensionRegistry = app(ExtensionRegistry::class);
-            /** @var SubscriptionExtension $subscriptionExtension */
+            /** @var \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension $subscriptionExtension */
             $subscriptionExtension = $extensionRegistry->get(SubscriptionExtension::name());
 
             $subscriber = Subscriber::initialize(

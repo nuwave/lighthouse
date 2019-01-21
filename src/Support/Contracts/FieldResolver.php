@@ -12,9 +12,8 @@ interface FieldResolver extends Directive
      * This must call $fieldValue->setResolver() before returning
      * the FieldValue.
      *
-     * @param FieldValue $fieldValue
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue);
 }

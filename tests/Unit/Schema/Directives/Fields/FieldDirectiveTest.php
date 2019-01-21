@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Queries\FooBar;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
@@ -12,79 +11,86 @@ class FieldDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itAssignsResolverFromCombinedDefinition()
+    public function itAssignsResolverFromCombinedDefinition(): void
     {
-        $schema = '
+        $this->schema = '
         type Query {
             bar: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo@bar")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             bar
         }        
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('foo.bar', Arr::get($result, 'data.bar'));
+        ')->assertJson([
+            'data' => [
+                'bar' => 'foo.bar',
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanResolveFieldWithMergedArgs()
+    public function itCanResolveFieldWithMergedArgs(): void
     {
-        $schema = '
+        $this->schema = '
         type Query {
             bar: String! @field(resolver: "Tests\\\Utils\\\Resolvers\\\Foo@baz" args:["foo.baz"])
         }
         ';
-        $query = '
+
+        $this->query('
         {
             bar
         }        
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('foo.baz', Arr::get($result, 'data.bar'));
+        ')->assertJson([
+            'data' => [
+                'bar' => 'foo.baz',
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itUsesDefaultFieldNamespace()
+    public function itUsesDefaultFieldNamespace(): void
     {
-        $schema = '
+        $this->schema = '
         type Query {
             bar: String! @field(resolver: "FooBar@customResolve")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             bar
         }        
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame(FooBar::CUSTOM_RESOLVE_RESULT, Arr::get($result, 'data.bar'));
+        ')->assertJson([
+            'data' => [
+                'bar' => FooBar::CUSTOM_RESOLVE_RESULT,
+            ],
+        ]);
     }
 
     /**
      * @test
      */
-    public function itThrowsAnErrorOnlyOnePartIsDefined()
+    public function itThrowsAnErrorOnlyOnePartIsDefined(): void
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+
+        $this->schema = '
         type Query {
             bar: String! @field(resolver: "bar")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             bar
         }        
-        ';
-        $this->execute($schema, $query);
+        ');
     }
 }

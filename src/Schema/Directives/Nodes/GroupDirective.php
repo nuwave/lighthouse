@@ -9,8 +9,6 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use GraphQL\Language\AST\ObjectTypeExtensionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
@@ -38,10 +36,10 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param Node $node
-     * @param DocumentAST $documentAST
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
@@ -57,11 +55,10 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     *
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
      */
     protected function setNamespaceDirectiveOnFields($objectType)
     {
@@ -79,7 +76,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
         $objectType->fields = new NodeList(
             collect($objectType->fields)
-                ->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue) {
+                ->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue): FieldDefinitionNode {
                     $existingNamespaces = ASTHelper::directiveDefinition(
                         $fieldDefinition,
                         NamespaceDirective::NAME
@@ -100,10 +97,9 @@ class GroupDirective extends BaseDirective implements NodeManipulator
     }
 
     /**
-     * @param string $namespaceValue
-     * @param DirectiveNode $directive
-     *
-     * @return DirectiveNode
+     * @param  string  $namespaceValue
+     * @param  \GraphQL\Language\AST\DirectiveNode  $directive
+     * @return \GraphQL\Language\AST\DirectiveNode
      */
     protected function mergeNamespaceOnExistingDirective(string $namespaceValue, DirectiveNode $directive): DirectiveNode
     {

@@ -8,14 +8,16 @@ use Tests\Utils\Models\Company;
 
 class FindDirectiveTest extends DBTestCase
 {
-    /** @test */
-    public function itReturnsSingleUser()
+    /**
+     * @test
+     */
+    public function itReturnsSingleUser(): void
     {
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -25,25 +27,29 @@ class FindDirectiveTest extends DBTestCase
             user(id: ID @eq): User @find(model: "User")
         }
         ';
-        $query = "
+
+        $this->query("
         {
             user(id:{$userB->id}) {
                 name
             }
         }
-        ";
-        $result = $this->executeQuery($schema, $query);
-
-        $this->assertSame('B', $result->data['user']['name']);
+        ")->assertJsonFragment([
+            'user' => [
+                'name' => 'B',
+            ],
+        ]);
     }
 
-    /** @test */
-    public function itDefaultsToFieldTypeIfNoModelIsSupplied()
+    /**
+     * @test
+     */
+    public function itDefaultsToFieldTypeIfNoModelIsSupplied(): void
     {
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -53,27 +59,28 @@ class FindDirectiveTest extends DBTestCase
             user(id: ID @eq): User @find
         }
         ';
-        $query = "
+
+        $this->query("
         {
             user(id:{$userA->id}) {
                 name
             }
         }
-        ";
-
-        $result = $this->executeQuery($schema, $query);
-
-        $this->assertSame('A', $result->data['user']['name']);
+        ")->assertJsonFragment([
+            'name' => 'A',
+        ]);
     }
 
-    /** @test */
-    public function itCannotFetchIfMultipleModelsMatch()
+    /**
+     * @test
+     */
+    public function itCannotFetchIfMultipleModelsMatch(): void
     {
-        $userA = factory(User::class)->create(['name' => 'A']);
-        $userB = factory(User::class)->create(['name' => 'A']);
-        $userC = factory(User::class)->create(['name' => 'B']);
+        factory(User::class)->create(['name' => 'A']);
+        factory(User::class)->create(['name' => 'A']);
+        factory(User::class)->create(['name' => 'B']);
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -83,20 +90,20 @@ class FindDirectiveTest extends DBTestCase
             user(name: String @eq): User @find(model: "User")
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user(name: "A") {
                 name
             }
         }
-        ';
-        $result = $this->executeQuery($schema, $query);
-
-        $this->assertCount(1, $result->errors);
+        ')->assertJsonCount(1, 'errors');
     }
 
-    /** @test */
-    public function itCanUseScopes()
+    /**
+     * @test
+     */
+    public function itCanUseScopes(): void
     {
         $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
         $companyB = factory(Company::class)->create(['name' => 'CompanyB']);
@@ -104,7 +111,7 @@ class FindDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
         $userC = factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
 
-        $schema = '
+        $this->schema = '
         type Company {
             name: String!
         }
@@ -118,17 +125,21 @@ class FindDirectiveTest extends DBTestCase
             user(name: String @eq, company: String!): User @find(model: "User" scopes: [companyName])
         }
         ';
-        $query = '
+
+        $this->query('
         {
             user(name: "A" company: "CompanyA") {
                 id
                 name
             }
         }
-        ';
-        $result = $this->executeQuery($schema, $query);
-
-        $this->assertEquals($userA->id, $result->data['user']['id']);
-        $this->assertSame('A', $result->data['user']['name']);
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $userA->id,
+                    'name' => 'A',
+                ],
+            ],
+        ]);
     }
 }

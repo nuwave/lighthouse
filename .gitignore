@@ -5,3 +5,4 @@ build
 vendor
 .idea
 phpunit.xml
+.DS_Store

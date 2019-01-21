@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives\Fields;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class RenameDirectiveTest extends TestCase
@@ -11,11 +10,11 @@ class RenameDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanRenameAField()
+    public function itCanRenameAField(): void
     {
         $resolver = addslashes(self::class).'@resolve';
 
-        $schema = "
+        $this->schema = "
         type Query {
             bar: Bar @field(resolver: \"{$resolver}\")
         }
@@ -24,19 +23,23 @@ class RenameDirectiveTest extends TestCase
             bar: String! @rename(attribute: \"baz\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             bar {
                 bar
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('asdf', Arr::get($result, 'data.bar.bar'));
+        ')->assertJson([
+            'data' => [
+                'bar' => [
+                    'bar' => 'asdf',
+                ],
+            ],
+        ]);
     }
 
-    public function resolve()
+    public function resolve(): Bar
     {
         return new Bar;
     }
@@ -44,14 +47,17 @@ class RenameDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsAnExceptionIfNoAttributeDefined()
+    public function itThrowsAnExceptionIfNoAttributeDefined(): void
     {
         $this->expectException(DirectiveException::class);
-        $this->execute('
+
+        $this->schema = '
         type Query {
             foo: String! @rename
         }
-        ', '
+        ';
+
+        $this->query('
         {
             fooBar
         }
@@ -61,5 +67,8 @@ class RenameDirectiveTest extends TestCase
 
 class Bar
 {
+    /**
+     * @var string
+     */
     public $baz = 'asdf';
 }

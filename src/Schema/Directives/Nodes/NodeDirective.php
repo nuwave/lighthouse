@@ -13,11 +13,14 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
 class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
 {
-    /** @var NodeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\NodeRegistry
+     */
     protected $nodeRegistry;
 
     /**
-     * @param NodeRegistry $nodeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\NodeRegistry  $nodeRegistry
+     * @return void
      */
     public function __construct(NodeRegistry $nodeRegistry)
     {
@@ -37,10 +40,10 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     /**
      * Handle type construction.
      *
-     * @param NodeValue $value
-     * @param \Closure $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
+     * @param  \Closure  $next
      *
-     * @return NodeValue
+     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next): NodeValue
     {
@@ -55,10 +58,10 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     }
 
     /**
-     * @param Node $node
-     * @param DocumentAST $documentAST
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      *
-     * @return DocumentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {

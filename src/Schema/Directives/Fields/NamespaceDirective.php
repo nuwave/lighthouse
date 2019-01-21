@@ -12,14 +12,17 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
  * is to provide namespaces for other directives. On its own, it does
  * not do anything.
  *
- * The args for this directive are map from directive names to namespaces.
- * For example: (field: "App\\GraphQL")
+ * The args for this directive are a map from directive names to namespaces.
+ * For example: @namespace(field: "App\\GraphQL")
  *
  * The namespaces are used to complete class references in other field directives.
  */
 class NamespaceDirective implements Directive
 {
-    /** @var string todo remove as soon as name() is static itself */
+    /**
+     * todo remove as soon as name() is static itself.
+     * @var string
+     */
     const NAME = 'namespace';
 
     /**

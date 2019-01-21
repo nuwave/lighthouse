@@ -3,44 +3,46 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
+use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
-use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions as Auth;
-use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator as Iterator;
-use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent as Event;
+use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 
 class SubscriptionBroadcaster implements BroadcastsSubscriptions
 {
     /**
-     * @var Auth
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions
      */
     protected $auth;
 
     /**
-     * @var StorageManager
+     * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
      */
     protected $storage;
 
     /**
-     * @var Iterator
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator
      */
     protected $iterator;
 
     /**
-     * @var BroadcastManager
+     * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcastManager;
 
     /**
-     * @param Auth             $auth
-     * @param StorageManager   $storage
-     * @param Iterator         $iterator
-     * @param BroadcastManager $broadcastManager
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions  $auth
+     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator  $iterator
+     * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
+     * @return void
      */
     public function __construct(
-        Auth $auth,
+        AuthorizesSubscriptions $auth,
         StorageManager $storage,
-        Iterator $iterator,
+        SubscriptionIterator $iterator,
         BroadcastManager $broadcastManager
     ) {
         $this->auth = $auth;
@@ -52,35 +54,37 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Queue pushing subscription data to subscribers.
      *
-     * @param GraphQLSubscription $subscription
-     * @param string              $fieldName
-     * @param mixed               $root
+     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
+     * @param  string  $fieldName
+     * @param  mixed  $root
+     * @return void
      */
-    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root)
+    public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
-        event(new Event($subscription, $fieldName, $root));
+        event(new BroadcastSubscriptionEvent($subscription, $fieldName, $root));
     }
 
     /**
      * Push subscription data to subscribers.
      *
-     * @param GraphQLSubscription $subscription
-     * @param string              $fieldName
-     * @param mixed               $root
+     * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
+     * @param  string  $fieldName
+     * @param  mixed  $root
+     * @return void
      */
-    public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root)
+    public function broadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
         $topic = $subscription->decodeTopic($fieldName, $root);
 
         $subscribers = $this->storage
             ->subscribersByTopic($topic)
-            ->filter(function (Subscriber $subscriber) use ($subscription, $root) {
+            ->filter(function (Subscriber $subscriber) use ($subscription, $root): bool {
                 return $subscription->filter($subscriber, $root);
             });
 
         $this->iterator->process(
             $subscribers,
-            function (Subscriber $subscriber) use ($root) {
+            function (Subscriber $subscriber) use ($root): void {
                 $data = graphql()->executeQuery(
                     $subscriber->queryString,
                     $subscriber->context,
@@ -100,11 +104,10 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     /**
      * Authorize the subscription.
      *
-     * @param Request $request
-     *
-     * @return array
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function authorize(Request $request)
+    public function authorize(Request $request): Response
     {
         return $this->auth->authorize($request)
             ? $this->broadcastManager->authorized($request)

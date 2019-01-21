@@ -12,7 +12,7 @@ interface HasArgumentPath
     public function argumentPath(): array;
 
     /**
-     * @param array $argumentPath
+     * @param  array  $argumentPath
      *
      * @return static
      */

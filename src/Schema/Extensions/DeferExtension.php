@@ -2,43 +2,64 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class DeferExtension extends GraphQLExtension
 {
-    /** @var CanStreamResponse */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse
+     */
     protected $stream;
 
-    /** @var ExtensionRequest */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest
+     */
     protected $request;
 
-    /** @var array */
+    /**
+     * @var mixed[]
+     */
     protected $data = [];
 
-    /** @var array */
+    /**
+     * @var mixed[]
+     */
     protected $deferred = [];
 
-    /** @var array */
+    /**
+     * @var mixed[]
+     */
     protected $resolved = [];
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $defer = true;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $streaming = false;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $maxExecutionTime = 0;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $maxNestedFields = 0;
 
     /**
-     * @param CanStreamResponse $stream
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse  $stream
+     * @return void
      */
     public function __construct(CanStreamResponse $stream)
     {
@@ -52,7 +73,7 @@ class DeferExtension extends GraphQLExtension
      *
      * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'defer';
     }
@@ -60,9 +81,10 @@ class DeferExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param ExtensionRequest $request
+     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
+     * @return void
      */
-    public function requestDidStart(ExtensionRequest $request)
+    public function requestDidStart(ExtensionRequest $request): void
     {
         $this->request = $request;
     }
@@ -70,9 +92,8 @@ class DeferExtension extends GraphQLExtension
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param DocumentAST $documentAST
-     *
-     * @return DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(DocumentAST $documentAST): DocumentAST
     {
@@ -91,7 +112,7 @@ class DeferExtension extends GraphQLExtension
     /**
      * Format extension output.
      *
-     * @return array
+     * @return mixed[]
      */
     public function jsonSerialize(): array
     {
@@ -109,12 +130,11 @@ class DeferExtension extends GraphQLExtension
     /**
      * Register deferred field.
      *
-     * @param \Closure $resolver
-     * @param string   $path
-     *
+     * @param  \Closure  $resolver
+     * @param  string  $path
      * @return mixed
      */
-    public function defer(\Closure $resolver, string $path)
+    public function defer(Closure $resolver, string $path)
     {
         if ($data = Arr::get($this->data, "data.{$path}")) {
             return $data;
@@ -128,12 +148,11 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param \Closure $originalResolver
-     * @param string   $path
-     *
+     * @param  \Closure  $originalResolver
+     * @param  string  $path
      * @return mixed
      */
-    public function findOrResolve(\Closure $originalResolver, string $path)
+    public function findOrResolve(Closure $originalResolver, string $path)
     {
         if (! $this->hasData($path)) {
             if (isset($this->deferred[$path])) {
@@ -149,15 +168,16 @@ class DeferExtension extends GraphQLExtension
     /**
      * Resolve field with data or resolver.
      *
-     * @param \Closure $originalResolver
-     * @param string   $path
-     *
+     * @param  \Closure  $originalResolver
+     * @param  string  $path
      * @return mixed
      */
-    public function resolve(\Closure $originalResolver, string $path)
+    public function resolve(Closure $originalResolver, string $path)
     {
         $isDeferred = $this->isDeferred($path);
-        $resolver = $isDeferred ? $this->deferred[$path] : $originalResolver;
+        $resolver = $isDeferred
+            ? $this->deferred[$path]
+            : $originalResolver;
 
         if ($isDeferred) {
             $this->resolved[] = $path;
@@ -169,8 +189,7 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param string $path
-     *
+     * @param  string  $path
      * @return bool
      */
     public function isDeferred(string $path): bool
@@ -179,8 +198,7 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param string $path
-     *
+     * @param  string  $path
      * @return bool
      */
     public function hasData(string $path): bool
@@ -189,54 +207,58 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param array $data
-     *
-     * @return \Illuminate\Http\Response
+     * @param  mixed[]  $data
+     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function response(array $data)
+    public function response(array $data): Response
     {
         if (empty($this->deferred)) {
             return response($data);
         }
 
-        return response()->stream(function () use ($data) {
-            $nested = 1;
-            $this->data = $data;
-            $this->streaming = true;
-            $this->stream->stream($data, [], empty($this->deferred));
+        return response()->stream(
+            function () use ($data): void {
+                $nested = 1;
+                $this->data = $data;
+                $this->streaming = true;
+                $this->stream->stream($data, [], empty($this->deferred));
 
-            if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
-                $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
-            }
+                if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
+                    $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);
+                }
 
-            // TODO: Allow nested_levels to be set in config
-            // to break out of loop early.
-            while (
-                count($this->deferred) &&
-                ! $this->executionTimeExpired() &&
-                ! $this->maxNestedFieldsResolved($nested)
-            ) {
-                $nested++;
-                $this->executeDeferred();
-            }
+                // TODO: Allow nested_levels to be set in config
+                // to break out of loop early.
+                while (
+                    count($this->deferred) &&
+                    ! $this->executionTimeExpired() &&
+                    ! $this->maxNestedFieldsResolved($nested)
+                ) {
+                    $nested++;
+                    $this->executeDeferred();
+                }
 
-            // We've hit the max execution time or max nested levels of deferred fields.
-            // Process remaining deferred fields.
-            if (count($this->deferred)) {
-                $this->defer = false;
-                $this->executeDeferred();
-            }
-        }, 200, [
-            // TODO: Allow headers to be set in config
-            'X-Accel-Buffering' => 'no',
-            'Content-Type' => 'multipart/mixed; boundary="-"',
-        ]);
+                // We've hit the max execution time or max nested levels of deferred fields.
+                // Process remaining deferred fields.
+                if (count($this->deferred)) {
+                    $this->defer = false;
+                    $this->executeDeferred();
+                }
+            },
+            200,
+            [
+                // TODO: Allow headers to be set in config
+                'X-Accel-Buffering' => 'no',
+                'Content-Type' => 'multipart/mixed; boundary="-"',
+            ]
+        );
     }
 
     /**
-     * @param int $time
+     * @param  int  $time
+     * @return void
      */
-    public function setMaxExecutionTime(int $time)
+    public function setMaxExecutionTime(int $time): void
     {
         $this->maxExecutionTime = $time;
     }
@@ -244,14 +266,17 @@ class DeferExtension extends GraphQLExtension
     /**
      * Override max nested fields.
      *
-     * @param int $max
+     * @param  int  $max
+     * @return void
      */
-    public function setMaxNestedFields(int $max)
+    public function setMaxNestedFields(int $max): void
     {
         $this->maxNestedFields = $max;
     }
 
     /**
+     * Check if the maximum execution time has expired.
+     *
      * @return bool
      */
     protected function executionTimeExpired(): bool
@@ -264,8 +289,9 @@ class DeferExtension extends GraphQLExtension
     }
 
     /**
-     * @param int $nested
+     * Check if the maximum number of nested field has been resolved.
      *
+     * @param  int  $nested
      * @return bool
      */
     protected function maxNestedFieldsResolved(int $nested): bool
@@ -279,22 +305,26 @@ class DeferExtension extends GraphQLExtension
 
     /**
      * Execute deferred fields.
+     *
+     * @return void
      */
-    protected function executeDeferred()
+    protected function executeDeferred(): void
     {
         // TODO: Properly parse variables array
         // TODO: Get debug setting
-        $this->data = graphql()->executeQuery(
+        $this->data = graphql()
+            ->executeQuery(
                 $this->request->request()->input('query', ''),
                 $this->request->context(),
                 $this->request->request()->input('variables', [])
-            )->toArray(config('lighthouse.debug'));
+            )
+            ->toArray(config('lighthouse.debug'));
 
         $this->stream->stream(
-                $this->data,
-                $this->resolved,
-                empty($this->deferred)
-            );
+            $this->data,
+            $this->resolved,
+            empty($this->deferred)
+        );
 
         $this->resolved = [];
     }

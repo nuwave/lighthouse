@@ -2,41 +2,46 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
-use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions as Storage;
+use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class PusherBroadcaster implements Broadcaster
 {
     const EVENT_NAME = 'lighthouse-subscription';
 
-    /** @var \Pusher\Pusher */
+    /**
+     * @var \Pusher\Pusher
+     */
     protected $pusher;
 
-    /** @var Storage */
+    /**
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions
+     */
     protected $storage;
 
     /**
      * Create instance of pusher broadcaster.
      *
-     * @param \Pusher\Pusher $pusher
+     * @param  \Pusher\Pusher  $pusher
+     * @return void
      */
     public function __construct($pusher)
     {
         $this->pusher = $pusher;
-        $this->storage = app(Storage::class);
+        $this->storage = app(StoresSubscriptions::class);
     }
 
     /**
      * Authorize subscription request.
      *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function authorized(Request $request)
+    public function authorized(Request $request): JsonResponse
     {
         $channel = $request->input('channel_name');
         $socketId = $request->input('socket_id');
@@ -51,11 +56,10 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Handle unauthorized subscription request.
      *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function unauthorized(Request $request)
+    public function unauthorized(Request $request): JsonResponse
     {
         return response()->json(['error' => 'unauthorized'], 403);
     }
@@ -63,18 +67,18 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Handle subscription web hook.
      *
-     * @param Request $request
-     *
-     * @return \Illuminate\Support\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function hook(Request $request)
+    public function hook(Request $request): JsonResponse
     {
         collect($request->input('events', []))
-            ->filter(function ($event) {
-                return array_get($event, 'name') === 'channel_vacated';
-            })->each(function ($event) {
+            ->filter(function ($event): bool {
+                return Arr::get($event, 'name') === 'channel_vacated';
+            })
+            ->each(function (array $event): void {
                 $this->storage->deleteSubscriber(
-                    array_get($event, 'channel')
+                    Arr::get($event, 'channel')
                 );
             });
 
@@ -84,10 +88,11 @@ class PusherBroadcaster implements Broadcaster
     /**
      * Send data to subscriber.
      *
-     * @param Subscriber $subscriber
-     * @param array      $data
+     * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
+     * @param  mixed[]  $data
+     * @return void
      */
-    public function broadcast(Subscriber $subscriber, array $data)
+    public function broadcast(Subscriber $subscriber, array $data): void
     {
         $this->pusher->trigger(
             $subscriber->channel,

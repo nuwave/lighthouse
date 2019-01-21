@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class InjectDirective extends BaseDirective implements FieldMiddleware
@@ -24,12 +25,11 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      *
-     * @throws DirectiveException
-     *
-     * @return FieldValue
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -51,7 +51,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
 
         return $next(
             $value->setResolver(
-                function ($rootValue, array $args, $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolvers) {
+                function ($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($contextAttributeName, $argumentName, $previousResolvers) {
                     return $previousResolvers(
                         $rootValue,
                         Arr::add($args, $argumentName, data_get($context, $contextAttributeName)),

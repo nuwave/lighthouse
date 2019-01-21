@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
+    /**
+     * @var string[]
+     */
     protected $primaryKey = ['barcode', 'uuid'];
+
+    /**
+     * @var bool
+     */
     public $incrementing = false;
 
     public function color() : BelongsTo
@@ -20,7 +27,7 @@ class Product extends Model
     // Usually this is placed on traits
     // This is not related to Lighthouse
 
-    public function getKey()
+    public function getKey(): array
     {
         $attributes = [];
         foreach ($this->getKeyName() as $key) {

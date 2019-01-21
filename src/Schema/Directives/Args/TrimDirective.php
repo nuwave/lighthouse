@@ -19,7 +19,7 @@ class TrimDirective implements ArgTransformerDirective
     /**
      * Remove whitespace from the beginning and end of a given input.
      *
-     * @param string $argumentValue
+     * @param  string  $argumentValue
      *
      * @return mixed
      */

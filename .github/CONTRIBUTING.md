@@ -46,13 +46,16 @@ Not every application has them enabled - Lumen does not use Facades by default.
 Prefer direct usage of Illuminate classes instead of helpers.
 
 ```php
-# WRONG
-array_get($foo, 'bar');
-
-# CORRECT
+// Correct usage
 use \Illuminate\Support\Arr;
 Arr::get($foo, 'bar');
+
+// Wrong usage
+array_get($foo, 'bar');
 ```
+
+A notable exception is the `response()` helper - using DI for injecting a
+`ResponseFactory` does not work in Lumen, while `response()` works for both.
 
 ### Type definitions
 
@@ -63,7 +66,7 @@ If known, add additional type information in the PHPDoc.
 /**
  * We know we get an array of strings here.
  *
- * @param string[] $bar
+ * @param  string[]  $bar
  * @return string
  */
 function foo(array $bar): string
@@ -102,8 +105,7 @@ class Foo
     /**
      * Use $this for fluent setters when we expect the exact same object back. 
      *
-     * @param string $bar
-     *
+     * @param  string  $bar
      * @return $this
      */
     public function setBar(string $bar): self
@@ -157,6 +159,16 @@ at the Laravel coding style.
 Look through some of the code to get a feel for the naming conventions.
 
 Prefer explicit naming and short functions over excessive comments.
+
+### Ternarys
+
+Ternary's should be spread out across multiple lines.
+
+```php
+$foo = $cond
+    ? 1
+    : 2;
+```
 
 ## Documentation
 

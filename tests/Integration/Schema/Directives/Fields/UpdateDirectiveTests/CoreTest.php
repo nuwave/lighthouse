@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives\Fields\UpdateDirectiveTests;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
@@ -14,11 +13,11 @@ class CoreTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanUpdateFromFieldArguments()
+    public function itCanUpdateFromFieldArguments(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -31,7 +30,8 @@ class CoreTest extends DBTestCase
             ): Company @update
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCompany(
                 id: 1
@@ -41,22 +41,25 @@ class CoreTest extends DBTestCase
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
+        ')->assertJson([
+            'data' => [
+                'updateCompany' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
         $this->assertSame('bar', Company::first()->name);
     }
 
     /**
      * @test
      */
-    public function itCanUpdateFromInputObject()
+    public function itCanUpdateFromInputObject(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -73,7 +76,8 @@ class CoreTest extends DBTestCase
             name: String
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCompany(input: {
                 id: 1
@@ -83,22 +87,25 @@ class CoreTest extends DBTestCase
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateCompany.id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCompany.name'));
+        ')->assertJson([
+            'data' => [
+                'updateCompany' => [
+                    'id' => '1',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
         $this->assertSame('bar', Company::first()->name);
     }
 
     /**
      * @test
      */
-    public function itCanUpdateWithCustomPrimaryKey()
+    public function itCanUpdateWithCustomPrimaryKey(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
-        $schema = '
+        $this->schema = '
         type Category {
             category_id: ID!
             name: String!
@@ -111,7 +118,8 @@ class CoreTest extends DBTestCase
             ): Category @update
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateCategory(
                 category_id: 1
@@ -121,22 +129,25 @@ class CoreTest extends DBTestCase
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
-        $this->assertSame('1', Arr::get($result, 'data.updateCategory.category_id'));
-        $this->assertSame('bar', Arr::get($result, 'data.updateCategory.name'));
+        ')->assertJson([
+            'data' => [
+                'updateCategory' => [
+                    'category_id' => '1',
+                    'name' => 'bar',
+                ],
+            ],
+        ]);
         $this->assertSame('bar', Category::first()->name);
     }
 
     /**
      * @test
      */
-    public function itDoesNotUpdateWithFailingRelationship()
+    public function itDoesNotUpdateWithFailingRelationship(): void
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $schema = '
+        $this->schema = '
         type Task {
             id: ID!
             name: String!
@@ -167,7 +178,8 @@ class CoreTest extends DBTestCase
             user: ID
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             updateUser(input: {
                 id: 1
@@ -186,10 +198,7 @@ class CoreTest extends DBTestCase
                 }
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
-
+        ')->assertJsonCount(1, 'errors');
         $this->assertSame('Original', User::first()->name);
-        $this->assertTrue(Arr::has($result, 'errors'));
     }
 }

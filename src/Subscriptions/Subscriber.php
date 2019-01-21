@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -42,10 +44,10 @@ class Subscriber
     /**
      * Create new subscription instance.
      *
-     * @param array          $args
-     * @param GraphQLContext $context
-     * @param ResolveInfo    $info
-     * @param string         $queryString
+     * @param  array  $args
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  string  $queryString
      *
      * @return static
      */
@@ -54,7 +56,7 @@ class Subscriber
         GraphQLContext $context,
         ResolveInfo $info,
         string $queryString
-    ) {
+    ): self {
         if ($info->operation->name === null) {
             throw new SubscriptionException('An operation name must be present on a subscription request.');
         }
@@ -73,21 +75,21 @@ class Subscriber
     /**
      * Unserialize subscription.
      *
-     * @param string $subscription
+     * @param  string  $subscription
      *
      * @return static
      */
-    public static function unserialize($subscription)
+    public static function unserialize(string $subscription): self
     {
         $data = json_decode($subscription, true);
         $instance = new static();
-        $instance->channel = array_get($data, 'channel');
+        $instance->channel = Arr::get($data, 'channel');
         $instance->context = $instance->serializer()->unserialize(
-            array_get($data, 'context')
+            Arr::get($data, 'context')
         );
-        $instance->args = array_get($data, 'args', []);
-        $instance->operationName = array_get($data, 'operation_name');
-        $instance->queryString = array_get($data, 'query_string');
+        $instance->args = Arr::get($data, 'args', []);
+        $instance->operationName = Arr::get($data, 'operation_name');
+        $instance->queryString = Arr::get($data, 'query_string');
 
         return $instance;
     }
@@ -95,8 +97,7 @@ class Subscriber
     /**
      * Set root data.
      *
-     * @param mixed $root
-     *
+     * @param  mixed  $root
      * @return $this
      */
     public function setRoot($root): self
@@ -129,13 +130,13 @@ class Subscriber
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-'.(string) str_random(32).'-'.time();
+        return 'private-'.Str::random(32).'-'.time();
     }
 
     /**
-     * @return ContextSerializer
+     * @return \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer
      */
-    protected function serializer()
+    protected function serializer(): ContextSerializer
     {
         return app(ContextSerializer::class);
     }

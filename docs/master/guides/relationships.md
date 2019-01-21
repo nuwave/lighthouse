@@ -53,7 +53,7 @@ without returning it directly.
 
 ### One To One
 
-Use the [@hasOne](../api-reference/directives.md#hasOne) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one)
+Use the [@hasOne](../api-reference/directives.md#hasone) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one)
 between two types in your schema.
 
 ```graphql
@@ -62,7 +62,7 @@ type User {
 }
 ```
 
-The inverse can be defined through the [@belongsTo](../api-reference/directives#belongsTo) directive.
+The inverse can be defined through the [@belongsTo](../api-reference/directives.md#belongsto) directive.
 
 ```graphql
 type Phone {
@@ -72,7 +72,7 @@ type Phone {
 
 ### One To Many
 
-Use the [@hasMany](../api-reference/directives#hasMany) directive to define a [one-to-many relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
+Use the [@hasMany](../api-reference/directives.md#hasmany) directive to define a [one-to-many relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
 
 ```graphql
 type Post {
@@ -80,7 +80,7 @@ type Post {
 }
 ```
 
-Again, the inverse is defined with the [@belongsTo](../api-reference/directives#belongsTo) directive.
+Again, the inverse is defined with the [@belongsTo](../api-reference/directives.md#belongsto) directive.
 
 ```graphql
 type Comment {
@@ -92,7 +92,7 @@ type Comment {
 
 While [many-to-many relationships](https://laravel.com/docs/5.7/eloquent-relationships#many-to-many)
 are a bit more work to set up in Laravel, defining them in Lighthouse is a breeze.
-Use the [@belongsToMany](../api-reference/directives#belongsToMany) directive to define it.
+Use the [@belongsToMany](../api-reference/directives.md#belongstomany) directive to define it.
 
 ```graphql
 type User {
@@ -171,32 +171,53 @@ If any of the nested operations fail, the whole mutation is aborted
 and no changes are written to the database.
 You can change this setting [in the configuration](../getting-started/configuration.md).
 
-### Belongs To One
+### Belongs To
 
-You can allow the user to attach a `BelongsTo` relationship by defining
-an argument that is named just like the underlying relationship method.
+We will start of by defining a mutation to create a post.
 
 ```graphql
 type Mutation {
   createPost(input: CreatePostInput!): Post @create(flatten: true)
 }
+```
 
-input CreateAuthorRelation {
-  connect: ID
-  create: CreateAuthorInput
-}
+The mutation takes a single argument `input` that contains data about
+the Post you want to create.
 
-input CreateAuthorInput {
-  name: String!
-}
-
+```graphql
 input CreatePostInput {
   title: String!
   author: CreateAuthorRelation
 }
 ```
 
-Just pass the ID of the model you want to associate.
+The first argument `title` is a value of the `Post` itself and corresponds
+to a column in the database.
+
+The second argument `author`, exposes operations on the related `User` model.
+It has to be named just like the relationship method that is defined on the `Post` model.
+
+```graphql
+input CreateAuthorRelation {
+  connect: ID
+  create: CreateUserInput
+}
+```
+
+There are two possible operations that you can expose on a `BelongsTo` relationship:
+- `connect` it to an existing model
+- `create` and attach a new related model
+
+Finally, you need to define the input that allows you to create a new `User`.
+
+```graphql
+input CreateUserInput {
+  name: String!
+}
+```
+
+To create a new model and connect it to an existing model,
+just pass the ID of the model you want to associate.
 
 ```graphql
 mutation {
@@ -214,27 +235,7 @@ mutation {
 }
 ```
 
-Or create a new one.
-
-```graphql
-mutation {
-  createPost(input: {
-    title: "My new Post"
-    author: {
-      create: {
-        name: "Herbert"
-      }  
-    }
-  }){
-    id
-    author {
-      name
-    }
-  }
-}
-```
-
-Lighthouse will detect the relationship and attach/create it.
+Lighthouse will create a new `Post` and associate an `User` with it.
 
 ```json
 {
@@ -243,6 +244,40 @@ Lighthouse will detect the relationship and attach/create it.
       "id": 456,
       "author": {
         "name": "Herbert"
+      }
+    }
+  }
+}
+```
+
+If the related model does not exist yet, you can also
+create a new one.
+
+```graphql
+mutation {
+  createPost(input: {
+    title: "My new Post"
+    author: {
+      create: {
+        name: "Gina"
+      }  
+    }
+  }){
+    id
+    author {
+      id
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "createPost": {
+      "id": 456,
+      "author": {
+        "id": 55
       }
     }
   }
@@ -284,6 +319,83 @@ mutation {
     "updatePost": {
       "title": "An updated title",
       "author": null
+    }
+  }
+}
+```
+
+### Has Many
+
+The counterpart to a `BelongsTo` relationship is `HasMany`. We will start
+of by defining a mutation to create an `User`.
+
+```graphql
+type Mutation {
+  createUser(input: CreateUserInput!): User @create(flatten: true)
+}
+```
+
+This mutation takes a single argument `input` that contains values
+of the `User` itself and its associated `Post` models.
+
+```graphql
+input CreateUserInput {
+  name: String!
+  posts: CreatePostsRelation
+}
+```
+
+Now, we can an operation that allows us to directly create new posts
+right when we create the `User`.
+
+```graphql
+input CreatePostsRelation {
+  create: [CreatePostInput!]!
+}
+
+input CreatePostInput {
+  title: String!
+}
+```
+
+You can now create a `User` and some posts with it in one request.
+
+```graphql
+mutation {
+  createUser(input: {
+    name: "Phil"
+    posts: {
+      create: [
+        {
+          title: "Phils first post"
+        },
+        {
+          title: "Awesome second post"
+        }
+      ]  
+    }
+  }){
+    id
+    posts {
+      id
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "createUser": {
+      "id": 23,
+      "posts": [
+        {
+          "id": 434
+        },
+        {
+          "id": 435
+        }
+      ]
     }
   }
 }

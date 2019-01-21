@@ -3,18 +3,19 @@
 namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class DeleteDirectiveTest extends DBTestCase
 {
-    /** @test */
-    public function itDeletesUserAndReturnsIt()
+    /**
+     * @test
+     */
+    public function itDeletesUserAndReturnsIt(): void
     {
         factory(User::class)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
         }
@@ -23,25 +24,32 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUser(id: ID!): User @delete
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             deleteUser(id: 1) {
                 id
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
+        ')->assertJson([
+            'data' => [
+                'deleteUser' => [
+                    'id' => 1,
+                ],
+            ],
+        ]);
 
-        $this->assertEquals(1, Arr::get($result, 'data.deleteUser.id'));
         $this->assertCount(0, User::all());
     }
 
-    /** @test */
-    public function itDeletesMultipleUsersAndReturnsThem()
+    /**
+     * @test
+     */
+    public function itDeletesMultipleUsersAndReturnsThem(): void
     {
         factory(User::class, 2)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -51,24 +59,26 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUsers(id: [ID!]!): [User!]! @delete
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             deleteUsers(id: [1, 2]) {
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
+        ')->assertJsonCount(2, 'data.deleteUsers');
 
-        $this->assertCount(2, Arr::get($result, 'data.deleteUsers'));
         $this->assertCount(0, User::all());
     }
 
-    /** @test */
-    public function itRejectsDefinitionWithNullableArgument()
+    /**
+     * @test
+     */
+    public function itRejectsDefinitionWithNullableArgument(): void
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -78,21 +88,24 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUser(id: ID): User @delete
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             deleteUser(id: 1) {
                 name
             }
         }
-        ';
-        $this->execute($schema, $query);
+        ');
     }
 
-    /** @test */
-    public function itRejectsDefinitionWithNoArgument()
+    /**
+     * @test
+     */
+    public function itRejectsDefinitionWithNoArgument(): void
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -102,21 +115,24 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUser: User @delete
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             deleteUser {
                 name
             }
         }
-        ';
-        $this->execute($schema, $query);
+        ');
     }
 
-    /** @test */
-    public function itRejectsDefinitionWithMultipleArguments()
+    /**
+     * @test
+     */
+    public function itRejectsDefinitionWithMultipleArguments(): void
     {
         $this->expectException(DirectiveException::class);
-        $schema = '
+
+        $this->schema = '
         type User {
             id: ID!
             name: String
@@ -126,13 +142,13 @@ class DeleteDirectiveTest extends DBTestCase
             deleteUser(foo: String, bar: Int): User @delete
         }
         '.$this->placeholderQuery();
-        $query = '
+
+        $this->query('
         mutation {
             deleteUser {
                 name
             }
         }
-        ';
-        $this->execute($schema, $query);
+        ');
     }
 }

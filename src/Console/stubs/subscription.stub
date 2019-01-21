@@ -15,19 +15,19 @@ class DummyClass extends GraphQLSubscription
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    public function authorize(Subscriber $subscriber, Request $request)
+    public function authorize(Subscriber $subscriber, Request $request): bool
     {
         // TODO implement authorize
     }
 
     /**
-     * Filter subscribers who should receive subscription.
+     * Filter which subscribers should receive the subscription.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  mixed  $root
      * @return bool
      */
-    public function filter(Subscriber $subscriber, $root)
+    public function filter(Subscriber $subscriber, $root): bool
     {
         // TODO implement filter
     }

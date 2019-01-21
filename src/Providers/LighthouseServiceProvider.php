@@ -40,7 +40,7 @@ class LighthouseServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
 
@@ -62,10 +62,10 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * Load routes from provided path.
      *
-     * @param string $path
+     * @param  string  $path
      * @return void
      */
-    protected function loadRoutesFrom($path)
+    protected function loadRoutesFrom($path): void
     {
         if (Str::contains($this->app->version(), 'Lumen')) {
             require realpath($path);
@@ -81,7 +81,7 @@ class LighthouseServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
@@ -120,7 +120,7 @@ class LighthouseServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerValidator()
+    protected function registerValidator(): void
     {
         $this->app->make(Factory::class)->resolver(
             function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {

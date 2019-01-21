@@ -24,7 +24,7 @@ type Query {
 #import user.graphql
 ```
 
-Imports always begin on a seperate line with `#import `, followed by the relative path
+Imports always begin on a separate line with `#import `, followed by the relative path
 to the imported file. The contents of `user.graphql` are pasted in the final schema.
 
 ```graphql

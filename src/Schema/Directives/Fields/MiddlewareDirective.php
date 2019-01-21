@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Http\Request;
 use GraphQL\Language\AST\Node;
-use Illuminate\Routing\Router;
 use GraphQL\Language\AST\NodeList;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
@@ -26,17 +25,26 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
 {
-    /** @var string todo remove as soon as name() is static itself */
+    /**
+     * todo remove as soon as name() is static itself.
+     * @var string
+     */
     const NAME = 'middleware';
 
-    /** @var Pipeline */
+    /**
+     * @var \Nuwave\Lighthouse\Support\Pipeline
+     */
     protected $pipeline;
-    /** @var CreatesContext */
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
+     */
     protected $createsContext;
 
     /**
-     * @param Pipeline $pipeline
-     * @param CreatesContext $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @return void
      */
     public function __construct(Pipeline $pipeline, CreatesContext $createsContext)
     {
@@ -57,10 +65,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure    $next
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -89,11 +96,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param Node $node
-     * @param DocumentAST $documentAST
-     *
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\Node  $node
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
     {
@@ -106,12 +111,11 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param ObjectTypeDefinitionNode|ObjectTypeExtensionNode $objectType
-     * @param array $middlewareArgValue
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @param  array  $middlewareArgValue
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode
      *
-     * @throws DirectiveException
-     *
-     * @return ObjectTypeDefinitionNode|ObjectTypeExtensionNode
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
     {
@@ -124,7 +128,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
         }
 
         $middlewareArgValue = collect($middlewareArgValue)
-            ->map(function (string $middleware) {
+            ->map(function (string $middleware) : string {
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
             })
@@ -134,7 +138,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
 
         $objectType->fields = new NodeList(
             collect($objectType->fields)
-                ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective) {
+                ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective): FieldDefinitionNode {
                     // If the field already has middleware defined, skip over it
                     // Field middleware are more specific then those defined on a type
                     if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)) {
@@ -152,19 +156,19 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param $middlewareArgValue
+     * @param  mixed  $middlewareArgValue
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<string>
      */
     protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
     {
-        /** @var Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = app('router');
         $middleware = $router->getMiddleware();
         $middlewareGroups = $router->getMiddlewareGroups();
 
         return collect($middlewareArgValue)
-            ->map(function (string $name) use ($middleware, $middlewareGroups) {
+            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
                 return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
             })
             ->flatten();

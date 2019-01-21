@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -24,10 +23,10 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $value
-     * @param \Closure   $next
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Closure  $next
      *
-     * @return FieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, \Closure $next): FieldValue
     {
@@ -36,7 +35,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
 
         return $next(
             $value->setResolver(
-                function ($root, $args, $context, ResolveInfo $resolveInfo) use ($type, $resolver) {
+                function () use ($type, $resolver) {
                     $resolvedValue = call_user_func_array($resolver, func_get_args());
 
                     return GlobalId::encode(
@@ -51,9 +50,9 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
     /**
      * Return an array containing the type name and id.
      *
-     * @param string $argumentValue
+     * @param  string  $argumentValue
      *
-     * @return array
+     * @return string[]
      */
     public function transform($argumentValue): array
     {

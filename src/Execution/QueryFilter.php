@@ -23,7 +23,7 @@ class QueryFilter
      * A map from a composite key consisting of the columnName and type of key
      * to the Closure that will resolve the key.
      *
-     * @var ArgFilterDirective[]
+     * @var \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective[]
      */
     protected $multiArgumentFilters = [];
 
@@ -36,11 +36,10 @@ class QueryFilter
     protected $multiArgumentFiltersArgNames = [];
 
     /**
-     * Get query filter instance for field.
+     * Get the single instance of the query filter for a field.
      *
-     * @param FieldValue $value
-     *
-     * @return self
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @return static
      */
     public static function getInstance(FieldValue $value): self
     {
@@ -55,16 +54,17 @@ class QueryFilter
     }
 
     /**
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
-     * @param array                                                                    $args
-     * @param array                                                                    $scopes
-     * @param ResolveInfo                                                              $resolveInfo
+     * Check if the ResolveInfo contains a QueryFilter instance and apply it to the query if given.
      *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
+     * @param  array  $args
+     * @param  string[]                $scopes
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public static function apply($query, array $args, array $scopes, ResolveInfo $resolveInfo)
     {
-        /** @var QueryFilter $queryFilter */
+        /** @var \Nuwave\Lighthouse\Execution\QueryFilter $queryFilter */
         if ($queryFilter = $resolveInfo->queryFilter ?? false) {
             $query = $queryFilter->filter($query, $args);
         }
@@ -77,14 +77,13 @@ class QueryFilter
     }
 
     /**
-     * Run query through filter.
+     * Apply all registered filters to the query.
      *
-     * @param \Illuminate\Database\Query\Builder $builder
-     * @param array                              $args
-     *
-     * @return \Illuminate\Database\Query\Builder
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
+     * @param  array  $args
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function filter($builder, array $args = [])
+    public function filter($query, array $args = [])
     {
         $valuesGroupedByFilterKey = [];
 
@@ -106,11 +105,11 @@ class QueryFilter
 
             // Filters that only take a single argument can be applied directly
             if ($filterInfo = Arr::get($this->singleArgumentFilters, $key)) {
-                /** @var ArgFilterDirective $argFilterDirective */
+                /** @var \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective $argFilterDirective */
                 $argFilterDirective = $filterInfo['filter'];
                 $columnName = $filterInfo['columnName'];
 
-                $builder = $argFilterDirective->applyFilter($builder, $columnName, $value);
+                $query = $argFilterDirective->applyFilter($query, $columnName, $value);
             }
         }
 
@@ -124,19 +123,18 @@ class QueryFilter
             if ($values) {
                 $argFilterDirective = $this->multiArgumentFilters[$filterKey];
 
-                $builder = $argFilterDirective->applyFilter($builder, $columnName, $values);
+                $query = $argFilterDirective->applyFilter($query, $columnName, $values);
             }
         }
 
-        return $builder;
+        return $query;
     }
 
     /**
-     * @param string             $argumentName
-     * @param string             $columnName
-     * @param ArgFilterDirective $argFilterDirective
-     *
-     * @return QueryFilter
+     * @param  string  $argumentName
+     * @param  string  $columnName
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
+     * @return $this
      */
     public function addArgumentFilter(string $argumentName, string $columnName, ArgFilterDirective $argFilterDirective): self
     {

@@ -9,10 +9,9 @@ interface NodeMiddleware extends Directive
     /**
      * Handle node value.
      *
-     * @param NodeValue $value
-     * @param \Closure   $next
-     *
-     * @return NodeValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
+     * @param  \Closure  $next
+     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
     public function handleNode(NodeValue $value, \Closure $next);
 }

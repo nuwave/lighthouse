@@ -1,1 +1,4 @@
 preset: laravel
+finder:
+  not-name:
+  - "_ide_helper.php"

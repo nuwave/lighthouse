@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use GraphQL\Deferred;
+use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
@@ -21,7 +22,7 @@ abstract class BatchLoader
      *
      * [key => resolvedValue]
      *
-     * @var array
+     * @var mixed[]
      */
     private $results = [];
 
@@ -35,13 +36,12 @@ abstract class BatchLoader
     /**
      * Return an instance of a BatchLoader for a specific field.
      *
-     * @param string $loaderClass     the class name of the concrete BatchLoader to instantiate
-     * @param array  $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param array  $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
+     * @param  string  $loaderClass     the class name of the concrete BatchLoader to instantiate
+     * @param  mixed[] $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param  mixed[] $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
+     * @return static
      *
      * @throws \Exception
-     *
-     * @return BatchLoader
      */
     public static function instance(string $loaderClass, array $pathToField, array $constructorArgs = []): self
     {
@@ -50,7 +50,7 @@ abstract class BatchLoader
 
         // If we are resolving a batched query, we need to assign each
         // query a uniquely indexed instance
-        $currentBatchIndex = app('graphql')->currentBatchIndex();
+        $currentBatchIndex = app(GraphQL::class)->currentBatchIndex();
 
         if ($currentBatchIndex !== null) {
             $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
@@ -76,8 +76,7 @@ abstract class BatchLoader
     /**
      * Generate a unique key for the instance, using the path in the query.
      *
-     * @param array $path
-     *
+     * @param  mixed[] $path
      * @return string
      */
     public static function instanceKey(array $path): string
@@ -94,10 +93,9 @@ abstract class BatchLoader
     /**
      * Load object by key.
      *
-     * @param mixed $key
-     * @param array $metaInfo
-     *
-     * @return Deferred
+     * @param  mixed  $key
+     * @param  array  $metaInfo
+     * @return \GraphQL\Deferred
      */
     public function load($key, array $metaInfo = []): Deferred
     {
@@ -117,7 +115,9 @@ abstract class BatchLoader
     /**
      * Resolve the keys.
      *
-     * The result has to be a map: [key => result]
+     * The result has to be an associative array: [key => result]
+     *
+     * @return array
      */
     abstract public function resolve(): array;
 }

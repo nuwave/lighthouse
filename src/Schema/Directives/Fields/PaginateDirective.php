@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -31,11 +30,10 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
-     * @param FieldDefinitionNode      $fieldDefinition
-     * @param ObjectTypeDefinitionNode $parentType
-     * @param DocumentAST              $current
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
@@ -51,9 +49,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Resolve the field directive.
      *
-     * @param FieldValue $fieldValue
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
@@ -79,14 +76,13 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Create a paginator resolver.
      *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected function paginatorTypeResolver(FieldValue $value): FieldValue
     {
         return $value->setResolver(
-            function ($root, array $args) {
+            function ($root, array $args): LengthAwarePaginator {
                 $first = $args['count'];
                 $page = $args['page'] ?? 1;
 
@@ -98,14 +94,13 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Create a connection resolver.
      *
-     * @param FieldValue $value
-     *
-     * @return FieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected function connectionTypeResolver(FieldValue $value): FieldValue
     {
         return $value->setResolver(
-            function ($root, array $args) {
+            function ($root, array $args): LengthAwarePaginator {
                 $first = $args['first'];
                 $page = Pagination::calculateCurrentPage(
                     $first,
@@ -118,11 +113,10 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
-     * @param array $resolveArgs
-     * @param int   $page
-     * @param int   $first
-     *
-     * @return LengthAwarePaginator
+     * @param  array  $resolveArgs
+     * @param  int  $page
+     * @param  int  $first
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     protected function getPaginatedResults(array $resolveArgs, int $page, int $first): LengthAwarePaginator
     {
@@ -132,7 +126,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                 $resolveArgs
             );
         } else {
-            /** @var Model $model */
+            /** @var \Illuminate\Database\Eloquent\Model $model */
             $model = $this->getPaginatorModel();
             $query = $model::query();
         }
@@ -150,11 +144,10 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * This works differently as in other directives, so we define a seperate function for it.
-     *
-     * @throws DirectiveException
+     * This works differently as in other directives, so we define a separate function for it.
      *
      * @return string
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getPaginatorModel(): string
     {
@@ -171,7 +164,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
 
         if (! $model) {
             throw new DirectiveException(
-                "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
+                "A `model` argument must be assigned to the '{$this->name()}' directive on '{$this->definitionNode->name->value}"
             );
         }
 

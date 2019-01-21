@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\TypeSystemDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
@@ -17,7 +16,7 @@ abstract class BaseDirective implements Directive
     /**
      * The node the directive is defined on.
      *
-     * @var TypeSystemDefinitionNode
+     * @var \GraphQL\Language\AST\TypeSystemDefinitionNode
      */
     protected $definitionNode;
 
@@ -26,9 +25,9 @@ abstract class BaseDirective implements Directive
      *
      * @todo Make this type annotation a hard requirement as soon as the underlying implementation is fixed
      *
-     * @param TypeSystemDefinitionNode $definitionNode
+     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
      *
-     * @return BaseDirective
+     * @return $this
      */
     public function hydrate($definitionNode): self
     {
@@ -40,7 +39,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get the directive definition associated with the current directive.
      *
-     * @return DirectiveNode
+     * @return \GraphQL\Language\AST\DirectiveNode
      */
     protected function directiveDefinition(): DirectiveNode
     {
@@ -53,8 +52,8 @@ abstract class BaseDirective implements Directive
     /**
      * Get directive argument value.
      *
-     * @param string     $name
-     * @param mixed|null $default
+     * @param  string  $name
+     * @param  mixed|null  $default
      *
      * @return mixed|null
      */
@@ -70,7 +69,7 @@ abstract class BaseDirective implements Directive
     /**
      * Does the current directive have an argument with the given name?
      *
-     * @param string $name
+     * @param  string  $name
      *
      * @return bool
      */
@@ -85,7 +84,7 @@ abstract class BaseDirective implements Directive
     /**
      * Get a Closure that is defined through an argument on the directive.
      *
-     * @param string $argumentName
+     * @param  string  $argumentName
      *
      * @return \Closure
      */
@@ -101,9 +100,11 @@ abstract class BaseDirective implements Directive
     /**
      * Get the model class from the `model` argument of the field.
      *
-     * @param string $argumentName The default argument name "model" may be overwritten
+     * @param  string  $argumentName The default argument name "model" may be overwritten
      *
      * @return string
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
@@ -128,13 +129,12 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * @param string   $classCandidate
-     * @param string[] $namespacesToTry
-     * @param callable $determineMatch
-     *
-     * @throws DirectiveException
-     *
+     * @param  string  $classCandidate
+     * @param  string[] $namespacesToTry
+     * @param  callable  $determineMatch
      * @return string
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
     {
@@ -148,7 +148,7 @@ abstract class BaseDirective implements Directive
         );
 
         if (! $determineMatch) {
-            $determineMatch = '\class_exists';
+            $determineMatch = 'class_exists';
         }
 
         $className = Utils::namespaceClassname(
@@ -173,11 +173,10 @@ abstract class BaseDirective implements Directive
      * e.g. "App\My\Class@methodName"
      * This validates that exactly two parts are given and are not empty.
      *
-     * @param string $argumentName
+     * @param  string  $argumentName
+     * @return string[] Contains two entries: [string $className, string $methodName]
      *
-     * @throws DirectiveException
-     *
-     * @return array [string $className, string $methodName]
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {
@@ -202,7 +201,7 @@ abstract class BaseDirective implements Directive
     /**
      * Try adding the default model namespace and ensure the given class is a model.
      *
-     * @param string $modelClassCandidate
+     * @param  string  $modelClassCandidate
      *
      * @return string
      */

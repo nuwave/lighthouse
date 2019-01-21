@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 use Carbon\Carbon;
 use GraphQL\Error\Error;
 use GraphQL\Utils\Utils;
-use GraphQL\Language\AST\Node;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Language\AST\StringValueNode;
@@ -15,10 +14,7 @@ class Date extends ScalarType
     /**
      * Serialize an internal value, ensuring it is a valid date string.
      *
-     * @param Carbon|string $value
-     *
-     * @throws InvariantViolation
-     *
+     * @param  \Carbon\Carbon|string  $value
      * @return string
      */
     public function serialize($value): string
@@ -34,9 +30,8 @@ class Date extends ScalarType
     /**
      * Parse a externally provided variable value into a Carbon instance.
      *
-     * @param mixed $value
-     *
-     * @return Carbon
+     * @param  string  $value
+     * @return \Carbon\Carbon
      */
     public function parseValue($value): Carbon
     {
@@ -46,17 +41,19 @@ class Date extends ScalarType
     /**
      * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
      *
-     * @param Node         $valueNode
-     * @param mixed[]|null $variables
+     * @param  \GraphQL\Language\AST\Node  $valueNode
+     * @param  mixed[]|null  $variables
+     * @return \Carbon\Carbon
      *
-     * @throws Error
-     *
-     * @return Carbon
+     * @throws \GraphQL\Error\Error
      */
     public function parseLiteral($valueNode, ?array $variables = null): Carbon
     {
         if (! $valueNode instanceof StringValueNode) {
-            throw new Error('Query error: Can only parse strings got: '.$valueNode->kind, [$valueNode]);
+            throw new Error(
+                "Query error: Can only parse strings, got {$valueNode->kind}",
+                [$valueNode]
+            );
         }
 
         return $this->tryParsingDate($valueNode->value, Error::class);
@@ -65,12 +62,11 @@ class Date extends ScalarType
     /**
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
-     * @param mixed  $value
-     * @param string $exceptionClass
+     * @param  string  $value
+     * @param  string  $exceptionClass
+     * @return \Carbon\Carbon
      *
-     * @throws InvariantViolation|Error
-     *
-     * @return Carbon
+     * @throws \GraphQL\Error\InvariantViolation|Error
      */
     private function tryParsingDate($value, string $exceptionClass): Carbon
     {
