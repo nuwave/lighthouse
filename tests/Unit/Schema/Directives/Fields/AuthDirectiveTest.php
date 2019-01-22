@@ -39,4 +39,38 @@ class AuthDirectiveTest extends TestCase
             ],
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function itCanResolveAuthenticatedUserWithGuardArgument(): void
+    {
+        $user = new User(['foo' => 'bar']);
+
+        $this->app['auth']->guard('api')->setUser($user);
+
+        $this->schema = '
+        type User {
+            foo: String!
+        }
+        
+        type Query {
+            user: User! @auth(guard: "api")
+        }
+        ';
+
+        $this->query('
+        {
+            user {
+                foo
+            }
+        }           
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'foo' => 'bar',
+                ],
+            ],
+        ]);
+    }
 }
