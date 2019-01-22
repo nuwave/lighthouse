@@ -10,7 +10,8 @@ type Query {
 }
 ```
 
-If you need to use a guard besides the default to resolve the authenticated user, you can pass the guard name as the `guard` argument
+If you need to use a guard besides the default to resolve the authenticated user,
+you can pass the guard name as the `guard` argument
 
 ```graphql
 type Query {
