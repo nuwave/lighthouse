@@ -15,18 +15,6 @@ if (! function_exists('graphql')) {
     }
 }
 
-if (! function_exists('auth')) {
-    /**
-     * Get instance of auth container.
-     *
-     * @return \Illuminate\Auth\AuthManager
-     */
-    function auth()
-    {
-        return app('auth');
-    }
-}
-
 if (! function_exists('config_path')) {
     /**
      * Get base configuration path.

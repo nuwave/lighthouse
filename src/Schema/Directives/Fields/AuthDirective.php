@@ -4,11 +4,28 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class AuthDirective extends BaseDirective implements FieldResolver
 {
+    /**
+     * @var \Illuminate\Contracts\Auth\Factory
+     */
+    private $authFactory;
+
+    /**
+     * AuthDirective constructor.
+     *
+     * @param  \Illuminate\Contracts\Auth\Factory  $authFactory
+     * @return void
+     */
+    public function __construct(AuthFactory $authFactory)
+    {
+        $this->authFactory = $authFactory;
+    }
+
     /**
      * Name of the directive.
      *
@@ -28,11 +45,15 @@ class AuthDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
+        /** @var string|null $guard */
         $guard = $this->directiveArgValue('guard');
 
         return $fieldValue->setResolver(
             function () use ($guard): ?Authenticatable {
-                return auth($guard)->user();
+                return $this
+                    ->authFactory
+                    ->guard($guard)
+                    ->user();
             }
         );
     }
