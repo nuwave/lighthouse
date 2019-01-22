@@ -74,7 +74,7 @@ class CacheValue
                 ? 'auth'
                 : null,
             $this->privateCache
-                ? auth()->user()->getKey()
+                ? app('auth')->user()->getKey()
                 : null,
             strtolower($this->resolveInfo->parentType->name),
             $this->fieldKey,
