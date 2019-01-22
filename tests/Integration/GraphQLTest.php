@@ -201,4 +201,17 @@ class GraphQLTest extends DBTestCase
             $result->jsonGet('errors.0.message')
         );
     }
+
+    /**
+     * @test
+     */
+    public function itIgnoresInvalidJSONVariables(): void
+    {
+        $result = $this->postGraphQL([
+            'query' => '{}',
+            'variables' => '{}',
+        ]);
+
+        $result->assertStatus(200);
+    }
 }
