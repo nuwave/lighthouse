@@ -13,7 +13,7 @@ class ASTBuilderTest extends TestCase
      */
     public function itCanMergeTypeExtensionFields(): void
     {
-        $documentAST = ASTBuilder::generate('
+        $documentAST = ASTBuilder::build('
         type Query {
             foo: String
         }
@@ -41,7 +41,7 @@ class ASTBuilderTest extends TestCase
     public function itDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
         $this->expectException(DefinitionException::class);
-        ASTBuilder::generate('
+        ASTBuilder::build('
         type Query {
             foo: String
         }

@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use GraphQL\Executor\ExecutionResult;
@@ -12,6 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 
 class GraphQLController extends Controller
 {
@@ -36,24 +38,32 @@ class GraphQLController extends Controller
     protected $graphQLResponse;
 
     /**
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $eventsDispatcher;
+
+    /**
      * Inject middleware into request.
      *
      * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $graphQLResponse
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
      * @return void
      */
     public function __construct(
         ExtensionRegistry $extensionRegistry,
         GraphQL $graphQL,
         CreatesContext $createsContext,
-        GraphQLResponse $graphQLResponse
+        GraphQLResponse $graphQLResponse,
+        EventsDispatcher $eventsDispatcher
     ) {
         $this->graphQL = $graphQL;
         $this->extensionRegistry = $extensionRegistry;
         $this->createsContext = $createsContext;
         $this->graphQLResponse = $graphQLResponse;
+        $this->eventsDispatcher = $eventsDispatcher;
     }
 
     /**
@@ -64,13 +74,13 @@ class GraphQLController extends Controller
      */
     public function query(Request $request): Response
     {
+        $this->eventsDispatcher->dispatch(
+            new StartRequest()
+        );
+
         // If the request is a 0-indexed array, we know we are dealing with a batched query
         $batched = isset($request->toArray()[0]) && config('lighthouse.batched_queries', true);
         $context = $this->createsContext->generate($request);
-
-        $this->extensionRegistry->requestDidStart(
-            new ExtensionRequest($request, $context, $batched)
-        );
 
         $response = $batched
             ? $this->executeBatched($request, $context)

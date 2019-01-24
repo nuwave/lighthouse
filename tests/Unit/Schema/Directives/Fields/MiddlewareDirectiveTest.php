@@ -191,7 +191,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itAddsMiddlewareDirectiveToFields(): void
     {
-        $document = ASTBuilder::generate('
+        $document = ASTBuilder::build('
         type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {
             foo: Int
         } 

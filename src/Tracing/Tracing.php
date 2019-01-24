@@ -1,14 +1,16 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Extensions;
+namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Events\StartBatch;
+use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
-class TracingExtension extends GraphQLExtension
+class Tracing
 {
     /**
      * @var \Carbon\Carbon
@@ -18,28 +20,9 @@ class TracingExtension extends GraphQLExtension
     /**
      * Trace entries.
      *
-     * @var \Illuminate\Support\Collection
+     * @var array[]
      */
-    protected $resolvers;
-
-    /**
-     * Create instance of trace extension.
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->resolvers = collect();
-    }
-
-    /**
-     * Extension name.
-     *
-     * @return string
-     */
-    public static function name(): string
-    {
-        return 'tracing';
-    }
+    protected $resolverTraces = [];
 
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
@@ -58,25 +41,23 @@ class TracingExtension extends GraphQLExtension
     /**
      * Handle request start.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest  $request
-     * @return $this
+     * @param  \Nuwave\Lighthouse\Events\StartRequest  $startRequest
+     * @return void
      */
-    public function requestDidStart(ExtensionRequest $request): self
+    public function handleStartRequest(StartRequest $startRequest): void
     {
         $this->requestStart = Carbon::now();
-
-        return $this;
     }
 
     /**
      * Handle batch request start.
      *
-     * @param  int  $index
+     * @param  \Nuwave\Lighthouse\Events\StartBatch  $startBatch
      * @return void
      */
-    public function batchedQueryDidStart(int $index): void
+    public function handleStartBatch(StartBatch $startBatch): void
     {
-        $this->resolvers = collect();
+        $this->resolverTraces = [];
     }
 
     /**
@@ -92,14 +73,14 @@ class TracingExtension extends GraphQLExtension
         $startOffset = abs(($start->micro - $this->requestStart->micro) * 1000);
         $duration = abs(($end->micro - $start->micro) * 1000);
 
-        $this->resolvers->push([
+        $this->resolverTraces []= [
             'path' => $info->path,
             'parentType' => $info->parentType->name,
             'returnType' => $info->returnType->__toString(),
             'fieldName' => $info->fieldName,
             'startOffset' => $startOffset,
             'duration' => $duration,
-        ]);
+        ];
     }
 
     /**
@@ -118,7 +99,7 @@ class TracingExtension extends GraphQLExtension
             'endTime' => $end->format("Y-m-d\TH:i:s.v\Z"),
             'duration' => $duration,
             'execution' => [
-                'resolvers' => $this->resolvers->toArray(),
+                'resolvers' => $this->resolverTraces,
             ],
         ];
     }

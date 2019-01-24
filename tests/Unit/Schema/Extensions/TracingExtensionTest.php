@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
+use Nuwave\Lighthouse\Tracing\Tracing;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
 class TracingExtensionTest extends TestCase
 {
@@ -11,7 +11,7 @@ class TracingExtensionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('lighthouse.extensions', [TracingExtension::class]);
+        $app['config']->set('lighthouse.extensions', [Tracing::class]);
     }
 
     protected $schema = <<<SCHEMA

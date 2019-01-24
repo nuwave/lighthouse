@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
-use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
+use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
@@ -21,7 +21,7 @@ trait RequestsStreamedResponses
             return $this->stream;
         });
 
-        $app['config']->set('lighthouse.extensions', [DeferExtension::class]);
+        $app['config']->set('lighthouse.extensions', [Defer::class]);
     }
 
     /**

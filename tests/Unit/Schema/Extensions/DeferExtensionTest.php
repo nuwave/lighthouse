@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Extensions;
 
-use Tests\TestCase;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
+use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Tests\TestCase;
 
 class DeferExtensionTest extends TestCase
 {
@@ -283,8 +283,8 @@ class DeferExtensionTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxExecutionTime(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
-        $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
+        /** @var \Nuwave\Lighthouse\Defer\Defer $deferExtension */
+        $deferExtension = app(ExtensionRegistry::class)->get(Defer::name());
         // Set max execution time to now so we immediately resolve deferred fields
         $deferExtension->setMaxExecutionTime(microtime(true));
 
@@ -342,8 +342,8 @@ class DeferExtensionTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxNestedFields(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
-        $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
+        /** @var \Nuwave\Lighthouse\Defer\Defer $deferExtension */
+        $deferExtension = app(ExtensionRegistry::class)->get(Defer::name());
         $deferExtension->setMaxNestedFields(1);
 
         self::$data = [

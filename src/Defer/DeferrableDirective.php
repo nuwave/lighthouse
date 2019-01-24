@@ -1,22 +1,23 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Fields;
+namespace Nuwave\Lighthouse\Defer;
 
+use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Language\AST\NonNullTypeNode;
+use Nuwave\Lighthouse\Exceptions\ParseClientException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Exceptions\ParseClientException;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeferrableDirective extends BaseDirective implements Directive, FieldMiddleware
 {
+    const NAME = 'deferrable';
+
     /**
      * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
      */
@@ -38,7 +39,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      */
     public function name(): string
     {
-        return 'deferrable';
+        return self::NAME;
     }
 
     /**
@@ -119,10 +120,10 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     }
 
     /**
-     * @return \Nuwave\Lighthouse\Schema\Extensions\DeferExtension
+     * @return \Nuwave\Lighthouse\Defer\Defer
      */
-    protected function getDeferExtension(): DeferExtension
+    protected function getDeferExtension(): Defer
     {
-        return $this->extensions->get(DeferExtension::name());
+        return $this->extensions->get(Defer::name());
     }
 }

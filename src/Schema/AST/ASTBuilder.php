@@ -12,39 +12,46 @@ use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class ASTBuilder
 {
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     */
+    private $directiveFactory;
+
+    public function __construct(DirectiveFactory $directiveFactory)
+    {
+        $this->directiveFactory = $directiveFactory;
+    }
+    
     /**
      * Convert the base schema string into an AST by applying different manipulations.
      *
      * @param  string  $schema
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public static function generate(string $schema): DocumentAST
+    public function build(string $schema): DocumentAST
     {
         $document = DocumentAST::fromSource($schema);
 
         // Node manipulators may be defined on type extensions
-        $document = self::applyNodeManipulators($document);
+        $document = $this->applyNodeManipulators($document);
         // After they have been applied, we can safely merge them
-        $document = self::mergeTypeExtensions($document);
+        $document = $this->mergeTypeExtensions($document);
 
-        $document = self::applyFieldManipulators($document);
-        $document = self::applyArgManipulators($document);
+        $document = $this->applyFieldManipulators($document);
+        $document = $this->applyArgManipulators($document);
 
-        $document = self::addPaginationInfoTypes($document);
-        $document = self::addNodeSupport($document);
-
-        return app(ExtensionRegistry::class)->manipulate($document);
+        $document = $this->addPaginationInfoTypes($document);
+        return $this->addNodeSupport($document);
     }
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
+    protected function applyNodeManipulators(DocumentAST $document): DocumentAST
     {
         return $document
             ->typeDefinitions()
@@ -54,14 +61,14 @@ class ASTBuilder
             )
             ->reduce(
                 function (DocumentAST $document, Node $node): DocumentAST {
-                    $nodeManipulators = app(DirectiveFactory::class)->createNodeManipulators($node);
-
-                    return $nodeManipulators->reduce(
-                        function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
-                            return $nodeManipulator->manipulateSchema($node, $document);
-                        },
-                        $document
-                    );
+                    return $this->directiveFactory
+                        ->createNodeManipulators($node)
+                        ->reduce(
+                            function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
+                                return $nodeManipulator->manipulateSchema($node, $document);
+                            },
+                            $document
+                        );
                 },
                 $document
             );
@@ -73,7 +80,7 @@ class ASTBuilder
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected static function mergeTypeExtensions(DocumentAST $document): DocumentAST
+    protected function mergeTypeExtensions(DocumentAST $document): DocumentAST
     {
         $document->objectTypeDefinitions()->each(
             function (ObjectTypeDefinitionNode $objectType) use ($document) {
@@ -105,20 +112,20 @@ class ASTBuilder
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected static function applyFieldManipulators(DocumentAST $document): DocumentAST
+    protected function applyFieldManipulators(DocumentAST $document): DocumentAST
     {
         return $document->objectTypeDefinitions()->reduce(
             function (DocumentAST $document, ObjectTypeDefinitionNode $objectType): DocumentAST {
                 return collect($objectType->fields)->reduce(
                     function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType): DocumentAST {
-                        $fieldManipulators = app(DirectiveFactory::class)->createFieldManipulators($fieldDefinition);
-
-                        return $fieldManipulators->reduce(
-                            function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType): DocumentAST {
-                                return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document);
-                            },
-                            $document
-                        );
+                        return $this->directiveFactory
+                            ->createFieldManipulators($fieldDefinition)
+                            ->reduce(
+                                function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType): DocumentAST {
+                                    return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document);
+                                },
+                                $document
+                            );
                     },
                     $document
                 );
@@ -131,7 +138,7 @@ class ASTBuilder
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected static function applyArgManipulators(DocumentAST $document): DocumentAST
+    protected function applyArgManipulators(DocumentAST $document): DocumentAST
     {
         return $document->objectTypeDefinitions()->reduce(
             function (DocumentAST $document, ObjectTypeDefinitionNode $parentType): DocumentAST {
@@ -139,23 +146,23 @@ class ASTBuilder
                     function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType): DocumentAST {
                         return collect($parentField->arguments)->reduce(
                             function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField): DocumentAST {
-                                $argManipulators = app(DirectiveFactory::class)->createArgManipulators($argDefinition);
-
-                                return $argManipulators->reduce(
-                                    function (DocumentAST $document, ArgManipulator $argManipulator) use (
-                                        $argDefinition,
-                                        $parentField,
-                                        $parentType
-                                    ): DocumentAST {
-                                        return $argManipulator->manipulateSchema(
+                                return $this->directiveFactory
+                                    ->createArgManipulators($argDefinition)
+                                    ->reduce(
+                                        function (DocumentAST $document, ArgManipulator $argManipulator) use (
                                             $argDefinition,
                                             $parentField,
-                                            $parentType,
-                                            $document
-                                        );
-                                    },
-                                    $document
-                                );
+                                            $parentType
+                                        ): DocumentAST {
+                                            return $argManipulator->manipulateSchema(
+                                                $argDefinition,
+                                                $parentField,
+                                                $parentType,
+                                                $document
+                                            );
+                                        },
+                                        $document
+                                    );
                             },
                             $document
                         );
@@ -171,7 +178,7 @@ class ASTBuilder
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected static function addPaginationInfoTypes(DocumentAST $document): DocumentAST
+    protected function addPaginationInfoTypes(DocumentAST $document): DocumentAST
     {
         $paginatorInfo = PartialParser::objectTypeDefinition('
         type PaginatorInfo {
@@ -229,9 +236,7 @@ class ASTBuilder
           lastPage: Int
         }
         ');
-        $document->setDefinition($pageInfo);
-
-        return $document;
+        return $document->setDefinition($pageInfo);
     }
 
     /**
@@ -240,7 +245,7 @@ class ASTBuilder
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected static function addNodeSupport(DocumentAST $document): DocumentAST
+    protected function addNodeSupport(DocumentAST $document): DocumentAST
     {
         $hasTypeImplementingNode = $document->objectTypeDefinitions()
             ->contains(function (ObjectTypeDefinitionNode $objectType): bool {
@@ -271,8 +276,7 @@ GRAPHQL
         $nodeQuery = PartialParser::fieldDefinition(
             'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
         );
-        $document->addFieldToQueryType($nodeQuery);
 
-        return $document;
+        return $document->addFieldToQueryType($nodeQuery);
     }
 }
