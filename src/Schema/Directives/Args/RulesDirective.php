@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;

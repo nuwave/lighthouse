@@ -30,7 +30,7 @@ class RulesForArrayDirective extends BaseDirective implements ArgValidationDirec
     {
         $rules = $this->directiveArgValue('apply');
 
-        if(!in_array('array', $rules)){
+        if (! in_array('array', $rules)) {
             $rules = Arr::prepend($rules, 'array');
         }
 
