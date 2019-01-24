@@ -14,6 +14,7 @@ class ValidationTest extends TestCase
         foo(
             email: String = "hans@peter.rudolf" @rules(apply: ["email"])
             required: String @rules(apply: ["required"])
+            stringList: [String!] @rulesForArray(apply: ["array", "max:1"])
             input: [Bar] @rulesForArray(apply: ["min:3"])
             list: [String]
                 @rules(apply: ["required", "email"])
@@ -144,6 +145,10 @@ class ValidationTest extends TestCase
         $result = $this->query('
         {
             foo(
+                stringList: [
+                    "asdf",
+                    "one too many"
+                ]
                 input: [{
                     foobar: 1
                 }]
@@ -153,8 +158,20 @@ class ValidationTest extends TestCase
 
         $this->assertValidationKeysSame([
             'required',
+            'stringList',
             'input',
         ], $result);
+
+        $this->assertStringContainsString(
+            'may not have more than 1 items.',
+            $result->json('errors.0.extensions.validation.stringList.0')
+        );
+
+        $this->assertStringContainsString(
+            'must have at least 3 items.',
+            $result->json('errors.0.extensions.validation.input.0'),
+            'Validate size as an array by prepending the rules with the "array" validation'
+        );
     }
 
     /**
