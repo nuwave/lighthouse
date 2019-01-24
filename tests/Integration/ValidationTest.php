@@ -165,14 +165,14 @@ class ValidationTest extends TestCase
 
         $this->assertTrue(
             Str::endsWith(
-                $result->json('errors.0.extensions.validation.stringList.0'),
+                $result->jsonGet('errors.0.extensions.validation.stringList.0'),
                 'may not have more than 1 items.'
             )
         );
 
         $this->assertTrue(
             Str::endsWith(
-                $result->json('errors.0.extensions.validation.input.0'),
+                $result->jsonGet('errors.0.extensions.validation.input.0'),
                 'must have at least 3 items.'
             ),
             'Validate size as an array by prepending the rules with the "array" validation'
