@@ -3,6 +3,7 @@
 namespace Tests\Integration;
 
 use Tests\TestCase;
+use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
@@ -162,14 +163,18 @@ class ValidationTest extends TestCase
             'input',
         ], $result);
 
-        $this->assertStringContainsString(
-            'may not have more than 1 items.',
-            $result->json('errors.0.extensions.validation.stringList.0')
+        $this->assertTrue(
+            Str::endsWith(
+                $result->json('errors.0.extensions.validation.stringList.0'),
+                'may not have more than 1 items.'
+            )
         );
 
-        $this->assertStringContainsString(
-            'must have at least 3 items.',
-            $result->json('errors.0.extensions.validation.input.0'),
+        $this->assertTrue(
+            Str::endsWith(
+                $result->json('errors.0.extensions.validation.input.0'),
+                'must have at least 3 items.'
+            ),
             'Validate size as an array by prepending the rules with the "array" validation'
         );
     }
