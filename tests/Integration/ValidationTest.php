@@ -3,8 +3,8 @@
 namespace Tests\Integration;
 
 use Tests\TestCase;
-use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
 
