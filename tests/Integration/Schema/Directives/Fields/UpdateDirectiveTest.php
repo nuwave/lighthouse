@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives\Fields;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Tests\Utils\Models\Project;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Category;
 
@@ -202,6 +203,48 @@ class UpdateDirectiveTest extends DBTestCase
             ],
         ]);
         $this->assertSame('bar', Category::first()->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUpdateWithCustomLighthouseKey(): void
+    {
+        factory(Project::class)->create(['title' => 'foo', 'uuid' => '679b592c-1d77-4994-80b5-6b5cb5c5930f']);
+
+        $this->schema = '
+        type Project {
+            id: String! @rename(attribute: "uuid")
+            title: String!
+        }
+        
+        type Mutation {
+            updateProject(
+                id: String!
+                title: String
+            ): Project @update
+        }
+        '.$this->placeholderQuery();
+
+        $this->query('
+        mutation {
+            updateProject(
+                id: "679b592c-1d77-4994-80b5-6b5cb5c5930f"
+                title: "bar"
+            ) {
+                id
+                title
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateProject' => [
+                    'id' => '679b592c-1d77-4994-80b5-6b5cb5c5930f',
+                    'title' => 'bar',
+                ],
+            ],
+        ]);
+        $this->assertSame('bar', Project::first()->title);
     }
 
     /**

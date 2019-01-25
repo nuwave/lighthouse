@@ -201,12 +201,18 @@ class MutationExecutor
      */
     public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
     {
-        $id = $args->pull('id')
+
+        $key = $model->getKeyName();
+        $value = $args->pull('id')
             ?? $args->pull(
                 $model->getKeyName()
             );
 
-        $model = $model->newQuery()->findOrFail($id);
+        if (method_exists($model, 'getLighthouseKeyName')) {
+            $key = $model->getLighthouseKeyName();
+        }
+
+        $model = $model->newQuery()->where($key, $value)->firstOrFail();
 
         $reflection = new \ReflectionClass($model);
 
