@@ -55,14 +55,10 @@ class GraphQLRequest
         $variables = $this->getInputByKey('variables');
 
         if (is_string($variables)) {
-            $variables = json_decode($variables, true);
+            return json_decode($variables, true) ?? [];
         }
 
-        if (is_array($variables)) {
-            return $variables;
-        }
-
-        return [];
+        return $variables ?? [];
     }
 
     /**
