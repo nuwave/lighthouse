@@ -30,7 +30,9 @@ class Person
         // The return type can be a string either,
         // because the upstream lib `webonyx/graphql-php` allows us to give a string
         // which in this case you can just return the `$type` it self.
-        $type = isset($value['id']) ? 'User' : 'Employee';
+        $type = isset($value['id'])
+            ? 'User'
+            : 'Employee';
 
         return $this->typeRegistry->get($type);
     }

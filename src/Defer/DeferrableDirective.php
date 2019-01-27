@@ -104,8 +104,12 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
             $skipDirective = ASTHelper::directiveDefinition($fieldNode, 'skip');
             $includeDirective = ASTHelper::directiveDefinition($fieldNode, 'include');
 
-            $shouldSkip = $skipDirective ? ASTHelper::directiveArgValue($skipDirective, 'if', false) : false;
-            $shouldInclude = $includeDirective ? ASTHelper::directiveArgValue($includeDirective, 'if', false) : false;
+            $shouldSkip = $skipDirective
+                ? ASTHelper::directiveArgValue($skipDirective, 'if', false)
+                : false;
+            $shouldInclude = $includeDirective
+                ? ASTHelper::directiveArgValue($includeDirective, 'if', false)
+                : false;
 
             if ($shouldSkip || $shouldInclude) {
                 return false;

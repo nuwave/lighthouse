@@ -81,7 +81,9 @@ class ExtensionRequest
             ? $this->request->input('variables')
             : Arr::get($this->request, "{$index}.variables");
 
-        return is_string($variables) ? json_decode($variables, true) : $variables;
+        return is_string($variables)
+            ? json_decode($variables, true)
+            : $variables;
     }
 
     /**

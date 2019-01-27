@@ -80,7 +80,9 @@ export default {
     // make suggestions align right when there are not enough items
     alignRight () {
       const navCount = (this.$site.themeConfig.nav || []).length
-      const repo = this.$site.repo ? 1 : 0
+      const repo = this.$site.repo
+              ? 1
+              : 0
       return navCount + repo <= 2
     }
   },

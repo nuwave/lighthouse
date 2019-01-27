@@ -152,7 +152,9 @@ class Defer
     public function resolve(Closure $originalResolver, string $path)
     {
         $isDeferred = $this->isDeferred($path);
-        $resolver = $isDeferred ? $this->deferred[$path] : $originalResolver;
+        $resolver = $isDeferred
+            ? $this->deferred[$path]
+            : $originalResolver;
 
         if ($isDeferred) {
             $this->resolved[] = $path;
