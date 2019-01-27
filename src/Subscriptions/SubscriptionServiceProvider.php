@@ -5,6 +5,8 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -22,6 +24,11 @@ class SubscriptionServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             BroadcastSubscriptionEvent::class,
             BroadcastSubscriptionListener::class
+        );
+
+        $eventDispatcher->listen(
+            StartExecution::class,
+            SubscriptionRegistry::class . '@handleStartExecution'
         );
 
         // Register the routes for the configured broadcaster. The specific

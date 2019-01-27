@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Support\Arr;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
@@ -26,6 +27,11 @@ class SubscriptionRegistry
     protected $storage;
 
     /**
+     * @var \Nuwave\Lighthouse\GraphQL
+     */
+    protected $graphQL;
+
+    /**
      * A map from operation names to channel names.
      *
      * @var string[]
@@ -40,14 +46,15 @@ class SubscriptionRegistry
     protected $subscriptions = [];
 
     /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
-     * @return void
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer $serializer
+     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager $storage
+     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      */
-    public function __construct(ContextSerializer $serializer, StorageManager $storage)
+    public function __construct(ContextSerializer $serializer, StorageManager $storage, GraphQL $graphQL)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
+        $this->graphQL = $graphQL;
     }
 
     /**
@@ -126,13 +133,9 @@ class SubscriptionRegistry
     {
         // A subscription can be fired w/out a request so we must make
         // sure the schema has been generated.
-        app(GraphQL::class)->prepSchema();
+        $this->graphQL->prepSchema();
 
-        $documentNode = Parser::parse($subscriber->queryString, [
-            'noLocation' => true,
-        ]);
-
-        return collect($documentNode->definitions)
+        return collect($subscriber->query->definitions)
             ->filter(function (Node $node): bool {
                 return $node instanceof OperationDefinitionNode;
             })
@@ -156,22 +159,25 @@ class SubscriptionRegistry
     }
 
     /**
+     * Reset the collection of subscribers when a new execution starts.
+     *
+     * @param \Nuwave\Lighthouse\Events\StartExecution $startExecution
+     */
+    public function handleStartExecution(StartExecution $startExecution)
+    {
+        $this->subscribers = [];
+    }
+
+    /**
      * Get all current subscribers.
      *
      * @return string[]
      */
-    public function toArray(): array
+    public function handleWillSendResponse(): array
     {
-        return $this->subscribers;
-    }
-
-    /**
-     * Reset collection of subscribers.
-     *
-     * @return void
-     */
-    public function reset(): void
-    {
-        $this->subscribers = [];
+        return [
+            'version' => 1,
+            'channels' => $this->subscribers,
+        ];
     }
 }

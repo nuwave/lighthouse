@@ -263,16 +263,10 @@ class FieldValue
                 return $subscription->resolve($root->root, $args, $context, $resolveInfo);
             }
 
-            /** @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry */
-            $extensionRegistry = app(ExtensionRegistry::class);
-            /** @var \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension $subscriptionExtension */
-            $subscriptionExtension = $extensionRegistry->get(SubscriptionExtension::name());
-
-            $subscriber = Subscriber::initialize(
+            $subscriber = new Subscriber(
                 $args,
                 $context,
-                $resolveInfo,
-                $subscriptionExtension->currentQuery()
+                $resolveInfo
             );
 
             if (! $subscription->can($subscriber)) {

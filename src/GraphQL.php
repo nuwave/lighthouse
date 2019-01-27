@@ -9,10 +9,11 @@ use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -104,7 +105,7 @@ class GraphQL
         SchemaBuilder $schemaBuilder,
         SchemaSourceProvider $schemaSourceProvider,
         Pipeline $pipeline,
-        Dispatcher $dispatcher,
+        EventDispatcher $dispatcher,
         ASTBuilder $astBuilder
     ) {
         $this->extensionRegistry = $extensionRegistry;
@@ -134,7 +135,6 @@ class GraphQL
 
         return $this->applyDebugSettings($result);
     }
-    public function currentBatchIndex(): ?int {}
 
     /**
      * Apply the debug settings from the config and get the result as an array.
@@ -160,7 +160,7 @@ class GraphQL
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
-     * @param  string  $query
+     * @param  string|\GraphQL\Language\AST\DocumentNode  $query
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  mixed[] $variables
      * @param  mixed|null  $rootValue
@@ -168,13 +168,15 @@ class GraphQL
      * @return \GraphQL\Executor\ExecutionResult
      */
     public function executeQuery(
-        string $query,
+        $query,
         GraphQLContext $context,
         ?array $variables = [],
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
-        $operationName = $operationName ?: app('request')->input('operationName');
+        $this->dispatcher->dispatch(
+            new StartExecution()
+        );
 
         $result = GraphQLBase::executeQuery(
             $this->prepSchema(),
@@ -187,6 +189,11 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
+        // TODO loop over extension results and merge them in
+        $this->dispatcher->dispatch(
+            new GatheringExtensionResults(),
+
+        )
         $result->extensions = $this->extensionRegistry->jsonSerialize();
 
         $result->setErrorsHandler(

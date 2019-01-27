@@ -77,17 +77,7 @@ class SubscriptionExtension extends GraphQLExtension
     {
         return [
             'version' => 1,
-            'channels' => $this->registry->toArray(),
+            'channels' => $this->registry->handleWillSendResponse(),
         ];
-    }
-
-    /**
-     * Get the current query.
-     *
-     * @return string
-     */
-    public function currentQuery(): string
-    {
-        return $this->currentQuery;
     }
 }

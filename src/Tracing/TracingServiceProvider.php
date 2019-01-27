@@ -3,9 +3,10 @@
 namespace Nuwave\Lighthouse\Defer;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Events\Dispatcher;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Events\StartRequest;
+use Illuminate\Contracts\Events\Dispatcher;
+use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Tracing\Tracing;
 use Nuwave\Lighthouse\Tracing\TracingDirective;
@@ -34,6 +35,11 @@ class TracingServiceProvider extends ServiceProvider
         $dispatcher->listen(
             StartRequest::class,
             Tracing::class . '@handleStartRequest'
+        );
+
+        $dispatcher->listen(
+            StartExecution::class,
+            Tracing::class . '@handleStartExecution'
         );
     }
 

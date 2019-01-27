@@ -67,9 +67,7 @@ class StorageManager implements StoresSubscriptions
     {
         $key = self::SUBSCRIBER_KEY.".{$channel}";
 
-        return $this->cache->has($key)
-            ? Subscriber::unserialize($this->cache->get($key))
-            : null;
+        return $this->cache->get($key);
     }
 
     /**
@@ -117,7 +115,7 @@ class StorageManager implements StoresSubscriptions
         $topic[] = $subscriber->channel;
 
         $this->cache->forever($topicKey, json_encode($topic));
-        $this->cache->forever($subscriberKey, json_encode($subscriber->toArray()));
+        $this->cache->forever($subscriberKey, $subscriber);
     }
 
     /**
@@ -132,9 +130,7 @@ class StorageManager implements StoresSubscriptions
         $key = self::SUBSCRIBER_KEY.".{$channel}";
         $hasSubscriber = $this->cache->has($key);
 
-        $subscriber = $hasSubscriber
-            ? Subscriber::unserialize($this->cache->get($key))
-            : null;
+        $subscriber = $this->cache->get($key);
 
         if ($hasSubscriber) {
             $this->cache->forget($key);

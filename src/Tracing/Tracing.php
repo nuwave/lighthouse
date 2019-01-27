@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Events\StartBatch;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -52,10 +52,10 @@ class Tracing
     /**
      * Handle batch request start.
      *
-     * @param  \Nuwave\Lighthouse\Events\StartBatch  $startBatch
+     * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
      * @return void
      */
-    public function handleStartBatch(StartBatch $startBatch): void
+    public function handleStartExecution(StartExecution $startExecution): void
     {
         $this->resolverTraces = [];
     }

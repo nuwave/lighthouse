@@ -2,15 +2,17 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Support\Arr;
+use GraphQL\Utils\AST;
+use GraphQL\Error\Error;
 use Illuminate\Support\Str;
+use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
-class Subscriber
+class Subscriber implements \Serializable
 {
+    const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
     /**
      * @var string
      */
@@ -19,7 +21,7 @@ class Subscriber
     /**
      * @var mixed
      */
-    public $context;
+    public $root;
 
     /**
      * @var array
@@ -27,80 +29,100 @@ class Subscriber
     public $args;
 
     /**
+     * @var mixed
+     */
+    public $context;
+
+    /**
+     * @var \GraphQL\Language\AST\DocumentNode
+     */
+    public $query;
+
+    /**
      * @var string
      */
     public $operationName;
 
     /**
-     * @var string
-     */
-    public $queryString;
-
-    /**
-     * @var mixed
-     */
-    public $root;
-
-    /**
-     * Create new subscription instance.
-     *
-     * @param  array  $args
+     * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
-     * @param  string  $queryString
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @return void
      *
-     * @return static
+     * @throws Error
      */
-    public static function initialize(
+    public function __construct(
         array $args,
         GraphQLContext $context,
-        ResolveInfo $info,
-        string $queryString
-    ): self {
-        if ($info->operation->name === null) {
-            throw new SubscriptionException('An operation name must be present on a subscription request.');
+        ResolveInfo $resolveInfo
+    ) {
+        $operationName = $resolveInfo->operation->name;
+        if (! $operationName) {
+            throw new Error(
+                self::MISSING_OPERATION_NAME
+            );
         }
+        $this->operationName = $operationName->value;
 
-        $instance = new static();
+        $this->channel = $this->uniqueChannelName();
+        $this->args = $args;
+        $this->context = $context;
 
-        $instance->channel = $instance->uniqueChannelName();
-        $instance->context = $context;
-        $instance->args = $args;
-        $instance->operationName = $info->operation->name->value;
-        $instance->queryString = $queryString;
-
-        return $instance;
+        $documentNode = new DocumentNode([]);
+        $documentNode->definitions = $resolveInfo->fragments;
+        $documentNode->definitions[] = $resolveInfo->operation;
+        $this->query = $documentNode;
     }
 
     /**
-     * Unserialize subscription.
+     * Unserialize subscription from a JSON string.
      *
      * @param  string  $subscription
-     *
-     * @return static
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
      */
-    public static function unserialize(string $subscription): self
+    public function unserialize($subscription): Subscriber
     {
         $data = json_decode($subscription, true);
-        $instance = new static();
-        $instance->channel = Arr::get($data, 'channel');
-        $instance->context = $instance->serializer()->unserialize(
-            Arr::get($data, 'context')
-        );
-        $instance->args = Arr::get($data, 'args', []);
-        $instance->operationName = Arr::get($data, 'operation_name');
-        $instance->queryString = Arr::get($data, 'query_string');
 
-        return $instance;
+        $this->channel = $data['channel'];
+        $this->context = $this->contextSerializer()->unserialize(
+            $data['context']
+        );
+        $this->args = $data['args'];
+
+        $this->operationName = $data['operation_name'];
+        $this->query = AST::fromArray(
+            \unserialize($data['query'])
+        );
+
+        return $this;
+    }
+
+    /**
+     * Convert this into a JSON string.
+     *
+     * @return false|string
+     */
+    public function serialize()
+    {
+        return json_encode([
+            'channel' => $this->channel,
+            'context' => $this->contextSerializer()->serialize($this->context),
+            'args' => $this->args,
+            'operation_name',
+            'query' => \serialize(
+                AST::toArray($this->query)
+            ),
+        ]);
     }
 
     /**
      * Set root data.
      *
      * @param  mixed  $root
-     * @return $this
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
      */
-    public function setRoot($root): self
+    public function setRoot($root): Subscriber
     {
         $this->root = $root;
 
@@ -108,27 +130,11 @@ class Subscriber
     }
 
     /**
-     * Serialized subscription.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return [
-            'channel' => $this->channel,
-            'context' => $this->serializer()->serialize($this->context),
-            'args' => $this->args,
-            'operation_name' => $this->operationName,
-            'query_string' => $this->queryString,
-        ];
-    }
-
-    /**
-     * Generate a globally unique channel name.
+     * Generate a unique private channel name.
      *
      * @return string
      */
-    public static function uniqueChannelName(): string
+    protected function uniqueChannelName(): string
     {
         return 'private-'.Str::random(32).'-'.time();
     }
@@ -136,7 +142,7 @@ class Subscriber
     /**
      * @return \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer
      */
-    protected function serializer(): ContextSerializer
+    protected function contextSerializer(): ContextSerializer
     {
         return app(ContextSerializer::class);
     }

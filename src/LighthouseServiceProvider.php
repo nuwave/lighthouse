@@ -27,7 +27,6 @@ use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
@@ -44,18 +43,18 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot(ValidationFactory $validationFactory): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'lighthouse');
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
 
         $this->publishes([
-            __DIR__.'/../../config/config.php' => config_path('lighthouse.php'),
+            __DIR__.'/../config/config.php' => config_path('lighthouse.php'),
         ], 'config');
 
         $this->publishes([
-            __DIR__.'/../../assets/default-schema.graphql' => config('lighthouse.schema.register'),
+            __DIR__.'/../assets/default-schema.graphql' => config('lighthouse.schema.register'),
         ], 'schema');
 
         if (config('lighthouse.controller')) {
-            $this->loadRoutesFrom(__DIR__.'/../Support/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__.'./Support/Http/routes.php');
         }
 
         $validationFactory->resolver(

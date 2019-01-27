@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use GraphQL\Executor\ExecutionResult;
@@ -69,22 +70,18 @@ class GraphQLController extends Controller
     /**
      * Execute GraphQL query.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function query(Request $request): Response
+    public function query(GraphQLRequest $request)
     {
         $this->eventsDispatcher->dispatch(
             new StartRequest()
         );
 
-        // If the request is a 0-indexed array, we know we are dealing with a batched query
-        $batched = isset($request->toArray()[0]) && config('lighthouse.batched_queries', true);
-        $context = $this->createsContext->generate($request);
-
-        $response = $batched
-            ? $this->executeBatched($request, $context)
-            : $this->execute($request, $context);
+        $response = $request->isBatched()
+            ? $this->executeBatched($request)
+            : $this->graphQL->executeRequest($request);
 
         return $this->graphQLResponse->create(
             $this->extensionRegistry->willSendResponse($response)
@@ -92,68 +89,19 @@ class GraphQLController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @return mixed[]
-     */
-    protected function execute(Request $request, GraphQLContext $context): array
-    {
-        return $this->graphQL->executeQuery(
-            $request->input('query', ''),
-            $context,
-            $this->ensureVariablesAreArray(
-                $request->input('variables', [])
-            )
-        )->toArray(
-            $this->getDebugSetting()
-        );
-    }
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @return mixed[]
-     */
-    protected function executeBatched(Request $request, GraphQLContext $context): array
-    {
-        $data = $this->graphQL->executeBatchedQueries(
-            $request->toArray(),
-            $context
-        );
-
-        return array_map(
-            function (ExecutionResult $result) {
-                return $result->toArray(
-                    $this->getDebugSetting()
-                );
-            },
-            $data
-        );
-    }
-
-    /**
-     * @param  mixed  $variables
-     * @return mixed[]
-     */
-    protected function ensureVariablesAreArray($variables): array
-    {
-        return is_string($variables)
-            ? json_decode($variables, true)
-            : $variables === null ? [] : $variables;
-    }
-
-    /**
-     * Get the GraphQL debug setting.
+     * Loop through the individual batched queries and collect the results.
      *
-     * @return int|bool
+     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
+     * @return mixed[]
      */
-    protected function getDebugSetting()
+    protected function executeBatched(GraphQLRequest $request): array
     {
-        // If debugging is set to false globally, do not add GraphQL specific
-        // debugging info either. If it is true, then we fetch the debug
-        // level from the Lighthouse configuration.
-        return config('app.debug')
-            ? config('lighthouse.debug')
-            : false;
+        $results = [];
+
+        do {
+            $results[] = $this->graphQL->executeRequest($request);
+        } while ($request->advanceBatchIndex());
+
+        return $results;
     }
 }
