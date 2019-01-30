@@ -9,11 +9,23 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 class ASTBuilderTest extends TestCase
 {
     /**
+     * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
+     */
+    protected $astBuilder;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->astBuilder = app(ASTBuilder::class);
+    }
+
+    /**
      * @test
      */
     public function itCanMergeTypeExtensionFields(): void
     {
-        $documentAST = ASTBuilder::build('
+        $documentAST = $this->astBuilder->build('
         type Query {
             foo: String
         }
@@ -41,7 +53,7 @@ class ASTBuilderTest extends TestCase
     public function itDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
         $this->expectException(DefinitionException::class);
-        ASTBuilder::build('
+        $this->astBuilder->build('
         type Query {
             foo: String
         }

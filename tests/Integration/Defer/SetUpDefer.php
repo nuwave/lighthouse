@@ -1,19 +1,22 @@
 <?php
 
-namespace Tests\Unit\Schema\Extensions;
+namespace Tests\Integration\Defer;
 
 use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
-trait RequestsStreamedResponses
+trait SetUpDefer
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Http\Responses\MemoryStream
      */
     protected $stream;
 
-    protected function setUpInMemoryStream($app)
+    /**
+     * @param \Illuminate\Foundation\Application $app
+     */
+    protected function setUpDefer($app)
     {
         $this->stream = new MemoryStream();
 

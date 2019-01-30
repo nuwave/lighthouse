@@ -7,12 +7,13 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
-class Defer
+class Defer implements GraphQLResponse
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse
@@ -189,7 +190,7 @@ class Defer
      * @param  mixed[]  $data
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function response(array $data): Response
+    public function create(array $data): Response
     {
         if (empty($this->deferred)) {
             return response($data);

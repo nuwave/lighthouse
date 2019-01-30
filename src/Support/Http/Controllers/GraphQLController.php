@@ -2,19 +2,14 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
+use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
-use GraphQL\Executor\ExecutionResult;
-use Symfony\Component\HttpFoundation\Response;
+use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 
 class GraphQLController extends Controller
 {
@@ -29,42 +24,41 @@ class GraphQLController extends Controller
     protected $createsContext;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
+     * @var \Nuwave\Lighthouse\Defer\Defer
      */
-    protected $extensionRegistry;
-
-    /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse
-     */
-    protected $graphQLResponse;
+    protected $defer;
 
     /**
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventsDispatcher;
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse
+     */
+    private $createsResponse;
 
     /**
      * Inject middleware into request.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $graphQLResponse
+     * @param  \Nuwave\Lighthouse\Defer\Defer  $defer
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $createsResponse
      * @return void
      */
     public function __construct(
-        ExtensionRegistry $extensionRegistry,
         GraphQL $graphQL,
         CreatesContext $createsContext,
-        GraphQLResponse $graphQLResponse,
-        EventsDispatcher $eventsDispatcher
+        Defer $defer,
+        EventsDispatcher $eventsDispatcher,
+        GraphQLResponse $createsResponse
     ) {
         $this->graphQL = $graphQL;
-        $this->extensionRegistry = $extensionRegistry;
         $this->createsContext = $createsContext;
-        $this->graphQLResponse = $graphQLResponse;
+        $this->defer = $defer;
         $this->eventsDispatcher = $eventsDispatcher;
+        $this->createsResponse = $createsResponse;
     }
 
     /**
@@ -79,13 +73,11 @@ class GraphQLController extends Controller
             new StartRequest()
         );
 
-        $response = $request->isBatched()
+        $result = $request->isBatched()
             ? $this->executeBatched($request)
             : $this->graphQL->executeRequest($request);
 
-        return $this->graphQLResponse->create(
-            $this->extensionRegistry->willSendResponse($response)
-        );
+        return $this->createsResponse->create($result);
     }
 
     /**

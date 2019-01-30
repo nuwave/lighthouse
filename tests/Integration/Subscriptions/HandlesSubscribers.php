@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Subscriptions;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Http\Request;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -17,9 +18,11 @@ trait HandlesSubscribers
      */
     protected function subscriber(?string $queryString = null): Subscriber
     {
-        $subscriber = new Subscriber();
-        $subscriber->args = ['foo' => 'bar'];
-        $subscriber->context = $this;
+        $subscriber = new Subscriber(
+            ['foo' => 'bar'],
+            $this,
+            new ResolveInfo()
+        );
         $subscriber->operationName = 'foo';
         $subscriber->queryString = $queryString ?: '{ me }';
         $subscriber->channel = Subscriber::uniqueChannelName();

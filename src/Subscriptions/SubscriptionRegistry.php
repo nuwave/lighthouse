@@ -173,11 +173,13 @@ class SubscriptionRegistry
      *
      * @return string[]
      */
-    public function handleWillSendResponse(): array
+    public function handleGatheringExtensions(): array
     {
         return [
-            'version' => 1,
-            'channels' => $this->subscribers,
+            'lighthouse_subscriptions' => [
+                'version' => 1,
+                'channels' => $this->subscribers,
+            ]
         ];
     }
 }

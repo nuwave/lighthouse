@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Defer;
+namespace Nuwave\Lighthouse\Tracing;
 
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\StartRequest;
@@ -8,8 +8,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Tracing\Tracing;
-use Nuwave\Lighthouse\Tracing\TracingDirective;
 
 class TracingServiceProvider extends ServiceProvider
 {
@@ -24,7 +22,7 @@ class TracingServiceProvider extends ServiceProvider
     {
         $directiveFactory->addResolved(
             TracingDirective::NAME,
-            Tracing::class
+            TracingDirective::class
         );
 
         $dispatcher->listen(

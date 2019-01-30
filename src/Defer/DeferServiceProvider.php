@@ -37,5 +37,6 @@ class DeferServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(Defer::class);
+
     }
 }

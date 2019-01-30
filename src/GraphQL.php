@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
+use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Support\Pipeline;
@@ -22,7 +23,6 @@ use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class GraphQL
 {
@@ -39,13 +39,6 @@ class GraphQL
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
-
-    /**
-     * Th extension registry.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
-     */
-    protected $extensionRegistry;
 
     /**
      * The schema builder.
@@ -80,7 +73,7 @@ class GraphQL
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $dispatcher;
+    protected $eventDispatcher;
 
     /**
      * The AST builder.
@@ -92,27 +85,24 @@ class GraphQL
     /**
      * GraphQL constructor.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
      * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
      * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
      * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
      * @return void
      */
     public function __construct(
-        ExtensionRegistry $extensionRegistry,
         SchemaBuilder $schemaBuilder,
         SchemaSourceProvider $schemaSourceProvider,
         Pipeline $pipeline,
-        EventDispatcher $dispatcher,
+        EventDispatcher $eventDispatcher,
         ASTBuilder $astBuilder
     ) {
-        $this->extensionRegistry = $extensionRegistry;
         $this->schemaBuilder = $schemaBuilder;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->pipeline = $pipeline;
-        $this->dispatcher = $dispatcher;
+        $this->eventDispatcher = $eventDispatcher;
         $this->astBuilder = $astBuilder;
     }
 
@@ -174,7 +164,7 @@ class GraphQL
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
-        $this->dispatcher->dispatch(
+        $this->eventDispatcher->dispatch(
             new StartExecution()
         );
 
@@ -189,12 +179,19 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
-        // TODO loop over extension results and merge them in
-        $this->dispatcher->dispatch(
-            new GatheringExtensionResults(),
+        // Listeners of this event should return an array comprised of
+        // a single key and the extension content as the value.
+        $extensionResults = $this->eventDispatcher->dispatch(
+            new GatheringExtensions()
+        );
 
-        )
-        $result->extensions = $this->extensionRegistry->jsonSerialize();
+        // Ensure we preserve the extension keys while flattening
+        foreach($extensionResults as $singleExtensionResult){
+            $result->extensions = array_merge(
+                $result->extensions,
+                $singleExtensionResult
+            );
+        }
 
         $result->setErrorsHandler(
             function (array $errors, callable $formatter): array {
@@ -290,7 +287,7 @@ class GraphQL
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = $this->dispatcher->dispatch(
+        $additionalSchemas = $this->eventDispatcher->dispatch(
             new BuildingAST($schemaString)
         );
 
@@ -304,7 +301,7 @@ class GraphQL
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulatingAST event. This can be useful for extensions
         // that want to programmatically change the schema.
-        $this->dispatcher->dispatch(
+        $this->eventDispatcher->dispatch(
             new ManipulatingAST($documentAST)
         );
 

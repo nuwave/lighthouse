@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class Tracing
@@ -27,13 +27,13 @@ class Tracing
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @param  \Nuwave\Lighthouse\Events\ManipulatingAST  $manipulatingAST
+     * @return void
      */
-    public function manipulateSchema(DocumentAST $documentAST): DocumentAST
+    public function handleManipulatingAST(ManipulatingAST $manipulatingAST): void
     {
-        return ASTHelper::attachDirectiveToObjectTypeFields(
-            $documentAST,
+        ASTHelper::attachDirectiveToObjectTypeFields(
+            $manipulatingAST->ast,
             PartialParser::directive('@tracing')
         );
     }

@@ -21,7 +21,6 @@ use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
@@ -30,7 +29,6 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
-use Nuwave\Lighthouse\Support\Http\Responses\Response;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 
 class LighthouseServiceProvider extends ServiceProvider
@@ -54,7 +52,7 @@ class LighthouseServiceProvider extends ServiceProvider
         ], 'schema');
 
         if (config('lighthouse.controller')) {
-            $this->loadRoutesFrom(__DIR__.'./Support/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
         }
 
         $validationFactory->resolver(
@@ -95,12 +93,25 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->alias(GraphQL::class, 'graphql');
 
         $this->app->singleton(DirectiveFactory::class);
-        $this->app->singleton(ExtensionRegistry::class);
         $this->app->singleton(NodeRegistry::class);
         $this->app->singleton(TypeRegistry::class);
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
-        $this->app->singleton(GraphQLResponse::class, Response::class);
+
+        $this->app->bind(GraphQLResponse::class, function() {
+            return new class implements GraphQLResponse {
+                /**
+                 * Create GraphQL response.
+                 *
+                 * @param  array $data
+                 * @return \Symfony\Component\HttpFoundation\Response
+                 */
+                public function create(array $data)
+                {
+                    return response($data);
+                }
+            };
+        });
 
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
             return new GraphQLRequest($app->make('request'));

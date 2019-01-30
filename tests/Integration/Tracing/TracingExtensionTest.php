@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Extensions;
+namespace Tests\Integration\Tracing;
 
 use Nuwave\Lighthouse\Tracing\Tracing;
 use Tests\TestCase;

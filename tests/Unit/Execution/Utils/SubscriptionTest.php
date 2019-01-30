@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Execution\Utils;
 
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Tests\TestCase;
 use Prophecy\Argument;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class SubscriptionTest extends TestCase
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
      */
-    protected $registry;
+    protected $subscriptionRegistry;
 
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
@@ -33,18 +34,18 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $this->registry = app(SubscriptionRegistry::class);
-        $this->registry->register($this->subscription(), self::SUBSCRIPTION_FIELD);
-
-        $this->broadcaster = $this->prophesize(SubscriptionBroadcaster::class);
-        $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());
-
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
         type Query {
             subscription: String @field(resolver: \"{$resolver}\")
         }
         ";
+
+        $this->subscriptionRegistry = app(SubscriptionRegistry::class);
+        $this->subscriptionRegistry->register($this->subscription(), self::SUBSCRIPTION_FIELD);
+
+        $this->broadcaster = $this->prophesize(SubscriptionBroadcaster::class);
+        $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());
     }
 
     /**
