@@ -10,6 +10,15 @@ type Query {
 }
 ```
 
+If you need to use a guard besides the default to resolve the authenticated user,
+you can pass the guard name as the `guard` argument
+
+```graphql
+type Query {
+    me: User @auth(guard: "api")
+}
+```
+
 ## @all
 
 Fetch all Eloquent models and return the collection as the result for a field.
@@ -914,6 +923,30 @@ You can customize the error message for a particular argument.
 
 ```graphql
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
+```
+
+## @rulesForArray
+
+Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/5.6/validation#available-validation-rules).
+
+```graphql
+type Mutation {
+  saveIcecream(flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])): Icecream
+}
+```
+
+You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
+both the size and the contents of an argument array.
+For example, you might require a list of at least 3 valid emails to be passed.
+
+```graphql
+type Mutation {
+  attachEmails(
+    email: [String!]!
+      @rules(apply: ["email"])
+      @rulesForArray(apply: ["min:3"])
+   ): File
+}
 ```
 
 ## @scalar
