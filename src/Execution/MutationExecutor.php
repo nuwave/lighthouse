@@ -147,6 +147,10 @@ class MutationExecutor
                     $belongsTo = $model->{$relationName}();
                     $belongsTo->associate($values);
                 }
+
+                if ($operationKey === 'delete') {
+                    $relation->getModel()::destroy($values);
+                }
             });
         });
 
@@ -212,6 +216,16 @@ class MutationExecutor
 
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
+        [$morphMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphMany::class);
+
+        [$hasOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
+
+        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
+
+        [$morphOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
+
+        [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
+
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
         $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
@@ -223,6 +237,103 @@ class MutationExecutor
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
 
+                if ($operationKey === 'update') {
+                    collect($values)->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    });
+                }
+
+                if ($operationKey === 'delete') {
+                    $relation->getModel()::destroy($values);
+                }
+            });
+        });
+
+        $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
+            $relation = $model->{$relationName}();
+
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleSingleRelationCreate(collect($values), $relation);
+                }
+            });
+        });
+
+        $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+            $relation = $model->{$relationName}();
+
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleMultiRelationCreate(collect($values), $relation);
+                }
+                if ($operationKey === 'update') {
+                    collect($values)->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    });
+                }
+
+                if ($operationKey === 'delete') {
+                    $relation->getModel()::destroy($values);
+                }
+            });
+        });
+
+        $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
+            $relation = $model->{$relationName}();
+
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleSingleRelationCreate(collect($values), $relation);
+                }
+
+                if ($operationKey === 'update') {
+                    collect($values)->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    });
+                }
+
+                if ($operationKey === 'delete') {
+                    $relation->getModel()::destroy($values);
+                }
+            });
+        });
+
+        $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
+            $relation = $model->{$relationName}();
+
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleMultiRelationCreate(collect($values), $relation);
+                }
+
+                if ($operationKey === 'update') {
+                    collect($values)->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    });
+                }
+
+                if ($operationKey === 'delete') {
+                    $relation->getModel()::destroy($values);
+                }
+
+                if ($operationKey === 'connect') {
+                    $relation->attach($values);
+                }
+            });
+        });
+
+        $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
+            $relation = $model->{$relationName}();
+
+            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleMultiRelationCreate(collect($values), $relation);
+                }
                 if ($operationKey === 'update') {
                     collect($values)->each(function ($singleValues) use ($relation): void {
                         self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
