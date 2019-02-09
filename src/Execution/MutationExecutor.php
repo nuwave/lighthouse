@@ -257,6 +257,16 @@ class MutationExecutor
                 if ($operationKey === 'create') {
                     self::handleSingleRelationCreate(collect($values), $relation);
                 }
+
+                if ($operationKey === 'update') {
+                    collect($values)->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    });
+                }
+
+                if ($operationKey === 'delete') {
+                    $relation->getModel()::destroy($values);
+                }
             });
         });
 
