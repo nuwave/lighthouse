@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -49,6 +50,13 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationType;
 
     /**
+     * The paginator can be limited to only allow querying a maximum number of items
+     *
+     * @var int|null
+     */
+    protected $paginationMaxCount;
+
+    /**
      * @param  string  $relationName
      * @param  array  $args
      * @param  string[]    $scopes
@@ -56,13 +64,14 @@ class RelationBatchLoader extends BatchLoader
      * @param  string|null  $paginationType
      * @return void
      */
-    public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null)
+    public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null, int $paginationMaxCount = null)
     {
         $this->relationName = $relationName;
         $this->args = $args;
         $this->scopes = $scopes;
         $this->resolveInfo = $resolveInfo;
         $this->paginationType = $paginationType;
+        $this->paginationMaxCount = $paginationMaxCount;
     }
 
     /**
@@ -80,6 +89,12 @@ class RelationBatchLoader extends BatchLoader
                 $first = $this->args['first'];
                 $after = Cursor::decode($this->args);
 
+                // check against count limit
+                $maxCount = $this->paginationMaxCount;
+                if ($maxCount !== null && $first > $maxCount) {
+                    throw new Error("Count parameter limit of {$maxCount} exceeded");
+                }
+
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
 
                 $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
@@ -88,6 +103,12 @@ class RelationBatchLoader extends BatchLoader
                 // count must be set so we can safely get it like this
                 $count = $this->args['count'];
                 $page = Arr::get($this->args, 'page', 1);
+
+                // check against count limit
+                $maxCount = $this->paginationMaxCount;
+                if ($maxCount !== null && $count > $maxCount) {
+                    throw new Error("Count parameter limit of {$maxCount} exceeded");
+                }
 
                 $modelRelationFetcher->loadRelationsForPage($count, $page);
                 break;

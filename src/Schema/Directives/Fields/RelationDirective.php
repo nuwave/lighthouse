@@ -55,8 +55,16 @@ abstract class RelationDirective extends BaseDirective
         }
 
         $defaultCount = $this->directiveArgValue('defaultCount');
+        $maxCount = $this->directiveArgValue('maxCount');
 
-        return PaginationManipulator::transformToPaginatedField($paginationType, $fieldDefinition, $parentType, $current, $defaultCount);
+        return PaginationManipulator::transformToPaginatedField(
+            $paginationType,
+            $fieldDefinition,
+            $parentType,
+            $current,
+            $defaultCount,
+            $maxCount
+        );
     }
 
     /**
@@ -68,11 +76,13 @@ abstract class RelationDirective extends BaseDirective
      */
     protected function getLoaderConstructorArguments(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
+        $maxCount = $this->directiveArgValue('maxCount') ?? config('lighthouse.paginate_max_count');
         $constructorArgs = [
             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
             'args' => $args,
             'scopes' => $this->directiveArgValue('scopes', []),
             'resolveInfo' => $resolveInfo,
+            'paginationMaxCount' => $maxCount,
         ];
 
         if ($paginationType = $this->directiveArgValue('type')) {
