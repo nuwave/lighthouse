@@ -277,7 +277,7 @@ class HasManyDirectiveTest extends DBTestCase
             }
         }
         ');
-        
+
         $this->assertSame(
             'Count parameter limit of 2 exceeded',
             $result->jsonGet('errors.0.message')
@@ -291,7 +291,7 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
-         $this->schema = '
+        $this->schema = '
          type User {
              tasks: [Task!]! @hasMany(type: "relay")
          }
@@ -304,8 +304,8 @@ class HasManyDirectiveTest extends DBTestCase
              user: User @auth
          }
          ';
- 
-         $result = $this->query('
+
+        $result = $this->query('
          {
              user {
                  tasks(first: 3) {
@@ -318,11 +318,11 @@ class HasManyDirectiveTest extends DBTestCase
              }
          }
          ');
-         
-         $this->assertSame(
-             'Count parameter limit of 2 exceeded',
-             $result->jsonGet('errors.0.message')
-         );
+
+        $this->assertSame(
+            'Count parameter limit of 2 exceeded',
+            $result->jsonGet('errors.0.message')
+        );
     }
 
     /**

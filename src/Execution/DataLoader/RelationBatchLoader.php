@@ -50,7 +50,7 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationType;
 
     /**
-     * The paginator can be limited to only allow querying a maximum number of items
+     * The paginator can be limited to only allow querying a maximum number of items.
      *
      * @var int|null
      */
