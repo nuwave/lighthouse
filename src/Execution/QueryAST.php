@@ -53,7 +53,7 @@ class QueryAST
     /**
      * Get all fragment definitions.
      *
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\FragmentDefinitionNode>
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\FragmentDefinitionNode
      */
     public function fragmentDefinitions(): Collection
     {
