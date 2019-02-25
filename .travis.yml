@@ -37,7 +37,7 @@ before_install:
   - phpenv config-rm xdebug.ini || true
   - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - travis_retry composer self-update
-  - composer global require hirak/prestissimo --update-no-dev
+  - travis_retry composer global require hirak/prestissimo --update-no-dev
   - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
 
 install:
