@@ -8,7 +8,7 @@ language: php
 
 env:
   global:
-    - COVERAGE=0 XDEBUG=0
+    - COVERAGE=0
 
 matrix:
   include:
@@ -25,16 +25,17 @@ matrix:
     - php: 7.2
       env: LARAVEL='5.7.*'
     - php: 7.3
-      env: LARAVEL='5.5.*' XDEBUG=1
+      env: LARAVEL='5.5.*'
     - php: 7.3
-      env: LARAVEL='5.6.*' XDEBUG=1
+      env: LARAVEL='5.6.*'
     - php: 7.3
-      env: COVERAGE=1 LARAVEL='5.7.*' XDEBUG=1
+      env: COVERAGE=1 LARAVEL='5.7.*'
   fast_finish: true
 
 
 before_install:
-  - if [[ $XDEBUG = 0 ]]; then phpenv config-rm xdebug.ini; fi
+  - phpenv config-rm xdebug.ini || true
+  - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - travis_retry composer self-update
   - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
 
