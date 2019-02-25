@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderTest extends DBTestCase
 {
-    protected function setUp()
+    protected function setup(): void
     {
         parent::setUp();
 

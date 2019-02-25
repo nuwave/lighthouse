@@ -19,7 +19,7 @@ class SyncIteratorTest extends TestCase
      */
     protected $iterator;
 
-    protected function setUp()
+    protected function setup(): void
     {
         parent::setUp();
 

@@ -12,7 +12,7 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     protected $users;
 
-    protected function setUp()
+    protected function setup(): void
     {
         parent::setUp();
 

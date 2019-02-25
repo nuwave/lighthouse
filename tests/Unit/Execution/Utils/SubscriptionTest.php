@@ -29,7 +29,7 @@ class SubscriptionTest extends TestCase
      */
     protected $broadcaster;
 
-    protected function setUp()
+    protected function setup(): void
     {
         parent::setUp();
 

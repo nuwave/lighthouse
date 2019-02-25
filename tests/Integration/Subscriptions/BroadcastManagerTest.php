@@ -26,7 +26,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setup(): void
     {
         parent::setUp();
 

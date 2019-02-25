@@ -45,7 +45,7 @@ class GraphQLTest extends DBTestCase
      */
     protected $tasks;
 
-    protected function setUp()
+    protected function setup(): void
     {
         parent::setUp();
 
