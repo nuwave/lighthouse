@@ -25,12 +25,12 @@ class RulesDirectiveTest extends TestCase
             foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
         }
-        
+
         type Mutation {
             foo(bar: String @rules(apply: [\"required\"])): User
                 @field(resolver: \"{$resolver}\")
         }
-        
+
         type User {
             first_name: String
             last_name: String
@@ -47,7 +47,7 @@ class RulesDirectiveTest extends TestCase
                 input: UserInput
             ): Boolean
         }
-        
+
         input UserInput {
             email: String
                 @rules(
