@@ -58,7 +58,7 @@ class SubscriptionExtension extends GraphQLExtension
     /**
      * Handle batch request start.
      *
-     * @param  int index
+     * @param  int  index
      *
      * @return void
      */

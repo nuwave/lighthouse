@@ -141,7 +141,7 @@ class GraphQL
      *
      * @param  string  $query
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  mixed[] $variables
+     * @param  mixed[]  $variables
      * @param  mixed|null  $rootValue
      * @param  string|null  $operationName
      * @return \GraphQL\Executor\ExecutionResult

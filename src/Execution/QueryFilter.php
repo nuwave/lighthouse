@@ -58,7 +58,7 @@ class QueryFilter
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
      * @param  array  $args
-     * @param  string[]                $scopes
+     * @param  string[]  $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */

@@ -86,7 +86,7 @@ class NodeRegistry
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param  $rootValue
+     * @param  mixed|null  $rootValue
      * @param  array  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
