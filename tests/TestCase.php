@@ -162,11 +162,22 @@ abstract class TestCase extends BaseTestCase
                 public function renderForConsole($output, Exception $e)
                 {
                 }
+
+                /**
+                 * Determine if the exception should be reported.
+                 *
+                 * @param  \Exception $e
+                 * @return bool
+                 */
+                public function shouldReport(Exception $e)
+                {
+                    return false;
+                }
             };
         });
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
