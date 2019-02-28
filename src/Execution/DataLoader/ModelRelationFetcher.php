@@ -252,27 +252,26 @@ class ModelRelationFetcher
     /**
      * Load default eager loads.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $collection
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $collection
      * @return $this
      */
     protected function loadDefaultWith(EloquentCollection $collection): self
     {
-        if ($collection->isNotEmpty()) {
-            $model = $collection->first();
-            $reflection = new ReflectionClass($model);
-            $withProperty = $reflection->getProperty('with');
-            $withProperty->setAccessible(true);
+        if ($collection->isEmpty()) {
+            return $this;
+        }
 
-            $with = array_filter(
-                (array) $withProperty->getValue($model),
-                function ($relation) use ($model) {
-                    return ! $model->relationLoaded($relation);
-                }
-            );
+        $model = $collection->first();
+        $reflection = new ReflectionClass($model);
+        $withProperty = $reflection->getProperty('with');
+        $withProperty->setAccessible(true);
 
-            if (! empty($with)) {
-                $collection->load($with);
-            }
+        $with = array_filter((array) $withProperty->getValue($model), function ($relation) use ($model) {
+            return ! $model->relationLoaded($relation);
+        });
+
+        if (! empty($with)) {
+            $collection->load($with);
         }
 
         return $this;
@@ -381,7 +380,7 @@ class ModelRelationFetcher
      * Ensure the pivot relation is hydrated too, if it exists.
      *
      * @param  string  $relationName
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $relationModels
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relationModels
      * @return $this
      */
     protected function hydratePivotRelation(string $relationName, EloquentCollection $relationModels): self

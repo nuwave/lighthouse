@@ -100,7 +100,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
         if (! $can) {
             throw new AuthorizationException(
-                "You are not not authorized to access {$this->definitionNode->name->value}"
+                "You are not authorized to access {$this->definitionNode->name->value}"
             );
         }
     }

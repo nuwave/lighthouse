@@ -95,9 +95,18 @@ as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super pow
 
     composer require nuwave/lighthouse mll-lab/laravel-graphql-playground
 
-Then publish the default schema to `graphql/schema.graphql`.
+Then publish the configurations files and the default schema.
 
-    php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider" --tag=schema
+
+```bash
+# lighthouse
+php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider"
+
+# playground
+php artisan vendor:publish --provider="MLL\GraphQLPlayground\GraphQLPlaygroundServiceProvider"
+```
+
+The default schema will be published to `graphql/schema.graphql`.
 
 Consult the [Laravel docs on database configuration](https://laravel.com/docs/5.7/database#configuration)
 and ensure you have a working database set up.

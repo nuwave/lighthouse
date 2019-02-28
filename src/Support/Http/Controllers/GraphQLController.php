@@ -127,9 +127,11 @@ class GraphQLController extends Controller
      */
     protected function ensureVariablesAreArray($variables): array
     {
-        return is_string($variables)
-            ? json_decode($variables, true)
-            : $variables === null ? [] : $variables;
+        if (is_string($variables)) {
+            return json_decode($variables, true) ?? [];
+        }
+
+        return $variables ?? [];
     }
 
     /**

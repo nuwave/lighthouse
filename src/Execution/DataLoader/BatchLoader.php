@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Exception;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
@@ -37,8 +38,8 @@ abstract class BatchLoader
      * Return an instance of a BatchLoader for a specific field.
      *
      * @param  string  $loaderClass     the class name of the concrete BatchLoader to instantiate
-     * @param  mixed[] $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param  mixed[] $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
+     * @param  mixed[]  $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param  mixed[]  $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
      * @return static
      *
      * @throws \Exception
@@ -65,7 +66,7 @@ abstract class BatchLoader
             );
 
         if (! $instance instanceof self) {
-            throw new \Exception(
+            throw new Exception(
                 "The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader"
             );
         }
@@ -76,7 +77,7 @@ abstract class BatchLoader
     /**
      * Generate a unique key for the instance, using the path in the query.
      *
-     * @param  mixed[] $path
+     * @param  mixed[]  $path
      * @return string
      */
     public static function instanceKey(array $path): string

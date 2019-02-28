@@ -66,7 +66,7 @@ class ErrorBuffer
     /**
      * Resolve the exception by calling the exception handler with the given args.
      *
-     * @param  mixed ...$args
+     * @param  mixed  ...$args
      * @return mixed
      */
     protected function resolveException(...$args)
@@ -85,11 +85,9 @@ class ErrorBuffer
     {
         if ($key === null) {
             $this->errors[] = $errorMessage;
-
-            return $this;
+        } else {
+            $this->errors[$key][] = $errorMessage;
         }
-
-        $this->errors[$key][] = $errorMessage;
 
         return $this;
     }

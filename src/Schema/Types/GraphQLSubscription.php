@@ -48,7 +48,7 @@ abstract class GraphQLSubscription
      * Resolve the subscription.
      *
      * @param  mixed  $root
-     * @param  mixed[] $args
+     * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $info
      * @return mixed

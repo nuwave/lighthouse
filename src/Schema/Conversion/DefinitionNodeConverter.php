@@ -38,7 +38,7 @@ class DefinitionNodeConverter
      * Unwrap the node if needed and convert to type.
      *
      * @param  mixed  $node
-     * @param  string[] $wrappers
+     * @param  string[]  $wrappers
      * @return \GraphQL\Type\Definition\Type
      */
     protected function convertWrappedDefinitionNode($node, array $wrappers = []): Type
