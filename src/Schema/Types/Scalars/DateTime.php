@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
-use Carbon\Carbon;
 use Exception;
+use Carbon\Carbon;
 use GraphQL\Error\Error;
 use GraphQL\Utils\Utils;
 use GraphQL\Error\InvariantViolation;
