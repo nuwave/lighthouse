@@ -17,7 +17,7 @@ class Upload
      */
     public function resolve($root, $args): array
     {
-        if(! $args['file'] instanceof UploadedFile) {
+        if (! $args['file'] instanceof UploadedFile) {
             throw new Exception('Argument "file" is not of type "UploadedFile"');
         }
 

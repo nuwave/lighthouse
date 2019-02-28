@@ -30,7 +30,7 @@ class Upload extends ScalarType
     public function parseValue($value): UploadedFile
     {
         if (! $value instanceof UploadedFile) {
-            throw new Error('Could not get uploaded file, be sure to conform to GraphQL multipart request specification. Instead got: ' . Utils::printSafe($value));
+            throw new Error('Could not get uploaded file, be sure to conform to GraphQL multipart request specification. Instead got: '.Utils::printSafe($value));
         }
 
         return $value;

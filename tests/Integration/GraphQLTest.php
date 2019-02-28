@@ -118,9 +118,9 @@ class GraphQLTest extends DBTestCase
             [
                 'operations' => [
                     'query' => $query,
-                    'variables' => []
+                    'variables' => [],
                 ],
-                'map' => []
+                'map' => [],
             ]
         )->assertJson([
             'data' => [
@@ -275,9 +275,9 @@ class GraphQLTest extends DBTestCase
             [
                 'operations' => [
                     'query' => '',
-                    'variables' => []
+                    'variables' => [],
                 ],
-                'map' => []
+                'map' => [],
             ]
         );
 
