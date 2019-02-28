@@ -14,7 +14,7 @@ class RulesDirectiveTest extends TestCase
         $app['config']->set('app.debug', false);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
