@@ -48,6 +48,6 @@ class Upload extends ScalarType
      */
     public function parseLiteral($valueNode, array $variables = null)
     {
-        Throw new Error('"Upload" cannot be serialized');
+        throw new Error('"Upload" cannot be serialized');
     }
 }

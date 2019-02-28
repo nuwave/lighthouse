@@ -165,9 +165,10 @@ class GraphQLController extends Controller
      *
      * @param Request $request
      * @param array $variables
-     * @return Array
+     * @return array
      */
-    protected function mapUploadedFiles(Request $request, array $variables): array {
+    protected function mapUploadedFiles(Request $request, array $variables): array
+    {
         if ($this->isMultipartRequest($request)) {
             $map = json_decode($request->input('map'), true);
 
@@ -179,7 +180,7 @@ class GraphQLController extends Controller
                     $location = preg_replace('/variables./', '', $location, 1);
                     $location = explode('.', $location);
                     foreach ($location as $key) {
-                        if (!isset($items[$key]) || !is_array($items[$key])) {
+                        if (! isset($items[$key]) || !is_array($items[$key])) {
                             $items[$key] = [];
                         }
                         $items = &$items[$key];
@@ -199,8 +200,10 @@ class GraphQLController extends Controller
      * @param Request $request
      * @return bool
      */
-    protected function isMultipartRequest(Request $request): bool {
+    protected function isMultipartRequest(Request $request): bool
+    {
         $contentType = $request->header('content-type') ?? '';
+
         return mb_stripos($contentType, 'multipart/form-data') !== false;
     }
 }
