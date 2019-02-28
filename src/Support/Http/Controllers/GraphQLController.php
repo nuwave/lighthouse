@@ -92,8 +92,6 @@ class GraphQLController extends Controller
     {
         $operations = json_decode($request->input('operations'));
 
-        #dd($request->input());
-
         $query = optional($operations)->query ?: $request->input('query', '');
         $variables = (array) optional($operations)->variables ?: $request->input('variables', []);
         $operationName = optional($operations)->operationName ?: $request->input('operationName');
