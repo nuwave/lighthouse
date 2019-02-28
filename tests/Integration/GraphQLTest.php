@@ -323,4 +323,3 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 }
-
