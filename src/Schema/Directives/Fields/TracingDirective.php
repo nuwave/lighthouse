@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Carbon\Carbon;
 use Closure;
+use Carbon\Carbon;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
