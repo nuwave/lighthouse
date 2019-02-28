@@ -15,7 +15,7 @@ class Pagination
     public static function calculateCurrentPage(int $first, int $after, int $defaultPage = 1): int
     {
         return $first && $after
-            ? (int) (($first + $after) / $first)
+            ? (int) floor(($first + $after) / $first)
             : $defaultPage;
     }
 }
