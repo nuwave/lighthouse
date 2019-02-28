@@ -138,6 +138,7 @@ abstract class TestCase extends BaseTestCase
                  */
                 public function report(Exception $e)
                 {
+                    //
                 }
 
                 /**
@@ -161,6 +162,7 @@ abstract class TestCase extends BaseTestCase
                  */
                 public function renderForConsole($output, Exception $e)
                 {
+                    //
                 }
 
                 /**

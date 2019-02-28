@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -34,7 +35,7 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
 
         return $next($value->setResolver(function () use ($resolver, $relations) {
             $result = call_user_func_array($resolver, func_get_args());
-            ($result instanceof \GraphQL\Deferred)
+            ($result instanceof Deferred)
                 ? $result->then(function (Collection &$items) use ($relations) {
                     $items->load($relations);
 

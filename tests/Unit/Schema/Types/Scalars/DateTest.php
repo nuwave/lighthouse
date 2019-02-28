@@ -49,6 +49,7 @@ class DateTest extends TestCase
             [1],
             ['rolf'],
             [new class() {
+                //
             }],
             [null],
             [''],
