@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
+use Exception;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
@@ -125,7 +126,7 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         try {
             $flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // buffer error, do nothing...
         }
     }

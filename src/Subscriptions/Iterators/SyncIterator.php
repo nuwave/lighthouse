@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Iterators;
 
+use Exception;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 
@@ -20,7 +21,7 @@ class SyncIterator implements SubscriptionIterator
         $items->each(function ($item) use ($cb, $error): void {
             try {
                 $cb($item);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 if (! $error) {
                     throw $e;
                 }

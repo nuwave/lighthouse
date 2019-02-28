@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
 use Carbon\Carbon;
+use Exception;
 use GraphQL\Error\Error;
 use GraphQL\Utils\Utils;
 use GraphQL\Error\InvariantViolation;
@@ -69,7 +70,7 @@ class DateTime extends ScalarType
     {
         try {
             return Carbon::createFromFormat(Carbon::DEFAULT_TO_STRING_FORMAT, $value);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new $exceptionClass(
                 Utils::printSafeJson($e->getMessage())
             );
