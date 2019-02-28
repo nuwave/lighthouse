@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 
 interface NodeMiddleware extends Directive
@@ -13,5 +14,5 @@ interface NodeMiddleware extends Directive
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
-    public function handleNode(NodeValue $value, \Closure $next);
+    public function handleNode(NodeValue $value, Closure $next);
 }

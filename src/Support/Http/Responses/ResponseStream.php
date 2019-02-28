@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
@@ -108,8 +109,8 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         echo $chunk;
 
-        $this->flush(\Closure::fromCallable('ob_flush'));
-        $this->flush(\Closure::fromCallable('flush'));
+        $this->flush(Closure::fromCallable('ob_flush'));
+        $this->flush(Closure::fromCallable('flush'));
     }
 
     /**
@@ -121,7 +122,7 @@ class ResponseStream extends Stream implements CanStreamResponse
      * @param  \Closure  $flush
      * @return void
      */
-    protected function flush(\Closure $flush): void
+    protected function flush(Closure $flush): void
     {
         try {
             $flush();

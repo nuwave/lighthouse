@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support;
 
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 
@@ -29,7 +30,7 @@ class Pipeline extends BasePipeline
      *
      * @return \Closure
      */
-    protected function carry(): \Closure
+    protected function carry(): Closure
     {
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
@@ -51,7 +52,7 @@ class Pipeline extends BasePipeline
      * @param  \Closure  $always
      * @return $this
      */
-    public function always(\Closure $always): self
+    public function always(Closure $always): self
     {
         $this->always = $always;
 

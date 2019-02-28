@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Type;
@@ -60,7 +61,7 @@ class NodeRegistry
      *
      * @return $this
      */
-    public function registerNode(string $typeName, \Closure $resolve): self
+    public function registerNode(string $typeName, Closure $resolve): self
     {
         $this->nodeResolver[$typeName] = $resolve;
 

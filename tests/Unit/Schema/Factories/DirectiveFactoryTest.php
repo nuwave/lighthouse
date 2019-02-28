@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema;
 
+use Closure;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -65,7 +66,7 @@ class DirectiveFactoryTest extends TestCase
                 return 'foo';
             }
 
-            public function handleField(FieldValue $value, \Closure $next): void
+            public function handleField(FieldValue $value, Closure $next): void
             {
                 //
             }

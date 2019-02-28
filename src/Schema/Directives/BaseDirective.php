@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Closure;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Language\AST\DirectiveNode;
 use Illuminate\Database\Eloquent\Model;
@@ -88,7 +89,7 @@ abstract class BaseDirective implements Directive
      *
      * @return \Closure
      */
-    public function getResolverFromArgument(string $argumentName): \Closure
+    public function getResolverFromArgument(string $argumentName): Closure
     {
         [$className, $methodName] = $this->getMethodArgumentParts($argumentName);
 

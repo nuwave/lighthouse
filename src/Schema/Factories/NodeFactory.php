@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Closure;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
@@ -247,7 +248,7 @@ class NodeFactory
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode  $definition
      * @return \Closure
      */
-    protected function resolveFieldsFunction($definition): \Closure
+    protected function resolveFieldsFunction($definition): Closure
     {
         return function () use ($definition): array {
             return collect($definition->fields)
@@ -284,7 +285,7 @@ class NodeFactory
      * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      * @return \Closure
      */
-    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): \Closure
+    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): Closure
     {
         return function () use ($definition) {
             return collect($definition->fields)
@@ -342,7 +343,7 @@ class NodeFactory
      *
      * @return \Closure
      */
-    public function typeResolverFallback(): \Closure
+    public function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
             return $this->typeRegistry->get(
