@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
+use Throwable;
+use InvalidArgumentException;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
@@ -31,7 +33,7 @@ class Subscription
         $registry = app(SubscriptionRegistry::class);
 
         if (! $registry->has($subscriptionField)) {
-            throw new \InvalidArgumentException("No subscription field registered for {$subscriptionField}");
+            throw new InvalidArgumentException("No subscription field registered for {$subscriptionField}");
         }
 
         /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions $broadcaster */
@@ -52,7 +54,7 @@ class Subscription
                 $subscriptionField,
                 $root
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler $exceptionHandler */
             $exceptionHandler = app(SubscriptionExceptionHandler::class);
 

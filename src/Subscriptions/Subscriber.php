@@ -136,7 +136,7 @@ class Subscriber implements \Serializable
      */
     protected function uniqueChannelName(): string
     {
-        return 'private-'.Str::random(32).'-'.time();
+        return 'private-lighthouse-'.Str::random(32).'-'.time();
     }
 
     /**
