@@ -46,6 +46,6 @@ class Upload extends ScalarType
      */
     public function parseLiteral($valueNode, array $variables = null)
     {
-        throw new Error('"Upload" cannot be serialized');
+        throw new Error('"Upload" cannot be hardcoded in query. Be sure to conform to GraphQL multipart request specification.');
     }
 }
