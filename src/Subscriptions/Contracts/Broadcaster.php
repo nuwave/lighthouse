@@ -38,7 +38,7 @@ interface Broadcaster
      * Send data to subscriber.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
-     * @param  mixed[]    $data
+     * @param  mixed[]  $data
      */
     public function broadcast(Subscriber $subscriber, array $data);
 }

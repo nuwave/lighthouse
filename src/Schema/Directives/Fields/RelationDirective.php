@@ -61,7 +61,7 @@ abstract class RelationDirective extends BaseDirective
 
     /**
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  mixed[]        $args
+     * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed[]

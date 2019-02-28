@@ -245,8 +245,8 @@ class MutationExecutor
     /**
      * Execute a create on HasMany relation.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param \Illuminate\Support\Collection $hasMany
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $hasMany
      * @return void
      */
     protected static function executeCreateHasMany(Model $model, $hasMany): void
@@ -266,8 +266,8 @@ class MutationExecutor
     /**
      * Execute a create on HasOne relation.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param \Illuminate\Support\Collection $hasOne
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $hasOne
      * @return void
      */
     protected static function executeCreateHasOne(Model $model, $hasOne): void
@@ -287,8 +287,8 @@ class MutationExecutor
     /**
      * Execute a create on MorphMany relation.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param \Illuminate\Support\Collection $morphMany
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $morphMany
      * @return void
      */
     protected static function executeCreateMorphMany(Model $model, $morphMany): void
@@ -308,8 +308,8 @@ class MutationExecutor
     /**
      * Execute a create on MorphOne relation.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param \Illuminate\Support\Collection $morphOne
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $morphOne
      * @return void
      */
     protected static function executeCreateMorphOne(Model $model, $morphOne): void
@@ -329,8 +329,8 @@ class MutationExecutor
     /**
      * Execute a create on BelongsTo relation.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param \Illuminate\Support\Collection $belongsToMany
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $belongsToMany
      * @return void
      */
     protected static function executeCreateBelongsToMany(Model $model, $belongsToMany): void
@@ -354,8 +354,8 @@ class MutationExecutor
     /**
      * Execute a create on MorphToMany relation.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param \Illuminate\Support\Collection $morphToMany
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $morphToMany
      * @return void
      */
     protected static function executeCreateMorphToMany(Model $model, $morphToMany): void

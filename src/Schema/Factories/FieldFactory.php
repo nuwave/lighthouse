@@ -393,7 +393,7 @@ class FieldFactory
 
     /**
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
-     * @param  mixed[]                  $argumentPath
+     * @param  mixed[]  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
      *
      * @return void
@@ -443,7 +443,7 @@ class FieldFactory
     /**
      * Append a path to the base path to create a new path.
      *
-     * @param  mixed[]    $basePath
+     * @param  mixed[]  $basePath
      * @param  string|int  $pathToBeAdded
      *
      * @return mixed[]
