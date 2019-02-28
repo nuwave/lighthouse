@@ -32,6 +32,7 @@ class GraphQLController extends Controller
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventsDispatcher;
+
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse
      */
