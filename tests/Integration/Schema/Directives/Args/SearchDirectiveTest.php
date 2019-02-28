@@ -21,7 +21,7 @@ class SearchDirectiveTest extends DBTestCase
      */
     protected $engine;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

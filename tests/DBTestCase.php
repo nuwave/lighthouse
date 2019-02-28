@@ -4,7 +4,7 @@ namespace Tests;
 
 abstract class DBTestCase extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

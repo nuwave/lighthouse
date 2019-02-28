@@ -25,7 +25,7 @@ class SchemaStitcherTest extends TestCase
      */
     protected $filesystem;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -37,7 +37,7 @@ class SchemaStitcherTest extends TestCase
         $this->filesystem = new Filesystem(new Local(self::SCHEMA_PATH));
     }
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         parent::tearDown();
 

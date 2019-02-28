@@ -20,7 +20,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
      */
     protected $storage;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

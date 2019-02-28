@@ -24,7 +24,7 @@ class HasManyDirectiveTest extends DBTestCase
      */
     protected $tasks;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

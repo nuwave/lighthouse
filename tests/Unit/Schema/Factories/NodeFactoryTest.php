@@ -21,7 +21,7 @@ class NodeFactoryTest extends TestCase
      */
     protected $factory;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

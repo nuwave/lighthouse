@@ -31,7 +31,7 @@ class BelongsToTest extends DBTestCase
      */
     protected $company;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 

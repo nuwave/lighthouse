@@ -15,7 +15,7 @@ class SchemaSourceProviderTest extends TestCase
      */
     const SCHEMA_PATH = __DIR__.'/schema/';
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class SchemaSourceProviderTest extends TestCase
         $this->filesystem = new Filesystem(new Local(self::SCHEMA_PATH));
     }
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         parent::tearDown();
 
