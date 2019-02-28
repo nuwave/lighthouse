@@ -308,7 +308,7 @@ class NodeFactory
         $nodeName = $interfaceDefinition->name->value;
 
         if ($directive = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
-            $interfaceDirective = (new InterfaceDirective())->hydrate($interfaceDefinition);
+            $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
@@ -360,7 +360,7 @@ class NodeFactory
         $nodeName = $unionDefinition->name->value;
 
         if ($directive = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
-            $unionDirective = (new UnionDirective())->hydrate($unionDefinition);
+            $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {

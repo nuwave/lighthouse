@@ -55,7 +55,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
         $this->broadcastManager->extend('foo', function ($app, array $config) use (&$broadcasterConfig): Broadcaster {
             $broadcasterConfig = $config;
 
-            return new class() implements Broadcaster {
+            return new class implements Broadcaster {
                 public function authorized(Request $request)
                 {
                     //
@@ -94,7 +94,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
     public function itThrowsIfDriverDoesNotImplementInterface(): void
     {
         $this->broadcastManager->extend('foo', function () {
-            return new class() {
+            return new class {
                 //
             };
         });

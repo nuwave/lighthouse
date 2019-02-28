@@ -150,7 +150,7 @@ class SubscriptionRegistry
                 return Arr::get(
                     $this->subscriptions,
                     $subscriptionField,
-                    new NotFoundSubscription()
+                    new NotFoundSubscription
                 );
             });
     }

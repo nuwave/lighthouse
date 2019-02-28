@@ -221,7 +221,7 @@ class ASTHelper
     {
         $namespaceDirective = static::directiveDefinition(
             $definitionNode,
-            (new NamespaceDirective())->name()
+            (new NamespaceDirective)->name()
         );
 
         return $namespaceDirective
