@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
-use GraphQL\Executor\ExecutionResult;
 use JsonSerializable;
+use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 abstract class GraphQLExtension implements JsonSerializable

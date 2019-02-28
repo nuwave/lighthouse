@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use Serializable;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Error\SyntaxError;
@@ -19,7 +20,6 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Serializable;
 
 class DocumentAST implements Serializable
 {
