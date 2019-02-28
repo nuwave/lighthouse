@@ -85,11 +85,9 @@ class ErrorBuffer
     {
         if ($key === null) {
             $this->errors[] = $errorMessage;
-
-            return $this;
+        } else {
+            $this->errors[$key][] = $errorMessage;
         }
-
-        $this->errors[$key][] = $errorMessage;
 
         return $this;
     }
