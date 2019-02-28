@@ -3,10 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use GraphQL\Executor\ExecutionResult;
+use JsonSerializable;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-class ExtensionRegistry implements \JsonSerializable
+class ExtensionRegistry implements JsonSerializable
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Pipeline

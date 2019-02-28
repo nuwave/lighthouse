@@ -19,8 +19,9 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use Serializable;
 
-class DocumentAST implements \Serializable
+class DocumentAST implements Serializable
 {
     /**
      * A map from definition name to the definition node.
