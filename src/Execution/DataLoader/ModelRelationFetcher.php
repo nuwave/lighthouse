@@ -252,7 +252,7 @@ class ModelRelationFetcher
     /**
      * Load default eager loads.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $collection
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $collection
      * @return $this
      */
     protected function loadDefaultWith(EloquentCollection $collection): self
@@ -380,7 +380,7 @@ class ModelRelationFetcher
      * Ensure the pivot relation is hydrated too, if it exists.
      *
      * @param  string  $relationName
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $relationModels
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relationModels
      * @return $this
      */
     protected function hydratePivotRelation(string $relationName, EloquentCollection $relationModels): self

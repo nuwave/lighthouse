@@ -250,7 +250,7 @@ class DirectiveFactory
     }
 
     /**
-     * @param  $inputValueDefinition
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgManipulator>
      */
     public function createArgManipulators(InputValueDefinitionNode $inputValueDefinition): Collection

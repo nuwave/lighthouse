@@ -4,4 +4,5 @@ namespace Nuwave\Lighthouse\Support;
 
 class NoValue
 {
+    //
 }

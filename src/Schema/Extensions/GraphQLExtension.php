@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use JsonSerializable;
 use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
-abstract class GraphQLExtension implements \JsonSerializable
+abstract class GraphQLExtension implements JsonSerializable
 {
     /**
      * Manipulate the schema.
@@ -25,6 +26,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      */
     public function requestDidStart(ExtensionRequest $request)
     {
+        //
     }
 
     /**
@@ -34,6 +36,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      */
     public function batchedQueryDidStart(int $index)
     {
+        //
     }
 
     /**
@@ -44,6 +47,7 @@ abstract class GraphQLExtension implements \JsonSerializable
      */
     public function batchedQueryDidEnd(ExecutionResult $result, int $index)
     {
+        //
     }
 
     /**

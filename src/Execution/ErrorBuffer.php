@@ -66,7 +66,7 @@ class ErrorBuffer
     /**
      * Resolve the exception by calling the exception handler with the given args.
      *
-     * @param  mixed ...$args
+     * @param  mixed  ...$args
      * @return mixed
      */
     protected function resolveException(...$args)

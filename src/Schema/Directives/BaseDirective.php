@@ -130,7 +130,7 @@ abstract class BaseDirective implements Directive
 
     /**
      * @param  string  $classCandidate
-     * @param  string[] $namespacesToTry
+     * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch
      * @return string
      *

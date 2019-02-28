@@ -67,6 +67,7 @@ class DirectiveFactoryTest extends TestCase
 
             public function handleField(FieldValue $value, \Closure $next): void
             {
+                //
             }
         };
 

@@ -26,7 +26,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,14 +58,17 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
             return new class() implements Broadcaster {
                 public function authorized(Request $request)
                 {
+                    //
                 }
 
                 public function unauthorized(Request $request)
                 {
+                    //
                 }
 
                 public function hook(Request $request)
                 {
+                    //
                 }
 
                 public function broadcast(Subscriber $subscriber, array $data)
@@ -92,6 +95,7 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
     {
         $this->broadcastManager->extend('foo', function () {
             return new class() {
+                //
             };
         });
 
