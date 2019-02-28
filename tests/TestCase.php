@@ -207,12 +207,12 @@ abstract class TestCase extends BaseTestCase
     protected function postGraphQLMultipart(array $data, array $headers = ['content-type' => 'multipart/form-data']): TestResponse
     {
         // JSON encode operations
-        if(isset($data['operations'])) {
+        if (isset($data['operations'])) {
             $data['operations'] = json_encode($data['operations']);
         }
 
         // JSON encode map
-        if(isset($data['map'])) {
+        if (isset($data['map'])) {
             $data['map'] = json_encode($data['map']);
         }
 

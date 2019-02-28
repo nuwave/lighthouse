@@ -2,10 +2,10 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Http\UploadedFile;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Http\UploadedFile;
 
 class GraphQLTest extends DBTestCase
 {
@@ -303,13 +303,13 @@ class GraphQLTest extends DBTestCase
                     'query' => $query,
                     'variables' => [
                         'file' => null,
-                        'user' => 1
-                    ]
+                        'user' => 1,
+                    ],
                 ],
                 'map' => [
-                    '0' => ['variables.file']
+                    '0' => ['variables.file'],
                 ],
-                0 => UploadedFile::fake()->create('image.jpg', 500)
+                0 => UploadedFile::fake()->create('image.jpg', 500),
             ]
         );
 
@@ -317,7 +317,7 @@ class GraphQLTest extends DBTestCase
             'data' => [
                 'uploadAvatar' => [
                     'id' => 123,
-                    'url' => 'http://localhost.dev/image_123.jpg'
+                    'url' => 'http://localhost.dev/image_123.jpg',
                 ]
             ]
         ]);

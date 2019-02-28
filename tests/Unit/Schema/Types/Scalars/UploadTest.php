@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
+use Tests\TestCase;
 use GraphQL\Error\Error;
 use Illuminate\Http\UploadedFile;
 use Nuwave\Lighthouse\Schema\Types\Scalars\Upload;
-use Tests\TestCase;
 
 class UploadTest extends TestCase
 {
@@ -49,5 +49,4 @@ class UploadTest extends TestCase
 
         $this->assertEquals($value, $parsedValue);
     }
-
 }

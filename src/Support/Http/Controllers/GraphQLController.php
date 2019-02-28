@@ -180,7 +180,7 @@ class GraphQLController extends Controller
                     $location = preg_replace('/variables./', '', $location, 1);
                     $location = explode('.', $location);
                     foreach ($location as $key) {
-                        if (! isset($items[$key]) || !is_array($items[$key])) {
+                        if (! isset($items[$key]) || ! is_array($items[$key])) {
                             $items[$key] = [];
                         }
                         $items = &$items[$key];
