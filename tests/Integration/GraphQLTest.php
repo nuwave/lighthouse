@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use Illuminate\Http\UploadedFile;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -9,6 +10,8 @@ use Tests\Utils\Models\User;
 class GraphQLTest extends DBTestCase
 {
     protected $schema = '
+    scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+    
     type User {
         id: ID!
         name: String!
@@ -16,6 +19,7 @@ class GraphQLTest extends DBTestCase
         created_at: String!
         updated_at: String!
         tasks: [Task!]! @hasMany
+        avatar: Avatar @hasOne
     }
     
     type Task {
@@ -26,8 +30,17 @@ class GraphQLTest extends DBTestCase
         user: User! @belongsTo
     }
     
+    type Avatar {
+        id: ID!
+        url: String!
+    }
+    
     type Query {
         user: User @auth
+    }
+    
+    type Mutation {
+        uploadAvatar(user: ID!, file: Upload!): Avatar @field(resolver: "Tests\\\\Utils\\\\Mutations\\\\Upload@resolve")
     }
     ';
 
@@ -72,6 +85,44 @@ class GraphQLTest extends DBTestCase
             }
         }
         ')->assertJson([
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks
+                        ->map(
+                            function (Task $task): array {
+                                return ['name' => $task->name];
+                            }
+                        )->toArray(),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolvesQueryViaMultipartRequest(): void
+    {
+        $query = '
+        query UserWithTasks {
+            user {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+        $this->postGraphQLMultipart(
+            [
+                'operations' => [
+                    'query' => $query,
+                    'variables' => []
+                ],
+                'map' => []
+            ]
+        )->assertJson([
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
@@ -214,4 +265,62 @@ class GraphQLTest extends DBTestCase
 
         $result->assertStatus(200);
     }
+
+    /**
+     * @test
+     */
+    public function itAcceptsMultipartRequests(): void
+    {
+        $result = $this->postGraphQLMultipart(
+            [
+                'operations' => [
+                    'query' => '',
+                    'variables' => []
+                ],
+                'map' => []
+            ]
+        );
+
+        $result->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolvesUploadViaMultipartRequest(): void
+    {
+        $query = '
+        mutation UploadAvatar($user: ID!, $file: Upload!) {
+            uploadAvatar(user: $user, file: $file) {
+                id
+                url
+            }
+        }
+        ';
+        $res = $this->postGraphQLMultipart(
+            [
+                'operations' => [
+                    'query' => $query,
+                    'variables' => [
+                        'file' => null,
+                        'user' => 1
+                    ]
+                ],
+                'map' => [
+                    '0' => ['variables.file']
+                ],
+                0 => UploadedFile::fake()->create('image.jpg', 500)
+            ]
+        );
+
+        $res->assertJson([
+            'data' => [
+                'uploadAvatar' => [
+                    'id' => 123,
+                    'url' => 'http://localhost.dev/image_123.jpg'
+                ]
+            ]
+        ]);
+    }
 }
+

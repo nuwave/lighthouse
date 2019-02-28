@@ -64,8 +64,10 @@ class GraphQLController extends Controller
      */
     public function query(Request $request): Response
     {
-        // If the request is a 0-indexed array, we know we are dealing with a batched query
-        $batched = isset($request->toArray()[0]) && config('lighthouse.batched_queries', true);
+        // If the request is a 0-indexed array and the request isn't a multipart-request,
+        // we know we are dealing with a batched query
+        $batched = isset($request->toArray()[0]) && $this->isMultipartRequest($request) == false &&
+            config('lighthouse.batched_queries', true);
         $context = $this->createsContext->generate($request);
 
         $this->extensionRegistry->requestDidStart(
@@ -88,12 +90,23 @@ class GraphQLController extends Controller
      */
     protected function execute(Request $request, GraphQLContext $context): array
     {
+        $operations = json_decode($request->input('operations'));
+
+        #dd($request->input());
+
+        $query = optional($operations)->query ?: $request->input('query', '');
+        $variables = (array) optional($operations)->variables ?: $request->input('variables', []);
+        $operationName = optional($operations)->operationName ?: $request->input('operationName');
+
+        $variables = $this->mapUploadedFiles($request, $this->ensureVariablesAreArray($variables));
+
         return $this->graphQL->executeQuery(
-            $request->input('query', ''),
+            $query,
             $context,
-            $this->ensureVariablesAreArray(
-                $request->input('variables', [])
-            )
+            $variables,
+            null,
+            $operationName
+
         )->toArray(
             $this->getDebugSetting()
         );
@@ -147,5 +160,49 @@ class GraphQLController extends Controller
         return config('app.debug')
             ? config('lighthouse.debug')
             : false;
+    }
+
+    /**
+     * Maps uploaded files to the variables array.
+     *
+     * @param Request $request
+     * @param array $variables
+     * @return Array
+     */
+    protected function mapUploadedFiles(Request $request, array $variables): array {
+        if ($this->isMultipartRequest($request)) {
+            $map = json_decode($request->input('map'), true);
+
+            // TODO Throw exception if no map defined.
+
+            foreach ($map as $fileKey => $locations) {
+                foreach ($locations as $location) {
+                    $items = &$variables;
+                    $location = preg_replace('/variables./', '', $location, 1);
+                    $location = explode('.', $location);
+                    foreach ($location as $key) {
+                        if (!isset($items[$key]) || !is_array($items[$key])) {
+                            $items[$key] = [];
+                        }
+                        $items = &$items[$key];
+                    }
+
+                    $items = $request->file($fileKey);
+                }
+            }
+        }
+
+        return $variables;
+    }
+
+    /**
+     * Is the request a multipart-request?
+     *
+     * @param Request $request
+     * @return bool
+     */
+    protected function isMultipartRequest(Request $request): bool {
+        $contentType = $request->header('content-type') ?? '';
+        return mb_stripos($contentType, 'multipart/form-data') !== false;
     }
 }
