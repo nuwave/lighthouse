@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
+use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -56,7 +57,7 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
             $start = Carbon::now();
             $result = $resolver($root, $args, $context, $info);
 
-            ($result instanceof \GraphQL\Deferred)
+            ($result instanceof Deferred)
                 ? $result->then(function () use ($info, $start) {
                     $this->tracing->record($info, $start, Carbon::now());
                 })
