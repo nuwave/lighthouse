@@ -2,59 +2,50 @@ sudo: false
 
 cache:
   directories:
-  - $HOME/.composer/cache
+    - $HOME/.composer/cache
 
 language: php
 
-php:
-- 7.1
-- 7.2
-- 7.3
-
 env:
-  matrix:
-  - LARAVEL='5.5.*' PHPUNIT='~6.0'
-  - LARAVEL='5.6.*' PHPUNIT='^7.0'
-  - LARAVEL='5.7.*' PHPUNIT='^7.0'
   global:
-  - COVERAGE=0
+    - COVERAGE=0
 
 matrix:
-  exclude:
-  # This is run with coverage instead
-  - php: 7.1
-    env: LARAVEL='5.7.*' PHPUNIT='^7.0'
   include:
-  # Generating coverage on 7.1, as 7.2 does segfault, switch back eventually
-  - php: 7.1
-    env: LARAVEL='5.7.*' PHPUNIT='^7.0' COVERAGE=1
+    - php: 7.1
+      env: LARAVEL='5.5.*'
+    - php: 7.1
+      env: LARAVEL='5.6.*'
+    - php: 7.1
+      env: LARAVEL='5.7.*'
+    - php: 7.2
+      env: LARAVEL='5.5.*'
+    - php: 7.2
+      env: LARAVEL='5.6.*'
+    - php: 7.2
+      env: LARAVEL='5.7.*'
+    - php: 7.3
+      env: LARAVEL='5.5.*'
+    - php: 7.3
+      env: LARAVEL='5.6.*'
+    - php: 7.3
+      env: COVERAGE=1 LARAVEL='5.7.*'
   fast_finish: true
 
+
 before_install:
-- phpenv config-rm xdebug.ini || true
-- echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-- composer global require hirak/prestissimo --update-no-dev
-- composer require
-  "illuminate/contracts:${LARAVEL}"
-  "illuminate/http:${LARAVEL}"
-  "illuminate/pagination:${LARAVEL}"
-  "illuminate/routing:${LARAVEL}"
-  "illuminate/support:${LARAVEL}"
-  "illuminate/validation:${LARAVEL}"
-  "orchestra/testbench:${LARAVEL/5\./3\.}"
-  "orchestra/database:${LARAVEL/5\./3\.}@dev"
-  "phpunit/phpunit:${PHPUNIT}"
-  --no-interaction --no-update
+  - phpenv config-rm xdebug.ini || true
+  - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - travis_retry composer self-update
+  - travis_retry composer global require hirak/prestissimo --update-no-dev
+  - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
 
 install:
-- composer install --prefer-dist --no-interaction --no-suggest
+  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
 
 script:
-- if [[ $COVERAGE = 1 ]]; then
-    phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml;
-  else
-    phpunit --colors=always --verbose;
-  fi
+  - if [[ $COVERAGE = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml; fi
+  - if [[ $COVERAGE = 0 ]]; then vendor/bin/phpunit --colors=always --verbose; fi
 
 after_success:
-- if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
+  - if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
