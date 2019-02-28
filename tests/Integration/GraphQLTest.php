@@ -318,8 +318,8 @@ class GraphQLTest extends DBTestCase
                 'uploadAvatar' => [
                     'id' => 123,
                     'url' => 'http://localhost.dev/image_123.jpg',
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

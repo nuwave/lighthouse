@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Utils\Mutations;
+
 use Exception;
 use Illuminate\Http\UploadedFile;
 
@@ -14,6 +15,7 @@ class Upload
      * Return a value for the field.
      *
      * @return array
+     * @throws Exception
      */
     public function resolve($root, $args): array
     {
