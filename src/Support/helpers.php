@@ -67,6 +67,6 @@ if (! function_exists('construct_resolver')) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
-        return \Closure::fromCallable([resolve($className), $methodName]);
+        return \Closure::fromCallable([app($className), $methodName]);
     }
 }

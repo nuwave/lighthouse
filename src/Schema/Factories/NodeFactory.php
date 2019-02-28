@@ -258,7 +258,7 @@ class NodeFactory
                     );
 
                     return [
-                        $fieldDefinition->name->value => resolve(FieldFactory::class)->handle($fieldValue),
+                        $fieldDefinition->name->value => app(FieldFactory::class)->handle($fieldValue),
                     ];
                 })
                 ->toArray();

@@ -194,7 +194,7 @@ class FieldFactory
     public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
     {
         return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
-            $this->currentValidationErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
+            $this->currentValidationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
 
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
 
