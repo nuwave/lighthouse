@@ -8,13 +8,13 @@ use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\StringValueNode;
-use Nuwave\Lighthouse\Schema\Types\Scalars\Date;
+use Nuwave\Lighthouse\Schema\Types\Scalars\DateTime;
 
-class DateTest extends TestCase
+class DateTimeTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider invalidDateValues
+     * @dataProvider invalidDateTimeValues
      *
      * @param  mixed  $value
      */
@@ -22,12 +22,12 @@ class DateTest extends TestCase
     {
         $this->expectException(InvariantViolation::class);
 
-        (new Date)->serialize($value);
+        (new DateTime())->serialize($value);
     }
 
     /**
      * @test
-     * @dataProvider invalidDateValues
+     * @dataProvider invalidDateTimeValues
      *
      * @param  mixed  $value
      */
@@ -35,7 +35,7 @@ class DateTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Date)->parseValue($value);
+        (new DateTime())->parseValue($value);
     }
 
     /**
@@ -43,13 +43,12 @@ class DateTest extends TestCase
      *
      * @return mixed[]
      */
-    public function invalidDateValues(): array
+    public function invalidDateTimeValues(): array
     {
         return [
             [1],
             ['rolf'],
-            [new class {
-                //
+            [new class() {
             }],
             [null],
             [''],
@@ -61,10 +60,10 @@ class DateTest extends TestCase
      */
     public function itParsesValueString(): void
     {
-        $date = '2018-10-01';
+        $date = '2018-10-01 12:45:01';
         $this->assertEquals(
-            (new Carbon($date))->startOfDay(),
-            (new Date)->parseValue($date)
+            (new Carbon($date))->toDateTimeString(),
+            (new DateTime())->parseValue($date)
         );
     }
 
@@ -74,13 +73,13 @@ class DateTest extends TestCase
     public function itParsesLiteral(): void
     {
         $dateLiteral = new StringValueNode(
-            ['value' => '2018-10-01']
+            ['value' => '2018-10-01 12:45:01']
         );
-        $result = (new Date)->parseLiteral($dateLiteral);
+        $result = (new DateTime())->parseLiteral($dateLiteral);
 
         $this->assertSame(
             $dateLiteral->value,
-            $result->toDateString()
+            $result->toDateTimeString()
         );
     }
 
@@ -91,7 +90,7 @@ class DateTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Date)->parseLiteral(
+        (new DateTime())->parseLiteral(
             new IntValueNode([])
         );
     }
@@ -102,10 +101,10 @@ class DateTest extends TestCase
     public function itSerializesCarbonInstance(): void
     {
         $now = now();
-        $result = (new Date)->serialize($now);
+        $result = (new DateTime())->serialize($now);
 
         $this->assertSame(
-            $now->toDateString(),
+            $now->toDateTimeString(),
             $result
         );
     }
@@ -113,10 +112,10 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itSerializesValidDateString(): void
+    public function itSerializesValidDateTimeString(): void
     {
-        $date = '2018-10-01';
-        $result = (new Date)->serialize($date);
+        $date = '2018-10-01 12:45:01';
+        $result = (new DateTime())->serialize($date);
 
         $this->assertSame(
             $date,

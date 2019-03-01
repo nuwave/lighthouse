@@ -61,7 +61,7 @@ class DirectiveFactory
             config('lighthouse.namespaces.directives'),
 
             // Plugin developers defined directives
-            event(new RegisteringDirectiveBaseNamespaces()),
+            event(new RegisteringDirectiveBaseNamespaces),
 
             // Lighthouse defined directives
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',

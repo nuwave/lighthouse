@@ -16,7 +16,7 @@ class CanDirectiveTest extends TestCase
      */
     public function itThrowsIfNotAuthorized(string $argumentName): void
     {
-        $this->be(new User());
+        $this->be(new User);
 
         $this->schema = '
         type Query {
@@ -47,7 +47,7 @@ class CanDirectiveTest extends TestCase
      */
     public function itPassesAuthIfAuthorized(string $argumentName): void
     {
-        $user = new User();
+        $user = new User;
         $user->name = 'admin';
         $this->be($user);
 
@@ -125,7 +125,7 @@ class CanDirectiveTest extends TestCase
      */
     public function itPassesMultiplePolicies(string $argumentName): void
     {
-        $user = new User();
+        $user = new User;
         $user->name = 'admin';
         $this->be($user);
 
@@ -187,7 +187,7 @@ class CanDirectiveTest extends TestCase
 
     public function resolveUser(): User
     {
-        $user = new User();
+        $user = new User;
         $user->name = 'foo';
 
         return $user;

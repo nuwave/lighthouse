@@ -207,7 +207,7 @@ class FieldFactory
 
                     // because we are passing by reference, we need a variable to contain the null value.
                     if ($noValuePassedForThisArgument) {
-                        $argValue = new NoValue();
+                        $argValue = new NoValue;
                     } else {
                         $argValue = &$args[$argumentValue->getName()];
                     }
@@ -279,7 +279,7 @@ class FieldFactory
 
                         // because we are passing by reference, we need a variable to contain the null value.
                         if ($noValuePassedForThisArgument) {
-                            $value = new NoValue();
+                            $value = new NoValue;
                         } else {
                             $value = &$argValue[$field->name];
                         }

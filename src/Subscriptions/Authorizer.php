@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Exception;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -78,7 +79,7 @@ class Authorizer implements AuthorizesSubscriptions
             }
 
             return $authorized;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->exceptionHandler->handleAuthError($e);
 
             return false;

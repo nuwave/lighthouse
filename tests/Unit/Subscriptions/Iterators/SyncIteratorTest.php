@@ -23,7 +23,7 @@ class SyncIteratorTest extends TestCase
     {
         parent::setUp();
 
-        $this->iterator = new SyncIterator();
+        $this->iterator = new SyncIterator;
     }
 
     /**
