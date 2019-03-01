@@ -7,10 +7,10 @@ use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
 class Defer implements GraphQLResponse

@@ -53,15 +53,23 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
 
         $resolver = $value->getResolver();
 
-        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver) {
+        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
             $start = Carbon::now();
-            $result = $resolver($root, $args, $context, $info);
+            $result = $resolver($root, $args, $context, $resolveInfo);
 
             ($result instanceof Deferred)
-                ? $result->then(function () use ($info, $start) {
-                    $this->tracing->record($info, $start, Carbon::now());
+                ? $result->then(function () use ($resolveInfo, $start): void {
+                    $this->tracing->record(
+                        $resolveInfo,
+                        $start,
+                        Carbon::now()
+                    );
                 })
-                : $this->tracing->record($info, $start, Carbon::now());
+                : $this->tracing->record(
+                    $resolveInfo,
+                    $start,
+                    Carbon::now()
+                );
 
             return $result;
         });
