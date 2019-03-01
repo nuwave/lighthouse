@@ -6,20 +6,26 @@ use Tests\TestCase;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 
-class BroadcastManagerTest extends TestCase implements GraphQLContext
+class BroadcastManagerTest extends TestCase
 {
-    use HandlesSubscribers;
-
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\BroadcastManager
      */
     protected $broadcastManager;
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
+    }
 
     /**
      * Set up test environment.
@@ -50,47 +56,45 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
      */
     public function itCanExtendBroadcastManager(): void
     {
-        $this->getMockBuilder(Broadcaster::class)
-            ->getMock()
-            ->method()
-            ->method($this->once())
-            ->with('foo');
-
         $broadcasterConfig = [];
 
-        $this->broadcastManager->extend('foo', function ($app, array $config) use (&$broadcasterConfig): Broadcaster {
+        $broadcaster = new class() implements Broadcaster
+        {
+            public function authorized(Request $request)
+            {
+                //
+            }
+
+            public function unauthorized(Request $request)
+            {
+                //
+            }
+
+            public function hook(Request $request)
+            {
+                //
+            }
+
+            public function broadcast(Subscriber $subscriber, array $data)
+            {
+                //
+            }
+        };
+
+        $this->broadcastManager->extend('foo', function ($app, array $config) use (&$broadcasterConfig, $broadcaster): Broadcaster {
             $broadcasterConfig = $config;
 
-            return new class() implements Broadcaster {
-                public function authorized(Request $request)
-                {
-                    //
-                }
-
-                public function unauthorized(Request $request)
-                {
-                    //
-                }
-
-                public function hook(Request $request)
-                {
-                    //
-                }
-
-                public function broadcast(Subscriber $subscriber, array $data)
-                {
-                    return $data;
-                }
-            };
+            return $broadcaster;
         });
 
-        $data = ['foo' => 'bar'];
-        $broadcaster = $this->broadcastManager->driver('foo');
+        /** @var Broadcaster $broadcaster */
+        $resolvedBroadcaster = $this->broadcastManager->driver('foo');
 
         $this->assertSame(['driver' => 'foo'], $broadcasterConfig);
+
         $this->assertSame(
-            $data,
-            $broadcaster->broadcast($this->subscriber(), $data)
+            $broadcaster,
+            $resolvedBroadcaster
         );
     }
 

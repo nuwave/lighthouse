@@ -5,6 +5,7 @@ namespace Tests\Integration\Subscriptions;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 
 class StorageManagerTest extends TestCase implements GraphQLContext
 {
@@ -19,6 +20,14 @@ class StorageManagerTest extends TestCase implements GraphQLContext
      * @var \Nuwave\Lighthouse\Subscriptions\StorageManager
      */
     protected $storage;
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
+    }
 
     protected function setUp(): void
     {
