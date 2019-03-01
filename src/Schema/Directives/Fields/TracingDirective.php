@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Carbon\Carbon;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -31,7 +32,7 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $value = $next($value);
 

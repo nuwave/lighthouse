@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Closure;
 use Nuwave\Lighthouse\Exceptions\GenericException;
 
 class ErrorBuffer
@@ -30,7 +31,7 @@ class ErrorBuffer
      * @param  \Closure|null  $exceptionResolver
      * @return void
      */
-    public function __construct(string $errorType = 'generic', ?\Closure $exceptionResolver = null)
+    public function __construct(string $errorType = 'generic', ?Closure $exceptionResolver = null)
     {
         $this->errorType = $errorType;
         $this->exceptionResolver = $exceptionResolver ?? $this->defaultExceptionResolver();
@@ -41,7 +42,7 @@ class ErrorBuffer
      *
      * @return \Closure
      */
-    protected function defaultExceptionResolver(): \Closure
+    protected function defaultExceptionResolver(): Closure
     {
         return function (string $errorMessage) {
             return (new GenericException($errorMessage))
@@ -56,7 +57,7 @@ class ErrorBuffer
      * @param  \Closure  $exceptionResolver
      * @return $this
      */
-    public function setExceptionResolver(\Closure $exceptionResolver): self
+    public function setExceptionResolver(Closure $exceptionResolver): self
     {
         $this->exceptionResolver = $exceptionResolver;
 

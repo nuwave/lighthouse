@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Iterators;
 
+use Closure;
 use Exception;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
@@ -16,7 +17,7 @@ class SyncIterator implements SubscriptionIterator
      * @param  \Closure|null  $error
      * @return void
      */
-    public function process(Collection $items, \Closure $cb, \Closure $error = null): void
+    public function process(Collection $items, Closure $cb, Closure $error = null): void
     {
         $items->each(function ($item) use ($cb, $error): void {
             try {

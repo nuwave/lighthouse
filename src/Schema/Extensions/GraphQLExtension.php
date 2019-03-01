@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
+use Closure;
 use JsonSerializable;
 use GraphQL\Executor\ExecutionResult;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -57,7 +58,7 @@ abstract class GraphQLExtension implements JsonSerializable
      * @param  \Closure  $next
      * @return array
      */
-    public function willSendResponse(array $response, \Closure $next)
+    public function willSendResponse(array $response, Closure $next)
     {
         return $next($response);
     }

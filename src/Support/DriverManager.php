@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support;
 
+use Closure;
 use Illuminate\Container\Container as Application;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 
@@ -114,7 +115,7 @@ abstract class DriverManager
      * @param  \Closure  $callback
      * @return $this
      */
-    public function extend(string $driver, \Closure $callback): self
+    public function extend(string $driver, Closure $callback): self
     {
         $this->customCreators[$driver] = $callback;
 

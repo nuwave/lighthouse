@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Closure;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
@@ -191,7 +192,7 @@ class FieldFactory
      * @param  \Illuminate\Support\Collection<ArgumentValue>  $argumentValues
      * @return \Closure
      */
-    public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
+    public function decorateResolverWithArgs(Closure $resolver, Collection $argumentValues): Closure
     {
         return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
             $this->currentValidationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
