@@ -32,7 +32,7 @@ class DirectiveFactoryTest extends TestCase
     {
         $this->assertInstanceOf(
             FieldDirective::class,
-            $this->directiveFactory->create((new FieldDirective())->name())
+            $this->directiveFactory->create((new FieldDirective)->name())
         );
     }
 
@@ -59,7 +59,7 @@ class DirectiveFactoryTest extends TestCase
             foo: String
         ');
 
-        $directive = new class() implements FieldMiddleware {
+        $directive = new class implements FieldMiddleware {
             public function name(): string
             {
                 return 'foo';

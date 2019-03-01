@@ -15,7 +15,7 @@ class GraphQLExtensionTest extends TestCase
         parent::getEnvironmentSetUp($app);
 
         $app->singleton(ExtensionRegistry::class, function (): ExtensionRegistry {
-            return new class() extends ExtensionRegistry {
+            return new class extends ExtensionRegistry {
                 public function __construct()
                 {
                     $this->pipeline = app(Pipeline::class);
@@ -47,7 +47,7 @@ class GraphQLExtensionTest extends TestCase
 
     public static function getExtension(): GraphQLExtension
     {
-        return new class() extends GraphQLExtension {
+        return new class extends GraphQLExtension {
             public static function name(): string
             {
                 return 'foo';

@@ -115,7 +115,7 @@ class BaseDirectiveTest extends TestCase
      */
     protected function constructTestDirective($definitionNode): BaseDirective
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             /**
              * Name of the directive.
              *
