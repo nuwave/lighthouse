@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse\Defer;
 
-use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\TypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Exceptions\ParseClientException;
+use GraphQL\Language\AST\NonNullTypeNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Exceptions\ParseClientException;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class DeferrableDirective extends BaseDirective implements Directive, FieldMiddleware
 {
@@ -54,19 +54,19 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
         $fieldType = $value->getField()->type;
 
         $value->setResolver(
-            function ($root, $args, GraphQLContext $context, ResolveInfo $info) use ($resolver, $fieldType) {
-                $wrappedResolver = function () use ($resolver, $root, $args, $context, $info) {
-                    return $resolver($root, $args, $context, $info);
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $fieldType) {
+                $wrappedResolver = function () use ($resolver, $root, $args, $context, $resolveInfo) {
+                    return $resolver($root, $args, $context, $resolveInfo);
                 };
-                $path = implode('.', $info->path);
+                $path = implode('.', $resolveInfo->path);
 
-                if ($this->shouldDefer($fieldType, $info)) {
+                if ($this->shouldDefer($fieldType, $resolveInfo)) {
                     return $this->defer->defer($wrappedResolver, $path);
                 }
 
                 return $this->defer->isStreaming()
                     ? $this->defer->findOrResolve($wrappedResolver, $path)
-                    : $resolver($root, $args, $context, $info);
+                    : $resolver($root, $args, $context, $resolveInfo);
             }
         );
 
@@ -77,18 +77,18 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      * Determine of field should be deferred.
      *
      * @param  \GraphQL\Language\AST\TypeNode  $fieldType
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return bool
      *
      * @throws \Nuwave\Lighthouse\Exceptions\ParseClientException
      */
-    protected function shouldDefer(TypeNode $fieldType, ResolveInfo $info): bool
+    protected function shouldDefer(TypeNode $fieldType, ResolveInfo $resolveInfo): bool
     {
-        if (strtolower($info->operation->operation) === 'mutation') {
+        if (strtolower($resolveInfo->operation->operation) === 'mutation') {
             return false;
         }
 
-        foreach ($info->fieldNodes as $fieldNode) {
+        foreach ($resolveInfo->fieldNodes as $fieldNode) {
             $deferDirective = ASTHelper::directiveDefinition($fieldNode, 'defer');
 
             if (! $deferDirective) {

@@ -63,21 +63,21 @@ class Tracing
     /**
      * Record resolver execution time.
      *
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @param  \Carbon\Carbon  $start
      * @param  \Carbon\Carbon  $end
      * @return void
      */
-    public function record(ResolveInfo $info, Carbon $start, Carbon $end): void
+    public function record(ResolveInfo $resolveInfo, Carbon $start, Carbon $end): void
     {
         $startOffset = abs(($start->micro - $this->requestStart->micro) * 1000);
         $duration = abs(($end->micro - $start->micro) * 1000);
 
         $this->resolverTraces []= [
-            'path' => $info->path,
-            'parentType' => $info->parentType->name,
-            'returnType' => $info->returnType->__toString(),
-            'fieldName' => $info->fieldName,
+            'path' => $resolveInfo->path,
+            'parentType' => $resolveInfo->parentType->name,
+            'returnType' => $resolveInfo->returnType->__toString(),
+            'fieldName' => $resolveInfo->fieldName,
             'startOffset' => $startOffset,
             'duration' => $duration,
         ];

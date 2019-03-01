@@ -537,10 +537,10 @@ class Commentable
      *
      * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
@@ -900,10 +900,10 @@ class Person
      *
      * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
