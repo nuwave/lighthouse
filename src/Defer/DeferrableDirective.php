@@ -74,7 +74,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     }
 
     /**
-     * Determine of field should be deferred.
+     * Determine if field should be deferred.
      *
      * @param  \GraphQL\Language\AST\TypeNode  $fieldType
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
