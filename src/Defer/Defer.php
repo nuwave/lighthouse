@@ -8,7 +8,6 @@ use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Symfony\Component\HttpFoundation\Response;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
@@ -24,11 +23,6 @@ class Defer implements GraphQLResponse
      * @var \Nuwave\Lighthouse\GraphQL
      */
     protected $graphQL;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\GraphQLRequest
-     */
-    protected $request;
 
     /**
      * @var mixed[]
@@ -68,14 +62,12 @@ class Defer implements GraphQLResponse
     /**
      * @param  \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse  $stream
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return void
      */
-    public function __construct(CanStreamResponse $stream, GraphQL $graphQL, GraphQLRequest $request)
+    public function __construct(CanStreamResponse $stream, GraphQL $graphQL)
     {
         $this->stream = $stream;
         $this->graphQL = $graphQL;
-        $this->request = $request;
         $this->maxNestedFields = config('lighthouse.defer.max_nested_fields', 0);
     }
 
@@ -290,8 +282,8 @@ class Defer implements GraphQLResponse
      */
     protected function executeDeferred(): void
     {
-        $this->result = $this->graphQL->executeRequest(
-            $this->request
+        $this->result = app()->call(
+            [$this->graphQL, 'executeRequest']
         );
 
         $this->stream->stream(
