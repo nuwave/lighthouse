@@ -35,7 +35,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $chunk['path'] = collect(explode('.', $path))
                         ->map(function ($partial) {
                             return is_numeric($partial)
-                                ? intval($partial)
+                                ? (int) $partial
                                 : $partial;
                         })
                         ->toArray();
