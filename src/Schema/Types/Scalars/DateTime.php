@@ -20,11 +20,12 @@ class DateTime extends ScalarType
     public function serialize($value): string
     {
         if ($value instanceof Carbon) {
-            return $value->toAtomString();
+            return $value->toDateTimeString();
         }
 
-        return $this->tryParsingDateTime($value, InvariantViolation::class)
-            ->toAtomString();
+        return $this
+            ->tryParsingDateTime($value, InvariantViolation::class)
+            ->toDateTimeString();
     }
 
     /**
@@ -50,7 +51,10 @@ class DateTime extends ScalarType
     public function parseLiteral($valueNode, ?array $variables = null): Carbon
     {
         if (! $valueNode instanceof StringValueNode) {
-            throw new Error('Query error: Can only parse strings got: '.$valueNode->kind, [$valueNode]);
+            throw new Error(
+                'Query error: Can only parse strings got: '.$valueNode->kind,
+                [$valueNode]
+            );
         }
 
         return $this->tryParsingDateTime($valueNode->value, Error::class);
@@ -71,7 +75,9 @@ class DateTime extends ScalarType
             return Carbon::createFromFormat(Carbon::DEFAULT_TO_STRING_FORMAT, $value);
         } catch (\Exception $e) {
             throw new $exceptionClass(
-                Utils::printSafeJson($e->getMessage())
+                Utils::printSafeJson(
+                    $e->getMessage()
+                )
             );
         }
     }
