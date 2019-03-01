@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
+use Exception;
 use Carbon\Carbon;
 use GraphQL\Error\Error;
 use GraphQL\Utils\Utils;
@@ -72,7 +73,7 @@ class Date extends ScalarType
     {
         try {
             return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new $exceptionClass(
                 Utils::printSafeJson($e->getMessage())
             );
