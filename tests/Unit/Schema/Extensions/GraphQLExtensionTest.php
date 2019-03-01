@@ -18,7 +18,7 @@ class GraphQLExtensionTest extends TestCase
             return new class extends ExtensionRegistry {
                 public function __construct()
                 {
-                    $this->pipeline = app(Pipeline::class);
+                    parent::__construct(app(Pipeline::class));
                     $this->extensions = collect([GraphQLExtensionTest::getExtension()]);
                 }
             };

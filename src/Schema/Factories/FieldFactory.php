@@ -359,7 +359,7 @@ class FieldFactory
             return $argumentValue;
         }
 
-        $this->prepareDirectives($astNode, $argumentPath, $directives);
+        $this->prepareDirectives($argumentPath, $directives);
 
         foreach ($directives as $directive) {
             // Remove the directive from the list to avoid evaluating
@@ -393,15 +393,14 @@ class FieldFactory
     }
 
     /**
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
      *
      * @return void
      */
-    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives): void
+    protected function prepareDirectives(array $argumentPath, Collection $directives): void
     {
-        $directives->each(function (Directive $directive) use ($astNode, $argumentPath): void {
+        $directives->each(function (Directive $directive) use ($argumentPath): void {
             if ($directive instanceof HasErrorBuffer) {
                 $directive->setErrorBuffer($this->currentValidationErrorBuffer);
             }
