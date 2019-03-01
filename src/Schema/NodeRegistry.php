@@ -17,16 +17,6 @@ class NodeRegistry
     protected $typeRegistry;
 
     /**
-     * NodeRegistry constructor.
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
-
-    /**
      * A map from type names to resolver functions.
      *
      * @var \Closure[]
@@ -43,6 +33,17 @@ class NodeRegistry
      * @var string
      */
     protected $currentType;
+
+    /**
+     * NodeRegistry constructor.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
+     */
+    public function __construct(TypeRegistry $typeRegistry)
+    {
+        $this->typeRegistry = $typeRegistry;
+    }
 
     /**
      * @param  string  $typeName

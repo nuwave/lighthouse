@@ -142,7 +142,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective): FieldDefinitionNode {
                     // If the field already has middleware defined, skip over it
                     // Field middleware are more specific then those defined on a type
-                    if (ASTHelper::directiveDefinition($fieldDefinition, MiddlewareDirective::NAME)) {
+                    if (ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
                         return $fieldDefinition;
                     }
 
