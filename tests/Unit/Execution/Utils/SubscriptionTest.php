@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Execution\Utils;
 
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Tests\TestCase;
 use Prophecy\Argument;
 use Illuminate\Http\Request;
@@ -11,6 +10,7 @@ use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionTest extends TestCase
@@ -29,6 +29,14 @@ class SubscriptionTest extends TestCase
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $broadcaster;
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
+    }
 
     protected function setUp(): void
     {

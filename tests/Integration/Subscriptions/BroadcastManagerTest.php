@@ -50,6 +50,12 @@ class BroadcastManagerTest extends TestCase implements GraphQLContext
      */
     public function itCanExtendBroadcastManager(): void
     {
+        $this->getMockBuilder(Broadcaster::class)
+            ->getMock()
+            ->method()
+            ->method($this->once())
+            ->with('foo');
+
         $broadcasterConfig = [];
 
         $this->broadcastManager->extend('foo', function ($app, array $config) use (&$broadcasterConfig): Broadcaster {

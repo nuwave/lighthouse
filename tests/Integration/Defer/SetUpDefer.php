@@ -2,7 +2,6 @@
 
 namespace Tests\Integration\Defer;
 
-use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\MemoryStream;
 
@@ -23,8 +22,6 @@ trait SetUpDefer
         $app->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->stream;
         });
-
-        $app['config']->set('lighthouse.extensions', [Defer::class]);
     }
 
     /**

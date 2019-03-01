@@ -2,16 +2,17 @@
 
 namespace Tests\Integration\Tracing;
 
-use Nuwave\Lighthouse\Tracing\Tracing;
+use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Tests\TestCase;
 
 class TracingExtensionTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function getPackageProviders($app)
     {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('lighthouse.extensions', [Tracing::class]);
+        return array_merge(
+            parent::getPackageProviders($app),
+            [TracingServiceProvider::class]
+        );
     }
 
     protected $schema = <<<SCHEMA
@@ -95,6 +96,7 @@ SCHEMA;
     public function resolve(): string
     {
         usleep(20000); // 20 milliseconds
+
         return 'bar';
     }
 }

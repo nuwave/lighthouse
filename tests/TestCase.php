@@ -8,12 +8,9 @@ use GraphQL\Type\Schema;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\TestResponse;
 use Laravel\Scout\ScoutServiceProvider;
-use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Tests\Utils\Middleware\CountRuns;
@@ -42,8 +39,6 @@ abstract class TestCase extends BaseTestCase
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
             LighthouseServiceProvider::class,
-            TracingServiceProvider::class,
-            SubscriptionServiceProvider::class,
             ConsoleServiceProvider::class,
         ];
     }

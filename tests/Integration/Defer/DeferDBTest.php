@@ -9,7 +9,6 @@ use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
-use Tests\Integration\Defer\SetUpDefer;
 
 class DeferDBTest extends DBTestCase
 {
