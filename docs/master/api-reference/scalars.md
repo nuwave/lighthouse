@@ -25,7 +25,7 @@ type Mutation {
 ## Date
 **Parse:**
 
-Expects an ISO date string, eg.: `2019-01-15`. Parses to a Carbon-object.
+Expects an ISO 8601 date string (`Y-m-d`), eg.: `2019-01-15`. Parses to a Carbon-object.
 
 **Serialize:**
 
