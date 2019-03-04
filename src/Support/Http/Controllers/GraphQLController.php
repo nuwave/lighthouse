@@ -91,11 +91,11 @@ class GraphQLController extends Controller
      */
     protected function execute(Request $request, GraphQLContext $context): array
     {
-        $operations = optional(json_decode($request->input('operations')));
+        $operations = json_decode($request->input('operations'));
 
-        $query = $operations->query ?: $request->input('query', '');
-        $variables = (array) $operations->variables ?: $request->input('variables', []);
-        $operationName = $operations->operationName ?: $request->input('operationName');
+        $query = isset($operations->query) ? $operations->query : $request->input('query', '');
+        $variables = (array) (isset($operations->variables) ? $operations->variables : $request->input('variables', []));
+        $operationName = isset($operations->operationName) ? $operations->operationName : $request->input('operationName');
 
         $variables = $this->mapUploadedFiles($request, $this->ensureVariablesAreArray($variables));
 
