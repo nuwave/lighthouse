@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
 use GraphQL\Error\Error;
-use GraphQL\Error\InvariantViolation;
 use GraphQL\Utils\Utils;
 use Illuminate\Http\UploadedFile;
+use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\ScalarType;
 
 class Upload extends ScalarType
