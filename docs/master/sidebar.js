@@ -23,6 +23,7 @@ module.exports = [{
             'guides/auth',
             'guides/validation',
             'guides/relationships',
+            'guides/file-uploads',
             'guides/custom-directives',
             'guides/plugin-development'
         ]
@@ -39,6 +40,7 @@ module.exports = [{
         children: [
             'api-reference/directives',
             'api-reference/resolvers',
+            'api-reference/scalars',
         ]
     }
 ]
