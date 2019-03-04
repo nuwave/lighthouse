@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
+use Nuwave\Lighthouse\Exceptions\SubscriptionException;
+use Serializable;
 use GraphQL\Utils\AST;
 use GraphQL\Error\Error;
 use Illuminate\Support\Str;
@@ -10,9 +12,10 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
-class Subscriber implements \Serializable
+class Subscriber implements Serializable
 {
     const MISSING_OPERATION_NAME = 'Must pass an operation name when using a subscription.';
+
     /**
      * @var string
      */
@@ -49,7 +52,7 @@ class Subscriber implements \Serializable
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return void
      *
-     * @throws Error
+     * @throws \Nuwave\Lighthouse\Exceptions\SubscriptionException
      */
     public function __construct(
         array $args,
@@ -58,13 +61,13 @@ class Subscriber implements \Serializable
     ) {
         $operationName = $resolveInfo->operation->name;
         if (! $operationName) {
-            throw new Error(
+            throw new SubscriptionException(
                 self::MISSING_OPERATION_NAME
             );
         }
         $this->operationName = $operationName->value;
 
-        $this->channel = $this->uniqueChannelName();
+        $this->channel = self::uniqueChannelName();
         $this->args = $args;
         $this->context = $context;
 
@@ -84,13 +87,12 @@ class Subscriber implements \Serializable
     {
         $data = json_decode($subscription, true);
 
+        $this->operationName = $data['operation_name'];
         $this->channel = $data['channel'];
+        $this->args = $data['args'];
         $this->context = $this->contextSerializer()->unserialize(
             $data['context']
         );
-        $this->args = $data['args'];
-
-        $this->operationName = $data['operation_name'];
         $this->query = AST::fromArray(
             \unserialize($data['query'])
         );
@@ -106,10 +108,10 @@ class Subscriber implements \Serializable
     public function serialize()
     {
         return json_encode([
+            'operation_name' => $this->operationName,
             'channel' => $this->channel,
-            'context' => $this->contextSerializer()->serialize($this->context),
             'args' => $this->args,
-            'operation_name',
+            'context' => $this->contextSerializer()->serialize($this->context),
             'query' => \serialize(
                 AST::toArray($this->query)
             ),
@@ -134,7 +136,7 @@ class Subscriber implements \Serializable
      *
      * @return string
      */
-    protected function uniqueChannelName(): string
+    public static function uniqueChannelName(): string
     {
         return 'private-lighthouse-'.Str::random(32).'-'.time();
     }

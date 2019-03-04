@@ -2,10 +2,18 @@
 
 namespace Tests\Integration\Subscriptions;
 
+use GraphQL\Language\AST\DocumentNode;
+use GraphQL\Language\Parser;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Utils\AST;
+use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
+use Tests\Utils\Models\User;
 
 class StorageManagerTest extends TestCase implements GraphQLContext
 {
@@ -36,6 +44,101 @@ class StorageManagerTest extends TestCase implements GraphQLContext
         $this->storage = app(StorageManager::class);
     }
 
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app->bind(ContextSerializer::class, function(): ContextSerializer {
+            return new class() implements ContextSerializer {
+                /**
+                 * Serialize the context.
+                 *
+                 * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext $context
+                 * @return string
+                 */
+                public function serialize(GraphQLContext $context)
+                {
+                    return 'foo';
+                }
+
+                /**
+                 * Unserialize the context.
+                 *
+                 * @param  string $context
+                 * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
+                 */
+                public function unserialize(string $context)
+                {
+                    return new class() implements GraphQLContext {
+
+                        /**
+                         * Get an instance of the authenticated user.
+                         *
+                         * @return \Illuminate\Foundation\Auth\User|null
+                         */
+                        public function user()
+                        {
+                            //
+                        }
+
+                        /**
+                         * Get an instance of the current HTTP request.
+                         *
+                         * @return \Illuminate\Http\Request
+                         */
+                        public function request()
+                        {
+                            //
+                        }
+                    };
+                }
+            };
+        });
+    }
+
+    /**
+     * Construct a dummy subscriber for testing.
+     *
+     * @param  string  $queryString
+     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
+     */
+    protected function subscriber(string $queryString): Subscriber
+    {
+        /** @var Subscriber $subscriber */
+        $subscriber = $this->getMockBuilder(Subscriber::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $subscriber->channel = Subscriber::uniqueChannelName();
+        $subscriber->query = Parser::parse($queryString);
+
+        return $subscriber;
+    }
+
+    /**
+     * @see \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::user()
+     *
+     * @return \Tests\Utils\Models\User
+     */
+    public function user(): User
+    {
+        return new User([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@doe.com',
+        ]);
+    }
+
+    /**
+     * @see \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::request()
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function request(): Request
+    {
+        return new Request();
+    }
+
     /**
      * @test
      */
@@ -48,21 +151,22 @@ class StorageManagerTest extends TestCase implements GraphQLContext
         $this->storage->storeSubscriber($subscriber2, self::TOPIC);
         $this->storage->storeSubscriber($subscriber3, self::TOPIC.'-foo');
 
-        $this->assertSame(
-            $subscriber1->queryString,
-            $this->storage->subscriberByChannel($subscriber1->channel)->queryString
+        $this->assertSubscriberIsSame(
+            $subscriber1,
+            $this->storage->subscriberByChannel($subscriber1->channel)
         );
-        $this->assertSame(
-            $subscriber2->queryString,
-            $this->storage->subscriberByChannel($subscriber2->channel)->queryString
+        $this->assertSubscriberIsSame(
+            $subscriber2,
+            $this->storage->subscriberByChannel($subscriber2->channel)
         );
-        $this->assertSame(
-            $subscriber1->queryString,
-            $this->storage->subscriberByRequest(['channel_name' => $subscriber1->channel], [])->queryString
+
+        $this->assertSubscriberIsSame(
+            $subscriber1,
+            $this->storage->subscriberByRequest(['channel_name' => $subscriber1->channel], [])
         );
-        $this->assertSame(
-            $subscriber2->queryString,
-            $this->storage->subscriberByRequest(['channel_name' => $subscriber2->channel], [])->queryString
+        $this->assertSubscriberIsSame(
+            $subscriber2,
+            $this->storage->subscriberByRequest(['channel_name' => $subscriber2->channel], [])
         );
 
         $topicSubscribers = $this->storage->subscribersByTopic(self::TOPIC);
@@ -70,5 +174,13 @@ class StorageManagerTest extends TestCase implements GraphQLContext
 
         $this->storage->deleteSubscriber($subscriber1->channel);
         $this->assertCount(1, $this->storage->subscribersByTopic(self::TOPIC));
+    }
+
+    protected function assertSubscriberIsSame(Subscriber $expected, Subscriber $actual): void
+    {
+        $this->assertSame(
+            AST::toArray($expected->query),
+            AST::toArray($actual->query)
+        );
     }
 }

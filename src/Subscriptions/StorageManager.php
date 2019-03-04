@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions
@@ -29,14 +28,14 @@ class StorageManager implements StoresSubscriptions
     protected $cache;
 
     /**
-     * @param  \Illuminate\Cache\CacheManager  $cache
+     * @param  \Illuminate\Cache\CacheManager  $cacheManager
      * @return void
      */
-    public function __construct(CacheManager $cache)
+    public function __construct(CacheManager $cacheManager)
     {
-        $store = config('lighthouse.subscriptions.storage', 'redis');
-
-        $this->cache = $cache->store($store);
+        $this->cache = $cacheManager->store(
+            config('lighthouse.subscriptions.storage', 'redis')
+        );
     }
 
     /**

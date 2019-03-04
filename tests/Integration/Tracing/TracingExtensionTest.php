@@ -17,7 +17,7 @@ class TracingExtensionTest extends TestCase
 
     protected $schema = <<<SCHEMA
 type Query {
-    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TracingExtensionTest@resolve")
+    foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
 }
 SCHEMA;
 
@@ -68,15 +68,7 @@ SCHEMA;
         ])->assertJsonCount(2)
             ->assertJsonStructure([
                 $expectedResponse,
-                [
-                    'extensions' => [
-                        'tracing' => [
-                            'execution' => [
-                                'resolvers',
-                            ],
-                        ],
-                    ],
-                ],
+                $expectedResponse,
             ]);
 
         $this->assertSame(
