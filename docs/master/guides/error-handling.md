@@ -9,7 +9,7 @@ In a production setting, error messages should not be shown to the user by defau
 to prevent information leaking. In some cases however, you may want to display an
 explicit error message to the user.
 
-[`webonyx/graphql-php`]() offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface, that can
+**webonyx/graphql-php** offers the [`GraphQL\Error\ClientAware`](https://github.com/webonyx/graphql-php/blob/master/src/Error/ClientAware.php) interface, that can
 be implemented by Exceptions to control how they are rendered to the client.  
 
 ## Additional Error Information
