@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema;
+namespace Tests\Unit\Schema\Values;
 
 use Closure;
 use Tests\TestCase;

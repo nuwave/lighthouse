@@ -289,7 +289,7 @@ class NodeFactory
     {
         return function () use ($definition) {
             return collect($definition->fields)
-                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($definition) {
+                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
                     $argumentValue = new ArgumentValue($inputValueDefinition);
 
                     return [

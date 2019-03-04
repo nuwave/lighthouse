@@ -1,6 +1,5 @@
 <?php
 
-use Closure;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 

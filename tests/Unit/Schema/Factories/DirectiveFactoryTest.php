@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema;
+namespace Tests\Unit\Schema\Factories;
 
 use Closure;
 use Tests\TestCase;
