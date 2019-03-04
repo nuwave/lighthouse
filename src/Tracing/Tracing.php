@@ -70,16 +70,13 @@ class Tracing
      */
     public function record(ResolveInfo $resolveInfo, Carbon $start, Carbon $end): void
     {
-        $startOffset = abs(($start->micro - $this->requestStart->micro) * 1000);
-        $duration = abs(($end->micro - $start->micro) * 1000);
-
         $this->resolverTraces [] = [
             'path' => $resolveInfo->path,
             'parentType' => $resolveInfo->parentType->name,
             'returnType' => $resolveInfo->returnType->__toString(),
             'fieldName' => $resolveInfo->fieldName,
-            'startOffset' => $startOffset,
-            'duration' => $duration,
+            'startOffset' => $start->diffInSeconds($this->requestStart),
+            'duration' => $start->diffInSeconds($end),
         ];
     }
 
@@ -91,13 +88,12 @@ class Tracing
     public function jsonSerialize(): array
     {
         $end = Carbon::now();
-        $duration = abs(($end->micro - $this->requestStart->micro) * 1000);
 
         return [
             'version' => 1,
             'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.v\Z"),
             'endTime' => $end->format("Y-m-d\TH:i:s.v\Z"),
-            'duration' => $duration,
+            'duration' => $end->diffInSeconds($this->requestStart),
             'execution' => [
                 'resolvers' => $this->resolverTraces,
             ],
