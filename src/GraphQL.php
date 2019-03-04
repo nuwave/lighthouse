@@ -176,7 +176,8 @@ class GraphQL
 
                 /**
                  * Handlers are defined as classes in the config.
-                 * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
+                 * They must implement the Interface
+                 * @see \Nuwave\Lighthouse\Execution\ErrorHandler
                  * This allows the user to register multiple handlers and pipe the errors through.
                  */
                 $handlers = config('lighthouse.error_handlers', []);

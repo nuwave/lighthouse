@@ -289,10 +289,11 @@ namespace App\GraphQL\Queries;
 
 use App\Post;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class LatestPost
 {
-    public function resolve($rootValue, array $args, $context, ResolveInfo $resolveInfo): Post
+    public function resolve($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
     {
         return Post::orderBy('published_at', 'DESC')->first();
     }

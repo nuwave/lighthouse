@@ -877,10 +877,11 @@ namespace App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Blog
 {
-    public function visiblePosts($root, array $args, $context, ResolveInfo $resolveInfo): Builder
+    public function visiblePosts($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         return DB::table('posts')
             ->where('visible', true)
