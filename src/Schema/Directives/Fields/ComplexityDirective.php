@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Support\Helper;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -37,7 +38,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
                 $fieldValue->defaultNamespacesForParent()
             );
 
-            $resolver = construct_resolver($namespacedClassName, $methodName);
+            $resolver = Helper::constructResolver($namespacedClassName, $methodName);
         } else {
             $resolver = function (int $childrenComplexity, array $args): int {
                 $complexity = Arr::get(

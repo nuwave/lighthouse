@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\Support\Helper;
 use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
@@ -85,7 +86,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $this->iterator->process(
             $subscribers,
             function (Subscriber $subscriber) use ($root): void {
-                $data = graphql()->executeQuery(
+                $data = Helper::graphql()->executeQuery(
                     $subscriber->queryString,
                     $subscriber->context,
                     $subscriber->args,

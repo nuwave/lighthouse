@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Support\Helper;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Symfony\Component\HttpFoundation\Response;
@@ -312,7 +313,7 @@ class DeferExtension extends GraphQLExtension
     {
         // TODO: Properly parse variables array
         // TODO: Get debug setting
-        $this->data = graphql()
+        $this->data = Helper::graphql()
             ->executeQuery(
                 $this->request->request()->input('query', ''),
                 $this->request->context(),

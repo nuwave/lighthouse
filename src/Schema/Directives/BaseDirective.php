@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Nuwave\Lighthouse\Support\Utils;
+use Nuwave\Lighthouse\Support\Helper;
 use GraphQL\Language\AST\DirectiveNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -95,7 +96,7 @@ abstract class BaseDirective implements Directive
 
         $namespacedClassName = $this->namespaceClassName($className);
 
-        return construct_resolver($namespacedClassName, $methodName);
+        return Helper::constructResolver($namespacedClassName, $methodName);
     }
 
     /**

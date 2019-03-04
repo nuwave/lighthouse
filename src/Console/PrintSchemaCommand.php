@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Console;
 use Illuminate\Console\Command;
 use GraphQL\Utils\SchemaPrinter;
 use Illuminate\Cache\Repository;
+use Nuwave\Lighthouse\Support\Helper;
 use Illuminate\Contracts\Filesystem\Filesystem;
 
 class PrintSchemaCommand extends Command
@@ -39,7 +40,7 @@ class PrintSchemaCommand extends Command
         $cache->forget(config('lighthouse.cache.key'));
 
         $schema = SchemaPrinter::doPrint(
-            graphql()->prepSchema()
+            Helper::graphql()->prepSchema()
         );
 
         if ($this->option('write')) {
