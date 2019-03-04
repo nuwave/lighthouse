@@ -23,23 +23,26 @@ type Mutation {
 ```
 
 ## Date
+Converts input from date strings to `Carbon` and vice verse.
+
 **Parse:**
 
-Expects an ISO 8601 date string (`Y-m-d`), eg.: `2019-01-15`. Parses to a Carbon-object.
+Expects a date string (`Y-m-d`), eg.: `2019-01-15`. Parses to a `Carbon`-object.
 
 **Serialize:**
 
-Convert a date or Carbon-object to an ISO 8601 date string, eg. `2019-01-15`.
+Convert a date or `Carbon`-object to a date string (`Y-m-d`), eg. `2019-01-15`.
 
 ## DateTime
+Converts input from datetime strings to `Carbon` and vice verse.
 
 **Parse:**
 
-Expects an ISO 8601 datetime string, eg.: `2019-01-15T23:15:33`. Parses to a `Carbon`-object.
+Expects a datetime string (`Y-m-d H:i:s`), eg.: `2019-01-15 23:15:33`. Parses to a `Carbon`-object.
 
 **Serialize:**
 
-Converts a date or Carbon-object to an ISO 8601 datetime string, eg. `2019-01-15T23:15:33`.
+Converts a date or `Carbon`-object to a datetime string (`Y-m-d H:i:s`), eg. `2019-01-15 23:15:33`.
 
 ## Upload
 Enables file uploads on attributes of type `Upload`.
