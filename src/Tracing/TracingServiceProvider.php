@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use Illuminate\Support\ServiceProvider;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
+use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class TracingServiceProvider extends ServiceProvider

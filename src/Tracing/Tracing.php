@@ -4,12 +4,12 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Events\GatheringExtensions;
 
 class Tracing
 {
@@ -80,7 +80,7 @@ class Tracing
                 'execution' => [
                     'resolvers' => $this->resolverTraces,
                 ],
-            ]
+            ],
         ];
     }
 
