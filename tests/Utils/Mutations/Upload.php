@@ -5,10 +5,6 @@ namespace Tests\Utils\Mutations;
 use Exception;
 use Illuminate\Http\UploadedFile;
 
-/**
- * This is used solely as a placeholder resolver, as schemas without a valid
- * field in the query type are invalid.
- */
 class Upload
 {
     /**

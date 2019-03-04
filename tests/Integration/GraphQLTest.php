@@ -297,7 +297,7 @@ class GraphQLTest extends DBTestCase
             }
         }
         ';
-        $res = $this->postGraphQLMultipart(
+        $this->postGraphQLMultipart(
             [
                 'operations' => [
                     'query' => $query,
@@ -311,9 +311,7 @@ class GraphQLTest extends DBTestCase
                 ],
                 0 => UploadedFile::fake()->create('image.jpg', 500),
             ]
-        );
-
-        $res->assertJson([
+        )->assertJson([
             'data' => [
                 'uploadAvatar' => [
                     'id' => 123,

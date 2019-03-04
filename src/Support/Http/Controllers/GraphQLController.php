@@ -66,7 +66,8 @@ class GraphQLController extends Controller
     {
         // If the request is a 0-indexed array and the request isn't a multipart-request,
         // we know we are dealing with a batched query
-        $batched = isset($request->toArray()[0]) && $this->isMultipartRequest($request) == false &&
+        $batched = isset($request->toArray()[0]) &&
+            $this->isMultipartRequest($request) == false &&
             config('lighthouse.batched_queries', true);
         $context = $this->createsContext->generate($request);
 
