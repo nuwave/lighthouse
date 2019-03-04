@@ -1,7 +1,7 @@
 # File Uploads
-::: tip
-The logic for handling file uploads is located in the GraphQLController.
-You must include that logic if you use a custom controller.
+::: warning
+When using a custom controller instead of the default one supplied by Lighthouse (`GraphQLController`),
+file upload will not work out of the box. You will have to add support for this in your controller yourself.
 :::
 
 Lighthouse conforms to the [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec)
