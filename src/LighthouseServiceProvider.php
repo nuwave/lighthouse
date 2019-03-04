@@ -98,7 +98,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
-        $this->app->bind(GraphQLResponse::class, function () {
+        $this->app->bind(GraphQLResponse::class, function (): GraphQLResponse {
             return new class implements GraphQLResponse {
                 /**
                  * Create GraphQL response.
@@ -114,11 +114,15 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
-            return new GraphQLRequest($app->make('request'));
+            return new GraphQLRequest(
+                $app->make('request')
+            );
         });
 
         $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
-            return new SchemaStitcher(config('lighthouse.schema.register', ''));
+            return new SchemaStitcher(
+                config('lighthouse.schema.register', '')
+            );
         });
 
         if ($this->app->runningInConsole()) {

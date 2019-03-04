@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -61,6 +62,29 @@ class Tracing
     }
 
     /**
+     * Return additional information for the result.
+     *
+     * @param  \Nuwave\Lighthouse\Events\GatheringExtensions  $gatheringExtensions
+     * @return mixed[]
+     */
+    public function handleGatheringExtensions(GatheringExtensions $gatheringExtensions): array
+    {
+        $end = Carbon::now();
+
+        return [
+            'tracing' => [
+                'version' => 1,
+                'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.v\Z"),
+                'endTime' => $end->format("Y-m-d\TH:i:s.v\Z"),
+                'duration' => $end->diffInSeconds($this->requestStart),
+                'execution' => [
+                    'resolvers' => $this->resolverTraces,
+                ],
+            ]
+        ];
+    }
+
+    /**
      * Record resolver execution time.
      *
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
@@ -77,26 +101,6 @@ class Tracing
             'fieldName' => $resolveInfo->fieldName,
             'startOffset' => $start->diffInSeconds($this->requestStart),
             'duration' => $start->diffInSeconds($end),
-        ];
-    }
-
-    /**
-     * Format extension output.
-     *
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        $end = Carbon::now();
-
-        return [
-            'version' => 1,
-            'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.v\Z"),
-            'endTime' => $end->format("Y-m-d\TH:i:s.v\Z"),
-            'duration' => $end->diffInSeconds($this->requestStart),
-            'execution' => [
-                'resolvers' => $this->resolverTraces,
-            ],
         ];
     }
 }

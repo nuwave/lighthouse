@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\StartExecution;
@@ -38,6 +39,11 @@ class TracingServiceProvider extends ServiceProvider
         $dispatcher->listen(
             StartExecution::class,
             Tracing::class.'@handleStartExecution'
+        );
+
+        $dispatcher->listen(
+            GatheringExtensions::class,
+            Tracing::class.'@handleGatheringExtensions'
         );
     }
 

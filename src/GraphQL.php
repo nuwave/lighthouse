@@ -62,13 +62,6 @@ class GraphQL
     protected $pipeline;
 
     /**
-     * The current batch index.
-     *
-     * @var int|null
-     */
-    protected $currentBatchIndex = null;
-
-    /**
      * The event dispatcher.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
