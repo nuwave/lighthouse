@@ -139,7 +139,7 @@ class FieldFactory
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
-        $fieldDefinition = [
+        return [
             'name' => $fieldDefinitionNode->name->value,
             'type' => $this->fieldValue->getReturnType(),
             'args' => $this->getInputValueDefinitions($argumentValues),
@@ -148,8 +148,6 @@ class FieldFactory
             'complexity' => $this->fieldValue->getComplexity(),
             'deprecationReason' => $this->fieldValue->getDeprecationReason(),
         ];
-
-        return $fieldDefinition;
     }
 
     /**
