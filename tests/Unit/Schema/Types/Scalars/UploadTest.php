@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
+use GraphQL\Error\InvariantViolation;
 use Tests\TestCase;
 use GraphQL\Error\Error;
 use Illuminate\Http\UploadedFile;
@@ -14,9 +15,9 @@ class UploadTest extends TestCase
      */
     public function itThrowsIfSerializing(): void
     {
-        $this->expectException(Error::class);
+        $this->expectException(InvariantViolation::class);
 
-        (new Upload())->serialize('');
+        (new Upload)->serialize('');
     }
 
     /**
@@ -26,7 +27,7 @@ class UploadTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Upload())->parseLiteral('');
+        (new Upload)->parseLiteral('');
     }
 
     /**
@@ -36,7 +37,7 @@ class UploadTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Upload())->parseValue('not a file');
+        (new Upload)->parseValue('not a file');
     }
 
     /**
@@ -45,7 +46,7 @@ class UploadTest extends TestCase
     public function itParsesValidFiles(): void
     {
         $value = UploadedFile::fake()->create('my-file.jpg', 500);
-        $parsedValue = (new Upload())->parseValue($value);
+        $parsedValue = (new Upload)->parseValue($value);
 
         $this->assertEquals($value, $parsedValue);
     }

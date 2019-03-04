@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Types\Scalars;
 
 use GraphQL\Error\Error;
+use GraphQL\Error\InvariantViolation;
 use GraphQL\Utils\Utils;
 use Illuminate\Http\UploadedFile;
 use GraphQL\Type\Definition\ScalarType;
@@ -17,15 +18,19 @@ class Upload extends ScalarType
      * Serialize an internal value, ensuring it is a valid date string.
      *
      * @param $value
-     * @throws Error
+     * @throws InvariantViolation
      */
     public function serialize($value)
     {
-        throw new Error('"Upload" cannot be serialized');
+        throw new InvariantViolation('"Upload" cannot be serialized');
     }
 
     /**
      * Parse a externally provided variable value into a Carbon instance.
+     *
+     * @param $value
+     * @throws Error
+     * @return UploadedFile
      */
     public function parseValue($value): UploadedFile
     {
@@ -42,7 +47,7 @@ class Upload extends ScalarType
      * @param  \GraphQL\Language\AST\Node  $valueNode
      * @param  mixed[]|null  $variables
      *
-     * @throws \GraphQL\Error\Error
+     * @throws Error
      */
     public function parseLiteral($valueNode, array $variables = null)
     {
