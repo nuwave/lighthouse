@@ -289,18 +289,17 @@ class GraphQLTest extends DBTestCase
      */
     public function itResolvesUploadViaMultipartRequest(): void
     {
-        $query = '
-        mutation UploadAvatar($user: ID!, $file: Upload!) {
-            uploadAvatar(user: $user, file: $file) {
-                id
-                url
-            }
-        }
-        ';
         $this->postGraphQLMultipart(
             [
                 'operations' => [
-                    'query' => $query,
+                    'query' => '
+                        mutation UploadAvatar($user: ID!, $file: Upload!) {
+                            uploadAvatar(user: $user, file: $file) {
+                                id
+                                url
+                            }
+                        }
+                    ',
                     'variables' => [
                         'file' => null,
                         'user' => 1,
