@@ -29,6 +29,7 @@ class DocumentAST implements Serializable
      * @var \GraphQL\Type\Definition\ObjectType<\GraphQL\Language\AST\DefinitionNode>
      */
     protected $definitionMap;
+
     /**
      * A collection of type extensions.
      *
