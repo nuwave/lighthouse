@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
-use GraphQL\Error\InvariantViolation;
 use Tests\TestCase;
 use GraphQL\Error\Error;
 use Illuminate\Http\UploadedFile;
+use GraphQL\Error\InvariantViolation;
 use Nuwave\Lighthouse\Schema\Types\Scalars\Upload;
 
 class UploadTest extends TestCase
