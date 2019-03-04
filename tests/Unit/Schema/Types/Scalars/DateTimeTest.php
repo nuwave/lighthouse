@@ -22,7 +22,7 @@ class DateTimeTest extends TestCase
     {
         $this->expectException(InvariantViolation::class);
 
-        (new DateTime())->serialize($value);
+        (new DateTime)->serialize($value);
     }
 
     /**
@@ -35,7 +35,7 @@ class DateTimeTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new DateTime())->parseValue($value);
+        (new DateTime)->parseValue($value);
     }
 
     /**
@@ -63,7 +63,7 @@ class DateTimeTest extends TestCase
         $date = '2018-10-01 12:45:01';
         $this->assertEquals(
             (new Carbon($date))->toDateTimeString(),
-            (new DateTime())->parseValue($date)
+            (new DateTime)->parseValue($date)
         );
     }
 
@@ -75,7 +75,7 @@ class DateTimeTest extends TestCase
         $dateLiteral = new StringValueNode(
             ['value' => '2018-10-01 12:45:01']
         );
-        $result = (new DateTime())->parseLiteral($dateLiteral);
+        $result = (new DateTime)->parseLiteral($dateLiteral);
 
         $this->assertSame(
             $dateLiteral->value,
@@ -90,7 +90,7 @@ class DateTimeTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new DateTime())->parseLiteral(
+        (new DateTime)->parseLiteral(
             new IntValueNode([])
         );
     }
@@ -101,7 +101,7 @@ class DateTimeTest extends TestCase
     public function itSerializesCarbonInstance(): void
     {
         $now = now();
-        $result = (new DateTime())->serialize($now);
+        $result = (new DateTime)->serialize($now);
 
         $this->assertSame(
             $now->toDateTimeString(),
@@ -115,7 +115,7 @@ class DateTimeTest extends TestCase
     public function itSerializesValidDateTimeString(): void
     {
         $date = '2018-10-01 12:45:01';
-        $result = (new DateTime())->serialize($date);
+        $result = (new DateTime)->serialize($date);
 
         $this->assertSame(
             $date,
