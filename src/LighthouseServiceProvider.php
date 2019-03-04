@@ -2,33 +2,33 @@
 
 namespace Nuwave\Lighthouse;
 
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\Validator;
-use Nuwave\Lighthouse\Console\ClearCacheCommand;
-use Nuwave\Lighthouse\Console\InterfaceCommand;
-use Nuwave\Lighthouse\Console\MutationCommand;
-use Nuwave\Lighthouse\Console\PrintSchemaCommand;
+use Illuminate\Support\ServiceProvider;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Schema\NodeRegistry;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
-use Nuwave\Lighthouse\Console\ScalarCommand;
-use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
-use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
+use Nuwave\Lighthouse\Console\ScalarCommand;
+use Illuminate\Contracts\Container\Container;
+use Nuwave\Lighthouse\Console\MutationCommand;
+use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
+use Nuwave\Lighthouse\Console\ClearCacheCommand;
+use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
+use Illuminate\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 
 class LighthouseServiceProvider extends ServiceProvider
@@ -98,7 +98,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
-        $this->app->bind(GraphQLResponse::class, function() {
+        $this->app->bind(GraphQLResponse::class, function () {
             return new class implements GraphQLResponse {
                 /**
                  * Create GraphQL response.

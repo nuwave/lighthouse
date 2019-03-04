@@ -2,13 +2,12 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Serializable;
 use GraphQL\Utils\AST;
-use GraphQL\Error\Error;
 use Illuminate\Support\Str;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\SubscriptionException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 
@@ -83,7 +82,7 @@ class Subscriber implements Serializable
      * @param  string  $subscription
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
      */
-    public function unserialize($subscription): Subscriber
+    public function unserialize($subscription): self
     {
         $data = json_decode($subscription, true);
 
@@ -124,7 +123,7 @@ class Subscriber implements Serializable
      * @param  mixed  $root
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
      */
-    public function setRoot($root): Subscriber
+    public function setRoot($root): self
     {
         $this->root = $root;
 

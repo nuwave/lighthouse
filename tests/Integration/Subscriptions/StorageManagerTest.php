@@ -2,18 +2,16 @@
 
 namespace Tests\Integration\Subscriptions;
 
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\Parser;
-use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Utils\AST;
-use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Tests\TestCase;
+use GraphQL\Utils\AST;
+use GraphQL\Language\Parser;
+use Illuminate\Http\Request;
+use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Tests\Utils\Models\User;
 
 class StorageManagerTest extends TestCase implements GraphQLContext
 {
@@ -48,7 +46,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->bind(ContextSerializer::class, function(): ContextSerializer {
+        $app->bind(ContextSerializer::class, function (): ContextSerializer {
             return new class() implements ContextSerializer {
                 /**
                  * Serialize the context.
@@ -70,7 +68,6 @@ class StorageManagerTest extends TestCase implements GraphQLContext
                 public function unserialize(string $context)
                 {
                     return new class() implements GraphQLContext {
-
                         /**
                          * Get an instance of the authenticated user.
                          *

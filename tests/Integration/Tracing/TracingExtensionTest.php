@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Tracing;
 
-use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 
 class TracingExtensionTest extends TestCase
 {

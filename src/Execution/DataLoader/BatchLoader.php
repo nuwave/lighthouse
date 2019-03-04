@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 
 use Exception;
 use GraphQL\Deferred;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader

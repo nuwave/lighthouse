@@ -27,17 +27,17 @@ class TracingServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             ManipulatingAST::class,
-            Tracing::class . '@handleManipulatingAST'
+            Tracing::class.'@handleManipulatingAST'
         );
 
         $dispatcher->listen(
             StartRequest::class,
-            Tracing::class . '@handleStartRequest'
+            Tracing::class.'@handleStartRequest'
         );
 
         $dispatcher->listen(
             StartExecution::class,
-            Tracing::class . '@handleStartExecution'
+            Tracing::class.'@handleStartExecution'
         );
     }
 

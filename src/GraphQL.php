@@ -8,21 +8,21 @@ use Illuminate\Support\Arr;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
-use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 
 class GraphQL
 {
@@ -186,7 +186,7 @@ class GraphQL
         );
 
         // Ensure we preserve the extension keys while flattening
-        foreach($extensionResults as $singleExtensionResult){
+        foreach ($extensionResults as $singleExtensionResult) {
             $result->extensions = array_merge(
                 $result->extensions,
                 $singleExtensionResult

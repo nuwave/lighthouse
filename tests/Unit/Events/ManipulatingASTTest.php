@@ -17,7 +17,7 @@ class ManipulatingASTTest extends TestCase
         $this->schema = $this->placeholderQuery();
 
         Event::fake([
-            ManipulatingAST::class
+            ManipulatingAST::class,
         ]);
 
         $this->query('
@@ -40,7 +40,7 @@ class ManipulatingASTTest extends TestCase
         }
         ';
 
-        Event::listen(ManipulatingAST::class, function(ManipulatingAST $manipulatingAST): void {
+        Event::listen(ManipulatingAST::class, function (ManipulatingAST $manipulatingAST): void {
             $manipulatingAST->ast->setDefinition(
                 PartialParser::objectTypeDefinition(
                     $this->placeholderQuery()
@@ -54,8 +54,8 @@ class ManipulatingASTTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => 42
-            ]
+                'foo' => 42,
+            ],
         ]);
     }
 }

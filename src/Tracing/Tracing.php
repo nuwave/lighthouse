@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
-use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Events\StartExecution;
+use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class Tracing
@@ -73,7 +73,7 @@ class Tracing
         $startOffset = abs(($start->micro - $this->requestStart->micro) * 1000);
         $duration = abs(($end->micro - $start->micro) * 1000);
 
-        $this->resolverTraces []= [
+        $this->resolverTraces [] = [
             'path' => $resolveInfo->path,
             'parentType' => $resolveInfo->parentType->name,
             'returnType' => $resolveInfo->returnType->__toString(),

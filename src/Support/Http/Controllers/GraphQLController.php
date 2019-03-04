@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
+use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
-use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 
 class GraphQLController extends Controller
 {

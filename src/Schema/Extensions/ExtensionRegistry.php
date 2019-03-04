@@ -3,10 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Extensions;
 
 use JsonSerializable;
-use Illuminate\Support\Collection;
 use GraphQL\Executor\ExecutionResult;
-use Nuwave\Lighthouse\Support\Pipeline;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 class ExtensionRegistry implements JsonSerializable
 {
@@ -80,7 +77,6 @@ class ExtensionRegistry implements JsonSerializable
                 return $response;
             });
     }
-
 
     /**
      * Render the result of the extensions to an array that is put in the response.

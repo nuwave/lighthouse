@@ -8,8 +8,8 @@ use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
 use Nuwave\Lighthouse\Exceptions\InvalidDriverException;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\PusherBroadcaster;
 
 class BroadcastManagerTest extends TestCase
@@ -58,8 +58,7 @@ class BroadcastManagerTest extends TestCase
     {
         $broadcasterConfig = [];
 
-        $broadcaster = new class() implements Broadcaster
-        {
+        $broadcaster = new class() implements Broadcaster {
             public function authorized(Request $request)
             {
                 //

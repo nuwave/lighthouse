@@ -24,7 +24,7 @@ class ASTBuilder
     {
         $this->directiveFactory = $directiveFactory;
     }
-    
+
     /**
      * Convert the base schema string into an AST by applying different manipulations.
      *
@@ -44,6 +44,7 @@ class ASTBuilder
         $document = $this->applyArgManipulators($document);
 
         $document = $this->addPaginationInfoTypes($document);
+
         return $this->addNodeSupport($document);
     }
 
@@ -236,6 +237,7 @@ class ASTBuilder
           lastPage: Int
         }
         ');
+
         return $document->setDefinition($pageInfo);
     }
 

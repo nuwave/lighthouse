@@ -3,12 +3,11 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
-use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
-use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
+use Nuwave\Lighthouse\Events\StartExecution;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
@@ -179,7 +178,7 @@ class SubscriptionRegistry
             'lighthouse_subscriptions' => [
                 'version' => 1,
                 'channels' => $this->subscribers,
-            ]
+            ],
         ];
     }
 }

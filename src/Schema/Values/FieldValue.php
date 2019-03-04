@@ -277,8 +277,6 @@ class FieldValue
                 $subscriber,
                 $subscription->encodeTopic($subscriber, $this->getFieldName())
             );
-
-            return null;
         };
     }
 

@@ -26,7 +26,7 @@ class DeferServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             ManipulatingAST::class,
-            Defer::class . '@handleManipulatingAST'
+            Defer::class.'@handleManipulatingAST'
         );
     }
 
