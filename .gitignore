@@ -6,3 +6,4 @@ vendor
 .idea
 phpunit.xml
 .DS_Store
+.phpunit.result.cache
