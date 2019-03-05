@@ -52,7 +52,7 @@ abstract class BatchLoader
 
         // If we are resolving a batched query, we need to assign each
         // query a uniquely indexed instance
-        /** @var GraphQLRequest $graphQLRequest */
+        /** @var \Nuwave\Lighthouse\Execution\GraphQLRequest $graphQLRequest */
         $graphQLRequest = app(GraphQLRequest::class);
         if ($graphQLRequest->isBatched()) {
             $currentBatchIndex = $graphQLRequest->batchIndex();

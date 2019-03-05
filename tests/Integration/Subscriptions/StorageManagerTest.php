@@ -45,7 +45,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
         parent::getEnvironmentSetUp($app);
 
         $app->bind(ContextSerializer::class, function (): ContextSerializer {
-            return new class() implements ContextSerializer {
+            return new class implements ContextSerializer {
                 /**
                  * Serialize the context.
                  *
@@ -99,7 +99,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
      */
     protected function subscriber(string $queryString): Subscriber
     {
-        /** @var Subscriber $subscriber */
+        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber */
         $subscriber = $this->getMockBuilder(Subscriber::class)
             ->disableOriginalConstructor()
             ->getMock();
