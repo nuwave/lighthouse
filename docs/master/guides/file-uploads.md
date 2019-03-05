@@ -1,71 +1,79 @@
 # File Uploads
+
+Lighthouse allows you to upload files using a multipart form request
+as defined in [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
+
 ::: warning
-When using a custom controller instead of the default one supplied by Lighthouse (`GraphQLController`),
-file uploads will not work out of the box. You will have to add support for this in your controller yourself.
+The upload functionality is implemented in Lighthouse's default controller `\Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController`.
+When using a custom controller, you will have to add support for it yourself.
 :::
-
-Lighthouse conforms to the [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec)
-which use multipart/form-requests to transfer files in the same request as the query.
-
-This allows for file uploads through mutations.
 
 ## Preparing your schema
 
 In order to accept file uploads, you must add the `Upload` scalar to your schema.
 
 ```graphql
+"Can be used as an argument to upload files using https://github.com/jaydenseric/graphql-multipart-request-spec" 
 scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
 ```
 
 Once the scalar is added, you can add it to a mutation.
 
-````graphql
+```graphql
 type Mutation {
-    addProfilePicture(file: Upload!): ProfilePicture @field(resolver: "App\\GraphQL\\Mutations\\Models\\ProfilePictureMutator@add")
+  "Upload a file that is publicly available."
+  upload(file: Upload!): String
 }
-````
-
-## Uploading a file
-
-In order to upload a file, you must send a multipart/form-request.
-
-The request must contain a payload structured like this:
-
-```
---------------------------cec8e8123c05ba25 
-Content-Disposition: form-data; name="operations"
-
-{ "query": "mutation ($file: Upload!) { singleUpload(file: $file) { id } }", "variables": { "file": null } }
---------------------------cec8e8123c05ba25
-Content-Disposition: form-data; name="map"
-
-{ "0": ["variables.file"] }
---------------------------cec8e8123c05ba25
-Content-Disposition: form-data; name="0"; filename="a.txt"
-Content-Type: text/plain
-
-Alpha file content.
-
---------------------------cec8e8123c05ba25--
 ```
 
-Please note that the variable `file` is also defined inside `operations.variables`, but have the value `null`.
-This value will be overwritten with the actual file by Lighthouse.
+## Handling file uploads
 
-**Explanation:**
+Lighthouse accepts multipart form requests that contain file uploads.
+The given file is injected into the `array $variables` as an instance of [`\Illuminate\Http\UploadedFile`](https://laravel.com/api/5.8/Illuminate/Http/UploadedFile.html)
+and passed into the resolver.
 
-| Field         | Description |
-| ------------- | :---------- | 
-| operations    | Contains the data a normal query would contain; `query`, `variables` and `operationName`. | 
-| map           | Contains a map of where, inside the `variables`, files should be added. | 
-| 0, 1, 2 ...   | Each field contains a file. File 1 = `0` and so on. | 
+It is up to you how to handle the given file in the resolver,
+see the [Laravel docs for File Uploads](https://laravel.com/docs/filesystem#file-uploads).
 
-On top of this, the header `content-type` must have the value `multipart/form` on all requests of this type.
+The field from the previous example can be implemented like this:
 
-**cURL example:**
+```php
+<?php
+
+namespace App\GraphQL\Mutations;
+
+class Upload
+{
+    /**
+     * Upload a file, store it on the server and return the path.
+     *
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return string|null
+     */
+    public function resolve($root, array $args): ?string
+    {
+        /** @var \Illuminate\Http\UploadedFile $file */
+        $file = $args['file'];
+
+        return $file->storePublicly('uploads');
+    }
+}
 ```
-curl lighthouse-project.dev/graphql \
-  -F operations='{ "query": "mutation ($file: Upload!) { singleUpload(file: $file) { id } }", "variables": { "file": null } }' \
-  -F map='{ "0": ["variables.file"] }' \
-  -F 0=@a.txt
-```
+
+## Client-side usage
+
+In order to upload a file, you must send a `multipart/form-data` request.
+Use any of the [available client implementations](https://github.com/jaydenseric/graphql-multipart-request-spec#client)
+or look at the [specification examples](https://github.com/jaydenseric/graphql-multipart-request-spec#multipart-form-field-structure) to roll your own.
+
+To test the example above, prepare a file you can upload.
+
+    echo "test content" > my_file.txt
+
+Then, send a request to upload the file to your server:
+
+    curl localhost/graphql \
+      -F operations='{ "query": "mutation ($file: Upload!) { upload(file: $file) }", "variables": { "file": null } }' \
+      -F map='{ "0": ["variables.file"] }' \
+      -F 0=@my_file.txt

@@ -29,8 +29,8 @@ type Query {
 Scalar types are the most basic elements of a GraphQL schema. There are a
 few built in scalars, such as `String` or `Int`.
 
-Lighthouse provides some scalars that work well with Laravel out of the box, you can find
-them in the [default schema](../getting-started/installation.md#publish-the-default-schema).
+Lighthouse provides some scalars that work well with Laravel out of the box,
+read about them in the [API reference for scalars](../api-reference/scalars.md).
 
 Define your own scalar types by running `php artisan lighthouse:scalar <Scalar name>`
 and including it in your schema. Lighthouse will look for Scalar types in a configurable
