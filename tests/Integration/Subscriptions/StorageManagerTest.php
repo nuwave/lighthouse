@@ -15,8 +15,6 @@ use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 
 class StorageManagerTest extends TestCase implements GraphQLContext
 {
-    use HandlesSubscribers;
-
     /**
      * @var string
      */
