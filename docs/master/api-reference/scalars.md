@@ -1,58 +1,46 @@
 # Scalars
-Scalars will parse the input and serialize the output of attributes and nodes of said type.
 
-**Schema example:**
+You can use Lighthouse's built-in scalars by defining them in your schema,
+using [`@scalar`](directives.md#scalar) to point them to a FQCN.
+
 ```graphql
+"A datetime string with format 'Y-m-d H:i:s', e.g. '2018-01-01 13:00:00'."
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
-type Appointment {
-    title: String!
-    date: DateTime!
-    created_at: DateTime!
-    updated_at: DateTime!
-}
-
 type Query {
-    appointments: [Appointment] @paginate(type: "connection")
+  "Get the local server time."
+  now: DateTime!
 }
-
-type Mutation {
-    addAppointment(text: String!, date: DateTime!): Appointment @create
-}
-
 ```
 
 ## Date
-Converts input from date strings to `Carbon` and vice verse.
 
-**Parse:**
+```graphql
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+```
 
-Expects a date string (`Y-m-d`), eg.: `2019-01-15`. Parses to a `Carbon`-object.
-
-**Serialize:**
-
-Convert a date or `Carbon`-object to a date string (`Y-m-d`), eg. `2019-01-15`.
+Internally represented as an instance of `Carbon\Carbon`.
 
 ## DateTime
-Converts input from datetime strings to `Carbon` and vice verse.
 
-**Parse:**
+```graphql
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-01-01 13:00:00`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+```
 
-Expects a datetime string (`Y-m-d H:i:s`), eg.: `2019-01-15 23:15:33`. Parses to a `Carbon`-object.
-
-**Serialize:**
-
-Converts a date or `Carbon`-object to a datetime string (`Y-m-d H:i:s`), eg. `2019-01-15 23:15:33`.
+Internally represented as an instance of `Carbon\Carbon`.
 
 ## Upload
-Enables file uploads on attributes of type `Upload`.
-For more information, please refer to the [File Uploads](../guides/file-uploads.md) guide.
 
-**Parse:**
+```graphql
+"Can be used as an argument to upload files using https://github.com/jaydenseric/graphql-multipart-request-spec" 
+scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
+```
 
-Injects the file into the variables array. The file will be available on the attribute.
-Parses to a [`UploadedFile`](https://laravel.com/api/5.6/Illuminate/Http/UploadedFile.html)-object
+This Scalar can only be used as an argument, not as a return type.
+For more information, please refer to the [file uploads guide](../guides/file-uploads.md).
 
-**Serialize:**
-
-Not supported.
+The multipart form request is handled by Lighthouse, the resolver gets passed
+an instance of [`\Illuminate\Http\UploadedFile`](https://laravel.com/api/5.8/Illuminate/Http/UploadedFile.html)
+in the argument `array $variables`.
