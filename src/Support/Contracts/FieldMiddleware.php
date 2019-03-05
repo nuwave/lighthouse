@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 
 interface FieldMiddleware extends Directive
@@ -13,5 +14,5 @@ interface FieldMiddleware extends Directive
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next);
+    public function handleField(FieldValue $value, Closure $next);
 }

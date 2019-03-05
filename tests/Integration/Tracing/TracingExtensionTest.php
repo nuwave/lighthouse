@@ -7,6 +7,12 @@ use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 
 class TracingExtensionTest extends TestCase
 {
+    protected $schema = <<<SCHEMA
+type Query {
+    foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
+}
+SCHEMA;
+
     protected function getPackageProviders($app)
     {
         return array_merge(
@@ -15,11 +21,12 @@ class TracingExtensionTest extends TestCase
         );
     }
 
-    protected $schema = <<<SCHEMA
-type Query {
-    foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
-}
-SCHEMA;
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('lighthouse.extensions', [TracingExtension::class]);
+    }
 
     /**
      * @test

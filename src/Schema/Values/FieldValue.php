@@ -205,12 +205,12 @@ class FieldValue
                 );
             }
 
-            return \Closure::fromCallable(
+            return Closure::fromCallable(
                 [app($resolverClass), 'resolve']
             );
         }
 
-        return \Closure::fromCallable(
+        return Closure::fromCallable(
             [Executor::class, 'defaultFieldResolver']
         );
     }

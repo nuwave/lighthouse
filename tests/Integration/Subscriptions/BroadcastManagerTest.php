@@ -103,7 +103,7 @@ class BroadcastManagerTest extends TestCase
     public function itThrowsIfDriverDoesNotImplementInterface(): void
     {
         $this->broadcastManager->extend('foo', function () {
-            return new class() {
+            return new class {
                 //
             };
         });

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -31,7 +32,7 @@ class WithDirective extends RelationDirective implements FieldMiddleware
      *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $resolver = $value->getResolver();
 

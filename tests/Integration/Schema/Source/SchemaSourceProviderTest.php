@@ -15,6 +15,11 @@ class SchemaSourceProviderTest extends TestCase
      */
     const SCHEMA_PATH = __DIR__.'/schema/';
 
+    /**
+     * @var \League\Flysystem\Filesystem
+     */
+    protected $filesystem;
+
     protected function setUp(): void
     {
         parent::setUp();

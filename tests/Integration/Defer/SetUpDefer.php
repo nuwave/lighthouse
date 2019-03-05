@@ -17,7 +17,7 @@ trait SetUpDefer
      */
     protected function setUpDefer($app)
     {
-        $this->stream = new MemoryStream();
+        $this->stream = new MemoryStream;
 
         $app->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->stream;

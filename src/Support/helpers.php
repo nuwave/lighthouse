@@ -61,12 +61,12 @@ if (! function_exists('construct_resolver')) {
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    function construct_resolver(string $className, string $methodName): \Closure
+    function construct_resolver(string $className, string $methodName): Closure
     {
         if (! method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
-        return \Closure::fromCallable([app($className), $methodName]);
+        return Closure::fromCallable([app($className), $methodName]);
     }
 }
