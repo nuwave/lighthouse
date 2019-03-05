@@ -10,47 +10,53 @@ use GraphQL\Type\Definition\ScalarType;
 
 class Upload extends ScalarType
 {
-    public $name = 'Upload';
-
-    public $description = ''; // TODO Add description / refer to docs.
-
     /**
-     * Serialize an internal value, ensuring it is a valid date string.
+     * This always throws, as the Upload scalar can only be used as an argument.
      *
-     * @param $value
+     * @param  mixed  $value
+     * @return void
+     *
      * @throws InvariantViolation
      */
-    public function serialize($value)
+    public function serialize($value): void
     {
-        throw new InvariantViolation('"Upload" cannot be serialized');
+        throw new InvariantViolation(
+            '"Upload" cannot be serialized, it can only be used as an argument.'
+        );
     }
 
     /**
      * Parse a externally provided variable value into a Carbon instance.
      *
-     * @param $value
+     * @param  mixed  $value
+     * @return \Illuminate\Http\UploadedFile
+     *
      * @throws Error
-     * @return UploadedFile
      */
     public function parseValue($value): UploadedFile
     {
         if (! $value instanceof UploadedFile) {
-            throw new Error('Could not get uploaded file, be sure to conform to GraphQL multipart request specification. Instead got: '.Utils::printSafe($value));
+            throw new Error(
+                'Could not get uploaded file, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec Instead got: '.Utils::printSafe($value)
+            );
         }
 
         return $value;
     }
 
     /**
-     * Parse a literal provided as part of a GraphQL query string into a Carbon instance.
+     * This always throws, as the Upload scalar must be used with a multipart form request.
      *
      * @param  \GraphQL\Language\AST\Node  $valueNode
      * @param  mixed[]|null  $variables
+     * @return void
      *
      * @throws Error
      */
-    public function parseLiteral($valueNode, array $variables = null)
+    public function parseLiteral($valueNode, array $variables = null): void
     {
-        throw new Error('"Upload" cannot be hardcoded in query. Be sure to conform to GraphQL multipart request specification.');
+        throw new Error(
+            '"Upload" cannot be hardcoded in a query. Be sure to conform to the GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
+        );
     }
 }

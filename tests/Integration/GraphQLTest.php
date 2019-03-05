@@ -19,7 +19,6 @@ class GraphQLTest extends DBTestCase
         created_at: String!
         updated_at: String!
         tasks: [Task!]! @hasMany
-        avatar: Avatar @hasOne
     }
     
     type Task {
@@ -30,17 +29,12 @@ class GraphQLTest extends DBTestCase
         user: User! @belongsTo
     }
     
-    type Avatar {
-        id: ID!
-        url: String!
-    }
-    
     type Query {
         user: User @auth
     }
     
     type Mutation {
-        uploadAvatar(user: ID!, file: Upload!): Avatar @field(resolver: "Tests\\\\Utils\\\\Mutations\\\\Upload@resolve")
+        upload(file: Upload!): Boolean
     }
     ';
 
@@ -102,65 +96,32 @@ class GraphQLTest extends DBTestCase
     /**
      * @test
      */
-    public function itResolvesQueryViaMultipartRequest(): void
+    public function itResolvesQueryViaGetRequest(): void
     {
-        $query = '
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ';
-        $this->postGraphQLMultipart(
-            [
-                'operations' => [
-                    'query' => $query,
-                    'variables' => [],
-                ],
-                'map' => [],
-            ]
-        )->assertJson([
+        $this->getJson(
+            'graphql?'
+            .http_build_query(
+                ['query' => '
+                    query UserWithTasks {
+                        user {
+                            email
+                            tasks {
+                                name
+                            }
+                        }
+                    }
+                    '
+                ]
+            )
+        )->assertExactJson([
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
                     'tasks' => $this->tasks
-                        ->map(
-                            function (Task $task): array {
-                                return ['name' => $task->name];
-                            }
-                        )->toArray(),
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * @test
-     */
-    public function itResolvesQueryViaGetRequest(): void
-    {
-        $query = '
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ';
-        $uri = 'graphql?'.http_build_query(['query' => $query]);
-
-        $this->getJson($uri)->assertExactJson([
-            'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                    'tasks' => $this->tasks->map(function ($task) {
-                        return ['name' => $task->name];
-                    })->toArray(),
+                        ->map(function (Task $task): array {
+                            return ['name' => $task->name];
+                        })
+                        ->toArray(),
                 ],
             ],
         ]);
@@ -269,16 +230,51 @@ class GraphQLTest extends DBTestCase
     /**
      * @test
      */
-    public function itAcceptsMultipartRequests(): void
+    public function itResolvesQueryViaMultipartRequest(): void
     {
-        $result = $this->postGraphQLMultipart(
+        $this->postGraphQLMultipart(
             [
                 'operations' => [
-                    'query' => '',
+                    'query' => '
+                        query UserWithTasks {
+                            user {
+                                email
+                                tasks {
+                                    name
+                                }
+                            }
+                        }
+                    ',
                     'variables' => [],
                 ],
                 'map' => [],
             ]
+        )->assertJson([
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                    'tasks' => $this->tasks
+                        ->map(
+                            function (Task $task): array {
+                                return ['name' => $task->name];
+                            }
+                        )->toArray(),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itAcceptsMultipartRequests(): void
+    {
+        $result = $this->postGraphQLMultipart(
+            [
+                'query' => '',
+                'variables' => [],
+            ],
+            []
         );
 
         $result->assertStatus(200);
@@ -293,16 +289,12 @@ class GraphQLTest extends DBTestCase
             [
                 'operations' => [
                     'query' => '
-                        mutation UploadAvatar($user: ID!, $file: Upload!) {
-                            uploadAvatar(user: $user, file: $file) {
-                                id
-                                url
-                            }
+                        mutation Upload($file: Upload!) {
+                            upload(file: $file)
                         }
                     ',
                     'variables' => [
                         'file' => null,
-                        'user' => 1,
                     ],
                 ],
                 'map' => [
@@ -312,10 +304,7 @@ class GraphQLTest extends DBTestCase
             ]
         )->assertJson([
             'data' => [
-                'uploadAvatar' => [
-                    'id' => 123,
-                    'url' => 'http://localhost.dev/image_123.jpg',
-                ],
+                'upload' => true,
             ],
         ]);
     }

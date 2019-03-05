@@ -10,18 +10,14 @@ class Upload
     /**
      * Return a value for the field.
      *
-     * @return array
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return bool
+     *
      * @throws Exception
      */
-    public function resolve($root, $args): array
+    public function resolve($root, array $args): bool
     {
-        if (! $args['file'] instanceof UploadedFile) {
-            throw new Exception('Argument "file" is not of type "UploadedFile"');
-        }
-
-        return [
-            'id' => 123,
-            'url' => 'http://localhost.dev/image_123.jpg',
-        ];
+        return $args['file'] instanceof UploadedFile;
     }
 }
