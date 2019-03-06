@@ -222,41 +222,20 @@ abstract class TestCase extends BaseTestCase
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
      *
-     * @param  mixed[]  $data
+     * @param  mixed[]  $parameters
+     * @param  mixed[]  $files
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    protected function postGraphQLMultipart(array $data): TestResponse
+    protected function postGraphQLMultipart(array $parameters, array $files): TestResponse
     {
-        // JSON encode and add parameters only if they are given.
-        // This allows tests with invalid payloads to be sent.
-        $parameters = [];
-        if (isset($data['operations'])) {
-            $parameters['operations'] = json_encode($data['operations']);
-        }
-
-        if (isset($data['map'])) {
-            $parameters['map'] = json_encode($data['map']);
-        }
-
-        // Add files
-        $files = [];
-
-        // If array is zero-index, there are files attached to the query
-        if (isset($data[0])) {
-            // Loop through all files, and add them to the payload
-            for ($i = 0; isset($data[$i]); $i++) {
-                $files[] = $data[$i];
-            }
-        }
-
         return $this->call(
-            'post',
+            'POST',
             'graphql',
             $parameters,
             [],
             $files,
             $this->transformHeadersToServerVars([
-                'content-type' => 'multipart/form-data',
+                'Content-Type' => 'multipart/form-data',
             ])
         );
     }

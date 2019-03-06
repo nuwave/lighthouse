@@ -234,50 +234,24 @@ class GraphQLTest extends DBTestCase
     {
         $this->postGraphQLMultipart(
             [
-                'operations' => [
-                    'query' => '
-                        query UserWithTasks {
-                            user {
-                                email
-                                tasks {
-                                    name
-                                }
-                            }
-                        }
-                    ',
-                    'variables' => [],
-                ],
-                'map' => [],
-            ]
+                'operations' => /** @lang JSON */
+                    '
+                    {
+                        "query": "{ user { email } }",
+                        "variables": {}
+                    }
+                ',
+                'map' => /** @lang JSON */
+                    '{}'
+            ],
+            []
         )->assertJson([
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
-                    'tasks' => $this->tasks
-                        ->map(
-                            function (Task $task): array {
-                                return ['name' => $task->name];
-                            }
-                        )->toArray(),
                 ],
             ],
         ]);
-    }
-
-    /**
-     * @test
-     */
-    public function itAcceptsMultipartRequests(): void
-    {
-        $result = $this->postGraphQLMultipart(
-            [
-                'query' => '',
-                'variables' => [],
-            ],
-            []
-        );
-
-        $result->assertStatus(200);
     }
 
     /**
@@ -287,20 +261,24 @@ class GraphQLTest extends DBTestCase
     {
         $this->postGraphQLMultipart(
             [
-                'operations' => [
-                    'query' => '
-                        mutation Upload($file: Upload!) {
-                            upload(file: $file)
+                'operations' => /** @lang JSON */
+                    '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                        "variables": {
+                            "file": null
                         }
-                    ',
-                    'variables' => [
-                        'file' => null,
-                    ],
-                ],
-                'map' => [
-                    '0' => ['variables.file'],
-                ],
-                0 => UploadedFile::fake()->create('image.jpg', 500),
+                    }
+                ',
+                'map' => /** @lang JSON */
+                    '
+                    {
+                        "0": ["variables.file"]
+                    }
+                '
+            ],
+            [
+                '0' => UploadedFile::fake()->create('image.jpg', 500),
             ]
         )->assertJson([
             'data' => [
