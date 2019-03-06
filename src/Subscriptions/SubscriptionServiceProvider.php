@@ -6,8 +6,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\GatheringExtensions;
+use Illuminate\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
@@ -19,19 +20,24 @@ use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionListener;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {
-    public function boot(EventDispatcher $eventDispatcher): void
+    /**
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
+     * @param  \Illuminate\Config\Repository  $configRepository
+     * @return void
+     */
+    public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void
     {
-        $eventDispatcher->listen(
+        $eventsDispatcher->listen(
             BroadcastSubscriptionEvent::class,
             BroadcastSubscriptionListener::class
         );
 
-        $eventDispatcher->listen(
+        $eventsDispatcher->listen(
             StartExecution::class,
             SubscriptionRegistry::class.'@handleStartExecution'
         );
 
-        $eventDispatcher->listen(
+        $eventsDispatcher->listen(
             GatheringExtensions::class,
             SubscriptionRegistry::class.'@handleGatheringExtensions'
         );
@@ -39,8 +45,8 @@ class SubscriptionServiceProvider extends ServiceProvider
         // Register the routes for the configured broadcaster. The specific
         // method that is used can be changed, so we retrieve its name
         // dynamically and then call it with an instance of 'router'.
-        $broadcaster = config('lighthouse.subscriptions.broadcaster');
-        if ($routesMethod = config("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
+        $broadcaster = $configRepository->get('lighthouse.subscriptions.broadcaster');
+        if ($routesMethod = $configRepository->get("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes")) {
             [$router, $method] = Str::parseCallback($routesMethod, 'pusher');
 
             call_user_func(

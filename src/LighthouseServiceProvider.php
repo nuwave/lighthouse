@@ -24,6 +24,7 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Execution\LighthouseResponse;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
@@ -38,9 +39,10 @@ class LighthouseServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @param  \Illuminate\Validation\Factory  $validationFactory
+     * @param  \Illuminate\Config\Repository  $configRepository
      * @return void
      */
-    public function boot(ValidationFactory $validationFactory): void
+    public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
 
@@ -49,10 +51,10 @@ class LighthouseServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->publishes([
-            __DIR__.'/../assets/default-schema.graphql' => config('lighthouse.schema.register'),
+            __DIR__.'/../assets/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'schema');
 
-        if (config('lighthouse.controller')) {
+        if ($configRepository->get('lighthouse.controller')) {
             $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
         }
 
@@ -86,9 +88,10 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      *
+     * @param  \Illuminate\Config\Repository  $configRepository
      * @return void
      */
-    public function register(): void
+    public function register(ConfigRepository $configRepository): void
     {
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
@@ -107,9 +110,9 @@ class LighthouseServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
+        $this->app->singleton(SchemaSourceProvider::class, function () use ($configRepository): SchemaStitcher {
             return new SchemaStitcher(
-                config('lighthouse.schema.register', '')
+                $configRepository->get('lighthouse.schema.register', '')
             );
         });
 

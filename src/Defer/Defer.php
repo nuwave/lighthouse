@@ -42,7 +42,7 @@ class Defer implements GraphQLResponse
     /**
      * @var bool
      */
-    protected $deferMore = true;
+    protected $acceptFurtherDeferring = true;
 
     /**
      * @var bool
@@ -110,11 +110,12 @@ class Defer implements GraphQLResponse
             return $data;
         }
 
-        if ($this->isDeferred($path) || ! $this->deferMore) {
+        if ($this->isDeferred($path) || ! $this->acceptFurtherDeferring) {
             return $this->resolve($resolver, $path);
         }
 
         $this->deferred[$path] = $resolver;
+        return null;
     }
 
     /**
@@ -202,18 +203,19 @@ class Defer implements GraphQLResponse
                 // TODO: Allow nested_levels to be set in config
                 // to break out of loop early.
                 while (
-                    count($this->deferred) &&
-                    ! $this->executionTimeExpired() &&
-                    ! $this->maxNestedFieldsResolved($nested)
+                    count($this->deferred)
+                    && ! $this->executionTimeExpired()
+                    && ! $this->maxNestedFieldsResolved($nested)
                 ) {
                     $nested++;
                     $this->executeDeferred();
                 }
 
                 // We've hit the max execution time or max nested levels of deferred fields.
-                // Process remaining deferred fields.
+                // We process remaining deferred fields, but are no longer allowing additional
+                // fields to be deferred.
                 if (count($this->deferred)) {
-                    $this->deferMore = false;
+                    $this->acceptFurtherDeferring = false;
                     $this->executeDeferred();
                 }
             },

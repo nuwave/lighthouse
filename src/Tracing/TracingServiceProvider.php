@@ -4,11 +4,11 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\StartRequest;
-use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 
 class TracingServiceProvider extends ServiceProvider
 {
@@ -16,32 +16,32 @@ class TracingServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
      * @return void
      */
-    public function boot(DirectiveFactory $directiveFactory, Dispatcher $dispatcher): void
+    public function boot(DirectiveFactory $directiveFactory, EventsDispatcher $eventsDispatcher): void
     {
         $directiveFactory->addResolved(
             TracingDirective::NAME,
             TracingDirective::class
         );
 
-        $dispatcher->listen(
+        $eventsDispatcher->listen(
             ManipulatingAST::class,
             Tracing::class.'@handleManipulatingAST'
         );
 
-        $dispatcher->listen(
+        $eventsDispatcher->listen(
             StartRequest::class,
             Tracing::class.'@handleStartRequest'
         );
 
-        $dispatcher->listen(
+        $eventsDispatcher->listen(
             StartExecution::class,
             Tracing::class.'@handleStartExecution'
         );
 
-        $dispatcher->listen(
+        $eventsDispatcher->listen(
             GatheringExtensions::class,
             Tracing::class.'@handleGatheringExtensions'
         );
