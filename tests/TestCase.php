@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Exception;
+use GuzzleHttp\Client;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Tests\Utils\Middleware\CountRuns;
@@ -204,23 +205,46 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function postGraphQLMultipart(array $data, array $headers = ['content-type' => 'multipart/form-data']): TestResponse
+    protected function postGraphQLMultipart(array $data, array $headers = ['content-type' => 'multipart/form-data'])
     {
-        // JSON encode operations
+        $client = new Client();
+        $payload = [];
+
+        // JSON encode operations. Only add it to payload if defined. Some tests require an invalid payload
         if (isset($data['operations'])) {
-            $data['operations'] = json_encode($data['operations']);
+            $payload[] = [
+                'name'      => 'operations',
+                'contents'  => json_encode($data['operations'])
+            ];
         }
 
-        // JSON encode map
+        // JSON encode map. Only add it to payload if defined. Some tests require an invalid payload
         if (isset($data['map'])) {
-            $data['map'] = json_encode($data['map']);
+            $payload[] = [
+                'name'      => 'map',
+                'contents'  => json_encode($data['map'])
+            ];
         }
 
-        return $this->post(
-            'graphql',
-            $data,
-            $headers
-        );
+        // If array is zero-index, there are files attached to the query
+        if(isset($data[0])) {
+            // Loop through all files, and add them to the payload
+            for( $i = 0; isset($data[$i]); $i++ ) {
+                $payload[] = [
+                    'name'      => $i,
+                    'contents'  => $data[$i]->get(),
+                    'filename'  => $data[$i]->name,
+                    'Mime-Type' => $data[$i]->getMimeType(),
+                ];
+            }
+        }
+
+        // TODO Find a way to post the payload directly to the HttpKernel
+        $res = $client->post( 'https://posthere.io/f089-428d-8d33', [
+            'multipart' => $payload,
+        ]);
+
+        dd($res);
     }
 
     /**
