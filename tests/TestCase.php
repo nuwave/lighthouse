@@ -243,7 +243,7 @@ abstract class TestCase extends BaseTestCase
             [],
             $files,
             $this->transformHeadersToServerVars([
-                'content-type' => 'multipart/form-data'
+                'content-type' => 'multipart/form-data',
             ])
         );
     }
