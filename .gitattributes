@@ -12,6 +12,7 @@
 .travis.yml export-ignore
 _ide_helper.php export-ignore
 docker-compose.yml export-ignore
+Dockerfile export-ignore
 logo.png export-ignore
 netlify.toml export-ignore
 phpunit.xml.dist export-ignore
