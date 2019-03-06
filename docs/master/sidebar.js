@@ -24,6 +24,7 @@ module.exports = [{
             'guides/validation',
             'guides/relationships',
             'guides/custom-directives',
+            'guides/error-handling',
             'guides/plugin-development'
         ]
     },
