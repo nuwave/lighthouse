@@ -206,20 +206,36 @@ abstract class TestCase extends BaseTestCase
 
     protected function postGraphQLMultipart(array $data, array $headers = ['content-type' => 'multipart/form-data']): TestResponse
     {
+        $parameters = [];
         // JSON encode operations
         if (isset($data['operations'])) {
-            $data['operations'] = json_encode($data['operations']);
+            $parameters['operations'] = json_encode($data['operations']);
         }
 
         // JSON encode map
         if (isset($data['map'])) {
-            $data['map'] = json_encode($data['map']);
+            $parameters['map'] = json_encode($data['map']);
         }
 
-        return $this->post(
+        // Add files
+        $files = [];
+
+        // If array is zero-index, there are files attached to the query
+        if(isset($data[0])) {
+            // Loop through all files, and add them to the payload
+            for ($i = 0; isset($data[$i]); $i++) {
+                $files[] = $data[$i];
+            }
+        }
+
+        $server = $this->transformHeadersToServerVars($headers);
+        return $this->call(
+            'post',
             'graphql',
-            $data,
-            $headers
+            $parameters,
+            [],
+            $files,
+            $server
         );
     }
 
