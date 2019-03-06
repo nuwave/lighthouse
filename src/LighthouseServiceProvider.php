@@ -22,6 +22,7 @@ use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
+use Nuwave\Lighthouse\Execution\LighthouseResponse;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -98,20 +99,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
-        $this->app->bind(GraphQLResponse::class, function (): GraphQLResponse {
-            return new class implements GraphQLResponse {
-                /**
-                 * Create GraphQL response.
-                 *
-                 * @param  array $data
-                 * @return \Symfony\Component\HttpFoundation\Response
-                 */
-                public function create(array $data)
-                {
-                    return response($data);
-                }
-            };
-        });
+        $this->app->bind(GraphQLResponse::class, LighthouseResponse::class);
 
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
             return new GraphQLRequest(
