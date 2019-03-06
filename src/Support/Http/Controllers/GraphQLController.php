@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
-use GraphQL\Error\Error;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\GraphQL;

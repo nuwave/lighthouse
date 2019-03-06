@@ -110,7 +110,7 @@ class GraphQLTest extends DBTestCase
                             }
                         }
                     }
-                    '
+                    ',
                 ]
             )
         )->assertExactJson([
