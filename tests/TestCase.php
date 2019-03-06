@@ -221,7 +221,7 @@ abstract class TestCase extends BaseTestCase
         $files = [];
 
         // If array is zero-index, there are files attached to the query
-        if(isset($data[0])) {
+        if (isset($data[0])) {
             // Loop through all files, and add them to the payload
             for ($i = 0; isset($data[$i]); $i++) {
                 $files[] = $data[$i];
@@ -229,6 +229,7 @@ abstract class TestCase extends BaseTestCase
         }
 
         $server = $this->transformHeadersToServerVars($headers);
+        
         return $this->call(
             'post',
             'graphql',
