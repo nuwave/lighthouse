@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
-use Nuwave\Lighthouse\Defer\Defer;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -24,11 +23,6 @@ class GraphQLController extends Controller
     protected $createsContext;
 
     /**
-     * @var \Nuwave\Lighthouse\Defer\Defer
-     */
-    protected $defer;
-
-    /**
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventsDispatcher;
@@ -43,7 +37,6 @@ class GraphQLController extends Controller
      *
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
-     * @param  \Nuwave\Lighthouse\Defer\Defer  $defer
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $createsResponse
      * @return void
@@ -51,13 +44,11 @@ class GraphQLController extends Controller
     public function __construct(
         GraphQL $graphQL,
         CreatesContext $createsContext,
-        Defer $defer,
         EventsDispatcher $eventsDispatcher,
         GraphQLResponse $createsResponse
     ) {
         $this->graphQL = $graphQL;
         $this->createsContext = $createsContext;
-        $this->defer = $defer;
         $this->eventsDispatcher = $eventsDispatcher;
         $this->createsResponse = $createsResponse;
     }
@@ -71,7 +62,7 @@ class GraphQLController extends Controller
     public function query(GraphQLRequest $request)
     {
         $this->eventsDispatcher->dispatch(
-            new StartRequest()
+            new StartRequest
         );
 
         $result = $request->isBatched()

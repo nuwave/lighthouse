@@ -48,6 +48,7 @@ class SubscriptionRegistry
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer $serializer
      * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager $storage
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
+     * @return void
      */
     public function __construct(ContextSerializer $serializer, StorageManager $storage, GraphQL $graphQL)
     {
@@ -125,8 +126,6 @@ class SubscriptionRegistry
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return \Illuminate\Support\Collection
-     *
-     * @throws \GraphQL\Error\SyntaxError
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {
@@ -161,6 +160,7 @@ class SubscriptionRegistry
      * Reset the collection of subscribers when a new execution starts.
      *
      * @param \Nuwave\Lighthouse\Events\StartExecution $startExecution
+     * @return void
      */
     public function handleStartExecution(StartExecution $startExecution)
     {

@@ -11,7 +11,7 @@ class ManipulatingAST
      *
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public $ast;
+    public $documentAST;
 
     /**
      * BuildingAST constructor.
@@ -21,6 +21,6 @@ class ManipulatingAST
      */
     public function __construct(DocumentAST &$documentAST)
     {
-        $this->ast = $documentAST;
+        $this->documentAST = $documentAST;
     }
 }

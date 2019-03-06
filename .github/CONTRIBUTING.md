@@ -122,7 +122,7 @@ class Foo
      */
     public function duplicate(): self
     {
-        $instance = new static();
+        $instance = new static;
         $instance->bar = $this->bar;
 
         return $instance;
@@ -168,6 +168,16 @@ Ternary's should be spread out across multiple lines.
 $foo = $cond
     ? 1
     : 2;
+```
+
+### new + braces
+
+If no arguments are passed to a class constructor, omit the braces.
+
+```php
+new Foo        // correct
+new Foo('bar') // correct
+new Foo()      // wrong
 ```
 
 ## Documentation

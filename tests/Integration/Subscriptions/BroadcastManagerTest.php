@@ -58,7 +58,7 @@ class BroadcastManagerTest extends TestCase
     {
         $broadcasterConfig = [];
 
-        $broadcaster = new class() implements Broadcaster {
+        $broadcaster = new class implements Broadcaster {
             public function authorized(Request $request)
             {
                 //

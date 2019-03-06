@@ -80,7 +80,7 @@ class Subscriber implements Serializable
      * Unserialize subscription from a JSON string.
      *
      * @param  string  $subscription
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
+     * @return $this
      */
     public function unserialize($subscription): self
     {
@@ -93,7 +93,7 @@ class Subscriber implements Serializable
             $data['context']
         );
         $this->query = AST::fromArray(
-            \unserialize($data['query'])
+            unserialize($data['query'])
         );
 
         return $this;
@@ -111,7 +111,7 @@ class Subscriber implements Serializable
             'channel' => $this->channel,
             'args' => $this->args,
             'context' => $this->contextSerializer()->serialize($this->context),
-            'query' => \serialize(
+            'query' => serialize(
                 AST::toArray($this->query)
             ),
         ]);
@@ -121,7 +121,7 @@ class Subscriber implements Serializable
      * Set root data.
      *
      * @param  mixed  $root
-     * @return \Nuwave\Lighthouse\Subscriptions\Subscriber
+     * @return $this
      */
     public function setRoot($root): self
     {

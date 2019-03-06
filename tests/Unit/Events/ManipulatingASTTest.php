@@ -41,7 +41,7 @@ class ManipulatingASTTest extends TestCase
         ';
 
         Event::listen(ManipulatingAST::class, function (ManipulatingAST $manipulatingAST): void {
-            $manipulatingAST->ast->setDefinition(
+            $manipulatingAST->documentAST->setDefinition(
                 PartialParser::objectTypeDefinition(
                     $this->placeholderQuery()
                 )

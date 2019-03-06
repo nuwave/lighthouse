@@ -420,6 +420,6 @@ const network = Network.create(fetchQuery, subscriptionHandler);
 
 export const environment = new Environment({
     network,
-    store: new Store(new RecordSource())
+    store: new Store(new RecordSource)
 });
 ```

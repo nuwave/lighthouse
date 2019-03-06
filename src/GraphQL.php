@@ -73,7 +73,7 @@ class GraphQL
      *
      * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
      */
-    private $astBuilder;
+    protected $astBuilder;
 
     /**
      * GraphQL constructor.
@@ -158,7 +158,7 @@ class GraphQL
         ?string $operationName = null
     ): ExecutionResult {
         $this->eventDispatcher->dispatch(
-            new StartExecution()
+            new StartExecution
         );
 
         $result = GraphQLBase::executeQuery(
@@ -175,7 +175,7 @@ class GraphQL
         // Listeners of this event should return an array comprised of
         // a single key and the extension content as the value.
         $extensionResults = $this->eventDispatcher->dispatch(
-            new GatheringExtensions()
+            new GatheringExtensions
         );
 
         // Ensure we preserve the extension keys while flattening

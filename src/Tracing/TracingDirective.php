@@ -13,6 +13,8 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class TracingDirective extends BaseDirective implements FieldMiddleware
 {
+    const NAME = 'tracing';
+
     /**
      * @var \Nuwave\Lighthouse\Tracing\Tracing
      */
@@ -28,8 +30,6 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
     {
         $this->tracing = $tracing;
     }
-
-    const NAME = 'tracing';
 
     /**
      * Name of the directive.
@@ -58,19 +58,15 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
             $start = Carbon::now();
             $result = $resolver($root, $args, $context, $resolveInfo);
 
-            ($result instanceof Deferred)
-                ? $result->then(function () use ($resolveInfo, $start): void {
-                    $this->tracing->record(
-                        $resolveInfo,
-                        $start,
-                        Carbon::now()
-                    );
-                })
-                : $this->tracing->record(
-                    $resolveInfo,
-                    $start,
-                    Carbon::now()
-                );
+            $end = Carbon::now();
+
+            if (($result instanceof Deferred)) {
+                $result->then(function () use ($resolveInfo, $start, $end): void {
+                    $this->tracing->record($resolveInfo, $start, $end);
+                });
+            } else {
+                $this->tracing->record($resolveInfo, $start, $end);
+            }
 
             return $result;
         });

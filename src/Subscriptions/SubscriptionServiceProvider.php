@@ -44,8 +44,8 @@ class SubscriptionServiceProvider extends ServiceProvider
             [$router, $method] = Str::parseCallback($routesMethod, 'pusher');
 
             call_user_func(
-                [app($router), $method],
-                app('router')
+                [$this->app->make($router), $method],
+                $this->app->make('router')
             );
         }
     }

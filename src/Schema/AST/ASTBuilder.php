@@ -20,6 +20,12 @@ class ASTBuilder
      */
     private $directiveFactory;
 
+    /**
+     * ASTBuilder constructor.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @return void
+     */
     public function __construct(DirectiveFactory $directiveFactory)
     {
         $this->directiveFactory = $directiveFactory;

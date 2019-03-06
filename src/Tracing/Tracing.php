@@ -34,7 +34,7 @@ class Tracing
     public function handleManipulatingAST(ManipulatingAST $manipulatingAST): void
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
-            $manipulatingAST->ast,
+            $manipulatingAST->documentAST,
             PartialParser::directive('@tracing')
         );
     }

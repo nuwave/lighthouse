@@ -19,7 +19,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     const NAME = 'deferrable';
 
     /**
-     * @var Defer
+     * @var \Nuwave\Lighthouse\Defer\Defer
      */
     private $defer;
 

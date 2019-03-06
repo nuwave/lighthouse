@@ -101,13 +101,11 @@ class GraphQLRequest
      */
     public function advanceBatchIndex(): bool
     {
-        if ($this->hasMoreBatches()) {
+        if ($result = $this->hasMoreBatches()) {
             $this->batchIndex++;
-
-            return true;
-        } else {
-            return false;
         }
+
+        return $result;
     }
 
     /**

@@ -5,15 +5,13 @@ namespace Tests\Integration\Subscriptions;
 use Tests\TestCase;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
-use Illuminate\Http\Request;
-use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 
-class StorageManagerTest extends TestCase implements GraphQLContext
+class StorageManagerTest extends TestCase
 {
     /**
      * @var string
@@ -65,7 +63,7 @@ class StorageManagerTest extends TestCase implements GraphQLContext
                  */
                 public function unserialize(string $context)
                 {
-                    return new class() implements GraphQLContext {
+                    return new class implements GraphQLContext {
                         /**
                          * Get an instance of the authenticated user.
                          *
@@ -108,30 +106,6 @@ class StorageManagerTest extends TestCase implements GraphQLContext
         $subscriber->query = Parser::parse($queryString);
 
         return $subscriber;
-    }
-
-    /**
-     * @see \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::user()
-     *
-     * @return \Tests\Utils\Models\User
-     */
-    public function user(): User
-    {
-        return new User([
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john@doe.com',
-        ]);
-    }
-
-    /**
-     * @see \Nuwave\Lighthouse\Support\Contracts\GraphQLContext::request()
-     *
-     * @return \Illuminate\Http\Request
-     */
-    public function request(): Request
-    {
-        return new Request();
     }
 
     /**

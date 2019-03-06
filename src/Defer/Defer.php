@@ -79,12 +79,12 @@ class Defer implements GraphQLResponse
      */
     public function handleManipulatingAST(ManipulatingAST $manipulatingAST): void
     {
-        $manipulatingAST->ast = ASTHelper::attachDirectiveToObjectTypeFields(
-            $manipulatingAST->ast,
+        $manipulatingAST->documentAST = ASTHelper::attachDirectiveToObjectTypeFields(
+            $manipulatingAST->documentAST,
             PartialParser::directive('@deferrable')
         );
 
-        $manipulatingAST->ast->setDefinition(
+        $manipulatingAST->documentAST->setDefinition(
             PartialParser::directiveDefinition('directive @defer(if: Boolean) on FIELD')
         );
     }
