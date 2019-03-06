@@ -17,7 +17,7 @@ trait HandlesSubscribers
      */
     protected function subscriber(?string $queryString = null): Subscriber
     {
-        $subscriber = new Subscriber();
+        $subscriber = new Subscriber;
         $subscriber->args = ['foo' => 'bar'];
         $subscriber->context = $this;
         $subscriber->operationName = 'foo';
@@ -48,6 +48,6 @@ trait HandlesSubscribers
      */
     public function request(): Request
     {
-        return new Request();
+        return new Request;
     }
 }

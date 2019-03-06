@@ -15,7 +15,7 @@ trait RequestsStreamedResponses
 
     protected function setUpInMemoryStream($app)
     {
-        $this->stream = new MemoryStream();
+        $this->stream = new MemoryStream;
 
         $app->singleton(CanStreamResponse::class, function (): MemoryStream {
             return $this->stream;

@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Carbon\Carbon;
+use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -30,7 +32,7 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $value = $next($value);
 
@@ -38,14 +40,14 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
 
         return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver) {
             /** @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry */
-            $extensionRegistry = resolve(ExtensionRegistry::class);
+            $extensionRegistry = app(ExtensionRegistry::class);
             /** @var \Nuwave\Lighthouse\Schema\Extensions\TracingExtension $tracingExtension */
             $tracingExtension = $extensionRegistry->get(TracingExtension::name());
 
             $start = Carbon::now();
             $result = $resolver($root, $args, $context, $info);
 
-            ($result instanceof \GraphQL\Deferred)
+            ($result instanceof Deferred)
                 ? $result->then(function (&$items) use ($info, $start, $tracingExtension) {
                     $tracingExtension->record($info, $start, Carbon::now());
                 })

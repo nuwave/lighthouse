@@ -44,5 +44,6 @@ class NotFoundSubscription extends GraphQLSubscription
      */
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info)
     {
+        //
     }
 }

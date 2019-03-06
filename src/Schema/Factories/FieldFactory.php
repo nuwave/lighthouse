@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Closure;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
@@ -138,7 +139,7 @@ class FieldFactory
 
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
-        $fieldDefinition = [
+        return [
             'name' => $fieldDefinitionNode->name->value,
             'type' => $this->fieldValue->getReturnType(),
             'args' => $this->getInputValueDefinitions($argumentValues),
@@ -147,8 +148,6 @@ class FieldFactory
             'complexity' => $this->fieldValue->getComplexity(),
             'deprecationReason' => $this->fieldValue->getDeprecationReason(),
         ];
-
-        return $fieldDefinition;
     }
 
     /**
@@ -191,10 +190,10 @@ class FieldFactory
      * @param  \Illuminate\Support\Collection<ArgumentValue>  $argumentValues
      * @return \Closure
      */
-    public function decorateResolverWithArgs(\Closure $resolver, Collection $argumentValues): \Closure
+    public function decorateResolverWithArgs(Closure $resolver, Collection $argumentValues): Closure
     {
         return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
-            $this->currentValidationErrorBuffer = resolve(ErrorBuffer::class)->setErrorType('validation');
+            $this->currentValidationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
 
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
 
@@ -206,7 +205,7 @@ class FieldFactory
 
                     // because we are passing by reference, we need a variable to contain the null value.
                     if ($noValuePassedForThisArgument) {
-                        $argValue = new NoValue();
+                        $argValue = new NoValue;
                     } else {
                         $argValue = &$args[$argumentValue->getName()];
                     }
@@ -278,7 +277,7 @@ class FieldFactory
 
                         // because we are passing by reference, we need a variable to contain the null value.
                         if ($noValuePassedForThisArgument) {
-                            $value = new NoValue();
+                            $value = new NoValue;
                         } else {
                             $value = &$argValue[$field->name];
                         }
@@ -358,7 +357,7 @@ class FieldFactory
             return $argumentValue;
         }
 
-        $this->prepareDirectives($astNode, $argumentPath, $directives);
+        $this->prepareDirectives($argumentPath, $directives);
 
         foreach ($directives as $directive) {
             // Remove the directive from the list to avoid evaluating
@@ -392,15 +391,14 @@ class FieldFactory
     }
 
     /**
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
      *
      * @return void
      */
-    protected function prepareDirectives(InputValueDefinitionNode $astNode, array $argumentPath, Collection $directives): void
+    protected function prepareDirectives(array $argumentPath, Collection $directives): void
     {
-        $directives->each(function (Directive $directive) use ($astNode, $argumentPath): void {
+        $directives->each(function (Directive $directive) use ($argumentPath): void {
             if ($directive instanceof HasErrorBuffer) {
                 $directive->setErrorBuffer($this->currentValidationErrorBuffer);
             }

@@ -59,7 +59,7 @@ class MethodDirectiveTest extends TestCase
 
     public function resolve(): Foo
     {
-        return new Foo();
+        return new Foo;
     }
 }
 

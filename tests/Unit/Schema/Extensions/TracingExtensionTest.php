@@ -7,18 +7,18 @@ use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
 
 class TracingExtensionTest extends TestCase
 {
+    protected $schema = <<<SCHEMA
+type Query {
+    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TracingExtensionTest@resolve")
+}
+SCHEMA;
+
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('lighthouse.extensions', [TracingExtension::class]);
     }
-
-    protected $schema = <<<SCHEMA
-type Query {
-    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TracingExtensionTest@resolve")
-}
-SCHEMA;
 
     /**
      * @test

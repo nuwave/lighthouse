@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Closure;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
@@ -247,7 +248,7 @@ class NodeFactory
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode  $definition
      * @return \Closure
      */
-    protected function resolveFieldsFunction($definition): \Closure
+    protected function resolveFieldsFunction($definition): Closure
     {
         return function () use ($definition): array {
             return collect($definition->fields)
@@ -258,7 +259,7 @@ class NodeFactory
                     );
 
                     return [
-                        $fieldDefinition->name->value => resolve(FieldFactory::class)->handle($fieldValue),
+                        $fieldDefinition->name->value => app(FieldFactory::class)->handle($fieldValue),
                     ];
                 })
                 ->toArray();
@@ -284,11 +285,11 @@ class NodeFactory
      * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      * @return \Closure
      */
-    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): \Closure
+    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): Closure
     {
         return function () use ($definition) {
             return collect($definition->fields)
-                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($definition) {
+                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
                     $argumentValue = new ArgumentValue($inputValueDefinition);
 
                     return [
@@ -308,7 +309,7 @@ class NodeFactory
         $nodeName = $interfaceDefinition->name->value;
 
         if ($directive = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
-            $interfaceDirective = (new InterfaceDirective())->hydrate($interfaceDefinition);
+            $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
@@ -342,7 +343,7 @@ class NodeFactory
      *
      * @return \Closure
      */
-    public function typeResolverFallback(): \Closure
+    public function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
             return $this->typeRegistry->get(
@@ -360,7 +361,7 @@ class NodeFactory
         $nodeName = $unionDefinition->name->value;
 
         if ($directive = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
-            $unionDirective = (new UnionDirective())->hydrate($unionDefinition);
+            $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
