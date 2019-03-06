@@ -199,20 +199,28 @@ abstract class TestCase extends BaseTestCase
     {
         return $this->postJson(
             'graphql',
-            $data,
-            $headers
+            $data
         );
     }
 
-    protected function postGraphQLMultipart(array $data, array $headers = ['content-type' => 'multipart/form-data']): TestResponse
+    /**
+     * Send a multipart form request.
+     *
+     * This is used for file uploads conforming to the specification:
+     * https://github.com/jaydenseric/graphql-multipart-request-spec
+     *
+     * @param  mixed[]  $data
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    protected function postGraphQLMultipart(array $data): TestResponse
     {
+        // JSON encode and add parameters only if they are given.
+        // This allows tests with invalid payloads to be sent.
         $parameters = [];
-        // JSON encode operations
         if (isset($data['operations'])) {
             $parameters['operations'] = json_encode($data['operations']);
         }
 
-        // JSON encode map
         if (isset($data['map'])) {
             $parameters['map'] = json_encode($data['map']);
         }
@@ -228,15 +236,15 @@ abstract class TestCase extends BaseTestCase
             }
         }
 
-        $server = $this->transformHeadersToServerVars($headers);
-
         return $this->call(
             'post',
             'graphql',
             $parameters,
             [],
             $files,
-            $server
+            $this->transformHeadersToServerVars([
+                'content-type' => 'multipart/form-data'
+            ])
         );
     }
 
