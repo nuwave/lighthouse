@@ -234,15 +234,15 @@ class GraphQLTest extends DBTestCase
     {
         $this->postGraphQLMultipart(
             [
-                'operations' => /** @lang JSON */
+                'operations' => /* @lang JSON */
                     '
                     {
                         "query": "{ user { email } }",
                         "variables": {}
                     }
                 ',
-                'map' => /** @lang JSON */
-                    '{}'
+                'map' => /* @lang JSON */
+                    '{}',
             ],
             []
         )->assertJson([
@@ -261,7 +261,7 @@ class GraphQLTest extends DBTestCase
     {
         $this->postGraphQLMultipart(
             [
-                'operations' => /** @lang JSON */
+                'operations' => /* @lang JSON */
                     '
                     {
                         "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
@@ -270,12 +270,12 @@ class GraphQLTest extends DBTestCase
                         }
                     }
                 ',
-                'map' => /** @lang JSON */
+                'map' => /* @lang JSON */
                     '
                     {
                         "0": ["variables.file"]
                     }
-                '
+                ',
             ],
             [
                 '0' => UploadedFile::fake()->create('image.jpg', 500),
