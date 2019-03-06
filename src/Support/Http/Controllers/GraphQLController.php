@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
+use GraphQL\Error\Error;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
@@ -66,9 +68,9 @@ class GraphQLController extends Controller
     {
         // If the request is a 0-indexed array and the request isn't a multipart-request,
         // we know we are dealing with a batched query
-        $batched = isset($request->toArray()[0]) &&
-            $this->isMultipartRequest($request) == false &&
-            config('lighthouse.batched_queries', true);
+        $batched = isset($request->toArray()[0])
+            && $this->isMultipartRequest($request) === false
+            && config('lighthouse.batched_queries', true);
         $context = $this->createsContext->generate($request);
 
         $this->extensionRegistry->requestDidStart(
@@ -124,7 +126,7 @@ class GraphQLController extends Controller
         );
 
         return array_map(
-            function (ExecutionResult $result) {
+            function (ExecutionResult $result): array {
                 return $result->toArray(
                     $this->getDebugSetting()
                 );
@@ -164,8 +166,8 @@ class GraphQLController extends Controller
     /**
      * Maps uploaded files to the variables array.
      *
-     * @param Request $request
-     * @param array $variables
+     * @param  Request  $request
+     * @param  array  $variables
      * @return array
      */
     protected function mapUploadedFiles(Request $request, array $variables): array
@@ -198,13 +200,14 @@ class GraphQLController extends Controller
     /**
      * Is the request a multipart-request?
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return bool
      */
     protected function isMultipartRequest(Request $request): bool
     {
-        $contentType = $request->header('content-type') ?? '';
-
-        return mb_stripos($contentType, 'multipart/form-data') !== false;
+        return Str::startsWith(
+            $request->header('Content-Type'),
+            'multipart/form-data'
+        );
     }
 }
