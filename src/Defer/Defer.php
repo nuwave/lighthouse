@@ -115,7 +115,6 @@ class Defer implements GraphQLResponse
         }
 
         $this->deferred[$path] = $resolver;
-        return null;
     }
 
     /**
