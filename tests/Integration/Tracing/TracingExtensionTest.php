@@ -1,17 +1,25 @@
 <?php
 
-namespace Tests\Unit\Schema\Extensions;
+namespace Tests\Integration\Tracing;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\Extensions\TracingExtension;
+use Nuwave\Lighthouse\Tracing\TracingServiceProvider;
 
 class TracingExtensionTest extends TestCase
 {
     protected $schema = <<<SCHEMA
 type Query {
-    foo: String! @field(resolver: "Tests\\\Unit\\\Schema\\\Extensions\\\TracingExtensionTest@resolve")
+    foo: String! @field(resolver: "Tests\\\Integration\\\Tracing\\\TracingExtensionTest@resolve")
 }
 SCHEMA;
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [TracingServiceProvider::class]
+        );
+    }
 
     protected function getEnvironmentSetUp($app)
     {
@@ -67,15 +75,7 @@ SCHEMA;
         ])->assertJsonCount(2)
             ->assertJsonStructure([
                 $expectedResponse,
-                [
-                    'extensions' => [
-                        'tracing' => [
-                            'execution' => [
-                                'resolvers',
-                            ],
-                        ],
-                    ],
-                ],
+                $expectedResponse,
             ]);
 
         $this->assertSame(
@@ -95,6 +95,7 @@ SCHEMA;
     public function resolve(): string
     {
         usleep(20000); // 20 milliseconds
+
         return 'bar';
     }
 }

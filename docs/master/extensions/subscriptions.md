@@ -49,6 +49,7 @@ namespace App\GraphQL\Subscriptions;
 
 use App\User;
 use App\Post;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -101,7 +102,7 @@ class PostUpdated extends GraphQLSubscription
         // `author` argument.
         $args = $subscriber->args;
 
-        return snake_case($fieldName).':'.$args['author'];
+        return Str::snake($fieldName).':'.$args['author'];
     }
 
     /**
@@ -116,7 +117,7 @@ class PostUpdated extends GraphQLSubscription
         // Decode the topic name if the `encodeTopic` has been overwritten.
         $author_id = $root->author_id;
 
-        return snake_case($fieldName).':'.$author_id;
+        return Str::snake($fieldName).':'.$author_id;
     }
 
     /**
@@ -125,10 +126,10 @@ class PostUpdated extends GraphQLSubscription
      * @param  \App\Post  $root
      * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info): Post
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
     {
         // Optionally manipulate the `$root` item before it gets broadcasted to
         // subscribed client(s).
@@ -420,6 +421,6 @@ const network = Network.create(fetchQuery, subscriptionHandler);
 
 export const environment = new Environment({
     network,
-    store: new Store(new RecordSource())
+    store: new Store(new RecordSource)
 });
 ```

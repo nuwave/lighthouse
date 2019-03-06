@@ -159,21 +159,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Extensions
-    |--------------------------------------------------------------------------
-    |
-    | Register extension classes that extend \Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension
-    |
-    */
-
-    'extensions' => [
-        // \Nuwave\Lighthouse\Schema\Extensions\DeferExtension::class,
-        // \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
-        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | GraphQL Controller
     |--------------------------------------------------------------------------
     |
@@ -257,6 +242,7 @@ return [
             'pusher' => [
                 'driver' => 'pusher',
                 'routes' => \Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class.'@pusher',
+                'connection' => 'pusher',
             ],
         ],
     ],

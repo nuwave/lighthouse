@@ -10,6 +10,7 @@ use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class SubscriptionTest extends TestCase
@@ -22,22 +23,24 @@ class SubscriptionTest extends TestCase
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry
      */
-    protected $registry;
+    protected $subscriptionRegistry;
 
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $broadcaster;
 
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->registry = app(SubscriptionRegistry::class);
-        $this->registry->register($this->subscription(), self::SUBSCRIPTION_FIELD);
-
-        $this->broadcaster = $this->prophesize(SubscriptionBroadcaster::class);
-        $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());
 
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
@@ -45,6 +48,12 @@ class SubscriptionTest extends TestCase
             subscription: String @field(resolver: \"{$resolver}\")
         }
         ";
+
+        $this->subscriptionRegistry = app(SubscriptionRegistry::class);
+        $this->subscriptionRegistry->register($this->subscription(), self::SUBSCRIPTION_FIELD);
+
+        $this->broadcaster = $this->prophesize(SubscriptionBroadcaster::class);
+        $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());
     }
 
     /**

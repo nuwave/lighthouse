@@ -120,7 +120,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      */
     public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
     {
-        if (! $objectType instanceof ObjectTypeDefinitionNode
+        if (
+            ! $objectType instanceof ObjectTypeDefinitionNode
             && ! $objectType instanceof ObjectTypeExtensionNode
         ) {
             throw new DirectiveException(

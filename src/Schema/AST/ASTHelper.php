@@ -248,13 +248,15 @@ class ASTHelper
                         return $document;
                     }
 
-                    $objectType->fields = new NodeList(collect($objectType->fields)
-                        ->map(function (FieldDefinitionNode $field) use ($directive): FieldDefinitionNode {
-                            $field->directives = $field->directives->merge([$directive]);
+                    $objectType->fields = new NodeList(
+                        collect($objectType->fields)
+                            ->map(function (FieldDefinitionNode $field) use ($directive): FieldDefinitionNode {
+                                $field->directives = $field->directives->merge([$directive]);
 
-                            return $field;
-                        })
-                        ->all());
+                                return $field;
+                            })
+                            ->all()
+                    );
 
                     $document->setDefinition($objectType);
 

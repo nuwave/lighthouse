@@ -13,12 +13,16 @@ use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use Nuwave\Lighthouse\Events\GatheringExtensions;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 
 class GraphQL
 {
@@ -35,13 +39,6 @@ class GraphQL
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
-
-    /**
-     * Th extension registry.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
-     */
-    protected $extensionRegistry;
 
     /**
      * The schema builder.
@@ -65,72 +62,79 @@ class GraphQL
     protected $pipeline;
 
     /**
-     * The current batch index.
+     * The event dispatcher.
      *
-     * @var int|null
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected $currentBatchIndex = null;
+    protected $eventDispatcher;
+
+    /**
+     * The AST builder.
+     *
+     * @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder
+     */
+    protected $astBuilder;
 
     /**
      * GraphQL constructor.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensionRegistry
      * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
      * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
+     * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
      * @return void
      */
     public function __construct(
-        ExtensionRegistry $extensionRegistry,
         SchemaBuilder $schemaBuilder,
         SchemaSourceProvider $schemaSourceProvider,
-        Pipeline $pipeline
+        Pipeline $pipeline,
+        EventDispatcher $eventDispatcher,
+        ASTBuilder $astBuilder
     ) {
-        $this->extensionRegistry = $extensionRegistry;
         $this->schemaBuilder = $schemaBuilder;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->pipeline = $pipeline;
-    }
-
-    /**
-     * Returns the index of the current batch if we are resolving
-     * a batched query or `null` if we are resolving a single query.
-     *
-     * @return int|null
-     */
-    public function currentBatchIndex(): ?int
-    {
-        return $this->currentBatchIndex;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->astBuilder = $astBuilder;
     }
 
     /**
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
-     * @param  array  $requests
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  mixed|null  $rootValue
-     * @return \GraphQL\Executor\ExecutionResult[]
+     * @param \Nuwave\Lighthouse\Execution\GraphQLRequest $request
+     * @return mixed[]
      */
-    public function executeBatchedQueries(array $requests, GraphQLContext $context, $rootValue = null): array
+    public function executeRequest(GraphQLRequest $request): array
     {
-        return collect($requests)
-            ->map(function (array $request, int $index) use ($context, $rootValue) {
-                $this->currentBatchIndex = $index;
-                $this->extensionRegistry->batchedQueryDidStart($index);
+        $result = $this->executeQuery(
+            $request->query(),
+            $request->context(),
+            $request->variables(),
+            null,
+            $request->operationName()
+        );
 
-                $result = $this->executeQuery(
-                    Arr::get($request, 'query', ''),
-                    $context,
-                    Arr::get($request, 'variables', []),
-                    $rootValue
-                );
+        return $this->applyDebugSettings($result);
+    }
 
-                $this->extensionRegistry->batchedQueryDidEnd($result, $index);
-
-                return $result;
-            })
-            ->all();
+    /**
+     * Apply the debug settings from the config and get the result as an array.
+     *
+     * @param \GraphQL\Executor\ExecutionResult $result
+     * @return mixed[]
+     */
+    public function applyDebugSettings(ExecutionResult $result): array
+    {
+        // If debugging is set to false globally, do not add GraphQL specific
+        // debugging info either. If it is true, then we fetch the debug
+        // level from the Lighthouse configuration.
+        return $result->toArray(
+            config('app.debug')
+                ? config('lighthouse.debug')
+                : false
+        );
     }
 
     /**
@@ -139,7 +143,7 @@ class GraphQL
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in \GraphQL\Error\Debug
      *
-     * @param  string  $query
+     * @param  string|\GraphQL\Language\AST\DocumentNode  $query
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  mixed[]  $variables
      * @param  mixed|null  $rootValue
@@ -147,13 +151,15 @@ class GraphQL
      * @return \GraphQL\Executor\ExecutionResult
      */
     public function executeQuery(
-        string $query,
+        $query,
         GraphQLContext $context,
         ?array $variables = [],
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
-        $operationName = $operationName ?: app('request')->input('operationName');
+        $this->eventDispatcher->dispatch(
+            new StartExecution
+        );
 
         $result = GraphQLBase::executeQuery(
             $this->prepSchema(),
@@ -166,7 +172,19 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
-        $result->extensions = $this->extensionRegistry->jsonSerialize();
+        // Listeners of this event should return an array comprised of
+        // a single key and the extension content as the value.
+        $extensionResults = $this->eventDispatcher->dispatch(
+            new GatheringExtensions
+        );
+
+        // Ensure we preserve the extension keys while flattening
+        foreach ($extensionResults as $singleExtensionResult) {
+            $result->extensions = array_merge(
+                $result->extensions,
+                $singleExtensionResult
+            );
+        }
 
         $result->setErrorsHandler(
             function (array $errors, callable $formatter): array {
@@ -262,10 +280,24 @@ class GraphQL
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = collect(
-            event(new BuildingAST($schemaString))
-        )->implode(PHP_EOL);
+        $additionalSchemas = $this->eventDispatcher->dispatch(
+            new BuildingAST($schemaString)
+        );
 
-        return ASTBuilder::generate($schemaString.PHP_EOL.$additionalSchemas);
+        $documentAST = $this->astBuilder->build(
+            implode(
+                PHP_EOL,
+                Arr::prepend($additionalSchemas, $schemaString)
+            )
+        );
+
+        // Listeners may manipulate the DocumentAST that is passed by reference
+        // into the ManipulatingAST event. This can be useful for extensions
+        // that want to programmatically change the schema.
+        $this->eventDispatcher->dispatch(
+            new ManipulatingAST($documentAST)
+        );
+
+        return $documentAST;
     }
 }

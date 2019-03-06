@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
+use Illuminate\Contracts\Events\Dispatcher;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -52,16 +53,18 @@ class DirectiveFactory
 
     /**
      * DirectiveFactory constructor.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function __construct()
+    public function __construct(Dispatcher $dispatcher)
     {
         $this->directiveBaseNamespaces = collect([
             // User defined directives (top priority)
             config('lighthouse.namespaces.directives'),
 
             // Plugin developers defined directives
-            event(new RegisteringDirectiveBaseNamespaces),
+            $dispatcher->dispatch(new RegisteringDirectiveBaseNamespaces),
 
             // Lighthouse defined directives
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',
@@ -259,7 +262,7 @@ class DirectiveFactory
      * Get the node resolver directive for the given type definition.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $node
-     * @return \GraphQL\Language\AST\NodeResolver|null
+     * @return \Nuwave\Lighthouse\Support\Contracts\NodeResolver|null
      */
     public function createNodeResolver(TypeDefinitionNode $node): ?NodeResolver
     {

@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 use Exception;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
@@ -51,9 +52,10 @@ abstract class BatchLoader
 
         // If we are resolving a batched query, we need to assign each
         // query a uniquely indexed instance
-        $currentBatchIndex = app(GraphQL::class)->currentBatchIndex();
-
-        if ($currentBatchIndex !== null) {
+        /** @var \Nuwave\Lighthouse\Execution\GraphQLRequest $graphQLRequest */
+        $graphQLRequest = app(GraphQLRequest::class);
+        if ($graphQLRequest->isBatched()) {
+            $currentBatchIndex = $graphQLRequest->batchIndex();
             $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
         }
 
