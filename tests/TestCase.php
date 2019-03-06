@@ -3,7 +3,6 @@
 namespace Tests;
 
 use Exception;
-use GuzzleHttp\Client;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Tests\Utils\Middleware\CountRuns;
@@ -205,46 +204,23 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function postGraphQLMultipart(array $data, array $headers = ['content-type' => 'multipart/form-data'])
+    protected function postGraphQLMultipart(array $data, array $headers = ['content-type' => 'multipart/form-data']): TestResponse
     {
-        $client = new Client();
-        $payload = [];
-
-        // JSON encode operations. Only add it to payload if defined. Some tests require an invalid payload
+        // JSON encode operations
         if (isset($data['operations'])) {
-            $payload[] = [
-                'name'      => 'operations',
-                'contents'  => json_encode($data['operations'])
-            ];
+            $data['operations'] = json_encode($data['operations']);
         }
 
-        // JSON encode map. Only add it to payload if defined. Some tests require an invalid payload
+        // JSON encode map
         if (isset($data['map'])) {
-            $payload[] = [
-                'name'      => 'map',
-                'contents'  => json_encode($data['map'])
-            ];
+            $data['map'] = json_encode($data['map']);
         }
 
-        // If array is zero-index, there are files attached to the query
-        if(isset($data[0])) {
-            // Loop through all files, and add them to the payload
-            for( $i = 0; isset($data[$i]); $i++ ) {
-                $payload[] = [
-                    'name'      => $i,
-                    'contents'  => $data[$i]->get(),
-                    'filename'  => $data[$i]->name,
-                    'Mime-Type' => $data[$i]->getMimeType(),
-                ];
-            }
-        }
-
-        // TODO Find a way to post the payload directly to the HttpKernel
-        $res = $client->post( 'https://posthere.io/f089-428d-8d33', [
-            'multipart' => $payload,
-        ]);
-
-        dd($res);
+        return $this->post(
+            'graphql',
+            $data,
+            $headers
+        );
     }
 
     /**
