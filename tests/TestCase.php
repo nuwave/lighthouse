@@ -229,7 +229,7 @@ abstract class TestCase extends BaseTestCase
         }
 
         $server = $this->transformHeadersToServerVars($headers);
-        
+
         return $this->call(
             'post',
             'graphql',
