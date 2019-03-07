@@ -48,9 +48,9 @@ class QueryFilter
             .'.'.strtolower($value->getFieldName());
 
         // Get an existing instance or register a new one
-        return app()->has($handler)
-            ? resolve($handler)
-            : app()->instance($handler, resolve(static::class));
+        return app()->bound($handler)
+            ? app($handler)
+            : app()->instance($handler, app(static::class));
     }
 
     /**
@@ -58,7 +58,7 @@ class QueryFilter
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $query
      * @param  array  $args
-     * @param  string[]                $scopes
+     * @param  string[]  $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
@@ -131,6 +131,8 @@ class QueryFilter
     }
 
     /**
+     * Add the argument filter.
+     *
      * @param  string  $argumentName
      * @param  string  $columnName
      * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective

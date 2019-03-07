@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Closure;
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Exceptions\RendersErrorsExtensions;
 
@@ -16,7 +17,7 @@ class ExtensionErrorHandler implements ErrorHandler
      * @param  \Closure  $next
      * @return array
      */
-    public static function handle(Error $error, \Closure $next): array
+    public static function handle(Error $error, Closure $next): array
     {
         $underlyingException = $error->getPrevious();
 

@@ -141,7 +141,7 @@ class GraphQL
      *
      * @param  string  $query
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  mixed[] $variables
+     * @param  mixed[]  $variables
      * @param  mixed|null  $rootValue
      * @param  string|null  $operationName
      * @return \GraphQL\Executor\ExecutionResult
@@ -174,7 +174,7 @@ class GraphQL
                 // Do not report: Validation, Errors that are meant for the final user
                 // Malformed Queries: Log if you are dogfooding your app
 
-                /**
+                /*
                  * Handlers are defined as classes in the config.
                  * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
                  * This allows the user to register multiple handlers and pipe the errors through.

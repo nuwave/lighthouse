@@ -9,10 +9,12 @@
         "laravel-graphql"
     ],
     "license": "MIT",
-    "authors": [{
-        "name": "Christopher Moore",
-        "email": "chris@nuwavecommerce.com"
-    }],
+    "authors": [
+        {
+            "name": "Christopher Moore",
+            "email": "chris@nuwavecommerce.com"
+        }
+    ],
     "support": {
         "issues": "https://github.com/nuwave/lighthouse/issues",
         "source": "https://github.com/nuwave/lighthouse"
@@ -20,20 +22,20 @@
     "require": {
         "php": ">= 7.1",
         "ext-json": "*",
-        "illuminate/contracts": "5.5.*|5.6.*|5.7.*",
-        "illuminate/http": "5.5.*|5.6.*|5.7.*",
-        "illuminate/pagination": "5.5.*|5.6.*|5.7.*",
-        "illuminate/routing": "5.5.*|5.6.*|5.7.*",
-        "illuminate/support": "5.5.*|5.6.*|5.7.*",
-        "illuminate/validation": "5.5.*|5.6.*|5.7.*",
+        "illuminate/contracts": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/http": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/pagination": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/routing": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/validation": "5.5.*|5.6.*|5.7.*|5.8.*",
         "opis/closure": "^3.0",
         "webonyx/graphql-php": "^0.13"
     },
     "require-dev": {
         "laravel/scout": "^4.0",
-        "mockery/mockery": "dev-master",
-        "orchestra/database": "3.5.*|3.6.*|3.7.*@dev",
-        "orchestra/testbench": "3.5.*|3.6.*|3.7.*",
+        "mockery/mockery": "^1.0",
+        "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.x-dev",
+        "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {

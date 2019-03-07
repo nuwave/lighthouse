@@ -51,7 +51,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * @param  string  $relationName
      * @param  array  $args
-     * @param  string[]    $scopes
+     * @param  string[]  $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @param  string|null  $paginationType
      * @return void

@@ -115,7 +115,7 @@ class BaseDirectiveTest extends TestCase
      */
     protected function constructTestDirective($definitionNode): BaseDirective
     {
-        $directive = new class() extends BaseDirective {
+        $directive = new class extends BaseDirective {
             /**
              * Name of the directive.
              *
@@ -130,7 +130,7 @@ class BaseDirectiveTest extends TestCase
              * Allow to call protected methods from the test.
              *
              * @param  string  $method
-             * @param  mixed[] $args
+             * @param  mixed[]  $args
              * @return mixed
              */
             public function __call(string $method, $args)

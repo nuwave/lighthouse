@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Type;
@@ -14,16 +15,6 @@ class NodeRegistry
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
     protected $typeRegistry;
-
-    /**
-     * NodeRegistry constructor.
-     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
-     * @return void
-     */
-    public function __construct(TypeRegistry $typeRegistry)
-    {
-        $this->typeRegistry = $typeRegistry;
-    }
 
     /**
      * A map from type names to resolver functions.
@@ -44,6 +35,17 @@ class NodeRegistry
     protected $currentType;
 
     /**
+     * NodeRegistry constructor.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
+     */
+    public function __construct(TypeRegistry $typeRegistry)
+    {
+        $this->typeRegistry = $typeRegistry;
+    }
+
+    /**
      * @param  string  $typeName
      *
      * The name of the ObjectType that can be resolved with the Node interface
@@ -60,7 +62,7 @@ class NodeRegistry
      *
      * @return $this
      */
-    public function registerNode(string $typeName, \Closure $resolve): self
+    public function registerNode(string $typeName, Closure $resolve): self
     {
         $this->nodeResolver[$typeName] = $resolve;
 
@@ -86,7 +88,7 @@ class NodeRegistry
     /**
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
-     * @param  $rootValue
+     * @param  mixed|null  $rootValue
      * @param  array  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo

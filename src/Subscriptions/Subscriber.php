@@ -61,7 +61,7 @@ class Subscriber
             throw new SubscriptionException('An operation name must be present on a subscription request.');
         }
 
-        $instance = new static();
+        $instance = new static;
 
         $instance->channel = $instance->uniqueChannelName();
         $instance->context = $context;
@@ -82,7 +82,7 @@ class Subscriber
     public static function unserialize(string $subscription): self
     {
         $data = json_decode($subscription, true);
-        $instance = new static();
+        $instance = new static;
         $instance->channel = Arr::get($data, 'channel');
         $instance->context = $instance->serializer()->unserialize(
             Arr::get($data, 'context')
@@ -130,7 +130,7 @@ class Subscriber
      */
     public static function uniqueChannelName(): string
     {
-        return 'private-'.Str::random(32).'-'.time();
+        return 'private-lighthouse-'.Str::random(32).'-'.time();
     }
 
     /**

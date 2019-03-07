@@ -19,11 +19,11 @@ class SyncIteratorTest extends TestCase
      */
     protected $iterator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->iterator = new SyncIterator();
+        $this->iterator = new SyncIterator;
     }
 
     /**
@@ -53,7 +53,7 @@ class SyncIteratorTest extends TestCase
 
         $this->iterator->process(
             $this->items(),
-            function ($item) use (&$items): void {
+            function (): void {
                 throw new Exception(self::EXCEPTION_MESSAGE);
             },
             function (Exception $e) use (&$exception): void {

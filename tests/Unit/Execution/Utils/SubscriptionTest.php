@@ -29,7 +29,7 @@ class SubscriptionTest extends TestCase
      */
     protected $broadcaster;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -85,7 +85,7 @@ class SubscriptionTest extends TestCase
 
     protected function subscription(): GraphQLSubscription
     {
-        return new class() extends GraphQLSubscription {
+        return new class extends GraphQLSubscription {
             public function authorize(Subscriber $subscriber, Request $request): bool
             {
                 return true;

@@ -45,7 +45,7 @@ class GraphQLTest extends DBTestCase
      */
     protected $tasks;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -200,5 +200,18 @@ class GraphQLTest extends DBTestCase
             'nonExistingField',
             $result->jsonGet('errors.0.message')
         );
+    }
+
+    /**
+     * @test
+     */
+    public function itIgnoresInvalidJSONVariables(): void
+    {
+        $result = $this->postGraphQL([
+            'query' => '{}',
+            'variables' => '{}',
+        ]);
+
+        $result->assertStatus(200);
     }
 }

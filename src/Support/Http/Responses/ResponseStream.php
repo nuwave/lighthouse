@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Http\Responses;
 
+use Closure;
+use Exception;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
@@ -33,7 +35,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                     $chunk['path'] = collect(explode('.', $path))
                         ->map(function ($partial) {
                             return is_numeric($partial)
-                                ? intval($partial)
+                                ? (int) $partial
                                 : $partial;
                         })
                         ->toArray();
@@ -108,8 +110,8 @@ class ResponseStream extends Stream implements CanStreamResponse
     {
         echo $chunk;
 
-        $this->flush(\Closure::fromCallable('ob_flush'));
-        $this->flush(\Closure::fromCallable('flush'));
+        $this->flush(Closure::fromCallable('ob_flush'));
+        $this->flush(Closure::fromCallable('flush'));
     }
 
     /**
@@ -121,11 +123,11 @@ class ResponseStream extends Stream implements CanStreamResponse
      * @param  \Closure  $flush
      * @return void
      */
-    protected function flush(\Closure $flush): void
+    protected function flush(Closure $flush): void
     {
         try {
             $flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // buffer error, do nothing...
         }
     }

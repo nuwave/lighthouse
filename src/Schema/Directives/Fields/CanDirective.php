@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -31,7 +32,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $resolver = $value->getResolver();
 
@@ -100,7 +101,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
         if (! $can) {
             throw new AuthorizationException(
-                "You are not not authorized to access {$this->definitionNode->name->value}"
+                "You are not authorized to access {$this->definitionNode->name->value}"
             );
         }
     }
