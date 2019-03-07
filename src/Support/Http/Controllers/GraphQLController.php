@@ -1,5 +1,7 @@
 <?php
+
 namespace Nuwave\Lighthouse\Support\Http\Controllers;
+
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Events\StartRequest;
@@ -65,6 +67,7 @@ class GraphQLController extends Controller
         $result = $request->isBatched()
             ? $this->executeBatched($request)
             : $this->graphQL->executeRequest($request);
+
         return $this->createsResponse->create($result);
     }
 
@@ -80,6 +83,7 @@ class GraphQLController extends Controller
         do {
             $results[] = $this->graphQL->executeRequest($request);
         } while ($request->advanceBatchIndex());
+
         return $results;
     }
 }
