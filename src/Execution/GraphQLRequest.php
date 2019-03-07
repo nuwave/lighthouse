@@ -188,6 +188,7 @@ class GraphQLRequest
                 }
             }
         }
+
         return $variables;
     }
 

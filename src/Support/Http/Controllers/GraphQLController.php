@@ -7,24 +7,29 @@ use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
+
 class GraphQLController extends Controller
 {
     /**
      * @var \Nuwave\Lighthouse\GraphQL
      */
     protected $graphQL;
+
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
     protected $createsContext;
+
     /**
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventsDispatcher;
+
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse
      */
     private $createsResponse;
+
     /**
      * Inject middleware into request.
      *
@@ -45,6 +50,7 @@ class GraphQLController extends Controller
         $this->eventsDispatcher = $eventsDispatcher;
         $this->createsResponse = $createsResponse;
     }
+
     /**
      * Execute GraphQL query.
      *
@@ -61,6 +67,7 @@ class GraphQLController extends Controller
             : $this->graphQL->executeRequest($request);
         return $this->createsResponse->create($result);
     }
+
     /**
      * Loop through the individual batched queries and collect the results.
      *
