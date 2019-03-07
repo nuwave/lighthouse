@@ -88,10 +88,9 @@ class LighthouseServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      *
-     * @param  \Illuminate\Config\Repository  $configRepository
      * @return void
      */
-    public function register(ConfigRepository $configRepository): void
+    public function register(): void
     {
         $this->app->singleton(GraphQL::class);
         $this->app->alias(GraphQL::class, 'graphql');
@@ -110,9 +109,9 @@ class LighthouseServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SchemaSourceProvider::class, function () use ($configRepository): SchemaStitcher {
+        $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
             return new SchemaStitcher(
-                $configRepository->get('lighthouse.schema.register', '')
+                config('lighthouse.schema.register', '')
             );
         });
 
