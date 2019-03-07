@@ -232,6 +232,7 @@ class MutationExecutor
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
+
                 if ($operationKey === 'update') {
                     collect($values)->each(function ($singleValues) use ($relation): void {
                         self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
@@ -288,6 +289,14 @@ class MutationExecutor
                 if ($operationKey === 'connect') {
                     $relation->attach($values);
                 }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
+                }
+
+                if ($operationKey === 'disconnect') {
+                    $relation->detach($values);
+                }
             });
         });
 
@@ -299,6 +308,7 @@ class MutationExecutor
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(collect($values), $relation);
                 }
+
                 if ($operationKey === 'update') {
                     collect($values)->each(function ($singleValues) use ($relation): void {
                         self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
@@ -308,6 +318,18 @@ class MutationExecutor
                 if ($operationKey === 'delete') {
                     $relation->detach($values);
                     $relation->getModel()::destroy($values);
+                }
+
+                if ($operationKey === 'connect') {
+                    $relation->attach($values);
+                }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
+                }
+
+                if ($operationKey === 'disconnect') {
+                    $relation->detach($values);
                 }
             });
         });
