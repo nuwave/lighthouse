@@ -281,6 +281,7 @@ class MutationExecutor
                 }
 
                 if ($operationKey === 'delete') {
+                    $relation->detach($values);
                     $relation->getModel()::destroy($values);
                 }
 
@@ -305,6 +306,7 @@ class MutationExecutor
                 }
 
                 if ($operationKey === 'delete') {
+                    $relation->detach($values);
                     $relation->getModel()::destroy($values);
                 }
             });
