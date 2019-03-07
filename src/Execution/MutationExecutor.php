@@ -28,7 +28,7 @@ class MutationExecutor
      *         If we are in a nested create, we can use this to associate the new model to its parent
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public static function executeCreate(Model $model, Collection $args, Relation $parentRelation = null): Model
+    public static function executeCreate(Model $model, Collection $args, ?Relation $parentRelation = null): Model
     {
         $reflection = new ReflectionClass($model);
 
@@ -69,7 +69,7 @@ class MutationExecutor
      * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected static function saveModelWithBelongsTo(Model $model, Collection $args, Relation $parentRelation = null): Model
+    protected static function saveModelWithBelongsTo(Model $model, Collection $args, ?Relation $parentRelation = null): Model
     {
         $reflection = new ReflectionClass($model);
         [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $args, BelongsTo::class);
@@ -147,17 +147,17 @@ class MutationExecutor
     }
 
     /**
-     * Execute an update.
+     * Execute an update mutation.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      *         An empty instance of the model that should be updated
      * @param  \Illuminate\Support\Collection  $args
      *         The corresponding slice of the input arguments for updating this model
-     * @param  \Illuminate\Database\Eloquent\Relations\HasMany|null  $parentRelation
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
      *         If we are in a nested update, we can use this to associate the new model to its parent
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public static function executeUpdate(Model $model, Collection $args, ?HasMany $parentRelation = null): Model
+    public static function executeUpdate(Model $model, Collection $args, ?Relation $parentRelation = null): Model
     {
         $id = $args->pull('id')
             ?? $args->pull(
@@ -291,7 +291,7 @@ class MutationExecutor
         });
 
         $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
             $relation = $model->{$relationName}();
 
             collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
@@ -370,7 +370,7 @@ class MutationExecutor
      * @param  \Illuminate\Support\Collection  $hasMany
      * @return void
      */
-    protected static function executeCreateHasMany(Model $model, $hasMany): void
+    protected static function executeCreateHasMany(Model $model, Collection $hasMany): void
     {
         $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
@@ -391,7 +391,7 @@ class MutationExecutor
      * @param  \Illuminate\Support\Collection  $hasOne
      * @return void
      */
-    protected static function executeCreateHasOne(Model $model, $hasOne): void
+    protected static function executeCreateHasOne(Model $model, Collection $hasOne): void
     {
         $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
@@ -412,7 +412,7 @@ class MutationExecutor
      * @param  \Illuminate\Support\Collection  $morphMany
      * @return void
      */
-    protected static function executeCreateMorphMany(Model $model, $morphMany): void
+    protected static function executeCreateMorphMany(Model $model, Collection $morphMany): void
     {
         $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
@@ -433,7 +433,7 @@ class MutationExecutor
      * @param  \Illuminate\Support\Collection  $morphOne
      * @return void
      */
-    protected static function executeCreateMorphOne(Model $model, $morphOne): void
+    protected static function executeCreateMorphOne(Model $model, Collection $morphOne): void
     {
         $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
@@ -454,7 +454,7 @@ class MutationExecutor
      * @param  \Illuminate\Support\Collection  $belongsToMany
      * @return void
      */
-    protected static function executeCreateBelongsToMany(Model $model, $belongsToMany): void
+    protected static function executeCreateBelongsToMany(Model $model, Collection $belongsToMany): void
     {
         $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
@@ -479,7 +479,7 @@ class MutationExecutor
      * @param  \Illuminate\Support\Collection  $morphToMany
      * @return void
      */
-    protected static function executeCreateMorphToMany(Model $model, $morphToMany): void
+    protected static function executeCreateMorphToMany(Model $model, Collection $morphToMany): void
     {
         $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
