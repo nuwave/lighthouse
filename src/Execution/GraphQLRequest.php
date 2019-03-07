@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use GraphQL\Error\InvariantViolation;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use GraphQL\Error\InvariantViolation;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
