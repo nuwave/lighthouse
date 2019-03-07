@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use GraphQL\Error\InvariantViolation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -30,7 +32,7 @@ class GraphQLRequest
         $this->request = $request;
         // If the request has neither a query, nor an operationName
         // we might be dealing with a batched query
-        if (! $request->hasAny(['query', 'operationName'])) {
+        if (! $request->hasAny(['query', 'operationName']) && ! $this->isMultipartRequest()) {
             $this->batchIndex = 0;
         }
     }
@@ -52,7 +54,11 @@ class GraphQLRequest
      */
     public function variables(): array
     {
-        $variables = $this->getInputByKey('variables');
+        $variables = (array) $this->getInputByKey('variables');
+
+        if ($this->isMultipartRequest()) {
+            $variables = $this->mapUploadedFiles($variables);
+        }
 
         if (is_string($variables)) {
             return json_decode($variables, true) ?? [];
@@ -140,7 +146,61 @@ class GraphQLRequest
      */
     protected function getInputByKey(string $key)
     {
+        if ($this->isMultipartRequest()) {
+            $operations = json_decode($this->request->input('operations'));
+
+            return isset($operations->{$key}) ? $operations->{$key} : null;
+        }
+
         return $this->request->input($key)
             ?? $this->request->input("{$this->batchIndex}.{$key}");
+    }
+
+    /**
+     * Maps uploaded files to the variables array.
+     *
+     * @param  array  $variables
+     * @return array
+     */
+    protected function mapUploadedFiles(array $variables): array
+    {
+        if ($this->isMultipartRequest($this->request)) {
+            $map = json_decode($this->request->input('map'), true);
+
+            if (! isset($map)) {
+                throw new InvariantViolation(
+                    'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
+                );
+            }
+
+            foreach ($map as $fileKey => $locations) {
+                foreach ($locations as $location) {
+                    $items = &$variables;
+                    $location = preg_replace('/variables./', '', $location, 1);
+                    $location = explode('.', $location);
+                    foreach ($location as $key) {
+                        if (! isset($items[$key]) || ! is_array($items[$key])) {
+                            $items[$key] = [];
+                        }
+                        $items = &$items[$key];
+                    }
+                    $items = $this->request->file($fileKey);
+                }
+            }
+        }
+        return $variables;
+    }
+
+    /**
+     * Is the request a multipart-request?
+     *
+     * @return bool
+     */
+    protected function isMultipartRequest(): bool
+    {
+        return Str::startsWith(
+            $this->request->header('Content-Type'),
+            'multipart/form-data'
+        );
     }
 }
