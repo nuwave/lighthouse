@@ -40,6 +40,7 @@ module.exports = [{
         children: [
             'api-reference/directives',
             'api-reference/resolvers',
+            'api-reference/events',
         ]
     }
 ]

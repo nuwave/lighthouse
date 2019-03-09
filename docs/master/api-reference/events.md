@@ -1,0 +1,197 @@
+# Events
+
+This reference lists the events that Lighthouse dispatches during a request in order
+of execution.
+
+All events reside in the namespace `\Nuwave\Lighthouse\Events`.
+
+## StartRequest
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+use Carbon\Carbon;
+
+/**
+ * Fires right after a request reaches the GraphQLController.
+ *
+ * Can be used for logging or for measuring and monitoring
+ * the time a request takes to resolve. 
+ *
+ * @see \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController
+ */
+class StartRequest
+{
+    /**
+     * The point in time when the request started. 
+     *
+     * @var \Carbon\Carbon
+     */
+    public $moment;
+
+    /**
+     * StartRequest constructor.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->moment = Carbon::now();
+    }
+}
+```
+
+## BuildingAST
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+/**
+ * Fires before building the AST from the user-defined schema string.
+ *
+ * Listeners may return a schema string,
+ * which is added to the user schema.
+ *
+ * Only fires once if schema caching is active.
+ */
+class BuildingAST
+{
+    /**
+     * The root schema that was defined by the user.
+     *
+     * @var string
+     */
+    public $userSchema;
+
+    /**
+     * BuildingAST constructor.
+     *
+     * @param  string  $userSchema
+     * @return void
+     */
+    public function __construct(string $userSchema)
+    {
+        $this->userSchema = $userSchema;
+    }
+}
+```
+
+## ManipulatingAST
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+
+/**
+ * Fires after the AST was built but before the executable schema is built.
+ *
+ * Listeners may mutate the $documentAST and make programmatic
+ * changes to the schema.
+ *
+ * Only fires once if schema caching is active.
+ */
+class ManipulatingAST
+{
+    /**
+     * The AST that can be manipulated.
+     *
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     */
+    public $documentAST;
+
+    /**
+     * BuildingAST constructor.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
+     */
+    public function __construct(DocumentAST &$documentAST)
+    {
+        $this->documentAST = $documentAST;
+    }
+}
+```
+
+## RegisteringDirectiveBaseNamespaces
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+/**
+ * Fires when the directive factory is constructed.
+ *
+ * Listeners may return one or more strings that are used as the base
+ * namespace for locating directives.
+ *
+ * @see \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+ */
+class RegisteringDirectiveBaseNamespaces
+{
+    //
+}
+```
+
+## StartExecution
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+use Carbon\Carbon;
+
+/**
+ * Fires right before resolving an individual query.
+ *
+ * Might happen multiple times in a single request if
+ * query batching is used.
+ */
+class StartExecution
+{
+    /**
+     * The point in time when the query execution started.
+     *
+     * @var \Carbon\Carbon
+     */
+    public $moment;
+
+    /**
+     * StartRequest constructor.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->moment = Carbon::now();
+    }
+}
+```
+
+## GatheringExtensions
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+/**
+ * Fires after a query was resolved.
+ *
+ * Listeners of this event must return an array comprised of
+ * a single key and the extension content as the value, e.g.
+ * ['tracing' => ['some' => 'content']]
+ */
+class GatheringExtensions
+{
+    //
+}
+```

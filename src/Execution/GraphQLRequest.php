@@ -9,6 +9,8 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class GraphQLRequest
 {
     /**
+     * The incoming HTTP request.
+     *
      * @var \Illuminate\Http\Request
      */
     protected $request;
@@ -23,7 +25,8 @@ class GraphQLRequest
     protected $batchIndex;
 
     /**
-     * @param Request $request
+     * @param  Request  $request
+     * @return void
      */
     public function __construct(Request $request)
     {
@@ -134,8 +137,7 @@ class GraphQLRequest
      * If we are dealing with a batched request, this gets the
      * contents of the currently resolving batch index.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return array|string|null
      */
     protected function getInputByKey(string $key)

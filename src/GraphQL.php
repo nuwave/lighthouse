@@ -157,12 +157,17 @@ class GraphQL
         $rootValue = null,
         ?string $operationName = null
     ): ExecutionResult {
+        // Building the executable schema might take a while to do,
+        // so we do it before we fire the StartExecution event.
+        // This allows tracking the time for batched queries independently.
+        $this->prepSchema();
+
         $this->eventDispatcher->dispatch(
             new StartExecution
         );
 
         $result = GraphQLBase::executeQuery(
-            $this->prepSchema(),
+            $this->executableSchema,
             $query,
             $rootValue,
             $context,
@@ -172,8 +177,9 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
-        // Listeners of this event should return an array comprised of
-        // a single key and the extension content as the value.
+        // Listeners of this event must return an array comprised of
+        // a single key and the extension content as the value, e.g.
+        // ['tracing' => ['some' => 'content']]
         $extensionResults = $this->eventDispatcher->dispatch(
             new GatheringExtensions
         );
@@ -188,15 +194,8 @@ class GraphQL
 
         $result->setErrorsHandler(
             function (array $errors, callable $formatter): array {
-                // Do report: Errors that are not client safe, schema definition errors
-                // Do not report: Validation, Errors that are meant for the final user
-                // Malformed Queries: Log if you are dogfooding your app
-
-                /*
-                 * Handlers are defined as classes in the config.
-                 * They must implement the Interface \Nuwave\Lighthouse\Execution\ErrorHandler
-                 * This allows the user to register multiple handlers and pipe the errors through.
-                 */
+                // User defined error handlers, implementing \Nuwave\Lighthouse\Execution\ErrorHandler
+                // This allows the user to register multiple handlers and pipe the errors through.
                 $handlers = config('lighthouse.error_handlers', []);
 
                 return array_map(
