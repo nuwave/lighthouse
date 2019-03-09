@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
+use Illuminate\Support\Str;
 use GraphQL\Executor\Executor;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Utils;
@@ -192,7 +193,7 @@ class FieldValue
 
         if ($this->parentIsRootType()) {
             $resolverClass = Utils::namespaceClassname(
-                studly_case($this->getFieldName()),
+                Str::studly($this->getFieldName()),
                 $this->defaultNamespacesForParent(),
                 function (string $class): bool {
                     return method_exists($class, 'resolve');
@@ -227,7 +228,7 @@ class FieldValue
         if ($directive = ASTHelper::directiveDefinition($this->field, 'subscription')) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
-            $className = studly_case($this->getFieldName());
+            $className = Str::studly($this->getFieldName());
         }
 
         $className = Utils::namespaceClassname(

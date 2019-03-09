@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
@@ -115,7 +116,7 @@ class DirectiveFactory
     protected function createOrFail(string $directiveName): Directive
     {
         foreach ($this->directiveBaseNamespaces as $baseNamespace) {
-            $className = $baseNamespace.'\\'.studly_case($directiveName).'Directive';
+            $className = $baseNamespace.'\\'.Str::studly($directiveName).'Directive';
             if (class_exists($className)) {
                 $directive = app($className);
 
