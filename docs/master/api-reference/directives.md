@@ -782,6 +782,40 @@ type Query {
 }
 ```
 
+## @orderBy
+
+Order by fields.
+
+```graphql
+type Query{
+    posts(orderBy: [OrderByClause!]! @orderBy)
+}
+```
+
+The `OrderByClause` is a type that is available in the schema by default.
+
+```graphql
+    input OrderByClause{
+        field: String!
+        order: SortOrder!
+    }
+    
+    enum SortOrder {
+        ASC
+        DESC
+    }
+```
+
+Querying a field that has an orderBy argument looks like this:
+
+```graphql
+{
+    users(orderBy: [{field:"name", order: ASC}]){
+        name
+    }
+}
+```
+
 ## @paginate
 
 Transform a field so it returns a paginated list.
