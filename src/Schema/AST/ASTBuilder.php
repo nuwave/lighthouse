@@ -37,6 +37,8 @@ class ASTBuilder
         $document = self::addPaginationInfoTypes($document);
         $document = self::addNodeSupport($document);
 
+        $document = self::addOrderByTypes($document);
+
         return app(ExtensionRegistry::class)->manipulate($document);
     }
 
@@ -272,6 +274,33 @@ GRAPHQL
             'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
         );
         $document->addFieldToQueryType($nodeQuery);
+
+        return $document;
+    }
+
+    /**
+     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $document
+     *
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     */
+    private static function addOrderByTypes(DocumentAST $document)
+    {
+        $sortOrderEnum = PartialParser::enumTypeDefinition("
+                enum OrderBy {
+                    ASC
+                    DESC
+                }
+        ");
+
+        $sortOptionInput = PartialParser::inputObjectTypeDefinition("
+            input OrderByClause {
+               field: String!
+               order: OrderBy!
+            }
+        ");
+
+        $document->setDefinition($sortOrderEnum);
+        $document->setDefinition($sortOptionInput);
 
         return $document;
     }
