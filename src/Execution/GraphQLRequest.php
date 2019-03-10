@@ -31,9 +31,9 @@ class GraphQLRequest
     public function __construct(Request $request)
     {
         $this->request = $request;
-        // If the request has neither a query, nor an operationName
-        // we might be dealing with a batched query
-        if (! $request->hasAny(['query', 'operationName'])) {
+        // If the request has neither a query, nor an operationName,
+        // we assume we are resolving a batched query.
+        if (! $request->hasAny('query', 'operationName')) {
             $this->batchIndex = 0;
         }
     }
