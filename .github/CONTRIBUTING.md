@@ -23,6 +23,12 @@ Just clone the project and run the following in the project root:
     composer install
     composer test
 
+If you want to use Xdebug, you can enter that container instead:
+
+    docker-compose exec xdebug sh
+
+Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
+
 ## Committing code
 
 1. Fork the project
@@ -74,7 +80,7 @@ function foo(array $bar): string
 
 For aggregate types such as the commonly used `Collection` class, use
 the generic type hint style. While not officially part of PHPDoc, it is understood
-by PHPStorm and most other editors.
+by PhpStorm and most other editors.
 
 ```php
 /**
