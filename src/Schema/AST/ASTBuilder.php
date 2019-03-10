@@ -16,10 +16,12 @@ use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 
 class ASTBuilder
 {
+
     /**
      * Convert the base schema string into an AST by applying different manipulations.
      *
-     * @param  string  $schema
+     * @param  string $schema
+     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function generate(string $schema): DocumentAST
@@ -43,7 +45,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST $document
+     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function applyNodeManipulators(DocumentAST $document): DocumentAST
@@ -72,7 +75,8 @@ class ASTBuilder
     /**
      * The final schema must not contain type extensions, so we merge them here.
      *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST $document
+     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function mergeTypeExtensions(DocumentAST $document): DocumentAST
@@ -104,7 +108,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST $document
+     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function applyFieldManipulators(DocumentAST $document): DocumentAST
@@ -130,7 +135,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST $document
+     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function applyArgManipulators(DocumentAST $document): DocumentAST
@@ -170,7 +176,8 @@ class ASTBuilder
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST $document
+     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function addPaginationInfoTypes(DocumentAST $document): DocumentAST
@@ -239,22 +246,24 @@ class ASTBuilder
     /**
      * Inject the node type and a node field into Query.
      *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST $document
+     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected static function addNodeSupport(DocumentAST $document): DocumentAST
     {
         $hasTypeImplementingNode = $document->objectTypeDefinitions()
-            ->contains(function (ObjectTypeDefinitionNode $objectType): bool {
-                return collect($objectType->interfaces)
-                    ->contains(function (NamedTypeNode $interface): bool {
-                        return $interface->name->value === 'Node';
-                    });
-            });
+                                            ->contains(function (ObjectTypeDefinitionNode $objectType): bool {
+                                                return collect($objectType->interfaces)
+                                                    ->contains(function (NamedTypeNode $interface): bool {
+                                                        return $interface->name->value === 'Node';
+                                                    });
+                                            });
 
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if (! $hasTypeImplementingNode) {
+        if ( ! $hasTypeImplementingNode)
+        {
             return $document;
         }
 
@@ -267,7 +276,7 @@ interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegis
   $globalId: ID!	
 }	
 GRAPHQL
-);
+        );
         $document->setDefinition($interface);
 
         $nodeQuery = PartialParser::fieldDefinition(

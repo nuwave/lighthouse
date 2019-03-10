@@ -3,11 +3,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-
-use Illuminate\Database\Eloquent\Builder;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 
 /**
  * Class OrderBy
@@ -16,6 +13,16 @@ use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
  */
 class OrderByDirective implements ArgFilterDirective, ArgDirectiveForArray
 {
+
+    /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'orderBy';
+    }
 
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
@@ -45,15 +52,5 @@ class OrderByDirective implements ArgFilterDirective, ArgDirectiveForArray
     public function combinesMultipleArguments(): bool
     {
         return false;
-    }
-
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'orderBy';
     }
 }
