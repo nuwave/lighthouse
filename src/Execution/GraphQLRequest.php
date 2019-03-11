@@ -11,6 +11,8 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 class GraphQLRequest
 {
     /**
+     * The incoming HTTP request.
+     *
      * @var \Illuminate\Http\Request
      */
     protected $request;
@@ -25,14 +27,15 @@ class GraphQLRequest
     protected $batchIndex;
 
     /**
-     * @param Request $request
+     * @param  Request  $request
+     * @return void
      */
     public function __construct(Request $request)
     {
         $this->request = $request;
-        // If the request has neither a query, nor an operationName
-        // we might be dealing with a batched query
-        if (! $request->hasAny(['query', 'operationName']) && ! $this->isMultipartRequest()) {
+        // If the request has neither a query, nor an operationName and is not a multipart-request,
+        // we assume we are resolving a batched query.
+        if (! $request->hasAny('query', 'operationName') && ! $this->isMultipartRequest()) {
             $this->batchIndex = 0;
         }
     }
@@ -140,8 +143,7 @@ class GraphQLRequest
      * If we are dealing with a batched request, this gets the
      * contents of the currently resolving batch index.
      *
-     * @param string $key
-     *
+     * @param  string  $key
      * @return array|string|null
      */
     protected function getInputByKey(string $key)

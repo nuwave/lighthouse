@@ -1,5 +1,8 @@
 # GraphQL Subscriptions
 
+Subscriptions allow GraphQL clients to observe specific events
+and receive updates from the server when those events occur.
+
 ::: tip NOTE
 Much of the credit should be given to the [Ruby implementation](https://github.com/rmosolgo/graphql-ruby/blob/master/guides/subscriptions/overview.md) as they provided a great overview of how the backend should work.
 :::
@@ -10,12 +13,11 @@ Install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php) for 
 
     composer require pusher/pusher-php-server
 
-Enable the extension in the `lighthouse.php` config file
+Add the service provider to your `config/app.php`
 
 ```php
-'extensions' => [
-    // ...
-    \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+'providers' => [
+    \Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider::class,
 ],
 ```
 

@@ -14,12 +14,16 @@ use Nuwave\Lighthouse\Events\GatheringExtensions;
 class Tracing
 {
     /**
+     * The point in time where the request was initially started.
+     *
      * @var \Carbon\Carbon
      */
     protected $requestStart;
 
     /**
-     * Trace entries.
+     * Trace entries for a single query execution.
+     *
+     * Is reset between batches.
      *
      * @var array[]
      */
@@ -47,7 +51,7 @@ class Tracing
      */
     public function handleStartRequest(StartRequest $startRequest): void
     {
-        $this->requestStart = Carbon::now();
+        $this->requestStart = $startRequest->moment;
     }
 
     /**
