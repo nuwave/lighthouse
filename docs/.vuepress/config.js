@@ -20,13 +20,13 @@ module.exports = {
         editLinks: true, //  "Edit this page" at the bottom of each page
         lastUpdated: 'Last Updated', //  "Last Updated" at the bottom of each page
         repo: 'nuwave/lighthouse', //  Github repo
-        docsDir: 'docs/', //  Github repo docs folder    
+        docsDir: 'docs/', //  Github repo docs folder
         versions: {
             latest: versioning.versions.latest,
             selected: versioning.versions.latest,
             all: versioning.versions.all
         },
-        search: false,
+        search: true,
         nav: [
             {
                 text: `Docs`,
