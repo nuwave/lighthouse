@@ -24,7 +24,7 @@ use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Events\RegisteringDirectiveBaseNamespaces;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class DirectiveFactory
@@ -65,7 +65,7 @@ class DirectiveFactory
             config('lighthouse.namespaces.directives'),
 
             // Plugin developers defined directives
-            $dispatcher->dispatch(new RegisteringDirectiveBaseNamespaces),
+            $dispatcher->dispatch(new RegisterDirectiveNamespaces),
 
             // Lighthouse defined directives
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',

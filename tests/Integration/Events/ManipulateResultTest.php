@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Events\BuildingAST;
+use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Tests\Utils\Queries\Foo;
 
 class ManipulateResultTest extends TestCase

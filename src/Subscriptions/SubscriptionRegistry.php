@@ -172,7 +172,7 @@ class SubscriptionRegistry
      *
      * @return string[]
      */
-    public function handleGatheringExtensions(): array
+    public function handleBuildExtensionsResponse(): array
     {
         return [
             'lighthouse_subscriptions' => [

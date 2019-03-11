@@ -12,14 +12,14 @@ may utilize this to offer users extra functionality that is not available in the
 ## Add schema definitions
 
 You might want to provide some additional types to the schema. The preferred way to
-do this is to listen for the [`BuildingAST`](../api-reference/events.md#buildingast) event.
+do this is to listen for the [`BuildSchemaString`](../api-reference/events.md#buildSchemaString) event.
 
-Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/BuildingASTTest.php)
+Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/BuildSchemaStringTest.php)
 for an example of how this works.
 
 ## Add custom directives
 
-You can add your custom directives to Lighthouse by listening for the `RegisteringDirectiveBaseNamespaces` event.
+You can add your custom directives to Lighthouse by listening for the `RegisterDirectiveNamespaces` event.
 
-Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/RegisteringDirectiveBaseNamespacesTest.php)
+Check out [the test suite](https://github.com/nuwave/lighthouse/tree/master/tests/Integration/Events/RegisterDirectiveNamespacesTest.php)
 for an example of how this works.

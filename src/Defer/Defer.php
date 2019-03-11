@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
@@ -74,17 +74,17 @@ class Defer implements CreatesResponse
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param  \Nuwave\Lighthouse\Events\ManipulatingAST  $manipulatingAST
+     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $ManipulateAST
      * @return void
      */
-    public function handleManipulatingAST(ManipulatingAST $manipulatingAST): void
+    public function handleManipulateAST(ManipulateAST $ManipulateAST): void
     {
-        $manipulatingAST->documentAST = ASTHelper::attachDirectiveToObjectTypeFields(
-            $manipulatingAST->documentAST,
+        $ManipulateAST->documentAST = ASTHelper::attachDirectiveToObjectTypeFields(
+            $ManipulateAST->documentAST,
             PartialParser::directive('@deferrable')
         );
 
-        $manipulatingAST->documentAST->setDefinition(
+        $ManipulateAST->documentAST->setDefinition(
             PartialParser::directiveDefinition('directive @defer(if: Boolean) on FIELD')
         );
     }

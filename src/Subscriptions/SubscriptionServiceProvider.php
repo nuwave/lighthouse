@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Illuminate\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
@@ -38,8 +38,8 @@ class SubscriptionServiceProvider extends ServiceProvider
         );
 
         $eventsDispatcher->listen(
-            GatheringExtensions::class,
-            SubscriptionRegistry::class.'@handleGatheringExtensions'
+            BuildExtensionsResponse::class,
+            SubscriptionRegistry::class.'@handleBuildExtensionsResponse'
         );
 
         // Register the routes for the configured broadcaster. The specific

@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Defer;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 
@@ -25,8 +25,8 @@ class DeferServiceProvider extends ServiceProvider
         );
 
         $dispatcher->listen(
-            ManipulatingAST::class,
-            Defer::class.'@handleManipulatingAST'
+            ManipulateAST::class,
+            Defer::class.'@handleManipulateAST'
         );
     }
 

@@ -43,7 +43,7 @@ class StartRequest
 }
 ```
 
-## BuildingAST
+## BuildSchemaString
 
 ```php
 <?php
@@ -58,7 +58,7 @@ namespace Nuwave\Lighthouse\Events;
  *
  * Only fires once if schema caching is active.
  */
-class BuildingAST
+class BuildSchemaString
 {
     /**
      * The root schema that was defined by the user.
@@ -68,7 +68,7 @@ class BuildingAST
     public $userSchema;
 
     /**
-     * BuildingAST constructor.
+     * BuildSchemaString constructor.
      *
      * @param  string  $userSchema
      * @return void
@@ -80,7 +80,7 @@ class BuildingAST
 }
 ```
 
-## ManipulatingAST
+## ManipulateAST
 
 ```php
 <?php
@@ -97,7 +97,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
  *
  * Only fires once if schema caching is active.
  */
-class ManipulatingAST
+class ManipulateAST
 {
     /**
      * The AST that can be manipulated.
@@ -107,7 +107,7 @@ class ManipulatingAST
     public $documentAST;
 
     /**
-     * BuildingAST constructor.
+     * BuildSchemaString constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST
      * @return void
@@ -119,7 +119,7 @@ class ManipulatingAST
 }
 ```
 
-## RegisteringDirectiveBaseNamespaces
+## RegisterDirectiveNamespaces
 
 ```php
 <?php
@@ -134,7 +134,7 @@ namespace Nuwave\Lighthouse\Events;
  *
  * @see \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
  */
-class RegisteringDirectiveBaseNamespaces
+class RegisterDirectiveNamespaces
 {
     //
 }
@@ -176,7 +176,7 @@ class StartExecution
 }
 ```
 
-## GatheringExtensions
+## BuildExtensionsResponse
 
 ```php
 <?php
@@ -190,8 +190,45 @@ namespace Nuwave\Lighthouse\Events;
  * a single key and the extension content as the value, e.g.
  * ['tracing' => ['some' => 'content']]
  */
-class GatheringExtensions
+class BuildExtensionsResponse
 {
     //
+}
+```
+
+## ManipulateResult
+
+```php
+<?php
+
+namespace Nuwave\Lighthouse\Events;
+
+use GraphQL\Executor\ExecutionResult;
+
+/**
+ * Fires after resolving each individual query.
+ *
+ * This gives listeners an easy way to manipulate the query
+ * result without worrying about batched execution.
+ */
+class ManipulateResult
+{
+    /**
+     * The result of resolving an individual query.
+     *
+     * @var \GraphQL\Executor\ExecutionResult
+     */
+    public $result;
+
+    /**
+     * ManipulateResult constructor.
+     *
+     * @param  \GraphQL\Executor\ExecutionResult  $result
+     * @return void
+     */
+    public function __construct(ExecutionResult &$result)
+    {
+        $this->result = $result;
+    }
 }
 ```

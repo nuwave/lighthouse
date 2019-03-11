@@ -12,16 +12,16 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
-use Nuwave\Lighthouse\Events\BuildingAST;
+use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
@@ -195,7 +195,7 @@ class GraphQL
         // a single key and the extension content as the value, e.g.
         // ['tracing' => ['some' => 'content']]
         $extensionResults = $this->eventDispatcher->dispatch(
-            new GatheringExtensions
+            new BuildExtensionsResponse
         );
 
         // Ensure we preserve the extension keys while flattening
@@ -299,7 +299,7 @@ class GraphQL
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
         $additionalSchemas = $this->eventDispatcher->dispatch(
-            new BuildingAST($schemaString)
+            new BuildSchemaString($schemaString)
         );
 
         $documentAST = $this->astBuilder->build(
@@ -310,10 +310,10 @@ class GraphQL
         );
 
         // Listeners may manipulate the DocumentAST that is passed by reference
-        // into the ManipulatingAST event. This can be useful for extensions
+        // into the ManipulateAST event. This can be useful for extensions
         // that want to programmatically change the schema.
         $this->eventDispatcher->dispatch(
-            new ManipulatingAST($documentAST)
+            new ManipulateAST($documentAST)
         );
 
         return $documentAST;

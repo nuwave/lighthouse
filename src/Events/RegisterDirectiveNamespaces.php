@@ -10,7 +10,7 @@ namespace Nuwave\Lighthouse\Events;
  *
  * @see \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
  */
-class RegisteringDirectiveBaseNamespaces
+class RegisterDirectiveNamespaces
 {
     //
 }

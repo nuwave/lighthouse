@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
  *
  * Only fires once if schema caching is active.
  */
-class ManipulatingAST
+class ManipulateAST
 {
     /**
      * The AST that can be manipulated.
@@ -22,7 +22,7 @@ class ManipulatingAST
     public $documentAST;
 
     /**
-     * BuildingAST constructor.
+     * BuildSchemaString constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST
      * @return void
