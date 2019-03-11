@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;

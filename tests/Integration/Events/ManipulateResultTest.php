@@ -2,14 +2,10 @@
 
 namespace Tests\Integration\Events;
 
-use Illuminate\Http\Request;
+use Tests\TestCase;
+use Tests\Utils\Queries\Foo;
 use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Events\ManipulateResult;
-use Nuwave\Lighthouse\Events\StartRequest;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use Tests\TestCase;
-use Nuwave\Lighthouse\Events\BuildSchemaString;
-use Tests\Utils\Queries\Foo;
 
 class ManipulateResultTest extends TestCase
 {
@@ -24,7 +20,7 @@ class ManipulateResultTest extends TestCase
             ManipulateResult::class,
             function (ManipulateResult $manipulateResult): void {
                 $manipulateResult->result->data = [
-                    'foo' => Foo::THE_ANSWER + 1
+                    'foo' => Foo::THE_ANSWER + 1,
                 ];
             }
         );
@@ -35,8 +31,8 @@ class ManipulateResultTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'foo' => Foo::THE_ANSWER + 1
-            ]
+                'foo' => Foo::THE_ANSWER + 1,
+            ],
         ]);
     }
 }

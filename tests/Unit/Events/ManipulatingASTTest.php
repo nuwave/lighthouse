@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
-class ManipulateASTTest extends TestCase
+class ManipulatingASTTest extends TestCase
 {
     /**
      * @test
