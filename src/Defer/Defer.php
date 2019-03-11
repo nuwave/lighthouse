@@ -9,10 +9,10 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 
-class Defer implements GraphQLResponse
+class Defer implements CreatesResponse
 {
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\CanStreamResponse
@@ -179,21 +179,21 @@ class Defer implements GraphQLResponse
     /**
      * Return either a final response or a stream of responses.
      *
-     * @param  mixed[]  $data
+     * @param  mixed[]  $result
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function create(array $data): Response
+    public function createResponse(array $result): Response
     {
         if (empty($this->deferred)) {
-            return response($data);
+            return response($result);
         }
 
         return response()->stream(
-            function () use ($data): void {
+            function () use ($result): void {
                 $nested = 1;
-                $this->result = $data;
+                $this->result = $result;
                 $this->isStreaming = true;
-                $this->stream->stream($data, [], empty($this->deferred));
+                $this->stream->stream($result, [], empty($this->deferred));
 
                 if ($executionTime = config('lighthouse.defer.max_execution_ms', 0)) {
                     $this->maxExecutionTime = microtime(true) + ($executionTime * 1000);

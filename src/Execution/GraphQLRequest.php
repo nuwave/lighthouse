@@ -2,124 +2,42 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Illuminate\Http\Request;
-use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-
-class GraphQLRequest
+interface GraphQLRequest
 {
-    /**
-     * The incoming HTTP request.
-     *
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    /**
-     * The current batch index.
-     *
-     * Is null if we are not resolving a batched query.
-     *
-     * @var int|null
-     */
-    protected $batchIndex;
-
-    /**
-     * @param  Request  $request
-     * @return void
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-        // If the request has neither a query, nor an operationName,
-        // we assume we are resolving a batched query.
-        if (! $request->hasAny('query', 'operationName')) {
-            $this->batchIndex = 0;
-        }
-    }
-
     /**
      * Get the contained GraphQL query string.
      *
      * @return string
      */
-    public function query(): string
-    {
-        return $this->getInputByKey('query');
-    }
+    public function query(): string;
 
     /**
      * Get the given variables for the query.
      *
      * @return mixed[]
      */
-    public function variables(): array
-    {
-        $variables = $this->getInputByKey('variables');
-
-        if (is_string($variables)) {
-            return json_decode($variables, true) ?? [];
-        }
-
-        return $variables ?? [];
-    }
+    public function variables(): array;
 
     /**
      * Get the operationName of the current request.
      *
      * @return string|null
      */
-    public function operationName(): ?string
-    {
-        return $this->getInputByKey('operationName');
-    }
-
-    /**
-     * Construct a GraphQLContext from the underlying request.
-     *
-     * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
-     */
-    public function context(): GraphQLContext
-    {
-        /** @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext $contextFactory */
-        $contextFactory = app(CreatesContext::class);
-
-        return $contextFactory->generate($this->request);
-    }
+    public function operationName(): ?string;
 
     /**
      * Is the current query a batched query?
      *
      * @return bool
      */
-    public function isBatched(): bool
-    {
-        return ! is_null($this->batchIndex);
-    }
+    public function isBatched(): bool;
 
     /**
      * Advance the batch index and indicate if there are more batches to process.
      *
      * @return bool
      */
-    public function advanceBatchIndex(): bool
-    {
-        if ($result = $this->hasMoreBatches()) {
-            $this->batchIndex++;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Are there more batched queries to process?
-     *
-     * @return bool
-     */
-    protected function hasMoreBatches(): bool
-    {
-        return count($this->request->input()) - 1 > $this->batchIndex;
-    }
+    public function advanceBatchIndex(): bool;
 
     /**
      * Get the index of the current batch.
@@ -128,21 +46,5 @@ class GraphQLRequest
      *
      * @return int|null
      */
-    public function batchIndex()
-    {
-        return $this->batchIndex;
-    }
-
-    /**
-     * If we are dealing with a batched request, this gets the
-     * contents of the currently resolving batch index.
-     *
-     * @param  string  $key
-     * @return array|string|null
-     */
-    protected function getInputByKey(string $key)
-    {
-        return $this->request->input($key)
-            ?? $this->request->input("{$this->batchIndex}.{$key}");
-    }
+    public function batchIndex(): ?int;
 }

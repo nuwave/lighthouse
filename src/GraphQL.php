@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
+use Nuwave\Lighthouse\Events\ManipulateResult;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Events\BuildingAST;
@@ -76,6 +78,13 @@ class GraphQL
     protected $astBuilder;
 
     /**
+     * The context factory.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
+     */
+    private $createsContext;
+
+    /**
      * GraphQL constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
@@ -83,6 +92,7 @@ class GraphQL
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
      * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @return void
      */
     public function __construct(
@@ -90,13 +100,15 @@ class GraphQL
         SchemaSourceProvider $schemaSourceProvider,
         Pipeline $pipeline,
         EventDispatcher $eventDispatcher,
-        ASTBuilder $astBuilder
+        ASTBuilder $astBuilder,
+        CreatesContext $createsContext
     ) {
         $this->schemaBuilder = $schemaBuilder;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->pipeline = $pipeline;
         $this->eventDispatcher = $eventDispatcher;
         $this->astBuilder = $astBuilder;
+        $this->createsContext = $createsContext;
     }
 
     /**
@@ -110,7 +122,9 @@ class GraphQL
     {
         $result = $this->executeQuery(
             $request->query(),
-            $request->context(),
+            $this->createsContext->generate(
+                app('request')
+            ),
             $request->variables(),
             null,
             $request->operationName()
@@ -210,6 +224,11 @@ class GraphQL
                     $errors
                 );
             }
+        );
+
+        // Allow listeners to manipulate the result after each resolved query
+        $this->eventDispatcher->dispatch(
+            new ManipulateResult($result)
         );
 
         return $result;

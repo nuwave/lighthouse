@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 
 class DeferServiceProvider extends ServiceProvider
 {
@@ -39,6 +39,6 @@ class DeferServiceProvider extends ServiceProvider
     {
         $this->app->singleton(Defer::class);
 
-        $this->app->singleton(GraphQLResponse::class, Defer::class);
+        $this->app->singleton(CreatesResponse::class, Defer::class);
     }
 }

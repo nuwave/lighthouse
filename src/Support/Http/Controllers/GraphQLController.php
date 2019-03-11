@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 
 class GraphQLController extends Controller
@@ -28,7 +28,7 @@ class GraphQLController extends Controller
     protected $eventsDispatcher;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesResponse
      */
     private $createsResponse;
 
@@ -38,14 +38,14 @@ class GraphQLController extends Controller
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLResponse  $createsResponse
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesResponse  $createsResponse
      * @return void
      */
     public function __construct(
         GraphQL $graphQL,
         CreatesContext $createsContext,
         EventsDispatcher $eventsDispatcher,
-        GraphQLResponse $createsResponse
+        CreatesResponse $createsResponse
     ) {
         $this->graphQL = $graphQL;
         $this->createsContext = $createsContext;
@@ -69,7 +69,7 @@ class GraphQLController extends Controller
             ? $this->executeBatched($request)
             : $this->graphQL->executeRequest($request);
 
-        return $this->createsResponse->create($result);
+        return $this->createsResponse->createResponse($result);
     }
 
     /**

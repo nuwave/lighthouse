@@ -11,7 +11,7 @@ class Foo
     /**
      * The answer to life, the universe and everything.
      *
-     * @var string
+     * @var int
      */
     const THE_ANSWER = 42;
 

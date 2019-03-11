@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
@@ -21,14 +22,14 @@ use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
 use Nuwave\Lighthouse\Console\SubscriptionCommand;
-use Nuwave\Lighthouse\Execution\LighthouseResponse;
+use Nuwave\Lighthouse\Execution\SingleResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
@@ -101,10 +102,10 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CreatesContext::class, ContextFactory::class);
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
-        $this->app->bind(GraphQLResponse::class, LighthouseResponse::class);
+        $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
-        $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
-            return new GraphQLRequest(
+        $this->app->singleton(GraphQLRequest::class, function (Container $app): LighthouseRequest {
+            return new LighthouseRequest(
                 $app->make('request')
             );
         });
