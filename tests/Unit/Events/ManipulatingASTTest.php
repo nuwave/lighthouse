@@ -10,26 +10,6 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 class ManipulatingASTTest extends TestCase
 {
     /**
-     * @@test
-     */
-    public function itDispatchesManipulatingASTEvent(): void
-    {
-        $this->schema = $this->placeholderQuery();
-
-        Event::fake([
-            ManipulatingAST::class,
-        ]);
-
-        $this->query('
-        {
-            foo
-        }
-        ');
-
-        Event::assertDispatched(ManipulatingAST::class);
-    }
-
-    /**
      * @test
      */
     public function itCanManipulateTheAST(): void

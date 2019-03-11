@@ -42,6 +42,7 @@ module.exports = [{
             'api-reference/directives',
             'api-reference/resolvers',
             'api-reference/scalars',
+            'api-reference/events',
         ]
     }
 ]
