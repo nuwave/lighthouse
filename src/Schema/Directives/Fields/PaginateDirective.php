@@ -138,6 +138,10 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $resolveArgs[3]
         );
 
+        if ($query instanceof \Laravel\Scout\Builder) {
+            return $query->paginate($first, 'page', $page);
+        }
+
         return $query->paginate($first, ['*'], 'page', $page);
     }
 

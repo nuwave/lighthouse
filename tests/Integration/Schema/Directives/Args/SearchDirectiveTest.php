@@ -53,12 +53,12 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->engine->shouldReceive('map')->andReturn(collect([$postA, $postC]));
 
-        $this->schema = '     
+        $this->schema = '
         type Post {
             id: ID!
             title: String!
         }
-  
+
         type Query {
             posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
         }
@@ -123,14 +123,79 @@ class SearchDirectiveTest extends DBTestCase
             ->andReturn(collect([$postA, $postB]))
             ->once();
 
-        $this->schema = '     
+        $this->schema = '
         type Post {
             id: ID!
             title: String!
         }
-  
+
         type Query {
             posts(search: String @search(within: "my.index")): [Post!]! @paginate(type: "paginator" model: "Post")
+        }
+        ';
+
+        $this->query('
+        {
+            posts(count: 10 search: "great") {
+                data {
+                    id
+                    title
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'posts' => [
+                    'data' => [
+                        [
+                            'id' => "$postA->id",
+                        ],
+                        [
+                            'id' => "$postB->id",
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itHandlesScoutBuilderPaginationArguments(): void
+    {
+        $postA = factory(Post::class)->create([
+            'title' => 'great title',
+        ]);
+        $postB = factory(Post::class)->create([
+            'title' => 'Really great title',
+        ]);
+        $postC = factory(Post::class)->create([
+            'title' => 'bad title',
+        ]);
+
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                collect([$postA, $postB])
+            )
+            ->once();
+
+        $this->engine->shouldReceive('paginate')
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::not('page')
+            )
+            ->once();
+
+        $this->schema = '
+        type Post {
+            id: ID!
+            title: String!
+        }
+
+        type Query {
+            posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
         }
         ';
 
