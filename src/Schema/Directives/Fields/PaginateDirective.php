@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Illuminate\Support\Str;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\QueryFilter;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -138,7 +139,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $resolveArgs[3]
         );
 
-        if ($query instanceof \Laravel\Scout\Builder) {
+        if ($query instanceof ScoutBuilder) {
             return $query->paginate($first, 'page', $page);
         }
 
