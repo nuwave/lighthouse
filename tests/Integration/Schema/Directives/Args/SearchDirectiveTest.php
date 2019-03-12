@@ -186,6 +186,7 @@ class SearchDirectiveTest extends DBTestCase
                 Mockery::any(),
                 Mockery::not('page')
             )
+            ->andReturn(collect([$postA, $postB]))
             ->once();
 
         $this->schema = '
