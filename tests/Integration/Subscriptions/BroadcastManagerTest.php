@@ -86,7 +86,7 @@ class BroadcastManagerTest extends TestCase
             return $broadcaster;
         });
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster $broadcaster */
+        /* @var \Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster $broadcaster */
         $resolvedBroadcaster = $this->broadcastManager->driver('foo');
 
         $this->assertSame(['driver' => 'foo'], $broadcasterConfig);

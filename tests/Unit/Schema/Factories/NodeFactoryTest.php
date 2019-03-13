@@ -39,7 +39,7 @@ class NodeFactoryTest extends TestCase
             ADMIN @enum(value: 123)
         }
         ');
-        /** @var \GraphQL\Type\Definition\EnumType $enumType */
+        /* @var \GraphQL\Type\Definition\EnumType $enumType */
         $enumType = $this->factory->handle($enumNode);
 
         $this->assertInstanceOf(EnumType::class, $enumType);
@@ -57,7 +57,7 @@ class NodeFactoryTest extends TestCase
             EMPLOYEE
         }
         ');
-        /** @var \GraphQL\Type\Definition\EnumType $enumType */
+        /* @var \GraphQL\Type\Definition\EnumType $enumType */
         $enumType = $this->factory->handle($enumNode);
 
         $this->assertInstanceOf(EnumType::class, $enumType);
@@ -73,7 +73,7 @@ class NodeFactoryTest extends TestCase
         $scalarNode = PartialParser::scalarTypeDefinition('
         scalar Email
         ');
-        /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
+        /* @var \GraphQL\Type\Definition\ScalarType $scalarType */
         $scalarType = $this->factory->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
@@ -88,7 +88,7 @@ class NodeFactoryTest extends TestCase
         $scalarNode = PartialParser::scalarTypeDefinition('
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
         ');
-        /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
+        /* @var \GraphQL\Type\Definition\ScalarType $scalarType */
         $scalarType = $this->factory->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
@@ -103,7 +103,7 @@ class NodeFactoryTest extends TestCase
         $scalarNode = PartialParser::scalarTypeDefinition('
         scalar SomeEmail @scalar(class: "Email")
         ');
-        /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
+        /* @var \GraphQL\Type\Definition\ScalarType $scalarType */
         $scalarType = $this->factory->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
@@ -120,7 +120,7 @@ class NodeFactoryTest extends TestCase
             bar: String
         }
         ');
-        /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
+        /* @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
         $interfaceType = $this->factory->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
@@ -138,7 +138,7 @@ class NodeFactoryTest extends TestCase
             bar: String
         }
         ');
-        /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
+        /* @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
         $interfaceType = $this->factory->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
@@ -155,7 +155,7 @@ class NodeFactoryTest extends TestCase
             bar: String
         }
         ');
-        /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
+        /* @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
         $interfaceType = $this->factory->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
@@ -170,7 +170,7 @@ class NodeFactoryTest extends TestCase
         $unionNode = PartialParser::unionTypeDefinition('
         union Foo = Bar
         ');
-        /** @var \GraphQL\Type\Definition\UnionType $unionType */
+        /* @var \GraphQL\Type\Definition\UnionType $unionType */
         $unionType = $this->factory->handle($unionNode);
 
         $this->assertInstanceOf(UnionType::class, $unionType);
@@ -188,7 +188,7 @@ class NodeFactoryTest extends TestCase
             foo(bar: String! @bcrypt): String!
         }
         ');
-        /** @var \GraphQL\Type\Definition\ObjectType $objectType */
+        /* @var \GraphQL\Type\Definition\ObjectType $objectType */
         $objectType = $this->factory->handle($objectTypeNode);
 
         $this->assertInstanceOf(ObjectType::class, $objectType);
@@ -206,7 +206,7 @@ class NodeFactoryTest extends TestCase
             foo: String!
         }
         ');
-        /** @var \GraphQL\Type\Definition\InputObjectType $inputObjectType */
+        /* @var \GraphQL\Type\Definition\InputObjectType $inputObjectType */
         $inputObjectType = $this->factory->handle($inputNode);
 
         $this->assertInstanceOf(InputObjectType::class, $inputObjectType);

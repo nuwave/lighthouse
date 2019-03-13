@@ -111,7 +111,7 @@ class SubscriptionTest extends TestCase
         }
         ');
 
-        /** @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
+        /* @var \Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster $log */
         $log = app(BroadcastManager::class)->driver();
         $this->assertCount(1, $log->broadcasts());
 

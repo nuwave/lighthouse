@@ -51,7 +51,7 @@ class WithDirectiveTest extends DBTestCase
         }
         ';
 
-        /** @var \Tests\Utils\Models\User $user */
+        /* @var \Tests\Utils\Models\User $user */
         $user = auth()->user();
 
         $this->assertFalse(
