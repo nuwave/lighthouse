@@ -252,7 +252,7 @@ class DeferDBTest extends DBTestCase
 
         $deferredCompanies = $chunks[2];
         $this->assertCount(6, $deferredCompanies);
-        collect($deferredCompanies)->each(function (array $item) use ($companies): void {
+        (new Collection($deferredCompanies))->toBase()->each(function (array $item) use ($companies): void {
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
 

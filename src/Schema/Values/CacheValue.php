@@ -123,7 +123,7 @@ class CacheValue
 
         ksort($args);
 
-        return collect($args)->map(function ($value, $key) {
+        return (new Collection($args))->map(function ($value, $key) {
             $keyValue = is_array($value)
                 ? json_encode($value, true)
                 : $value;
@@ -159,7 +159,7 @@ class CacheValue
      */
     protected function implode(array $items): string
     {
-        return collect($items)
+        return (new Collection($items))
             ->filter()
             ->values()
             ->implode(':');

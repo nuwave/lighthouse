@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
@@ -62,11 +63,11 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                 }
 
                 if (! config('lighthouse.transactional_mutations', true)) {
-                    return MutationExecutor::executeUpdate($model, collect($args))->refresh();
+                    return MutationExecutor::executeUpdate($model, new Collection($args))->refresh();
                 }
 
                 return $this->db->connection()->transaction(function () use ($model, $args): Model {
-                    return MutationExecutor::executeUpdate($model, collect($args))->refresh();
+                    return MutationExecutor::executeUpdate($model, new Collection($args))->refresh();
                 });
             }
         );

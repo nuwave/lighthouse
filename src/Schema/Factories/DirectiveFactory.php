@@ -60,7 +60,7 @@ class DirectiveFactory
      */
     public function __construct(Dispatcher $dispatcher)
     {
-        $this->directiveBaseNamespaces = collect([
+        $this->directiveBaseNamespaces = (new Collection([
             // User defined directives (top priority)
             config('lighthouse.namespaces.directives'),
 
@@ -71,9 +71,9 @@ class DirectiveFactory
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Fields',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Nodes',
-        ])->flatten()
-            ->filter()
-            ->all();
+        ]))->flatten()
+           ->filter()
+           ->all();
     }
 
     /**
@@ -196,7 +196,7 @@ class DirectiveFactory
      */
     protected function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
-        return collect($node->directives)
+        return (new Collection($node->directives))
             ->map(function (DirectiveNode $directive) use ($node) {
                 return $this->create($directive->name->value, $node);
             })

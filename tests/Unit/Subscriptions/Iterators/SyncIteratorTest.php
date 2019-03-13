@@ -69,6 +69,6 @@ class SyncIteratorTest extends TestCase
      */
     protected function items(): Collection
     {
-        return collect([1, 2, 3]);
+        return new Collection([1, 2, 3]);
     }
 }

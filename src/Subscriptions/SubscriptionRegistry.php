@@ -133,7 +133,7 @@ class SubscriptionRegistry
         // sure the schema has been generated.
         $this->graphQL->prepSchema();
 
-        return collect($subscriber->query->definitions)
+        return (new Collection($subscriber->query->definitions))
             ->filter(function (Node $node): bool {
                 return $node instanceof OperationDefinitionNode;
             })
@@ -141,7 +141,7 @@ class SubscriptionRegistry
                 return $node->operation === 'subscription';
             })
             ->flatMap(function (OperationDefinitionNode $node) {
-                return collect($node->selectionSet->selections)
+                return (new Collection($node->selectionSet->selections))
                     ->map(function (FieldNode $field): string {
                         return $field->name->value;
                     })
