@@ -18,7 +18,7 @@ class StartRequest
     /**
      * GraphQL request instance.
      *
-     * @var GraphQLRequest
+     * @var \Nuwave\Lighthouse\Execution\GraphQLRequest
      */
     public $request;
 
@@ -32,7 +32,7 @@ class StartRequest
     /**
      * StartRequest constructor.
      *
-     * @param GraphQLRequest $request
+     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      *
      * @return void
      */
