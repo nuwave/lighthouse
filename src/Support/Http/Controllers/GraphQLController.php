@@ -62,7 +62,7 @@ class GraphQLController extends Controller
     public function query(GraphQLRequest $request)
     {
         $this->eventsDispatcher->dispatch(
-            new StartRequest
+            new StartRequest($request)
         );
 
         $result = $request->isBatched()
