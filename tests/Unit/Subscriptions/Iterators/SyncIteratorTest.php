@@ -48,7 +48,7 @@ class SyncIteratorTest extends TestCase
      */
     public function itCanPassExceptionToHandler(): void
     {
-        /* @var \Exception|null $exception */
+        /** @var \Exception|null $exception */
         $exception = null;
 
         $this->iterator->process(

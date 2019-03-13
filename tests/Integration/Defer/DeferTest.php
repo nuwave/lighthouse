@@ -303,7 +303,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        /* @var \Nuwave\Lighthouse\Defer\Defer $defer */
+        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
         $defer = app(Defer::class);
         // Set max execution time to now so we immediately resolve deferred fields
         $defer->setMaxExecutionTime(microtime(true));
@@ -362,7 +362,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        /* @var \Nuwave\Lighthouse\Defer\Defer $defer */
+        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
         $defer = app(Defer::class);
         $defer->setMaxNestedFields(1);
 

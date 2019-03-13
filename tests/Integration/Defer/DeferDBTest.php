@@ -174,7 +174,7 @@ class DeferDBTest extends DBTestCase
      */
     public function itCanDeferNestedListFields(): void
     {
-        /* @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Company> $companies */
+        /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Company> $companies */
         $companies = factory(Company::class, 2)
             ->create()
             ->each(function (Company $company): void {

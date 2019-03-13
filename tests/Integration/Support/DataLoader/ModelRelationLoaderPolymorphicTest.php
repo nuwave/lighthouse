@@ -31,7 +31,7 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
      */
     public function itGetsPolymorphicRelationship(): void
     {
-        /* @var \Tests\Utils\Models\Task $task */
+        /** @var \Tests\Utils\Models\Task $task */
         $task = Task::first();
         $this->assertCount(3, $task->tags);
 

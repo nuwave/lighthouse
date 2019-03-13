@@ -97,7 +97,7 @@ class StorageManagerTest extends TestCase
      */
     protected function subscriber(string $queryString): Subscriber
     {
-        /* @var \Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber */
+        /** @var \Nuwave\Lighthouse\Subscriptions\Subscriber $subscriber */
         $subscriber = $this->getMockBuilder(Subscriber::class)
             ->disableOriginalConstructor()
             ->getMock();

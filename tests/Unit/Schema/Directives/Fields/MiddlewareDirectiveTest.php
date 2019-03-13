@@ -87,7 +87,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itRunsAliasedMiddleware(): void
     {
-        /* @var \Illuminate\Routing\Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
         $router->aliasMiddleware('foo', CountRuns::class);
 
@@ -115,7 +115,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itRunsMiddlewareGroup(): void
     {
-        /* @var \Illuminate\Routing\Router $router */
+        /** @var \Illuminate\Routing\Router $router */
         $router = $this->app['router'];
         $router->middlewareGroup('bar', [Authenticate::class]);
 
@@ -191,7 +191,7 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itAddsMiddlewareDirectiveToFields(): void
     {
-        /* @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
+        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = app(ASTBuilder::class);
         $document = $astBuilder->build('
         type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {

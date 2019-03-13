@@ -5,7 +5,7 @@ use Tests\Utils\Models\User;
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Company;
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(User::class, function (Faker $faker) {
     return [
         'company_id' => function () {

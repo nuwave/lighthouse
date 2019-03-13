@@ -5,7 +5,7 @@ use Tests\Utils\Models\User;
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Comment;
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Comment::class, function (Faker $faker) {
     return [
         'comment' => $faker->sentence,

@@ -267,7 +267,7 @@ class DirectiveFactory
      */
     public function createNodeResolver(TypeDefinitionNode $node): ?NodeResolver
     {
-        /* @noinspection PhpIncompatibleReturnTypeInspection */
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->createSingleDirectiveOfType($node, NodeResolver::class);
     }
 

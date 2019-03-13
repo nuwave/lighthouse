@@ -4,7 +4,7 @@ use Tests\Utils\Models\Hour;
 use Tests\Utils\Models\Task;
 use Faker\Generator as Faker;
 
-/* @var \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Hour::class, function (Faker $faker) {
     return [
         'from' => $faker->time('H:i'),

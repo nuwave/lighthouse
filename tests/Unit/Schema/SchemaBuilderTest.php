@@ -39,7 +39,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /* @var \GraphQL\Type\Definition\EnumType $enumType */
+        /** @var \GraphQL\Type\Definition\EnumType $enumType */
         $enumType = $schema->getType('Role');
         $this->assertInstanceOf(EnumType::class, $enumType);
         $this->assertSame('Role description', $enumType->description);
@@ -64,7 +64,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /* @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
+        /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
         $interfaceType = $schema->getType('Foo');
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
 
@@ -88,7 +88,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /* @var \GraphQL\Type\Definition\ObjectType $foo */
+        /** @var \GraphQL\Type\Definition\ObjectType $foo */
         $foo = $schema->getType('Foo');
         $this->assertInstanceOf(ObjectType::class, $foo);
 
@@ -117,7 +117,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /* @var \GraphQL\Type\Definition\InputObjectType $inputObjectType */
+        /** @var \GraphQL\Type\Definition\InputObjectType $inputObjectType */
         $inputObjectType = $schema->getType('CreateFoo');
         $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
 
@@ -138,7 +138,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /* @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
+        /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
         $mutationObjectType = $schema->getType('Mutation');
         $foo = $mutationObjectType->getField('foo');
 
@@ -152,7 +152,7 @@ class SchemaBuilderTest extends TestCase
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
-        /* @var \GraphQL\Type\Definition\ObjectType $queryObjectType */
+        /** @var \GraphQL\Type\Definition\ObjectType $queryObjectType */
         $queryObjectType = $schema->getType('Query');
         $field = $queryObjectType->getField('foo');
 
@@ -174,7 +174,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /* @var \GraphQL\Type\Definition\ObjectType $objectType */
+        /** @var \GraphQL\Type\Definition\ObjectType $objectType */
         $objectType = $schema->getType('Foo');
         $fields = $objectType->config['fields']();
 
@@ -197,7 +197,7 @@ class SchemaBuilderTest extends TestCase
         }
         ');
 
-        /* @var \GraphQL\Type\Definition\ObjectType $type */
+        /** @var \GraphQL\Type\Definition\ObjectType $type */
         $type = $schema->getType('Foo');
 
         $this->assertSame('yo?', $type->getField('bar')->description);
