@@ -401,60 +401,110 @@ mutation {
 }
 ```
 
+When updating a `User`, further nested operations become possible.
+It is up to you which ones you want to expose through the schema definition.
+
+The following example covers the full range of possible operations:
+`create`, `update` and `delete`.
+
+```graphql
+type Mutation {
+  updateUser(input: UpdateUserInput!): User @update(flatten: true)
+}
+
+input UpdateUserInput {
+  id: ID!
+  name: String
+  posts: UpdatePostsRelation
+}
+
+input UpdatePostsRelation {
+  create: [CreatePostInput!]
+  update: [UpdatePostInput!]
+  delete: [ID!]
+}
+
+input CreatePostInput {
+  title: String!
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+}
+```
+
+```graphql
+mutation {
+  updateUser(input: {
+    id: 3,
+    name: "Phillip"
+    posts: {
+      create: [
+        {
+          title: "A new post"
+        }
+      ],
+      update: [
+        {
+          id: 45,
+          title: "This post is updated"
+        }
+      ],
+      delete: [
+        8,
+      ]
+    }
+  }){
+    id
+    posts {
+      id
+    }
+  }
+}
+```
+
 ### Belongs To Many
 
+A belongs to many relation allows you to create new related models as well
+as attaching existing ones.
 
 ```graphql
 type Mutation {
   createPost(input: CreatePostInput!): Post @create(flatten: true)
 }
 
+input CreatePostInput {
+  title: String!
+  authors: CreateAuthorRelation
+}
+
 input CreateAuthorRelation {
-  connect: [ID]
-  create: [CreateAuthorInput]
+  create: [CreateAuthorInput!]
+  connect: [ID!]
 }
 
 input CreateAuthorInput {
   name: String!
 }
-
-input CreatePostInput {
-  title: String!
-  authors: CreateAuthorRelation
-}
 ```
 
-Just pass the ID of the models you want to associate.
+Just pass the ID of the models you want to associate or their full information
+to create a new relation.
 
 ```graphql
 mutation {
   createPost(input: {
     title: "My new Post"
     authors: {
-      connect: [123,124]
-    }
-  }){
-    id
-    authors {
-      name
-    }
-  }
-}
-```
-
-Or create a new ones.
-
-```graphql
-mutation {
-  createPost(input: {
-    title: "My new Post"
-    author: {
-      create: [{
-        name: "Herbert"
-      },
-      {
-        name: "Bro"
-      }]  
+      create: [
+        {
+          name: "Herbert"
+        }
+      ]
+      connect: [
+        123
+      ]
     }
   }){
     id
@@ -472,14 +522,49 @@ Lighthouse will detect the relationship and attach/create it.
   "data": {
     "createPost": {
       "id": 456,
-      "authors": [{
-        "name": "Herbert"
-      },
-      {
-        "name": "Bro"
-      }]
+      "authors": [
+        {
+          "id": 165,
+          "name": "Herbert"
+        },
+        {
+          "id": 123,
+          "name": "Franz"
+        }
+      ]
     }
   }
+}
+```
+
+Updates on BelongsToMany relations may expose up to 6 nested operations.
+
+```graphql
+type Mutation {
+  updatePost(input: UpdatePostInput!): Post @create(flatten: true)
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  authors: UpdateAuthorRelation
+}
+
+input UpdateAuthorRelation {
+  create: [CreateAuthorInput!]
+  connect: [ID!]
+  update: [UpdateAuthorInput!]
+  sync: [ID!]
+  delete: [ID!]
+  disconnect: [ID!]
+}
+
+input CreateAuthorInput {
+  name: String!
+}
+
+input CreateAuthorInput {
+  name: String!
 }
 ```
 
