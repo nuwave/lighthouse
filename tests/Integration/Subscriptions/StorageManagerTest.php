@@ -47,7 +47,7 @@ class StorageManagerTest extends TestCase
                 /**
                  * Serialize the context.
                  *
-                 * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext $context
+                 * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
                  * @return string
                  */
                 public function serialize(GraphQLContext $context)
@@ -58,7 +58,7 @@ class StorageManagerTest extends TestCase
                 /**
                  * Unserialize the context.
                  *
-                 * @param  string $context
+                 * @param  string  $context
                  * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
                  */
                 public function unserialize(string $context)

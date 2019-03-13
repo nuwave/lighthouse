@@ -115,7 +115,7 @@ class GraphQL
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
-     * @param \Nuwave\Lighthouse\Execution\GraphQLRequest $request
+     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return mixed[]
      */
     public function executeRequest(GraphQLRequest $request): array
@@ -136,7 +136,7 @@ class GraphQL
     /**
      * Apply the debug settings from the config and get the result as an array.
      *
-     * @param \GraphQL\Executor\ExecutionResult $result
+     * @param  \GraphQL\Executor\ExecutionResult  $result
      * @return mixed[]
      */
     public function applyDebugSettings(ExecutionResult $result): array
