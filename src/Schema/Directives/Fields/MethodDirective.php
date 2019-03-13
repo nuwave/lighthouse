@@ -35,8 +35,8 @@ class MethodDirective extends BaseDirective implements FieldResolver
         );
 
         return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($method) {
-                return call_user_func([$root, $method], $root, $args, $context, $info);
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($method) {
+                return call_user_func([$root, $method], $root, $args, $context, $resolveInfo);
             }
         );
     }

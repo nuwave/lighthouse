@@ -1,16 +1,16 @@
 <?php
 
-namespace Tests\Unit\Schema\Extensions;
+namespace Tests\Integration\Defer;
 
 use Tests\TestCase;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Schema\Extensions\DeferExtension;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
+use Nuwave\Lighthouse\Defer\Defer;
+use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 
-class DeferExtensionTest extends TestCase
+class DeferTest extends TestCase
 {
-    use RequestsStreamedResponses;
+    use SetUpDefer;
 
     /**
      * @var mixed[]
@@ -21,7 +21,15 @@ class DeferExtensionTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->setUpInMemoryStream($app);
+        $this->setUpDefer($app);
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [DeferServiceProvider::class]
+        );
     }
 
     /**
@@ -283,21 +291,6 @@ class DeferExtensionTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxExecutionTime(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
-        $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
-        // Set max execution time to now so we immediately resolve deferred fields
-        $deferExtension->setMaxExecutionTime(microtime(true));
-
-        self::$data = [
-            'name' => 'John Doe',
-            'parent' => [
-                'name' => 'Jane Doe',
-                'parent' => [
-                    'name' => 'Mr. Smith',
-                ],
-            ],
-        ];
-
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
         type User {
@@ -309,6 +302,21 @@ class DeferExtensionTest extends TestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
+
+        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
+        $defer = app(Defer::class);
+        // Set max execution time to now so we immediately resolve deferred fields
+        $defer->setMaxExecutionTime(microtime(true));
+
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+                'parent' => [
+                    'name' => 'Mr. Smith',
+                ],
+            ],
+        ];
 
         $chunks = $this->getStreamedChunks('
         { 
@@ -342,20 +350,6 @@ class DeferExtensionTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxNestedFields(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\Extensions\DeferExtension $deferExtension */
-        $deferExtension = app(ExtensionRegistry::class)->get(DeferExtension::name());
-        $deferExtension->setMaxNestedFields(1);
-
-        self::$data = [
-            'name' => 'John Doe',
-            'parent' => [
-                'name' => 'Jane Doe',
-                'parent' => [
-                    'name' => 'Mr. Smith',
-                ],
-            ],
-        ];
-
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
         type User {
@@ -367,6 +361,20 @@ class DeferExtensionTest extends TestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
+
+        /** @var \Nuwave\Lighthouse\Defer\Defer $defer */
+        $defer = app(Defer::class);
+        $defer->setMaxNestedFields(1);
+
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+                'parent' => [
+                    'name' => 'Mr. Smith',
+                ],
+            ],
+        ];
 
         $chunks = $this->getStreamedChunks('
         { 

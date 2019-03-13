@@ -48,13 +48,13 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         $maxAge = $this->directiveArgValue('maxAge');
         $privateCache = $this->directiveArgValue('private', false);
 
-        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($value, $resolver, $maxAge, $privateCache) {
+        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($value, $resolver, $maxAge, $privateCache) {
             $cacheValue = new CacheValue([
                 'field_value' => $value,
                 'root' => $root,
                 'args' => $args,
                 'context' => $context,
-                'resolve_info' => $info,
+                'resolve_info' => $resolveInfo,
                 'private_cache' => $privateCache,
             ]);
 
@@ -75,7 +75,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                     : $cache->get($cacheKey);
             }
 
-            $resolvedValue = $resolver($root, $args, $context, $info);
+            $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
 
             $cacheExp = $maxAge
                 ? Carbon::now()->addSeconds($maxAge)

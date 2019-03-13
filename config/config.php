@@ -147,21 +147,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Extensions
-    |--------------------------------------------------------------------------
-    |
-    | Register extension classes that extend \Nuwave\Lighthouse\Schema\Extensions\GraphQLExtension
-    |
-    */
-
-    'extensions' => [
-        // \Nuwave\Lighthouse\Schema\Extensions\DeferExtension::class,
-        // \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
-        // \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | GraphQL Controller
     |--------------------------------------------------------------------------
     |

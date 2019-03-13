@@ -62,7 +62,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"
+                "Nuwave\\Lighthouse\\LighthouseServiceProvider"
             ],
             "aliases": {
                 "graphql": "Nuwave\\Lighthouse\\GraphQL"

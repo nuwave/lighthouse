@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions
@@ -29,14 +28,14 @@ class StorageManager implements StoresSubscriptions
     protected $cache;
 
     /**
-     * @param  \Illuminate\Cache\CacheManager  $cache
+     * @param  \Illuminate\Cache\CacheManager  $cacheManager
      * @return void
      */
-    public function __construct(CacheManager $cache)
+    public function __construct(CacheManager $cacheManager)
     {
-        $store = config('lighthouse.subscriptions.storage', 'redis');
-
-        $this->cache = $cache->store($store);
+        $this->cache = $cacheManager->store(
+            config('lighthouse.subscriptions.storage', 'redis')
+        );
     }
 
     /**
@@ -67,9 +66,7 @@ class StorageManager implements StoresSubscriptions
     {
         $key = self::SUBSCRIBER_KEY.".{$channel}";
 
-        return $this->cache->has($key)
-            ? Subscriber::unserialize($this->cache->get($key))
-            : null;
+        return $this->cache->get($key);
     }
 
     /**
@@ -117,7 +114,7 @@ class StorageManager implements StoresSubscriptions
         $topic[] = $subscriber->channel;
 
         $this->cache->forever($topicKey, json_encode($topic));
-        $this->cache->forever($subscriberKey, json_encode($subscriber->toArray()));
+        $this->cache->forever($subscriberKey, $subscriber);
     }
 
     /**
@@ -132,9 +129,7 @@ class StorageManager implements StoresSubscriptions
         $key = self::SUBSCRIBER_KEY.".{$channel}";
         $hasSubscriber = $this->cache->has($key);
 
-        $subscriber = $hasSubscriber
-            ? Subscriber::unserialize($this->cache->get($key))
-            : null;
+        $subscriber = $this->cache->get($key);
 
         if ($hasSubscriber) {
             $this->cache->forget($key);

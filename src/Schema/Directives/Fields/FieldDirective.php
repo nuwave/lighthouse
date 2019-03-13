@@ -40,12 +40,12 @@ class FieldDirective extends BaseDirective implements FieldResolver
         $additionalData = $this->directiveArgValue('args');
 
         return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($resolver, $additionalData) {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $additionalData) {
                 return $resolver(
                     $root,
                     array_merge($args, ['directive' => $additionalData]),
                     $context,
-                    $info
+                    $resolveInfo
                 );
             }
         );
