@@ -3,7 +3,7 @@
 use Faker\Generator as Faker;
 use Tests\Utils\Models\Company;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Company::class, function (Faker $faker) {
     return [
         'name' => $faker->sentence,
