@@ -45,8 +45,8 @@ class SubscriptionRegistry
     protected $subscriptions = [];
 
     /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer $serializer
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager $storage
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
+     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @return void
      */
@@ -159,7 +159,7 @@ class SubscriptionRegistry
     /**
      * Reset the collection of subscribers when a new execution starts.
      *
-     * @param \Nuwave\Lighthouse\Events\StartExecution $startExecution
+     * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
      * @return void
      */
     public function handleStartExecution(StartExecution $startExecution)
