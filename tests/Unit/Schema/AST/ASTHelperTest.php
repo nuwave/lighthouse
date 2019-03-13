@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -61,7 +62,7 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(3, $objectType1->fields);
 
-        $firstNameField = collect($objectType1->fields)->first(function ($field) {
+        $firstNameField = (new Collection($objectType1->fields))->first(function ($field) {
             return $field->name->value === 'first_name';
         });
 

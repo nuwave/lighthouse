@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -57,11 +58,11 @@ class CreateDirective extends BaseDirective implements FieldResolver
                     : $args;
 
                 if (! config('lighthouse.transactional_mutations', true)) {
-                    return MutationExecutor::executeCreate($model, collect($args))->refresh();
+                    return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
                 }
 
                 return $this->db->connection()->transaction(function () use ($model, $args): Model {
-                    return MutationExecutor::executeCreate($model, collect($args))->refresh();
+                    return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
                 });
             }
         );

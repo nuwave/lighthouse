@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Closure;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
@@ -167,7 +168,7 @@ class NodeFactory
         return new EnumType([
             'name' => $enumDefinition->name->value,
             'description' => data_get($enumDefinition->description, 'value'),
-            'values' => collect($enumDefinition->values)
+            'values' => (new Collection($enumDefinition->values))
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     // Get the directive that is defined on the field itself
                     $directive = ASTHelper::directiveDefinition($field, 'enum');
@@ -233,7 +234,7 @@ class NodeFactory
             'description' => data_get($objectDefinition->description, 'value'),
             'fields' => $this->resolveFieldsFunction($objectDefinition),
             'interfaces' => function () use ($objectDefinition) {
-                return collect($objectDefinition->interfaces)
+                return (new Collection($objectDefinition->interfaces))
                     ->map(function (NamedTypeNode $interface) {
                         return $this->typeRegistry->get($interface->name->value);
                     })
@@ -251,7 +252,7 @@ class NodeFactory
     protected function resolveFieldsFunction($definition): Closure
     {
         return function () use ($definition): array {
-            return collect($definition->fields)
+            return (new Collection($definition->fields))
                 ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition): array {
                     $fieldValue = new FieldValue(
                         new NodeValue($definition),
@@ -288,7 +289,7 @@ class NodeFactory
     protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): Closure
     {
         return function () use ($definition) {
-            return collect($definition->fields)
+            return (new Collection($definition->fields))
                 ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
                     $argumentValue = new ArgumentValue($inputValueDefinition);
 
@@ -382,7 +383,7 @@ class NodeFactory
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
             'types' => function () use ($unionDefinition) {
-                return collect($unionDefinition->types)
+                return (new Collection($unionDefinition->types))
                     ->map(function (NamedTypeNode $type) {
                         return $this->typeRegistry->get(
                             $type->name->value

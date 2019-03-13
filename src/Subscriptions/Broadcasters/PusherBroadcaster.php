@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Subscriptions\Broadcasters;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -72,7 +73,7 @@ class PusherBroadcaster implements Broadcaster
      */
     public function hook(Request $request): JsonResponse
     {
-        collect($request->input('events', []))
+        (new Collection($request->input('events', [])))
             ->filter(function ($event): bool {
                 return Arr::get($event, 'name') === 'channel_vacated';
             })

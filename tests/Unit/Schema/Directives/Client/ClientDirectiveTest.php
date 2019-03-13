@@ -40,15 +40,15 @@ class ClientDirectiveTest extends TestCase
     public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
         /** @var \GraphQL\Language\AST\ArgumentNode $key */
-        $key = collect($resolveInfo->fieldNodes)
+        $key = (new Collection($resolveInfo->fieldNodes))
             ->flatMap(function (FieldNode $node): Collection {
-                return collect($node->directives);
+                return new Collection($node->directives);
             })
             ->filter(function (DirectiveNode $directive): bool {
                 return $directive->name->value === 'filter';
             })
             ->flatMap(function (DirectiveNode $directive): Collection {
-                return collect($directive->arguments);
+                return new Collection($directive->arguments);
             })
             ->first(function (ArgumentNode $arg): bool {
                 return $arg->name->value === 'key';
