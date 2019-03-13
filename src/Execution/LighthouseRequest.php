@@ -37,6 +37,16 @@ class LighthouseRequest implements GraphQLRequest
     }
 
     /**
+     * Get instance of original request.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function instance(): Request
+    {
+        return $this->request;
+    }
+
+    /**
      * Get the contained GraphQL query string.
      *
      * @return string
