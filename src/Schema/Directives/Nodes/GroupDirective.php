@@ -50,9 +50,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
         $node = $this->setNamespaceDirectiveOnFields($node);
 
-        $documentAST->setDefinition($node);
-
-        return $documentAST;
+        return $documentAST->setDefinition($node);
     }
 
     /**
