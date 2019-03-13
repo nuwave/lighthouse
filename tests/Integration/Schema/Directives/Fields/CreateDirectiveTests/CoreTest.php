@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use CreateTestbenchTagsTable;
 
 class CoreTest extends DBTestCase
 {
@@ -107,7 +108,7 @@ class CoreTest extends DBTestCase
             'data' => [
                 'createTag' => [
                     'name' => 'foobar',
-                    'default_string' => \CreateTestbenchTagsTable::DEFAULT_STRING,
+                    'default_string' => CreateTestbenchTagsTable::DEFAULT_STRING,
                 ],
             ],
         ]);
