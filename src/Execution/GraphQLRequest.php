@@ -7,13 +7,6 @@ use Illuminate\Http\Request;
 interface GraphQLRequest
 {
     /**
-     * Get instance of original request.
-     *
-     * @return \Illuminate\Http\Request
-     */
-    public function instance(): Request;
-
-    /**
      * Get the contained GraphQL query string.
      *
      * @return string
