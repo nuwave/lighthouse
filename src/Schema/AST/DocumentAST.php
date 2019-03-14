@@ -29,6 +29,7 @@ class DocumentAST implements Serializable
      * @var \GraphQL\Type\Definition\ObjectType<\GraphQL\Language\AST\DefinitionNode>
      */
     protected $definitionMap;
+
     /**
      * A collection of type extensions.
      *
@@ -45,7 +46,7 @@ class DocumentAST implements Serializable
         /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode> $typeExtensions */
         /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\DefinitionNode> $definitionNodes */
         // We can not store type extensions in the map, since they do not have unique names
-        [$typeExtensions, $definitionNodes] = collect($documentNode->definitions)
+        [$typeExtensions, $definitionNodes] = (new Collection($documentNode->definitions))
             ->partition(function (DefinitionNode $definitionNode): bool {
                 return $definitionNode instanceof TypeExtensionNode;
             });
@@ -69,7 +70,7 @@ class DocumentAST implements Serializable
      */
     protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
     {
-        $fieldNames = collect($typeExtensionNode->fields)
+        $fieldNames = (new Collection($typeExtensionNode->fields))
             ->map(function ($field): string {
                 return $field->name->value;
             })

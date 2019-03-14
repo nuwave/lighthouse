@@ -174,7 +174,7 @@ class FieldFactory
      */
     protected function getArgumentValues(): Collection
     {
-        return collect($this->fieldValue->getField()->arguments)
+        return (new Collection($this->fieldValue->getField()->arguments))
             ->map(function (InputValueDefinitionNode $inputValueDefinition): ArgumentValue {
                 return new ArgumentValue($inputValueDefinition, $this->fieldValue);
             });
@@ -270,7 +270,7 @@ class FieldFactory
         }
 
         if ($type instanceof InputObjectType) {
-            collect($type->getFields())
+            (new Collection($type->getFields()))
                 ->each(
                     function (InputObjectField $field) use ($argumentPath, &$argValue): void {
                         $noValuePassedForThisArgument = ! array_key_exists($field->name, $argValue);

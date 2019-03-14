@@ -32,7 +32,8 @@ module.exports = [{
         title: 'Extensions',
         children: [
             'extensions/subscriptions',
-            'extensions/deferred'
+            'extensions/deferred',
+            'extensions/tracing'
         ]
     },
     {
@@ -40,6 +41,7 @@ module.exports = [{
         children: [
             'api-reference/directives',
             'api-reference/resolvers',
+            'api-reference/events',
         ]
     }
 ]

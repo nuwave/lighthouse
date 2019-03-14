@@ -63,7 +63,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      */
     protected function getAbilities(): Collection
     {
-        return collect(
+        return new Collection(
             $this->directiveArgValue('ability')
             ?? $this->directiveArgValue('if')
         );

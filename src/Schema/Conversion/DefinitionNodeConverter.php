@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Conversion;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\NodeKind;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\NamedTypeNode;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
@@ -54,7 +55,7 @@ class DefinitionNodeConverter
         }
 
         // Re-wrap the type by applying the wrappers in the reversed order
-        return collect($wrappers)
+        return (new Collection($wrappers))
             ->reverse()
             ->reduce(
                 function (Type $type, string $kind): Type {

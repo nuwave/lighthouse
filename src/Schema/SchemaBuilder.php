@@ -123,12 +123,12 @@ class SchemaBuilder
                 return new Directive([
                     'name' => $directive->name->value,
                     'description' => data_get($directive->description, 'value'),
-                    'locations' => collect($directive->locations)
+                    'locations' => (new Collection($directive->locations))
                         ->map(function ($location) {
                             return $location->value;
                         })
                         ->toArray(),
-                    'args' => collect($directive->arguments)
+                    'args' => (new Collection($directive->arguments))
                         ->map(function (InputValueDefinitionNode $argument) {
                             $fieldArgumentConfig = [
                                 'name' => $argument->name->value,

@@ -120,7 +120,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      */
     public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
     {
-        if (! $objectType instanceof ObjectTypeDefinitionNode
+        if (
+            ! $objectType instanceof ObjectTypeDefinitionNode
             && ! $objectType instanceof ObjectTypeExtensionNode
         ) {
             throw new DirectiveException(
@@ -128,7 +129,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
             );
         }
 
-        $middlewareArgValue = collect($middlewareArgValue)
+        $middlewareArgValue = (new Collection($middlewareArgValue))
             ->map(function (string $middleware) : string {
                 // Add slashes, as re-parsing of the values removes a level of slashes
                 return addslashes($middleware);
@@ -138,7 +139,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
         $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
 
         $objectType->fields = new NodeList(
-            collect($objectType->fields)
+            (new Collection($objectType->fields))
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective): FieldDefinitionNode {
                     // If the field already has middleware defined, skip over it
                     // Field middleware are more specific then those defined on a type
@@ -168,7 +169,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
         $middleware = $router->getMiddleware();
         $middlewareGroups = $router->getMiddlewareGroups();
 
-        return collect($middlewareArgValue)
+        return (new Collection($middlewareArgValue))
             ->map(function (string $name) use ($middleware, $middlewareGroups): array {
                 return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
             })

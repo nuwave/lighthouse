@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Extensions;
+namespace Tests\Integration\Defer;
 
 use Tests\DBTestCase;
 use Illuminate\Support\Arr;
@@ -8,11 +8,11 @@ use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
-use Tests\Unit\Schema\Extensions\RequestsStreamedResponses;
+use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 
-class DeferExtensionDBTest extends DBTestCase
+class DeferDBTest extends DBTestCase
 {
-    use RequestsStreamedResponses;
+    use SetUpDefer;
 
     /**
      * @var \Closure
@@ -23,7 +23,15 @@ class DeferExtensionDBTest extends DBTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $this->setUpInMemoryStream($app);
+        $this->setUpDefer($app);
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [DeferServiceProvider::class]
+        );
     }
 
     /**
@@ -244,7 +252,7 @@ class DeferExtensionDBTest extends DBTestCase
 
         $deferredCompanies = $chunks[2];
         $this->assertCount(6, $deferredCompanies);
-        collect($deferredCompanies)->each(function (array $item) use ($companies): void {
+        (new Collection($deferredCompanies))->toBase()->each(function (array $item) use ($companies): void {
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
 

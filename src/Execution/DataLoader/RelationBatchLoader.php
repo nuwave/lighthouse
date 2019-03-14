@@ -126,6 +126,6 @@ class RelationBatchLoader extends BatchLoader
      */
     protected function getParentModels(): Collection
     {
-        return collect($this->keys)->pluck('parent');
+        return (new Collection($this->keys))->pluck('parent');
     }
 }

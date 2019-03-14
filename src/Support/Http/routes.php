@@ -16,5 +16,3 @@ app('router')->group(config('lighthouse.route', []), function (): void {
         'uses' => $controller,
     ]);
 });
-
-app(\Nuwave\Lighthouse\Subscriptions\SubscriptionRouter::class)->routes();

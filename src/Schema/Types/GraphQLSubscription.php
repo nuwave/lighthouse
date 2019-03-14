@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Types;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -29,7 +30,9 @@ abstract class GraphQLSubscription
      */
     public function encodeTopic(Subscriber $subscriber, string $fieldName)
     {
-        return strtoupper(snake_case($fieldName));
+        return strtoupper(
+            Str::snake($fieldName)
+        );
     }
 
     /**
@@ -41,7 +44,9 @@ abstract class GraphQLSubscription
      */
     public function decodeTopic(string $fieldName, $root)
     {
-        return strtoupper(snake_case($fieldName));
+        return strtoupper(
+            Str::snake($fieldName)
+        );
     }
 
     /**
@@ -50,10 +55,10 @@ abstract class GraphQLSubscription
      * @param  mixed  $root
      * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info)
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         return $root;
     }

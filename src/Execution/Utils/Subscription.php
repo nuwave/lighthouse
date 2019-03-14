@@ -25,7 +25,9 @@ class Subscription
     {
         // Ensure we have a schema and registered subscription fields
         // in the event we are calling this method in code.
-        app(GraphQL::class)->prepSchema();
+        /** @var \Nuwave\Lighthouse\GraphQL $graphQL */
+        $graphQL = app(GraphQL::class);
+        $graphQL->prepSchema();
 
         /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $registry */
         $registry = app(SubscriptionRegistry::class);
