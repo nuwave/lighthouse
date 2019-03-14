@@ -1,5 +1,9 @@
 # Tutorial
 
+[[toc]]
+
+---
+
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
 with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.

@@ -1,5 +1,9 @@
 # Installation
 
+[[toc]]
+
+---
+
 ## Install via composer
 
 ```bash

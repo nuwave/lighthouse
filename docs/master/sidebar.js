@@ -11,7 +11,6 @@ module.exports = [{
         title: 'The Basics',
         children: [
             'the-basics/schema',
-            'the-basics/types',
             'the-basics/fields',
         ]
     },
@@ -19,8 +18,12 @@ module.exports = [{
         title: 'Types',
         children: [
             ['types/getting-started', 'Getting Started'],
+            'types/objects',
             'types/scalars',
             'types/enums',
+            'types/inputs',
+            'types/interfaces',
+            'types/unions',
         ]
     },
     {
@@ -50,6 +53,13 @@ module.exports = [{
         ]
     },
     {
+        title: 'Directives',
+        children: [
+            ['directives/getting-started', 'Getting Started'],
+            ['directives/custom-directives', 'Creating Your Own'],
+        ]
+    },
+    {
         title: 'Extensions',
         children: [
             ['extensions/getting-started', 'Getting Started'],
@@ -74,6 +84,7 @@ module.exports = [{
             ['package-development/getting-started', 'Getting Started'],
             'package-development/schema',
             'package-development/request',
+            'package-development/directives',
 
         ],
     },
@@ -94,7 +105,6 @@ module.exports = [{
             'guides/auth',
             'guides/validation',
             'guides/relationships',
-            'guides/custom-directives',
             'guides/error-handling',
             'guides/plugin-development',
         ]

@@ -1,4 +1,8 @@
-# Custom Directives
+# Creating Your Own Directive
+
+[[toc]]
+
+---
 
 Lighthouse provides various convenient server side directives that can be applied to a lots of generic use cases.
 However you are free to create your own directives depending upon your needs. 
