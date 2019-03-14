@@ -44,7 +44,7 @@ class MutationExecutor
 
         [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
 
-        $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
+        $model = self::saveModelWithPotentialParent($model, $remaining, $parentRelation);
 
         self::executeCreateHasMany($model, $hasMany);
 
@@ -62,17 +62,20 @@ class MutationExecutor
     }
 
     /**
-     * Save a model with BelongsTo.
+     * Save a model that maybe has a parent.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Support\Collection  $args
      * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected static function saveModelWithBelongsTo(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    protected static function saveModelWithPotentialParent(Model $model, Collection $args, ?Relation $parentRelation = null): Model
     {
-        $reflection = new ReflectionClass($model);
-        [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $args, BelongsTo::class);
+        [$belongsTo, $remaining] = self::partitionArgsByRelationType(
+            new ReflectionClass($model),
+            $args,
+            BelongsTo::class
+        );
 
         // Use all the remaining attributes and fill the model
         $model->fill(
@@ -96,18 +99,35 @@ class MutationExecutor
                     $belongsTo->associate($values);
                 }
 
+                if ($operationKey === 'update') {
+                   $belongsToModel = self::executeUpdate($relation->getModel()->newInstance(), collect($values));
+                   $relation->associate($belongsToModel);
+                }
+
+                if ($operationKey === 'disconnect') {
+                    $relation->dissociate();
+                }
+
                 if ($operationKey === 'delete') {
                     $relation->getModel()::destroy($values);
                 }
             });
         });
 
-        // If we are already resolving a nested create, we might
-        // already have an instance of the parent relation available.
-        // In that case, use it to set the current model as a child.
-        $parentRelation
-            ? $parentRelation->save($model)
-            : $model->save();
+        if ($parentRelation && ! $parentRelation instanceof BelongsToMany){
+            // If we are already resolving a nested create, we might
+            // already have an instance of the parent relation available.
+            // In that case, use it to set the current model as a child.
+            $parentRelation->save($model);
+
+            return $model;
+        }
+
+        $model->save();
+
+        if ($parentRelation instanceof BelongsToMany) {
+            $parentRelation->syncWithoutDetaching($model);
+        }
 
         return $model;
     }
@@ -180,7 +200,7 @@ class MutationExecutor
 
         [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
 
-        $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
+        $model = self::saveModelWithPotentialParent($model, $remaining, $parentRelation);
 
         $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
