@@ -61,10 +61,10 @@ class BelongsToTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '2'
-                    ]
-                ]
-            ]
+                        'id' => '2',
+                    ],
+                ],
+            ],
         ]);
 
         $task = Task::first();

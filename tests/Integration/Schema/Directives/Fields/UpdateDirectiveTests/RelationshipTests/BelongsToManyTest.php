@@ -44,7 +44,7 @@ class BelongsToManyTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->schema = $this->schemaBase . $this->placeholderQuery();
+        $this->schema = $this->schemaBase.$this->placeholderQuery();
     }
 
     /**

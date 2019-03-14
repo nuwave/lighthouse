@@ -100,8 +100,8 @@ class MutationExecutor
                 }
 
                 if ($operationKey === 'update') {
-                   $belongsToModel = self::executeUpdate($relation->getModel()->newInstance(), collect($values));
-                   $relation->associate($belongsToModel);
+                    $belongsToModel = self::executeUpdate($relation->getModel()->newInstance(), collect($values));
+                    $relation->associate($belongsToModel);
                 }
 
                 if ($operationKey === 'disconnect') {
@@ -114,7 +114,7 @@ class MutationExecutor
             });
         });
 
-        if ($parentRelation && ! $parentRelation instanceof BelongsToMany){
+        if ($parentRelation && ! $parentRelation instanceof BelongsToMany) {
             // If we are already resolving a nested create, we might
             // already have an instance of the parent relation available.
             // In that case, use it to set the current model as a child.
