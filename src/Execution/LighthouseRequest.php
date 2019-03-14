@@ -181,7 +181,7 @@ class LighthouseRequest implements GraphQLRequest
                     }
 
                     // Check if this file is mapped to the current query or query is not batched
-                    if ($insideCurrentQuery) { // TODO Check is non-batched works
+                    if ($insideCurrentQuery) {
                         // Remove index from location, if query is batched
                         if ($this->isBatched()) {
                             $location = preg_replace('/'.$this->batchIndex.'./', '', $location, 1);
