@@ -177,7 +177,7 @@ class LighthouseRequest implements GraphQLRequest
                     // Set to true, if query is not batched
                     $insideCurrentQuery = ! $this->isBatched();
                     if ($this->isBatched()) {
-                        $insideCurrentQuery = strpos($location, (string) $this->batchIndex()) === 0 ? true : false;
+                        $insideCurrentQuery = strpos($location, (string) $this->batchIndex()) === 0;
                     }
 
                     // Check if this file is mapped to the current query or query is not batched
