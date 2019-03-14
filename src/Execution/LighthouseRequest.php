@@ -32,7 +32,7 @@ class LighthouseRequest implements GraphQLRequest
     {
         $this->request = $request;
 
-        if($this->isMultipartRequest()) {
+        if ($this->isMultipartRequest()) {
             // If operations is 0-indexed, we assume we are resolving a batched query
             if (! is_null($this->getInputByKey(0))) {
                 $this->batchIndex = 0;
@@ -176,7 +176,7 @@ class LighthouseRequest implements GraphQLRequest
 
                     // Check if location is inside current batchIndex.
                     // Set to true, if query is not batched
-                    $insideCurrentQuery = !$this->isBatched();
+                    $insideCurrentQuery = ! $this->isBatched();
                     if ($this->isBatched()) {
 
                         $insideCurrentQuery = strpos($location, (string) $this->batchIndex()) === 0 ? true : false;

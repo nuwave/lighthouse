@@ -333,7 +333,7 @@ class GraphQLTest extends DBTestCase
                 'data' => [
                     'upload' => true,
                 ],
-            ]
+            ],
         ]);
     }
 }
