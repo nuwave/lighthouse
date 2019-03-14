@@ -44,7 +44,6 @@ class LighthouseRequest implements GraphQLRequest
                 $this->batchIndex = 0;
             }
         }
-
     }
 
     /**
@@ -178,7 +177,6 @@ class LighthouseRequest implements GraphQLRequest
                     // Set to true, if query is not batched
                     $insideCurrentQuery = ! $this->isBatched();
                     if ($this->isBatched()) {
-
                         $insideCurrentQuery = strpos($location, (string) $this->batchIndex()) === 0 ? true : false;
                     }
 
