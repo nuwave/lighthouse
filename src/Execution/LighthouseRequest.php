@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use GraphQL\Error\InvariantViolation;
-use Illuminate\Support\Str;
 
 class LighthouseRequest implements GraphQLRequest
 {
