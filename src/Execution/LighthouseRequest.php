@@ -85,7 +85,7 @@ class LighthouseRequest implements GraphQLRequest
      */
     public function isBatched(): bool
     {
-        return ! is_null($this->batchIndex);
+        return ! is_null($this->batchIndex) && ! $this->isMultipartRequest();
     }
 
     /**
