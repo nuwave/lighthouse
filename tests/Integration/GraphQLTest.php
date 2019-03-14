@@ -286,4 +286,54 @@ class GraphQLTest extends DBTestCase
             ],
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function itResolvesUploadViaBatchedMultipartRequest(): void
+    {
+        $this->postGraphQLMultipart(
+            [
+                'operations' => /* @lang JSON */
+                    '
+                    [
+                        {
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "variables": {
+                                "file": null
+                            }
+                        },
+                        {
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "variables": {
+                                "file": null
+                            }
+                        }
+                    ]
+                ',
+                'map' => /* @lang JSON */
+                    '
+                    {
+                        "0": ["0.variables.file"],
+                        "1": ["1.variables.file"]
+                    }
+                ',
+            ],
+            [
+                '0' => UploadedFile::fake()->create('image.jpg', 500),
+                '1' => UploadedFile::fake()->create('image.jpg', 500),
+            ]
+        )->assertJson([
+            [
+                'data' => [
+                    'upload' => true,
+                ],
+            ],
+            [
+                'data' => [
+                    'upload' => true,
+                ],
+            ]
+        ]);
+    }
 }

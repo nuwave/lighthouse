@@ -31,11 +31,20 @@ class LighthouseRequest implements GraphQLRequest
     public function __construct(Request $request)
     {
         $this->request = $request;
-        // If the request has neither a query, nor an operationName,
-        // we assume we are resolving a batched query.
-        if (! $request->hasAny('query', 'operationName')) {
-            $this->batchIndex = 0;
+
+        if($this->isMultipartRequest()) {
+            // If operations is 0-indexed, we assume we are resolving a batched query
+            if (! is_null($this->getInputByKey(0))) {
+                $this->batchIndex = 0;
+            }
+        } else {
+            // If the request has neither a query, nor an operationName,
+            // we assume we are resolving a batched query.
+            if (! $request->hasAny('query', 'operationName')) {
+                $this->batchIndex = 0;
+            }
         }
+
     }
 
     /**
@@ -85,7 +94,7 @@ class LighthouseRequest implements GraphQLRequest
      */
     public function isBatched(): bool
     {
-        return ! is_null($this->batchIndex) && ! $this->isMultipartRequest();
+        return ! is_null($this->batchIndex);
     }
 
     /**
@@ -134,9 +143,11 @@ class LighthouseRequest implements GraphQLRequest
     protected function getInputByKey(string $key)
     {
         if ($this->isMultipartRequest()) {
-            $operations = json_decode($this->request->input('operations'));
+            $operations = json_decode($this->request->input('operations'), true);
 
-            return isset($operations->{$key}) ? $operations->{$key} : null;
+            return $operations[$key]
+                ?? $operations[$this->batchIndex][$key]
+                ?? null;
         }
 
         return $this->request->input($key)
@@ -162,16 +173,33 @@ class LighthouseRequest implements GraphQLRequest
 
             foreach ($map as $fileKey => $locations) {
                 foreach ($locations as $location) {
-                    $items = &$variables;
-                    $location = preg_replace('/variables./', '', $location, 1);
-                    $location = explode('.', $location);
-                    foreach ($location as $key) {
-                        if (! isset($items[$key]) || ! is_array($items[$key])) {
-                            $items[$key] = [];
-                        }
-                        $items = &$items[$key];
+
+                    // Check if location is inside current batchIndex.
+                    // Set to true, if query is not batched
+                    $insideCurrentQuery = !$this->isBatched();
+                    if ($this->isBatched()) {
+
+                        $insideCurrentQuery = strpos($location, (string) $this->batchIndex()) === 0 ? true : false;
                     }
-                    $items = $this->request->file($fileKey);
+
+                    // Check if this file is mapped to the current query or query is not batched
+                    if ($insideCurrentQuery) { // TODO Check is non-batched works
+                        // Remove index from location, if query is batched
+                        if ($this->isBatched()) {
+                            $location = preg_replace('/'.$this->batchIndex.'./', '', $location, 1);
+                        }
+
+                        $items = &$variables;
+                        $location = preg_replace('/variables./', '', $location, 1);
+                        $location = explode('.', $location);
+                        foreach ($location as $key) {
+                            if (! isset($items[$key]) || ! is_array($items[$key])) {
+                                $items[$key] = [];
+                            }
+                            $items = &$items[$key];
+                        }
+                        $items = $this->request->file($fileKey);
+                    }
                 }
             }
         }

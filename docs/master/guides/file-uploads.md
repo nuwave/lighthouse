@@ -3,11 +3,6 @@
 Lighthouse allows you to upload files using a multipart form request
 as defined in [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
 
-::: warning
-The upload functionality is implemented in Lighthouse's default controller `\Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController`.
-When using a custom controller, you will have to add support for it yourself.
-:::
-
 ## Preparing your schema
 
 In order to accept file uploads, you must add the `Upload` scalar to your schema.
