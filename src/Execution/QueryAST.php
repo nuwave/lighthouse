@@ -24,7 +24,7 @@ class QueryAST
      */
     public function __construct(DocumentNode $documentNode)
     {
-        $this->definitions = collect($documentNode->definitions);
+        $this->definitions = new Collection($documentNode->definitions);
     }
 
     /**

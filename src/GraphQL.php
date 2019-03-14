@@ -10,16 +10,18 @@ use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
-use Nuwave\Lighthouse\Events\BuildingAST;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Events\ManipulateResult;
+use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use GraphQL\Validator\Rules\DisableIntrospection;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
+use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
@@ -76,6 +78,13 @@ class GraphQL
     protected $astBuilder;
 
     /**
+     * The context factory.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
+     */
+    private $createsContext;
+
+    /**
      * GraphQL constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
@@ -83,6 +92,7 @@ class GraphQL
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
      * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
+     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @return void
      */
     public function __construct(
@@ -90,27 +100,31 @@ class GraphQL
         SchemaSourceProvider $schemaSourceProvider,
         Pipeline $pipeline,
         EventDispatcher $eventDispatcher,
-        ASTBuilder $astBuilder
+        ASTBuilder $astBuilder,
+        CreatesContext $createsContext
     ) {
         $this->schemaBuilder = $schemaBuilder;
         $this->schemaSourceProvider = $schemaSourceProvider;
         $this->pipeline = $pipeline;
         $this->eventDispatcher = $eventDispatcher;
         $this->astBuilder = $astBuilder;
+        $this->createsContext = $createsContext;
     }
 
     /**
      * Execute a set of batched queries on the lighthouse schema and return a
      * collection of ExecutionResults.
      *
-     * @param \Nuwave\Lighthouse\Execution\GraphQLRequest $request
+     * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return mixed[]
      */
     public function executeRequest(GraphQLRequest $request): array
     {
         $result = $this->executeQuery(
             $request->query(),
-            $request->context(),
+            $this->createsContext->generate(
+                app('request')
+            ),
             $request->variables(),
             null,
             $request->operationName()
@@ -122,7 +136,7 @@ class GraphQL
     /**
      * Apply the debug settings from the config and get the result as an array.
      *
-     * @param \GraphQL\Executor\ExecutionResult $result
+     * @param  \GraphQL\Executor\ExecutionResult  $result
      * @return mixed[]
      */
     public function applyDebugSettings(ExecutionResult $result): array
@@ -181,7 +195,7 @@ class GraphQL
         // a single key and the extension content as the value, e.g.
         // ['tracing' => ['some' => 'content']]
         $extensionResults = $this->eventDispatcher->dispatch(
-            new GatheringExtensions
+            new BuildExtensionsResponse
         );
 
         // Ensure we preserve the extension keys while flattening
@@ -210,6 +224,11 @@ class GraphQL
                     $errors
                 );
             }
+        );
+
+        // Allow listeners to manipulate the result after each resolved query
+        $this->eventDispatcher->dispatch(
+            new ManipulateResult($result)
         );
 
         return $result;
@@ -280,7 +299,7 @@ class GraphQL
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
         $additionalSchemas = $this->eventDispatcher->dispatch(
-            new BuildingAST($schemaString)
+            new BuildSchemaString($schemaString)
         );
 
         $documentAST = $this->astBuilder->build(
@@ -291,10 +310,10 @@ class GraphQL
         );
 
         // Listeners may manipulate the DocumentAST that is passed by reference
-        // into the ManipulatingAST event. This can be useful for extensions
+        // into the ManipulateAST event. This can be useful for extensions
         // that want to programmatically change the schema.
         $this->eventDispatcher->dispatch(
-            new ManipulatingAST($documentAST)
+            new ManipulateAST($documentAST)
         );
 
         return $documentAST;

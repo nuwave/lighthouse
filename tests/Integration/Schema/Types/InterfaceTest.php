@@ -140,7 +140,8 @@ class InterfaceTest extends DBTestCase
         }
         ');
 
-        $interface = collect($result->jsonGet('data.__schema.types'))
+        $interface = Collection ::make($result->jsonGet('data.__schema.types'))
+            ->toBase()
             ->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);

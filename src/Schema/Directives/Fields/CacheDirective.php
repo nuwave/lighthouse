@@ -6,6 +6,7 @@ use Closure;
 use Carbon\Carbon;
 use GraphQL\Deferred;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -145,12 +146,12 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         }
 
         $fields = data_get($nodeValue->getTypeDefinition(), 'fields', []);
-        $nodeKey = collect($fields)->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
+        $nodeKey = (new Collection($fields))->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
             if ($key) {
                 return $key;
             }
 
-            $hasCacheKey = collect($field->directives)
+            $hasCacheKey = (new Collection($field->directives))
                 ->contains(function (DirectiveNode $directive): bool {
                     return $directive->name->value === 'cacheKey';
                 });
@@ -161,7 +162,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         });
 
         if (! $nodeKey) {
-            $nodeKey = collect($fields)->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
+            $nodeKey = (new Collection($fields))->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
                 if ($key) {
                     return $key;
                 }

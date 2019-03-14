@@ -5,6 +5,7 @@ namespace Tests\Unit\Execution\Utils;
 use Tests\TestCase;
 use Prophecy\Argument;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
@@ -82,7 +83,7 @@ class SubscriptionTest extends TestCase
     public function itThrowsOnInvalidSubscriptionField(): void
     {
         $this->broadcaster->broadcast(Argument::any())->shouldNotBeCalled();
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         Subscription::broadcast('unknownField', []);
     }

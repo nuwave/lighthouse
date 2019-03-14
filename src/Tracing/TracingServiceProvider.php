@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Tracing;
 
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 
@@ -27,8 +27,8 @@ class TracingServiceProvider extends ServiceProvider
         );
 
         $eventsDispatcher->listen(
-            ManipulatingAST::class,
-            Tracing::class.'@handleManipulatingAST'
+            ManipulateAST::class,
+            Tracing::class.'@handleManipulateAST'
         );
 
         $eventsDispatcher->listen(
@@ -42,8 +42,8 @@ class TracingServiceProvider extends ServiceProvider
         );
 
         $eventsDispatcher->listen(
-            GatheringExtensions::class,
-            Tracing::class.'@handleGatheringExtensions'
+            BuildExtensionsResponse::class,
+            Tracing::class.'@handleBuildExtensionsResponse'
         );
     }
 

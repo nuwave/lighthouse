@@ -33,7 +33,8 @@ module.exports = [{
         title: 'Extensions',
         children: [
             'extensions/subscriptions',
-            'extensions/deferred'
+            'extensions/deferred',
+            'extensions/tracing'
         ]
     },
     {

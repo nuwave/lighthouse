@@ -4,7 +4,7 @@ namespace Tests\Unit\Events;
 
 use Tests\TestCase;
 use Illuminate\Support\Facades\Event;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class ManipulatingASTTest extends TestCase
@@ -20,8 +20,8 @@ class ManipulatingASTTest extends TestCase
         }
         ';
 
-        Event::listen(ManipulatingAST::class, function (ManipulatingAST $manipulatingAST): void {
-            $manipulatingAST->documentAST->setDefinition(
+        Event::listen(ManipulateAST::class, function (ManipulateAST $ManipulateAST): void {
+            $ManipulateAST->documentAST->setDefinition(
                 PartialParser::objectTypeDefinition(
                     $this->placeholderQuery()
                 )

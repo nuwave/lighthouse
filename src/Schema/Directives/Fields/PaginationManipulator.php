@@ -119,11 +119,9 @@ class PaginationManipulator
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
 
-        $documentAST->setDefinition($connectionType);
-        $documentAST->setDefinition($connectionEdge);
-        $documentAST->setDefinition($parentType);
-
-        return $documentAST;
+        return $documentAST->setDefinition($connectionType)
+                           ->setDefinition($connectionEdge)
+                           ->setDefinition($parentType);
     }
 
     /**

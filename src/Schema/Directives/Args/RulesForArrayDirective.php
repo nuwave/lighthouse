@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
@@ -42,7 +43,7 @@ class RulesForArrayDirective extends BaseDirective implements ArgValidationDirec
      */
     public function getMessages(): array
     {
-        return collect($this->directiveArgValue('messages'))
+        return (new Collection($this->directiveArgValue('messages')))
             ->mapWithKeys(function (string $message, string $rule): array {
                 $argumentPath = $this->argumentPathAsDotNotation();
 
