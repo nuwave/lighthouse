@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Support\Arr;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 
 class StorageManager implements StoresSubscriptions
@@ -81,12 +82,12 @@ class StorageManager implements StoresSubscriptions
         $key = self::TOPIC_KEY.".{$topic}";
 
         if (! $this->cache->has($key)) {
-            return collect();
+            return new Collection;
         }
 
         $channels = json_decode($this->cache->get($key), true);
 
-        return collect($channels)
+        return (new Collection($channels))
             ->map(function (string $channel): ?Subscriber {
                 return $this->subscriberByChannel($channel);
             })

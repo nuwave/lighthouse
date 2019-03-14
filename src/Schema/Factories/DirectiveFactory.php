@@ -21,10 +21,10 @@ use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Events\RegisteringDirectiveBaseNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class DirectiveFactory
@@ -60,20 +60,20 @@ class DirectiveFactory
      */
     public function __construct(Dispatcher $dispatcher)
     {
-        $this->directiveBaseNamespaces = collect([
+        $this->directiveBaseNamespaces = (new Collection([
             // User defined directives (top priority)
             config('lighthouse.namespaces.directives'),
 
             // Plugin developers defined directives
-            $dispatcher->dispatch(new RegisteringDirectiveBaseNamespaces),
+            $dispatcher->dispatch(new RegisterDirectiveNamespaces),
 
             // Lighthouse defined directives
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Fields',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Nodes',
-        ])->flatten()
-            ->filter()
-            ->all();
+        ]))->flatten()
+           ->filter()
+           ->all();
     }
 
     /**
@@ -196,7 +196,7 @@ class DirectiveFactory
      */
     protected function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
-        return collect($node->directives)
+        return (new Collection($node->directives))
             ->map(function (DirectiveNode $directive) use ($node) {
                 return $this->create($directive->name->value, $node);
             })

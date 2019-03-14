@@ -9,7 +9,7 @@ namespace Nuwave\Lighthouse\Events;
  * a single key and the extension content as the value, e.g.
  * ['tracing' => ['some' => 'content']]
  */
-class GatheringExtensions
+class BuildExtensionsResponse
 {
     //
 }

@@ -10,7 +10,7 @@ namespace Nuwave\Lighthouse\Events;
  *
  * Only fires once if schema caching is active.
  */
-class BuildingAST
+class BuildSchemaString
 {
     /**
      * The root schema that was defined by the user.
@@ -20,7 +20,7 @@ class BuildingAST
     public $userSchema;
 
     /**
-     * BuildingAST constructor.
+     * BuildSchemaString constructor.
      *
      * @param  string  $userSchema
      * @return void

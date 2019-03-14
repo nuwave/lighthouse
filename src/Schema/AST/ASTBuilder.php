@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\Node;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
@@ -123,7 +124,7 @@ class ASTBuilder
     {
         return $document->objectTypeDefinitions()->reduce(
             function (DocumentAST $document, ObjectTypeDefinitionNode $objectType): DocumentAST {
-                return collect($objectType->fields)->reduce(
+                return (new Collection($objectType->fields))->reduce(
                     function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType): DocumentAST {
                         return $this->directiveFactory
                             ->createFieldManipulators($fieldDefinition)
@@ -149,9 +150,9 @@ class ASTBuilder
     {
         return $document->objectTypeDefinitions()->reduce(
             function (DocumentAST $document, ObjectTypeDefinitionNode $parentType): DocumentAST {
-                return collect($parentType->fields)->reduce(
+                return (new Collection($parentType->fields))->reduce(
                     function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType): DocumentAST {
-                        return collect($parentField->arguments)->reduce(
+                        return (new Collection($parentField->arguments))->reduce(
                             function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField): DocumentAST {
                                 return $this->directiveFactory
                                     ->createArgManipulators($argDefinition)
@@ -257,7 +258,7 @@ class ASTBuilder
     {
         $hasTypeImplementingNode = $document->objectTypeDefinitions()
             ->contains(function (ObjectTypeDefinitionNode $objectType): bool {
-                return collect($objectType->interfaces)
+                return (new Collection($objectType->interfaces))
                     ->contains(function (NamedTypeNode $interface): bool {
                         return $interface->name->value === 'Node';
                     });

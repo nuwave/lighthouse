@@ -5,11 +5,11 @@ namespace Nuwave\Lighthouse\Tracing;
 use Carbon\Carbon;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Events\StartRequest;
+use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\StartExecution;
-use Nuwave\Lighthouse\Events\ManipulatingAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Events\GatheringExtensions;
+use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 
 class Tracing
 {
@@ -32,13 +32,13 @@ class Tracing
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param  \Nuwave\Lighthouse\Events\ManipulatingAST  $manipulatingAST
+     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $ManipulateAST
      * @return void
      */
-    public function handleManipulatingAST(ManipulatingAST $manipulatingAST): void
+    public function handleManipulateAST(ManipulateAST $ManipulateAST): void
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
-            $manipulatingAST->documentAST,
+            $ManipulateAST->documentAST,
             PartialParser::directive('@tracing')
         );
     }
@@ -68,10 +68,10 @@ class Tracing
     /**
      * Return additional information for the result.
      *
-     * @param  \Nuwave\Lighthouse\Events\GatheringExtensions  $gatheringExtensions
+     * @param  \Nuwave\Lighthouse\Events\BuildExtensionsResponse  $buildExtensionsResponse
      * @return mixed[]
      */
-    public function handleGatheringExtensions(GatheringExtensions $gatheringExtensions): array
+    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): array
     {
         $end = Carbon::now();
 

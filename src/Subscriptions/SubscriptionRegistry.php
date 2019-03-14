@@ -45,8 +45,8 @@ class SubscriptionRegistry
     protected $subscriptions = [];
 
     /**
-     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer $serializer
-     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager $storage
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
+     * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @return void
      */
@@ -133,7 +133,7 @@ class SubscriptionRegistry
         // sure the schema has been generated.
         $this->graphQL->prepSchema();
 
-        return collect($subscriber->query->definitions)
+        return (new Collection($subscriber->query->definitions))
             ->filter(function (Node $node): bool {
                 return $node instanceof OperationDefinitionNode;
             })
@@ -141,7 +141,7 @@ class SubscriptionRegistry
                 return $node->operation === 'subscription';
             })
             ->flatMap(function (OperationDefinitionNode $node) {
-                return collect($node->selectionSet->selections)
+                return (new Collection($node->selectionSet->selections))
                     ->map(function (FieldNode $field): string {
                         return $field->name->value;
                     })
@@ -159,7 +159,7 @@ class SubscriptionRegistry
     /**
      * Reset the collection of subscribers when a new execution starts.
      *
-     * @param \Nuwave\Lighthouse\Events\StartExecution $startExecution
+     * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
      * @return void
      */
     public function handleStartExecution(StartExecution $startExecution)
@@ -172,7 +172,7 @@ class SubscriptionRegistry
      *
      * @return string[]
      */
-    public function handleGatheringExtensions(): array
+    public function handleBuildExtensionsResponse(): array
     {
         return [
             'lighthouse_subscriptions' => [
