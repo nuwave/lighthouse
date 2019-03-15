@@ -4,7 +4,7 @@ You can use Lighthouse's built-in scalars by defining them in your schema,
 using [`@scalar`](directives.md#scalar) to point them to a FQCN.
 
 ```graphql
-"A datetime string with format 'Y-m-d H:i:s', e.g. '2018-01-01 13:00:00'."
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-01-01 13:00:00`."
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
 type Query {
