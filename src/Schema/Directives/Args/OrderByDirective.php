@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\NonNullTypeNode;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 
 class OrderByDirective implements ArgFilterDirective, ArgDirectiveForArray, ArgManipulator
 {
@@ -70,19 +70,19 @@ class OrderByDirective implements ArgFilterDirective, ArgDirectiveForArray, ArgM
         $expectedOrderByClause = ASTHelper::cloneNode($argDefinition);
 
         // Users may define this as NonNull if they want
-        if($argDefinition->type instanceof NonNullTypeNode){
+        if ($argDefinition->type instanceof NonNullTypeNode) {
             $expectedOrderByClause = $argDefinition->type;
         }
 
-        if(
+        if (
             data_get(
                 $expectedOrderByClause,
                 // Must be a list
                 'type'
                 // of non-nullable
-                . '.type'
+                .'.type'
                 // input objects
-                . '.type.name.value'
+                .'.type.name.value'
             ) !== 'OrderByClause'
         ) {
             throw new DefinitionException(

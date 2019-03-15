@@ -306,21 +306,21 @@ GRAPHQL
     {
         return $document
             ->setDefinition(
-                PartialParser::enumTypeDefinition("
+                PartialParser::enumTypeDefinition('
                     enum SortOrder {
                         ASC
                         DESC
                     }
-                "
+                '
                 )
             )
             ->setDefinition(
-                PartialParser::inputObjectTypeDefinition("
+                PartialParser::inputObjectTypeDefinition('
                     input OrderByClause {
                        field: String!
                        order: SortOrder!
                     }
-                ")
+                ')
             );
     }
 }

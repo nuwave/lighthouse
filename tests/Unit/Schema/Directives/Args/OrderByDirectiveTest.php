@@ -44,13 +44,13 @@ class OrderByDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'name' => 'A'
+                        'name' => 'A',
                     ],
                     [
-                        'name' => 'B'
-                    ]
-                ]
-            ]
+                        'name' => 'B',
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -79,13 +79,13 @@ class OrderByDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'name' => 'B'
+                        'name' => 'B',
                     ],
                     [
-                        'name' => 'A'
-                    ]
-                ]
-            ]
+                        'name' => 'A',
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -125,14 +125,14 @@ class OrderByDirectiveTest extends DBTestCase
                     ],
                     [
                         'team_id' => 2,
-                        'name' => 'C'
+                        'name' => 'C',
                     ],
                     [
                         'team_id' => 5,
-                        'name' => 'A'
+                        'name' => 'A',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
