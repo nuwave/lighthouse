@@ -6,6 +6,7 @@ use Closure;
 use Carbon\Carbon;
 use GraphQL\Deferred;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -48,13 +49,13 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         $maxAge = $this->directiveArgValue('maxAge');
         $privateCache = $this->directiveArgValue('private', false);
 
-        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($value, $resolver, $maxAge, $privateCache) {
+        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($value, $resolver, $maxAge, $privateCache) {
             $cacheValue = new CacheValue([
                 'field_value' => $value,
                 'root' => $root,
                 'args' => $args,
                 'context' => $context,
-                'resolve_info' => $info,
+                'resolve_info' => $resolveInfo,
                 'private_cache' => $privateCache,
             ]);
 
@@ -75,7 +76,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
                     : $cache->get($cacheKey);
             }
 
-            $resolvedValue = $resolver($root, $args, $context, $info);
+            $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
 
             $cacheExp = $maxAge
                 ? Carbon::now()->addSeconds($maxAge)
@@ -145,12 +146,12 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         }
 
         $fields = data_get($nodeValue->getTypeDefinition(), 'fields', []);
-        $nodeKey = collect($fields)->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
+        $nodeKey = (new Collection($fields))->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
             if ($key) {
                 return $key;
             }
 
-            $hasCacheKey = collect($field->directives)
+            $hasCacheKey = (new Collection($field->directives))
                 ->contains(function (DirectiveNode $directive): bool {
                     return $directive->name->value === 'cacheKey';
                 });
@@ -161,7 +162,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         });
 
         if (! $nodeKey) {
-            $nodeKey = collect($fields)->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
+            $nodeKey = (new Collection($fields))->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
                 if ($key) {
                     return $key;
                 }

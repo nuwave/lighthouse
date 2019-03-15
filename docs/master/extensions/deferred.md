@@ -11,14 +11,14 @@ as fast as possible, and then loading the rest of the page in the background.
 Lighthouse's `DeferExtension` adds support for the experimental `@defer` directive
 provided by Apollo which you can read more about [here](https://www.apollographql.com/docs/react/features/defer-support.html).
 
-To enable support, add the extension to the `lighthouse.php` configuration file:
+## Setup
+
+Add the service provider to your `config/app.php`
 
 ```php
-// config/lighthouse.php
-'extensions' => [
-    // ...
-    \Nuwave\Lighthouse\Schema\Extensions\DeferExtension::class,
-]
+'providers' => [
+    \Nuwave\Lighthouse\Defer\DeferServiceProvider::class,
+],
 ```
 
 <br />

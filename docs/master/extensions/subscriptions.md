@@ -1,5 +1,8 @@
 # GraphQL Subscriptions
 
+Subscriptions allow GraphQL clients to observe specific events
+and receive updates from the server when those events occur.
+
 ::: tip NOTE
 Much of the credit should be given to the [Ruby implementation](https://github.com/rmosolgo/graphql-ruby/blob/master/guides/subscriptions/overview.md) as they provided a great overview of how the backend should work.
 :::
@@ -10,12 +13,11 @@ Install the [Pusher PHP Library](https://github.com/pusher/pusher-http-php) for 
 
     composer require pusher/pusher-php-server
 
-Enable the extension in the `lighthouse.php` config file
+Add the service provider to your `config/app.php`
 
 ```php
-'extensions' => [
-    // ...
-    \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class,
+'providers' => [
+    \Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider::class,
 ],
 ```
 
@@ -49,6 +51,7 @@ namespace App\GraphQL\Subscriptions;
 
 use App\User;
 use App\Post;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
@@ -101,7 +104,7 @@ class PostUpdated extends GraphQLSubscription
         // `author` argument.
         $args = $subscriber->args;
 
-        return snake_case($fieldName).':'.$args['author'];
+        return Str::snake($fieldName).':'.$args['author'];
     }
 
     /**
@@ -116,7 +119,7 @@ class PostUpdated extends GraphQLSubscription
         // Decode the topic name if the `encodeTopic` has been overwritten.
         $author_id = $root->author_id;
 
-        return snake_case($fieldName).':'.$author_id;
+        return Str::snake($fieldName).':'.$author_id;
     }
 
     /**
@@ -125,10 +128,10 @@ class PostUpdated extends GraphQLSubscription
      * @param  \App\Post  $root
      * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed
      */
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $info): Post
+    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
     {
         // Optionally manipulate the `$root` item before it gets broadcasted to
         // subscribed client(s).
@@ -420,6 +423,6 @@ const network = Network.create(fetchQuery, subscriptionHandler);
 
 export const environment = new Environment({
     network,
-    store: new Store(new RecordSource())
+    store: new Store(new RecordSource)
 });
 ```

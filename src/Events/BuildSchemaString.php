@@ -2,7 +2,15 @@
 
 namespace Nuwave\Lighthouse\Events;
 
-class BuildingAST
+/**
+ * Fires before building the AST from the user-defined schema string.
+ *
+ * Listeners may return a schema string,
+ * which is added to the user schema.
+ *
+ * Only fires once if schema caching is active.
+ */
+class BuildSchemaString
 {
     /**
      * The root schema that was defined by the user.
@@ -12,7 +20,7 @@ class BuildingAST
     public $userSchema;
 
     /**
-     * BuildingAST constructor.
+     * BuildSchemaString constructor.
      *
      * @param  string  $userSchema
      * @return void

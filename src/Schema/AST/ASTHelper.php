@@ -6,6 +6,7 @@ use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\ArgumentNode;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
@@ -52,12 +53,12 @@ class ASTHelper
      */
     public static function mergeUniqueNodeList($original, $addition, bool $overwriteDuplicates = false): NodeList
     {
-        $newNames = collect($addition)
+        $newNames = (new Collection($addition))
             ->pluck('name.value')
             ->filter()
             ->all();
 
-        $remainingDefinitions = collect($original)
+        $remainingDefinitions = (new Collection($original))
             ->reject(function ($definition) use ($newNames, $overwriteDuplicates): bool {
                 $oldName = $definition->name->value;
                 $collisionOccurred = in_array(
@@ -138,7 +139,7 @@ class ASTHelper
      */
     public static function directiveHasArgument(DirectiveNode $directiveDefinition, string $name): bool
     {
-        return collect($directiveDefinition->arguments)
+        return (new Collection($directiveDefinition->arguments))
             ->contains(function (ArgumentNode $argumentNode) use ($name): bool {
                 return $argumentNode->name->value === $name;
             });
@@ -152,7 +153,7 @@ class ASTHelper
      */
     public static function directiveArgValue(DirectiveNode $directive, string $name, $default = null)
     {
-        $arg = collect($directive->arguments)
+        $arg = (new Collection($directive->arguments))
             ->first(function (ArgumentNode $argumentNode) use ($name): bool {
                 return $argumentNode->name->value === $name;
             });
@@ -189,7 +190,7 @@ class ASTHelper
      */
     public static function directiveDefinition(Node $definitionNode, string $name): ?DirectiveNode
     {
-        return collect($definitionNode->directives)
+        return (new Collection($definitionNode->directives))
             ->first(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
                 return $directiveDefinitionNode->name->value === $name;
             });
@@ -204,7 +205,7 @@ class ASTHelper
      */
     public static function hasDirectiveDefinition(Node $definitionNode, string $name): bool
     {
-        return collect($definitionNode->directives)
+        return (new Collection($definitionNode->directives))
             ->contains(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
                 return $directiveDefinitionNode->name->value === $name;
             });
@@ -248,13 +249,15 @@ class ASTHelper
                         return $document;
                     }
 
-                    $objectType->fields = new NodeList(collect($objectType->fields)
-                        ->map(function (FieldDefinitionNode $field) use ($directive): FieldDefinitionNode {
-                            $field->directives = $field->directives->merge([$directive]);
+                    $objectType->fields = new NodeList(
+                        (new Collection($objectType->fields))
+                            ->map(function (FieldDefinitionNode $field) use ($directive): FieldDefinitionNode {
+                                $field->directives = $field->directives->merge([$directive]);
 
-                            return $field;
-                        })
-                        ->all());
+                                return $field;
+                            })
+                            ->all()
+                    );
 
                     $document->setDefinition($objectType);
 

@@ -55,7 +55,7 @@ class NodeRegistry
      *
      * A function that returns the actual value by ID, e.g.
      *
-     * function($id, GraphQLContext $context, ResolveInfo $info)
+     * function($id, GraphQLContext $context, ResolveInfo $resolveInfo)
      * {
      *   return $this->db->getUserById($id)
      * }

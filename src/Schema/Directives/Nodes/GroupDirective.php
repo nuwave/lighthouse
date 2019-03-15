@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Nodes;
 
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -49,9 +50,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
         $node = $this->setNamespaceDirectiveOnFields($node);
 
-        $documentAST->setDefinition($node);
-
-        return $documentAST;
+        return $documentAST->setDefinition($node);
     }
 
     /**
@@ -75,7 +74,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
         $namespaceValue = addslashes($namespaceValue);
 
         $objectType->fields = new NodeList(
-            collect($objectType->fields)
+            (new Collection($objectType->fields))
                 ->map(function (FieldDefinitionNode $fieldDefinition) use ($namespaceValue): FieldDefinitionNode {
                     $existingNamespaces = ASTHelper::directiveDefinition(
                         $fieldDefinition,

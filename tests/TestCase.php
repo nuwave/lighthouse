@@ -10,10 +10,11 @@ use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Illuminate\Foundation\Testing\TestResponse;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Providers\LighthouseServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -210,6 +211,8 @@ abstract class TestCase extends BaseTestCase
      */
     protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
+        $this->app->forgetInstance(GraphQLRequest::class);
+
         return $this->postJson(
             'graphql',
             $data,

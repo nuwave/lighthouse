@@ -3,7 +3,7 @@
 namespace Tests\Integration\Events;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Events\BuildingAST;
+use Nuwave\Lighthouse\Events\BuildSchemaString;
 
 class BuildingASTTest extends TestCase
 {
@@ -15,9 +15,9 @@ class BuildingASTTest extends TestCase
         $schema = $this->placeholderQuery();
 
         app('events')->listen(
-            BuildingAST::class,
-            function (BuildingAST $buildingAST) use ($schema): void {
-                $this->assertSame($schema, $buildingAST->userSchema);
+            BuildSchemaString::class,
+            function (BuildSchemaString $buildSchemaString) use ($schema): void {
+                $this->assertSame($schema, $buildSchemaString->userSchema);
             }
         );
 
@@ -30,8 +30,8 @@ class BuildingASTTest extends TestCase
     public function itCanAddAdditionalSchemaThroughEvent(): void
     {
         app('events')->listen(
-            BuildingAST::class,
-            function (BuildingAST $buildingAST): string {
+            BuildSchemaString::class,
+            function (BuildSchemaString $buildSchemaString): string {
                 $resolver = $this->getResolver('resolveSayHello');
 
                 return "

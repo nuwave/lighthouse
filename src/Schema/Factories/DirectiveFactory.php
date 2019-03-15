@@ -3,9 +3,11 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
+use Illuminate\Contracts\Events\Dispatcher;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -19,10 +21,10 @@ use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Events\RegisteringDirectiveBaseNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class DirectiveFactory
@@ -52,24 +54,26 @@ class DirectiveFactory
 
     /**
      * DirectiveFactory constructor.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
-    public function __construct()
+    public function __construct(Dispatcher $dispatcher)
     {
-        $this->directiveBaseNamespaces = collect([
+        $this->directiveBaseNamespaces = (new Collection([
             // User defined directives (top priority)
             config('lighthouse.namespaces.directives'),
 
             // Plugin developers defined directives
-            event(new RegisteringDirectiveBaseNamespaces),
+            $dispatcher->dispatch(new RegisterDirectiveNamespaces),
 
             // Lighthouse defined directives
             'Nuwave\\Lighthouse\\Schema\\Directives\\Args',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Fields',
             'Nuwave\\Lighthouse\\Schema\\Directives\\Nodes',
-        ])->flatten()
-            ->filter()
-            ->all();
+        ]))->flatten()
+           ->filter()
+           ->all();
     }
 
     /**
@@ -112,7 +116,7 @@ class DirectiveFactory
     protected function createOrFail(string $directiveName): Directive
     {
         foreach ($this->directiveBaseNamespaces as $baseNamespace) {
-            $className = $baseNamespace.'\\'.studly_case($directiveName).'Directive';
+            $className = $baseNamespace.'\\'.Str::studly($directiveName).'Directive';
             if (class_exists($className)) {
                 $directive = app($className);
 
@@ -192,7 +196,7 @@ class DirectiveFactory
      */
     protected function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
-        return collect($node->directives)
+        return (new Collection($node->directives))
             ->map(function (DirectiveNode $directive) use ($node) {
                 return $this->create($directive->name->value, $node);
             })
@@ -259,7 +263,7 @@ class DirectiveFactory
      * Get the node resolver directive for the given type definition.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $node
-     * @return \GraphQL\Language\AST\NodeResolver|null
+     * @return \Nuwave\Lighthouse\Support\Contracts\NodeResolver|null
      */
     public function createNodeResolver(TypeDefinitionNode $node): ?NodeResolver
     {
