@@ -197,7 +197,7 @@ class GraphQL
         );
 
         foreach ($extensionsResponses as $extensionsReponse) {
-            if($extensionsReponse){
+            if ($extensionsReponse) {
                 $result->extensions[$extensionsReponse->key()] = $extensionsReponse->content();
             }
         }
