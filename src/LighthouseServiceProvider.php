@@ -26,6 +26,7 @@ use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Illuminate\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
@@ -104,10 +105,16 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
-        $this->app->singleton(GraphQLRequest::class, function (Container $app): LighthouseRequest {
-            return new LighthouseRequest(
-                $app->make('request')
-            );
+        $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
+            /** @var \Illuminate\Http\Request $request */
+            $request = $app->make('request');
+
+            return Str::startsWith(
+                $request->header('Content-Type'),
+                'multipart/form-data'
+            )
+                ? new MultipartFormRequest($request)
+                : new LighthouseRequest($request);
         });
 
         $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
