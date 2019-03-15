@@ -201,12 +201,14 @@ It has to be named just like the relationship method that is defined on the `Pos
 input CreateAuthorRelation {
   connect: ID
   create: CreateUserInput
+  update: UpdateUserInput
 }
 ```
 
-There are two possible operations that you can expose on a `BelongsTo` relationship:
+There are 3 possible operations that you can expose on a `BelongsTo` relationship when creating:
 - `connect` it to an existing model
-- `create` and attach a new related model
+- `create` a new related model and attach it
+- `update` an existing model and attach it
 
 Finally, you need to define the input that allows you to create a new `User`.
 
@@ -284,7 +286,7 @@ mutation {
 }
 ```
 
-You may also allow the user to change or remove a relation.
+When issuing an update, you can also allow the user to remove a relation.
 
 ```graphql
 type Mutation {
@@ -293,17 +295,28 @@ type Mutation {
 
 input UpdatePostInput {
   title: String
-  author: ID
+  author: UpdateAuthorRelation
+}
+
+input UpdateAuthorRelation {
+  connect: ID
+  create: CreateUserInput
+  update: UpdateUserInput
+  disconnect: ID
+  delete: ID
 }
 ```
 
-If you want to remove a relation, simply set it to `null`,
+Both `disconnect` and `delete` remove the association to the author,
+but `delete` also removes the author model itself.
 
 ```graphql
 mutation {
   updatePost(input: {
     title: "An updated title"
-    author: null
+    author: {
+      delete: 55
+    }
   }){
     title
     author {
