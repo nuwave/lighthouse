@@ -23,14 +23,14 @@ abstract class BaseRequest implements GraphQLRequest
      * @param  string  $key
      * @return array|string|null
      */
-    protected abstract function fieldValue(string $key);
+    abstract protected function fieldValue(string $key);
 
     /**
      * Are there more batched queries to process?
      *
      * @return bool
      */
-    protected abstract function hasMoreBatches(): bool;
+    abstract protected function hasMoreBatches(): bool;
 
     /**
      * Construct this from a HTTP request.
@@ -38,7 +38,7 @@ abstract class BaseRequest implements GraphQLRequest
      * @param  Request  $request
      * @return void
      */
-    public abstract function __construct(Request $request);
+    abstract public function __construct(Request $request);
 
     /**
      * Get the contained GraphQL query string.

@@ -25,7 +25,7 @@ class MultipartFormRequest extends BaseRequest
      */
     public function __construct(Request $request)
     {
-        if ( !$request->has('map')){
+        if (! $request->has('map')) {
             throw new InvariantViolation(
                 'Could not find a valid map, be sure to conform to GraphQL multipart request specification: https://github.com/jaydenseric/graphql-multipart-request-spec'
             );
@@ -44,7 +44,7 @@ class MultipartFormRequest extends BaseRequest
         $map = json_decode($request->input('map'), true);
 
         /**
-         * @var string $fileKey
+         * @var string
          * @var array $operationsPaths
          */
         foreach ($map as $fileKey => $operationsPaths) {
@@ -77,7 +77,7 @@ class MultipartFormRequest extends BaseRequest
     protected function fieldValue(string $key)
     {
         return $this->isBatched()
-            ? Arr::get($this->operations, $this->batchIndex . '.' . $key)
+            ? Arr::get($this->operations, $this->batchIndex.'.'.$key)
             : $this->operations[$key] ?? null;
     }
 
