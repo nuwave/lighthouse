@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;

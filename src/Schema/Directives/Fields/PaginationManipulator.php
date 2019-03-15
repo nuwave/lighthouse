@@ -188,17 +188,17 @@ class PaginationManipulator
     protected static function countArgument(string $argumentName, ?int $defaultCount = null, ?int $maxCount = null): string
     {
         $description = '"Limits number of fetched elements.';
-        if($maxCount){
-            $description .= ' Maximum allowed value: ' . $maxCount . '.';
+        if ($maxCount) {
+            $description .= ' Maximum allowed value: '.$maxCount.'.';
         }
         $description .= "\"\n";
 
-        $definition = $argumentName . ': Int'
-            . ($defaultCount
-                ? ' = ' . $defaultCount
+        $definition = $argumentName.': Int'
+            .($defaultCount
+                ? ' = '.$defaultCount
                 : '!'
             );
 
-        return $description . $definition;
+        return $description.$definition;
     }
 }

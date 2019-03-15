@@ -21,7 +21,6 @@ class Pagination
             : $defaultPage;
     }
 
-
     /**
      * Check the request number of paginated items against the defined maximum.
      *

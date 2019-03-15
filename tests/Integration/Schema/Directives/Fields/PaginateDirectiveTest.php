@@ -446,7 +446,6 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ');
 
-
         $this->assertSame(
             'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
             $resultFromDefaultPagination->jsonGet('errors.0.message')
