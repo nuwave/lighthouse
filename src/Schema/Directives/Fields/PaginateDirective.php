@@ -45,7 +45,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $parentType,
             $current,
             $this->directiveArgValue('defaultCount'),
-            $this->directiveArgValue('maxCount')
+            $this->paginateMaxCount()
         );
     }
 
@@ -87,17 +87,27 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args): LengthAwarePaginator {
                 $first = $args['count'];
-                $page = $args['page'] ?? 1;
+                Pagination::throwIfPaginateMaxCountExceeded(
+                    $this->paginateMaxCount(),
+                    $first
+                );
 
-                // check against count limit
-                $maxCount = $this->directiveArgValue('maxCount') ?? config('lighthouse.paginate_max_count');
-                if ($maxCount !== null && $first > $maxCount) {
-                    throw new Error("Count parameter limit of {$maxCount} exceeded");
-                }
+                $page = $args['page'] ?? 1;
 
                 return $this->getPaginatedResults(func_get_args(), $page, $first);
             }
         );
+    }
+
+    /**
+     * Get either the specific max or the global setting.
+     *
+     * @return int|null
+     */
+    protected function paginateMaxCount(): ?int
+    {
+        return $this->directiveArgValue('maxCount')
+            ?? config('lighthouse.paginate_max_count');
     }
 
     /**
@@ -111,12 +121,10 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args): LengthAwarePaginator {
                 $first = $args['first'];
-
-                // check against count limit
-                $maxCount = $this->directiveArgValue('maxCount') ?? config('lighthouse.paginate_max_count');
-                if ($maxCount !== null && $first > $maxCount) {
-                    throw new Error("Count parameter limit of {$maxCount} exceeded");
-                }
+                Pagination::throwIfPaginateMaxCountExceeded(
+                    $this->paginateMaxCount(),
+                    $first
+                );
 
                 $page = Pagination::calculateCurrentPage(
                     $first,

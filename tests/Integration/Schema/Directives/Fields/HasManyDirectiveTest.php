@@ -198,8 +198,9 @@ class HasManyDirectiveTest extends DBTestCase
             }
         }
         ');
+
         $this->assertSame(
-            'Count parameter limit of 3 exceeded',
+            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
             $result->jsonGet('errors.0.message')
         );
     }
@@ -238,8 +239,9 @@ class HasManyDirectiveTest extends DBTestCase
             }
         }
         ');
+
         $this->assertSame(
-            'Count parameter limit of 3 exceeded',
+            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
             $result->jsonGet('errors.0.message')
         );
     }
@@ -251,7 +253,6 @@ class HasManyDirectiveTest extends DBTestCase
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
-        // default pagination
         $this->schema = '
         type User {
             tasks: [Task!]! @hasMany(type: "paginator")
@@ -279,7 +280,7 @@ class HasManyDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Count parameter limit of 2 exceeded',
+            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
             $result->jsonGet('errors.0.message')
         );
     }
@@ -306,21 +307,21 @@ class HasManyDirectiveTest extends DBTestCase
          ';
 
         $result = $this->query('
-         {
-             user {
-                 tasks(first: 3) {
-                     edges {
-                         node {
-                            id
-                        }
-                    }
-                 }
-             }
-         }
-         ');
+        {
+            user {
+                tasks(first: 3) {
+                    edges {
+                        node {
+                           id
+                       }
+                   }
+                }
+            }
+        }
+        ');
 
         $this->assertSame(
-            'Count parameter limit of 2 exceeded',
+            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
             $result->jsonGet('errors.0.message')
         );
     }

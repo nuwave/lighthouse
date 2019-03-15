@@ -60,10 +60,17 @@ class PaginationManipulator
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
      * @param  int|null  $defaultCount
+     * @param  int|null  $maxCount
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public static function transformToPaginatedField(string $paginationType, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current, int $defaultCount = null, int $maxCount = null): DocumentAST
-    {
+    public static function transformToPaginatedField(
+        string $paginationType,
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $current,
+        ?int $defaultCount = null,
+        ?int $maxCount = null
+    ): DocumentAST {
         switch (self::assertValidPaginationType($paginationType)) {
             case self::PAGINATION_TYPE_CONNECTION:
                 return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
@@ -80,10 +87,16 @@ class PaginationManipulator
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
+     * @param  int|null  $maxCount
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public static function registerConnection(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null, int $maxCount = null): DocumentAST
-    {
+    public static function registerConnection(
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $documentAST,
+        ?int $defaultCount = null,
+        ?int $maxCount = null
+    ): DocumentAST {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $connectionTypeName = "{$fieldTypeName}Connection";
         $connectionEdgeName = "{$fieldTypeName}Edge";
@@ -103,14 +116,9 @@ class PaginationManipulator
             }
         ");
 
-        $countArgumentDescription = "\"Limits number of fetched elements. Maximum: {$maxCount}\"\n";
-        $countArgument = $defaultCount
-            ? "first: Int = {$defaultCount}"
-            : 'first: Int!';
-
         $inputValueDefinitions = [
-            $countArgumentDescription.$countArgument,
-            'after: String',
+            self::countArgument('first', $defaultCount, $maxCount),
+            "\"A cursor after which elements are returned.\"\nafter: String",
         ];
 
         $connectionArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
@@ -131,10 +139,16 @@ class PaginationManipulator
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
+     * @param  int|null  $maxCount
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public static function registerPaginator(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $documentAST, int $defaultCount = null, int $maxCount = null): DocumentAST
-    {
+    public static function registerPaginator(
+        FieldDefinitionNode $fieldDefinition,
+        ObjectTypeDefinitionNode $parentType,
+        DocumentAST $documentAST,
+        ?int $defaultCount = null,
+        ?int $maxCount = null
+    ): DocumentAST {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
@@ -146,14 +160,9 @@ class PaginationManipulator
             }
         ");
 
-        $countArgumentDescription = "\"Limits number of fetched elements. Maximum: {$maxCount}\"\n";
-        $countArgument = $defaultCount
-            ? "count: Int = {$defaultCount}"
-            : 'count: Int!';
-
         $inputValueDefinitions = [
-            $countArgumentDescription.$countArgument,
-            'page: Int',
+            self::countArgument('count', $defaultCount, $maxCount),
+            "\"The offset from which elements are returned.\"\npage: Int",
         ];
 
         $paginationArguments = PartialParser::inputValueDefinitions($inputValueDefinitions);
@@ -166,5 +175,30 @@ class PaginationManipulator
         $documentAST->setDefinition($parentType);
 
         return $documentAST;
+    }
+
+    /**
+     * Build the count argument definition string, considering default and max values.
+     *
+     * @param  string  $argumentName
+     * @param  int|null  $defaultCount
+     * @param  int|null  $maxCount
+     * @return string
+     */
+    protected static function countArgument(string $argumentName, ?int $defaultCount = null, ?int $maxCount = null): string
+    {
+        $description = '"Limits number of fetched elements.';
+        if($maxCount){
+            $description .= ' Maximum allowed value: ' . $maxCount . '.';
+        }
+        $description .= "\"\n";
+
+        $definition = $argumentName . ': Int'
+            . ($defaultCount
+                ? ' = ' . $defaultCount
+                : '!'
+            );
+
+        return $description . $definition;
     }
 }

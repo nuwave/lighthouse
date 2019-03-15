@@ -123,8 +123,9 @@ return [
     | Pagination
     |--------------------------------------------------------------------------
     |
-    | Limits maximum allowed "count" for pagination directive.
-    | A setting of "null" means that count is unrestricted.
+    | Limits the maximum "count" that users may pass as an argument
+    | to fields that are paginated with the @paginate directive.
+    | A setting of "null" means the count is unrestricted.
     |
     */
 

@@ -100,34 +100,43 @@ class PaginateDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itAddsDescriptionToCountArgument(): void
+    public function itHasMaxCountInGeneratedCountDescription(): void
     {
-        $schema = $this->buildSchema('
-        type User {
-            name: String
-        }
-        
-        type Query {
-            users1: [User!]! @paginate(maxCount: 10)
-            users2: [User!]! @paginate(maxCount: 10, type: "relay")
-        }
-        ');
-        $typeMap = $schema->getTypeMap();
+        config(['lighthouse.paginate_max_count' => 5]);
 
-        // default pagination
-        $argsConnect = $schema->getQueryType('users1')->getField('users1')->args;
-        $countArgConnect = Arr::first($argsConnect, function (FieldArgument $arg) {
-            return $arg->name === 'count';
-        });
+        $queryType = $this
+            ->buildSchema('
+            type Query {
+                defaultPaginated: [User!]! @paginate
+                defaultRelay: [User!]! @paginate(type: "relay")
+                customPaginated:  [User!]! @paginate(maxCount: 10)
+                customRelay:  [User!]! @paginate(maxCount: 10, type: "relay")
+            }
 
-        $this->assertSame('Limits number of fetched elements. Maximum: 10', $countArgConnect->description);
+            type User {
+                id: ID!
+            }
+            ')
+            ->getQueryType();
 
-        // relay pagination
-        $argsRelay = $schema->getQueryType('users2')->getField('users2')->args;
-        $countArgRelay = Arr::first($argsRelay, function (FieldArgument $arg) {
-            return $arg->name === 'first';
-        });
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 5.',
+            $queryType->getField('defaultPaginated')->getArg('count')->description
+        );
 
-        $this->assertSame('Limits number of fetched elements. Maximum: 10', $countArgRelay->description);
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 5.',
+            $queryType->getField('defaultRelay')->getArg('first')->description
+        );
+
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 10.',
+            $queryType->getField('customPaginated')->getArg('count')->description
+        );
+
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 10.',
+            $queryType->getField('customRelay')->getArg('first')->description
+        );
     }
 }

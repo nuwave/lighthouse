@@ -435,8 +435,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        // default pagination
-        $result = $this->query('
+        $resultFromDefaultPagination = $this->query('
         {
             users1(count: 10) {
                 data {
@@ -447,13 +446,13 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ');
 
+
         $this->assertSame(
-            'Count parameter limit of 5 exceeded',
-            $result->jsonGet('errors.0.message')
+            'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
+            $resultFromDefaultPagination->jsonGet('errors.0.message')
         );
 
-        // relay pagination
-        $result = $this->query('
+        $resultFromRelayPagination = $this->query('
         {
             users2(first: 10) {
                 edges {
@@ -467,8 +466,8 @@ class PaginateDirectiveTest extends DBTestCase
         ');
 
         $this->assertSame(
-            'Count parameter limit of 5 exceeded',
-            $result->jsonGet('errors.0.message')
+            'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
+            $resultFromRelayPagination->jsonGet('errors.0.message')
         );
     }
 
@@ -503,8 +502,9 @@ class PaginateDirectiveTest extends DBTestCase
             }
         }
         ');
+
         $this->assertSame(
-            'Count parameter limit of 6 exceeded',
+            'Maximum number of 6 requested items exceeded. Fetch smaller chunks.',
             $result->jsonGet('errors.0.message')
         );
 
@@ -518,63 +518,5 @@ class PaginateDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(10, 'data.users2.data');
-    }
-
-    /**
-     * @test
-     */
-    public function itHasMaxCountInGeneratedCountDescription(): void
-    {
-        config(['lighthouse.paginate_max_count' => 5]);
-
-        factory(User::class, 10)->create();
-
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String!
-        }
-        
-        type Query {
-            users1: [User!]! @paginate
-            users2: [User!]! @paginate(type: "relay")
-        }
-        ';
-
-        // default pagination
-        $result = $this->query('
-        {
-            users1(count: 10) {
-                data {
-                    id
-                    name
-                }
-            }
-        }
-        ');
-
-        $this->assertSame(
-            'Count parameter limit of 5 exceeded',
-            $result->jsonGet('errors.0.message')
-        );
-
-        // relay pagination
-        $result = $this->query('
-        {
-            users2(first: 10) {
-                edges {
-                    node {
-                        id
-                        name
-                    }
-                }
-            }
-        }
-        ');
-
-        $this->assertSame(
-            'Count parameter limit of 5 exceeded',
-            $result->jsonGet('errors.0.message')
-        );
     }
 }

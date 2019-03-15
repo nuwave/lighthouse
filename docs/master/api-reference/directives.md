@@ -850,6 +850,16 @@ query {
 }
 ```
 
+Lighthouse allows you to specify a global maximum for the number of items a user
+can request through pagination through the config. You may also overwrite this
+per field with the `maxCount` argument:
+
+```graphql
+type Query {
+    posts: [Post!]! @paginate(maxCount: 10)
+}
+```
+
 By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same
 name as the returned type. You can overwrite this by setting the `model` argument.
 
