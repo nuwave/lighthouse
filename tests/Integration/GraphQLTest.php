@@ -256,6 +256,7 @@ class GraphQLTest extends DBTestCase
 
     /**
      * @test
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file
      */
     public function itResolvesUploadViaMultipartRequest(): void
     {
@@ -289,6 +290,7 @@ class GraphQLTest extends DBTestCase
 
     /**
      * @test
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching
      */
     public function itResolvesUploadViaBatchedMultipartRequest(): void
     {

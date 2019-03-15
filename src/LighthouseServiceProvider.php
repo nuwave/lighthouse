@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
@@ -104,10 +105,16 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
-        $this->app->singleton(GraphQLRequest::class, function (Container $app): LighthouseRequest {
-            return new LighthouseRequest(
-                $app->make('request')
-            );
+        $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
+            /** @var \Illuminate\Http\Request $request */
+            $request = $app->make('request');
+
+            return Str::startsWith(
+                $request->header('Content-Type'),
+                'multipart/form-data'
+            )
+                ? new MultipartFormRequest($request)
+                : new LighthouseRequest($request);
         });
 
         $this->app->singleton(SchemaSourceProvider::class, function (): SchemaStitcher {
