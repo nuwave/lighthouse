@@ -191,19 +191,15 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
-        // Listeners of this event must return an array comprised of
-        // a single key and the extension content as the value, e.g.
-        // ['tracing' => ['some' => 'content']]
-        $extensionResults = $this->eventDispatcher->dispatch(
+        /** @var \Nuwave\Lighthouse\Execution\ExtensionsResponse[] $extensionsResponses */
+        $extensionsResponses = $this->eventDispatcher->dispatch(
             new BuildExtensionsResponse
         );
 
-        // Ensure we preserve the extension keys while flattening
-        foreach ($extensionResults as $singleExtensionResult) {
-            $result->extensions = array_merge(
-                $result->extensions,
-                $singleExtensionResult
-            );
+        foreach ($extensionsResponses as $extensionsReponse) {
+            if($extensionsReponse){
+                $result->extensions[$extensionsReponse->key()] = $extensionsReponse->content();
+            }
         }
 
         $result->setErrorsHandler(
