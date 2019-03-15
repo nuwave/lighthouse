@@ -70,12 +70,18 @@ class CacheValue
         $argKeys = $this->argKeys();
 
         return $this->implode([
-            $this->privateCache ? 'auth' : null,
-            $this->privateCache ? auth()->user()->getKey() : null,
+            $this->privateCache
+                ? 'auth'
+                : null,
+            $this->privateCache
+                ? app('auth')->user()->getKey()
+                : null,
             strtolower($this->resolveInfo->parentType->name),
             $this->fieldKey,
             strtolower($this->resolveInfo->fieldName),
-            $argKeys->isNotEmpty() ? $argKeys->implode(':') : null,
+            $argKeys->isNotEmpty()
+                ? $argKeys->implode(':')
+                : null,
         ]);
     }
 
@@ -117,7 +123,7 @@ class CacheValue
 
         ksort($args);
 
-        return collect($args)->map(function ($value, $key) {
+        return (new Collection($args))->map(function ($value, $key) {
             $keyValue = is_array($value)
                 ? json_encode($value, true)
                 : $value;
@@ -153,7 +159,7 @@ class CacheValue
      */
     protected function implode(array $items): string
     {
-        return collect($items)
+        return (new Collection($items))
             ->filter()
             ->values()
             ->implode(':');

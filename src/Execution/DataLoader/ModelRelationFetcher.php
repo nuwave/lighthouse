@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Closure;
 use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Str;
@@ -136,7 +137,7 @@ class ModelRelationFetcher
      * @param  \Closure  $relationConstraints
      * @return $this
      */
-    public function loadRelationForPage(int $perPage, int $page, string $relationName, \Closure $relationConstraints): self
+    public function loadRelationForPage(int $perPage, int $page, string $relationName, Closure $relationConstraints): self
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,
@@ -217,7 +218,7 @@ class ModelRelationFetcher
      * @param  \Closure  $relationConstraints
      * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Relations\Relation>
      */
-    protected function buildRelationsFromModels(string $relationName, \Closure $relationConstraints): Collection
+    protected function buildRelationsFromModels(string $relationName, Closure $relationConstraints): Collection
     {
         return $this->models->toBase()->map(
             function (Model $model) use ($relationName, $relationConstraints) {
@@ -252,27 +253,26 @@ class ModelRelationFetcher
     /**
      * Load default eager loads.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $collection
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $collection
      * @return $this
      */
     protected function loadDefaultWith(EloquentCollection $collection): self
     {
-        if ($collection->isNotEmpty()) {
-            $model = $collection->first();
-            $reflection = new ReflectionClass($model);
-            $withProperty = $reflection->getProperty('with');
-            $withProperty->setAccessible(true);
+        if ($collection->isEmpty()) {
+            return $this;
+        }
 
-            $with = array_filter(
-                (array) $withProperty->getValue($model),
-                function ($relation) use ($model) {
-                    return ! $model->relationLoaded($relation);
-                }
-            );
+        $model = $collection->first();
+        $reflection = new ReflectionClass($model);
+        $withProperty = $reflection->getProperty('with');
+        $withProperty->setAccessible(true);
 
-            if (! empty($with)) {
-                $collection->load($with);
-            }
+        $with = array_filter((array) $withProperty->getValue($model), function ($relation) use ($model) {
+            return ! $model->relationLoaded($relation);
+        });
+
+        if (! empty($with)) {
+            $collection->load($with);
         }
 
         return $this;
@@ -381,7 +381,7 @@ class ModelRelationFetcher
      * Ensure the pivot relation is hydrated too, if it exists.
      *
      * @param  string  $relationName
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $relationModels
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $relationModels
      * @return $this
      */
     protected function hydratePivotRelation(string $relationName, EloquentCollection $relationModels): self

@@ -2,7 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Exception;
 use GraphQL\Deferred;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Traits\HandlesCompositeKey;
 
 abstract class BatchLoader
@@ -36,8 +39,8 @@ abstract class BatchLoader
      * Return an instance of a BatchLoader for a specific field.
      *
      * @param  string  $loaderClass     the class name of the concrete BatchLoader to instantiate
-     * @param  mixed[] $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
-     * @param  mixed[] $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
+     * @param  mixed[]  $pathToField     path to the GraphQL field from the root, is used as a key for BatchLoader instances
+     * @param  mixed[]  $constructorArgs those arguments are passed to the constructor of the new BatchLoader instance
      * @return static
      *
      * @throws \Exception
@@ -49,9 +52,10 @@ abstract class BatchLoader
 
         // If we are resolving a batched query, we need to assign each
         // query a uniquely indexed instance
-        $currentBatchIndex = app('graphql')->currentBatchIndex();
-
-        if ($currentBatchIndex !== null) {
+        /** @var \Nuwave\Lighthouse\Execution\GraphQLRequest $graphQLRequest */
+        $graphQLRequest = app(GraphQLRequest::class);
+        if ($graphQLRequest->isBatched()) {
+            $currentBatchIndex = $graphQLRequest->batchIndex();
             $instanceName = "batch_{$currentBatchIndex}_{$instanceName}";
         }
 
@@ -64,7 +68,7 @@ abstract class BatchLoader
             );
 
         if (! $instance instanceof self) {
-            throw new \Exception(
+            throw new Exception(
                 "The given class '$loaderClass' must resolve to an instance of Nuwave\Lighthouse\Execution\DataLoader\BatchLoader"
             );
         }
@@ -75,12 +79,12 @@ abstract class BatchLoader
     /**
      * Generate a unique key for the instance, using the path in the query.
      *
-     * @param  mixed[] $path
+     * @param  mixed[]  $path
      * @return string
      */
     public static function instanceKey(array $path): string
     {
-        return collect($path)
+        return (new Collection($path))
             ->filter(function ($path) {
                 // Ignore numeric path entries, as those signify an array of fields
                 // Those are the very purpose for this batch loader, so they must not be included.

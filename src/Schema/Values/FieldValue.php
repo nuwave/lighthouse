@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
+use Illuminate\Support\Str;
 use GraphQL\Executor\Executor;
 use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Support\Utils;
@@ -15,8 +16,6 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 use Nuwave\Lighthouse\Subscriptions\Exceptions\UnauthorizedSubscriber;
 
@@ -194,7 +193,7 @@ class FieldValue
 
         if ($this->parentIsRootType()) {
             $resolverClass = Utils::namespaceClassname(
-                studly_case($this->getFieldName()),
+                Str::studly($this->getFieldName()),
                 $this->defaultNamespacesForParent(),
                 function (string $class): bool {
                     return method_exists($class, 'resolve');
@@ -207,12 +206,12 @@ class FieldValue
                 );
             }
 
-            return \Closure::fromCallable(
+            return Closure::fromCallable(
                 [app($resolverClass), 'resolve']
             );
         }
 
-        return \Closure::fromCallable(
+        return Closure::fromCallable(
             [Executor::class, 'defaultFieldResolver']
         );
     }
@@ -229,7 +228,7 @@ class FieldValue
         if ($directive = ASTHelper::directiveDefinition($this->field, 'subscription')) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
-            $className = studly_case($this->getFieldName());
+            $className = Str::studly($this->getFieldName());
         }
 
         $className = Utils::namespaceClassname(
@@ -263,16 +262,10 @@ class FieldValue
                 return $subscription->resolve($root->root, $args, $context, $resolveInfo);
             }
 
-            /** @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry $extensionRegistry */
-            $extensionRegistry = app(ExtensionRegistry::class);
-            /** @var \Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension $subscriptionExtension */
-            $subscriptionExtension = $extensionRegistry->get(SubscriptionExtension::name());
-
-            $subscriber = Subscriber::initialize(
+            $subscriber = new Subscriber(
                 $args,
                 $context,
-                $resolveInfo,
-                $subscriptionExtension->currentQuery()
+                $resolveInfo
             );
 
             if (! $subscription->can($subscriber)) {

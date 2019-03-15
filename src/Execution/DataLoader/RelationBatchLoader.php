@@ -59,7 +59,7 @@ class RelationBatchLoader extends BatchLoader
     /**
      * @param  string  $relationName
      * @param  array  $args
-     * @param  string[]    $scopes
+     * @param  string[]  $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @param  string|null  $paginationType
      * @return void
@@ -147,6 +147,6 @@ class RelationBatchLoader extends BatchLoader
      */
     protected function getParentModels(): Collection
     {
-        return collect($this->keys)->pluck('parent');
+        return (new Collection($this->keys))->pluck('parent');
     }
 }

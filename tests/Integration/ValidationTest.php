@@ -4,6 +4,7 @@ namespace Tests\Integration;
 
 use Tests\TestCase;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
 
@@ -14,6 +15,7 @@ class ValidationTest extends TestCase
         foo(
             email: String = "hans@peter.rudolf" @rules(apply: ["email"])
             required: String @rules(apply: ["required"])
+            stringList: [String!] @rulesForArray(apply: ["array", "max:1"])
             input: [Bar] @rulesForArray(apply: ["min:3"])
             list: [String]
                 @rules(apply: ["required", "email"])
@@ -144,6 +146,10 @@ class ValidationTest extends TestCase
         $result = $this->query('
         {
             foo(
+                stringList: [
+                    "asdf",
+                    "one too many"
+                ]
                 input: [{
                     foobar: 1
                 }]
@@ -153,8 +159,24 @@ class ValidationTest extends TestCase
 
         $this->assertValidationKeysSame([
             'required',
+            'stringList',
             'input',
         ], $result);
+
+        $this->assertTrue(
+            Str::endsWith(
+                $result->jsonGet('errors.0.extensions.validation.stringList.0'),
+                'may not have more than 1 items.'
+            )
+        );
+
+        $this->assertTrue(
+            Str::endsWith(
+                $result->jsonGet('errors.0.extensions.validation.input.0'),
+                'must have at least 3 items.'
+            ),
+            'Validate size as an array by prepending the rules with the "array" validation'
+        );
     }
 
     /**

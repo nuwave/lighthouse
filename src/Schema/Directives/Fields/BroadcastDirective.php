@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
@@ -28,22 +29,22 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
      *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, \Closure $next): FieldValue
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $value = $next($value);
         $resolver = $value->getResolver();
         $subscriptionField = $this->directiveArgValue('subscription');
-        $queue = $this->directiveArgValue('queue');
+        $shouldQueue = $this->directiveArgValue('shouldQueue');
 
-        return $value->setResolver(function () use ($resolver, $subscriptionField, $queue) {
+        return $value->setResolver(function () use ($resolver, $subscriptionField, $shouldQueue) {
             $resolved = call_user_func_array($resolver, func_get_args());
 
             if ($resolved instanceof Deferred) {
-                $resolved->then(function ($root) use ($subscriptionField, $queue) {
-                    Subscription::broadcast($subscriptionField, $root, $queue);
+                $resolved->then(function ($root) use ($subscriptionField, $shouldQueue) {
+                    Subscription::broadcast($subscriptionField, $root, $shouldQueue);
                 });
             } else {
-                Subscription::broadcast($subscriptionField, $resolved, $queue);
+                Subscription::broadcast($subscriptionField, $resolved, $shouldQueue);
             }
 
             return $resolved;

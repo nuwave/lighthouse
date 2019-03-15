@@ -2,53 +2,17 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
-use Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension;
 use Nuwave\Lighthouse\Support\Http\Controllers\SubscriptionController;
 
 class SubscriptionRouter
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry
-     */
-    protected $extensions;
-
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry  $extensions
-     * @return void
-     */
-    public function __construct(ExtensionRegistry $extensions)
-    {
-        $this->extensions = $extensions;
-    }
-
-    /**
-     * Generate subscription routes.
-     */
-    public function routes()
-    {
-        if (! $this->activated()) {
-            return;
-        }
-
-        $broadcaster = config('lighthouse.subscriptions.broadcaster');
-        $router = config("lighthouse.subscriptions.broadcasters.{$broadcaster}.routes");
-        $routerParts = explode('@', $router);
-
-        if (count($routerParts) === 2 && ! empty($routerParts[0]) && ! empty($routerParts[1])) {
-            $routerInstance = app($routerParts[0]);
-            $method = $routerParts[1];
-
-            call_user_func([$routerInstance, $method], app('router'));
-        }
-    }
-
-    /**
-     * Register subscription routes.
+     * Register the routes for pusher based subscriptions.
      *
      * @param  \Illuminate\Routing\Router  $router
+     * @return void
      */
-    public function pusher($router)
+    public function pusher($router): void
     {
         $router->post('graphql/subscriptions/auth', [
             'as' => 'lighthouse.subscriptions.auth',
@@ -59,13 +23,5 @@ class SubscriptionRouter
             'as' => 'lighthouse.subscriptions.auth',
             'uses' => SubscriptionController::class.'@webhook',
         ]);
-    }
-
-    /**
-     * @return bool
-     */
-    protected function activated()
-    {
-        return $this->extensions->has(SubscriptionExtension::name());
     }
 }

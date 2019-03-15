@@ -2,10 +2,12 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use GraphQL\Language\Parser;
+use Illuminate\Support\Arr;
 use GraphQL\Language\AST\Node;
+use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
+use Nuwave\Lighthouse\Events\StartExecution;
 use GraphQL\Language\AST\OperationDefinitionNode;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
@@ -24,6 +26,11 @@ class SubscriptionRegistry
     protected $storage;
 
     /**
+     * @var \Nuwave\Lighthouse\GraphQL
+     */
+    protected $graphQL;
+
+    /**
      * A map from operation names to channel names.
      *
      * @var string[]
@@ -40,12 +47,14 @@ class SubscriptionRegistry
     /**
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer  $serializer
      * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
+     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @return void
      */
-    public function __construct(ContextSerializer $serializer, StorageManager $storage)
+    public function __construct(ContextSerializer $serializer, StorageManager $storage, GraphQL $graphQL)
     {
         $this->serializer = $serializer;
         $this->storage = $storage;
+        $this->graphQL = $graphQL;
     }
 
     /**
@@ -117,20 +126,14 @@ class SubscriptionRegistry
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @return \Illuminate\Support\Collection
-     *
-     * @throws \GraphQL\Error\SyntaxError
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {
         // A subscription can be fired w/out a request so we must make
         // sure the schema has been generated.
-        app('graphql')->prepSchema();
+        $this->graphQL->prepSchema();
 
-        $documentNode = Parser::parse($subscriber->queryString, [
-            'noLocation' => true,
-        ]);
-
-        return collect($documentNode->definitions)
+        return (new Collection($subscriber->query->definitions))
             ->filter(function (Node $node): bool {
                 return $node instanceof OperationDefinitionNode;
             })
@@ -138,19 +141,30 @@ class SubscriptionRegistry
                 return $node->operation === 'subscription';
             })
             ->flatMap(function (OperationDefinitionNode $node) {
-                return collect($node->selectionSet->selections)
+                return (new Collection($node->selectionSet->selections))
                     ->map(function (FieldNode $field): string {
                         return $field->name->value;
                     })
                     ->toArray();
             })
             ->map(function ($subscriptionField): GraphQLSubscription {
-                return array_get(
+                return Arr::get(
                     $this->subscriptions,
                     $subscriptionField,
-                    new NotFoundSubscription()
+                    new NotFoundSubscription
                 );
             });
+    }
+
+    /**
+     * Reset the collection of subscribers when a new execution starts.
+     *
+     * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
+     * @return void
+     */
+    public function handleStartExecution(StartExecution $startExecution)
+    {
+        $this->subscribers = [];
     }
 
     /**
@@ -158,18 +172,13 @@ class SubscriptionRegistry
      *
      * @return string[]
      */
-    public function toArray(): array
+    public function handleBuildExtensionsResponse(): array
     {
-        return $this->subscribers;
-    }
-
-    /**
-     * Reset collection of subscribers.
-     *
-     * @return void
-     */
-    public function reset(): void
-    {
-        $this->subscribers = [];
+        return [
+            'lighthouse_subscriptions' => [
+                'version' => 1,
+                'channels' => $this->subscribers,
+            ],
+        ];
     }
 }

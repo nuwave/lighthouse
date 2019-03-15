@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use Serializable;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Error\SyntaxError;
@@ -20,7 +21,7 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
-class DocumentAST implements \Serializable
+class DocumentAST implements Serializable
 {
     /**
      * A map from definition name to the definition node.
@@ -28,6 +29,7 @@ class DocumentAST implements \Serializable
      * @var \GraphQL\Type\Definition\ObjectType<\GraphQL\Language\AST\DefinitionNode>
      */
     protected $definitionMap;
+
     /**
      * A collection of type extensions.
      *
@@ -44,7 +46,7 @@ class DocumentAST implements \Serializable
         /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode> $typeExtensions */
         /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\DefinitionNode> $definitionNodes */
         // We can not store type extensions in the map, since they do not have unique names
-        [$typeExtensions, $definitionNodes] = collect($documentNode->definitions)
+        [$typeExtensions, $definitionNodes] = (new Collection($documentNode->definitions))
             ->partition(function (DefinitionNode $definitionNode): bool {
                 return $definitionNode instanceof TypeExtensionNode;
             });
@@ -68,7 +70,7 @@ class DocumentAST implements \Serializable
      */
     protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
     {
-        $fieldNames = collect($typeExtensionNode->fields)
+        $fieldNames = (new Collection($typeExtensionNode->fields))
             ->map(function ($field): string {
                 return $field->name->value;
             })

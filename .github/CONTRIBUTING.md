@@ -23,6 +23,12 @@ Just clone the project and run the following in the project root:
     composer install
     composer test
 
+If you want to use Xdebug, you can enter that container instead:
+
+    docker-compose exec xdebug sh
+
+Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
+
 ## Committing code
 
 1. Fork the project
@@ -46,12 +52,12 @@ Not every application has them enabled - Lumen does not use Facades by default.
 Prefer direct usage of Illuminate classes instead of helpers.
 
 ```php
-# WRONG
-array_get($foo, 'bar');
-
-# CORRECT
+// Correct usage
 use \Illuminate\Support\Arr;
 Arr::get($foo, 'bar');
+
+// Wrong usage
+array_get($foo, 'bar');
 ```
 
 A notable exception is the `response()` helper - using DI for injecting a
@@ -74,7 +80,7 @@ function foo(array $bar): string
 
 For aggregate types such as the commonly used `Collection` class, use
 the generic type hint style. While not officially part of PHPDoc, it is understood
-by PHPStorm and most other editors.
+by PhpStorm and most other editors.
 
 ```php
 /**
@@ -122,7 +128,7 @@ class Foo
      */
     public function duplicate(): self
     {
-        $instance = new static();
+        $instance = new static;
         $instance->bar = $this->bar;
 
         return $instance;
@@ -159,6 +165,26 @@ at the Laravel coding style.
 Look through some of the code to get a feel for the naming conventions.
 
 Prefer explicit naming and short functions over excessive comments.
+
+### Ternarys
+
+Ternary's should be spread out across multiple lines.
+
+```php
+$foo = $cond
+    ? 1
+    : 2;
+```
+
+### new + braces
+
+If no arguments are passed to a class constructor, omit the braces.
+
+```php
+new Foo        // correct
+new Foo('bar') // correct
+new Foo()      // wrong
+```
 
 ## Documentation
 

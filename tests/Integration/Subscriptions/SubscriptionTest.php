@@ -8,17 +8,19 @@ use Illuminate\Foundation\Testing\TestResponse;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 use Nuwave\Lighthouse\Subscriptions\StorageManager;
 use Nuwave\Lighthouse\Subscriptions\BroadcastManager;
+use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 
 class SubscriptionTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function getPackageProviders($app)
     {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('lighthouse.extensions', [\Nuwave\Lighthouse\Schema\Extensions\SubscriptionExtension::class]);
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -29,14 +29,14 @@ class StorageManager implements StoresSubscriptions
     protected $cache;
 
     /**
-     * @param  \Illuminate\Cache\CacheManager  $cache
+     * @param  \Illuminate\Cache\CacheManager  $cacheManager
      * @return void
      */
-    public function __construct(CacheManager $cache)
+    public function __construct(CacheManager $cacheManager)
     {
-        $store = config('lighthouse.subscriptions.storage', 'redis');
-
-        $this->cache = $cache->store($store);
+        $this->cache = $cacheManager->store(
+            config('lighthouse.subscriptions.storage', 'redis')
+        );
     }
 
     /**
@@ -67,9 +67,7 @@ class StorageManager implements StoresSubscriptions
     {
         $key = self::SUBSCRIBER_KEY.".{$channel}";
 
-        return $this->cache->has($key)
-            ? Subscriber::unserialize($this->cache->get($key))
-            : null;
+        return $this->cache->get($key);
     }
 
     /**
@@ -84,12 +82,12 @@ class StorageManager implements StoresSubscriptions
         $key = self::TOPIC_KEY.".{$topic}";
 
         if (! $this->cache->has($key)) {
-            return collect();
+            return new Collection;
         }
 
         $channels = json_decode($this->cache->get($key), true);
 
-        return collect($channels)
+        return (new Collection($channels))
             ->map(function (string $channel): ?Subscriber {
                 return $this->subscriberByChannel($channel);
             })
@@ -117,7 +115,7 @@ class StorageManager implements StoresSubscriptions
         $topic[] = $subscriber->channel;
 
         $this->cache->forever($topicKey, json_encode($topic));
-        $this->cache->forever($subscriberKey, json_encode($subscriber->toArray()));
+        $this->cache->forever($subscriberKey, $subscriber);
     }
 
     /**
@@ -132,9 +130,7 @@ class StorageManager implements StoresSubscriptions
         $key = self::SUBSCRIBER_KEY.".{$channel}";
         $hasSubscriber = $this->cache->has($key);
 
-        $subscriber = $hasSubscriber
-            ? Subscriber::unserialize($this->cache->get($key))
-            : null;
+        $subscriber = $this->cache->get($key);
 
         if ($hasSubscriber) {
             $this->cache->forget($key);

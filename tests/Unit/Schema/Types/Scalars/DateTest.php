@@ -22,7 +22,7 @@ class DateTest extends TestCase
     {
         $this->expectException(InvariantViolation::class);
 
-        (new Date())->serialize($value);
+        (new Date)->serialize($value);
     }
 
     /**
@@ -35,7 +35,7 @@ class DateTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Date())->parseValue($value);
+        (new Date)->parseValue($value);
     }
 
     /**
@@ -48,7 +48,8 @@ class DateTest extends TestCase
         return [
             [1],
             ['rolf'],
-            [new class() {
+            [new class {
+                //
             }],
             [null],
             [''],
@@ -63,7 +64,7 @@ class DateTest extends TestCase
         $date = '2018-10-01';
         $this->assertEquals(
             (new Carbon($date))->startOfDay(),
-            (new Date())->parseValue($date)
+            (new Date)->parseValue($date)
         );
     }
 
@@ -75,7 +76,7 @@ class DateTest extends TestCase
         $dateLiteral = new StringValueNode(
             ['value' => '2018-10-01']
         );
-        $result = (new Date())->parseLiteral($dateLiteral);
+        $result = (new Date)->parseLiteral($dateLiteral);
 
         $this->assertSame(
             $dateLiteral->value,
@@ -90,7 +91,7 @@ class DateTest extends TestCase
     {
         $this->expectException(Error::class);
 
-        (new Date())->parseLiteral(
+        (new Date)->parseLiteral(
             new IntValueNode([])
         );
     }
@@ -101,7 +102,7 @@ class DateTest extends TestCase
     public function itSerializesCarbonInstance(): void
     {
         $now = now();
-        $result = (new Date())->serialize($now);
+        $result = (new Date)->serialize($now);
 
         $this->assertSame(
             $now->toDateString(),
@@ -115,7 +116,7 @@ class DateTest extends TestCase
     public function itSerializesValidDateString(): void
     {
         $date = '2018-10-01';
-        $result = (new Date())->serialize($date);
+        $result = (new Date)->serialize($date);
 
         $this->assertSame(
             $date,

@@ -4,6 +4,7 @@ module.exports = [{
             'getting-started/installation',
             'getting-started/configuration',
             'getting-started/tutorial',
+            'getting-started/migrating-to-lighthouse'
         ]
     },
     {
@@ -23,6 +24,7 @@ module.exports = [{
             'guides/validation',
             'guides/relationships',
             'guides/custom-directives',
+            'guides/error-handling',
             'guides/plugin-development'
         ]
     },
@@ -30,7 +32,8 @@ module.exports = [{
         title: 'Extensions',
         children: [
             'extensions/subscriptions',
-            'extensions/deferred'
+            'extensions/deferred',
+            'extensions/tracing'
         ]
     },
     {
@@ -38,6 +41,7 @@ module.exports = [{
         children: [
             'api-reference/directives',
             'api-reference/resolvers',
+            'api-reference/events',
         ]
     }
 ]

@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use ReflectionClass;
+use ReflectionNamedType;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -16,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class MutationExecutor
 {
     /**
+     * Execute a create mutation.
+     *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      *         An empty instance of the model that should be created
      * @param  \Illuminate\Support\Collection  $args
@@ -26,7 +30,7 @@ class MutationExecutor
      */
     public static function executeCreate(Model $model, Collection $args, Relation $parentRelation = null): Model
     {
-        $reflection = new \ReflectionClass($model);
+        $reflection = new ReflectionClass($model);
 
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
@@ -42,80 +46,24 @@ class MutationExecutor
 
         $model = self::saveModelWithBelongsTo($model, $remaining, $parentRelation);
 
-        $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
-            $relation = $model->{$relationName}();
+        self::executeCreateHasMany($model, $hasMany);
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
-                }
-            });
-        });
+        self::executeCreateHasOne($model, $hasOne);
 
-        $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
-            $relation = $model->{$relationName}();
+        self::executeCreateMorphMany($model, $morphMany);
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(collect($values), $relation);
-                }
-            });
-        });
+        self::executeCreateMorphOne($model, $morphOne);
 
-        $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
-            $relation = $model->{$relationName}();
+        self::executeCreateBelongsToMany($model, $belongsToMany);
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
-                }
-            });
-        });
-
-        $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
-            $relation = $model->{$relationName}();
-
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(collect($values), $relation);
-                }
-            });
-        });
-
-        $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
-            $relation = $model->{$relationName}();
-
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
-                }
-
-                if ($operationKey === 'connect') {
-                    $relation->attach($values);
-                }
-            });
-        });
-
-        $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
-            $relation = $model->{$relationName}();
-
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
-                }
-            });
-        });
+        self::executeCreateMorphToMany($model, $morphToMany);
 
         return $model;
     }
 
     /**
+     * Save a model with BelongsTo.
+     *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Support\Collection  $args
      * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
@@ -123,7 +71,7 @@ class MutationExecutor
      */
     protected static function saveModelWithBelongsTo(Model $model, Collection $args, Relation $parentRelation = null): Model
     {
-        $reflection = new \ReflectionClass($model);
+        $reflection = new ReflectionClass($model);
         [$belongsTo, $remaining] = self::partitionArgsByRelationType($reflection, $args, BelongsTo::class);
 
         // Use all the remaining attributes and fill the model
@@ -135,9 +83,9 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation, $model, $relationName): void {
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation, $model, $relationName): void {
                 if ($operationKey === 'create') {
-                    $belongsToModel = self::executeCreate($relation->getModel()->newInstance(), collect($values));
+                    $belongsToModel = self::executeCreate($relation->getModel()->newInstance(), new Collection($values));
                     $relation->associate($belongsToModel);
                 }
 
@@ -161,6 +109,8 @@ class MutationExecutor
     }
 
     /**
+     * Handle the creation with multiple relations.
+     *
      * @param  \Illuminate\Support\Collection  $multiValues
      * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
      * @return void
@@ -170,13 +120,15 @@ class MutationExecutor
         $multiValues->each(function ($singleValues) use ($relation): void {
             self::executeCreate(
                 $relation->getModel()->newInstance(),
-                collect($singleValues),
+                new Collection($singleValues),
                 $relation
             );
         });
     }
 
     /**
+     * Handle the creation with a single relation.
+     *
      * @param  \Illuminate\Support\Collection  $singleValues
      * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
      * @return void
@@ -185,12 +137,14 @@ class MutationExecutor
     {
         self::executeCreate(
             $relation->getModel()->newInstance(),
-            collect($singleValues),
+            new Collection($singleValues),
             $relation
         );
     }
 
     /**
+     * Execute an update.
+     *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      *         An empty instance of the model that should be updated
      * @param  \Illuminate\Support\Collection  $args
@@ -208,7 +162,7 @@ class MutationExecutor
 
         $model = $model->newQuery()->findOrFail($id);
 
-        $reflection = new \ReflectionClass($model);
+        $reflection = new ReflectionClass($model);
 
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
 
@@ -218,14 +172,14 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'update') {
-                    collect($values)->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
                     });
                 }
 
@@ -266,7 +220,7 @@ class MutationExecutor
      * @param  string  $relationClass
      * @return \Illuminate\Support\Collection  [relationshipArgs, remainingArgs]
      */
-    protected static function partitionArgsByRelationType(\ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
+    protected static function partitionArgsByRelationType(ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
     {
         return $args->partition(
             function ($value, string $key) use ($modelReflection, $relationClass): bool {
@@ -279,12 +233,142 @@ class MutationExecutor
                     return false;
                 }
 
-                if (! $returnType instanceof \ReflectionNamedType) {
+                if (! $returnType instanceof ReflectionNamedType) {
                     return false;
                 }
 
                 return $relationClass === $returnType->getName();
             }
         );
+    }
+
+    /**
+     * Execute a create on HasMany relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $hasMany
+     * @return void
+     */
+    protected static function executeCreateHasMany(Model $model, $hasMany): void
+    {
+        $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
+            $relation = $model->{$relationName}();
+
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
+                }
+            });
+        });
+    }
+
+    /**
+     * Execute a create on HasOne relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $hasOne
+     * @return void
+     */
+    protected static function executeCreateHasOne(Model $model, $hasOne): void
+    {
+        $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
+            $relation = $model->{$relationName}();
+
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleSingleRelationCreate(new Collection($values), $relation);
+                }
+            });
+        });
+    }
+
+    /**
+     * Execute a create on MorphMany relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $morphMany
+     * @return void
+     */
+    protected static function executeCreateMorphMany(Model $model, $morphMany): void
+    {
+        $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+            $relation = $model->{$relationName}();
+
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
+                }
+            });
+        });
+    }
+
+    /**
+     * Execute a create on MorphOne relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $morphOne
+     * @return void
+     */
+    protected static function executeCreateMorphOne(Model $model, $morphOne): void
+    {
+        $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
+            $relation = $model->{$relationName}();
+
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleSingleRelationCreate(new Collection($values), $relation);
+                }
+            });
+        });
+    }
+
+    /**
+     * Execute a create on BelongsTo relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $belongsToMany
+     * @return void
+     */
+    protected static function executeCreateBelongsToMany(Model $model, $belongsToMany): void
+    {
+        $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
+            $relation = $model->{$relationName}();
+
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
+                }
+
+                if ($operationKey === 'connect') {
+                    $relation->attach($values);
+                }
+            });
+        });
+    }
+
+    /**
+     * Execute a create on MorphToMany relation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Support\Collection  $morphToMany
+     * @return void
+     */
+    protected static function executeCreateMorphToMany(Model $model, $morphToMany): void
+    {
+        $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
+            $relation = $model->{$relationName}();
+
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
+                if ($operationKey === 'create') {
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
+                }
+            });
+        });
     }
 }

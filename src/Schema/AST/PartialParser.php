@@ -25,7 +25,7 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 class PartialParser
 {
     /**
-     * @param  string[] $objectTypes
+     * @param  string[]  $objectTypes
      * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode[]
      */
     public static function objectTypeDefinitions(array $objectTypes): array
@@ -60,7 +60,7 @@ class PartialParser
     }
 
     /**
-     * @param  string[] $inputValueDefinitions
+     * @param  string[]  $inputValueDefinitions
      * @return \GraphQL\Language\AST\InputValueDefinitionNode[]
      */
     public static function inputValueDefinitions(array $inputValueDefinitions): array
@@ -86,7 +86,7 @@ class PartialParser
     }
 
     /**
-     * @param  string[] $argumentDefinitions
+     * @param  string[]  $argumentDefinitions
      * @return \GraphQL\Language\AST\ArgumentNode[]
      */
     public static function arguments(array $argumentDefinitions): array
@@ -152,7 +152,7 @@ class PartialParser
     }
 
     /**
-     * @param  string[] $directives
+     * @param  string[]  $directives
      * @return \GraphQL\Language\AST\DirectiveNode[]
      */
     public static function directives(array $directives): array
@@ -178,7 +178,7 @@ class PartialParser
     }
 
     /**
-     * @param  string[] $directiveDefinitions
+     * @param  string[]  $directiveDefinitions
      * @return \GraphQL\Language\AST\DirectiveDefinitionNode[]
      */
     public static function directiveDefinitions(array $directiveDefinitions): array

@@ -7,6 +7,7 @@ use Tests\DBTestCase;
 use Mockery\MockInterface;
 use Tests\Utils\Models\Post;
 use Laravel\Scout\EngineManager;
+use Illuminate\Support\Collection;
 use Laravel\Scout\Engines\NullEngine;
 
 class SearchDirectiveTest extends DBTestCase
@@ -21,7 +22,7 @@ class SearchDirectiveTest extends DBTestCase
      */
     protected $engine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -51,14 +52,14 @@ class SearchDirectiveTest extends DBTestCase
             'title' => 'another great title',
         ]);
 
-        $this->engine->shouldReceive('map')->andReturn(collect([$postA, $postC]));
+        $this->engine->shouldReceive('map')->andReturn(new Collection([$postA, $postC]));
 
-        $this->schema = '     
+        $this->schema = '
         type Post {
             id: ID!
             title: String!
         }
-  
+
         type Query {
             posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
         }
@@ -106,7 +107,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->engine->shouldReceive('map')
             ->andReturn(
-                collect([$postA, $postB])
+                new Collection([$postA, $postB])
             )
             ->once();
 
@@ -120,17 +121,83 @@ class SearchDirectiveTest extends DBTestCase
                 Mockery::any(),
                 Mockery::any()
             )
-            ->andReturn(collect([$postA, $postB]))
+            ->andReturn(new Collection([$postA, $postB]))
             ->once();
 
-        $this->schema = '     
+        $this->schema = '
         type Post {
             id: ID!
             title: String!
         }
-  
+
         type Query {
             posts(search: String @search(within: "my.index")): [Post!]! @paginate(type: "paginator" model: "Post")
+        }
+        ';
+
+        $this->query('
+        {
+            posts(count: 10 search: "great") {
+                data {
+                    id
+                    title
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'posts' => [
+                    'data' => [
+                        [
+                            'id' => "$postA->id",
+                        ],
+                        [
+                            'id' => "$postB->id",
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itHandlesScoutBuilderPaginationArguments(): void
+    {
+        $postA = factory(Post::class)->create([
+            'title' => 'great title',
+        ]);
+        $postB = factory(Post::class)->create([
+            'title' => 'Really great title',
+        ]);
+        $postC = factory(Post::class)->create([
+            'title' => 'bad title',
+        ]);
+
+        $this->engine->shouldReceive('map')
+            ->andReturn(
+                new Collection([$postA, $postB])
+            )
+            ->once();
+
+        $this->engine->shouldReceive('paginate')
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::not('page')
+            )
+            ->andReturn(new Collection([$postA, $postB]))
+            ->once();
+
+        $this->schema = '
+        type Post {
+            id: ID!
+            title: String!
+        }
+
+        type Query {
+            posts(search: String @search): [Post!]! @paginate(type: "paginator" model: "Post")
         }
         ';
 

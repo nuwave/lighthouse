@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests\Unit\Schema;
+namespace Tests\Unit\Schema\Values;
 
+use Closure;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -18,7 +19,7 @@ class FieldValueTest extends TestCase
         $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
 
         $this->assertInstanceOf(
-            \Closure::class,
+            Closure::class,
             $fieldValue->getResolver()
         );
     }
@@ -31,7 +32,7 @@ class FieldValueTest extends TestCase
         $fieldValue = $this->constructFieldValue('foo: Int');
 
         $this->assertInstanceOf(
-            \Closure::class,
+            Closure::class,
             $fieldValue->getResolver()
         );
     }
@@ -44,7 +45,7 @@ class FieldValueTest extends TestCase
         $fieldValue = $this->constructFieldValue('baz: Int');
 
         $this->assertInstanceOf(
-            \Closure::class,
+            Closure::class,
             $fieldValue->getResolver()
         );
     }

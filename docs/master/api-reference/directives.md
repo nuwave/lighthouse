@@ -10,6 +10,15 @@ type Query {
 }
 ```
 
+If you need to use a guard besides the default to resolve the authenticated user,
+you can pass the guard name as the `guard` argument
+
+```graphql
+type Query {
+    me: User @auth(guard: "api")
+}
+```
+
 ## @all
 
 Fetch all Eloquent models and return the collection as the result for a field.
@@ -134,12 +143,12 @@ type Mutation {
 ```
 
 You may override the default queueing behaviour from the configuration by
-passing the `queue` argument. 
+passing the `shouldQueue` argument. 
 
 ```graphql
 type Mutation {
     updatePost(input: UpdatePostInput!): Post
-        @broadcast(subscription: "postUpdated", queue: false)
+        @broadcast(subscription: "postUpdated", shouldQueue: false)
 }
 ```
 
@@ -627,10 +636,10 @@ class Commentable
      *
      * @param  mixed  $rootValue  The value that was resolved by the field. Usually an Eloquent model.
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class
@@ -868,10 +877,11 @@ namespace App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class Blog
 {
-    public function visiblePosts($root, array $args, $context, ResolveInfo $resolveInfo): Builder
+    public function visiblePosts($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Builder
     {
         return DB::table('posts')
             ->where('visible', true)
@@ -914,6 +924,30 @@ You can customize the error message for a particular argument.
 
 ```graphql
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
+```
+
+## @rulesForArray
+
+Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/5.6/validation#available-validation-rules).
+
+```graphql
+type Mutation {
+  saveIcecream(flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])): Icecream
+}
+```
+
+You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
+both the size and the contents of an argument array.
+For example, you might require a list of at least 3 valid emails to be passed.
+
+```graphql
+type Mutation {
+  attachEmails(
+    email: [String!]!
+      @rules(apply: ["email"])
+      @rulesForArray(apply: ["min:3"])
+   ): File
+}
 ```
 
 ## @scalar
@@ -1049,10 +1083,10 @@ class Person
      *
      * @param  mixed  $rootValue The value that was resolved by the field. Usually an Eloquent model.
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $info
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return \GraphQL\Type\Definition\Type
      */
-    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $info): Type
+    public function resolveType($rootValue, GraphQLContext $context, ResolveInfo $resolveInfo): Type
     {
         // Default to getting a type with the same name as the passed in root value
         // TODO implement your own resolver logic - if the default is fine, just delete this class

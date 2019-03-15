@@ -11,19 +11,7 @@ if (! function_exists('graphql')) {
      */
     function graphql(): GraphQL
     {
-        return app('graphql');
-    }
-}
-
-if (! function_exists('auth')) {
-    /**
-     * Get instance of auth container.
-     *
-     * @return \Illuminate\Auth\AuthManager
-     */
-    function auth()
-    {
-        return app('auth');
+        return app(GraphQL::class);
     }
 }
 
@@ -73,12 +61,12 @@ if (! function_exists('construct_resolver')) {
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    function construct_resolver(string $className, string $methodName): \Closure
+    function construct_resolver(string $className, string $methodName): Closure
     {
         if (! method_exists($className, $methodName)) {
             throw new DefinitionException("Method '{$methodName}' does not exist on class '{$className}'");
         }
 
-        return \Closure::fromCallable([resolve($className), $methodName]);
+        return Closure::fromCallable([app($className), $methodName]);
     }
 }

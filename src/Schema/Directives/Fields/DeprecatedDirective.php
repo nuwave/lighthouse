@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -14,7 +15,7 @@ class DeprecatedDirective extends BaseDirective implements FieldMiddleware
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'deprecated';
     }
@@ -28,15 +29,14 @@ class DeprecatedDirective extends BaseDirective implements FieldMiddleware
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    public function handleField(FieldValue $value, \Closure $next)
+    public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $reason = $this->directiveArgValue('reason');
 
         if (! $reason) {
-            $parentName = $value->getParentName();
-            $message = "The @{$this->name()} directive requires a `reason` argument [defined on {$parentName}]";
-
-            throw new DirectiveException($message);
+            throw new DirectiveException(
+                "The @{$this->name()} directive requires a `reason` argument [defined on {$value->getParentName()}]"
+            );
         }
 
         $value->setDeprecationReason($reason);

@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Closure;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
@@ -166,7 +168,7 @@ class NodeFactory
         return new EnumType([
             'name' => $enumDefinition->name->value,
             'description' => data_get($enumDefinition->description, 'value'),
-            'values' => collect($enumDefinition->values)
+            'values' => (new Collection($enumDefinition->values))
                 ->mapWithKeys(function (EnumValueDefinitionNode $field) {
                     // Get the directive that is defined on the field itself
                     $directive = ASTHelper::directiveDefinition($field, 'enum');
@@ -232,7 +234,7 @@ class NodeFactory
             'description' => data_get($objectDefinition->description, 'value'),
             'fields' => $this->resolveFieldsFunction($objectDefinition),
             'interfaces' => function () use ($objectDefinition) {
-                return collect($objectDefinition->interfaces)
+                return (new Collection($objectDefinition->interfaces))
                     ->map(function (NamedTypeNode $interface) {
                         return $this->typeRegistry->get($interface->name->value);
                     })
@@ -247,10 +249,10 @@ class NodeFactory
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode  $definition
      * @return \Closure
      */
-    protected function resolveFieldsFunction($definition): \Closure
+    protected function resolveFieldsFunction($definition): Closure
     {
         return function () use ($definition): array {
-            return collect($definition->fields)
+            return (new Collection($definition->fields))
                 ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition): array {
                     $fieldValue = new FieldValue(
                         new NodeValue($definition),
@@ -258,7 +260,7 @@ class NodeFactory
                     );
 
                     return [
-                        $fieldDefinition->name->value => resolve(FieldFactory::class)->handle($fieldValue),
+                        $fieldDefinition->name->value => app(FieldFactory::class)->handle($fieldValue),
                     ];
                 })
                 ->toArray();
@@ -284,11 +286,11 @@ class NodeFactory
      * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      * @return \Closure
      */
-    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): \Closure
+    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): Closure
     {
         return function () use ($definition) {
-            return collect($definition->fields)
-                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) use ($definition) {
+            return (new Collection($definition->fields))
+                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
                     $argumentValue = new ArgumentValue($inputValueDefinition);
 
                     return [
@@ -308,7 +310,7 @@ class NodeFactory
         $nodeName = $interfaceDefinition->name->value;
 
         if ($directive = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
-            $interfaceDirective = (new InterfaceDirective())->hydrate($interfaceDefinition);
+            $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
@@ -342,7 +344,7 @@ class NodeFactory
      *
      * @return \Closure
      */
-    public function typeResolverFallback(): \Closure
+    public function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
             return $this->typeRegistry->get(
@@ -360,7 +362,7 @@ class NodeFactory
         $nodeName = $unionDefinition->name->value;
 
         if ($directive = ASTHelper::directiveDefinition($unionDefinition, 'union')) {
-            $unionDirective = (new UnionDirective())->hydrate($unionDefinition);
+            $unionDirective = (new UnionDirective)->hydrate($unionDefinition);
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
@@ -381,7 +383,7 @@ class NodeFactory
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
             'types' => function () use ($unionDefinition) {
-                return collect($unionDefinition->types)
+                return (new Collection($unionDefinition->types))
                     ->map(function (NamedTypeNode $type) {
                         return $this->typeRegistry->get(
                             $type->name->value

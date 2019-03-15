@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Pusher\Pusher;
+use RuntimeException;
+use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Support\DriverManager;
 use Nuwave\Lighthouse\Subscriptions\Contracts\Broadcaster;
 use Nuwave\Lighthouse\Subscriptions\Broadcasters\LogBroadcaster;
@@ -55,10 +57,17 @@ class BroadcastManager extends DriverManager
      */
     protected function createPusherDriver(array $config): PusherBroadcaster
     {
-        $appKey = config('broadcasting.connections.pusher.key');
-        $appSecret = config('broadcasting.connections.pusher.secret');
-        $appId = config('broadcasting.connections.pusher.app_id');
-        $options = config('broadcasting.connections.pusher.options', []);
+        $connection = $config['connection'] ?? 'pusher';
+        $driverConfig = config("broadcasting.connections.{$connection}");
+
+        if (empty($driverConfig) || $driverConfig['driver'] !== 'pusher') {
+            throw new RuntimeException("Could not initialize Pusher broadcast driver for connection: {$connection}.");
+        }
+
+        $appKey = Arr::get($driverConfig, 'key');
+        $appSecret = Arr::get($driverConfig, 'secret');
+        $appId = Arr::get($driverConfig, 'app_id');
+        $options = Arr::get($driverConfig, 'options', []);
 
         $pusher = new Pusher($appKey, $appSecret, $appId, $options);
 

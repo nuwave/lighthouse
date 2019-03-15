@@ -5,7 +5,7 @@ namespace Tests\Integration\Events;
 use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Events\RegisteringDirectiveBaseNamespaces;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Tests\Utils\Directives\FieldDirective as TestFieldDirective;
 
 class RegisteringDirectiveBaseNamespacesTest extends TestCase
@@ -18,7 +18,7 @@ class RegisteringDirectiveBaseNamespacesTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app->make('events')->listen(
-            RegisteringDirectiveBaseNamespaces::class,
+            RegisterDirectiveNamespaces::class,
             function () {
                 return ['Tests\\Utils\\Directives'];
             }
