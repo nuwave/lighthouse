@@ -784,37 +784,47 @@ type Query {
 
 ## @orderBy
 
-Order by fields.
+Sort a result list by one or more given fields.
 
 ```graphql
-type Query{
-    posts(orderBy: [OrderByClause!]! @orderBy)
+type Query {
+    posts(orderBy: [OrderByClause!] @orderBy): [Post!]!
 }
 ```
 
-The `OrderByClause` is a type that is available in the schema by default.
+The `OrderByClause` input is automatically added to the schema,
+together with the `SortOrder` enum.
 
 ```graphql
-    input OrderByClause{
-        field: String!
-        order: SortOrder!
-    }
-    
-    enum SortOrder {
-        ASC
-        DESC
-    }
+input OrderByClause{
+    field: String!
+    order: SortOrder!
+}
+
+enum SortOrder {
+    ASC
+    DESC
+}
 ```
 
-Querying a field that has an orderBy argument looks like this:
+Querying a field that has an `orderBy` argument looks like this:
 
 ```graphql
 {
-    users(orderBy: [{field:"name", order: ASC}]){
-        name
+    posts (
+        orderBy: [
+            {
+                field: "postedAt"
+                order: ASC
+            }
+        ]
+    ) {
+        title
     }
 }
 ```
+
+You may pass more than one sorting option to add a secondary ordering.
 
 ## @paginate
 

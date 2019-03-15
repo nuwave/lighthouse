@@ -1,19 +1,23 @@
 <?php
 
-
 namespace Tests\Unit\Schema\Directives\Args;
-
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-/**
- * Class OrderByDirectiveTest
- *
- * @package Tests\Unit\Schema\Directives\Args
- */
 class OrderByDirectiveTest extends DBTestCase
 {
+    protected $schema = '
+    type Query {
+        users(orderBy: [OrderByClause!] @orderBy): [User!]! @all
+    }
+
+    type User {
+        name: String
+        team_id: Int
+    }    
+    ';
 
     /**
      * @test
@@ -23,27 +27,31 @@ class OrderByDirectiveTest extends DBTestCase
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
 
-        $this->schema = "
-            type User {
-                name: String
-                team_id: Int
+        $this->query('
+        {
+            users(
+                orderBy: [
+                    {
+                        field: "name"
+                        order: ASC
+                    }
+                ]
+            ) {
+                name
             }
-            
-            type Query {
-                users(orderBy: [OrderByClause!]! @orderBy): [User!]! @all
-            }
-        ";
-
-        $result = $this->query("
-            {
-                users(orderBy: [{field:\"name\", order:ASC }]){
-                    name
-                }
-            }
-        ")->jsonGet('data.users.*.name');
-
-        $this->assertEquals('A', $result[0]);
-        $this->assertEquals('B', $result[1]);
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'name' => 'A'
+                    ],
+                    [
+                        'name' => 'B'
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -54,27 +62,31 @@ class OrderByDirectiveTest extends DBTestCase
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
 
-        $this->schema = "
-            type User {
-                name: String
-                team_id: Int
+        $this->query('
+        {
+            users(
+                orderBy: [
+                    {
+                        field: "name"
+                        order: ASC
+                    }
+                ]
+            ) {
+                name
             }
-            
-            type Query {
-                users(orderBy: [OrderByClause!]! @orderBy): [User!]! @all
-            }
-        ";
-
-        $result = $this->query("
-            {
-                users(orderBy: [{field:\"name\", order:DESC }]){
-                    name
-                }
-            }
-        ")->jsonGet('data.users.*.name');
-
-        $this->assertEquals('B', $result[0]);
-        $this->assertEquals('A', $result[1]);
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'name' => 'B'
+                    ],
+                    [
+                        'name' => 'A'
+                    ]
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -86,33 +98,55 @@ class OrderByDirectiveTest extends DBTestCase
         factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
         factory(User::class)->create(['name' => 'C', 'team_id' => 2]);
 
-        $this->schema = "
-            type User {
-                name: String
-                team_id: Int
+        $this->query('
+        {
+            users(
+                orderBy: [
+                    {
+                        field: "team_id"
+                        order: ASC
+                    }
+                    {
+                        field: "name"
+                        order: ASC
+                    }
+                ]
+            ) {
+                team_id
+                name
             }
-            
-            type Query {
-                users(orderBy: [OrderByClause!]! @orderBy): [User!]! @all
-            }
-        ";
+        }
+        ')->assertExactJson([
+            'data' => [
+                'users' => [
+                    [
+                        'team_id' => 2,
+                        'name' => 'B',
+                    ],
+                    [
+                        'team_id' => 2,
+                        'name' => 'C'
+                    ],
+                    [
+                        'team_id' => 5,
+                        'name' => 'A'
+                    ],
+                ]
+            ]
+        ]);
+    }
 
-        $result = $this->query("
-            {
-                users(orderBy: [{field:\"team_id\", order:ASC}, {field:\"name\", order:ASC }]){
-                    name
-                    team_id
-                }
-            }
-        ")->jsonGet('data.users.*');
+    /**
+     * @test
+     */
+    public function itThrowsOnInvalidDefinition()
+    {
+        $this->expectException(DefinitionException::class);
 
-        $this->assertEquals($result[0]['team_id'], 2);
-        $this->assertEquals($result[0]['name'], 'B');
-
-        $this->assertEquals($result[1]['team_id'], 2);
-        $this->assertEquals($result[1]['name'], 'C');
-
-        $this->assertEquals($result[2]['team_id'], 5);
-        $this->assertEquals($result[2]['name'], 'A');
+        $this->buildSchema('
+        type Query {
+            foo(bar: Int @orderBy): Int
+        }
+        ');
     }
 }

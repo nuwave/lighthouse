@@ -74,7 +74,7 @@ class ASTBuilder
                     return $this->directiveFactory
                         ->createNodeManipulators($node)
                         ->reduce(
-                            function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node) {
+                            function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node): DocumentAST {
                                 return $nodeManipulator->manipulateSchema($node, $document);
                             },
                             $document
@@ -190,64 +190,65 @@ class ASTBuilder
      */
     protected function addPaginationInfoTypes(DocumentAST $document): DocumentAST
     {
-        $paginatorInfo = PartialParser::objectTypeDefinition('
-        type PaginatorInfo {
-          "Total count of available items in the page."
-          count: Int!
-        
-          "Current pagination page."
-          currentPage: Int!
-        
-          "Index of first item in the current page."
-          firstItem: Int
-        
-          "If collection has more pages."
-          hasMorePages: Boolean!
-        
-          "Index of last item in the current page."
-          lastItem: Int
-        
-          "Last page number of the collection."
-          lastPage: Int!
-        
-          "Number of items per page in the collection."
-          perPage: Int!
-        
-          "Total items available in the collection."
-          total: Int!
-        }
-        ');
-        $document->setDefinition($paginatorInfo);
-
-        $pageInfo = PartialParser::objectTypeDefinition('
-        type PageInfo {
-          "When paginating forwards, are there more items?"
-          hasNextPage: Boolean!
-        
-          "When paginating backwards, are there more items?"
-          hasPreviousPage: Boolean!
-        
-          "When paginating backwards, the cursor to continue."
-          startCursor: String
-        
-          "When paginating forwards, the cursor to continue."
-          endCursor: String
-        
-          "Total number of node in connection."
-          total: Int
-        
-          "Count of nodes in current request."
-          count: Int
-        
-          "Current page of request."
-          currentPage: Int
-        
-          "Last page in connection."
-          lastPage: Int
-        }
-        ');
-
-        return $document->setDefinition($pageInfo);
+        return $document
+            ->setDefinition(
+                PartialParser::objectTypeDefinition('
+                    type PaginatorInfo {
+                      "Total count of available items in the page."
+                      count: Int!
+                    
+                      "Current pagination page."
+                      currentPage: Int!
+                    
+                      "Index of first item in the current page."
+                      firstItem: Int
+                    
+                      "If collection has more pages."
+                      hasMorePages: Boolean!
+                    
+                      "Index of last item in the current page."
+                      lastItem: Int
+                    
+                      "Last page number of the collection."
+                      lastPage: Int!
+                    
+                      "Number of items per page in the collection."
+                      perPage: Int!
+                    
+                      "Total items available in the collection."
+                      total: Int!
+                    }
+                ')
+            )
+            ->setDefinition(
+                PartialParser::objectTypeDefinition('
+                    type PageInfo {
+                      "When paginating forwards, are there more items?"
+                      hasNextPage: Boolean!
+                    
+                      "When paginating backwards, are there more items?"
+                      hasPreviousPage: Boolean!
+                    
+                      "When paginating backwards, the cursor to continue."
+                      startCursor: String
+                    
+                      "When paginating forwards, the cursor to continue."
+                      endCursor: String
+                    
+                      "Total number of node in connection."
+                      total: Int
+                    
+                      "Count of nodes in current request."
+                      count: Int
+                    
+                      "Current page of request."
+                      currentPage: Int
+                    
+                      "Last page in connection."
+                      lastPage: Int
+                    }
+                ')
+            );
     }
 
     /**
@@ -258,7 +259,8 @@ class ASTBuilder
      */
     protected function addNodeSupport(DocumentAST $document): DocumentAST
     {
-        $hasTypeImplementingNode = $document->objectTypeDefinitions()
+        $hasTypeImplementingNode = $document
+            ->objectTypeDefinitions()
             ->contains(function (ObjectTypeDefinitionNode $objectType): bool {
                 return (new Collection($objectType->interfaces))
                     ->contains(function (NamedTypeNode $interface): bool {
@@ -274,45 +276,51 @@ class ASTBuilder
 
         $globalId = config('lighthouse.global_id_field');
         // Double slashes to escape the slashes in the namespace.
-        $interface = PartialParser::interfaceTypeDefinition(<<<GRAPHQL
+        return $document
+            ->setDefinition(
+                PartialParser::interfaceTypeDefinition(<<<GRAPHQL
 "Node global interface"	
 interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {	
   "Global identifier that can be used to resolve any Node implementation."
   $globalId: ID!	
 }	
 GRAPHQL
-);
-        $document->setDefinition($interface);
-
-        $nodeQuery = PartialParser::fieldDefinition(
-            'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
-        );
-
-        return $document->addFieldToQueryType($nodeQuery);
+                )
+            )
+            ->addFieldToQueryType(
+                PartialParser::fieldDefinition(
+                    'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
+                )
+            );
     }
 
     /**
+     * Add types that are used for the @orderBy directive.
+     *
+     * @see \Nuwave\Lighthouse\Schema\Directives\Args\OrderByDirective
+     *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected function addOrderByTypes(DocumentAST $document)
     {
-        $sortOrderEnum = PartialParser::enumTypeDefinition("
-                enum OrderBy {
-                    ASC
-                    DESC
-                }
-        ");
-
-        $sortOptionInput = PartialParser::inputObjectTypeDefinition("
-            input OrderByClause {
-               field: String!
-               order: OrderBy!
-            }
-        ");
-
         return $document
-            ->setDefinition($sortOrderEnum)
-            ->setDefinition($sortOptionInput);
+            ->setDefinition(
+                PartialParser::enumTypeDefinition("
+                    enum SortOrder {
+                        ASC
+                        DESC
+                    }
+                "
+                )
+            )
+            ->setDefinition(
+                PartialParser::inputObjectTypeDefinition("
+                    input OrderByClause {
+                       field: String!
+                       order: SortOrder!
+                    }
+                ")
+            );
     }
 }
