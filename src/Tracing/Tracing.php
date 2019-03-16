@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 
 class Tracing
@@ -69,14 +70,15 @@ class Tracing
      * Return additional information for the result.
      *
      * @param  \Nuwave\Lighthouse\Events\BuildExtensionsResponse  $buildExtensionsResponse
-     * @return mixed[]
+     * @return \Nuwave\Lighthouse\Execution\ExtensionsResponse
      */
-    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): array
+    public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ExtensionsResponse
     {
         $end = Carbon::now();
 
-        return [
-            'tracing' => [
+        return new ExtensionsResponse(
+            'tracing',
+            [
                 'version' => 1,
                 'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.v\Z"),
                 'endTime' => $end->format("Y-m-d\TH:i:s.v\Z"),
@@ -84,8 +86,8 @@ class Tracing
                 'execution' => [
                     'resolvers' => $this->resolverTraces,
                 ],
-            ],
-        ];
+            ]
+        );
     }
 
     /**
