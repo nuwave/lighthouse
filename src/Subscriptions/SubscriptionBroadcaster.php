@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Subscriptions;
 
-use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\GraphQL;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;

@@ -49,7 +49,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
 
         $this->publishes([
-            __DIR__.'/../config/config.php' => $this->app->make('path.config') . DIRECTORY_SEPARATOR . 'lighthouse.php',
+            __DIR__.'/../config/config.php' => $this->app->make('path.config').DIRECTORY_SEPARATOR.'lighthouse.php',
         ], 'config');
 
         $this->publishes([

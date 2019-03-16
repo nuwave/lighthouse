@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Support\Utils;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Utils;
 
 class ComplexityDirective extends BaseDirective implements FieldMiddleware
 {
