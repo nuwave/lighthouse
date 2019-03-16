@@ -169,6 +169,166 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function paginatorTypeIsLimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.paginate_max_count' => 1]);
+
+        $this->schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "paginator", maxCount: 3)
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->query('
+        {
+            user {
+                tasks(count: 5) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            $result->jsonGet('errors.0.message')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function relayTypeIsLimitedByMaxCountFromDirective(): void
+    {
+        config(['lighthouse.paginate_max_count' => 1]);
+
+        $this->schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "relay", maxCount: 3)
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->query('
+        {
+            user {
+                tasks(first: 5) {
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
+            $result->jsonGet('errors.0.message')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function paginatorTypeIsLimitedToMaxCountFromConfig(): void
+    {
+        config(['lighthouse.paginate_max_count' => 2]);
+
+        $this->schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "paginator")
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $result = $this->query('
+        {
+            user {
+                tasks(count: 3) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            $result->jsonGet('errors.0.message')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function relayTypeIsLimitedToMaxCountFromConfig(): void
+    {
+        config(['lighthouse.paginate_max_count' => 2]);
+
+        $this->schema = '
+         type User {
+             tasks: [Task!]! @hasMany(type: "relay")
+         }
+         
+         type Task {
+             id: Int!
+         }
+         
+         type Query {
+             user: User @auth
+         }
+         ';
+
+        $result = $this->query('
+        {
+            user {
+                tasks(first: 3) {
+                    edges {
+                        node {
+                           id
+                       }
+                   }
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
+            $result->jsonGet('errors.0.message')
+        );
+    }
+
+    /**
+     * @test
+     */
     public function itCanQueryHasManyPaginatorWithADefaultCount(): void
     {
         $this->schema = '

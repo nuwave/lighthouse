@@ -49,20 +49,35 @@ class RelationBatchLoader extends BatchLoader
     protected $paginationType;
 
     /**
+     * The paginator can be limited to only allow querying a maximum number of items.
+     *
+     * @var int|null
+     */
+    protected $paginateMaxCount;
+
+    /**
      * @param  string  $relationName
-     * @param  array  $args
+     * @param  mixed[]  $args
      * @param  string[]  $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @param  string|null  $paginationType
+     * @param  int|null  $paginateMaxCount
      * @return void
      */
-    public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null)
-    {
+    public function __construct(
+        string $relationName,
+        array $args,
+        array $scopes,
+        ResolveInfo $resolveInfo,
+        ?string $paginationType = null,
+        ?int $paginateMaxCount = null
+    ) {
         $this->relationName = $relationName;
         $this->args = $args;
         $this->scopes = $scopes;
         $this->resolveInfo = $resolveInfo;
         $this->paginationType = $paginationType;
+        $this->paginateMaxCount = $paginateMaxCount;
     }
 
     /**
@@ -77,7 +92,10 @@ class RelationBatchLoader extends BatchLoader
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
                 // first is an required argument
+                /** @var int $first */
                 $first = $this->args['first'];
+                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $first);
+
                 $after = Cursor::decode($this->args);
 
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
@@ -86,7 +104,10 @@ class RelationBatchLoader extends BatchLoader
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                 // count must be set so we can safely get it like this
+                /** @var int $count */
                 $count = $this->args['count'];
+                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $count);
+
                 $page = Arr::get($this->args, 'page', 1);
 
                 $modelRelationFetcher->loadRelationsForPage($count, $page);

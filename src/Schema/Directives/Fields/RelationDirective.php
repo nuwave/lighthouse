@@ -54,9 +54,14 @@ abstract class RelationDirective extends BaseDirective
             return $current;
         }
 
-        $defaultCount = $this->directiveArgValue('defaultCount');
-
-        return PaginationManipulator::transformToPaginatedField($paginationType, $fieldDefinition, $parentType, $current, $defaultCount);
+        return PaginationManipulator::transformToPaginatedField(
+            $paginationType,
+            $fieldDefinition,
+            $parentType,
+            $current,
+            $this->directiveArgValue('defaultCount'),
+            $this->paginateMaxCount()
+        );
     }
 
     /**
@@ -73,6 +78,7 @@ abstract class RelationDirective extends BaseDirective
             'args' => $args,
             'scopes' => $this->directiveArgValue('scopes', []),
             'resolveInfo' => $resolveInfo,
+            'paginateMaxCount' => $this->paginateMaxCount(),
         ];
 
         if ($paginationType = $this->directiveArgValue('type')) {
@@ -80,5 +86,16 @@ abstract class RelationDirective extends BaseDirective
         }
 
         return $constructorArgs;
+    }
+
+    /**
+     * Get either the specific max or the global setting.
+     *
+     * @return int|null
+     */
+    protected function paginateMaxCount(): ?int
+    {
+        return $this->directiveArgValue('maxCount')
+            ?? config('lighthouse.paginate_max_count');
     }
 }

@@ -43,7 +43,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             $fieldDefinition,
             $parentType,
             $current,
-            $this->directiveArgValue('defaultCount')
+            $this->directiveArgValue('defaultCount'),
+            $this->paginateMaxCount()
         );
     }
 
@@ -85,11 +86,27 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args): LengthAwarePaginator {
                 $first = $args['count'];
+                Pagination::throwIfPaginateMaxCountExceeded(
+                    $this->paginateMaxCount(),
+                    $first
+                );
+
                 $page = $args['page'] ?? 1;
 
                 return $this->getPaginatedResults(func_get_args(), $page, $first);
             }
         );
+    }
+
+    /**
+     * Get either the specific max or the global setting.
+     *
+     * @return int|null
+     */
+    protected function paginateMaxCount(): ?int
+    {
+        return $this->directiveArgValue('maxCount')
+            ?? config('lighthouse.paginate_max_count');
     }
 
     /**
@@ -103,6 +120,11 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
         return $value->setResolver(
             function ($root, array $args): LengthAwarePaginator {
                 $first = $args['first'];
+                Pagination::throwIfPaginateMaxCountExceeded(
+                    $this->paginateMaxCount(),
+                    $first
+                );
+
                 $page = Pagination::calculateCurrentPage(
                     $first,
                     Cursor::decode($args)
