@@ -15,11 +15,20 @@ use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 class Tracing
 {
     /**
-     * The point in time where the request was initially started.
+     * The timestamp the request was initially started.
      *
      * @var \Carbon\Carbon
      */
     protected $requestStart;
+
+    /**
+     * The precise point in time where the request was initially started.
+     *
+     * This is either in seconds with microsecond precision (float) or nanoseconds (int).
+     *
+     * @var float|int
+     */
+    protected $requestStartPrecise;
 
     /**
      * Trace entries for a single query execution.
@@ -34,6 +43,7 @@ class Tracing
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
      * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $ManipulateAST
+     *
      * @return void
      */
     public function handleManipulateAST(ManipulateAST $ManipulateAST): void
@@ -52,7 +62,8 @@ class Tracing
      */
     public function handleStartRequest(StartRequest $startRequest): void
     {
-        $this->requestStart = $startRequest->moment;
+        $this->requestStart = Carbon::now();
+        $this->requestStartPrecise = $this->getTime();
     }
 
     /**
@@ -74,15 +85,16 @@ class Tracing
      */
     public function handleBuildExtensionsResponse(BuildExtensionsResponse $buildExtensionsResponse): ExtensionsResponse
     {
-        $end = Carbon::now();
+        $requestEnd = Carbon::now();
+        $requestEndPrecise = $this->getTime();
 
         return new ExtensionsResponse(
             'tracing',
             [
                 'version' => 1,
-                'startTime' => $this->requestStart->format("Y-m-d\TH:i:s.v\Z"),
-                'endTime' => $end->format("Y-m-d\TH:i:s.v\Z"),
-                'duration' => $end->diffInSeconds($this->requestStart),
+                'startTime' => $this->requestStart->format(Carbon::RFC3339_EXTENDED),
+                'endTime' => $requestEnd->format(Carbon::RFC3339_EXTENDED),
+                'duration' => $this->diffTimeInNanoseconds($this->requestStartPrecise, $requestEndPrecise),
                 'execution' => [
                     'resolvers' => $this->resolverTraces,
                 ],
@@ -94,19 +106,63 @@ class Tracing
      * Record resolver execution time.
      *
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @param  \Carbon\Carbon  $start
-     * @param  \Carbon\Carbon  $end
+     * @param  float|int  $start
+     * @param  float|int  $end
      * @return void
      */
-    public function record(ResolveInfo $resolveInfo, Carbon $start, Carbon $end): void
+    public function record(ResolveInfo $resolveInfo, $start, $end): void
     {
         $this->resolverTraces [] = [
             'path' => $resolveInfo->path,
             'parentType' => $resolveInfo->parentType->name,
             'returnType' => $resolveInfo->returnType->__toString(),
             'fieldName' => $resolveInfo->fieldName,
-            'startOffset' => $start->diffInSeconds($this->requestStart),
-            'duration' => $start->diffInSeconds($end),
+            'startOffset' => $this->diffTimeInNanoseconds($this->requestStartPrecise, $start),
+            'duration' => $this->diffTimeInNanoseconds($start, $end),
         ];
+    }
+
+    /**
+     * Get the system's highest resolution of time possible.
+     *
+     * This is either in seconds with microsecond precision (float) or nanoseconds (int).
+     *
+     * @return float|int
+     */
+    public function getTime()
+    {
+        return $this->platformSupportsNanoseconds()
+            ? hrtime(true)
+            : microtime(true);
+    }
+
+    /**
+     * Diff the time results to each other and convert to nanoseconds if needed.
+     *
+     * @param  float|int  $start
+     * @param  float|int  $end
+     * @return int
+     */
+    private function diffTimeInNanoseconds($start, $end): int
+    {
+        if ($this->platformSupportsNanoseconds()) {
+            return $end - $start;
+        }
+
+        // Difference is in seconds (with microsecond precision)
+        // * 1000 to get to milliseconds
+        // * 1000 to get to microseconds
+        // * 1000 to get to nanoseconds
+        return (int) (($end - $start) * 1000 * 1000 * 1000);
+    }
+
+    /**
+     * Test if the current PHP version has the `hrtime` function available to get a nanosecond precision point in time.
+     *
+     * @return bool
+     */
+    private function platformSupportsNanoseconds(): bool
+    {
+        return function_exists('hrtime');
     }
 }
