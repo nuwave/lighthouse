@@ -55,7 +55,6 @@ abstract class BaseDirective implements Directive
      *
      * @param  string  $name
      * @param  mixed|null  $default
-     *
      * @return mixed|null
      */
     protected function directiveArgValue(string $name, $default = null)
@@ -71,7 +70,6 @@ abstract class BaseDirective implements Directive
      * Does the current directive have an argument with the given name?
      *
      * @param  string  $name
-     *
      * @return bool
      */
     public function directiveHasArgument(string $name): bool
@@ -86,7 +84,6 @@ abstract class BaseDirective implements Directive
      * Get a Closure that is defined through an argument on the directive.
      *
      * @param  string  $argumentName
-     *
      * @return \Closure
      */
     public function getResolverFromArgument(string $argumentName): Closure
@@ -95,14 +92,13 @@ abstract class BaseDirective implements Directive
 
         $namespacedClassName = $this->namespaceClassName($className);
 
-        return construct_resolver($namespacedClassName, $methodName);
+        return Utils::constructResolver($namespacedClassName, $methodName);
     }
 
     /**
      * Get the model class from the `model` argument of the field.
      *
      * @param  string  $argumentName The default argument name "model" may be overwritten
-     *
      * @return string
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
@@ -203,7 +199,6 @@ abstract class BaseDirective implements Directive
      * Try adding the default model namespace and ensure the given class is a model.
      *
      * @param  string  $modelClassCandidate
-     *
      * @return string
      */
     protected function namespaceModelClass(string $modelClassCandidate): string

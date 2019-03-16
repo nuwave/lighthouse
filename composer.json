@@ -44,10 +44,7 @@
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
-        },
-        "files": [
-            "src/Support/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
