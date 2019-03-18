@@ -132,6 +132,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    |
+    | Limits the maximum "count" that users may pass as an argument
+    | to fields that are paginated with the @paginate directive.
+    | A setting of "null" means the count is unrestricted.
+    |
+    */
+
+    'paginate_max_count' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Debug
     |--------------------------------------------------------------------------
     |

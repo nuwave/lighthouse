@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Illuminate\Http\Request;
-
 interface GraphQLRequest
 {
     /**

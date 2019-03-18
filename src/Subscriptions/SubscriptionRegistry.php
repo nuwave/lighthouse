@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use GraphQL\Language\AST\FieldNode;
 use Nuwave\Lighthouse\Events\StartExecution;
 use GraphQL\Language\AST\OperationDefinitionNode;
+use Nuwave\Lighthouse\Execution\ExtensionsResponse;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Schema\Types\NotFoundSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
@@ -170,15 +171,16 @@ class SubscriptionRegistry
     /**
      * Get all current subscribers.
      *
-     * @return string[]
+     * @return \Nuwave\Lighthouse\Execution\ExtensionsResponse
      */
-    public function handleBuildExtensionsResponse(): array
+    public function handleBuildExtensionsResponse(): ExtensionsResponse
     {
-        return [
-            'lighthouse_subscriptions' => [
+        return new ExtensionsResponse(
+            'lighthouse_subscriptions',
+            [
                 'version' => 1,
                 'channels' => $this->subscribers,
-            ],
-        ];
+            ]
+        );
     }
 }

@@ -215,8 +215,31 @@ abstract class TestCase extends BaseTestCase
 
         return $this->postJson(
             'graphql',
-            $data,
-            $headers
+            $data
+        );
+    }
+
+    /**
+     * Send a multipart form request.
+     *
+     * This is used for file uploads conforming to the specification:
+     * https://github.com/jaydenseric/graphql-multipart-request-spec
+     *
+     * @param  mixed[]  $parameters
+     * @param  mixed[]  $files
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    protected function postGraphQLMultipart(array $parameters, array $files): TestResponse
+    {
+        return $this->call(
+            'POST',
+            'graphql',
+            $parameters,
+            [],
+            $files,
+            $this->transformHeadersToServerVars([
+                'Content-Type' => 'multipart/form-data',
+            ])
         );
     }
 

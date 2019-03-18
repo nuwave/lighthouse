@@ -94,4 +94,47 @@ class PaginateDirectiveTest extends TestCase
             $typeMap
         );
     }
+
+    /**
+     * @test
+     */
+    public function itHasMaxCountInGeneratedCountDescription(): void
+    {
+        config(['lighthouse.paginate_max_count' => 5]);
+
+        $queryType = $this
+            ->buildSchema('
+            type Query {
+                defaultPaginated: [User!]! @paginate
+                defaultRelay: [User!]! @paginate(type: "relay")
+                customPaginated:  [User!]! @paginate(maxCount: 10)
+                customRelay:  [User!]! @paginate(maxCount: 10, type: "relay")
+            }
+
+            type User {
+                id: ID!
+            }
+            ')
+            ->getQueryType();
+
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 5.',
+            $queryType->getField('defaultPaginated')->getArg('count')->description
+        );
+
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 5.',
+            $queryType->getField('defaultRelay')->getArg('first')->description
+        );
+
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 10.',
+            $queryType->getField('customPaginated')->getArg('count')->description
+        );
+
+        $this->assertSame(
+            'Limits number of fetched elements. Maximum allowed value: 10.',
+            $queryType->getField('customRelay')->getArg('first')->description
+        );
+    }
 }

@@ -81,7 +81,6 @@ class GraphQLController extends Controller
     protected function executeBatched(GraphQLRequest $request): array
     {
         $results = [];
-
         do {
             $results[] = $this->graphQL->executeRequest($request);
         } while ($request->advanceBatchIndex());

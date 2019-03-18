@@ -5,10 +5,13 @@ namespace Tests\Integration;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Http\UploadedFile;
 
 class GraphQLTest extends DBTestCase
 {
     protected $schema = '
+    scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+    
     type User {
         id: ID!
         name: String!
@@ -28,6 +31,10 @@ class GraphQLTest extends DBTestCase
     
     type Query {
         user: User @auth
+    }
+    
+    type Mutation {
+        upload(file: Upload!): Boolean
     }
     ';
 
@@ -91,25 +98,30 @@ class GraphQLTest extends DBTestCase
      */
     public function itResolvesQueryViaGetRequest(): void
     {
-        $query = '
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ';
-        $uri = 'graphql?'.http_build_query(['query' => $query]);
-
-        $this->getJson($uri)->assertExactJson([
+        $this->getJson(
+            'graphql?'
+            .http_build_query(
+                ['query' => '
+                    query UserWithTasks {
+                        user {
+                            email
+                            tasks {
+                                name
+                            }
+                        }
+                    }
+                    ',
+                ]
+            )
+        )->assertExactJson([
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
-                    'tasks' => $this->tasks->map(function ($task) {
-                        return ['name' => $task->name];
-                    })->toArray(),
+                    'tasks' => $this->tasks
+                        ->map(function (Task $task): array {
+                            return ['name' => $task->name];
+                        })
+                        ->toArray(),
                 ],
             ],
         ]);
@@ -213,5 +225,117 @@ class GraphQLTest extends DBTestCase
         ]);
 
         $result->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolvesQueryViaMultipartRequest(): void
+    {
+        $this->postGraphQLMultipart(
+            [
+                'operations' => /* @lang JSON */
+                    '
+                    {
+                        "query": "{ user { email } }",
+                        "variables": {}
+                    }
+                ',
+                'map' => /* @lang JSON */
+                    '{}',
+            ],
+            []
+        )->assertJson([
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file
+     */
+    public function itResolvesUploadViaMultipartRequest(): void
+    {
+        $this->postGraphQLMultipart(
+            [
+                'operations' => /* @lang JSON */
+                    '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                        "variables": {
+                            "file": null
+                        }
+                    }
+                ',
+                'map' => /* @lang JSON */
+                    '
+                    {
+                        "0": ["variables.file"]
+                    }
+                ',
+            ],
+            [
+                '0' => UploadedFile::fake()->create('image.jpg', 500),
+            ]
+        )->assertJson([
+            'data' => [
+                'upload' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching
+     */
+    public function itResolvesUploadViaBatchedMultipartRequest(): void
+    {
+        $this->postGraphQLMultipart(
+            [
+                'operations' => /* @lang JSON */
+                    '
+                    [
+                        {
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "variables": {
+                                "file": null
+                            }
+                        },
+                        {
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "variables": {
+                                "file": null
+                            }
+                        }
+                    ]
+                ',
+                'map' => /* @lang JSON */
+                    '
+                    {
+                        "0": ["0.variables.file"],
+                        "1": ["1.variables.file"]
+                    }
+                ',
+            ],
+            [
+                '0' => UploadedFile::fake()->create('image.jpg', 500),
+                '1' => UploadedFile::fake()->create('image.jpg', 500),
+            ]
+        )->assertJson([
+            [
+                'data' => [
+                    'upload' => true,
+                ],
+            ],
+            [
+                'data' => [
+                    'upload' => true,
+                ],
+            ],
+        ]);
     }
 }

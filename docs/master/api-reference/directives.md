@@ -782,6 +782,50 @@ type Query {
 }
 ```
 
+## @orderBy
+
+Sort a result list by one or more given fields.
+
+```graphql
+type Query {
+    posts(orderBy: [OrderByClause!] @orderBy): [Post!]!
+}
+```
+
+The `OrderByClause` input is automatically added to the schema,
+together with the `SortOrder` enum.
+
+```graphql
+input OrderByClause{
+    field: String!
+    order: SortOrder!
+}
+
+enum SortOrder {
+    ASC
+    DESC
+}
+```
+
+Querying a field that has an `orderBy` argument looks like this:
+
+```graphql
+{
+    posts (
+        orderBy: [
+            {
+                field: "postedAt"
+                order: ASC
+            }
+        ]
+    ) {
+        title
+    }
+}
+```
+
+You may pass more than one sorting option to add a secondary ordering.
+
 ## @paginate
 
 Transform a field so it returns a paginated list.
@@ -847,6 +891,16 @@ query {
         id
         name
     }
+}
+```
+
+Lighthouse allows you to specify a global maximum for the number of items a user
+can request through pagination through the config. You may also overwrite this
+per field with the `maxCount` argument:
+
+```graphql
+type Query {
+    posts: [Post!]! @paginate(maxCount: 10)
 }
 ```
 
