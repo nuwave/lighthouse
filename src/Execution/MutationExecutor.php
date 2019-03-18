@@ -104,12 +104,22 @@ class MutationExecutor
                     $relation->associate($belongsToModel);
                 }
 
-                if ($operationKey === 'disconnect') {
+                // We proceed with disconnecting/deleting only if the given $values is truthy.
+                // There is no other information to be passed when issuing those operations,
+                // but GraphQL forces us to pass some value. It would be unintuitive for
+                // the end user if the given value had no effect on the execution.
+                if (
+                    $operationKey === 'disconnect'
+                    && $values
+                ) {
                     $relation->dissociate();
                 }
 
-                if ($operationKey === 'delete') {
-                    $relation->getModel()::destroy($values);
+                if (
+                    $operationKey === 'delete'
+                    && $values
+                ) {
+                    $relation->delete();
                 }
             });
         });

@@ -7,37 +7,56 @@ use Tests\Utils\Models\User;
 
 class BelongsToTest extends DBTestCase
 {
+    protected $schema = '
+    type Mutation {
+        createTask(input: CreateTaskInput!): Task @create(flatten: true)
+    }
+    
+    type Task {
+        id: ID!
+        name: String!
+        user: User @belongsTo
+    }
+    
+    type User {
+        id: ID!
+        name: String!
+    }
+    
+    input CreateTaskInput {
+        name: String
+        user: CreateUserRelation
+    }
+    
+    input CreateUserRelation {
+        connect: ID
+        create: CreateUserInput
+        update: UpdateUserInput
+    }
+    
+    input CreateUserInput {
+        name: String!
+    }
+    
+    input UpdateUserInput {
+        id: ID!
+        name: String
+    }
+    ';
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->schema .= $this->placeholderQuery();
+    }
+
     /**
      * @test
      */
     public function itCanCreateAndConnectWithBelongsTo(): void
     {
         factory(User::class)->create();
-
-        $this->schema = '
-        type Task {
-            id: ID!
-            name: String!
-            user: User @belongsTo
-        }
-        
-        type User {
-            id: ID
-        }
-        
-        type Mutation {
-            createTask(input: CreateTaskInput!): Task @create(flatten: true)
-        }
-        
-        input CreateUserRelation {
-            connect: ID
-        }
-        
-        input CreateTaskInput {
-            name: String
-            user: CreateUserRelation
-        }
-        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
@@ -72,35 +91,6 @@ class BelongsToTest extends DBTestCase
      */
     public function itCanCreateWithNewBelongsTo(): void
     {
-        $this->schema = '
-        type Task {
-            id: ID!
-            name: String!
-            user: User @belongsTo
-        }
-        
-        type User {
-            id: ID
-        }
-        
-        type Mutation {
-            createTask(input: CreateTaskInput!): Task @create(flatten: true)
-        }
-        
-        input CreateUserRelation {
-            create: CreateUserInput!
-        }
-        
-        input CreateUserInput {
-            name: String!
-        }
-        
-        input CreateTaskInput {
-            name: String
-            user: CreateUserRelation
-        }
-        '.$this->placeholderQuery();
-
         $this->query('
         mutation {
             createTask(input: {
@@ -125,6 +115,48 @@ class BelongsToTest extends DBTestCase
                     'name' => 'foo',
                     'user' => [
                         'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanCreateAndUpdateBelongsTo(): void
+    {
+        factory(User::class)->create([
+            'name' => 'foo'
+        ]);
+
+        $this->query('
+        mutation {
+            createTask(input: {
+                name: "foo"
+                user: {
+                    update: {
+                        id: 1
+                        name: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                        'name' => 'bar',
                     ],
                 ],
             ],
