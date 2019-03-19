@@ -1,14 +1,13 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields\UpdateDirectiveTests;
+namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
-use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Category;
+use Tests\Utils\Models\Company;
+use Tests\Utils\Models\User;
 
-class CoreTest extends DBTestCase
+class UpdateDirectiveTest extends DBTestCase
 {
     /**
      * @test

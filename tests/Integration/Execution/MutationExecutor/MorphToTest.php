@@ -1,45 +1,50 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests\RelationshipTests;
+namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 
 class MorphToTest extends DBTestCase
 {
+    protected $schema = '
+    type Task {
+        id: ID
+        name: String
+    }
+    
+    type Hour {
+        id: ID
+        weekday: Int
+        hourable: Task
+    }
+    
+    type Mutation {
+        createHour(input: CreateHourInput!): Hour @create(flatten: true)
+    }
+    
+    input CreateHourInput {
+        hourable_type: String!
+        hourable_id: Int!
+        from: String
+        to: String
+        weekday: Int
+    }
+    ';
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->schema .= $this->placeholderQuery();
+    }
+
     /**
      * @test
      */
     public function itCanCreateAndConnectWithMorphTo(): void
     {
         factory(Task::class)->create(['name' => 'first_task']);
-
-        $this->schema = '
-        type Task {
-            id: ID
-            name: String
-            hour: Hour
-        }
-        
-        type Hour {
-            id: ID
-            weekday: Int
-            hourable: Task
-        }
-        
-        type Mutation {
-            createHour(input: CreateHourInput!): Hour @create(flatten: true)
-        }
-        
-        input CreateHourInput {
-            hourable_type: String!
-            hourable_id: Int!
-            from: String
-            to: String
-            weekday: Int
-        }
-        
-        '.$this->placeholderQuery();
 
         $this->query('
         mutation {

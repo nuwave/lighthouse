@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields\UpdateDirectiveTests\RelationshipTests;
+namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Role;
@@ -8,7 +8,7 @@ use Tests\Utils\Models\User;
 
 class BelongsToManyTest extends DBTestCase
 {
-    private $schemaBase = '
+    protected $schema = '
     type Role {
         id: ID!
         name: String
@@ -21,7 +21,22 @@ class BelongsToManyTest extends DBTestCase
     }
     
     type Mutation {
+        createRole(input: CreateRoleInput!): Role @create(flatten: true)
         updateRole(input: UpdateRoleInput!): Role @update(flatten: true)
+    }
+
+    input CreateRoleInput {
+        name: String
+        users: CreateUserRelation
+    }
+    
+    input CreateUserRelation {
+        create: [CreateUserInput!]
+        connect: [ID!]
+    }
+    
+    input CreateUserInput {
+        name: String
     }
     
     input UpdateRoleInput {
@@ -30,12 +45,17 @@ class BelongsToManyTest extends DBTestCase
         users: UpdateUserRelation
     }
     
-    input UpdateUserInput {
-        id: ID!
-        name: String
+    input UpdateUserRelation {
+        create: [CreateUserInput!]
+        update: [UpdateUserInput!]
+        delete: [ID!]
+        connect: [ID!]
+        sync: [ID!]
+        disconnect: [ID!]
     }
     
-    input CreateUserInput {
+    input UpdateUserInput {
+        id: ID!
         name: String
     }
     ';
@@ -44,7 +64,95 @@ class BelongsToManyTest extends DBTestCase
     {
         parent::setUp();
 
-        $this->schema = $this->schemaBase.$this->placeholderQuery();
+        $this->schema .= $this->placeholderQuery();
+    }
+
+    /**
+     * @test
+     */
+    public function itCanCreateWithNewBelongsToMany(): void
+    {
+        $this->query('
+        mutation {
+            createRole(input: {
+                name: "foobar"
+                users: {
+                    create: [{
+                        name: "bar"
+                    },
+                    {
+                        name: "foo"
+                    }]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createRole' => [
+                    'id' => '1',
+                    'name' => 'foobar',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanCreateAndConnectWithBelongsToMany(): void
+    {
+        factory(User::class)->create(['name' => 'user_one']);
+        factory(User::class)->create(['name' => 'user_two']);
+
+        $this->query('
+        mutation {
+            createRole(input: {
+                name: "foobar"
+                users: {
+                    connect: [
+                        1,2
+                    ]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createRole' => [
+                    'id' => '1',
+                    'name' => 'foobar',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'user_one',
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'user_two',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**
@@ -55,12 +163,6 @@ class BelongsToManyTest extends DBTestCase
         factory(Role::class)->create([
             'name' => 'is_admin',
         ]);
-
-        $this->schema .= '
-        input UpdateUserRelation {
-            create: [CreateUserInput!]
-        }
-        ';
 
         $this->query('
         mutation {
@@ -122,12 +224,6 @@ class BelongsToManyTest extends DBTestCase
             ->attach(
                 factory(User::class, 2)->create()
             );
-
-        $this->schema .= '
-        input UpdateUserRelation {
-            update: [UpdateUserInput!]
-        }
-        ';
 
         $this->query('
         mutation {
@@ -192,12 +288,6 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->schema .= '
-        input UpdateUserRelation {
-            delete: [ID!]
-        }
-        ';
-
         $this->query('
         mutation {
             updateRole(input: {
@@ -250,12 +340,6 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->schema .= '
-        input UpdateUserRelation {
-            connect: [ID!]
-        }
-        ';
-
         $this->query('
         mutation {
             updateRole(input: {
@@ -305,12 +389,6 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->schema .= '
-        input UpdateUserRelation {
-            sync: [ID!]
-        }
-        ';
-
         $this->query('
         mutation {
             updateRole(input: {
@@ -358,12 +436,6 @@ class BelongsToManyTest extends DBTestCase
             ->attach(
                 factory(User::class, 2)->create()
             );
-
-        $this->schema .= '
-        input UpdateUserRelation {
-            disconnect: [ID!]
-        }
-        ';
 
         $this->query('
         mutation {
