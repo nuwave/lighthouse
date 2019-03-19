@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Tracing;
 
 use Closure;
-use Carbon\Carbon;
 use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -55,12 +54,13 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
         $resolver = $value->getResolver();
 
         return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $start = Carbon::now();
+            $start = $this->tracing->getTime();
+
             $result = $resolver($root, $args, $context, $resolveInfo);
 
-            $end = Carbon::now();
+            $end = $this->tracing->getTime();
 
-            if (($result instanceof Deferred)) {
+            if ($result instanceof Deferred) {
                 $result->then(function () use ($resolveInfo, $start, $end): void {
                     $this->tracing->record($resolveInfo, $start, $end);
                 });
