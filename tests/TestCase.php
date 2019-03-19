@@ -5,6 +5,7 @@ namespace Tests;
 use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\GraphQL;
 use Tests\Utils\Middleware\CountRuns;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
@@ -267,7 +268,9 @@ abstract class TestCase extends BaseTestCase
     {
         $this->schema = $schema;
 
-        return graphql()->prepSchema();
+        return $this->app
+            ->make(GraphQL::class)
+            ->prepSchema();
     }
 
     /**

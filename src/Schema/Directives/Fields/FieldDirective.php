@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -35,7 +36,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
             $fieldValue->defaultNamespacesForParent()
         );
 
-        $resolver = construct_resolver($namespacedClassName, $methodName);
+        $resolver = Utils::constructResolver($namespacedClassName, $methodName);
 
         $additionalData = $this->directiveArgValue('args');
 
