@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields\CreateDirectiveTests;
+namespace Tests\Integration\Schema\Directives\Fields;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use CreateTestbenchTagsTable;
 
-class CoreTest extends DBTestCase
+class CreateDirectiveTest extends DBTestCase
 {
     /**
      * @test
