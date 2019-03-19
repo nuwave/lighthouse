@@ -243,9 +243,7 @@ class MutationExecutor
                 }
 
                 if ($operationKey === 'update') {
-                    collect($values)->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
-                    });
+                    self::executeUpdate($relation->getModel()->newInstance(), new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'delete') {
@@ -285,9 +283,7 @@ class MutationExecutor
                 }
 
                 if ($operationKey === 'update') {
-                    collect($values)->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
-                    });
+                    self::executeUpdate($relation->getModel()->newInstance(), new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'delete') {
