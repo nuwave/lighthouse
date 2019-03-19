@@ -5,7 +5,6 @@ namespace Tests\Integration\Execution\MutationExecutor;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Hour;
 use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
 
 class MorphManyTest extends DBTestCase
 {

@@ -140,7 +140,7 @@ class BelongsToTest extends DBTestCase
     public function itCanCreateAndUpdateBelongsTo(): void
     {
         factory(User::class)->create([
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
 
         $this->query('
@@ -294,7 +294,7 @@ class BelongsToTest extends DBTestCase
                     'id' => '1',
                     'name' => 'foo',
                     'user' => [
-                        'id' => '1'
+                        'id' => '1',
                     ],
                 ],
             ],

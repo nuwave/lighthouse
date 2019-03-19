@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives\Fields;
 
-use CreateTestbenchTagsTable;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use CreateTestbenchTagsTable;
 
 class CreateDirectiveTest extends DBTestCase
 {
