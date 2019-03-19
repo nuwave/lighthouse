@@ -100,7 +100,7 @@ class MutationExecutor
                 }
 
                 if ($operationKey === 'update') {
-                    $belongsToModel = self::executeUpdate($relation->getModel()->newInstance(), collect($values));
+                    $belongsToModel = self::executeUpdate($relation->getModel()->newInstance(), new Collection($values));
                     $relation->associate($belongsToModel);
                 }
 
@@ -237,9 +237,9 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(collect($values), $relation);
+                    self::handleSingleRelationCreate(new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'update') {
@@ -258,14 +258,14 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'update') {
-                    collect($values)->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
                     });
                 }
 
@@ -279,9 +279,9 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(collect($values), $relation);
+                    self::handleSingleRelationCreate(new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'update') {
@@ -300,14 +300,14 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'update') {
-                    collect($values)->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
                     });
                 }
 
@@ -334,14 +334,14 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
             $relation = $model->{$relationName}();
 
-            collect($nestedOperations)->each(function ($values, string $operationKey) use ($relation): void {
+            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(collect($values), $relation);
+                    self::handleMultiRelationCreate(new Collection($values), $relation);
                 }
 
                 if ($operationKey === 'update') {
-                    collect($values)->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), collect($singleValues), $relation);
+                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
+                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
                     });
                 }
 
