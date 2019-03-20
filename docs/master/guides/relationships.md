@@ -314,7 +314,7 @@ This structure was chosen as it is consistent with updating `BelongsToMany` rela
 and allows the query string to be mostly static, taking a variable value to control its behaviour.
 
 ```graphql
-mutation UpdatePost($disconnectAuthour: Boolean){
+mutation UpdatePost($disconnectAuthor: Boolean){
   updatePost(input: {
     title: "An updated title"
     author: {
