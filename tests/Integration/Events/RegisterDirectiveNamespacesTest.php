@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Tests\Utils\Directives\FieldDirective as TestFieldDirective;
 
-class RegisteringDirectiveBaseNamespacesTest extends TestCase
+class RegisterDirectiveNamespacesTest extends TestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory

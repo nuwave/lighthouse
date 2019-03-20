@@ -5,7 +5,7 @@ namespace Tests\Integration\Events;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 
-class BuildingASTTest extends TestCase
+class BuildSchemaStringTest extends TestCase
 {
     /**
      * @test
