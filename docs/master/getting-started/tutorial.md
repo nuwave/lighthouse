@@ -97,10 +97,9 @@ as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super pow
 
 Then publish the configurations files and the default schema.
 
-
 ```bash
 # lighthouse
-php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider"
+php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider"
 
 # playground
 php artisan vendor:publish --provider="MLL\GraphQLPlayground\GraphQLPlaygroundServiceProvider"
