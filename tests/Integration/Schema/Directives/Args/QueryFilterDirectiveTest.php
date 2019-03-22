@@ -218,8 +218,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         
         type Query {
             users(
-                start: String! @whereBetween(key: "created_at")
-                end: String! @whereBetween(key: "created_at")
+                createdBetween: [String!]! @whereBetween(key: "created_at")
             ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
         }
         ';
@@ -237,7 +236,7 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 start: "'.$start.'" end: "'.$end.'") {
+            users(count: 5 createdBetween: ["'.$start.'", "'.$end.'"]) {
                 data {
                     id
                 }
@@ -260,8 +259,7 @@ class QueryFilterDirectiveTest extends DBTestCase
         
         type Query {
             users(
-                start: String! @whereNotBetween(key: "created_at")
-                end: String! @whereNotBetween(key: "created_at")
+                notCreatedBetween: [String!]! @whereNotBetween(key: "created_at")
             ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
         }
         ';
@@ -279,7 +277,7 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 start: "'.$start.'" end: "'.$end.'") {
+            users(count: 5 notCreatedBetween: ["'.$start.'", "'.$end.'"]) {
                 data {
                     id
                 }

@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
+use Nuwave\Lighthouse\Schema\Directives\Args\BuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\NoValue;
 use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
@@ -379,6 +381,13 @@ class FieldFactory
             if ($directive instanceof ArgFilterDirective) {
                 $this->injectArgumentFilter($directive, $astNode);
             }
+
+            if ($directive instanceof ArgBuilderDirective) {
+                $this->queryFilter->addBuilder(
+                    $astNode->name->value,
+                    $directive
+                );
+            }
         }
 
         // If directives remain, snapshot the state that we are in now
@@ -428,14 +437,7 @@ class FieldFactory
     protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition): void
     {
         $argumentName = $inputValueDefinition->name->value;
-        $directiveDefinition = ASTHelper::directiveDefinition($inputValueDefinition, $argFilterDirective->name());
-        $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
 
-        $this->queryFilter->addArgumentFilter(
-            $argumentName,
-            $columnName,
-            $argFilterDirective
-        );
     }
 
     /**

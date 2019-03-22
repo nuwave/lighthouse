@@ -13,19 +13,17 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class CreateDirective extends BaseDirective implements FieldResolver
 {
     /**
-     * The policy mappings for the application.
-     *
      * @var \Illuminate\Database\DatabaseManager
      */
-    private $db;
+    protected $databaseManager;
 
     /**
-     * @param  \Illuminate\Database\DatabaseManager  $database
+     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
      * @return void
      */
-    public function __construct(DatabaseManager $database)
+    public function __construct(DatabaseManager $databaseManager)
     {
-        $this->db = $database;
+        $this->databaseManager = $databaseManager;
     }
 
     /**
@@ -52,18 +50,17 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName();
 
-                $flatten = $this->directiveArgValue('flatten', false);
-                $args = $flatten
-                    ? reset($args)
-                    : $args;
-
-                if (! config('lighthouse.transactional_mutations', true)) {
-                    return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
+                if($this->directiveArgValue('flatten', false)){
+                    $args = reset($args);
                 }
 
-                return $this->db->connection()->transaction(function () use ($model, $args): Model {
+                $executeMutation = function () use ($model, $args): Model {
                     return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
-                });
+                };
+
+                return config('lighthouse.transactional_mutations', true)
+                    ? $this->databaseManager->connection()->transaction($executeMutation)
+                    : $executeMutation();
             }
         );
     }

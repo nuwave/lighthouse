@@ -35,7 +35,9 @@ For example the class name of directive `@fooBar` must be `FooBarDirective`.
 
 Argument directives are applied to the [InputValueDefinition](https://facebook.github.io/graphql/June2018/#InputValueDefinition).
 
-There are 2 types of argument directives in Lighthouse.
+There are 3 types of argument directives in Lighthouse.
+
+### ArgValidationDirective
 
 * [ArgTransformerDirective](#argtransformerdirective)
 * [ArgFilterDirective](#argfilterdirective)
@@ -111,25 +113,28 @@ class CreateUser
 }
 ```
 
-### ArgFilterDirective
+### ArgBuilderDirective
 
-The `ArgFilterDirective` applies additional queries to those directives that are using the `Nuwave\Lighthouse\Execution\QueryFilter`. 
+The `ArgBuilderDirective` allows using arguments passed by the client to dynamically
+modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use the defined filters for resolving the query:
 
 * `@all`
 * `@paginate`
+* `@find`
+* `@first`
 * `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
 
 For example, if we have the following schema:
 
 ```graphql
 type User {
- posts(category: String @eq(key: "cat")): [Post!]! @hasMany
+ posts(category: String @eq): [Post!]! @hasMany
 }
 ```
 
-as a result, it will select the user's posts where its category(cat)
+as a result, it will select the user's posts where the `category` column
 is equal to the value of the `category` argument.
 
 So let's take a look at the built-in `@eq` directive.
@@ -139,9 +144,10 @@ So let's take a look at the built-in `@eq` directive.
 
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class EqDirective implements ArgFilterDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective
 {
     /**
      * Name of the directive.
@@ -154,58 +160,40 @@ class EqDirective implements ArgFilterDirective
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  string  $columnName
-     * @param  mixed  $value
+     * Apply a simple "WHERE = $value" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param  mixed $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function applyFilter($builder, string $columnName, $value)
+    public function handleBuilder($builder, $value)
     {
-        return $builder->where($columnName, $value);
-    }
-
-    /**
-     * Does this filter combine the values of multiple input arguments into one query?
-     *
-     * This is true for filter directives such as "whereBetween" that expects two
-     * different input values, given as separate arguments.
-     *
-     * @return bool
-     */
-    public function combinesMultipleArguments(): bool
-    {
-        return false;
+        return $builder->where(
+            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $value
+        );
     }
 }
 ```
 
-The `applyFilter` method takes three arguments
+The `handleBuilder` method takes two arguments:
 
-* `$builder`  
+* `$builder`
 The query builder for applying the additional query on to.
-* `$columnName`  
-The argument name by default, in our example the default value will be `'category'`.  
-However you can specify a value explicitly by using the `key` argument of `@eq`.
-As you can see, in our example we set the `key` to a string value 'cat', so the value of `$columnName` here is `'cat'`.
-* `$value`  
+* `$value`
 The value of the argument value that the `@eq` was applied on to.
 
-The `combinesMultipleArguments` method determine whether or not to combines multiple arguments.
+If you want to use a more complex value for manipulating a query,
+you can build a `ArgBuilderDirective` to work with lists or nested input objects.
+Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is one example of this.
 
-Considering the following use case.
-
-```graphql
+```graphql        
 type Query {
-  posts(
-    createdAfter: Date! @whereBetween(key: "created_at")
-    createdBefore: String! @whereBetween(key: "created_at")
-  ): [Post!]! @all
+    users(
+        createdBetween: [Date!]! @whereBetween(key: "created_at")
+    ): [User!]! @paginate
 }
 ```
-
-Where the `@whereBetween` directive must be applied to 2 arguments to get an array value that represents min and max values.
-
-In such a case, you want to have the `combinesMultipleArguments` method returned `true` to gather all the values of all the same directives.
 
 ### Evaluation Order
 

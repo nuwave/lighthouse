@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives\Args;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class NeqDirective extends BaseDirective implements ArgBuilderDirective
+class BuilderDirective extends BaseDirective implements ArgBuilderDirective
 {
     /**
      * Name of the directive.
@@ -14,22 +14,21 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function name(): string
     {
-        return 'neq';
+        return 'builder';
     }
 
     /**
-     * Apply a simple "WHERE = $value" clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param  mixed $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)
     {
-        return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
-            '<>',
-            $value
+        return call_user_func(
+            $this->getResolverFromArgument('method'),
+            $builder,
+            $value,
+            $this->definitionNode
         );
     }
 }

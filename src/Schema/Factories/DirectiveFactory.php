@@ -23,9 +23,9 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class DirectiveFactory
 {
@@ -371,13 +371,13 @@ class DirectiveFactory
     }
 
     /**
-     * Get filters for arguments.
+     * Get query builders for arguments.
      *
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $arg
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective>
      */
-    public function createArgFilterDirective(InputValueDefinitionNode $arg): Collection
+    public function createArgBuilderDirective(InputValueDefinitionNode $arg): Collection
     {
-        return $this->createAssociatedDirectivesOfType($arg, ArgFilterDirective::class);
+        return $this->createAssociatedDirectivesOfType($arg, ArgBuilderDirective::class);
     }
 }
