@@ -301,6 +301,15 @@ input CreatePostInput {
 }
 ```
 
+If the name of the Eloquent model does not match the return type of the field,
+or is located in a non-default namespace, set it with the `model` argument.
+
+```graphql
+type Mutation {
+    createPost(title: String!): Post @create(model: "Foo\\Bar\\MyPost")
+}
+```
+
 ## @delete
 
 Delete a model with a given id field. The field must be an `ID` type.
@@ -327,6 +336,15 @@ deleted models.
 ```graphql
 type Mutation {
     deletePosts(id: [ID!]!): [Post!]! @delete
+}
+```
+
+If the name of the Eloquent model does not match the return type of the field,
+or is located in a non-default namespace, set it with the `model` argument.
+
+```graphql
+type Mutation {
+    deletePost(id: ID!): Post @delete(model: "Bar\\Baz\\MyPost")
 }
 ```
 
@@ -1174,7 +1192,8 @@ type Mutation {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field,
+or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
