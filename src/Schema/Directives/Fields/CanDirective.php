@@ -41,6 +41,11 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
                     $gate = app(Gate::class);
                     $gateArguments = $this->getGateArguments();
+                    $model = $this->findModelById($args['id'] ?? null);
+
+                    if (! is_null($model)) {
+                        $gateArguments[0] = $model;
+                    }
 
                     $this->getAbilities()->each(
                         function (string $ability) use ($context, $gate, $gateArguments): void {

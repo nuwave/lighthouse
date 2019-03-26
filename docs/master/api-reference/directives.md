@@ -206,15 +206,22 @@ type Mutation {
 }
 ```
 
-This is currently limited to doing [general checks on a resource and not a specific instance](https://laravel.com/docs/authorization#methods-without-models).
-The defined function on the policy will receive the currently authenticated user.
-
 ```php
 class PostPolicy
 {
     public function create(User $user): bool
     {
         return $user->is_admin;
+    }
+}
+```
+
+```php
+class PostPolicy
+{
+    public function update(User $user, Post $post): bool
+    {
+        return $user->id === $post->author_id;
     }
 }
 ```
