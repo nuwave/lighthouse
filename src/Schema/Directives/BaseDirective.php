@@ -126,18 +126,6 @@ abstract class BaseDirective implements Directive
     }
 
     /**
-     * Find the model instance by the given key.
-     *
-     * @param string|int|null $id
-     * @return \Illuminate\Database\Eloquent\Model|null
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    protected function findModelById($id = null): ?Model
-    {
-        return $this->getModelClass()::find($id);
-    }
-
-    /**
      * @param  string  $classCandidate
      * @param  string[]  $namespacesToTry
      * @param  callable  $determineMatch
