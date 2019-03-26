@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -401,7 +402,9 @@ class MutationExecutor
 
                 $relationMethodCandidate = $modelReflection->getMethod($key);
                 if (! $returnType = $relationMethodCandidate->getReturnType()) {
-                    return false;
+                    throw new DefinitionException(
+                        "A return type has to be defined for the relationship method {$key} on model {$modelReflection->getName()}."
+                    );
                 }
 
                 if (! $returnType instanceof ReflectionNamedType) {
