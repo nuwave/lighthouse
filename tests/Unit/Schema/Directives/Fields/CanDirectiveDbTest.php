@@ -16,7 +16,7 @@ class CanDirectiveDbTest extends DBTestCase
     public function itPassesIfModelInstanceIsNotNull(string $argumentName): void
     {
         $user = User::create([
-            'name' => 'admin'
+            'name' => 'admin',
         ]);
         $this->be($user);
 
