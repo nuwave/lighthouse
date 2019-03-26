@@ -71,7 +71,7 @@ class CanDirectiveDbTest extends DBTestCase
 
         $postB = factory(Post::class)->create([
             'user_id' => $userB->getKey(),
-            'title' => 'Harry Potter and the Half-Blood Prince'
+            'title' => 'Harry Potter and the Half-Blood Prince',
         ]);
 
         $this->schema = '
