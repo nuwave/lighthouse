@@ -134,14 +134,10 @@ abstract class BaseDirective implements Directive
      */
     protected function findModelById($id = null): ?Model
     {
-        if (is_null($id)) {
-            return null;
-        }
-
         /** @var Model $modelClass */
         $modelClass = $this->getModelClass();
 
-        return $modelClass::where(app($modelClass)->getKeyName(), $id)->first();
+        return $modelClass::find($id);
     }
 
     /**
