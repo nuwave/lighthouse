@@ -38,4 +38,11 @@ class Post extends Model
     {
         return $this->morphToMany(Tag::class, 'taggable');
     }
+
+    /**
+     * @see \Tests\Unit\Execution\MutationExecutorTest
+     */
+    public function nonTypeHinted()
+    {
+    }
 }
