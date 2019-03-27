@@ -1,0 +1,9 @@
+includes:
+- ./vendor/nunomaduro/larastan/extension.neon
+parameters:
+  level: 5
+  paths:
+  - src
+  - tests
+  excludes_analyse:
+  - %rootDir%/../../../tests/database/*

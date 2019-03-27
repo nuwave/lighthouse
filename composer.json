@@ -34,8 +34,10 @@
     "require-dev": {
         "laravel/scout": "^4.0",
         "mockery/mockery": "^1.0",
+        "nunomaduro/larastan": "^0.3.15",
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.x-dev",
         "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*",
+        "phpstan/phpstan": "^0.11.5",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
@@ -54,7 +56,8 @@
     "scripts": {
         "test": "phpunit --colors=always",
         "test:unit": "phpunit --colors=always --testsuite Unit",
-        "test:integration": "phpunit --colors=always --testsuite Integration"
+        "test:integration": "phpunit --colors=always --testsuite Integration",
+        "stan": "phpstan analyse --memory-limit 2048M"
     },
     "extra": {
         "laravel": {
