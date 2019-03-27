@@ -3,16 +3,15 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
-use Nuwave\Lighthouse\Schema\Directives\Args\BuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\NoValue;
 use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Execution\QueryFilter;
@@ -74,11 +73,6 @@ class FieldFactory
      * @var \Nuwave\Lighthouse\Execution\ErrorBuffer
      */
     protected $currentValidationErrorBuffer;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Values\ArgumentValue
-     */
-    protected $currentArgumentValueInstance;
 
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\ArgDirective[]
@@ -201,8 +195,6 @@ class FieldFactory
 
             $argumentValues->each(
                 function (ArgumentValue $argumentValue) use (&$args): void {
-                    $this->currentArgumentValueInstance = $argumentValue;
-
                     $noValuePassedForThisArgument = ! array_key_exists($argumentValue->getName(), $args);
 
                     // because we are passing by reference, we need a variable to contain the null value.
@@ -266,32 +258,36 @@ class FieldFactory
         }
 
         if ($type instanceof NonNull) {
-            $this->handleArgWithAssociatedDirectivesRecursively($type->getWrappedType(), $argValue, $astNode, $argumentPath);
+            $this->handleArgWithAssociatedDirectivesRecursively(
+                $type->getWrappedType(),
+                $argValue,
+                $astNode,
+                $argumentPath
+            );
 
             return;
         }
 
         if ($type instanceof InputObjectType) {
-            (new Collection($type->getFields()))
-                ->each(
-                    function (InputObjectField $field) use ($argumentPath, &$argValue): void {
-                        $noValuePassedForThisArgument = ! array_key_exists($field->name, $argValue);
+            $argValue = $this->handleArgWithAssociatedDirectives($astNode, $argValue, $argumentPath, false);
 
-                        // because we are passing by reference, we need a variable to contain the null value.
-                        if ($noValuePassedForThisArgument) {
-                            $value = new NoValue;
-                        } else {
-                            $value = &$argValue[$field->name];
-                        }
+            foreach ($type->getFields() as $field) {
+                $noValuePassedForThisArgument = ! array_key_exists($field->name, $argValue);
 
-                        $this->handleArgWithAssociatedDirectivesRecursively(
-                            $field->type,
-                            $value,
-                            $field->astNode,
-                            $this->addPath($argumentPath, $field->name)
-                        );
-                    }
+                // because we are passing by reference, we need a variable to contain the null value.
+                if ($noValuePassedForThisArgument) {
+                    $value = new NoValue;
+                } else {
+                    $value = &$argValue[$field->name];
+                }
+
+                $this->handleArgWithAssociatedDirectivesRecursively(
+                    $field->type,
+                    $value,
+                    $field->astNode,
+                    $this->addPath($argumentPath, $field->name)
                 );
+            }
 
             return;
         }

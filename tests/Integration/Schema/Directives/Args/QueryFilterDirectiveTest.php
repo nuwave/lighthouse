@@ -236,7 +236,62 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 createdBetween: ["'.$start.'", "'.$end.'"]) {
+            users(
+                count: 5
+                createdBetween: ["'.$start.'", "'.$end.'"]
+            ) {
+                data {
+                    id
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.users.data');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUseInputObjectsForWhereBetweenFilter(): void
+    {
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String
+            email: String
+        }
+        
+        type Query {
+            users(
+                created: TimeRange @whereBetween(key: "created_at")
+            ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
+        }
+        
+        input TimeRange {
+            start: String!
+            end: String!
+        }
+        ';
+
+        $user = $this->users[0];
+        $user->created_at = now()->subDay();
+        $user->save();
+
+        $user = $this->users[1];
+        $user->created_at = now()->subDay();
+        $user->save();
+
+        $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
+        $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
+
+        $this->query('
+        {
+            users(
+                count: 5
+                created: {
+                    start: "'.$start.'"
+                    end: "'.$end.'"
+                }
+            ) {
                 data {
                     id
                 }
@@ -277,7 +332,10 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 notCreatedBetween: ["'.$start.'", "'.$end.'"]) {
+            users(
+                count: 5
+                notCreatedBetween: ["'.$start.'", "'.$end.'"]
+            ) {
                 data {
                     id
                 }
