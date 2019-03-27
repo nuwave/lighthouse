@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Execution;
 
-use Illuminate\Support\Collection;
 use Tests\TestCase;
 use Tests\Utils\Models\Post;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
@@ -21,7 +21,7 @@ class MutationExecutorTest extends TestCase
         MutationExecutor::executeCreate(
             new Post(),
             new Collection([
-                'nonTypeHinted' => 'Lighthouse will try to determine the return type of this method and fail.'
+                'nonTypeHinted' => 'Lighthouse will try to determine the return type of this method and fail.',
             ])
         );
     }
