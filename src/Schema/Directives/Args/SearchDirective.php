@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Args;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class SearchDirective extends BaseDirective implements ArgBuilderDirective
