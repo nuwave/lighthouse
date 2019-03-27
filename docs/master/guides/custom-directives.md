@@ -17,9 +17,7 @@ They can be applied to different parts of the schema, according to the [Directiv
 
 The class name of directive must follow the following pattern:
 
-```
-<Study case of directive name> + "Directive"
-```
+    <Directive name in StudlyCase>Directive
 
 For example the class name of directive `@fooBar` must be `FooBarDirective`. 
 
@@ -39,8 +37,7 @@ There are 3 types of argument directives in Lighthouse.
 
 ### ArgValidationDirective
 
-* [ArgTransformerDirective](#argtransformerdirective)
-* [ArgFilterDirective](#argfilterdirective)
+
 
 ### ArgTransformerDirective
 
@@ -126,16 +123,16 @@ Currently, the following directives use the defined filters for resolving the qu
 * `@first`
 * `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
 
-For example, if we have the following schema:
+Take the following schema as an example:
 
 ```graphql
 type User {
- posts(category: String @eq): [Post!]! @hasMany
+    posts(category: String @eq): [Post!]! @hasMany
 }
 ```
 
-as a result, it will select the user's posts where the `category` column
-is equal to the value of the `category` argument.
+Passing the `category` argument will select only the user's posts
+where the `category` column is equal to the value of the `category` argument.
 
 So let's take a look at the built-in `@eq` directive.
 

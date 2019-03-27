@@ -152,6 +152,40 @@ type Mutation {
 }
 ```
 
+## @builder
+
+Use an argument to modify the query builder for a field.
+
+```graphql
+type Query {
+    users(
+        limit: Int @builder(method: "App\MyClass@limit")
+    ): [User!]! @all
+}
+```
+
+You must point to a `method` which will receive the builder instance
+and the argument value and can apply additional constraints to the query.
+
+```php
+namespace App;
+
+class MyClass
+{
+
+     * Add a limit constrained upon the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function limit($builder, int $value)
+    {
+        return $builder->limit($value);
+    }
+}
+```
+
 ## @cache
 
 Cache the result of a resolver.
@@ -1225,29 +1259,42 @@ type Query {
 
 Verify that a column's value is between two values.
 
-_Note: You will need to add a `key` to the column to want to query for each date_
+The type of the input value should be either an `input` object with two
+fields or a list of values.
 
 ```graphql
 type Query {
     posts(
-        createdAfter: Date! @whereBetween(key: "created_at")
-        createdBefore: String! @whereBetween(key: "created_at")
+        created_at: DateRange @whereBetween
     ): [Post!]! @all
 }
+
+input DateRange {
+    from: Date!
+    to: Date!
+}
 ```
+
+If the name of the argument does not match the database column,
+pass the actual column name as the `key`.
 
 ## @whereNotBetween
 
 Verify that a column's value lies outside of two values.
 
-_Note: You will need to add a `key` to the column to want to query for each date_
+The type of the input value should be either an `input` object with two
+fields or a list of values.
 
 ```graphql
 type Query {
-    users(
-        bornBefore: Date! @whereNotBetween(key: "created_at")
-        bornAfter: Date! @whereNotBetween(key: "created_at")
-    ): [User!]! @all
+    posts(
+        notCreatedDuring: DateRange @whereNotBetween(key: "created_at")
+    ): [Post!]! @all
+}
+
+input DateRange {
+    from: Date!
+    to: Date!
 }
 ```
 
