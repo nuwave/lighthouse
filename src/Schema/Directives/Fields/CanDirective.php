@@ -42,6 +42,13 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                     $gate = app(Gate::class);
                     $gateArguments = $this->getGateArguments();
 
+                    if ($id = $args['id'] ?? null) {
+                        /** @var \Illuminate\Database\Eloquent\Model $modelClass */
+                        $modelClass = $this->getModelClass();
+
+                        $gateArguments[0] = $modelClass::findOrFail($id);
+                    }
+
                     $this->getAbilities()->each(
                         function (string $ability) use ($context, $gate, $gateArguments): void {
                             $this->authorize($context->user(), $gate, $ability, $gateArguments);
