@@ -32,10 +32,10 @@ class SchemaBuilderTest extends TestCase
         "Role description"
         enum Role {
             "Company administrator."
-            ADMIN @enum(value:"admin")
+            ADMIN @enum(value: "admin")
 
             "Company employee."
-            EMPLOYEE @enum(value:"employee")
+            EMPLOYEE @enum(value: "employee")
         }
         ');
 

@@ -53,6 +53,7 @@ class ASTBuilder
         $document = $this->addPaginationInfoTypes($document);
 
         $document = $this->addOrderByTypes($document);
+        $document = $this->addClientQueryTypes($document);
 
         return $this->addNodeSupport($document);
     }
@@ -302,7 +303,7 @@ GRAPHQL
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected function addOrderByTypes(DocumentAST $document)
+    protected function addOrderByTypes(DocumentAST $document): DocumentAST
     {
         return $document
             ->setDefinition(
@@ -322,5 +323,43 @@ GRAPHQL
                     }
                 ')
             );
+    }
+
+    /**
+     * Add the input type that is used for the @clientQuery directive.
+     *
+     * @see \Nuwave\Lighthouse\Schema\Directives\Args\ClientQueryDirective
+     *
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     */
+    protected function addClientQueryTypes(DocumentAST $document): DocumentAST
+    {
+        return $document
+            ->setDefinition(
+                PartialParser::inputObjectTypeDefinition('
+                    input WhereConstraint {
+                        column: String
+                        operator: Operator = EQ
+                        value: ID
+                        AND: [WhereConstraint!]
+                        OR: [WhereConstraint!]
+                        NOT: [WhereConstraint!]
+                    }
+                ')
+            )
+            ->setDefinition(
+                PartialParser::enumTypeDefinition('
+                    enum Operator {
+                        EQ @enum(value: "=")
+                        NEQ @enum(value: "<>")
+                        GT @enum(value: ">")
+                        GTE @enum(value: ">=")
+                        LT @enum(value: "<")
+                        LTE @enum(value: "<=")
+                    }
+                ')
+            );
+        // TODO change value to Mixed type
     }
 }

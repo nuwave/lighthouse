@@ -22,7 +22,6 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
@@ -232,7 +231,6 @@ class FieldFactory
      * @param  mixed  $argValue
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]  $argumentPath
-     *
      * @return void
      */
     protected function handleArgWithAssociatedDirectivesRecursively(
@@ -272,6 +270,7 @@ class FieldFactory
             foreach ($type->getFields() as $field) {
                 $noValuePassedForThisArgument = ! array_key_exists($field->name, $argValue);
 
+                // TODO clean up here, the reference passing magic leads to where.value getting overwritten with NoValue
                 // because we are passing by reference, we need a variable to contain the null value.
                 if ($noValuePassedForThisArgument) {
                     $value = new NoValue;
@@ -372,10 +371,6 @@ class FieldFactory
                 $argumentValue = $directive->transform($argumentValue);
             }
 
-            if ($directive instanceof ArgFilterDirective) {
-                $this->injectArgumentFilter($directive, $astNode);
-            }
-
             if ($directive instanceof ArgBuilderDirective) {
                 $this->queryFilter->addBuilder(
                     $astNode->name->value,
@@ -396,7 +391,6 @@ class FieldFactory
     /**
      * @param  mixed[]  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
-     *
      * @return void
      */
     protected function prepareDirectives(array $argumentPath, Collection $directives): void
@@ -423,22 +417,10 @@ class FieldFactory
     }
 
     /**
-     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
-     *
-     * @return void
-     */
-    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition): void
-    {
-        $argumentName = $inputValueDefinition->name->value;
-    }
-
-    /**
      * Append a path to the base path to create a new path.
      *
      * @param  mixed[]  $basePath
      * @param  string|int  $pathToBeAdded
-     *
      * @return mixed[]
      */
     protected function addPath(array $basePath, $pathToBeAdded): array
@@ -468,7 +450,6 @@ class FieldFactory
      * @param  array  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     *
      * @return void
      */
     protected function validateArgumentsBeforeValidationDirectives($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
