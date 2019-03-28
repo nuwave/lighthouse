@@ -18,6 +18,12 @@ class BelongsToManyTest extends DBTestCase
     type User {
         id: ID!
         name: String
+        organizational: OrganizationalPivot
+    }
+
+    type OrganizationalPivot {
+        approved: Boolean
+        priority: Int
     }
     
     type Mutation {
@@ -57,6 +63,12 @@ class BelongsToManyTest extends DBTestCase
     input UpdateUserInput {
         id: ID!
         name: String
+        organizational: UpdateOrganizationalPivotInput
+    }
+
+    input UpdateOrganizationalPivotInput {
+        approved: Boolean
+        priority: Int
     }
     ';
 
@@ -246,6 +258,79 @@ class BelongsToManyTest extends DBTestCase
                 users {
                     id
                     name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateRole' => [
+                    'id' => '1',
+                    'name' => 'is_user',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'user1',
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'user2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        /** @var Role $role */
+        $role = Role::first();
+        $this->assertCount(2, $role->users()->get());
+        $this->assertSame('is_user', $role->name);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUpdateWithBelongsToManyWithPivot(): void
+    {
+        factory(Role::class)
+            ->create([
+                'name' => 'is_admin',
+            ])
+            ->users()
+            ->attach(
+                factory(User::class, 2)->create()
+            );
+
+        $this->query('
+        mutation {
+            updateRole(input: {
+                id: 1
+                name: "is_user"
+                users: {
+                    update: [{
+                        id: 1
+                        name: "user1"
+                        organizational: {
+                            approved: true
+                        }
+                    },
+                    {
+                        id: 2
+                        name: "user2"
+                        organizational: {
+                            priority: 4
+                        }
+                    }]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                    organizational {
+                        approved
+                        priority
+                    }
                 }
             }
         }
