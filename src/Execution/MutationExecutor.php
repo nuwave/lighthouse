@@ -83,9 +83,9 @@ class MutationExecutor
         // $model->save() is not trying to work on nonexistant columns
         if ($parentRelation instanceof BelongsToMany) { // only BelongsToMany have pivots
             // check if there is a pivot
-            $accessor = $parentRelation ? MutationExecutor::accessProtected($parentRelation, "accessor") : false;
+            $accessor = $parentRelation ? self::accessProtected($parentRelation, 'accessor') : false;
             if ($accessor && $remaining->has($accessor)) { // there is still a pivot to resolve in $remaining data
-                $pivotAttributes = $remaining[$accessor];// save for later
+                $pivotAttributes = $remaining[$accessor]; // save for later
                 unset($remaining[$accessor]); // remove pivot from $remaining
             }
         }
@@ -561,10 +561,10 @@ class MutationExecutor
     }
 
     /**
-     * Access a private or protected property and return it's value
+     * Access a private or protected property and return it's value.
      *
-     * @param  Object  $obj Object to be accessed
-     * @param  String  $prop Property of object
+     * @param  object  $obj Object to be accessed
+     * @param  string  $prop Property of object
      * @return Value   value of property
      */
     protected static function accessProtected($obj, $prop)
@@ -574,7 +574,10 @@ class MutationExecutor
         $notAccessible = $property->isPrivate() || $property->isProtected();
         $property->setAccessible(true);
         $value = $property->getValue($obj);
-        if ($notAccessible) $property->setAccessible(false);
+        if ($notAccessible) {
+            $property->setAccessible(false);
+        }
+
         return $value;
     }
 }
