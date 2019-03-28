@@ -24,7 +24,6 @@ class MethodDirective extends BaseDirective implements FieldResolver
      * Resolve the field directive.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue

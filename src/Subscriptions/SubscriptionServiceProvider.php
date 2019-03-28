@@ -12,6 +12,7 @@ use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -72,5 +73,6 @@ class SubscriptionServiceProvider extends ServiceProvider
         $this->app->bind(SubscriptionIterator::class, SyncIterator::class);
         $this->app->bind(SubscriptionExceptionHandler::class, ExceptionHandler::class);
         $this->app->bind(BroadcastsSubscriptions::class, SubscriptionBroadcaster::class);
+        $this->app->bind(ProvidesSubscriptionResolver::class, SubscriptionResolverProvider::class);
     }
 }

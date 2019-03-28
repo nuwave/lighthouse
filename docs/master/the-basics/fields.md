@@ -228,6 +228,8 @@ If you need to implement custom resolvers for fields that are not on one of the
 root types `Query` or `Mutation`, you can use either the
 [@field](../api-reference/directives.md#field) or [@method](../api-reference/directives.md#method) directive.
 
+You may also [change the default resolver](../guides/plugin-development.md#change-the-default-resolver) if you need.
+
 ## Query data
 
 Lighthouse provides many resolvers that are already built-in, so you do not have to define them yourself.

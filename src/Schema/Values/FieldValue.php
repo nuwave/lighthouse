@@ -169,116 +169,9 @@ class FieldValue
      *
      * @return \Closure
      */
-    public function getResolver(): Closure
+    public function getResolver(): ?Closure
     {
-        if (! isset($this->resolver)) {
-            $this->resolver = $this->defaultResolver();
-        }
-
         return $this->resolver;
-    }
-
-    /**
-     * Get default field resolver.
-     *
-     * @return \Closure
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
-    protected function defaultResolver(): Closure
-    {
-        if ($this->getParentName() === 'Subscription') {
-            return $this->defaultSubscriptionResolver();
-        }
-
-        if ($this->parentIsRootType()) {
-            $resolverClass = Utils::namespaceClassname(
-                Str::studly($this->getFieldName()),
-                $this->defaultNamespacesForParent(),
-                function (string $class): bool {
-                    return method_exists($class, 'resolve');
-                }
-            );
-
-            if (! $resolverClass) {
-                throw new DefinitionException(
-                    "Could not locate a default resolver for the field {$this->field->name->value}"
-                );
-            }
-
-            return Closure::fromCallable(
-                [app($resolverClass), 'resolve']
-            );
-        }
-
-        return Closure::fromCallable(
-            [Executor::class, 'defaultFieldResolver']
-        );
-    }
-
-    /**
-     * Get the default resolver for a subscription field.
-     *
-     * @return \Closure
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
-     */
-    protected function defaultSubscriptionResolver(): Closure
-    {
-        if ($directive = ASTHelper::directiveDefinition($this->field, 'subscription')) {
-            $className = ASTHelper::directiveArgValue($directive, 'class');
-        } else {
-            $className = Str::studly($this->getFieldName());
-        }
-
-        $className = Utils::namespaceClassname(
-            $className,
-            $this->defaultNamespacesForParent(),
-            function (string $class): bool {
-                return is_subclass_of($class, GraphQLSubscription::class);
-            }
-        );
-
-        if (! $className) {
-            throw new DefinitionException(
-                "No class found for the subscription field {$this->getFieldName()}"
-            );
-        }
-
-        /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription */
-        $subscription = app($className);
-        /** @var \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry $subscriptionRegistry */
-        $subscriptionRegistry = app(SubscriptionRegistry::class);
-
-        // Subscriptions can only be placed on a single field on the root
-        // query, so there is no need to consider the field path
-        $subscriptionRegistry->register(
-            $subscription,
-            $this->getFieldName()
-        );
-
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($subscription, $subscriptionRegistry) {
-            if ($root instanceof Subscriber) {
-                return $subscription->resolve($root->root, $args, $context, $resolveInfo);
-            }
-
-            $subscriber = new Subscriber(
-                $args,
-                $context,
-                $resolveInfo
-            );
-
-            if (! $subscription->can($subscriber)) {
-                throw new UnauthorizedSubscriber(
-                    'Unauthorized subscription request'
-                );
-            }
-
-            $subscriptionRegistry->subscriber(
-                $subscriber,
-                $subscription->encodeTopic($subscriber, $this->getFieldName())
-            );
-        };
     }
 
     /**
@@ -339,7 +232,7 @@ class FieldValue
      *
      * @return bool
      */
-    protected function parentIsRootType(): bool
+    public function parentIsRootType(): bool
     {
         return in_array(
             $this->getParentName(),
