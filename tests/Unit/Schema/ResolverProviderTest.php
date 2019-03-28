@@ -3,8 +3,8 @@
 namespace Tests\Unit\Schema;
 
 use Closure;
-use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;

@@ -3,21 +3,10 @@
 namespace Nuwave\Lighthouse\Schema\Values;
 
 use Closure;
-use Illuminate\Support\Str;
-use GraphQL\Executor\Executor;
 use GraphQL\Type\Definition\Type;
-use Nuwave\Lighthouse\Support\Utils;
-use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\StringValueNode;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Subscriptions\Subscriber;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
-use Nuwave\Lighthouse\Subscriptions\Exceptions\UnauthorizedSubscriber;
 
 class FieldValue
 {

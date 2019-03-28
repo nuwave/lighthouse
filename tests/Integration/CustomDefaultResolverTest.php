@@ -22,7 +22,7 @@ class CustomDefaultResolverTest extends TestCase
     public function resolve(): array
     {
         return [
-            'bar' => 'This should not be returned.'
+            'bar' => 'This should not be returned.',
         ];
     }
 
@@ -33,7 +33,7 @@ class CustomDefaultResolverTest extends TestCase
     {
         $previous = Executor::getDefaultFieldResolver();
 
-        Executor::setDefaultFieldResolver(function(): int {
+        Executor::setDefaultFieldResolver(function (): int {
             return self::CUSTOM_RESOLVER_RESULT;
         });
 

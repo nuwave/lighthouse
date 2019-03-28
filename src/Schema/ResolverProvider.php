@@ -3,12 +3,12 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
-use GraphQL\Executor\Executor;
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
+use GraphQL\Executor\Executor;
 use Nuwave\Lighthouse\Support\Utils;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 
 class ResolverProvider implements ProvidesResolver
 {

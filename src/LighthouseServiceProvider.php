@@ -9,17 +9,18 @@ use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
-use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ScalarCommand;
 use Illuminate\Contracts\Container\Container;
 use Nuwave\Lighthouse\Console\MutationCommand;
+use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Execution\SingleResponse;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
@@ -30,15 +31,14 @@ use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
 use Illuminate\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Illuminate\Validation\Factory as ValidationFactory;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
-use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
+use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -129,11 +129,11 @@ class LighthouseServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
-        $this->app->bind(ProvidesSubscriptionResolver::class, function(): ProvidesSubscriptionResolver {
+        $this->app->bind(ProvidesSubscriptionResolver::class, function (): ProvidesSubscriptionResolver {
             return new class() implements ProvidesSubscriptionResolver {
                 public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
                 {
-                   throw new \Exception(
+                    throw new \Exception(
                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
                    );
                 }
