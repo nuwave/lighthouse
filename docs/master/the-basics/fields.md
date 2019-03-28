@@ -88,6 +88,9 @@ type Query {
 A minimal implementation of the field could look something like this.
 The skeleton for this class can be created using `php artisan lighthouse:query Greet`.
 
+The second argument of the resolver function is an associative array of the
+arguments that are passed to the query. 
+
 ```php
 <?php
 
@@ -152,24 +155,78 @@ about fields that are not on one of the root types?
 
 ```graphql
 type Query {
-  users: [User!]!
+  user: User!
 }
 
 type User {
   id: ID!
   name: String!
+  email: String
 }
 ```
 
-Fortunately, you do not have to manually specify a resolver for nested fields.
-The underlying GraphQL implementation provides [a sensible default resolver](http://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver).
+Let's play through what happens when the client send's the following query:
 
-The default resolver plays quite nicely with the data you would typically return from
+```graphql
+{
+  user {
+    id
+    name
+  }
+}
+```
+
+First, the resolver for `user` will be called. Let's suppose it returns an instance
+of `App\Model\User`.
+
+Next, the field sub-selection will be resolved - the two requested fields are `id` and `name`.
+Since we resolved the User already in the parent field, we do not want to fetch it again
+to get it's attributes.
+
+Conveniently, the first argument of each resolver is the return value of the parent
+field, in this case a User model.
+
+A naive implementation of a resolver for `id` might look like this:
+
+```php
+<?php
+
+use App\Models\User;
+
+function resolveUserId(User $user): string
+{
+    return $user->id;
+}
+```
+
+Writing out each such resolver would be pretty repetitive.
+We can utilize the fourth and final resolver argument `ResolveInfo`,
+which will give us access to the requested field name,
+to dynamically access the matching property.
+
+```php
+<?php
+
+use App\Models\User;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+
+function resolveUserAttribute(User $user, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+{
+    return $user->{$resolveInfo->fieldName};
+}
+```
+
+Fortunately, the underlying GraphQL implementation already provides [a sensible default resolver](http://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver),
+that plays quite nicely with the data you would typically return from
 a root resolver, e.g. `Eloquent` models or associative arrays.
+
+This means that in most cases, you will only have to provide resolvers for the
+root fields and make sure they return data in the proper shape.
 
 If you need to implement custom resolvers for fields that are not on one of the
 root types `Query` or `Mutation`, you can use either the
-[@field](../api-reference/directives.md#field) or [@method](../api-reference/directives.md#method) directive. 
+[@field](../api-reference/directives.md#field) or [@method](../api-reference/directives.md#method) directive.
 
 ## Query data
 
