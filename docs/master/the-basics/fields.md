@@ -1,12 +1,19 @@
 # Fields
 
-To fetch data from your GraphQL endpoint, you need to define resolvers for your fields.
-Lighthouse makes this easy by providing easy to use, pre-built resolvers that work
-great together with your Eloquent models.
+The entrypoints to any GraphQL API are the fields of the root types `Query`, `Mutation` and `Subscription`.
 
-## Hello World!
+*Every* field has a function associated with it that is called when the field
+is requested as part of a query. This function is called a **resolver**.
+
+The following section will teach you how to define a resolver for your fields
+and how you can utilize Lighthouse's built-in resolvers.
+
+## Resolving fields
 
 As is the tradition of our people, this section will teach you how to say "hello world!" through Lighthouse.
+
+### Schema definition
+
 The following schema defines a simple field called `hello` that returns a `String`.
 
 ```graphql
@@ -15,8 +22,14 @@ type Query {
 }
 ```
 
-You need to implement the actual resolver next. Lighthouse looks for a class with the capitalized name of the
-field in `App\GraphQL\Queries` and calls its `resolve` function.
+You need to implement the actual resolver next.
+
+### Defining resolvers
+
+By default, Lighthouse looks for a class with the capitalized name of the field in `App\GraphQL\Queries`
+or `App\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
+
+In this case, our field is called `hello` so we need to define our class as follows:
 
 ```php
 <?php
@@ -31,6 +44,14 @@ class Hello
     }
 }
 ```
+
+The easiest way to create such a class is to use the built in `artisan` commands
+`lighthouse:query` and `lighthouse:mutation`. They both take a single argument:
+the name of the field you want to generate.
+
+For example, this is how you generate a class for the field `hello`:
+
+    php artisan lighthouse:query Hello
 
 Now your schema can be queried.
 
@@ -49,6 +70,106 @@ And will return the following response:
   }
 }
 ```
+
+### Fields with arguments
+
+As we learned, *every* field has a resolver function associated with it.
+Just like functions, fields can take arguments to control their behaviour.
+
+Let's construct a query that greets the user. We add a required argument `name`
+that is used to construct the greeting.
+
+```graphql
+type Query {
+    greet(name: String!): String
+}
+```
+
+A minimal implementation of the field could look something like this.
+The skeleton for this class can be created using `php artisan lighthouse:query Greet`.
+
+```php
+<?php
+
+namespace App\GraphQL\Queries;
+
+class Greet
+{
+    public function resolve($rootValue, array $args): string
+    {
+        return "Hello, {$args['name']}!";
+    }
+}
+```
+
+We can call this query, passing a `name` of our choosing.
+
+```graphql
+{
+  greet(name: "Foo")
+}
+```
+
+And receive a friendly greeting.
+
+```json
+{
+  "data": {
+    "greet": "Hello, Foo!"
+  }
+}
+```
+
+If we don't want to require the user to pass an argument, we can modify our schema
+and make the `name` optional and provide a default value.
+
+```graphql
+type Query {
+    greet(name: String = "you"): String
+}
+```
+
+Now we can use our query like this:
+
+```graphql
+{
+  greet
+}
+```
+
+```json
+{
+  "data": {
+    "greet": "Hello, you!"
+  }
+}
+```
+
+### Resolving non-root fields
+
+As mentioned, every field in the schema has a resolver - but what
+about fields that are not on one of the root types?
+
+```graphql
+type Query {
+  users: [User!]!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+```
+
+Fortunately, you do not have to manually specify a resolver for nested fields.
+The underlying GraphQL implementation provides [a sensible default resolver](http://webonyx.github.io/graphql-php/data-fetching/#default-field-resolver).
+
+The default resolver plays quite nicely with the data you would typically return from
+a root resolver, e.g. `Eloquent` models or associative arrays.
+
+If you need to implement custom resolvers for fields that are not on one of the
+root types `Query` or `Mutation`, you can use either the
+[@field](../api-reference/directives.md#field) or [@method](../api-reference/directives.md#method) directive. 
 
 ## Query data
 
@@ -102,10 +223,10 @@ Will return the following result:
 }
 ```
 
-### Query with arguments
+### Adding query constraints
 
-You may have noticed how every field has to have a resolver function. In many ways, fields are similar to functions.
-Just like functions, fields can take arguments to make them more flexible.
+Lighthouse provides built-in directives to enhance your queries by giving
+additional query capabilities to the client.
 
 The following field allows you to fetch a single User by ID.
 
@@ -262,51 +383,3 @@ Lighthouse allows you to serve GraphQL subscriptions. Compared to queries and
 mutations, a more elaborate setup is required.
  
 [Read more about how to set up subscriptions](../extensions/subscriptions.md)
-
-## Custom resolvers
-
-Sometimes, the built-in directives just don't cut it - you need more control!
-Lighthouse allows you to implement your own resolver function for fields.
-
-By default, Lighthouse looks for a class with the capitalized name of the field in `App\GraphQL\Queries`
-or `App\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
-If you stick to that convention, you will not need to specify a directive at all.
-
-For example, the following field:
-
-```graphql
-type Query {
-  latestPost: Post!
-}
-```
-
-expects a class like this:
-
-```php
-<?php
-
-namespace App\GraphQL\Queries;
-
-use App\Post;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-
-class LatestPost
-{
-    public function resolve($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Post
-    {
-        return Post::orderBy('published_at', 'DESC')->first();
-    }
-}
-```
-
-The easiest way to create such a class is to use the built in artisan commands
-`lighthouse:query` and `lighthouse:mutation`. They both take a single argument:
-the name of the field you want to generate.
-
-For example, this is how you generate a class for the field `latestPost`:
-
-    php artisan lighthouse:query LatestPost
-
-If you need to implement custom resolvers for fields that are not on one of the
-root types `Query` or `Mutation`, you can use the [@field](../api-reference/directives.md#field) directive. 
