@@ -25,10 +25,10 @@ class ClientQueryDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function handleBuilder($builder, $whereConstraint)
     {
-        if($andConnectedConstraints = $whereConstraint['AND'] ?? null){
+        if ($andConnectedConstraints = $whereConstraint['AND'] ?? null) {
             $builder->whereNested(
-                function($builder) use ($andConnectedConstraints): void {
-                    foreach($andConnectedConstraints as $constraint){
+                function ($builder) use ($andConnectedConstraints): void {
+                    foreach ($andConnectedConstraints as $constraint) {
                         $this->handleBuilder($builder, $constraint);
                     }
                 },
@@ -36,10 +36,10 @@ class ClientQueryDirective extends BaseDirective implements ArgBuilderDirective
             );
         }
 
-        if($orConnectedConstraints = $whereConstraint['OR'] ?? null){
+        if ($orConnectedConstraints = $whereConstraint['OR'] ?? null) {
             $builder->whereNested(
-                function($builder) use ($orConnectedConstraints): void {
-                    foreach($orConnectedConstraints as $constraint){
+                function ($builder) use ($orConnectedConstraints): void {
+                    foreach ($orConnectedConstraints as $constraint) {
                         $this->handleBuilder($builder, $constraint);
                     }
                 },
@@ -47,10 +47,10 @@ class ClientQueryDirective extends BaseDirective implements ArgBuilderDirective
             );
         }
 
-        if($notConnectedConstraints = $whereConstraint['NOT'] ?? null){
+        if ($notConnectedConstraints = $whereConstraint['NOT'] ?? null) {
             $builder->whereNested(
-                function($builder) use ($notConnectedConstraints): void {
-                    foreach($notConnectedConstraints as $constraint){
+                function ($builder) use ($notConnectedConstraints): void {
+                    foreach ($notConnectedConstraints as $constraint) {
                         $this->handleBuilder($builder, $constraint);
                     }
                 },
@@ -58,8 +58,8 @@ class ClientQueryDirective extends BaseDirective implements ArgBuilderDirective
             );
         }
 
-        if($column = $whereConstraint['column'] ?? null){
-            if(! $value = $whereConstraint['value']) {
+        if ($column = $whereConstraint['column'] ?? null) {
+            if (! $value = $whereConstraint['value']) {
                 throw new Error(
                     "Did not receive a value to match the WhereConstraint for column {$column}."
                 );

@@ -302,7 +302,7 @@ class FieldFactory
         });
 
         // Remove the directive from the list to avoid evaluating the same directive twice
-        while($directive = $directives->shift()) {
+        while ($directive = $directives->shift()) {
             // Pause the iteration once we hit any directive that has to do
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
