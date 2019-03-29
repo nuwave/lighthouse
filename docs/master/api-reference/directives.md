@@ -1278,6 +1278,70 @@ input DateRange {
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
 
+## @whereConstraints
+
+Add a dynamically client-controlled where constraint to a fields query.
+
+The argument it is defined on may have any name but **must** be
+of the input type `WhereConstraints`.
+
+```graphql
+type Query {
+    people(where: WhereConstraints @whereConstraints): [Person!]!
+}
+```
+
+This is how you can use it to construct a complex query
+that gets actors over age 37 who either have red hair or are over 150cm.
+
+```graphql
+{
+  people(
+    filter: {
+      where: [
+        {
+          AND: [
+            { column: "age", operator: GT, value: 37 }
+            { column: "type", value: "Actor" }
+            {
+              OR: [
+                { column: "haircolour", value: "red" }
+                { column: "height", operator: GT, value: 150 }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
+
+The definition for the `WhereConstraints` input is automatically included
+within your schema.
+
+```graphql
+input WhereConstraints {
+    column: String
+    operator: Operator = EQ
+    value: ID
+    AND: [WhereConstraints!]
+    OR: [WhereConstraints!]
+    NOT: [WhereConstraints!]
+}
+
+enum Operator {
+    EQ @enum(value: "=")
+    NEQ @enum(value: "<>")
+    GT @enum(value: ">")
+    GTE @enum(value: ">=")
+    LT @enum(value: "<")
+    LTE @enum(value: "<=")
+}
+```
+
 ## @whereNotBetween
 
 Verify that a column's value lies outside of two values.
