@@ -25,3 +25,13 @@ namespace Illuminate\Foundation\Testing {
         }
     }
 }
+
+namespace GraphQL\Type\Definition {
+    class ResolveInfo
+    {
+        /**
+         * @var \Nuwave\Lighthouse\Execution\Builder
+         */
+        public $builder;
+    }
+}

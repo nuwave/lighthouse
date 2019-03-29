@@ -208,30 +208,22 @@ class CacheDirectiveTest extends DBTestCase
         }
         ';
 
+        $dbQueryCountForPost = 0;
+        DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
+            if(Str::contains($query->sql, 'select * from "posts"')){
+                $dbQueryCountForPost++;
+            }
+        });
+
         $firstResponse = $this->query($query);
 
         $posts = $this->cache->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $queries = 0;
-        DB::listen(function (QueryExecuted $query) use (&$queries): void {
-            // TODO: Find a better way of doing this
-            if (! Str::contains($query->sql, [
-                'drop',
-                'delete',
-                'migrations',
-                'aggregate',
-                'limit 1',
-            ])) {
-                $queries++;
-            }
-        });
-
         $cachedResponse = $this->query($query);
 
-        // Get the the original user and the `find` directive checks the count
-        $this->assertSame(0, $queries);
+        $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
             $firstResponse->jsonGet(),
             $cachedResponse->jsonGet()
@@ -257,15 +249,18 @@ class CacheDirectiveTest extends DBTestCase
             id: ID!
             title: String
         }
+        
         type User {
             id: ID!
             name: String!
             posts: [Post] @hasMany(type: "paginator") @cache
         }
+        
         type Query {
             user(id: ID! @eq): User @find(model: "User")
         }
         ';
+
         $query = '
         {
             user(id: '.$user->getKey().') {
@@ -280,30 +275,22 @@ class CacheDirectiveTest extends DBTestCase
         }
         ';
 
+        $dbQueryCountForPost = 0;
+        DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
+            if(Str::contains($query->sql, 'select * from "posts"')){
+                $dbQueryCountForPost++;
+            }
+        });
+
         $firstResponse = $this->query($query);
 
         $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $queries = 0;
-        DB::listen(function (QueryExecuted $query) use (&$queries): void {
-            // TODO: Find a better way of doing this
-            if (! Str::contains($query->sql, [
-                'drop',
-                'delete',
-                'migrations',
-                'aggregate',
-                'limit 1',
-            ])) {
-                $queries++;
-            }
-        });
-
         $cachedResponse = $this->query($query);
 
-        // Get the the original user and the `find` directive checks the count
-        $this->assertSame(0, $queries);
+        $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
             $firstResponse->jsonGet(),
             $cachedResponse->jsonGet()

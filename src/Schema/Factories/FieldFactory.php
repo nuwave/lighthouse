@@ -12,7 +12,7 @@ use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
-use Nuwave\Lighthouse\Execution\QueryFilter;
+use Nuwave\Lighthouse\Execution\Builder;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -37,9 +37,9 @@ class FieldFactory
     protected $fieldValue;
 
     /**
-     * @var \Nuwave\Lighthouse\Execution\QueryFilter
+     * @var \Nuwave\Lighthouse\Execution\Builder
      */
-    protected $queryFilter;
+    protected $builder;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
@@ -107,19 +107,10 @@ class FieldFactory
 
         // Get the initial resolver from the FieldValue
         // This is either the webonyx default resolver or provided by a directive
-        if ($fieldResolver = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
-            $this->fieldValue = $fieldResolver->resolveField($fieldValue);
-        }
-        $resolver = $this->fieldValue->getResolver();
-
-        $argumentValues = $this->getArgumentValues();
-        // No need to do handle the arguments if there are no
-        // arguments defined for the field
-        if ($argumentValues->isNotEmpty()) {
-            $resolver = $this->decorateResolverWithArgs($resolver, $argumentValues);
+        if ($fieldResolverDirective = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
+            $this->fieldValue = $fieldResolverDirective->resolveField($fieldValue);
         }
 
-        $this->fieldValue->setResolver($resolver);
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
             ->through(
@@ -133,13 +124,41 @@ class FieldFactory
             )
             ->getResolver();
 
+        $argumentValues = $this->getArgumentValues();
+
+        $this->fieldValue->setResolver(
+            function () use ($argumentValues, $resolverWithMiddleware) {
+                $this->setResolverArguments(...func_get_args());
+
+                $this->validationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
+                $this->builder = new Builder();
+
+                $argumentValues->each(
+                    function (ArgumentValue $argumentValue): void {
+                        $this->handleArgDirectivesRecursively(
+                            $argumentValue->getType(),
+                            $argumentValue->getAstNode(),
+                            [$argumentValue->getName()]
+                        );
+                    }
+                );
+
+                $this->runArgDirectives();
+
+                // The final resolver can access the builder through the ResolveInfo
+                $this->resolveInfo->builder = $this->builder;
+
+                return $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
+            }
+        );
+
         // To see what is allowed here, look at the validation rules in
         // GraphQL\Type\Definition\FieldDefinition::getDefinition()
         return [
             'name' => $fieldDefinitionNode->name->value,
             'type' => $this->fieldValue->getReturnType(),
             'args' => $this->getInputValueDefinitions($argumentValues),
-            'resolve' => $resolverWithMiddleware,
+            'resolve' => $this->fieldValue->getResolver(),
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $this->fieldValue->getComplexity(),
             'deprecationReason' => $this->fieldValue->getDeprecationReason(),
@@ -157,44 +176,6 @@ class FieldFactory
             ->map(function (InputValueDefinitionNode $inputValueDefinition): ArgumentValue {
                 return new ArgumentValue($inputValueDefinition, $this->fieldValue);
             });
-    }
-
-    /**
-     * Call `ArgMiddleware::handleArgument` at the resolving time.
-     *
-     * This may be used to transform the arguments, log them or do anything else
-     * before they reach the final resolver.
-     *
-     * @param  \Closure  $resolver
-     * @param  \Illuminate\Support\Collection<ArgumentValue>  $argumentValues
-     * @return \Closure
-     */
-    protected function decorateResolverWithArgs(Closure $resolver, Collection $argumentValues): Closure
-    {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
-            $this->validationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
-            $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
-
-            $this->setResolverArguments(...func_get_args());
-
-            $argumentValues->each(
-                function (ArgumentValue $argumentValue): void {
-                    $this->handleArgDirectivesRecursively(
-                        $argumentValue->getType(),
-                        $argumentValue->getAstNode(),
-                        [$argumentValue->getName()]
-                    );
-                }
-            );
-
-            $this->runArgDirectives();
-
-            // We (ab)use the ResolveInfo as a way of passing down the query filter
-            // to the final resolver
-            $resolveInfo->queryFilter = $this->queryFilter;
-
-            return $resolver(...$this->getResolverArguments());
-        };
     }
 
     /**
@@ -322,7 +303,7 @@ class FieldFactory
             }
 
             if ($directive instanceof ArgBuilderDirective) {
-                $this->queryFilter->addBuilder(
+                $this->builder->addBuilderDirective(
                     $astNode->name->value,
                     $directive
                 );

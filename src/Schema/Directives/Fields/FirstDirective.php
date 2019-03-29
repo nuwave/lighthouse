@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -25,24 +24,25 @@ class FirstDirective extends BaseDirective implements FieldResolver
      * Resolve the field directive.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
+        /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = $this->getModelClass();
 
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model) {
-                /** @var \Illuminate\Database\Eloquent\Builder $query */
-                $query = QueryFilter::apply(
-                    $model::query(),
-                    $args,
-                    $this->directiveArgValue('scopes', []),
-                    $resolveInfo
-                );
-
-                return $query->first();
+                return $resolveInfo
+                    ->builder
+                    ->addScopes(
+                        $this->directiveArgValue('scopes', [])
+                    )
+                    ->apply(
+                        $model::query(),
+                        $args
+                    )
+                    ->first();
             }
         );
     }
