@@ -53,7 +53,7 @@ class ASTBuilder
         $document = $this->addPaginationInfoTypes($document);
 
         $document = $this->addOrderByTypes($document);
-        $document = $this->addClientQueryTypes($document);
+        $document = $this->addWhereConstraintsTypes($document);
 
         return $this->addNodeSupport($document);
     }
@@ -326,25 +326,25 @@ GRAPHQL
     }
 
     /**
-     * Add the input type that is used for the @clientQuery directive.
+     * Add the input type that is used for the @whereConstraints directive.
      *
-     * @see \Nuwave\Lighthouse\Schema\Directives\Args\ClientQueryDirective
+     * @see \Nuwave\Lighthouse\Schema\Directives\Args\WhereConstraintsDirective
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected function addClientQueryTypes(DocumentAST $document): DocumentAST
+    protected function addWhereConstraintsTypes(DocumentAST $document): DocumentAST
     {
         return $document
             ->setDefinition(
                 PartialParser::inputObjectTypeDefinition('
-                    input WhereConstraint {
+                    input WhereConstraints {
                         column: String
                         operator: Operator = EQ
                         value: ID
-                        AND: [WhereConstraint!]
-                        OR: [WhereConstraint!]
-                        NOT: [WhereConstraint!]
+                        AND: [WhereConstraints!]
+                        OR: [WhereConstraints!]
+                        NOT: [WhereConstraints!]
                     }
                 ')
             )
