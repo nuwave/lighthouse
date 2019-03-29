@@ -111,8 +111,6 @@ class FieldFactory
         // No need to do handle the arguments if there are no
         // arguments defined for the field
         if ($argumentValues->isNotEmpty()) {
-            $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
-
             $resolver = $this->decorateResolverWithArgs($resolver, $argumentValues);
         }
 
@@ -183,10 +181,11 @@ class FieldFactory
      * @param  \Illuminate\Support\Collection<ArgumentValue>  $argumentValues
      * @return \Closure
      */
-    public function decorateResolverWithArgs(Closure $resolver, Collection $argumentValues): Closure
+    protected function decorateResolverWithArgs(Closure $resolver, Collection $argumentValues): Closure
     {
         return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $argumentValues) {
             $this->currentValidationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
+            $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
 
             $this->setResolverArguments($root, $args, $context, $resolveInfo);
 
