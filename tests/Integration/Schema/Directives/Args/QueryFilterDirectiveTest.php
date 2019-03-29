@@ -17,6 +17,13 @@ class QueryFilterDirectiveTest extends DBTestCase
         parent::setUp();
 
         $this->users = factory(User::class, 5)->create();
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String
+            email: String
+        }
+        ';
     }
 
     /**
@@ -24,27 +31,47 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachEqFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
-            users(id: ID @eq): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(id: ID @eq): [User!]! @all
         }
         ';
 
         $this->query('
         {
-            users(count: 5 id: '.$this->users->first()->getKey().') {
-                data {
-                    id
-                }
+            users(id: '.$this->users->first()->getKey().') {
+                id
             }
         }
-        ')->assertJsonCount(1, 'data.users.data');
+        ')->assertJsonCount(1, 'data.users');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanAttachEqFilterFromInputObject(): void
+    {
+        $this->schema .= '
+        type Query {
+            users(input: UserInput!): [User!]! @all
+        }
+        
+        input UserInput {
+            id: ID @eq
+        }
+        ';
+
+        $this->query('
+        {
+            users(
+                input: {
+                    id: '.$this->users->first()->getKey().'
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJsonCount(1, 'data.users');
     }
 
     /**
@@ -52,27 +79,19 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachNeqFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
-            users(id: ID @neq): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(id: ID @neq): [User!]! @all
         }
         ';
 
         $this->query('
         {
-            users(count: 5 id: '.$this->users->first()->getKey().') {
-                data {
-                    id
-                }
+            users(id: '.$this->users->first()->getKey().') {
+                id
             }
         }
-        ')->assertJsonCount(4, 'data.users.data');
+        ')->assertJsonCount(4, 'data.users');
     }
 
     /**
@@ -80,16 +99,9 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachInFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
-            users(include: [Int] @in(key: "id")): [User!]!
-                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(include: [Int] @in(key: "id")): [User!]! @all
         }
         ';
 
@@ -98,13 +110,11 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 include: ['.$user1.', '.$user2.']) {
-                data {
-                    id
-                }
+            users(include: ['.$user1.', '.$user2.']) {
+                id
             }
         }
-        ')->assertJsonCount(2, 'data.users.data');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -112,16 +122,9 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachNotInFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
-            users(exclude: [Int] @notIn(key: "id")): [User!]!
-                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(exclude: [Int] @notIn(key: "id")): [User!]! @all
         }
         ';
 
@@ -130,13 +133,11 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 exclude: ['.$user1.', '.$user2.']) {
-                data {
-                    id
-                }
+            users(exclude: ['.$user1.', '.$user2.']) {
+                id
             }
         }
-        ')->assertJsonCount(3, 'data.users.data');
+        ')->assertJsonCount(3, 'data.users');
     }
 
     /**
@@ -144,16 +145,9 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
-            users(id: Int @where(operator: ">")): [User!]!
-                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(id: Int @where(operator: ">")): [User!]! @all
         }
         ';
 
@@ -161,13 +155,11 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 id: '.$user1.') {
-                data {
-                    id
-                }
+            users(id: '.$user1.') {
+                id
             }
         }
-        ')->assertJsonCount(4, 'data.users.data');
+        ')->assertJsonCount(4, 'data.users');
     }
 
     /**
@@ -175,18 +167,12 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachTwoWhereFilterWithTheSameKeyToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
             users(
                 start: Int @where(key: "id", operator: ">")
                 end: Int @where(key: "id", operator: "<")
-            ): [User!]! @paginate
+            ): [User!]! @all
         }
         ';
 
@@ -195,13 +181,11 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 start: '.$user1.' end: '.$user2.') {
-                data {
-                    id
-                }
+            users(start: '.$user1.' end: '.$user2.') {
+                id
             }
         }
-        ')->assertJsonCount(3, 'data.users.data');
+        ')->assertJsonCount(3, 'data.users');
     }
 
     /**
@@ -209,17 +193,11 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereBetweenFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
             users(
                 createdBetween: [String!]! @whereBetween(key: "created_at")
-            ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            ): [User!]! @all
         }
         ';
 
@@ -237,15 +215,12 @@ class QueryFilterDirectiveTest extends DBTestCase
         $this->query('
         {
             users(
-                count: 5
                 createdBetween: ["'.$start.'", "'.$end.'"]
             ) {
-                data {
-                    id
-                }
+                id
             }
         }
-        ')->assertJsonCount(2, 'data.users.data');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -253,17 +228,11 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanUseInputObjectsForWhereBetweenFilter(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
             users(
                 created: TimeRange @whereBetween(key: "created_at")
-            ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            ): [User!]! @all
         }
         
         input TimeRange {
@@ -286,18 +255,15 @@ class QueryFilterDirectiveTest extends DBTestCase
         $this->query('
         {
             users(
-                count: 5
                 created: {
                     start: "'.$start.'"
                     end: "'.$end.'"
                 }
             ) {
-                data {
-                    id
-                }
+                id
             }
         }
-        ')->assertJsonCount(2, 'data.users.data');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -305,17 +271,11 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereNotBetweenFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
             users(
                 notCreatedBetween: [String!]! @whereNotBetween(key: "created_at")
-            ): [User!]! @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            ): [User!]! @all
         }
         ';
 
@@ -333,15 +293,12 @@ class QueryFilterDirectiveTest extends DBTestCase
         $this->query('
         {
             users(
-                count: 5
                 notCreatedBetween: ["'.$start.'", "'.$end.'"]
             ) {
-                data {
-                    id
-                }
+                id
             }
         }
-        ')->assertJsonCount(3, 'data.users.data');
+        ')->assertJsonCount(3, 'data.users');
     }
 
     /**
@@ -349,16 +306,11 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itCanAttachWhereClauseFilterToQuery(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
-            users(created_at: String! @where(clause: "whereYear")): [User!]!
-                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(
+                created_at: String! @where(clause: "whereYear")
+            ): [User!]! @all
         }
         ';
 
@@ -374,13 +326,11 @@ class QueryFilterDirectiveTest extends DBTestCase
 
         $this->query('
         {
-            users(count: 5 created_at: "'.$year.'") {
-                data {
-                    id
-                }
+            users(created_at: "'.$year.'") {
+                id
             }
         }
-        ')->assertJsonCount(2, 'data.users.data');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -388,27 +338,21 @@ class QueryFilterDirectiveTest extends DBTestCase
      */
     public function itOnlyProcessesFilledArguments(): void
     {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String
-            email: String
-        }
-        
+        $this->schema .= '
         type Query {
-            users(id: ID @eq, name: String @where(operator: "like")): [User!]!
-                @paginate(model: "Tests\\\Utils\\\Models\\\User")
+            users(
+                id: ID @eq
+                name: String @where(operator: "like")
+            ): [User!]! @all
         }
         ';
 
         $this->query('
         {
-            users(count: 5 name: "'.$this->users->first()->name.'") {
-                data {
-                    id
-                }
+            users(name: "'.$this->users->first()->name.'") {
+                id
             }
         }
-        ')->assertJsonCount(1, 'data.users.data');
+        ')->assertJsonCount(1, 'data.users');
     }
 }
