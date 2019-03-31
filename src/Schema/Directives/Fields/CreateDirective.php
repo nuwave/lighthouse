@@ -52,7 +52,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 $model = new $modelClassName();
 
                 if ($this->directiveArgValue('flatten', false)) {
-                    $args = Arr::flatten($args);
+                    $args = reset($args);
                 }
 
                 $executeMutation = function () use ($model, $args): Model {
