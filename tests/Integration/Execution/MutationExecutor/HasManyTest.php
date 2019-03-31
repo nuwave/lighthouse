@@ -21,8 +21,8 @@ class HasManyTest extends DBTestCase
     }
     
     type Mutation {
-        createUser(input: CreateUserInput!): User @create(flatten: true)
-        updateUser(input: UpdateUserInput!): User @update(flatten: true)
+        createUser(input: CreateUserInput! @spread): User @create
+        updateUser(input: UpdateUserInput! @spread): User @update
     }
     
     input CreateUserInput {

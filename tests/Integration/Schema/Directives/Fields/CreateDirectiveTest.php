@@ -54,7 +54,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            createCompany(input: CreateCompanyInput!): Company @create(flatten: true)
+            createCompany(input: CreateCompanyInput! @spread): Company @create
         }
         
         input CreateCompanyInput {
@@ -136,7 +136,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            createUser(input: CreateUserInput!): User @create(flatten: true)
+            createUser(input: CreateUserInput! @spread): User @create
         }
         
         input CreateUserInput {
@@ -206,7 +206,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            createUser(input: CreateUserInput!): User @create(flatten: true)
+            createUser(input: CreateUserInput! @spread): User @create
         }
         
         input CreateUserInput {
@@ -276,7 +276,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            createUser(input: CreateUserInput!): User @create(flatten: true)
+            createUser(input: CreateUserInput! @spread): User @create
         }
         
         input CreateUserInput {

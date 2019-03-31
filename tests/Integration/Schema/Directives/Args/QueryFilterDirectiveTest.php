@@ -53,7 +53,7 @@ class QueryFilterDirectiveTest extends DBTestCase
     {
         $this->schema .= '
         type Query {
-            users(input: UserInput!): [User!]! @all
+            users(input: UserInput! @spread): [User!]! @all
         }
         
         input UserInput {

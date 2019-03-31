@@ -66,22 +66,24 @@ class UpdateDirectiveTest extends DBTestCase
         
         type Mutation {
             updateCompany(
+                id: ID!
                 input: UpdateCompanyInput
             ): Company @update(flatten: true)
         }
         
         input UpdateCompanyInput {
-            id: ID!
             name: String
         }
         '.$this->placeholderQuery();
 
         $this->query('
         mutation {
-            updateCompany(input: {
+            updateCompany(
                 id: 1
-                name: "bar"
-            }) {
+                input: {
+                    name: "bar"
+                }
+            ) {
                 id
                 name
             }
@@ -159,7 +161,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            updateUser(input: UpdateUserInput!): User @update(flatten: true)
+            updateUser(input: UpdateUserInput! @spread): User @update
         }
         
         input UpdateUserInput {

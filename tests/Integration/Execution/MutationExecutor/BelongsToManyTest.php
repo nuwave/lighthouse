@@ -21,8 +21,8 @@ class BelongsToManyTest extends DBTestCase
     }
     
     type Mutation {
-        createRole(input: CreateRoleInput!): Role @create(flatten: true)
-        updateRole(input: UpdateRoleInput!): Role @update(flatten: true)
+        createRole(input: CreateRoleInput! @spread): Role @create
+        updateRole(input: UpdateRoleInput! @spread): Role @update
     }
 
     input CreateRoleInput {

@@ -338,11 +338,11 @@ type Mutation {
 ```
 
 If you are using a single input object as an argument, you must tell Lighthouse
-to `flatten` it before applying it to the resolver.
+to spread out the nested values before applying it to the resolver.
 
 ```graphql
 type Mutation {
-    createPost(input: CreatePostInput!): Post @create(flatten: true)
+    createPost(input: CreatePostInput! @spread): Post @create
 }
 
 input CreatePostInput {
@@ -1119,6 +1119,51 @@ type Query {
     posts(search: String @search(within: "my.index")): [Post!]! @paginate
 }
 ```
+
+## @spread
+
+Spread out the nested values of an input object into it's parent.
+
+```graphql
+type Mutation {
+    updatePost(
+        id: ID!
+        input: PostInput! @spread
+    ): Post @update
+}
+
+input PostInput {
+    title: String!
+    body: String
+}
+```
+
+Usage for the end user does not change:
+
+```graphql
+mutation {
+    updatePost(
+        id: 12 
+        input: {
+            title: "My awesome title"
+        }
+    ) {
+        id
+    }
+}   
+```
+
+This will make it so the arguments are passed to the resolver on the root level:
+
+```php
+[
+    'id' => 12
+    'title' = 'My awesome title'
+]
+```
+
+Note that Lighthouse spreads out the arguments **after** all other `ArgDirectives` have
+been applied, e.g. validation, transformation.
 
 ## @subscription
 

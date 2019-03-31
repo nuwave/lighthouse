@@ -20,8 +20,8 @@ class MorphManyTest extends DBTestCase
     }
     
     type Mutation {
-        createTask(input: CreateTaskInput!): Task @create(flatten: true)
-        updateTask(input: UpdateTaskInput!): Task @update(flatten: true)
+        createTask(input: CreateTaskInput! @spread): Task @create
+        updateTask(input: UpdateTaskInput! @spread): Task @update
     }
     
     input CreateTaskInput {

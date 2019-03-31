@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
+use Nuwave\Lighthouse\Schema\Directives\Args\SpreadDirective;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Builder;
@@ -92,6 +93,13 @@ class FieldFactory
     protected $handleArgDirectivesSnapshots = [];
 
     /**
+     * Arg paths to spread out.
+     *
+     * @var array[]
+     */
+    protected $spreadPaths = [];
+
+    /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
@@ -168,6 +176,22 @@ class FieldFactory
 
                 $this->runArgDirectives();
 
+                // Apply the argument spreadings after we are finished with all
+                // the other argument handling
+                foreach($this->spreadPaths as $argumentPath){
+                    $inputValues = $this->argValue($argumentPath);
+                    $this->unsetArgValue($argumentPath);
+
+                    array_pop($argumentPath);
+
+                    foreach($inputValues as $key => $value){
+                        $this->setArgValue(
+                            array_merge($argumentPath, [$key]),
+                            $value
+                        );
+                    }
+                }
+
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
 
@@ -224,9 +248,20 @@ class FieldFactory
             return;
         }
 
+        $directives = $this->directiveFactory->createArgDirectives($astNode);
+
+        if(
+            $directives->contains(function(Directive $directive): bool {
+                return $directive instanceof SpreadDirective;
+            })
+            && $type instanceof InputObjectType
+        ){
+            $this->spreadPaths []= $argumentPath;
+        }
+
         // Handle the argument itself. At this point, it can be wrapped
         // in a list or an input object
-        $this->handleArgWithAssociatedDirectives($type, $astNode, $argumentPath);
+        $this->handleArgWithAssociatedDirectives($type, $astNode, $directives, $argumentPath);
 
         // If we no value or null is given, we bail here to prevent
         // infinitely going down a chain of nested input objects
@@ -259,25 +294,27 @@ class FieldFactory
     /**
      * @param  \GraphQL\Type\Definition\InputType  $type
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
+     * @param  \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>  $directives
      * @param  mixed[]  $argumentPath
      * @return void
      */
     protected function handleArgWithAssociatedDirectives(
         InputType $type,
         InputValueDefinitionNode $astNode,
+        Collection $directives,
         array $argumentPath
     ): void {
-        $directives = $this->directiveFactory->createArgDirectives($astNode);
-
         $isArgDirectiveForArray = function (ArgDirective $directive): bool {
             return $directive instanceof ArgDirectiveForArray;
         };
 
-        $directives = $type instanceof ListOfType
-            ? $directives->filter($isArgDirectiveForArray)
-            : $directives->reject($isArgDirectiveForArray);
-
-        $this->handleArgDirectives($astNode, $argumentPath, $directives);
+        $this->handleArgDirectives(
+            $astNode,
+            $argumentPath,
+            $type instanceof ListOfType
+                ? $directives->filter($isArgDirectiveForArray)
+                : $directives->reject($isArgDirectiveForArray)
+        );
     }
 
     /**
@@ -348,6 +385,11 @@ class FieldFactory
     protected function setArgValue(array $argumentPath, $value)
     {
         return Arr::set($this->args, implode('.', $argumentPath), $value);
+    }
+
+    protected function unsetArgValue(array $argumentPath)
+    {
+        Arr::forget($this->args, implode('.', $argumentPath));
     }
 
     protected function argValue(array $argumentPath)
