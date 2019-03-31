@@ -1,5 +1,8 @@
 # Installation
 
+The following section teaches you how to install Lighthouse in your project.
+Make sure you familiarize yourself with [the basics](../the-basics/schema.md) before diving in.
+
 ## Install via composer
 
 ```bash

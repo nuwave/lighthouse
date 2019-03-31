@@ -1,16 +1,29 @@
 <?php
 
-namespace Tests\Unit\Schema\Values;
+namespace Tests\Unit\Schema;
 
 use Closure;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-class FieldValueTest extends TestCase
+class ResolverProviderTest extends TestCase
 {
+    /**
+     * @var \Nuwave\Lighthouse\Schema\ResolverProvider
+     */
+    private $resolverProvider;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->resolverProvider = new ResolverProvider();
+    }
+
     /**
      * @test
      */
@@ -20,7 +33,7 @@ class FieldValueTest extends TestCase
 
         $this->assertInstanceOf(
             Closure::class,
-            $fieldValue->getResolver()
+            $this->resolverProvider->provideResolver($fieldValue)
         );
     }
 
@@ -33,7 +46,7 @@ class FieldValueTest extends TestCase
 
         $this->assertInstanceOf(
             Closure::class,
-            $fieldValue->getResolver()
+            $this->resolverProvider->provideResolver($fieldValue)
         );
     }
 
@@ -46,7 +59,7 @@ class FieldValueTest extends TestCase
 
         $this->assertInstanceOf(
             Closure::class,
-            $fieldValue->getResolver()
+            $this->resolverProvider->provideResolver($fieldValue)
         );
     }
 
@@ -57,7 +70,9 @@ class FieldValueTest extends TestCase
     {
         $this->expectException(DefinitionException::class);
 
-        $this->constructFieldValue('noFieldClass: Int')->getResolver();
+        $this->resolverProvider->provideResolver(
+            $this->constructFieldValue('noFieldClass: Int')
+        );
     }
 
     protected function constructFieldValue(string $fieldDefinition, string $parentTypeName = 'Query'): FieldValue

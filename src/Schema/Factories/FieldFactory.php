@@ -19,25 +19,17 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldFactory
 {
     use HasResolverArguments;
-
-    /**
-     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    protected $fieldValue;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Builder
-     */
-    protected $builder;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
@@ -50,9 +42,29 @@ class FieldFactory
     protected $argumentFactory;
 
     /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver
+     */
+    protected $providesResolver;
+
+    /**
      * @var \Nuwave\Lighthouse\Support\Pipeline
      */
     protected $pipeline;
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver
+     */
+    protected $providesSubscriptionResolver;
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
+     */
+    protected $fieldValue;
+
+    /**
+     * @var \Nuwave\Lighthouse\Execution\Builder
+     */
+    protected $builder;
 
     /**
      * @var array
@@ -83,13 +95,22 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver  $providesResolver
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver  $providesSubscriptionResolver
      * @return void
      */
-    public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
-    {
+    public function __construct(
+        DirectiveFactory $directiveFactory,
+        ArgumentFactory $argumentFactory,
+        Pipeline $pipeline,
+        ProvidesResolver $providesResolver,
+        ProvidesSubscriptionResolver $providesSubscriptionResolver
+    ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
+        $this->providesResolver = $providesResolver;
+        $this->providesSubscriptionResolver = $providesSubscriptionResolver;
     }
 
     /**
@@ -100,13 +121,17 @@ class FieldFactory
      */
     public function handle(FieldValue $fieldValue): array
     {
-        $this->fieldValue = $fieldValue;
         $fieldDefinitionNode = $fieldValue->getField();
 
-        // Get the initial resolver from the FieldValue
-        // This is either the webonyx default resolver or provided by a directive
-        if ($fieldResolverDirective = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
-            $this->fieldValue = $fieldResolverDirective->resolveField($fieldValue);
+        // Directives have the first priority for defining a resolver for a field
+        if ($resolverDirective = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
+            $this->fieldValue = $resolverDirective->resolveField($fieldValue);
+        } else {
+            $this->fieldValue = $fieldValue->setResolver(
+                $fieldValue->getParentName() === 'Subscription'
+                    ? $this->providesSubscriptionResolver->provideSubscriptionResolver($fieldValue)
+                    : $this->providesResolver->provideResolver($fieldValue)
+            );
         }
 
         $resolverWithMiddleware = $this->pipeline

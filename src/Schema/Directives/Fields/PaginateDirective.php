@@ -210,9 +210,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             );
         }
 
-        return $this->namespaceClassName(
-            $model,
-            (array) config('lighthouse.namespaces.models')
-        );
+        return $this->namespaceModelClass($model);
     }
 }
