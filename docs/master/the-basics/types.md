@@ -7,7 +7,7 @@ look into the [GraphQL documentation](https://graphql.org/learn/schema/)
 ## Object Type
 
 Object types define the resources of your API and are closely related to Eloquent models.
-They must have a unique name and have a set of fields.
+They must have a unique name and contain a set of fields.
 
 ```graphql
 type User {

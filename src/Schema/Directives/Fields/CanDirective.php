@@ -34,11 +34,11 @@ class CanDirective extends BaseDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $value, Closure $next): FieldValue
     {
-        $resolver = $value->getResolver();
+        $previousResolver = $value->getResolver();
 
         return $next(
             $value->setResolver(
-                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+                function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
                     $gate = app(Gate::class);
                     $gateArguments = $this->getGateArguments();
 
@@ -55,7 +55,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                         }
                     );
 
-                    return call_user_func_array($resolver, func_get_args());
+                    return call_user_func_array($previousResolver, func_get_args());
                 }
             )
         );
