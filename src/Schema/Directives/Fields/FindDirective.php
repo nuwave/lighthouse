@@ -43,10 +43,9 @@ class FindDirective extends BaseDirective implements FieldResolver
                     $this->directiveArgValue('scopes', []),
                     $resolveInfo
                 );
-                $total = $query->count();
 
-                if ($total > 1) {
-                    throw new Error('Query returned more than one result.');
+                if ($query->count() > 1) {
+                    throw new Error('The query returned more than one result.');
                 }
 
                 return $query->first();

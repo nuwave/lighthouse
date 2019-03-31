@@ -202,4 +202,31 @@ class SchemaBuilderTest extends TestCase
 
         $this->assertSame('yo?', $type->getField('bar')->description);
     }
+
+    /**
+     * @test
+     */
+    public function itResolvesEnumDefaultValuesToInternalValues(): void
+    {
+        $schema = $this->buildSchema('
+        type Query {
+            foo(
+                bar: Baz = FOOBAR
+            ): Int
+        }
+        
+        enum Baz {
+            FOOBAR @enum(value: "internal")
+        }
+        ');
+
+        $this->assertSame(
+            'internal',
+            $schema
+                ->getQueryType()
+                ->getField('foo')
+                ->getArg('bar')
+                ->defaultValue
+        );
+    }
 }

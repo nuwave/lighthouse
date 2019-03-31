@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Utils\AST;
+use GraphQL\Type\Definition\EnumType;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class ArgumentFactory
@@ -17,16 +18,22 @@ class ArgumentFactory
     {
         $definition = $argumentValue->getAstNode();
 
+        $argumentType = $argumentValue->getType();
+
         $fieldArgument = [
             'name' => $argumentValue->getName(),
             'description' => data_get($definition->description, 'value'),
-            'type' => $argumentValue->getType(),
+            'type' => $argumentType,
             'astNode' => $definition,
         ];
 
         if ($defaultValue = $definition->defaultValue) {
             $fieldArgument += [
-                'defaultValue' => AST::valueFromASTUntyped($defaultValue),
+                // webonyx/graphql-php expects the internal value here, whereas the
+                // SDL uses the ENUM's name, so we run the conversion here
+                'defaultValue' => $argumentType instanceof EnumType
+                    ? $argumentType->getValue($defaultValue->value)->value
+                    : AST::valueFromASTUntyped($defaultValue),
             ];
         }
 
