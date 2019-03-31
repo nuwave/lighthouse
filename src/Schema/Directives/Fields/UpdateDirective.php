@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
@@ -52,7 +53,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                 $model = new $modelClassName();
 
                 if ($this->directiveArgValue('flatten', false)) {
-                    $args = reset($args);
+                    $args = Arr::flatten($args);
                 }
 
                 if ($this->directiveArgValue('globalId', false)) {

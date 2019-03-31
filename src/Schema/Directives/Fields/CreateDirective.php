@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
@@ -51,7 +52,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 $model = new $modelClassName();
 
                 if ($this->directiveArgValue('flatten', false)) {
-                    $args = reset($args);
+                    $args = Arr::flatten($args);
                 }
 
                 $executeMutation = function () use ($model, $args): Model {
