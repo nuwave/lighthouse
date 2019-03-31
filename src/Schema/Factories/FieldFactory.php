@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
-use Nuwave\Lighthouse\Schema\Directives\Args\SpreadDirective;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Builder;
@@ -23,6 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Schema\Directives\Args\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
@@ -178,13 +178,13 @@ class FieldFactory
 
                 // Apply the argument spreadings after we are finished with all
                 // the other argument handling
-                foreach($this->spreadPaths as $argumentPath){
+                foreach ($this->spreadPaths as $argumentPath) {
                     $inputValues = $this->argValue($argumentPath);
                     $this->unsetArgValue($argumentPath);
 
                     array_pop($argumentPath);
 
-                    foreach($inputValues as $key => $value){
+                    foreach ($inputValues as $key => $value) {
                         $this->setArgValue(
                             array_merge($argumentPath, [$key]),
                             $value
@@ -250,13 +250,13 @@ class FieldFactory
 
         $directives = $this->directiveFactory->createArgDirectives($astNode);
 
-        if(
-            $directives->contains(function(Directive $directive): bool {
+        if (
+            $directives->contains(function (Directive $directive): bool {
                 return $directive instanceof SpreadDirective;
             })
             && $type instanceof InputObjectType
-        ){
-            $this->spreadPaths []= $argumentPath;
+        ) {
+            $this->spreadPaths [] = $argumentPath;
         }
 
         // Handle the argument itself. At this point, it can be wrapped

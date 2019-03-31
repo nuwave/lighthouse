@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives\Fields;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
