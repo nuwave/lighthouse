@@ -23,11 +23,13 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldFactory
 {
@@ -84,16 +86,35 @@ class FieldFactory
     protected $currentHandlerArgsOfArgDirectivesAfterValidationDirective = [];
 
     /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver
+     */
+    protected $providesResolver;
+
+    /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver
+     */
+    protected $providesSubscriptionResolver;
+
+    /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver  $providesResolver
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver  $providesSubscriptionResolver
      * @return void
      */
-    public function __construct(DirectiveFactory $directiveFactory, ArgumentFactory $argumentFactory, Pipeline $pipeline)
-    {
+    public function __construct(
+        DirectiveFactory $directiveFactory,
+        ArgumentFactory $argumentFactory,
+        Pipeline $pipeline,
+        ProvidesResolver $providesResolver,
+        ProvidesSubscriptionResolver $providesSubscriptionResolver
+    ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
+        $this->providesResolver = $providesResolver;
+        $this->providesSubscriptionResolver = $providesSubscriptionResolver;
     }
 
     /**
@@ -104,14 +125,19 @@ class FieldFactory
      */
     public function handle(FieldValue $fieldValue): array
     {
-        $this->fieldValue = $fieldValue;
         $fieldDefinitionNode = $fieldValue->getField();
 
-        // Get the initial resolver from the FieldValue
-        // This is either the webonyx default resolver or provided by a directive
-        if ($fieldResolver = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
-            $this->fieldValue = $fieldResolver->resolveField($fieldValue);
+        // Directives have the first priority for defining a resolver for a field
+        if ($resolverDirective = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
+            $this->fieldValue = $resolverDirective->resolveField($fieldValue);
+        } else {
+            $this->fieldValue = $fieldValue->setResolver(
+             $fieldValue->getParentName() === 'Subscription'
+                    ? $this->providesSubscriptionResolver->provideSubscriptionResolver($fieldValue)
+                    : $this->providesResolver->provideResolver($fieldValue)
+            );
         }
+
         $resolver = $this->fieldValue->getResolver();
 
         $argumentValues = $this->getArgumentValues();

@@ -19,13 +19,13 @@ To run the tests locally, you can use [docker-compose](https://docs.docker.com/c
 Just clone the project and run the following in the project root:
 
     docker-compose up -d
-    docker-compose exec php sh
+    docker-compose exec php bash
     composer install
     composer test
 
 If you want to use Xdebug, you can enter that container instead:
 
-    docker-compose exec xdebug sh
+    docker-compose exec xdebug bash
 
 Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
 
