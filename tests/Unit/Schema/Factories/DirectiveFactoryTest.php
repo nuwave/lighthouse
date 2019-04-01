@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Schema\Directives\Fields\FieldDirective;
+use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 
 class DirectiveFactoryTest extends TestCase
 {
