@@ -21,7 +21,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     /**
      * @var \Nuwave\Lighthouse\Defer\Defer
      */
-    private $defer;
+    protected $defer;
 
     /**
      * @param  \Nuwave\Lighthouse\Defer\Defer  $defer

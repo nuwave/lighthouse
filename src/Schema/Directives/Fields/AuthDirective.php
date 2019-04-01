@@ -13,7 +13,7 @@ class AuthDirective extends BaseDirective implements FieldResolver
     /**
      * @var \Illuminate\Contracts\Auth\Factory
      */
-    private $authFactory;
+    protected $authFactory;
 
     /**
      * AuthDirective constructor.

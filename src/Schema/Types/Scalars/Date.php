@@ -69,7 +69,7 @@ class Date extends ScalarType
      *
      * @throws \GraphQL\Error\InvariantViolation|Error
      */
-    private function tryParsingDate($value, string $exceptionClass): Carbon
+    protected function tryParsingDate($value, string $exceptionClass): Carbon
     {
         try {
             return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();

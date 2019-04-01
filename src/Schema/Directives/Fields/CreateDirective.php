@@ -17,7 +17,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
      *
      * @var \Illuminate\Database\DatabaseManager
      */
-    private $db;
+    protected $db;
 
     /**
      * @param  \Illuminate\Database\DatabaseManager  $database
