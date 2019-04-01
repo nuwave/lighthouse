@@ -9,7 +9,6 @@ use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class DeleteDirective extends BaseDirective implements FieldResolver

@@ -6,7 +6,6 @@ use Closure;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class BroadcastDirective extends BaseDirective implements FieldMiddleware

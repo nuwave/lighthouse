@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 

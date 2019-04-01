@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 

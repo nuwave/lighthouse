@@ -11,10 +11,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
-use Nuwave\Lighthouse\Schema\Directives\MiddlewareDirective;
 
 /**
  * Class GroupDirective.

@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class DeprecatedDirective extends BaseDirective implements FieldMiddleware

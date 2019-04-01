@@ -13,7 +13,6 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;

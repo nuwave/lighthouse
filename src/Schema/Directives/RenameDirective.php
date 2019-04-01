@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class RenameDirective extends BaseDirective implements FieldResolver

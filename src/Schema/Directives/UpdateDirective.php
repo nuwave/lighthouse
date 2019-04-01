@@ -8,7 +8,6 @@ use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class UpdateDirective extends BaseDirective implements FieldResolver

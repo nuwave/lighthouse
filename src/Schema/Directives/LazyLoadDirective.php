@@ -6,7 +6,6 @@ use Closure;
 use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class LazyLoadDirective extends BaseDirective implements FieldMiddleware
