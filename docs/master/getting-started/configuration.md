@@ -258,6 +258,13 @@ return [
                 'connection' => 'pusher',
             ],
         ],
+
+        /*
+         * Subscription auth route middleware.
+         */
+        'route' => [
+            // 'middleware' => ['loghttp']
+        ],
     ],
 
 ];
