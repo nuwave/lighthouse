@@ -17,12 +17,12 @@ class SubscriptionRouter
         $router->group(config('lighthouse.subscriptions.route', []), function (): void {
             $routeName = config('lighthouse.route_name', 'graphql');
 
-            $router->post($routerName. '/subscriptions/auth', [
+            $router->post($routeName. '/subscriptions/auth', [
                 'as' => 'lighthouse.subscriptions.auth',
                 'uses' => SubscriptionController::class.'@authorize',
             ])->middleware($middleware);
 
-            $router->post($routerName. '/subscriptions/webhook', [
+            $router->post($routeName. '/subscriptions/webhook', [
                 'as' => 'lighthouse.subscriptions.auth',
                 'uses' => SubscriptionController::class.'@webhook',
             ]);
