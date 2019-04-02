@@ -20,7 +20,7 @@ class SubscriptionRouter
             $router->post($routeName. '/subscriptions/auth', [
                 'as' => 'lighthouse.subscriptions.auth',
                 'uses' => SubscriptionController::class.'@authorize',
-            ])->middleware($middleware);
+            ]);
 
             $router->post($routeName. '/subscriptions/webhook', [
                 'as' => 'lighthouse.subscriptions.auth',
