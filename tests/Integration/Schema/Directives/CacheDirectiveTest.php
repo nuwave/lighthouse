@@ -15,7 +15,7 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @var \Illuminate\Cache\CacheManager|\Illuminate\Contracts\Cache\Repository
      */
-    private $cache;
+    protected $cache;
 
     protected function getEnvironmentSetUp($app)
     {

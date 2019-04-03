@@ -143,7 +143,7 @@ class Tracing
      * @param  float|int  $end
      * @return int
      */
-    private function diffTimeInNanoseconds($start, $end): int
+    protected function diffTimeInNanoseconds($start, $end): int
     {
         if ($this->platformSupportsNanoseconds()) {
             return $end - $start;
@@ -161,7 +161,7 @@ class Tracing
      *
      * @return bool
      */
-    private function platformSupportsNanoseconds(): bool
+    protected function platformSupportsNanoseconds(): bool
     {
         return function_exists('hrtime');
     }

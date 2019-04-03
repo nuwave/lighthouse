@@ -19,7 +19,7 @@ class ASTBuilder
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
-    private $directiveFactory;
+    protected $directiveFactory;
 
     /**
      * ASTBuilder constructor.

@@ -26,14 +26,14 @@ abstract class BatchLoader
      *
      * @var mixed[]
      */
-    private $results = [];
+    protected $results = [];
 
     /**
      * Check if data has been loaded.
      *
      * @var bool
      */
-    private $hasLoaded = false;
+    protected $hasLoaded = false;
 
     /**
      * Return an instance of a BatchLoader for a specific field.

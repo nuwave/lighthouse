@@ -82,7 +82,7 @@ class GraphQL
      *
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
-    private $createsContext;
+    protected $createsContext;
 
     /**
      * GraphQL constructor.
