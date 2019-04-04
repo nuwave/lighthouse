@@ -26,6 +26,24 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
+    public function itGeneratesWithEmptyQueryType(): void
+    {
+        $schema = $this->buildSchema('
+        type Query
+        
+        extend type Query {
+            foo: Int
+        }
+        ');
+
+        $this->assertInstanceOf(Schema::class, $schema);
+        // This would throw if the schema were invalid
+        $schema->assertValid();
+    }
+
+    /**
+     * @test
+     */
     public function itCanResolveEnumTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
