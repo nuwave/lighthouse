@@ -66,3 +66,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove the `@security` directive in favour of defining security options through the config https://github.com/nuwave/lighthouse/pull/435
 - Rename the `resolver` argument of `@interface` and `@union` to `resolveType` https://github.com/nuwave/lighthouse/pull/435
 - Remove deprecated Traits https://github.com/nuwave/lighthouse/pull/435
+
+## Pre-v3
+
+We just started maintaining a changelog starting from v3.
+
+If someone wants to make one for previous versions, PR's are welcome.
