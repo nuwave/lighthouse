@@ -189,4 +189,4 @@ new Foo()      // wrong
 ## Documentation
 
 The docs for Lighthouse are located in [`/docs`](/docs).
-Hop over there for more information on how to to contribute to the docs.
+You can check out the [Docs README](/docs/.github/README.md) for more information on how to to contribute to the docs.
