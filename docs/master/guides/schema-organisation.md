@@ -80,7 +80,26 @@ type Query {
 
 __Attention__: A valid `Query` type definition with at least one field
 must be present in the root schema.
-This is because `extend type` needs the original type to get merged into. 
+This is because `extend type` needs the original type to get merged into.
+
+You can provide an empty `Query` type (without curly braces) in the root schema:
+
+```graphql
+type Query
+
+#import post.graphql
+```
+
+The same applies for mutations: if you want to use them, you can define 
+an empty `Mutation` type (without curly braces) within your root schema:
+
+```graphql
+type Query
+
+type Mutation
+
+#import post.graphql
+```
 
 Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
 in your main file, but that spreads the definition apart, and could also grow quite large over time.
