@@ -90,6 +90,17 @@ type Query
 #import post.graphql
 ```
 
+The same applies for mutations: if you want to use them, you can define 
+an empty `Mutation` type (without curly braces) within your root schema:
+
+```graphql
+type Query
+
+type Mutation
+
+#import post.graphql
+```
+
 Now you want to add a few queries to actually fetch posts. You could add them to the main `Query` type
 in your main file, but that spreads the definition apart, and could also grow quite large over time.
 
