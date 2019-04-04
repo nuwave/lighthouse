@@ -33,12 +33,11 @@ Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm
 
 1. Fork the project
 1. Create a new branch
-1. Write tests
+1. Think about how the changes you are about to make can be tested, write tests before coding 
 1. Run tests, make sure they fail
-1. Write the actual code
+1. Write the actual code to make the tests pass
 1. Commit with a concise title line and a few more lines detailing the change
-1. Run tests until they pass. Yay!
-1. Open a PR detailing your changes
+1. Open a pull request detailing your changes. Make sure to follow the [template](./PULL_REQUEST_TEMPLATE.md)
 
 ## Code guidelines
 
@@ -189,4 +188,6 @@ new Foo()      // wrong
 ## Documentation
 
 The docs for Lighthouse are located in [`/docs`](/docs).
-Hop over there for more information on how to to contribute to the docs.
+You can check out the [Docs README](/docs/.github/README.md) for more information on how to to contribute to the docs.
+
+We keep a [changelog](/CHANGELOG.md) to inform users about changes in our releases.
