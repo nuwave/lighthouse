@@ -501,6 +501,7 @@ input CreatePostInput {
 input CreateAuthorRelation {
   create: [CreateAuthorInput!]
   connect: [ID!]
+  sync: [ID!]
 }
 
 input CreateAuthorInput {
