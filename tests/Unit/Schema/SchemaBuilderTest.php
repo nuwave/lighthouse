@@ -44,6 +44,28 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
+    public function itGeneratesWithEmptyMutationType(): void
+    {
+        $schema = $this->buildSchema('
+        type Query
+        
+        type Mutation
+        
+        extend type Mutation {
+            foo(bar: String! baz: String): String
+        }
+        ');
+
+        /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
+        $mutationObjectType = $schema->getType('Mutation');
+        $foo = $mutationObjectType->getField('foo');
+
+        $this->assertSame('foo', $foo->name);
+    }
+
+    /**
+     * @test
+     */
     public function itCanResolveEnumTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
