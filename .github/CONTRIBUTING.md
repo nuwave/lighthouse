@@ -207,8 +207,8 @@ interface Foo
 You can use the following two case-sensitive regexes to search for violations:
 
 ```regexp
-@(var|return|throws).*\|[A-Z]
-@(var|return|throws)\s*[A-Z]
+@(var|param|return|throws).*\|[A-Z]
+@(var|param|return|throws)\s*[A-Z]
 ```
 
 ## Documentation
