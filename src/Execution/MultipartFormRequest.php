@@ -20,7 +20,7 @@ class MultipartFormRequest extends BaseRequest
     /**
      * MultipartFormRequest constructor.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     public function __construct(Request $request)
