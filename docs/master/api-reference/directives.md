@@ -492,13 +492,13 @@ type User {
 ## @event
 
 Fire an event after a mutation has taken place.
-It requires the `fire` argument that should be
+It requires the `dispatch` argument that should be
 the class name of the event you want to fire.
 
 ```graphql
 type Mutation {
     createPost(title: String!, content: String!): Post
-        @event(fire: "App\\Events\\PostCreated")
+        @event(dispatch: "App\\Events\\PostCreated")
 }
 ```
 
