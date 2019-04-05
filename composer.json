@@ -41,7 +41,7 @@
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
-        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflows - integrated with Laravel"
+        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel"
     },
     "autoload": {
         "psr-4": {
