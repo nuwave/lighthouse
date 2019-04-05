@@ -16,7 +16,7 @@ class Upload extends ScalarType
      * @param  mixed  $value
      * @return void
      *
-     * @throws InvariantViolation
+     * @throws \GraphQL\Error\InvariantViolation
      */
     public function serialize($value): void
     {
@@ -31,7 +31,7 @@ class Upload extends ScalarType
      * @param  mixed  $value
      * @return \Illuminate\Http\UploadedFile
      *
-     * @throws Error
+     * @throws \GraphQL\Error\Error
      */
     public function parseValue($value): UploadedFile
     {
@@ -51,7 +51,7 @@ class Upload extends ScalarType
      * @param  mixed[]|null  $variables
      * @return void
      *
-     * @throws Error
+     * @throws \GraphQL\Error\Error
      */
     public function parseLiteral($valueNode, array $variables = null): void
     {

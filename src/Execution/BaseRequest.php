@@ -35,7 +35,7 @@ abstract class BaseRequest implements GraphQLRequest
     /**
      * Construct this from a HTTP request.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     abstract public function __construct(Request $request);
