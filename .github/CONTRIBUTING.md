@@ -185,6 +185,32 @@ new Foo('bar') // correct
 new Foo()      // wrong
 ```
 
+### Class References
+
+When used in the actual source code, classes must always be imported at the top.
+However, class references in PHPDoc must use the full namespace.
+
+```php
+<?php
+
+use Illuminate\Database\Eloquent\Model;
+
+interface Foo
+{
+    /**
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function bar(): Model;
+}
+```
+
+You can use the following two case-sensitive regexes to search for violations:
+
+```regexp
+@(var|return|throws).*\|[A-Z]
+@(var|return|throws)\s*[A-Z]
+```
+
 ## Documentation
 
 The docs for Lighthouse are located in [`/docs`](/docs).
