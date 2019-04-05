@@ -196,9 +196,9 @@ class GraphQL
             new BuildExtensionsResponse
         );
 
-        foreach ($extensionsResponses as $extensionsReponse) {
-            if ($extensionsReponse) {
-                $result->extensions[$extensionsReponse->key()] = $extensionsReponse->content();
+        foreach ($extensionsResponses as $extensionsResponse) {
+            if ($extensionsResponse) {
+                $result->extensions[$extensionsResponse->key()] = $extensionsResponse->content();
             }
         }
 
