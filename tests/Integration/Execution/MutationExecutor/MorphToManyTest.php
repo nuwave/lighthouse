@@ -8,35 +8,35 @@ use Tests\Utils\Models\Tag;
 class MorphToManyTest extends DBTestCase
 {
     protected $schema = '
-        type Task {
-            id: ID!
-            name: String!
-            tags: [Tag!]!
-        }
-        
-        type Tag {
-            id: ID!
-            name: String!
-        }
-        
-        input CreateTagInput {
-            name: String!
-        }
-        
-        input CreateTagRelation {
-            create: [CreateTagInput!]
-            sync: [ID!]
-            connect: [ID!]
-        }
-        
-        input CreateTaskInput {
-            name: String!
-            tags: CreateTagRelation
-        }
-        
-        type Mutation {
-            createTask(input: CreateTaskInput!): Task @create(flatten: true)
-        }
+    type Task {
+        id: ID!
+        name: String!
+        tags: [Tag!]!
+    }
+    
+    type Tag {
+        id: ID!
+        name: String!
+    }
+    
+    input CreateTagInput {
+        name: String!
+    }
+    
+    input CreateTagRelation {
+        create: [CreateTagInput!]
+        sync: [ID!]
+        connect: [ID!]
+    }
+    
+    input CreateTaskInput {
+        name: String!
+        tags: CreateTagRelation
+    }
+    
+    type Mutation {
+        createTask(input: CreateTaskInput!): Task @create(flatten: true)
+    }
     ';
 
     public function setUp(): void
@@ -53,18 +53,18 @@ class MorphToManyTest extends DBTestCase
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
         $this->query('
-            mutation {
+        mutation {
             createTask(input: {
-                    name: "Finish tests"
-                    tags: {
-                        connect: [1]
-                    }
-                }){
-                    tags{
-                            id
-                        }
+                name: "Finish tests"
+                tags: {
+                    connect: [1]
+                }
+            }){
+                tags{
+                        id
                     }
                 }
+            }
             ')->assertJson([
                 'data'=> [
                     'createTask' => [
@@ -85,18 +85,18 @@ class MorphToManyTest extends DBTestCase
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
         $this->query('
-            mutation {
+        mutation {
             createTask(input: {
-                    name: "Finish tests"
-                    tags: {
-                        sync: [1]
-                    }
-                }){
-                    tags{
-                            id
-                        }
+                name: "Finish tests"
+                tags: {
+                    sync: [1]
+                }
+            }){
+                tags{
+                        id
                     }
                 }
+            }
             ')->assertJson([
             'data'=> [
                 'createTask' => [
@@ -115,19 +115,19 @@ class MorphToManyTest extends DBTestCase
      */
     public function itCanCreateANewTagRelationByUsingCreate(){
         $this->query('
-            mutation {
+        mutation {
             createTask(input: {
-                    name: "Finish tests"
-                    tags: {
-                        create: [{name: "php"}]
-                    }
-                }){
-                    tags{
-                            id
-                            name
-                        }
+                name: "Finish tests"
+                tags: {
+                    create: [{name: "php"}]
+                }
+            }){
+                tags{
+                        id
+                        name
                     }
                 }
+            }
             ')->assertJson([
             'data'=> [
                 'createTask' => [
