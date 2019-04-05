@@ -19,7 +19,12 @@ class MorphToManyTest extends DBTestCase
             name: String!
         }
         
+        input CreateTagInput {
+            name: String!
+        }
+        
         input CreateTagRelation {
+            create: [CreateTagInput!]
             sync: [ID!]
             connect: [ID!]
         }
@@ -98,6 +103,38 @@ class MorphToManyTest extends DBTestCase
                     'tags' => [
                         [
                             'id' => $id
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanCreateANewTagRelationByUsingCreate(){
+        $this->query('
+            mutation {
+            createTask(input: {
+                    name: "Finish tests"
+                    tags: {
+                        create: [{name: "php"}]
+                    }
+                }){
+                    tags{
+                            id
+                            name
+                        }
+                    }
+                }
+            ')->assertJson([
+            'data'=> [
+                'createTask' => [
+                    'tags' => [
+                        [
+                            'id' => 1,
+                            'name' => 'php'
                         ]
                     ]
                 ]
