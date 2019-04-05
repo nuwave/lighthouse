@@ -73,22 +73,22 @@ class MutationExecutor
     {
         $pivotAttributes = null;
 
+        /** @var Collection $remaining */
         [$belongsTo, $remaining] = self::partitionArgsByRelationType(
             new ReflectionClass($model),
             $args,
             BelongsTo::class
         );
 
-        // fetches pivot property from $remaining so
-        // $model->save() is not trying to work on nonexistant columns
-        if ($parentRelation instanceof BelongsToMany) { // only BelongsToMany have pivots
-            // check if there is a pivot
-            $accessor = $parentRelation ? self::accessProtected($parentRelation, 'accessor') : false;
-            if ($accessor && $remaining->has($accessor)) { // there is still a pivot to resolve in $remaining data
-                $pivotAttributes = $remaining[$accessor]; // save for later
-                unset($remaining[$accessor]); // remove pivot from $remaining
-            }
+        // If the parent relation is of the type BelongsToMany, we extract
+        // properties that are meant to be saved onto a pivot table from
+        // the remaining args, as they do not belong in the model itself.
+        if ($parentRelation instanceof BelongsToMany) {
+            $pivotAttributes = $remaining->pull(
+                $parentRelation->getPivotAccessor()
+            );
         }
+
         // Use all the remaining attributes and fill the model
         $model->fill(
             $remaining->all()
@@ -153,6 +153,7 @@ class MutationExecutor
             if ($pivotAttributes) {
                 $parentRelation->updateExistingPivot($model, $pivotAttributes);
             }
+
             $parentRelation->syncWithoutDetaching($model);
         }
 
@@ -558,26 +559,5 @@ class MutationExecutor
                 }
             });
         });
-    }
-
-    /**
-     * Access a private or protected property and return it's value.
-     *
-     * @param  object  $obj Object to be accessed
-     * @param  string  $prop Property of object
-     * @return Value   value of property
-     */
-    protected static function accessProtected($obj, $prop)
-    {
-        $reflection = new ReflectionClass($obj);
-        $property = $reflection->getProperty($prop);
-        $notAccessible = $property->isPrivate() || $property->isProtected();
-        $property->setAccessible(true);
-        $value = $property->getValue($obj);
-        if ($notAccessible) {
-            $property->setAccessible(false);
-        }
-
-        return $value;
     }
 }
