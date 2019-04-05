@@ -49,7 +49,8 @@ class MorphToManyTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCreateATaskWithExistingTagsByUsingConnect(){
+    public function itCanCreateATaskWithExistingTagsByUsingConnect()
+    {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
         $this->query('
@@ -70,18 +71,19 @@ class MorphToManyTest extends DBTestCase
                     'createTask' => [
                         'tags' => [
                             [
-                            'id' => $id
-                            ]
-                        ]
-                    ]
-                ]
+                            'id' => $id,
+                            ],
+                        ],
+                    ],
+                ],
         ]);
     }
 
     /**
      * @test
      */
-    public function itCanCreateATaskWithExistingTagsByUsingSync(){
+    public function itCanCreateATaskWithExistingTagsByUsingSync()
+    {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
         $this->query('
@@ -102,18 +104,19 @@ class MorphToManyTest extends DBTestCase
                 'createTask' => [
                     'tags' => [
                         [
-                            'id' => $id
-                        ]
-                    ]
-                ]
-            ]
+                            'id' => $id,
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 
     /**
      * @test
      */
-    public function itCanCreateANewTagRelationByUsingCreate(){
+    public function itCanCreateANewTagRelationByUsingCreate()
+    {
         $this->query('
         mutation {
             createTask(input: {
@@ -134,11 +137,11 @@ class MorphToManyTest extends DBTestCase
                     'tags' => [
                         [
                             'id' => 1,
-                            'name' => 'php'
-                        ]
-                    ]
-                ]
-            ]
+                            'name' => 'php',
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }
