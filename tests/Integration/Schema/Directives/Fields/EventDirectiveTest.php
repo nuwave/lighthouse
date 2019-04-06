@@ -36,9 +36,9 @@ class EventDirectiveTest extends DBTestCase
         
         type Mutation {
             createCompany(name: String): Company @create
-                @event(' . $argumentName . ': "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fields\\\\Fixtures\\\\CompanyWasCreatedEvent")
+                @event('.$argumentName.': "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fields\\\\Fixtures\\\\CompanyWasCreatedEvent")
         }
-        ' .$this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $this->query('
         mutation {
