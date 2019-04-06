@@ -301,7 +301,7 @@ class GraphQL
         $documentAST = $this->astBuilder->build(
             implode(
                 PHP_EOL,
-                Arr::prepend( $additionalSchemas, $schemaString)
+                Arr::prepend($additionalSchemas, $schemaString)
             )
         );
 
