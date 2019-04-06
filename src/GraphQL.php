@@ -194,7 +194,7 @@ class GraphQL
         /** @var \Nuwave\Lighthouse\Execution\ExtensionsResponse[] $extensionsResponses */
         $extensionsResponses = $this->eventDispatcher->dispatch(
             new BuildExtensionsResponse
-        );
+        ) ?? [];
 
         foreach ($extensionsResponses as $extensionsResponse) {
             if ($extensionsResponse) {
@@ -296,12 +296,12 @@ class GraphQL
         // while still allowing the user to add in their schema as usual.
         $additionalSchemas = $this->eventDispatcher->dispatch(
             new BuildSchemaString($schemaString)
-        );
+        ) ?? [];
 
         $documentAST = $this->astBuilder->build(
             implode(
                 PHP_EOL,
-                Arr::prepend($additionalSchemas, $schemaString)
+                Arr::prepend( $additionalSchemas, $schemaString)
             )
         );
 
