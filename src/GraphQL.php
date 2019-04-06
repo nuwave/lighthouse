@@ -192,7 +192,7 @@ class GraphQL
         );
 
         /** @var \Nuwave\Lighthouse\Execution\ExtensionsResponse[] $extensionsResponses */
-        $extensionsResponses = $this->eventDispatcher->dispatch(
+        $extensionsResponses = (array) $this->eventDispatcher->dispatch(
             new BuildExtensionsResponse
         );
 
@@ -294,7 +294,7 @@ class GraphQL
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = $this->eventDispatcher->dispatch(
+        $additionalSchemas = (array) $this->eventDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );
 
