@@ -12,6 +12,9 @@ class EventDirectiveTest extends DBTestCase
     {
         return [
             ['dispatch'],
+            /**
+             * @deprecated The aliases for dispatch will be removed in v4
+             */
             ['fire'],
             ['class'],
         ];
