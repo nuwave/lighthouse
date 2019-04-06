@@ -8,7 +8,7 @@ use Tests\Integration\Schema\Directives\Fields\Fixtures\CompanyWasCreatedEvent;
 
 class EventDirectiveTest extends DBTestCase
 {
-    public function providerForItDispatchesAnEvent(): array
+    public function eventDirectiveArgumentAliases(): array
     {
         return [
             ['dispatch'],
@@ -18,17 +18,17 @@ class EventDirectiveTest extends DBTestCase
     }
 
     /**
-     * @dataProvider providerForItDispatchesAnEvent
-     * @param  string  $method
+     * @dataProvider eventDirectiveArgumentAliases
+     * @param  string  $argumentName
      * @test
      */
-    public function itDispatchesAnEvent(string $method): void
+    public function itDispatchesAnEvent(string $argumentName): void
     {
         Event::fake([
             CompanyWasCreatedEvent::class,
         ]);
 
-        $this->schema = sprintf('
+        $this->schema = '
         type Company {
             id: ID!
             name: String!
@@ -36,9 +36,9 @@ class EventDirectiveTest extends DBTestCase
         
         type Mutation {
             createCompany(name: String): Company @create
-                @event(%s: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fields\\\\Fixtures\\\\CompanyWasCreatedEvent")
+                @event(' . $argumentName . ': "Tests\\\\Integration\\\\Schema\\\\Directives\\\\Fields\\\\Fixtures\\\\CompanyWasCreatedEvent")
         }
-        ', $method).$this->placeholderQuery();
+        ' .$this->placeholderQuery();
 
         $this->query('
         mutation {
