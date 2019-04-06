@@ -47,7 +47,7 @@ class EventDirective extends BaseDirective implements FieldMiddleware
     public function handleField(FieldValue $value, Closure $next): FieldValue
     {
         $eventBaseName = $this->directiveArgValue('dispatch')
-            /**
+            /*
              * @deprecated The aliases for dispatch will be removed in v4
              */
             ?? $this->directiveArgValue('fire')
