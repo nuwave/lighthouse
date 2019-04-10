@@ -591,18 +591,6 @@ input CreateAuthorInput {
 ### MorphTo
 
 ```graphql
-type Task {
-  id: ID
-  name: String
-  hour: Hour
-}
-
-type Hour {
-  id: ID
-  weekday: Int
-  hourable: Task
-}
-
 type Mutation {
   createHour(input: CreateHourInput!): Hour @create(flatten: true)
 }
@@ -614,21 +602,33 @@ input CreateHourInput {
   to: String
   weekday: Int
 }
+
+type Hour {
+  id: ID
+  weekday: Int
+  hourable: Task
+}
+
+type Task {
+  id: ID
+  name: String
+  hour: Hour
+}
 ```
 
 ```graphql
 mutation {
   createHour(input: {
-      hourable_type: "App\\\Task"
-      hourable_id: 1
-      weekday: 2
+    hourable_type: "App\\\Task"
+    hourable_id: 1
+    weekday: 2
   }) {
+    id
+    weekday
+    hourable {
       id
-      weekday
-      hourable {
-          id
-          name
-      }
+      name
+    }
   }
 }
 ```
@@ -639,70 +639,76 @@ A morph to many relation allows you to create new related models as well
 as attaching existing ones.
 
 ```graphql
-	type Task {
-		id: ID!
-		name: String!
-		tags: [Tag!]!
-	}
-			
-	type Tag {
-		id: ID!
-		name: String!
-	}
-	
-	input CreateTagInput {
-		name: String!
-	}	
-			
-	input CreateTagRelation {
-		create: [CreateTagInput!]
-		sync: [ID!]
-		connect: [ID!]
-	}
-	
-	input CreateTaskInput {
-		name: String!
-		tags: CreateTagRelation
-	}
-	
-	type Mutation {
-		createTask(input: CreateTaskInput!): Task @create(flatten: true)
-	}
+type Mutation {
+  createTask(input: CreateTaskInput!): Task @create(flatten: true)
+}
+
+input CreateTaskInput {
+  name: String!
+  tags: CreateTagRelation
+}
+
+input CreateTagRelation {
+  create: [CreateTagInput!]
+  sync: [ID!]
+  connect: [ID!]
+}
+
+input CreateTagInput {
+  name: String!
+}
+
+type Task {
+  id: ID!
+  name: String!
+  tags: [Tag!]!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+}
 ```
 
-In this example, the tag with id 1 already exists in the database. The query connects this tag to the task using the `MorphToMany` relationship.
+In this example, the tag with id `1` already exists in the database. The query connects this tag to the task using the `MorphToMany` relationship.
  
 ```graphql
 mutation {
-	createTask(input: {
-		name: "Loundry"
-		tags: {
-			connect: [1]
-		}
-	}){
-		tags{
-				id
-				name
-			}
-		}
-	}
+  createTask(input: {
+    name: "Loundry"
+    tags: {
+      connect: [1]
+    }
+  }) {
+    tags {
+      id
+      name
+    }
+  }
+}
 ```
+
 You can either use `connect` or `sync` during creation. 
 
-When you want to create a new tag while creating the task, you need to use `create`, and provide an array of `CreateTagInput`:
+When you want to create a new tag while creating the task,
+you need use the `create` operation to provide an array of `CreateTagInput`:
 
 ```graphql
-	mutation {
-		createTask(input: {
-			name: "Loundry"
-			tags: {
-				create: [{name: "home"}]
-			}
-		}){
-			tags{
-					id
-					name
-				}
-			}
-		}
+mutation {
+  createTask(input: {
+    name: "Loundry"
+      tags: {
+        create: [
+          {
+            name: "home"
+          }
+        ]
+      }
+  }) {
+    tags {
+      id
+      name
+    }
+  }
+}
 ``` 
