@@ -119,7 +119,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itReturnsNullForNonexistingArgumentOnDirective(): void
+    public function itReturnsNullForNonExistingArgumentOnDirective(): void
     {
         $directive = PartialParser::directive('@foo');
         $this->assertNull(

@@ -177,7 +177,7 @@ class BelongsToTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanResolveBelongsToRelationshipWhenMainModelhasCompositePrimaryKey(): void
+    public function itCanResolveBelongsToRelationshipWhenMainModelHasCompositePrimaryKey(): void
     {
         $this->be($this->user);
 

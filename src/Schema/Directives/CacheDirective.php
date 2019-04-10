@@ -175,12 +175,9 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         }
 
         if (! $nodeKey && $nodeValue->getTypeDefinitionName() !== 'Query') {
-            $message = sprintf(
-                'No @cacheKey or ID field defined on %s',
-                $nodeValue->getTypeDefinitionName()
+            throw new DirectiveException(
+                "No @cacheKey or ID field defined on {$nodeValue->getTypeDefinitionName()}"
             );
-
-            throw new DirectiveException($message);
         }
 
         $nodeValue->setCacheKey($nodeKey);
