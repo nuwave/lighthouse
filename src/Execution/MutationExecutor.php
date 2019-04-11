@@ -539,6 +539,14 @@ class MutationExecutor
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(new Collection($values), $relation);
                 }
+
+                if ($operationKey === 'connect') {
+                    $relation->attach($values);
+                }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
+                }
             });
         });
     }
