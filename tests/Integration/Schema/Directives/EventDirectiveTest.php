@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Company;
 use Illuminate\Support\Facades\Event;
-use Tests\Integration\Schema\Directives\Fields\Fixtures\CompanyWasCreatedEvent;
 
 class EventDirectiveTest extends DBTestCase
 {
@@ -62,5 +62,18 @@ class EventDirectiveTest extends DBTestCase
         Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event) {
             return $event->company->id === 1 && $event->company->name === 'foo';
         });
+    }
+}
+
+class CompanyWasCreatedEvent
+{
+    /**
+     * @var \Tests\Utils\Models\Company
+     */
+    public $company;
+
+    public function __construct(Company $company)
+    {
+        $this->company = $company;
     }
 }
