@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse;
 
 use Closure;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
@@ -133,7 +134,7 @@ class LighthouseServiceProvider extends ServiceProvider
             return new class() implements ProvidesSubscriptionResolver {
                 public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
                 {
-                    throw new \Exception(
+                    throw new Exception(
                        'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
                    );
                 }
