@@ -31,8 +31,8 @@ use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\UnionDirective;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
+use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
+use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 
 class NodeFactory
 {

@@ -5,13 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.1.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.2.1...master)
+
+## [3.2.1](https://github.com/nuwave/lighthouse/compare/v3.2.0...v3.2.1) - 2019-04-12
+
+### Changed
+
+- Flatten the namespace for the built-in directives https://github.com/nuwave/lighthouse/pull/700
+
+## [3.2.0](https://github.com/nuwave/lighthouse/compare/v3.1.0...v3.2.0) - 2019-04-10
 
 ### Added
 
 - Sync and connect existing models in morphToMany relations using nested mutations https://github.com/nuwave/lighthouse/pull/707
 
-## [3.1.0](https://github.com/nuwave/lighthouse/compare/v3.0.0...v3.1.0) - 2019-07-03
+## [3.1.0](https://github.com/nuwave/lighthouse/compare/v3.0.0...v3.1.0) - 2019-04-07
 
 ### Added
 
