@@ -53,7 +53,6 @@ class ASTBuilder
         $document = $this->addPaginationInfoTypes($document);
 
         $document = $this->addOrderByTypes($document);
-        $document = $this->addWhereConstraintsTypes($document);
 
         return $this->addNodeSupport($document);
     }
@@ -323,43 +322,5 @@ GRAPHQL
                     }
                 ')
             );
-    }
-
-    /**
-     * Add the input type that is used for the @whereConstraints directive.
-     *
-     * @see \Nuwave\Lighthouse\Schema\Directives\WhereConstraintsDirective
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected function addWhereConstraintsTypes(DocumentAST $document): DocumentAST
-    {
-        return $document
-            ->setDefinition(
-                PartialParser::inputObjectTypeDefinition('
-                    input WhereConstraints {
-                        column: String
-                        operator: Operator = EQ
-                        value: ID
-                        AND: [WhereConstraints!]
-                        OR: [WhereConstraints!]
-                        NOT: [WhereConstraints!]
-                    }
-                ')
-            )
-            ->setDefinition(
-                PartialParser::enumTypeDefinition('
-                    enum Operator {
-                        EQ @enum(value: "=")
-                        NEQ @enum(value: "<>")
-                        GT @enum(value: ">")
-                        GTE @enum(value: ">=")
-                        LT @enum(value: "<")
-                        LTE @enum(value: "<=")
-                    }
-                ')
-            );
-        // TODO change value to Mixed type
     }
 }
