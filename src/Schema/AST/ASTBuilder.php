@@ -328,7 +328,7 @@ GRAPHQL
     /**
      * Add the input type that is used for the @whereConstraints directive.
      *
-     * @see \Nuwave\Lighthouse\Schema\Directives\Args\WhereConstraintsDirective
+     * @see \Nuwave\Lighthouse\Schema\Directives\WhereConstraintsDirective
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST

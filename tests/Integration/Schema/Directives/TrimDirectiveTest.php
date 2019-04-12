@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives\Fields;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 

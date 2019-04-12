@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Args;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;

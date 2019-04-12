@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Args;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;

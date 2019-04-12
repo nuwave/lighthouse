@@ -22,7 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
-use Nuwave\Lighthouse\Schema\Directives\Args\SpreadDirective;
+use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
