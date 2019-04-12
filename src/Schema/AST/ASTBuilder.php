@@ -297,7 +297,7 @@ GRAPHQL
     /**
      * Add types that are used for the @orderBy directive.
      *
-     * @see \Nuwave\Lighthouse\Schema\Directives\Args\OrderByDirective
+     * @see \Nuwave\Lighthouse\Schema\Directives\OrderByDirective
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST

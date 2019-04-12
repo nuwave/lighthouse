@@ -15,7 +15,7 @@ use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Directives\Fields\NamespaceDirective;
+use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
 
 class ASTHelper
 {
