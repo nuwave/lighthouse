@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
-use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
+use Nuwave\Lighthouse\Schema\Directives\PaginationManipulator;
 
 class RelationBatchLoader extends BatchLoader
 {

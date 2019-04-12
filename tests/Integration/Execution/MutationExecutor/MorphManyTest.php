@@ -55,7 +55,7 @@ class MorphManyTest extends DBTestCase
     }
     ';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

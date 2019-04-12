@@ -31,8 +31,8 @@ use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\UnionDirective;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
+use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
+use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 
 class NodeFactory
 {
@@ -246,7 +246,7 @@ class NodeFactory
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode  $definition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $definition
      * @return \Closure
      */
     protected function resolveFieldsFunction($definition): Closure

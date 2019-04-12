@@ -60,6 +60,7 @@ class DirectiveFactory
      */
     public function __construct(Dispatcher $dispatcher)
     {
+        // The namespaces will be tried in the order that they contain
         $this->directiveBaseNamespaces = (new Collection([
             // User defined directives (top priority)
             config('lighthouse.namespaces.directives'),
@@ -68,9 +69,7 @@ class DirectiveFactory
             $dispatcher->dispatch(new RegisterDirectiveNamespaces),
 
             // Lighthouse defined directives
-            'Nuwave\\Lighthouse\\Schema\\Directives\\Args',
-            'Nuwave\\Lighthouse\\Schema\\Directives\\Fields',
-            'Nuwave\\Lighthouse\\Schema\\Directives\\Nodes',
+            'Nuwave\\Lighthouse\\Schema\\Directives',
         ]))->flatten()
            ->filter()
            ->all();

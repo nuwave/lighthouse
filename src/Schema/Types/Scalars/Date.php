@@ -67,7 +67,7 @@ class Date extends ScalarType
      * @param  string  $exceptionClass
      * @return \Carbon\Carbon
      *
-     * @throws \GraphQL\Error\InvariantViolation|Error
+     * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error
      */
     protected function tryParsingDate($value, string $exceptionClass): Carbon
     {
