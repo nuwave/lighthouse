@@ -49,7 +49,7 @@ Let's take a look at the built-in `@trim` directive.
 ```php
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Args;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
@@ -137,7 +137,7 @@ So let's take a look at the built-in `@eq` directive.
 ```php
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives\Args;
+namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
