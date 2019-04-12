@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.2.1...master)
 
+### Added
+
+- Add `@whereConstraints` directive that offers flexible query capabilities to the client. Resolves #312
+
 ## [3.2.1](https://github.com/nuwave/lighthouse/compare/v3.2.0...v3.2.1) - 2019-04-12
 
 ### Changed
