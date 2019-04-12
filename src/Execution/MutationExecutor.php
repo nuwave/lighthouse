@@ -297,10 +297,6 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'sync') {
-                    $relation->sync($values);
-                }
-
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(new Collection($values), $relation);
                 }
@@ -318,6 +314,10 @@ class MutationExecutor
 
                 if ($operationKey === 'connect') {
                     $relation->attach($values);
+                }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
                 }
 
                 if ($operationKey === 'disconnect') {
@@ -331,10 +331,6 @@ class MutationExecutor
             $relation = $model->{$relationName}();
 
             (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'sync') {
-                    $relation->sync($values);
-                }
-
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(new Collection($values), $relation);
                 }
@@ -352,6 +348,10 @@ class MutationExecutor
 
                 if ($operationKey === 'connect') {
                     $relation->attach($values);
+                }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
                 }
 
                 if ($operationKey === 'disconnect') {
