@@ -43,7 +43,6 @@ class Tracing
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
      * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $ManipulateAST
-     *
      * @return void
      */
     public function handleManipulateAST(ManipulateAST $ManipulateAST): void
