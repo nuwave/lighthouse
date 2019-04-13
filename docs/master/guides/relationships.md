@@ -577,7 +577,6 @@ mutation {
 }
 ```
 
-
 Updates on BelongsToMany relations may expose up to 6 nested operations.
 
 ```graphql

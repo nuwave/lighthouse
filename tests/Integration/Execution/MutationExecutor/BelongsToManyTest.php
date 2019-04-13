@@ -476,7 +476,8 @@ class BelongsToManyTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanSyncExistingUsersDuringCreateToABelongsToManyRelation(){
+    public function itCanSyncExistingUsersDuringCreateToABelongsToManyRelation()
+    {
         factory(User::class, 2)->create();
 
         $this->query('
