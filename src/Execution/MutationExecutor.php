@@ -510,19 +510,21 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
             $relation = $model->{$relationName}();
 
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
+            if(array_key_exists('sync', $nestedOperations)){
+                $relation->sync($nestedOperations['sync']);
+            }
 
-                if ($operationKey === 'connect') {
-                    $relation->attach($values);
-                }
+            if(array_key_exists('connect', $nestedOperations)){
+                $relation->attach($nestedOperations['connect']);
+            }
 
-                if ($operationKey === 'sync') {
-                    $relation->sync($values);
-                }
-            });
+            if(array_key_exists('attach', $nestedOperations)){
+                $relation->attach($nestedOperations['attach']);
+            }
+
+            if(array_key_exists('create', $nestedOperations)){
+                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
+            }
         });
     }
 

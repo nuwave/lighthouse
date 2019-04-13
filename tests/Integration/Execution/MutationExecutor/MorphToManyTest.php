@@ -4,6 +4,7 @@ namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Tag;
+use Tests\Utils\Models\User;
 
 class MorphToManyTest extends DBTestCase
 {
@@ -147,5 +148,13 @@ class MorphToManyTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanSyncAndCreateInOneMutation()
+    {
+
     }
 }
