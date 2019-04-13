@@ -70,7 +70,7 @@ class DirectiveFactory
         ]);
 
         // Allow a smooth transition away from the deprecated directives
-        if(config('new_between_directives')){
+        if (config('new_between_directives')) {
             $directives->push('Nuwave\\Lighthouse\\Between');
         }
 
