@@ -266,7 +266,6 @@ class FieldFactory
      * @param  mixed  $argValue
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]  $argumentPath
-     *
      * @return void
      */
     protected function handleArgWithAssociatedDirectivesRecursively(
@@ -419,7 +418,6 @@ class FieldFactory
     /**
      * @param  mixed[]  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
-     *
      * @return void
      */
     protected function prepareDirectives(array $argumentPath, Collection $directives): void
@@ -448,7 +446,6 @@ class FieldFactory
     /**
      * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
-     *
      * @return void
      */
     protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition): void
@@ -469,7 +466,6 @@ class FieldFactory
      *
      * @param  mixed[]  $basePath
      * @param  string|int  $pathToBeAdded
-     *
      * @return mixed[]
      */
     protected function addPath(array $basePath, $pathToBeAdded): array
@@ -499,7 +495,6 @@ class FieldFactory
      * @param  array  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     *
      * @return void
      */
     protected function validateArgumentsBeforeValidationDirectives($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): void
@@ -553,7 +548,6 @@ class FieldFactory
      * @param  array  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     *
      * @return void
      */
     protected function handleArgDirectivesAfterValidationDirectives($root, array &$args, GraphQLContext $context, ResolveInfo $resolveInfo): void

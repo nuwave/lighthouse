@@ -25,7 +25,6 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
      * @param  \Closure  $next
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, Closure $next): FieldValue
@@ -51,7 +50,6 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      * Return an array containing the type name and id.
      *
      * @param  string  $argumentValue
-     *
      * @return string[]
      */
     public function transform($argumentValue): array

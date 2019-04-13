@@ -158,7 +158,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
 
     /**
      * @param  mixed  $middlewareArgValue
-     *
      * @return \Illuminate\Support\Collection<string>
      */
     protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection

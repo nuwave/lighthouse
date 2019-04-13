@@ -42,7 +42,6 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
      * @param  \Closure  $next
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
     public function handleNode(NodeValue $value, Closure $next): NodeValue
@@ -60,7 +59,6 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     /**
      * @param  \GraphQL\Language\AST\Node  $node
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST

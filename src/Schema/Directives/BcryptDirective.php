@@ -22,7 +22,6 @@ class BcryptDirective implements ArgTransformerDirective
      * Useful for hashing passwords before inserting them into the database.
      *
      * @param  string  $argumentValue
-     *
      * @return mixed
      */
     public function transform($argumentValue): string

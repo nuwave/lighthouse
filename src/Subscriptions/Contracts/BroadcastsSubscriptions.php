@@ -29,7 +29,6 @@ interface BroadcastsSubscriptions
      * Authorize the subscription.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authorize(Request $request);
