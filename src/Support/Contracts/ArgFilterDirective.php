@@ -1,21 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Support\Contracts;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
-
-class WhereBetweenDirective implements ArgFilterDirective
+/**
+ * @deprecated
+ */
+interface ArgFilterDirective extends ArgDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
-    public function name(): string
-    {
-        return 'whereBetween';
-    }
-
     /**
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  string  $columnName
@@ -23,10 +14,7 @@ class WhereBetweenDirective implements ArgFilterDirective
      *
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function applyFilter($builder, string $columnName, $value)
-    {
-        return $builder->whereBetween($columnName, $value);
-    }
+    public function applyFilter($builder, string $columnName, $value);
 
     /**
      * Does this filter combine the values of multiple input arguments into one query?
@@ -36,8 +24,5 @@ class WhereBetweenDirective implements ArgFilterDirective
      *
      * @return bool
      */
-    public function combinesMultipleArguments(): bool
-    {
-        return true;
-    }
+    public function combinesMultipleArguments(): bool;
 }

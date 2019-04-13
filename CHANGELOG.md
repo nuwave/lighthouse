@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.2.1...master)
 
+### Added
+
+- Add `@spread` directive to reshape nested input arguments https://github.com/nuwave/lighthouse/pull/680
+- Add flexible `@builder` directive to quickly specify a single method to apply constraints
+  to the query builder https://github.com/nuwave/lighthouse/pull/680
+- Add `new_between_directives` config to use the new between directives now https://github.com/nuwave/lighthouse/pull/680
+
+### Deprecated
+
+- Use the `@spread` instead of the `flatten` argument of `@create`/`@update` https://github.com/nuwave/lighthouse/pull/680
+- Prefer usage of the `ArgBuilderDirective` instead of the `ArgFilterDirective` https://github.com/nuwave/lighthouse/pull/680
+- `@whereBetween` and `@whereNotBetween` will take a single input object
+  instead of being spread across two args https://github.com/nuwave/lighthouse/pull/680
+
 ## [3.2.1](https://github.com/nuwave/lighthouse/compare/v3.2.0...v3.2.1) - 2019-04-12
 
 ### Changed

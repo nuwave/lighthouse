@@ -7,6 +7,9 @@ use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
+use Nuwave\Lighthouse\Execution\QueryFilter;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Builder;
@@ -66,6 +69,12 @@ class FieldFactory
      * @var \Nuwave\Lighthouse\Execution\Builder
      */
     protected $builder;
+
+    /**
+     * @var \Nuwave\Lighthouse\Execution\QueryFilter
+     * @deprecated
+     */
+    protected $queryFilter;
 
     /**
      * @var array
@@ -164,6 +173,8 @@ class FieldFactory
                 $this->validationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
                 $this->builder = new Builder();
 
+                $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
+
                 $argumentValues->each(
                     function (ArgumentValue $argumentValue): void {
                         $this->handleArgDirectivesRecursively(
@@ -191,6 +202,10 @@ class FieldFactory
                         );
                     }
                 }
+
+                $this->builder->setQueryFilter(
+                    $this->queryFilter
+                );
 
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
@@ -368,6 +383,10 @@ class FieldFactory
                     $directive
                 );
             }
+
+            if ($directive instanceof ArgFilterDirective) {
+                $this->injectArgumentFilter($directive, $astNode);
+            }
         }
 
         // If directives remain, snapshot the state that we are in now
@@ -375,6 +394,25 @@ class FieldFactory
         if ($directives->isNotEmpty()) {
             $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
         }
+    }
+
+    /**
+     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
+     *
+     * @return void
+     */
+    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition): void
+    {
+        $argumentName = $inputValueDefinition->name->value;
+        $directiveDefinition = ASTHelper::directiveDefinition($inputValueDefinition, $argFilterDirective->name());
+        $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
+
+        $this->queryFilter->addArgumentFilter(
+            $argumentName,
+            $columnName,
+            $argFilterDirective
+        );
     }
 
     protected function argValueExists(array $argumentPath)

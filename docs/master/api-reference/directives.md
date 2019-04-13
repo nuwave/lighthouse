@@ -1319,6 +1319,25 @@ type Query {
 
 Verify that a column's value is between two values.
 
+### Old syntax
+
+_Attention: This following use is deprecated and will be removed in v4._
+
+_Note: You will need to add a `key` to the column to want to query for each date_
+
+```graphql
+type Query {
+    posts(
+        createdAfter: Date! @whereBetween(key: "created_at")
+        createdBefore: String! @whereBetween(key: "created_at")
+    ): [Post!]! @all
+}
+```
+
+### New syntax
+
+_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
+
 The type of the input value should be either an `input` object with two
 fields or a list of values.
 
@@ -1341,6 +1360,25 @@ pass the actual column name as the `key`.
 ## @whereNotBetween
 
 Verify that a column's value lies outside of two values.
+
+### Old syntax
+
+_Attention: This following use is deprecated and will be removed in v4._
+
+_Note: You will need to add a `key` to the column to want to query for each date_
+
+```graphql
+type Query {
+    users(
+        bornBefore: Date! @whereNotBetween(key: "created_at")
+        bornAfter: Date! @whereNotBetween(key: "created_at")
+    ): [User!]! @all
+}
+```
+
+### New syntax
+
+_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
 
 The type of the input value should be either an `input` object with two
 fields or a list of values.

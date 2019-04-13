@@ -22,6 +22,12 @@ class Builder
     protected $scopes = [];
 
     /**
+     * @var \Nuwave\Lighthouse\Execution\QueryFilter
+     * @deprecated
+     */
+    protected $queryFilter;
+
+    /**
      * Apply the bound QueryBuilderDirectives to the given builder.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
@@ -30,6 +36,9 @@ class Builder
      */
     public function apply($builder, array $args)
     {
+        // Call the queryFilter for backwards compatibility
+        $this->queryFilter->filter($builder, $args);
+
         foreach ($args as $key => $value) {
             /** @var \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective $builderDirective */
             if ($builderDirective = Arr::get($this->builderDirectives, $key)) {
@@ -67,6 +76,20 @@ class Builder
     public function addBuilderDirective(string $argumentName, ArgBuilderDirective $argBuilderDirective): self
     {
         $this->builderDirectives[$argumentName] = $argBuilderDirective;
+
+        return $this;
+    }
+
+    /**
+     * Keep a reference to the QueryFilter for backwards compatibility.
+     *
+     * @deprecated
+     * @param  \Nuwave\Lighthouse\Execution\QueryFilter  $queryFilter
+     * @return $this
+     */
+    public function setQueryFilter(QueryFilter $queryFilter): self
+    {
+        $this->queryFilter = $queryFilter;
 
         return $this;
     }
