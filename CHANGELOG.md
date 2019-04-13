@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.2.1...master)
  
+### Added
+
 - Sync existing models in belongsToMany relations using nested mutations https://github.com/nuwave/lighthouse/pull/707
 
 ## [3.2.1](https://github.com/nuwave/lighthouse/compare/v3.2.0...v3.2.1) - 2019-04-12
