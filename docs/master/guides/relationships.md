@@ -557,6 +557,27 @@ Lighthouse will detect the relationship and attach/create it.
 }
 ```
 
+It is also possible to use the `sync` operation to ensure only the given IDs
+will be contained withing the relation.
+
+```graphql
+mutation {
+  createPost(input: {
+    title: "My new Post"
+    authors: {
+      sync: [
+        123
+      ]
+    }
+  }){
+    id
+    authors {
+      name
+    }
+  }
+}
+```
+
 Updates on BelongsToMany relations may expose up to 6 nested operations.
 
 ```graphql

@@ -27,7 +27,6 @@ abstract class BaseDirective implements Directive
      * @todo Make this type annotation a hard requirement as soon as the underlying implementation is fixed
      *
      * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
-     *
      * @return $this
      */
     public function hydrate($definitionNode): self
