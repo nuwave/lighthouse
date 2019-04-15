@@ -71,6 +71,7 @@ class LogBroadcaster implements Broadcaster
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  array  $data
+     * @return void
      */
     public function broadcast(Subscriber $subscriber, array $data)
     {
