@@ -7,9 +7,9 @@ However you are free to create your own directives depending upon your needs.
 
 There are 3 different levels of directives in Lighthouse.
 
-* [Node Directives](#node-directives)
-* [Field Directives](#field-directives)
-* [Argument Directives](#argument-directives)
+- [Node Directives](#node-directives)
+- [Field Directives](#field-directives)
+- [Argument Directives](#argument-directives)
 
 They can be applied to different parts of the schema, according to the [DirectiveLocation](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
 
@@ -117,11 +117,11 @@ modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use the defined filters for resolving the query:
 
-* `@all`
-* `@paginate`
-* `@find`
-* `@first`
-* `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
+- `@all`
+- `@paginate`
+- `@find`
+- `@first`
+- `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
 
 Take the following schema as an example:
 
@@ -175,9 +175,9 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
 
 The `handleBuilder` method takes two arguments:
 
-* `$builder`
+- `$builder`
 The query builder for applying the additional query on to.
-* `$value`
+- `$value`
 The value of the argument value that the `@eq` was applied on to.
 
 If you want to use a more complex value for manipulating a query,

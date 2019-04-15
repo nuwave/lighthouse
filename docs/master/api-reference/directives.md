@@ -1138,7 +1138,7 @@ input PostInput {
 }
 ```
 
-Usage for the end user does not change:
+The chema does not change, client side usage works the same:
 
 ```graphql
 mutation {
@@ -1153,7 +1153,8 @@ mutation {
 }   
 ```
 
-This will make it so the arguments are passed to the resolver on the root level:
+Internally, the arguments will be transformed into a flat structure before
+they are passed along to the resolver:
 
 ```php
 [
