@@ -518,6 +518,10 @@ class MutationExecutor
                 if ($operationKey === 'connect') {
                     $relation->attach($values);
                 }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
+                }
             });
         });
     }
