@@ -8,7 +8,6 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Builder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Type\Definition\InputObjectType;
@@ -385,7 +384,15 @@ class FieldFactory
             }
 
             if ($directive instanceof ArgFilterDirective) {
-                $this->injectArgumentFilter($directive, $astNode);
+                $argumentName = $astNode->name->value;
+                $directiveDefinition = ASTHelper::directiveDefinition($astNode, $directive->name());
+                $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
+
+                $this->queryFilter->addArgumentFilter(
+                    $argumentName,
+                    $columnName,
+                    $directive
+                );
             }
         }
 
@@ -394,25 +401,6 @@ class FieldFactory
         if ($directives->isNotEmpty()) {
             $this->handleArgDirectivesSnapshots[] = [$astNode, $argumentPath, $directives];
         }
-    }
-
-    /**
-     * @param  \Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective  $argFilterDirective
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
-     *
-     * @return void
-     */
-    protected function injectArgumentFilter(ArgFilterDirective $argFilterDirective, InputValueDefinitionNode $inputValueDefinition): void
-    {
-        $argumentName = $inputValueDefinition->name->value;
-        $directiveDefinition = ASTHelper::directiveDefinition($inputValueDefinition, $argFilterDirective->name());
-        $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
-
-        $this->queryFilter->addArgumentFilter(
-            $argumentName,
-            $columnName,
-            $argFilterDirective
-        );
     }
 
     protected function argValueExists(array $argumentPath)
