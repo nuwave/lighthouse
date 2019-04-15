@@ -1,29 +1,47 @@
 # Custom Directives
 
-Lighthouse provides various convenient server side directives that can be applied to a lots of generic use cases.
-However you are free to create your own directives depending upon your needs. 
+Lighthouse provides general purpose server side directives.
 
-## Directive Types
-
-There are 3 different levels of directives in Lighthouse.
-
-- [Node Directives](#node-directives)
-- [Field Directives](#field-directives)
-- [Argument Directives](#argument-directives)
-
-They can be applied to different parts of the schema, according to the [DirectiveLocation](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
+As you grow your GraphQL schema, you may find the need for more specialized functionality.
+Learn how you can abstract logic in a composable and reusable manner by using custom directives.  
 
 ## Directive Class Naming Convention
 
-The class name of directive must follow the following pattern:
+Directives are implemented as PHP classes, each directive available
+in the schema corresponds to a single class.
+
+The class name of a directive must follow the following pattern:
 
     <Directive name in StudlyCase>Directive
 
 For example the class name of directive `@fooBar` must be `FooBarDirective`. 
 
+## Directive Interfaces
+
+Every directive must implement the interface [`\Nuwave\Lighthouse\Support\Contracts\Directive`](../../../src/Support/Contracts/Directive.php).
+It contains a single function `name` to specify the name the directive has in the schema.
+
+By itself though, directives that implement just this base interface do not do anything.
+Depending on what your directive should do, you can pick one or more of the provided
+directive interfaces to add functionality. They serve as the point of contact to Lighthouse.
+
+Depending on which interfaces you implement, a directive can be applied to different parts
+of the schema, according to the [specified directive location](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
+
 ## Node Directives
 
-// TODO
+These directives can generally be applied to [type definitions](../the-basics/types.md) in the schema.
+
+### NodeManipulator
+
+The [`\Nuwave\Lighthouse\Support\Contracts\NodeManipulator`](../../../src/Support/Contracts/NodeManipulator.php)
+interface can be used to manipulate the AST. 
+
+### NodeMiddleware
+
+The [`\Nuwave\Lighthouse\Support\Contracts\NodeMiddleware`](../../../src/Support/Contracts/NodeMiddleware.php)
+interface can be used to manipulate the AST. 
+
 
 ## Field Directives
 
@@ -33,11 +51,7 @@ For example the class name of directive `@fooBar` must be `FooBarDirective`.
 
 Argument directives are applied to the [InputValueDefinition](https://facebook.github.io/graphql/June2018/#InputValueDefinition).
 
-There are 3 types of argument directives in Lighthouse.
-
 ### ArgValidationDirective
-
-
 
 ### ArgTransformerDirective
 

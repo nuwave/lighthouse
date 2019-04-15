@@ -47,7 +47,8 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     public function handleNode(NodeValue $value, Closure $next): NodeValue
     {
         $this->nodeRegistry->registerModel(
-            $value->getTypeDefinitionName(), $this->getModelClass('class')
+            $value->getTypeDefinitionName(),
+            $this->getModelClass('class')
         );
 
         return $next($value);
