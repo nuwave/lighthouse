@@ -48,6 +48,7 @@ abstract class TestCase extends BaseTestCase
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
+     * @return void
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -127,6 +128,7 @@ abstract class TestCase extends BaseTestCase
      * are fully dumped to the console when making requests.
      *
      * @param  \Illuminate\Foundation\Application  $app
+     * @return void
      */
     protected function resolveApplicationExceptionHandler($app)
     {

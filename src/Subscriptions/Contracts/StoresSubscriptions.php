@@ -37,6 +37,7 @@ interface StoresSubscriptions
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  string  $topic
+     * @return void
      */
     public function storeSubscriber(Subscriber $subscriber, string $topic);
 

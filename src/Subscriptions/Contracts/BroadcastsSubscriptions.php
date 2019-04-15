@@ -22,6 +22,7 @@ interface BroadcastsSubscriptions
      * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $fieldName
      * @param  mixed  $root
+     * @return void
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root);
 
