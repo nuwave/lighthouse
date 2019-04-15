@@ -17,10 +17,10 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
     }
 
     /**
-     * Apply a simple "WHERE = $value" clause.
+     * Apply a "WHERE = $value" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param  mixed $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
     public function handleBuilder($builder, $value)
