@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective
+class BuilderDirective extends BaseDirective implements ArgBuilderDirective
 {
     /**
      * Name of the directive.
@@ -13,11 +13,11 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function name(): string
     {
-        return 'eq';
+        return 'builder';
     }
 
     /**
-     * Apply a "WHERE = $value" clause.
+     * Dynamically call a user-defined method to enhance the builder.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  mixed  $value
@@ -25,9 +25,11 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function handleBuilder($builder, $value)
     {
-        return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
-            $value
+        return call_user_func(
+            $this->getResolverFromArgument('method'),
+            $builder,
+            $value,
+            $this->definitionNode
         );
     }
 }

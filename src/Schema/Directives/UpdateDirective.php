@@ -13,19 +13,17 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 class UpdateDirective extends BaseDirective implements FieldResolver
 {
     /**
-     * The policy mappings for the application.
-     *
      * @var \Illuminate\Database\DatabaseManager
      */
-    protected $db;
+    protected $databaseManager;
 
     /**
-     * @param  \Illuminate\Database\DatabaseManager  $database
+     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
      * @return void
      */
-    public function __construct(DatabaseManager $database)
+    public function __construct(DatabaseManager $databaseManager)
     {
-        $this->db = $database;
+        $this->databaseManager = $databaseManager;
     }
 
     /**
@@ -52,22 +50,24 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName();
 
-                $flatten = $this->directiveArgValue('flatten', false);
-                $args = $flatten
-                    ? reset($args)
-                    : $args;
+                /*
+                 * @deprecated in favour of @spread
+                 */
+                if ($this->directiveArgValue('flatten', false)) {
+                    $args = reset($args);
+                }
 
                 if ($this->directiveArgValue('globalId', false)) {
                     $args['id'] = GlobalId::decodeId($args['id']);
                 }
 
-                if (! config('lighthouse.transactional_mutations', true)) {
+                $executeMutation = function () use ($model, $args): Model {
                     return MutationExecutor::executeUpdate($model, new Collection($args))->refresh();
-                }
+                };
 
-                return $this->db->connection()->transaction(function () use ($model, $args): Model {
-                    return MutationExecutor::executeUpdate($model, new Collection($args))->refresh();
-                });
+                return config('lighthouse.transactional_mutations', true)
+                    ? $this->databaseManager->connection()->transaction($executeMutation)
+                    : $executeMutation();
             }
         );
     }

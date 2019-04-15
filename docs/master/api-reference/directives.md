@@ -152,6 +152,40 @@ type Mutation {
 }
 ```
 
+## @builder
+
+Use an argument to modify the query builder for a field.
+
+```graphql
+type Query {
+    users(
+        limit: Int @builder(method: "App\MyClass@limit")
+    ): [User!]! @all
+}
+```
+
+You must point to a `method` which will receive the builder instance
+and the argument value and can apply additional constraints to the query.
+
+```php
+namespace App;
+
+class MyClass
+{
+
+     * Add a limit constrained upon the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function limit($builder, int $value)
+    {
+        return $builder->limit($value);
+    }
+}
+```
+
 ## @cache
 
 Cache the result of a resolver.
@@ -304,11 +338,13 @@ type Mutation {
 ```
 
 If you are using a single input object as an argument, you must tell Lighthouse
-to `flatten` it before applying it to the resolver.
+to spread out the nested values before applying it to the resolver.
+
+_Note_: The usage of `flatten` is deprecated.
 
 ```graphql
 type Mutation {
-    createPost(input: CreatePostInput!): Post @create(flatten: true)
+    createPost(input: CreatePostInput! @spread): Post @create
 }
 
 input CreatePostInput {
@@ -1086,6 +1122,52 @@ type Query {
 }
 ```
 
+## @spread
+
+Spread out the nested values of an input object into it's parent.
+
+```graphql
+type Mutation {
+    updatePost(
+        id: ID!
+        input: PostInput! @spread
+    ): Post @update
+}
+
+input PostInput {
+    title: String!
+    body: String
+}
+```
+
+The chema does not change, client side usage works the same:
+
+```graphql
+mutation {
+    updatePost(
+        id: 12 
+        input: {
+            title: "My awesome title"
+        }
+    ) {
+        id
+    }
+}   
+```
+
+Internally, the arguments will be transformed into a flat structure before
+they are passed along to the resolver:
+
+```php
+[
+    'id' => 12
+    'title' = 'My awesome title'
+]
+```
+
+Note that Lighthouse spreads out the arguments **after** all other `ArgDirectives` have
+been applied, e.g. validation, transformation.
+
 ## @subscription
 
 Declare a class to handle the broadcasting of a subscription to clients.
@@ -1240,6 +1322,10 @@ type Query {
 
 Verify that a column's value is between two values.
 
+### Old syntax
+
+_Attention: This following use is deprecated and will be removed in v4._
+
 _Note: You will need to add a `key` to the column to want to query for each date_
 
 ```graphql
@@ -1251,9 +1337,36 @@ type Query {
 }
 ```
 
+### New syntax
+
+_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
+
+The type of the input value should be either an `input` object with two
+fields or a list of values.
+
+```graphql
+type Query {
+    posts(
+        created_at: DateRange @whereBetween
+    ): [Post!]! @all
+}
+
+input DateRange {
+    from: Date!
+    to: Date!
+}
+```
+
+If the name of the argument does not match the database column,
+pass the actual column name as the `key`.
+
 ## @whereNotBetween
 
 Verify that a column's value lies outside of two values.
+
+### Old syntax
+
+_Attention: This following use is deprecated and will be removed in v4._
 
 _Note: You will need to add a `key` to the column to want to query for each date_
 
@@ -1263,6 +1376,26 @@ type Query {
         bornBefore: Date! @whereNotBetween(key: "created_at")
         bornAfter: Date! @whereNotBetween(key: "created_at")
     ): [User!]! @all
+}
+```
+
+### New syntax
+
+_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
+
+The type of the input value should be either an `input` object with two
+fields or a list of values.
+
+```graphql
+type Query {
+    posts(
+        notCreatedDuring: DateRange @whereNotBetween(key: "created_at")
+    ): [Post!]! @all
+}
+
+input DateRange {
+    from: Date!
+    to: Date!
 }
 ```
 

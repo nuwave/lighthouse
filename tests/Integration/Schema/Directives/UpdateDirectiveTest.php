@@ -159,7 +159,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            updateUser(input: UpdateUserInput!): User @update(flatten: true)
+            updateUser(input: UpdateUserInput! @spread): User @update
         }
         
         input UpdateUserInput {

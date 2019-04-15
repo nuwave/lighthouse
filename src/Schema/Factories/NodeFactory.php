@@ -276,29 +276,18 @@ class NodeFactory
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
-            'fields' => $this->resolveInputFieldsFunction($inputDefinition),
+            'fields' => function () use ($inputDefinition) {
+                return (new Collection($inputDefinition->fields))
+                    ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
+                        $argumentValue = new ArgumentValue($inputValueDefinition);
+
+                        return [
+                            $inputValueDefinition->name->value => $this->argumentFactory->handle($argumentValue),
+                        ];
+                    })
+                    ->toArray();
+            },
         ]);
-    }
-
-    /**
-     * Returns a closure that lazy loads the Input Fields for a constructed type.
-     *
-     * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
-     * @return \Closure
-     */
-    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): Closure
-    {
-        return function () use ($definition) {
-            return (new Collection($definition->fields))
-                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
-                    $argumentValue = new ArgumentValue($inputValueDefinition);
-
-                    return [
-                        $inputValueDefinition->name->value => $this->argumentFactory->handle($argumentValue),
-                    ];
-                })
-                ->toArray();
-        };
     }
 
     /**

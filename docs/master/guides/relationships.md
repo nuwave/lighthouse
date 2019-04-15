@@ -177,7 +177,7 @@ We will start of by defining a mutation to create a post.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput!): Post @create(flatten: true)
+  createPost(input: CreatePostInput! @spread): Post @create
 }
 ```
 
@@ -292,7 +292,7 @@ but `delete` also removes the author model itself.
 
 ```graphql
 type Mutation {
-  updatePost(input: UpdatePostInput!): Post @update(flatten: true)
+  updatePost(input: UpdatePostInput! @spread): Post @update
 }
 
 input UpdatePostInput {
@@ -350,7 +350,7 @@ of by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
-  createUser(input: CreateUserInput!): User @create(flatten: true)
+  createUser(input: CreateUserInput! @spread): User @create
 }
 ```
 
@@ -428,7 +428,7 @@ The following example covers the full range of possible operations:
 
 ```graphql
 type Mutation {
-  updateUser(input: UpdateUserInput!): User @update(flatten: true)
+  updateUser(input: UpdateUserInput! @spread): User @update
 }
 
 input UpdateUserInput {
@@ -490,7 +490,7 @@ as attaching existing ones.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput!): Post @create(flatten: true)
+  createPost(input: CreatePostInput! @spread): Post @create
 }
 
 input CreatePostInput {
@@ -582,7 +582,7 @@ Updates on BelongsToMany relations may expose up to 6 nested operations.
 
 ```graphql
 type Mutation {
-  updatePost(input: UpdatePostInput!): Post @create(flatten: true)
+  updatePost(input: UpdatePostInput! @spread): Post @create
 }
 
 input UpdatePostInput {
@@ -613,7 +613,7 @@ input CreateAuthorInput {
 
 ```graphql
 type Mutation {
-  createHour(input: CreateHourInput!): Hour @create(flatten: true)
+  createHour(input: CreateHourInput! @spread): Hour @create
 }
 
 input CreateHourInput {

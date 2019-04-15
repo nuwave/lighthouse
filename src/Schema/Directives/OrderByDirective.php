@@ -10,10 +10,10 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 
-class OrderByDirective implements ArgFilterDirective, ArgDirectiveForArray, ArgManipulator
+class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator
 {
     /**
      * Name of the directive.
@@ -26,14 +26,15 @@ class OrderByDirective implements ArgFilterDirective, ArgDirectiveForArray, ArgM
     }
 
     /**
+     * Apply an "ORDER BY" clause.
+     *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  string  $columnName
-     * @param  array[]  $orderByClauses
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function applyFilter($builder, string $columnName, $orderByClauses)
+    public function handleBuilder($builder, $value)
     {
-        foreach ($orderByClauses as $orderByClause) {
+        foreach ($value as $orderByClause) {
             $builder->orderBy(
                 $orderByClause['field'],
                 $orderByClause['order']
@@ -41,19 +42,6 @@ class OrderByDirective implements ArgFilterDirective, ArgDirectiveForArray, ArgM
         }
 
         return $builder;
-    }
-
-    /**
-     * Does this filter combine the values of multiple input arguments into one query?
-     *
-     * This is true for filter directives such as "whereBetween" that expects two
-     * different input values, given as separate arguments.
-     *
-     * @return bool
-     */
-    public function combinesMultipleArguments(): bool
-    {
-        return false;
     }
 
     /**

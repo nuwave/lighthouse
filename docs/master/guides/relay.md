@@ -35,6 +35,13 @@ type User {
 
 [@globalId](../api-reference/directives.md#globalid)
 
-## Mutations
+## Input Object Mutations
 
-// TODO write something about how Mutations must always take InputObjects and how flattening helps achieve that.
+Lighthouse makes it easy to follow the principle of using a
+single field argument called `input`, just use the [`@spread`](../api-reference/directives.md#spread) directive.
+
+```graphql
+type Mutation {
+    introduceShip(input: IntroduceShipInput! @spread): IntroduceShipPayload!
+}
+```

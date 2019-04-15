@@ -5,7 +5,6 @@ namespace Nuwave\Lighthouse\Execution\DataLoader;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
 use Nuwave\Lighthouse\Schema\Directives\PaginationManipulator;
@@ -34,8 +33,7 @@ class RelationBatchLoader extends BatchLoader
     protected $scopes;
 
     /**
-     * The ResolveInfo of the currently executing field. Used for retrieving
-     * the QueryFilter.
+     * The ResolveInfo of the currently executing field.
      *
      * @var \GraphQL\Type\Definition\ResolveInfo
      */
@@ -130,12 +128,10 @@ class RelationBatchLoader extends BatchLoader
         return new ModelRelationFetcher(
             $this->getParentModels(),
             [$this->relationName => function ($query) {
-                return QueryFilter::apply(
-                    $query,
-                    $this->args,
-                    $this->scopes,
-                    $this->resolveInfo
-                );
+                return $this->resolveInfo
+                    ->builder
+                    ->addScopes($this->scopes)
+                    ->apply($query, $this->args);
             }]
         );
     }
