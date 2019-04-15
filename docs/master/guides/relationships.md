@@ -557,7 +557,8 @@ Lighthouse will detect the relationship and attach/create it.
 }
 ```
 
-It is also possible to use sync instead of connect, to sync te relationship.
+It is also possible to use the `sync` operation to ensure only the given IDs
+will be contained withing the relation.
 
 ```graphql
 mutation {
