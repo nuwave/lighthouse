@@ -36,7 +36,7 @@ class Builder
      */
     public function apply($builder, array $args)
     {
-        /**
+        /*
          * Call the queryFilter for backwards compatibility
          * @deprecated
          */

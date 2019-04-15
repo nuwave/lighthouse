@@ -69,7 +69,7 @@ class DirectiveFactory
             $dispatcher->dispatch(new RegisterDirectiveNamespaces),
         ]);
 
-        /**
+        /*
          * Allow a smooth transition away from the deprecated between directives.
          * @deprecated
          */
