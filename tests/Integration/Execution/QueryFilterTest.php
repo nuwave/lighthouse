@@ -6,7 +6,8 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
 /**
- * @deprecated
+ * @deprecated in favour of
+ * @see \Tests\Integration\Execution\BuilderTest
  */
 class QueryFilterTest extends DBTestCase
 {

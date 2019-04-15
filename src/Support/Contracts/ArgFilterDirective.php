@@ -3,7 +3,8 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 /**
- * @deprecated
+ * @deprecated in favour of
+ * @see \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective
  */
 interface ArgFilterDirective extends ArgDirective
 {

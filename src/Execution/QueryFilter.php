@@ -9,7 +9,8 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
 /**
- * @deprecated
+ * @deprecated in favour of
+ * @see \Nuwave\Lighthouse\Execution\Builder
  */
 class QueryFilter
 {

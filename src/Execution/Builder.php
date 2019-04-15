@@ -23,7 +23,7 @@ class Builder
 
     /**
      * @var \Nuwave\Lighthouse\Execution\QueryFilter
-     * @deprecated
+     * @deprecated once QueryFilter is removed
      */
     protected $queryFilter;
 
@@ -36,7 +36,10 @@ class Builder
      */
     public function apply($builder, array $args)
     {
-        // Call the queryFilter for backwards compatibility
+        /**
+         * Call the queryFilter for backwards compatibility
+         * @deprecated
+         */
         $this->queryFilter->filter($builder, $args);
 
         foreach ($args as $key => $value) {

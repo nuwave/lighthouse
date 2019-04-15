@@ -11,6 +11,9 @@ class BuilderTest extends DBTestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        /**
+         * @deprecated once the new directives become the standard
+         */
         $app['config']->set('new_between_directives', true);
     }
 
