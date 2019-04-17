@@ -4,7 +4,7 @@ namespace Tests\Integration\Schema;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class NodeInterfaceTest extends DBTestCase
 {
@@ -33,8 +33,8 @@ class NodeInterfaceTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $firstGlobalId = GlobalId::encode('User', $this->testTuples[1]['id']);
-        $secondGlobalId = GlobalId::encode('User', $this->testTuples[2]['id']);
+        $firstGlobalId = app(GlobalId::class)->encode('User', $this->testTuples[1]['id']);
+        $secondGlobalId = app(GlobalId::class)->encode('User', $this->testTuples[2]['id']);
 
         $this->query('
         {
@@ -88,7 +88,7 @@ class NodeInterfaceTest extends DBTestCase
         $user = factory(User::class)->create(
             ['name' => 'Sepp']
         );
-        $globalId = GlobalId::encode('User', $user->getKey());
+        $globalId = app(GlobalId::class)->encode('User', $user->getKey());
 
         $this->query('
         {

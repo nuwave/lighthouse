@@ -5,10 +5,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class UpdateDirective extends BaseDirective implements FieldResolver
 {
@@ -20,12 +20,23 @@ class UpdateDirective extends BaseDirective implements FieldResolver
     protected $db;
 
     /**
+     * The GlobalId resolver.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     */
+    protected $globalId;
+
+    /**
+     * UpdateDirective constructor.
+     *
      * @param  \Illuminate\Database\DatabaseManager  $database
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
      * @return void
      */
-    public function __construct(DatabaseManager $database)
+    public function __construct(DatabaseManager $database, GlobalId $globalId)
     {
         $this->db = $database;
+        $this->globalId = $globalId;
     }
 
     /**
@@ -58,7 +69,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                     : $args;
 
                 if ($this->directiveArgValue('globalId', false)) {
-                    $args['id'] = GlobalId::decodeId($args['id']);
+                    $args['id'] = $this->globalId->decodeId($args['id']);
                 }
 
                 if (! config('lighthouse.transactional_mutations', true)) {

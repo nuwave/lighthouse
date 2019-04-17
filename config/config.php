@@ -183,6 +183,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Global ID resolver
+    |--------------------------------------------------------------------------
+    |
+    | The Global ID resolver class.
+    | You can set your own here, as long as it implements the following
+    | interface: \Nuwave\Lighthouse\Support\Contracts\GlobalId
+    |
+    */
+
+    'global_id_resolver' => \Nuwave\Lighthouse\Execution\Utils\GlobalId::class,
+
+    /*
+    |--------------------------------------------------------------------------
     | Batched Queries
     |--------------------------------------------------------------------------
     |

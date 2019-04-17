@@ -17,6 +17,7 @@ use Nuwave\Lighthouse\Console\ScalarCommand;
 use Illuminate\Contracts\Container\Container;
 use Nuwave\Lighthouse\Console\MutationCommand;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
@@ -39,6 +40,7 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class LighthouseServiceProvider extends ServiceProvider
@@ -110,6 +112,12 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(CanStreamResponse::class, ResponseStream::class);
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
+
+        $this->app->bind(GlobalIdContract::class, function () {
+            return $this->app->make(
+                config('lighthouse.global_id_resolver', GlobalId::class)
+            );
+        });
 
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
             /** @var \Illuminate\Http\Request $request */
