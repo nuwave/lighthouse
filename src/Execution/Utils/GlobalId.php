@@ -17,19 +17,19 @@ class GlobalId implements GlobalIdContract
     /**
      * {@inheritdoc}
      */
-    public function decodeID(string $globalID): string
+    public function decode(string $globalID): array
     {
-        [$type, $id] = self::decode($globalID);
-
-        return $id;
+        return explode(':', base64_decode($globalID));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function decode(string $globalID): array
+    public function decodeID(string $globalID): string
     {
-        return explode(':', base64_decode($globalID));
+        [$type, $id] = self::decode($globalID);
+
+        return $id;
     }
 
     /**
