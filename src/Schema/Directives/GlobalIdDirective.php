@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective
 {

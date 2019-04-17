@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 class GlobalId implements GlobalIdContract
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function encode(string $type, $id): string
     {
@@ -15,7 +15,7 @@ class GlobalId implements GlobalIdContract
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function decodeID(string $globalID): string
     {
@@ -25,7 +25,7 @@ class GlobalId implements GlobalIdContract
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function decode(string $globalID): array
     {
@@ -33,7 +33,7 @@ class GlobalId implements GlobalIdContract
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function decodeType(string $globalID): string
     {
