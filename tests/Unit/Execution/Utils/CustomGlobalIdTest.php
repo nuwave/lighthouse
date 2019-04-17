@@ -8,6 +8,20 @@ use Nuwave\Lighthouse\Execution\Utils\GlobalId as BaseGlobalId;
 
 class CustomGlobalIdTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app->bind(GlobalId::class, CustomGlobalId::class);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->app->bind(GlobalId::class, BaseGlobalId::class);
+
+        parent::tearDown();
+    }
+
     /**
      * @test
      */
@@ -40,20 +54,6 @@ class CustomGlobalIdTest extends TestCase
         $globalId = app(GlobalId::class)->encode('User', 123);
 
         $this->assertSame('User', app(GlobalId::class)->decodeType($globalId));
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->app->bind(GlobalId::class, CustomGlobalId::class);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->app->bind(GlobalId::class, BaseGlobalId::class);
-
-        parent::tearDown();
     }
 }
 
