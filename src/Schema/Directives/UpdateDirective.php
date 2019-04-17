@@ -15,7 +15,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
     /**
      * @var \Illuminate\Database\DatabaseManager
      */
-    protected $databaseManager;
+    protected $db;
 
     /**
      * The GlobalId resolver.
@@ -77,7 +77,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                 };
 
                 return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection()->transaction($executeMutation)
+                    ? $this->db->connection()->transaction($executeMutation)
                     : $executeMutation();
             }
         );
