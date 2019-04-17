@@ -7,9 +7,9 @@ However you are free to create your own directives depending upon your needs.
 
 There are 3 different levels of directives in Lighthouse.
 
-* [Node Directives](#node-directives)
-* [Field Directives](#field-directives)
-* [Argument Directives](#argument-directives)
+- [Node Directives](#node-directives)
+- [Field Directives](#field-directives)
+- [Argument Directives](#argument-directives)
 
 They can be applied to different parts of the schema, according to the [DirectiveLocation](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
 
@@ -37,8 +37,8 @@ Argument directives are applied to the [InputValueDefinition](https://facebook.g
 
 There are 2 types of argument directives in Lighthouse.
 
-* [ArgTransformerDirective](#argtransformerdirective)
-* [ArgFilterDirective](#argfilterdirective)
+- [ArgTransformerDirective](#argtransformerdirective)
+- [ArgFilterDirective](#argfilterdirective)
 
 ### ArgTransformerDirective
 
@@ -117,9 +117,9 @@ The `ArgFilterDirective` applies additional queries to those directives that are
 
 Currently, the following directives use the defined filters for resolving the query:
 
-* `@all`
-* `@paginate`
-* `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
+- `@all`
+- `@paginate`
+- `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
 
 For example, if we have the following schema:
 
@@ -181,13 +181,13 @@ class EqDirective implements ArgFilterDirective
 
 The `applyFilter` method takes three arguments
 
-* `$builder`  
+- `$builder`  
 The query builder for applying the additional query on to.
-* `$columnName`  
+- `$columnName`  
 The argument name by default, in our example the default value will be `'category'`.  
 However you can specify a value explicitly by using the `key` argument of `@eq`.
 As you can see, in our example we set the `key` to a string value 'cat', so the value of `$columnName` here is `'cat'`.
-* `$value`  
+- `$value`  
 The value of the argument value that the `@eq` was applied on to.
 
 The `combinesMultipleArguments` method determine whether or not to combines multiple arguments.

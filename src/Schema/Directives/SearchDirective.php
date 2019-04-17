@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class SearchDirective extends BaseDirective implements ArgFilterDirective
+class SearchDirective extends BaseDirective implements ArgBuilderDirective
 {
     /**
      * Name of the directive.
@@ -17,12 +17,13 @@ class SearchDirective extends BaseDirective implements ArgFilterDirective
     }
 
     /**
+     * Apply a scout search to the builder.
+     *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  string  $columnName
      * @param  mixed  $value
      * @return \Laravel\Scout\Builder
      */
-    public function applyFilter($builder, string $columnName, $value)
+    public function handleBuilder($builder, $value)
     {
         $within = $this->directiveArgValue('within');
 
@@ -39,18 +40,5 @@ class SearchDirective extends BaseDirective implements ArgFilterDirective
         }
 
         return $builder;
-    }
-
-    /**
-     * Does this filter combine the values of multiple input arguments into one query?
-     *
-     * This is true for filter directives such as "whereBetween" that expects two
-     * different input values, given as separate arguments.
-     *
-     * @return bool
-     */
-    public function combinesMultipleArguments(): bool
-    {
-        return false;
     }
 }

@@ -14,6 +14,7 @@ class CanDirectiveDbTest extends DBTestCase
      * @dataProvider provideAcceptableArgumentNames
      *
      * @param  string  $argumentName
+     * @return void
      */
     public function itPassesIfModelInstanceIsNotNull(string $argumentName): void
     {
@@ -57,6 +58,7 @@ class CanDirectiveDbTest extends DBTestCase
      * @dataProvider provideAcceptableArgumentNames
      *
      * @param  string  $argumentName
+     * @return void
      */
     public function itThrowsIfNotAuthorized(string $argumentName): void
     {

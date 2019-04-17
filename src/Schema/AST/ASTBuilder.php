@@ -302,7 +302,7 @@ GRAPHQL
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected function addOrderByTypes(DocumentAST $document)
+    protected function addOrderByTypes(DocumentAST $document): DocumentAST
     {
         return $document
             ->setDefinition(

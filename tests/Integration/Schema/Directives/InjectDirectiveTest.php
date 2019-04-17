@@ -27,7 +27,7 @@ class InjectDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            createTask(input: CreateTaskInput!): Task @create(flatten: true) @inject(context: "user.id", name: "input.user_id")
+            createTask(input: CreateTaskInput! @spread): Task @create @inject(context: "user.id", name: "user_id")
         }
         
         input CreateTaskInput {

@@ -13,14 +13,14 @@ trait HasResolverArguments
     protected $root;
 
     /**
+     * @var mixed[]
+     */
+    protected $args;
+
+    /**
      * @var \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     protected $context;
-
-    /**
-     * @var mixed[]
-     */
-    protected $arguments;
 
     /**
      * @var \GraphQL\Type\Definition\ResolveInfo
@@ -47,6 +47,25 @@ trait HasResolverArguments
     }
 
     /**
+     * @return mixed[]
+     */
+    public function args(): array
+    {
+        return $this->args;
+    }
+
+    /**
+     * @param  mixed[]  $args
+     * @return $this
+     */
+    public function setArgs(array $args): self
+    {
+        $this->args = $args;
+
+        return $this;
+    }
+
+    /**
      * @return \Nuwave\Lighthouse\Support\Contracts\GraphQLContext
      */
     public function context(): GraphQLContext
@@ -61,25 +80,6 @@ trait HasResolverArguments
     public function setContext(GraphQLContext $context): self
     {
         $this->context = $context;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function arguments(): array
-    {
-        return $this->arguments;
-    }
-
-    /**
-     * @param  mixed[]  $arguments
-     * @return $this
-     */
-    public function setArguments(array $arguments): self
-    {
-        $this->arguments = $arguments;
 
         return $this;
     }
@@ -104,30 +104,33 @@ trait HasResolverArguments
     }
 
     /**
+     * Set all resolver arguments at once.
+     *
      * @param  mixed|null  $root
-     * @param  array  $args
+     * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return $this
      */
-    public function setResolverArguments($root, array $args, $context, ResolveInfo $resolveInfo): self
+    public function setResolverArguments($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): self
     {
-        return $this->setRoot($root)
-                    ->setArguments($args)
-                    ->setContext($context)
-                    ->setResolveInfo($resolveInfo);
+        return $this
+            ->setRoot($root)
+            ->setArgs($args)
+            ->setContext($context)
+            ->setResolveInfo($resolveInfo);
     }
 
     /**
      * Get all the resolver arguments.
      *
-     * @return array
+     * @return mixed[]
      */
     public function getResolverArguments(): array
     {
         return [
             $this->root(),
-            $this->arguments(),
+            $this->args(),
             $this->context(),
             $this->resolveInfo(),
         ];
