@@ -61,7 +61,7 @@ class CustomGlobalId implements GlobalId
 {
     public function encode(string $type, $id): string
     {
-        return sprintf("gid://myapp/$type/$id");
+        return "gid://myapp/$type/$id";
     }
 
     public function decodeID(string $globalID): string
