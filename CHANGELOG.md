@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.4.0...master)
 
+### Changed
+
+- Default the config to always set the `Accept: application/json` header https://github.com/nuwave/lighthouse/pull/743
+
 ## [3.4.0](https://github.com/nuwave/lighthouse/compare/v3.3.0...v3.4.0) - 2019-04-18
 
 ### Added
