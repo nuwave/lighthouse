@@ -40,18 +40,53 @@ interface can be used to manipulate the AST.
 ### NodeMiddleware
 
 The [`\Nuwave\Lighthouse\Support\Contracts\NodeMiddleware`](../../../src/Support/Contracts/NodeMiddleware.php)
-interface can be used to manipulate the AST. 
+interface allows access to an AST node as it is converted to an executable type.
 
+### NodeResolves
+
+The [`\Nuwave\Lighthouse\Support\Contracts\NodeResolves`](../../../src/Support/Contracts/NodeResolver.php)
+interface can be used for custom conversion from AST values to an executable type.
 
 ## Field Directives
 
-// TODO
+Field directives can be applied to any [FieldDefinition](https://graphql.github.io/graphql-spec/June2018/#FieldDefinition)
+
+### FieldResolver
+
+Perhaps the most important directive interface, a [FieldResolver](../../../src/Support/Contracts/FieldResolver.php)
+let's you add a resolver for a field through a directive.
+
+It can be a great way to reuse resolver logic within a schema.
+
+### FieldMiddleware
+
+A [FieldMiddleware](../../../src/Support/Contracts/FieldMiddleware.php) directive allows you
+to wrap around the field resolver, just like [Laravel Middleware](https://laravel.com/docs/middleware).
+
+You may use it both to handle incoming values before reaching the final resolver
+as well as the outgoing result of resolving the field.
+
+### FieldManipulator
+
+An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](../../../src/Support/Contracts/FieldManipulator.php)
+directive can be used to manipulate the schema AST. 
 
 ## Argument Directives
 
-Argument directives are applied to the [InputValueDefinition](https://facebook.github.io/graphql/June2018/#InputValueDefinition).
+Argument directives can be applied to a [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition).
+
+As arguments may be contained within a list in the schema definition, you must specify
+what your argument should apply to in addition to its function
+
+If it applies to the individual items within the list,
+implement the [ArgDirective](../../../src/Support/Contracts/ArgDirective.php) interface.
+
+Else, if it should apply to the whole list,
+implement the [ArgDirectiveForArray](../../../src/Support/Contracts/ArgDirectiveForArray.php) interface.
 
 ### ArgValidationDirective
+
+May be used to return custom rules and messages to use for validation of an argument.
 
 ### ArgTransformerDirective
 
@@ -123,6 +158,23 @@ class CreateUser
     }
 }
 ```
+
+#### Evaluation Order
+
+Argument directives are evaluated in the order that they are defined in the schema.
+
+```graphql
+type Mutation {
+  createUser(
+    password: String @trim @rules(apply: ["min:10,max:20"]) @bcrypt
+  ): User
+}
+```
+
+In the given example, Lighthouse will take the value of the `password` argument and:
+1. Trim any whitespace
+1. Run validation on it
+1. Encrypt the password via `bcrypt`
 
 ### ArgBuilderDirective
 
@@ -206,24 +258,7 @@ type Query {
 }
 ```
 
-### Evaluation Order
+### ArgManipulator
 
-Argument directives are evaluated in the order that they are defined in the schema.
-
-```graphql
-type Mutation {
-  createUser(
-    password: String @trim @rules(apply: ["min:10,max:20"]) @bcrypt
-  ): User
-}
-```
-
-Notice the order how the argument directives were written.
-
-The evaluation process of the above example written in pseudo code can be:
- 
-```php
-$trimedValue = trim($password);
-// validate with the rules ["min:10,max:20"] ...
-$finalArgumentValue = bcrypt($trimedValue);
-```
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](../../../src/Support/Contracts/ArgManipulator.php)
+directive can be used to manipulate the schema AST. 
