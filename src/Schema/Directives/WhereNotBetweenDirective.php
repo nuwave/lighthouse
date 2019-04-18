@@ -4,6 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 
+/**
+ * @deprecated in favour of
+ * @see \Nuwave\Lighthouse\Between\WhereNotBetweenDirective
+ */
 class WhereNotBetweenDirective implements ArgFilterDirective
 {
     /**

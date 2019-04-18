@@ -36,6 +36,7 @@ interface Broadcaster
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  mixed[]  $data
+     * @return void
      */
     public function broadcast(Subscriber $subscriber, array $data);
 }

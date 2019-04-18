@@ -14,6 +14,7 @@ class UnionTest extends DBTestCase
      * @dataProvider withAndWithoutCustomTypeResolver
      * @param  string  $schema
      * @param  string  $query
+     * @return void
      */
     public function itCanResolveUnionTypes(string $schema, string $query): void
     {

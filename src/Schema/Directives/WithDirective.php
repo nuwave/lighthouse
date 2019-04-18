@@ -37,20 +37,20 @@ class WithDirective extends RelationDirective implements FieldMiddleware
 
         return $next(
             $value->setResolver(
-                function (Model $parent, array $resolveArgs, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
+                function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
                     $loader = BatchLoader::instance(
                         RelationBatchLoader::class,
                         $resolveInfo->path,
-                        $this->getLoaderConstructorArguments($parent, $resolveArgs, $context, $resolveInfo)
+                        $this->toLoaderConstructorArguments($parent, $args, $context, $resolveInfo)
                     );
 
-                    return new Deferred(function () use ($loader, $resolver, $parent, $resolveArgs, $context, $resolveInfo) {
+                    return new Deferred(function () use ($loader, $resolver, $parent, $args, $context, $resolveInfo) {
                         return $loader->load(
                             $parent->getKey(),
                             ['parent' => $parent]
                         )->then(
-                            function () use ($resolver, $parent, $resolveArgs, $context, $resolveInfo) {
-                                return $resolver($parent, $resolveArgs, $context, $resolveInfo);
+                            function () use ($resolver, $parent, $args, $context, $resolveInfo) {
+                                return $resolver($parent, $args, $context, $resolveInfo);
                             }
                         );
                     });

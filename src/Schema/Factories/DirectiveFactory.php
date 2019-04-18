@@ -23,7 +23,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
@@ -60,19 +60,30 @@ class DirectiveFactory
      */
     public function __construct(Dispatcher $dispatcher)
     {
-        // The namespaces will be tried in the order that they contain
-        $this->directiveBaseNamespaces = (new Collection([
+        // When looking for a directive by name, the namespaces are tried in order
+        $directives = new Collection([
             // User defined directives (top priority)
             config('lighthouse.namespaces.directives'),
 
             // Plugin developers defined directives
             $dispatcher->dispatch(new RegisterDirectiveNamespaces),
+        ]);
 
-            // Lighthouse defined directives
-            'Nuwave\\Lighthouse\\Schema\\Directives',
-        ]))->flatten()
-           ->filter()
-           ->all();
+        /*
+         * Allow a smooth transition away from the deprecated between directives.
+         * @deprecated
+         */
+        if (config('new_between_directives')) {
+            $directives->push('Nuwave\\Lighthouse\\Between');
+        }
+
+        // Lighthouse defined directives
+        $directives->push('Nuwave\\Lighthouse\\Schema\\Directives');
+
+        $this->directiveBaseNamespaces = $directives
+            ->flatten()
+            ->filter()
+            ->all();
     }
 
     /**
@@ -370,13 +381,13 @@ class DirectiveFactory
     }
 
     /**
-     * Get filters for arguments.
+     * Get query builders for arguments.
      *
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $arg
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective>
      */
-    public function createArgFilterDirective(InputValueDefinitionNode $arg): Collection
+    public function createArgBuilderDirective(InputValueDefinitionNode $arg): Collection
     {
-        return $this->createAssociatedDirectivesOfType($arg, ArgFilterDirective::class);
+        return $this->createAssociatedDirectivesOfType($arg, ArgBuilderDirective::class);
     }
 }

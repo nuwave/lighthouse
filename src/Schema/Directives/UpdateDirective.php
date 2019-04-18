@@ -5,27 +5,36 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class UpdateDirective extends BaseDirective implements FieldResolver
 {
     /**
-     * The policy mappings for the application.
-     *
      * @var \Illuminate\Database\DatabaseManager
      */
-    protected $db;
+    protected $databaseManager;
 
     /**
-     * @param  \Illuminate\Database\DatabaseManager  $database
+     * The GlobalId resolver.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     */
+    protected $globalId;
+
+    /**
+     * UpdateDirective constructor.
+     *
+     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
      * @return void
      */
-    public function __construct(DatabaseManager $database)
+    public function __construct(DatabaseManager $databaseManager, GlobalId $globalId)
     {
-        $this->db = $database;
+        $this->databaseManager = $databaseManager;
+        $this->globalId = $globalId;
     }
 
     /**
@@ -52,22 +61,24 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName();
 
-                $flatten = $this->directiveArgValue('flatten', false);
-                $args = $flatten
-                    ? reset($args)
-                    : $args;
+                /*
+                 * @deprecated in favour of @spread
+                 */
+                if ($this->directiveArgValue('flatten', false)) {
+                    $args = reset($args);
+                }
 
                 if ($this->directiveArgValue('globalId', false)) {
-                    $args['id'] = GlobalId::decodeId($args['id']);
+                    $args['id'] = $this->globalId->decodeId($args['id']);
                 }
 
-                if (! config('lighthouse.transactional_mutations', true)) {
+                $executeMutation = function () use ($model, $args): Model {
                     return MutationExecutor::executeUpdate($model, new Collection($args))->refresh();
-                }
+                };
 
-                return $this->db->connection()->transaction(function () use ($model, $args): Model {
-                    return MutationExecutor::executeUpdate($model, new Collection($args))->refresh();
-                });
+                return config('lighthouse.transactional_mutations', true)
+                    ? $this->databaseManager->connection()->transaction($executeMutation)
+                    : $executeMutation();
             }
         );
     }

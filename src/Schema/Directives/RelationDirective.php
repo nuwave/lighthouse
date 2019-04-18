@@ -28,7 +28,7 @@ abstract class RelationDirective extends BaseDirective
                 return BatchLoader::instance(
                     RelationBatchLoader::class,
                     $resolveInfo->path,
-                    $this->getLoaderConstructorArguments($parent, $args, $context, $resolveInfo)
+                    $this->toLoaderConstructorArguments($parent, $args, $context, $resolveInfo)
                 )->load(
                     $parent->getKey(),
                     ['parent' => $parent]
@@ -64,13 +64,17 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
+     * Transform resolver args to an array suitable for constructing a BatchLoader.
+     *
+     * @see \Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader
+     *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed[]
      */
-    protected function getLoaderConstructorArguments(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
+    protected function toLoaderConstructorArguments(Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): array
     {
         $constructorArgs = [
             'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),

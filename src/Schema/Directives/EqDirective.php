@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class EqDirective implements ArgFilterDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective
 {
     /**
      * Name of the directive.
@@ -17,26 +17,17 @@ class EqDirective implements ArgFilterDirective
     }
 
     /**
+     * Apply a "WHERE = $value" clause.
+     *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
-     * @param  string  $columnName
      * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function applyFilter($builder, string $columnName, $value)
+    public function handleBuilder($builder, $value)
     {
-        return $builder->where($columnName, $value);
-    }
-
-    /**
-     * Does this filter combine the values of multiple input arguments into one query?
-     *
-     * This is true for filter directives such as "whereBetween" that expects two
-     * different input values, given as separate arguments.
-     *
-     * @return bool
-     */
-    public function combinesMultipleArguments(): bool
-    {
-        return false;
+        return $builder->where(
+            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $value
+        );
     }
 }
