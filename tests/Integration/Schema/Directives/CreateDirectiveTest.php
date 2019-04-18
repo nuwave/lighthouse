@@ -6,7 +6,6 @@ use Tests\Constants;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use CreateTestbenchTagsTable;
 
 class CreateDirectiveTest extends DBTestCase
 {

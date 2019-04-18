@@ -5,7 +5,7 @@ namespace Tests;
 /**
  * This class exists as a workaround to both:
  * - use constants in migrations
- * - make PHPStan happy
+ * - make PHPStan happy.
  *
  * As migrations are not namespaced, they do not play nice with PHPStan.
  */
