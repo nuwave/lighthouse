@@ -4,16 +4,20 @@ namespace Nuwave\Lighthouse\Schema\Conversion;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\NodeKind;
+use Illuminate\Support\Collection;
 use GraphQL\Language\AST\NamedTypeNode;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class DefinitionNodeConverter
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
 
     /**
-     * @param TypeRegistry $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
      */
     public function __construct(TypeRegistry $typeRegistry)
     {
@@ -23,9 +27,8 @@ class DefinitionNodeConverter
     /**
      * Convert a definition node to an executable Type.
      *
-     * @param mixed $node
-     *
-     * @return Type
+     * @param  mixed  $node
+     * @return \GraphQL\Type\Definition\Type
      */
     public function toType($node): Type
     {
@@ -35,15 +38,14 @@ class DefinitionNodeConverter
     /**
      * Unwrap the node if needed and convert to type.
      *
-     * @param mixed $node
-     * @param array $wrappers
-     *
-     * @return Type
+     * @param  mixed  $node
+     * @param  string[]  $wrappers
+     * @return \GraphQL\Type\Definition\Type
      */
     protected function convertWrappedDefinitionNode($node, array $wrappers = []): Type
     {
         // Recursively unwrap the type and save the wrappers
-        if (NodeKind::NON_NULL_TYPE === $node->kind || NodeKind::LIST_TYPE === $node->kind) {
+        if ($node->kind === NodeKind::NON_NULL_TYPE || $node->kind === NodeKind::LIST_TYPE) {
             $wrappers[] = $node->kind;
 
             return $this->convertWrappedDefinitionNode(
@@ -53,13 +55,15 @@ class DefinitionNodeConverter
         }
 
         // Re-wrap the type by applying the wrappers in the reversed order
-        return collect($wrappers)
+        return (new Collection($wrappers))
             ->reverse()
             ->reduce(
-                function (Type $type, string $kind) {
-                    if (NodeKind::NON_NULL_TYPE === $kind) {
+                function (Type $type, string $kind): Type {
+                    if ($kind === NodeKind::NON_NULL_TYPE) {
                         return Type::nonNull($type);
-                    } elseif (NodeKind::LIST_TYPE === $kind) {
+                    }
+
+                    if ($kind === NodeKind::LIST_TYPE) {
                         return Type::listOf($type);
                     }
 
@@ -72,9 +76,8 @@ class DefinitionNodeConverter
     /**
      * Converted named node to type.
      *
-     * @param NamedTypeNode $node
-     *
-     * @return Type
+     * @param  \GraphQL\Language\AST\NamedTypeNode  $node
+     * @return \GraphQL\Type\Definition\Type
      */
     protected function convertNamedTypeNode(NamedTypeNode $node): Type
     {

@@ -3,14 +3,20 @@
 namespace Tests\Utils\Scalars;
 
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
+use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Language\AST\StringValueNode;
 
 class Email extends ScalarType
 {
+    /**
+     * @var string
+     */
     public $name = 'Email';
 
+    /**
+     * @var string
+     */
     public $description = 'Email address.';
 
     public function serialize($value)
@@ -27,10 +33,7 @@ class Email extends ScalarType
         return $value;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function parseLiteral($valueNode, array $variables = null)
+    public function parseLiteral($valueNode, ?array $variables = null)
     {
         if (! $valueNode instanceof StringValueNode) {
             throw new Error('Query error: Can only parse strings got: '.$valueNode->kind, [$valueNode]);

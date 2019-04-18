@@ -9,11 +9,11 @@ class CreateTestbenchRolesTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('acl_id');
+            $table->unsignedInteger('acl_id')->nullable();
             $table->string('name');
         });
     }
@@ -21,7 +21,7 @@ class CreateTestbenchRolesTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('roles');
     }

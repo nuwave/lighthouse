@@ -10,32 +10,32 @@ class ScalarCommand extends LighthouseGeneratorCommand
      * @var string
      */
     protected $name = 'lighthouse:scalar';
-    
+
     /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Create a class for a Scalar type.';
-    
+
     /**
      * The type of class being generated.
      *
      * @var string
      */
     protected $type = 'Scalar';
-    
+
     /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
      * @return string
      */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace($rootNamespace): string
     {
         return config('lighthouse.namespaces.scalars');
     }
-    
+
     /**
      * Get the stub file for the generator.
      *
@@ -43,6 +43,6 @@ class ScalarCommand extends LighthouseGeneratorCommand
      */
     protected function getStub(): string
     {
-        return __DIR__ . '/stubs/scalar.stub';
+        return __DIR__.'/stubs/scalar.stub';
     }
 }

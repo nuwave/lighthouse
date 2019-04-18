@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use GraphQL\Type\Definition\ResolveInfo;
 
 class CacheValue
 {
     /**
-     * @var FieldValue
+     * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     protected $fieldValue;
 
@@ -28,7 +28,7 @@ class CacheValue
     protected $context;
 
     /**
-     * @var ResolveInfo
+     * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
@@ -45,16 +45,17 @@ class CacheValue
     /**
      * Create instance of cache value.
      *
-     * @param array $arguments
+     * @param  array  $arguments
+     * @return void
      */
     public function __construct(array $arguments = [])
     {
-        $this->fieldValue = array_get($arguments, 'field_value');
-        $this->rootValue = array_get($arguments, 'root');
-        $this->args = array_get($arguments, 'args');
-        $this->context = array_get($arguments, 'context');
-        $this->resolveInfo = array_get($arguments, 'resolve_info');
-        $this->privateCache = array_get($arguments, 'private_cache');
+        $this->fieldValue = Arr::get($arguments, 'field_value');
+        $this->rootValue = Arr::get($arguments, 'root');
+        $this->args = Arr::get($arguments, 'args');
+        $this->context = Arr::get($arguments, 'context');
+        $this->resolveInfo = Arr::get($arguments, 'resolve_info');
+        $this->privateCache = Arr::get($arguments, 'private_cache');
 
         $this->setFieldKey();
     }
@@ -62,19 +63,25 @@ class CacheValue
     /**
      * Resolve key from root value.
      *
-     * @return mixed
+     * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         $argKeys = $this->argKeys();
 
         return $this->implode([
-            $this->privateCache ? 'auth' : null,
-            $this->privateCache ? auth()->user()->getKey() : null,
+            $this->privateCache
+                ? 'auth'
+                : null,
+            $this->privateCache
+                ? app('auth')->user()->getKey()
+                : null,
             strtolower($this->resolveInfo->parentType->name),
             $this->fieldKey,
             strtolower($this->resolveInfo->fieldName),
-            $argKeys->isNotEmpty() ? $argKeys->implode(':') : null,
+            $argKeys->isNotEmpty()
+                ? $argKeys->implode(':')
+                : null,
         ]);
     }
 
@@ -108,7 +115,7 @@ class CacheValue
     /**
      * Convert input arguments to keys.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function argKeys(): Collection
     {
@@ -116,7 +123,7 @@ class CacheValue
 
         ksort($args);
 
-        return collect($args)->map(function ($value, $key) {
+        return (new Collection($args))->map(function ($value, $key) {
             $keyValue = is_array($value)
                 ? json_encode($value, true)
                 : $value;
@@ -131,7 +138,7 @@ class CacheValue
     protected function setFieldKey()
     {
         if (! $this->fieldValue || ! $this->rootValue) {
-            return null;
+            return;
         }
 
         $cacheFieldKey = $this->fieldValue
@@ -146,13 +153,12 @@ class CacheValue
     /**
      * Implode value to create string.
      *
-     * @param array $items
-     *
+     * @param  array  $items
      * @return string
      */
     protected function implode(array $items): string
     {
-        return collect($items)
+        return (new Collection($items))
             ->filter()
             ->values()
             ->implode(':');

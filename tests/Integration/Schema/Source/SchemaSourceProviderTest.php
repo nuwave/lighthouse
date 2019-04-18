@@ -10,12 +10,17 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 class SchemaSourceProviderTest extends TestCase
 {
+    /**
+     * @var string
+     */
     const SCHEMA_PATH = __DIR__.'/schema/';
 
     /**
-     * Set up test case.
+     * @var \League\Flysystem\Filesystem
      */
-    protected function setUp()
+    protected $filesystem;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +32,7 @@ class SchemaSourceProviderTest extends TestCase
         $this->filesystem = new Filesystem(new Local(self::SCHEMA_PATH));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -36,11 +41,6 @@ class SchemaSourceProviderTest extends TestCase
         $currentDir->deleteDir('schema');
     }
 
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         $app->singleton(SchemaSourceProvider::class, function () {
@@ -51,12 +51,12 @@ class SchemaSourceProviderTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetRootPath()
+    public function itCanSetRootPath(): void
     {
         $this->filesystem->put('foo', 'bar');
 
         app(SchemaSourceProvider::class)->setRootPath(__DIR__.'/schema/foo');
 
-        $this->assertEquals('bar' . PHP_EOL, app(SchemaSourceProvider::class)->getSchemaString());
+        $this->assertSame('bar'.PHP_EOL, app(SchemaSourceProvider::class)->getSchemaString());
     }
 }

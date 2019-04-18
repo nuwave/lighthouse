@@ -3,21 +3,34 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Illuminate\Support\Str;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Nuwave\Lighthouse\Schema\Values\CacheValue;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 
 class CacheDirectiveTest extends DBTestCase
 {
     /**
+     * @var \Illuminate\Cache\CacheManager|\Illuminate\Contracts\Cache\Repository
+     */
+    protected $cache;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $this->cache = $app->make('cache');
+    }
+
+    /**
      * @test
      */
-    public function itCanStoreResolverResultInCache()
+    public function itCanStoreResolverResultInCache(): void
     {
-        $resolver = addslashes(self::class) . '@resolve';
-        $schema = "
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
         type User {
             id: ID!
             name: String @cache
@@ -27,17 +40,22 @@ class CacheDirectiveTest extends DBTestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get('user:1:name'));
+        $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
     /**
@@ -45,8 +63,8 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanPlaceCacheKeyOnAnyField()
     {
-        $resolver = addslashes(self::class) . '@resolve';
-        $schema = "
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
         type User {
             id: ID!
             name: String @cache
@@ -57,30 +75,35 @@ class CacheDirectiveTest extends DBTestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get('user:foo@bar.com:name'));
+        $this->assertSame('foobar', $this->cache->get('user:foo@bar.com:name'));
     }
 
     /**
      * @test
      */
-    public function itCanStoreResolverResultInPrivateCache()
+    public function itCanStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
         $cacheKey = "auth:{$user->getKey()}:user:1:name";
 
-        $resolver = addslashes(self::class) . '@resolve';
-        $schema = "
+        $resolver = addslashes(self::class).'@resolve';
+        $this->schema = "
         type User {
             id: ID!
             name: String @cache(private: true)
@@ -90,27 +113,32 @@ class CacheDirectiveTest extends DBTestCase
             user: User @field(resolver: \"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             user {
                 name
             }
         }
-        ';
-        $result = $this->execute($schema, $query);
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
 
-        $this->assertEquals('foobar', array_get($result, 'data.user.name'));
-        $this->assertEquals('foobar', resolve('cache')->get($cacheKey));
+        $this->assertSame('foobar', $this->cache->get($cacheKey));
     }
 
     /**
      * @test
      */
-    public function itCanStorePaginateResolverInCache()
+    public function itCanStorePaginateResolverInCache(): void
     {
         factory(User::class, 5)->create();
 
-        $schema = '
+        $this->schema = '
         type User {
             id: ID!
             name: String!
@@ -120,7 +148,8 @@ class CacheDirectiveTest extends DBTestCase
             users: [User] @paginate(type: "paginator", model: "User") @cache
         }
         ';
-        $query = '
+
+        $this->query('
         {
             users(count: 5) {
                 data {
@@ -129,10 +158,9 @@ class CacheDirectiveTest extends DBTestCase
                 }
             }
         }
-        ';
-        $this->execute($schema, $query);
+        ');
 
-        $result = resolve('cache')->get('query:users:count:5');
+        $result = $this->cache->get('query:users:count:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
@@ -141,7 +169,7 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanCacheHasManyResolver()
+    public function itCanCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
 
@@ -149,7 +177,7 @@ class CacheDirectiveTest extends DBTestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $schema = '
+        $this->schema = '
         type Post {
             id: ID!
             title: String
@@ -165,9 +193,10 @@ class CacheDirectiveTest extends DBTestCase
             user(id: ID! @eq): User @find(model: "User")
         }
         ';
+
         $query = '
         {
-            user(id: ' . $user->getKey() . ') {
+            user(id: '.$user->getKey().') {
                 id
                 name
                 posts(count: 3) {
@@ -178,77 +207,33 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query)['data'];
 
-        $posts = resolve('cache')->get("user:{$user->getKey()}:posts:count:3");
+        $dbQueryCountForPost = 0;
+        DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
+            if (Str::contains($query->sql, 'select * from "posts"')) {
+                $dbQueryCountForPost++;
+            }
+        });
+
+        $firstResponse = $this->query($query);
+
+        $posts = $this->cache->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $queries = 0;
-        \DB::listen(function ($query) use (&$queries) {
-            // TODO: Find a better way of doing this
-            if (!str_contains($query->sql, [
-                'drop',
-                'delete',
-                'migrations',
-                'aggregate',
-                'limit 1',
-            ])) {
-                ++$queries;
-            }
-        });
+        $cachedResponse = $this->query($query);
 
-        $cache = $this->execute($schema, $query)['data'];
-
-        // Get the the original user and the `find` directive checks the count
-        $this->assertEquals(0, $queries);
-        $this->assertEquals($result, $cache);
+        $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
+        $this->assertSame(
+            $firstResponse->jsonGet(),
+            $cachedResponse->jsonGet()
+        );
     }
 
     /**
      * @test
      */
-    public function itCanUseCustomCacheValue()
-    {
-        /** @var ValueFactory $valueFactory */
-        $valueFactory = resolve(ValueFactory::class);
-        $valueFactory->cacheResolver(function ($arguments) {
-            return new class($arguments) extends CacheValue
-            {
-                public function getKey()
-                {
-                    return 'foo';
-                }
-            };
-        });
-
-        $resolver = addslashes(self::class) . '@resolve';
-        $schema = "
-        type User {
-            id: ID!
-            name: String @cache
-        }
-        
-        type Query {
-            user: User @field(resolver: \"{$resolver}\")
-        }
-        ";
-        $query = '
-        {
-            user {
-                name
-            }
-        }
-        ';
-        $this->execute($schema, $query);
-
-        $this->assertEquals('foobar', resolve('cache')->get('foo'));
-    }
-
-    /**
-     * @test
-     */
-    public function itCanAttachTagsToCache()
+    public function itCanAttachTagsToCache(): void
     {
         config(['lighthouse.cache.tags' => true]);
 
@@ -259,23 +244,26 @@ class CacheDirectiveTest extends DBTestCase
 
         $tags = ['graphql:user:1', 'graphql:user:1:posts'];
 
-        $schema = '
+        $this->schema = '
         type Post {
             id: ID!
             title: String
         }
+        
         type User {
             id: ID!
             name: String!
             posts: [Post] @hasMany(type: "paginator") @cache
         }
+        
         type Query {
             user(id: ID! @eq): User @find(model: "User")
         }
         ';
+
         $query = '
         {
-            user(id: ' . $user->getKey() . ') {
+            user(id: '.$user->getKey().') {
                 id
                 name
                 posts(count: 3) {
@@ -286,33 +274,32 @@ class CacheDirectiveTest extends DBTestCase
             }
         }
         ';
-        $result = $this->execute($schema, $query)['data'];
 
-        $posts = resolve('cache')->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
-        $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
-        $this->assertCount(3, $posts);
-
-        $queries = 0;
-        \DB::listen(function ($query) use (&$queries) {
-            // TODO: Find a better way of doing this
-            if (!str_contains($query->sql, [
-                'drop',
-                'delete',
-                'migrations',
-                'aggregate',
-                'limit 1',
-            ])) {
-                ++$queries;
+        $dbQueryCountForPost = 0;
+        DB::listen(function (QueryExecuted $query) use (&$dbQueryCountForPost): void {
+            if (Str::contains($query->sql, 'select * from "posts"')) {
+                $dbQueryCountForPost++;
             }
         });
 
-        $cache = $this->execute($schema, $query)['data'];
+        $firstResponse = $this->query($query);
 
-        // Get the the original user and the `find` directive checks the count
-        $this->assertEquals(0, $queries);
-        $this->assertEquals($result, $cache);
+        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
+        $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
+        $this->assertCount(3, $posts);
+
+        $cachedResponse = $this->query($query);
+
+        $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
+        $this->assertSame(
+            $firstResponse->jsonGet(),
+            $cachedResponse->jsonGet()
+        );
     }
 
+    /**
+     * @return mixed[]
+     */
     public function resolve(): array
     {
         return [

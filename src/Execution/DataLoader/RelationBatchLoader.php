@@ -2,11 +2,12 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\QueryUtils;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Execution\Utils\Pagination;
-use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
+use Nuwave\Lighthouse\Schema\Directives\PaginationManipulator;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -16,95 +17,132 @@ class RelationBatchLoader extends BatchLoader
      * @var string
      */
     protected $relationName;
+
     /**
      * The arguments that were passed to the field.
      *
-     * @var array
+     * @var mixed[]
      */
     protected $args;
+
     /**
      * Names of the scopes that have to be called for the query.
      *
      * @var string[]
      */
     protected $scopes;
+
+    /**
+     * The ResolveInfo of the currently executing field.
+     *
+     * @var \GraphQL\Type\Definition\ResolveInfo
+     */
+    protected $resolveInfo;
+
     /**
      * The pagination type can either be "connection", "paginator" or null, in which case there is no pagination.
      *
      * @var string|null
      */
     protected $paginationType;
-    
+
     /**
-     * @param string $relationName
-     * @param array $args
-     * @param array $scopes
-     * @param string|null $paginationType
+     * The paginator can be limited to only allow querying a maximum number of items.
+     *
+     * @var int|null
      */
-    public function __construct(string $relationName, array $args, array $scopes, string $paginationType = null)
-    {
+    protected $paginateMaxCount;
+
+    /**
+     * @param  string  $relationName
+     * @param  mixed[]  $args
+     * @param  string[]  $scopes
+     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
+     * @param  string|null  $paginationType
+     * @param  int|null  $paginateMaxCount
+     * @return void
+     */
+    public function __construct(
+        string $relationName,
+        array $args,
+        array $scopes,
+        ResolveInfo $resolveInfo,
+        ?string $paginationType = null,
+        ?int $paginateMaxCount = null
+    ) {
         $this->relationName = $relationName;
         $this->args = $args;
         $this->scopes = $scopes;
+        $this->resolveInfo = $resolveInfo;
         $this->paginationType = $paginationType;
+        $this->paginateMaxCount = $paginateMaxCount;
     }
-    
+
     /**
      * Resolve the keys.
      *
-     * @throws \Exception
-     *
-     * @return array
+     * @return mixed[]
      */
     public function resolve(): array
     {
         $modelRelationFetcher = $this->getRelationFetcher();
-    
+
         switch ($this->paginationType) {
             case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
                 // first is an required argument
+                /** @var int $first */
                 $first = $this->args['first'];
+                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $first);
+
                 $after = Cursor::decode($this->args);
+
                 $currentPage = Pagination::calculateCurrentPage($first, $after);
-            
+
                 $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
                 // count must be set so we can safely get it like this
+                /** @var int $count */
                 $count = $this->args['count'];
-                $page = array_get($this->args, 'page', 1);
-            
+                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $count);
+
+                $page = Arr::get($this->args, 'page', 1);
+
                 $modelRelationFetcher->loadRelationsForPage($count, $page);
                 break;
             default:
                 $modelRelationFetcher->loadRelations();
                 break;
         }
-    
+
         return $modelRelationFetcher->getRelationDictionary($this->relationName);
     }
-    
+
     /**
-     * @return ModelRelationFetcher
+     * Construct a new instance of a relation fetcher.
+     *
+     * @return \Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher
      */
     protected function getRelationFetcher(): ModelRelationFetcher
     {
         return new ModelRelationFetcher(
             $this->getParentModels(),
             [$this->relationName => function ($query) {
-                $query = QueryUtils::applyScopes($query, $this->args, $this->scopes);
-                return QueryUtils::applyFilters($query, $this->args);
+                return $this->resolveInfo
+                    ->builder
+                    ->addScopes($this->scopes)
+                    ->apply($query, $this->args);
             }]
         );
     }
-    
+
     /**
      * Get the parents from the keys that are present on the BatchLoader.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\Illuminate\Database\Eloquent\Model>
      */
     protected function getParentModels(): Collection
     {
-        return collect($this->keys)->pluck('parent');
+        return (new Collection($this->keys))->pluck('parent');
     }
 }

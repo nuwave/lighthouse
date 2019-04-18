@@ -1,0 +1,2 @@
+# Force visitors to the custom domain
+https://lighthouse-php.netlify.com/* https://lighthouse-php.com/:splat 301!

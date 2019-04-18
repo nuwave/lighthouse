@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css?family=Miriam+Libre:400,700')
+
+body
+  font-family $secondaryFont !important
+  background-color #fbfbfb
+
+h1, h2, h3, h4, h5, h6
+  font-family: $primaryFont, sans-serif
+
+h1, h2, h3
+  font-weight: 400 !important
+
+/****************************** 
+  HOME
+*******************************/
+
+.home-container h2
+  border-bottom: none
+
+.home .highlights
+  padding 1.2rem 0
+  margin-top 1rem
+  display flex
+  flex-wrap wrap
+  align-items flex-start
+  align-content stretch
+  justify-content space-between
+
+.home .highlight 
+  flex-grow 1  
+  max-width 48%
+  
+  @media (max-width 719px)
+    max-width: 100% !important
+
+.home .highlight h2           
+  font-weight 800
+  border none !important
+  margin-top 10px
+
+.home .feature h2
+  font-weight 800 !important
+  
+  
+/****************************** 
+  CONTENT
+*******************************/
+
+.content img
+  border #f3f3f3 1px solid !important
+  border-radius 6px !important
+
+.content p
+  margin-bottom: 1.5em
+
+.content:not(.custom) > h2 
+  margin-top: 3rem !important
+  padding-top: 0 !important
+  margin-bottom: 1.6rem !important
+
+.container
+  margin-left: auto
+  margin-right: auto
+
+.button
+  border: 1px solid #a74ff4;
+  display: inline-block;
+  line-height: 1.2em;
+  padding: 10px;
+  text-decoration: none!important;
+  text-transform: uppercase;
+  transition: background .3s,color .3s;
+  border-color: #2b2644;
+  color: #2b2644;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  background-color: #fff;
+  border-radius: 0;
+
+.custom-block .custom-block-title
+  margin-top: 0.5rem
+  margin-bottom: 0.5rem
+
+/****************************** 
+  HERO
+*******************************/
+
+.home
+  padding: 0 !important
+  max-width: 100% !important
+
+.home .hero
+  display: none !important
+
+/****************************** 
+  CODE
+*******************************/
+
+pre,
+pre[class*="language-"],
+pre code[class*="language-"]
+  color: #EFEFEF
+  background-color: $backgroundColor !important
+  border-radius: 0 !important
+
+pre[class*="language-"] .token.attr-name,
+pre code[class*="language-"] .token.attr-name
+  color: #b2b7ff
+
+pre[class*="language-"] .token.function,
+pre code[class*="language-"] .token.function
+  color: #d6bbfc
+
+pre[class*="language-"] .token.string,
+pre code[class*="language-"] .token.string
+  color: #FFF
+
+pre[class*="language-"] .token.comment,
+pre code[class*="language-"] .token.comment
+  color: slategray
+
+/****************************** 
+  PAGE
+*******************************/
+
+@media (min-width 719px)
+  .page
+    padding-left 17rem
+
+/****************************** 
+  NAVBAR
+*******************************/
+
+.navbar  
+  border-bottom none !important
+  box-shadow 0 2px 4px 0 rgba(0,0,0,.05) !important
+
+
+.navbar .site-name
+  font-weight 400 !important
+  font-family: $primaryFont
+
+
+.nav-link, .repo-link , .nav-links .dropdown-title
+  font-weight 800 !important
+
+@media (max-width: 719px)
+  .navbar .home-link .can-hide
+    display: inline-block !important
+
+/****************************** 
+  BLOCKS
+*******************************/
+
+.custom-block-title
+  font-weight 800 !important
+
+.custom-block.danger 
+  background-color #fff6f6 !important
+  border-color #ffe6e6 !important
+
+
+.custom-block.warning 
+  background-color rgba(239, 224, 153, 0.3) !important
+  border-color #ecd45a !important
+
+.custom-block.tip 
+  border-color #cec3d6 !important
+
+
+/****************************** 
+  SIDEBAR
+*******************************/
+
+#app .sidebar     
+  width  17rem !important
+  border-right none !important
+  background-color $backgroundColor !important
+
+
+ .sidebar-group:not(.collapsable) .sidebar-heading,
+  .sidebar-heading
+    text-transform uppercase !important
+    letter-spacing 0.13rem !important
+    font-size 12px !important
+    font-weight 800 !important
+    color #C1CDDB !important
+
+  a.sidebar-link
+    color #fff !important
+    border-left 0.125rem solid transparent !important
+
+  a.sidebar-link:hover
+    color #fff !important
+    opacity 0.5 !important
+    border-left-color rgba(255, 255, 255, 0.7) !important
+
+  a.sidebar-link:active
+    color #fff !important
+    opacity 0.7 !important
+    border-left-color $accentColor !important
+
+  a.sidebar-link.active
+    color #fff !important
+    border-left-color $accentColor !important
+
+
+  @media (max-width 959px)
+    .sidebar .nav-links
+      border-bottom 2px solid rgba(255, 255, 255, 0.1)
+
+  @media (max-width 719px)
+    .nav-links a.nav-link, .nav-links a.repo-link, .nav-links .dropdown-title
+      color #fff
+
+/****************************** 
+  FOOTER
+*******************************/
+
+.footer
+  text-align: center
+
+/****************************** 
+  USERS
+*******************************/
+
+.showcase
+  margin: 0 auto
+  max-width: 900px
+  text-align: center
+
+.showcase .logos 
+  align-items: center
+  display: flex
+  flex-flow: row wrap
+  justify-content: center
+
+.showcase .logos img 
+  max-height: 128px
+  padding: 20px
+  width: 128px
+  border: none !important
+
+@media only screen and (max-width: 735px)
+  .showcase .logos img 
+    max-height: 64px
+    padding: 20px
+    width: 64px

@@ -2,11 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
+use Closure;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class FieldValue
@@ -14,21 +13,21 @@ class FieldValue
     /**
      * An instance of the type that this field returns.
      *
-     * @var Type|null
+     * @var \GraphQL\Type\Definition\Type|null
      */
     protected $returnType;
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * The underlying AST definition of the Field.
      *
-     * @var FieldDefinitionNode|InputValueDefinitionNode
+     * @var \GraphQL\Language\AST\FieldDefinitionNode
      */
     protected $field;
 
     /**
      * The parent type of the field.
      *
-     * @var NodeValue
+     * @var \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
     protected $parent;
 
@@ -38,6 +37,13 @@ class FieldValue
      * @var \Closure|null
      */
     protected $resolver;
+
+    /**
+     * Text describing by this field is deprecated.
+     *
+     * @var string|null
+     */
+    protected $deprecationReason = null;
 
     /**
      * A closure that determines the complexity of executing the field.
@@ -54,20 +60,13 @@ class FieldValue
     protected $privateCache = false;
 
     /**
-     * Additional args to inject into resolver.
-     *
-     * @var array
-     */
-    protected $additionalArgs = [];
-
-    /**
      * Create new field value instance.
      *
-     * @param NodeValue           $parent
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
-     * @param FieldDefinitionNode|InputValueDefinitionNode $field
+     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $parent
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
+     * @return void
      */
-    public function __construct(NodeValue $parent, $field)
+    public function __construct(NodeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
         $this->field = $field;
@@ -76,11 +75,10 @@ class FieldValue
     /**
      * Overwrite the current/default resolver.
      *
-     * @param \Closure $resolver
-     *
-     * @return FieldValue
+     * @param  \Closure  $resolver
+     * @return $this
      */
-    public function setResolver(\Closure $resolver): FieldValue
+    public function setResolver(Closure $resolver): self
     {
         $this->resolver = $resolver;
 
@@ -90,11 +88,10 @@ class FieldValue
     /**
      * Define a closure that is used to determine the complexity of the field.
      *
-     * @param \Closure $complexity
-     *
-     * @return FieldValue
+     * @param  \Closure  $complexity
+     * @return $this
      */
-    public function setComplexity(\Closure $complexity): FieldValue
+    public function setComplexity(Closure $complexity): self
     {
         $this->complexity = $complexity;
 
@@ -102,40 +99,27 @@ class FieldValue
     }
 
     /**
-     * Inject field argument.
+     * Set deprecation reason for field.
      *
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return FieldValue
+     * @param  string  $deprecationReason
+     * @return $this
      */
-    public function injectArg(string $key, $value): FieldValue
+    public function setDeprecationReason(string $deprecationReason): self
     {
-        $this->additionalArgs = array_merge(
-            $this->additionalArgs,
-            [$key => $value]
-        );
+        $this->deprecationReason = $deprecationReason;
 
         return $this;
     }
 
     /**
-     * @return array
-     */
-    public function getAdditionalArgs(): array
-    {
-        return $this->additionalArgs;
-    }
-
-    /**
      * Get an instance of the return type of the field.
      *
-     * @return Type
+     * @return \GraphQL\Type\Definition\Type
      */
     public function getReturnType(): Type
     {
-        if(! isset($this->returnType)){
-            $this->returnType = resolve(DefinitionNodeConverter::class)->toType(
+        if (! isset($this->returnType)) {
+            $this->returnType = app(DefinitionNodeConverter::class)->toType(
                 $this->field->type
             );
         }
@@ -144,7 +128,7 @@ class FieldValue
     }
 
     /**
-     * @return NodeValue
+     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
      */
     public function getParent(): NodeValue
     {
@@ -156,15 +140,15 @@ class FieldValue
      */
     public function getParentName(): string
     {
-        return $this->getParent()->getNodeName();
+        return $this->getParent()->getTypeDefinitionName();
     }
 
     /**
-     * @todo remove InputValueDefinitionNode once it no longer reuses this class.
+     * Get the underlying AST definition for the field.
      *
-     * @return FieldDefinitionNode|InputValueDefinitionNode
+     * @return \GraphQL\Language\AST\FieldDefinitionNode
      */
-    public function getField()
+    public function getField(): FieldDefinitionNode
     {
         return $this->field;
     }
@@ -174,61 +158,34 @@ class FieldValue
      *
      * @return \Closure
      */
-    public function getResolver(): \Closure
+    public function getResolver(): ?Closure
     {
-        if(!isset($this->resolver)){
-            $this->resolver = $this->defaultResolver();
-        }
-
         return $this->resolver;
     }
 
     /**
-     * Get default field resolver.
+     * Return the namespaces configured for the parent type.
      *
-     * @throws DefinitionException
-     *
-     * @return \Closure
+     * @return string[]
      */
-    protected function defaultResolver(): \Closure
-    {
-        if($namespace = $this->getDefaultNamespaceForParent()){
-            return construct_resolver(
-                $namespace . '\\' . studly_case($this->getFieldName()),
-                'resolve'
-            );
-        }
-
-        // TODO convert this back once we require PHP 7.1
-        // return \Closure::fromCallable(
-        //     [\GraphQL\Executor\Executor::class, 'defaultFieldResolver']
-        // );
-        return function() {
-            return \GraphQL\Executor\Executor::defaultFieldResolver(...func_get_args());
-        };
-    }
-
-    /**
-     * If a default namespace exists for the parent type, return it.
-     *
-     * @return string|null
-     */
-    public function getDefaultNamespaceForParent()
+    public function defaultNamespacesForParent(): array
     {
         switch ($this->getParentName()) {
-            case 'Mutation':
-                return config('lighthouse.namespaces.mutations');
             case 'Query':
-                return config('lighthouse.namespaces.queries');
+                return (array) config('lighthouse.namespaces.queries');
+            case 'Mutation':
+                return (array) config('lighthouse.namespaces.mutations');
+            case 'Subscription':
+                return (array) config('lighthouse.namespaces.subscriptions');
             default:
-                return null;
+               return [];
         }
     }
 
     /**
-     * @return StringValueNode|null
+     * @return \GraphQL\Language\AST\StringValueNode|null
      */
-    public function getDescription()
+    public function getDescription(): ?StringValueNode
     {
         return $this->field->description;
     }
@@ -238,7 +195,7 @@ class FieldValue
      *
      * @return \Closure|null
      */
-    public function getComplexity()
+    public function getComplexity(): ?Closure
     {
         return $this->complexity;
     }
@@ -252,37 +209,23 @@ class FieldValue
     }
 
     /**
-     * @return NodeValue
-     * @deprecated
+     * @return string|null
      */
-    public function getNode(): NodeValue
+    public function getDeprecationReason(): ?string
     {
-        return $this->getParent();
+        return $this->deprecationReason;
     }
 
     /**
-     * Get field's node name.
+     * Is the parent of this field one of the root types?
      *
-     * @return string
-     * @deprecated
+     * @return bool
      */
-    public function getNodeName(): string
+    public function parentIsRootType(): bool
     {
-        return $this->getParentName();
-    }
-
-    /**
-     * Set current type.
-     *
-     * @param \Closure|Type $type
-     *
-     * @return FieldValue
-     * @deprecated Do this sort of manipulation in the DocumentAST in the future.
-     */
-    public function setType($type): FieldValue
-    {
-        $this->returnType = $type;
-
-        return $this;
+        return in_array(
+            $this->getParentName(),
+            ['Query', 'Mutation', 'Subscription']
+        );
     }
 }

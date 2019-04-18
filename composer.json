@@ -9,10 +9,12 @@
         "laravel-graphql"
     ],
     "license": "MIT",
+    "homepage": "https://lighthouse-php.com",
     "authors": [
         {
             "name": "Christopher Moore",
-            "email": "chris@nuwavecommerce.com"
+            "email": "chris@nuwavecommerce.com",
+            "homepage": "https://www.nuwavecommerce.com"
         }
     ],
     "support": {
@@ -20,34 +22,31 @@
         "source": "https://github.com/nuwave/lighthouse"
     },
     "require": {
-        "php": ">= 7.0",
+        "php": ">= 7.1",
         "ext-json": "*",
-        "illuminate/contracts": "5.5.*|5.6.*|5.7.*",
-        "illuminate/http": "5.5.*|5.6.*|5.7.*",
-        "illuminate/pagination": "5.5.*|5.6.*|5.7.*",
-        "illuminate/routing": "5.5.*|5.6.*|5.7.*",
-        "illuminate/support": "5.5.*|5.6.*|5.7.*",
-        "illuminate/validation": "5.5.*|5.6.*|5.7.*",
+        "illuminate/contracts": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/http": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/pagination": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/routing": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "illuminate/validation": "5.5.*|5.6.*|5.7.*|5.8.*",
         "opis/closure": "^3.0",
-        "webonyx/graphql-php": "^0.12"
+        "webonyx/graphql-php": "^0.13"
     },
     "require-dev": {
-        "orchestra/testbench": "3.5.*|3.6.*|3.7.*",
-        "orchestra/database": "3.5.*|3.6.*|3.7.*@dev",
-        "friendsofphp/php-cs-fixer": "^2.10",
         "laravel/scout": "^4.0",
-        "mockery/mockery": "dev-master"
+        "mockery/mockery": "^1.0",
+        "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.x-dev",
+        "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*",
+        "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
-        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflows - integrated with Laravel"
+        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel"
     },
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
-        },
-        "files": [
-            "src/Support/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -55,18 +54,19 @@
         }
     },
     "scripts": {
-        "test" : "phpunit --colors=always",
-        "test:unit" : "phpunit --colors=always --testsuite Unit",
-        "test:integration" : "phpunit --colors=always --testsuite Integration",
-        "style": "php-cs-fixer fix"
+        "test": "phpunit --colors=always",
+        "test:unit": "phpunit --colors=always --testsuite Unit",
+        "test:integration": "phpunit --colors=always --testsuite Integration"
     },
     "extra": {
-      "laravel": {
-          "providers": ["Nuwave\\Lighthouse\\Providers\\LighthouseServiceProvider"],
-          "aliases": {
-            "graphql": "Nuwave\\Lighthouse\\GraphQL"
+        "laravel": {
+            "providers": [
+                "Nuwave\\Lighthouse\\LighthouseServiceProvider"
+            ],
+            "aliases": {
+                "graphql": "Nuwave\\Lighthouse\\GraphQL"
+            }
         }
-      }
     },
     "config": {
         "sort-packages": true

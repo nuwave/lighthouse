@@ -1,11 +1,11 @@
 <?php
 
 use Faker\Generator as Faker;
+use Tests\Utils\Models\Company;
 
-$factory->define(Tests\Utils\Models\Company::class, function (Faker $faker) {
+/* @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(Company::class, function (Faker $faker) {
     return [
         'name' => $faker->sentence,
-        'created_at' => now(),
-        'updated_at' => now(),
     ];
 });

@@ -2,92 +2,58 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use GraphQL\Language\AST\Node;
 use GraphQL\Type\Definition\Type;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Language\AST\NamedTypeNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 
 class NodeValue
 {
     /**
      * Current GraphQL type.
      *
-     * @var Type
+     * @var \GraphQL\Type\Definition\Type
      */
     protected $type;
 
     /**
      * Current definition node.
      *
-     * @var Node
+     * @var \GraphQL\Language\AST\TypeDefinitionNode
      */
-    protected $node;
+    protected $typeDefinition;
 
     /**
-     * Node directive.
+     * Cache key for this type.
      *
-     * @var DirectiveNode
-     */
-    protected $directive;
-
-    /**
-     * Current namespace.
-     *
-     * @var string
-     */
-    protected $namespace;
-
-    /**
-     * Cache key for node.
-     *
-     * @var string
+     * @var string|null
      */
     protected $cacheKey;
 
     /**
-     * Create new instance of node value.
-     *
-     * @param Node $node
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return void
      */
-    public function __construct(Node $node)
+    public function __construct(TypeDefinitionNode $typeDefinition)
     {
-        $this->node = $node;
+        $this->typeDefinition = $typeDefinition;
     }
 
     /**
-     * Create new instance of node value.
+     * Get resolved type.
      *
-     * @param Node $node
-     *
-     * @return NodeValue
+     * @return \GraphQL\Type\Definition\Type|null
      */
-    public static function init(Node $node)
+    public function getType(): ?Type
     {
-        return new static($node);
+        return $this->type;
     }
 
     /**
-     * Set current node instance.
+     * Set the executable type.
      *
-     * @param Node $node
-     *
-     * @return self
+     * @param  \GraphQL\Type\Definition\Type  $type
+     * @return $this
      */
-    public function setNode(Node $node)
-    {
-        $this->node = $node;
-
-        return $this;
-    }
-
-    /**
-     * Set type definition.
-     *
-     * @param Type $type
-     *
-     * @return self
-     */
-    public function setType(Type $type)
+    public function setType(Type $type): self
     {
         $this->type = $type;
 
@@ -95,108 +61,33 @@ class NodeValue
     }
 
     /**
-     * Set the current directive.
-     *
-     * @param DirectiveNode $directive
-     */
-    public function setDirective(DirectiveNode $directive)
-    {
-        $this->directive = $directive;
-    }
-
-    /**
-     * Set the current namespace.
-     *
-     * @param string $namespace
-     */
-    public function setNamespace($namespace)
-    {
-        $this->namespace = $namespace;
-    }
-
-    /**
-     * Set node cache key.
-     *
-     * @param string $key
-     */
-    public function setCacheKey($key)
-    {
-        $this->cacheKey = $key;
-    }
-
-    /**
-     * Get current node.
-     *
-     * @return Node
-     */
-    public function getNode()
-    {
-        return $this->node;
-    }
-
-    /**
-     * Get current directive.
-     *
-     * @return DirectiveNode|null
-     */
-    public function getDirective()
-    {
-        return $this->directive;
-    }
-
-    /**
-     * Get resolved type.
-     *
-     * @return Type|null
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Get current namespace.
-     *
-     * @param string $class
-     *
-     * @return string
-     */
-    public function getNamespace($class = null)
-    {
-        return $class ? $this->namespace.'\\'.$class : $this->namespace;
-    }
-
-    /**
      * Get the name of the node.
      *
      * @return string
      */
-    public function getNodeName()
+    public function getTypeDefinitionName(): string
     {
-        return data_get($this->getNode(), 'name.value');
+        return data_get($this->getTypeDefinition(), 'name.value');
     }
 
     /**
-     * Get fields for node.
+     * Get the underlying type definition.
      *
-     * @return array
+     * @return \GraphQL\Language\AST\TypeDefinitionNode
      */
-    public function getNodeFields()
+    public function getTypeDefinition(): TypeDefinitionNode
     {
-        return data_get($this->getNode(), 'fields', []);
+        return $this->typeDefinition;
     }
 
     /**
-     * Get a collection of the names of all interfaces the node has.
+     * Get the underlying type definition fields.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \GraphQL\Language\AST\NodeList|array
      */
-    public function getInterfaceNames()
+    public function getTypeDefinitionFields()
     {
-        return collect($this->node->interfaces)
-            ->map(function (NamedTypeNode $interface) {
-                return $interface->name->value;
-            });
+        return data_get($this->typeDefinition, 'fields', []);
     }
 
     /**
@@ -204,21 +95,21 @@ class NodeValue
      *
      * @return string|null
      */
-    public function getCacheKey()
+    public function getCacheKey(): ?string
     {
         return $this->cacheKey;
     }
 
     /**
-     * Check if node implements a interface.
+     * Set node cache key.
      *
-     * @param string $interfaceName
-     *
-     * @return bool
+     * @param  string|null  $key
+     * @return $this
      */
-    public function hasInterface($interfaceName)
+    public function setCacheKey(string $key = null): self
     {
-        return $this->getInterfaceNames()
-            ->containsStrict($interfaceName);
+        $this->cacheKey = $key;
+
+        return $this;
     }
 }

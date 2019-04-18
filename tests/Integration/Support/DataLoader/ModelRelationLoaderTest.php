@@ -10,28 +10,24 @@ use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderTest extends DBTestCase
 {
-    /**
-     * Setup test environment.
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $count = 4;
         $users = factory(User::class, 3)->create();
-        $users->each(function ($user) use (&$count) {
+        $users->each(function (User $user) use (&$count): void {
             factory(Task::class, $count)->create([
                 'user_id' => $user->getKey(),
             ]);
-            ++$count;
+            $count++;
         });
     }
 
     /**
      * @test
-     * @throws \Exception
      */
-    public function itCanLoadRelationshipsWithLimitsOnCollection()
+    public function itCanLoadRelationshipsWithLimitsOnCollection(): void
     {
         // TODO refactor this as soon as Laravel fixes https://github.com/laravel/framework/issues/16217
 
@@ -50,7 +46,7 @@ class ModelRelationLoaderTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanLoadCountOnCollection()
+    public function itCanLoadCountOnCollection(): void
     {
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->reloadModelsWithRelationCount()
@@ -63,9 +59,8 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
-    public function itCanPaginateRelationshipOnCollection()
+    public function itCanPaginateRelationshipOnCollection(): void
     {
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))
             ->loadRelationsForPage(2)
@@ -84,13 +79,12 @@ class ModelRelationLoaderTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
-    public function itCanHandleSoftDeletes()
+    public function itCanHandleSoftDeletes(): void
     {
         $user = User::first();
-        $count = $user->tasks()->count();
-        $task = $user->tasks()->get()->last();
+        $count = $user->tasks->count();
+        $task = $user->tasks->last();
         $task->delete();
 
         $users = (new ModelRelationFetcher(User::all(), ['tasks']))

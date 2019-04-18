@@ -3,9 +3,14 @@
 namespace Nuwave\Lighthouse\Exceptions;
 
 use GraphQL\Error\ClientAware;
+use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthorizationException;
 
-class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationException implements ClientAware
+class AuthorizationException extends IlluminateAuthorizationException implements ClientAware
 {
+    /**
+     * @var string
+     */
+    const CATEGORY = 'authorization';
 
     /**
      * Returns true when exception message is safe to be displayed to a client.
@@ -13,7 +18,7 @@ class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationExcept
      * @api
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
@@ -26,8 +31,8 @@ class AuthorizationException extends \Illuminate\Auth\Access\AuthorizationExcept
      * @api
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
-        return 'authorization';
+        return self::CATEGORY;
     }
 }

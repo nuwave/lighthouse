@@ -9,12 +9,15 @@ class CreateTestbenchTasksTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
-            $table->string('name');
+            $table->unsignedInteger('user_id')->nullable();
+            $table->string('name')->unique();
+            // Properties which collide with native model method names
+            $table->string('guard')->nullable();
+            // -------------------------------------------------------
             $table->timestamps();
             $table->softDeletes();
         });
@@ -23,7 +26,7 @@ class CreateTestbenchTasksTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('tasks');
     }

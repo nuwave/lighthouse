@@ -3,8 +3,8 @@
 namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -14,7 +14,7 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itParsesSimpleSchema()
+    public function itParsesSimpleSchema(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -31,33 +31,33 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsOnInvalidSchema()
+    public function itThrowsOnInvalidSchema(): void
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessageRegExp('/^Syntax Error/');
-        
+
         DocumentAST::fromSource('foo');
     }
 
     /**
      * @test
      */
-    public function itCanSetDefinition()
+    public function itCanSetDefinition(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
             foo: Int
         }
         ');
-        
+
         $objectType = PartialParser::objectTypeDefinition('
         type Mutation {
             bar: Int
         }
         ');
-        
+
         $documentAST->setDefinition($objectType);
-        
+
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $documentAST->mutationTypeDefinition()
@@ -67,7 +67,7 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itOverwritesDefinitionWithSameName()
+    public function itOverwritesDefinitionWithSameName(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -92,23 +92,23 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itCanBeSerialized()
+    public function itCanBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
             foo: Int
         }
         ');
-        
-        $reserialized = \unserialize(
-            \serialize($documentAST)
+
+        $reserialized = unserialize(
+            serialize($documentAST)
         );
-    
+
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $reserialized->queryTypeDefinition()
         );
-    
+
         $this->assertInstanceOf(
             FieldDefinitionNode::class,
             $reserialized->queryTypeDefinition()->fields[0]

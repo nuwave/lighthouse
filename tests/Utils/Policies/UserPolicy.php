@@ -15,4 +15,19 @@ class UserPolicy
     {
         return true;
     }
+
+    public function guestOnly($user = null): bool
+    {
+        return $user === null;
+    }
+
+    public function view(User $user, User $otherUser): bool
+    {
+        return $otherUser !== null;
+    }
+
+    public function dependingOnArg($user, bool $pass): bool
+    {
+        return $pass;
+    }
 }

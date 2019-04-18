@@ -6,14 +6,23 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Nuwave\Lighthouse\Support\Traits\IsRelayConnection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    use IsRelayConnection;
-
+    /**
+     * @var mixed[]
+     */
     protected $guarded = [];
+
+    public function getTaskCountAsString(): string
+    {
+        if (! $this->relationLoaded('tasks')) {
+            return 'This relation should have been preloaded via @with';
+        }
+
+        return "User has {$this->tasks->count()} tasks.";
+    }
 
     public function company(): BelongsTo
     {
@@ -42,8 +51,8 @@ class User extends Authenticatable
 
     public function scopeCompanyName(Builder $query, array $args): Builder
     {
-        return $query->whereHas("company", function($q) use ($args){
-            $q->where("name", $args['company']);
+        return $query->whereHas('company', function (Builder $q) use ($args): void {
+            $q->where('name', $args['company']);
         });
     }
 }

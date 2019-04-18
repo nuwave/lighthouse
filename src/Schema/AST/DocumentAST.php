@@ -1,20 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use Serializable;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
-use GraphQL\Language\AST\Node;
 use GraphQL\Error\SyntaxError;
+use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\DefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
@@ -22,73 +21,75 @@ use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
-class DocumentAST implements \Serializable
+class DocumentAST implements Serializable
 {
     /**
      * A map from definition name to the definition node.
      *
-     * @var Collection
+     * @var \GraphQL\Type\Definition\ObjectType<\GraphQL\Language\AST\DefinitionNode>
      */
     protected $definitionMap;
+
     /**
      * A collection of type extensions.
      *
-     * @var Collection
+     * @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
      */
     protected $typeExtensionsMap;
 
     /**
-     * @param DocumentNode $documentNode
+     * @param  \GraphQL\Language\AST\DocumentNode  $documentNode
+     * @return void
      */
     public function __construct(DocumentNode $documentNode)
     {
+        /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode> $typeExtensions */
+        /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\DefinitionNode> $definitionNodes */
         // We can not store type extensions in the map, since they do not have unique names
-        list($typeExtensions, $definitionNodes) = collect($documentNode->definitions)
-            ->partition(function(DefinitionNode $definitionNode){
+        [$typeExtensions, $definitionNodes] = (new Collection($documentNode->definitions))
+            ->partition(function (DefinitionNode $definitionNode): bool {
                 return $definitionNode instanceof TypeExtensionNode;
             });
 
         $this->typeExtensionsMap = $typeExtensions
-            ->mapWithKeys(function(TypeExtensionNode $node){
+            ->mapWithKeys(function (TypeExtensionNode $node): array {
                 return [$this->typeExtensionUniqueKey($node) => $node];
             });
 
         $this->definitionMap = $definitionNodes
-            ->mapWithKeys(function(DefinitionNode $node){
-               return [$node->name->value => $node];
+            ->mapWithKeys(function (DefinitionNode $node): array {
+                return [$node->name->value => $node];
             });
     }
 
     /**
      * Return a unique key that identifies a type extension.
      *
-     * @param TypeExtensionNode $typeExtensionNode
-     *
+     * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtensionNode
      * @return string
      */
     protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
     {
-        $fieldNames = collect($typeExtensionNode->fields)
-            ->map(function($field){
+        $fieldNames = (new Collection($typeExtensionNode->fields))
+            ->map(function ($field): string {
                 return $field->name->value;
             })
             ->implode(':');
 
-        return $typeExtensionNode->name->value . $fieldNames;
+        return $typeExtensionNode->name->value.$fieldNames;
     }
 
     /**
      * Create a new DocumentAST instance from a schema.
      *
-     * @param string $schema
+     * @param  string  $schema
+     * @return static
      *
-     * @throws ParseException
-     *
-     * @return DocumentAST
+     * @throws \Nuwave\Lighthouse\Exceptions\ParseException
      */
-    public static function fromSource(string $schema): DocumentAST
+    public static function fromSource(string $schema): self
     {
-        try{
+        try {
             return new static(
                 Parser::parse(
                     $schema,
@@ -96,7 +97,7 @@ class DocumentAST implements \Serializable
                     ['noLocation' => true]
                 )
             );
-        } catch (SyntaxError $syntaxError){
+        } catch (SyntaxError $syntaxError) {
             // Throw our own error class instead, since otherwise a schema definition
             // error would get rendered to the Client.
             throw new ParseException(
@@ -112,9 +113,9 @@ class DocumentAST implements \Serializable
      */
     public function serialize(): string
     {
-        return \serialize(
+        return serialize(
             $this->definitionMap
-                ->mapWithKeys(function(DefinitionNode $node, string $key){
+                ->mapWithKeys(function (DefinitionNode $node, string $key): array {
                     return [$key => AST::toArray($node)];
                 })
         );
@@ -123,14 +124,13 @@ class DocumentAST implements \Serializable
     /**
      * Construct from the string representation.
      *
-     * @param $serialized
-     *
+     * @param  string  $serialized
      * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
-        $this->definitionMap = \unserialize($serialized)
-            ->mapWithKeys(function(array $node, string $key){
+        $this->definitionMap = unserialize($serialized)
+            ->mapWithKeys(function (array $node, string $key): array {
                 return [$key => AST::fromArray($node)];
             });
     }
@@ -138,7 +138,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all type definitions from the document.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeDefinitionNode>
      */
     public function typeDefinitions(): Collection
     {
@@ -156,7 +156,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions for directives.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\DirectiveDefinitionNode>
      */
     public function directiveDefinitions(): Collection
     {
@@ -166,9 +166,8 @@ class DocumentAST implements \Serializable
     /**
      * Get all extensions that apply to a named type.
      *
-     * @param string $extendedTypeName
-     *
-     * @return Collection
+     * @param  string  $extendedTypeName
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
      */
     public function extensionsForType(string $extendedTypeName): Collection
     {
@@ -181,7 +180,7 @@ class DocumentAST implements \Serializable
     /**
      * Return all the type extensions.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
      */
     public function typeExtensions(): Collection
     {
@@ -191,7 +190,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions for object types.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\ObjectTypeDefinitionNode>
      */
     public function objectTypeDefinitions(): Collection
     {
@@ -201,20 +200,19 @@ class DocumentAST implements \Serializable
     /**
      * Get a single object type definition by name.
      *
-     * @param string $name
-     *
-     * @return ObjectTypeDefinitionNode|null
+     * @param  string  $name
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
-    public function objectTypeDefinition(string $name)
+    public function objectTypeDefinition(string $name): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinitions()
-            ->first(function (ObjectTypeDefinitionNode $objectType) use ($name) {
+            ->first(function (ObjectTypeDefinitionNode $objectType) use ($name): bool {
                 return $objectType->name->value === $name;
             });
     }
 
     /**
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\InputObjectTypeDefinitionNode>
      */
     public function inputObjectTypeDefinitions(): Collection
     {
@@ -222,14 +220,13 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * @param string $name
-     *
-     * @return InputObjectTypeDefinitionNode|null
+     * @param  string  $name
+     * @return \GraphQL\Language\AST\InputObjectTypeDefinitionNode|null
      */
-    public function inputObjectTypeDefinition(string $name)
+    public function inputObjectTypeDefinition(string $name): ?InputObjectTypeDefinitionNode
     {
         return $this->inputObjectTypeDefinitions()
-            ->first(function (InputObjectTypeDefinitionNode $inputType) use ($name) {
+            ->first(function (InputObjectTypeDefinitionNode $inputType) use ($name): bool {
                 return $inputType->name->value === $name;
             });
     }
@@ -237,7 +234,7 @@ class DocumentAST implements \Serializable
     /**
      * Get all interface definitions.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\InterfaceTypeDefinitionNode>
      */
     public function interfaceDefinitions(): Collection
     {
@@ -247,9 +244,9 @@ class DocumentAST implements \Serializable
     /**
      * Get the root query type definition.
      *
-     * @return ObjectTypeDefinitionNode
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
-    public function queryTypeDefinition(): ObjectTypeDefinitionNode
+    public function queryTypeDefinition(): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition('Query');
     }
@@ -257,9 +254,9 @@ class DocumentAST implements \Serializable
     /**
      * Get the root mutation type definition.
      *
-     * @return ObjectTypeDefinitionNode|null
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
-    public function mutationTypeDefinition()
+    public function mutationTypeDefinition(): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition('Mutation');
     }
@@ -267,9 +264,9 @@ class DocumentAST implements \Serializable
     /**
      * Get the root subscription type definition.
      *
-     * @return ObjectTypeDefinitionNode|null
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      */
-    public function subscriptionTypeDefinition()
+    public function subscriptionTypeDefinition(): ?ObjectTypeDefinitionNode
     {
         return $this->objectTypeDefinition('Subscription');
     }
@@ -277,9 +274,8 @@ class DocumentAST implements \Serializable
     /**
      * Get all definitions of a given type.
      *
-     * @param string $typeClassName
-     *
-     * @return Collection
+     * @param  string  $typeClassName
+     * @return \Illuminate\Support\Collection
      */
     protected function definitionsByType(string $typeClassName): Collection
     {
@@ -292,11 +288,10 @@ class DocumentAST implements \Serializable
     /**
      * Add a single field to the query type.
      *
-     * @param FieldDefinitionNode $field
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
+     * @return $this
      */
-    public function addFieldToQueryType(FieldDefinitionNode $field): DocumentAST
+    public function addFieldToQueryType(FieldDefinitionNode $field): self
     {
         $query = $this->queryTypeDefinition();
         $query->fields = ASTHelper::mergeNodeList($query->fields, [$field]);
@@ -307,14 +302,12 @@ class DocumentAST implements \Serializable
     }
 
     /**
-     * @param DefinitionNode $newDefinition
-     *
-     * @return DocumentAST
+     * @param  \GraphQL\Language\AST\DefinitionNode  $newDefinition
+     * @return $this
      */
-    public function setDefinition(DefinitionNode $newDefinition): DocumentAST
+    public function setDefinition(DefinitionNode $newDefinition): self
     {
-        if($newDefinition instanceof TypeExtensionNode){
-
+        if ($newDefinition instanceof TypeExtensionNode) {
             $this->typeExtensionsMap->put(
                 $this->typeExtensionUniqueKey($newDefinition),
                 $newDefinition
@@ -325,7 +318,7 @@ class DocumentAST implements \Serializable
                 $newDefinition
             );
         }
-        
+
         return $this;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Schema\Types\Scalars;
 
+use Carbon\Carbon;
 use Tests\TestCase;
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
@@ -14,31 +15,44 @@ class DateTest extends TestCase
     /**
      * @test
      * @dataProvider invalidDateValues
+     *
+     * @param  mixed  $value
+     * @return void
      */
-    public function itThrowsIfSerializingNonString($value)
+    public function itThrowsIfSerializingNonString($value): void
     {
         $this->expectException(InvariantViolation::class);
 
-        (new Date())->serialize($value);
+        (new Date)->serialize($value);
     }
 
     /**
      * @test
      * @dataProvider invalidDateValues
+     *
+     * @param  mixed  $value
+     * @return void
      */
-    public function itThrowsIfParseValueNonString($value)
+    public function itThrowsIfParseValueNonString($value): void
     {
         $this->expectException(Error::class);
 
-        (new Date())->parseValue($value);
+        (new Date)->parseValue($value);
     }
 
+    /**
+     * Those values should fail passing as a date.
+     *
+     * @return mixed[]
+     */
     public function invalidDateValues(): array
     {
         return [
             [1],
             ['rolf'],
-            [new class(){}],
+            [new class {
+                //
+            }],
             [null],
             [''],
         ];
@@ -47,26 +61,24 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itParsesValueString()
+    public function itParsesValueString(): void
     {
         $date = '2018-10-01';
-        $result = (new Date())->parseValue($date);
-
-        $this->assertSame(
-            $date,
-            $result->toDateString()
+        $this->assertEquals(
+            (new Carbon($date))->startOfDay(),
+            (new Date)->parseValue($date)
         );
     }
 
     /**
      * @test
      */
-    public function itParsesLiteral()
+    public function itParsesLiteral(): void
     {
         $dateLiteral = new StringValueNode(
             ['value' => '2018-10-01']
         );
-        $result = (new Date())->parseLiteral($dateLiteral);
+        $result = (new Date)->parseLiteral($dateLiteral);
 
         $this->assertSame(
             $dateLiteral->value,
@@ -77,11 +89,11 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsIfParseLiteralNonString()
+    public function itThrowsIfParseLiteralNonString(): void
     {
         $this->expectException(Error::class);
 
-        (new Date())->parseLiteral(
+        (new Date)->parseLiteral(
             new IntValueNode([])
         );
     }
@@ -89,10 +101,10 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itSerializesCarbonInstance()
+    public function itSerializesCarbonInstance(): void
     {
         $now = now();
-        $result = (new Date())->serialize($now);
+        $result = (new Date)->serialize($now);
 
         $this->assertSame(
             $now->toDateString(),
@@ -103,10 +115,10 @@ class DateTest extends TestCase
     /**
      * @test
      */
-    public function itSerializesValidDateString()
+    public function itSerializesValidDateString(): void
     {
         $date = '2018-10-01';
-        $result = (new Date())->serialize($date);
+        $result = (new Date)->serialize($date);
 
         $this->assertSame(
             $date,

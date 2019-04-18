@@ -1,16 +1,16 @@
-**Related Issue(s)**
+- [ ] Added or updated tests
+- [ ] Added Docs for all relevant versions
+- [ ] Updated the changelog
 
-/* Link to related issues this PR resolves, e.g. "Resolves #236",
-or a description of what this PR is trying to achieve. */
+**Related Issue/Intent**
 
-**PR Type**
-
-/* What kind of change does this PR introduce? (Bugfix, Feature, Reformat, Refactor, Build/CI, Docs, ...) /*
+<!-- Link to related issues this PR resolves, e.g. "Resolves #236",
+or a description of what this PR is trying to achieve. -->
 
 **Changes**
 
-/* Detail the changes in behaviour this PR introduces. */
+<!-- Detail the changes in behaviour this PR introduces. -->
 
 **Breaking changes**
 
-/* If there are any breaking changes, list them here. */
+<!-- If there are any breaking changes, list them here. -->

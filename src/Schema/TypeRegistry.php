@@ -9,7 +9,6 @@ use GraphQL\Error\InvariantViolation;
  * Store the executable types of our GraphQL schema.
  *
  * Class TypeRegistry
- * @package Nuwave\Lighthouse\Schema
  */
 class TypeRegistry
 {
@@ -18,63 +17,37 @@ class TypeRegistry
      *
      * [$typeName => Type]
      *
-     * @var Type[]
+     * @var \GraphQL\Type\Definition\Type[]
      */
     protected $types;
-    
+
     /**
      * Register type with registry.
      *
-     * @param Type $type
-     *
-     * @return TypeRegistry
+     * @param  \GraphQL\Type\Definition\Type  $type
+     * @return $this
      */
-    public function register(Type $type): TypeRegistry
+    public function register(Type $type): self
     {
         $this->types[$type->name] = $type;
-        
+
         return $this;
     }
 
     /**
      * Resolve type instance by name.
      *
-     * @param string $typeName
+     * @param  string  $typeName
+     * @return \GraphQL\Type\Definition\Type
      *
-     * @throws InvariantViolation
-     *
-     * @return Type
+     * @throws \GraphQL\Error\InvariantViolation
      */
     public function get(string $typeName): Type
     {
-        if(!isset($this->types[$typeName])){
+        if (! isset($this->types[$typeName])) {
             throw new InvariantViolation("No type {$typeName} was registered.");
         }
 
         return $this->types[$typeName];
-    }
-
-    /**
-     * Resolve type instance by name.
-     *
-     * @param string $typeName
-     *
-     * @return Type
-     * @deprecated in favour of get, remove in v3
-     */
-    public function instance($typeName)
-    {
-        return $this->get($typeName);
-    }
-
-    /**
-     * Register type with registry.
-     *
-     * @param Type $type
-     * @deprecated in favour of register, remove in v3
-     */
-    public function type(Type $type)
-    {
-        $this->register($type);
     }
 }

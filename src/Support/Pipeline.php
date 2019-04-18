@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support;
 
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 
@@ -12,9 +13,8 @@ class Pipeline extends BasePipeline
     /**
      * Set the array of pipes.
      *
-     * @param Collection|array $pipes
-     *
-     * @return self
+     * @param  \Illuminate\Support\Collection|array  $pipes
+     * @return $this
      */
     public function through($pipes)
     {
@@ -30,11 +30,11 @@ class Pipeline extends BasePipeline
      *
      * @return \Closure
      */
-    protected function carry()
+    protected function carry(): Closure
     {
         return function ($stack, $pipe) {
             return function ($passable) use ($stack, $pipe) {
-                if (! is_null($this->always)) {
+                if ($this->always !== null) {
                     $passable = ($this->always)($passable, $pipe);
                 }
                 $slice = parent::carry();
@@ -49,11 +49,10 @@ class Pipeline extends BasePipeline
     /**
      * Set always variable.
      *
-     * @param \Closure $always
-     *
-     * @return self
+     * @param  \Closure  $always
+     * @return $this
      */
-    public function always(\Closure $always)
+    public function always(Closure $always): self
     {
         $this->always = $always;
 

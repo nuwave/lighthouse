@@ -10,17 +10,14 @@ use Nuwave\Lighthouse\Execution\DataLoader\ModelRelationFetcher;
 
 class ModelRelationLoaderPolymorphicTest extends DBTestCase
 {
-    /**
-     * Setup test environment.
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $task = factory(Task::class)->create();
         $tags = factory(Tag::class, 3)->create();
 
-        $tags->each(function(Tag $tag) use ($task){
+        $tags->each(function (Tag $tag) use ($task) {
             DB::table('taggables')->insert([
                 'tag_id' => $tag->id,
                 'taggable_id' => $task->id,
@@ -31,11 +28,10 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
 
     /**
      * @test
-     * @throws \Exception
      */
-    public function itGetsPolymorphicRelationship()
+    public function itGetsPolymorphicRelationship(): void
     {
-        /** @var Task $task */
+        /** @var \Tests\Utils\Models\Task $task */
         $task = Task::first();
         $this->assertCount(3, $task->tags);
 

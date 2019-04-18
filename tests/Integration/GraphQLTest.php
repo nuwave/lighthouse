@@ -5,10 +5,13 @@ namespace Tests\Integration;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Http\UploadedFile;
 
 class GraphQLTest extends DBTestCase
 {
     protected $schema = '
+    scalar Upload @scalar(class: "Nuwave\\\\Lighthouse\\\\Schema\\\\Types\\\\Scalars\\\\Upload")
+    
     type User {
         id: ID!
         name: String!
@@ -29,38 +32,27 @@ class GraphQLTest extends DBTestCase
     type Query {
         user: User @auth
     }
+    
+    type Mutation {
+        upload(file: Upload!): Boolean
+    }
     ';
 
     /**
-     * Auth user.
+     * The user that shall make the requests.
      *
-     * @var User
+     * @var \Tests\Utils\Models\User
      */
     protected $user;
 
     /**
-     * User assigned tasks.
+     * Tasks associated with the current user.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection<\Tests\Utils\Models\Task>
      */
     protected $tasks;
 
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('lighthouse.route_enable_get', true);
-    }
-
-    /**
-     * Setup test environment.
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -68,15 +60,16 @@ class GraphQLTest extends DBTestCase
         $this->tasks = factory(Task::class, 5)->create([
             'user_id' => $this->user->getKey(),
         ]);
+
+        $this->be($this->user);
     }
 
     /**
      * @test
      */
-    public function itCanResolveQuery()
+    public function itResolvesQueryViaPostRequest(): void
     {
-        $this->be($this->user);
-        $query = '
+        $this->query('
         query UserWithTasks {
             user {
                 email
@@ -85,105 +78,80 @@ class GraphQLTest extends DBTestCase
                 }
             }
         }
-        ';
-
-        $data = graphql()->executeQuery($query)->toArray();
-        $expected = [
+        ')->assertJson([
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
-                    'tasks' => $this->tasks->map(function ($task) {
-                        return ['name' => $task->name];
-                    })->toArray(),
+                    'tasks' => $this->tasks
+                        ->map(
+                            function (Task $task): array {
+                                return ['name' => $task->name];
+                            }
+                        )->toArray(),
                 ],
             ],
-        ];
-
-        $this->assertEquals($expected, $data);
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanResolveQueryThroughController()
+    public function itResolvesQueryViaGetRequest(): void
     {
-        $this->be($this->user);
-        $data = $this->queryViaHttp('
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ');
-
-
-        $expected = [
+        $this->getJson(
+            'graphql?'
+            .http_build_query(
+                ['query' => '
+                    query UserWithTasks {
+                        user {
+                            email
+                            tasks {
+                                name
+                            }
+                        }
+                    }
+                    ',
+                ]
+            )
+        )->assertExactJson([
             'data' => [
                 'user' => [
                     'email' => $this->user->email,
-                    'tasks' => $this->tasks->map(function ($task) {
-                        return ['name' => $task->name];
-                    })->toArray(),
+                    'tasks' => $this->tasks
+                        ->map(function (Task $task): array {
+                            return ['name' => $task->name];
+                        })
+                        ->toArray(),
                 ],
             ],
-        ];
-
-        $this->assertEquals($expected, $data);
+        ]);
     }
 
     /**
      * @test
      */
-    public function itCanResolveQueryThroughControllerViaGetRequest()
+    public function itCanResolveBatchedQueries(): void
     {
-        $this->be($this->user);
-        $query = '
-        query UserWithTasks {
-            user {
-                email
-                tasks {
-                    name
-                }
-            }
-        }
-        ';
-
-        $uri = 'graphql?'.http_build_query(['query' => $query]);
-
-        $data = $this->getJson($uri)->json();
-
-        $expected = [
-            'data' => [
-                'user' => [
-                    'email' => $this->user->email,
-                    'tasks' => $this->tasks->map(function ($task) {
-                        return ['name' => $task->name];
-                    })->toArray(),
-                ],
+        $this->postGraphQL([
+            [
+                'query' => '
+                    {
+                        user {
+                            email
+                        }
+                    }
+                    ',
             ],
-        ];
-
-        $this->assertEquals($expected, $data);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanResolveBatchedQueries()
-    {
-        $this->be($this->user);
-
-        $queries = [
-            ['query' => '{ user { email } }'],
-            ['query' => '{ user { name } }'],
-        ];
-
-        $data = $this->postJson('/graphql', $queries)->json();
-
-        $expected = [
+            [
+                'query' => '
+                    {
+                        user {
+                            name
+                        }
+                    }
+                    ',
+            ],
+        ])->assertExactJson([
             [
                 'data' => [
                     'user' => [
@@ -198,8 +166,176 @@ class GraphQLTest extends DBTestCase
                     ],
                 ],
             ],
-        ];
+        ]);
+    }
 
-        $this->assertEquals($expected, $data);
+    /**
+     * @test
+     */
+    public function itResolvesNamedOperation(): void
+    {
+        $this->postGraphQL([
+            'query' => '
+                query User {
+                    user {
+                        email
+                    }
+                }
+                query User2 {
+                    user {
+                        name
+                    }
+                }
+            ',
+            'operationName' => 'User',
+        ])->assertExactJson([
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itRejectsInvalidQuery(): void
+    {
+        $result = $this->query('
+        {
+            nonExistingField
+        }
+        ');
+
+        $this->assertContains(
+            'nonExistingField',
+            $result->jsonGet('errors.0.message')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itIgnoresInvalidJSONVariables(): void
+    {
+        $result = $this->postGraphQL([
+            'query' => '{}',
+            'variables' => '{}',
+        ]);
+
+        $result->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolvesQueryViaMultipartRequest(): void
+    {
+        $this->postGraphQLMultipart(
+            [
+                'operations' => /* @lang JSON */
+                    '
+                    {
+                        "query": "{ user { email } }",
+                        "variables": {}
+                    }
+                ',
+                'map' => /* @lang JSON */
+                    '{}',
+            ],
+            []
+        )->assertJson([
+            'data' => [
+                'user' => [
+                    'email' => $this->user->email,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file
+     */
+    public function itResolvesUploadViaMultipartRequest(): void
+    {
+        $this->postGraphQLMultipart(
+            [
+                'operations' => /* @lang JSON */
+                    '
+                    {
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                        "variables": {
+                            "file": null
+                        }
+                    }
+                ',
+                'map' => /* @lang JSON */
+                    '
+                    {
+                        "0": ["variables.file"]
+                    }
+                ',
+            ],
+            [
+                '0' => UploadedFile::fake()->create('image.jpg', 500),
+            ]
+        )->assertJson([
+            'data' => [
+                'upload' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching
+     */
+    public function itResolvesUploadViaBatchedMultipartRequest(): void
+    {
+        $this->postGraphQLMultipart(
+            [
+                'operations' => /* @lang JSON */
+                    '
+                    [
+                        {
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "variables": {
+                                "file": null
+                            }
+                        },
+                        {
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "variables": {
+                                "file": null
+                            }
+                        }
+                    ]
+                ',
+                'map' => /* @lang JSON */
+                    '
+                    {
+                        "0": ["0.variables.file"],
+                        "1": ["1.variables.file"]
+                    }
+                ',
+            ],
+            [
+                '0' => UploadedFile::fake()->create('image.jpg', 500),
+                '1' => UploadedFile::fake()->create('image.jpg', 500),
+            ]
+        )->assertJson([
+            [
+                'data' => [
+                    'upload' => true,
+                ],
+            ],
+            [
+                'data' => [
+                    'upload' => true,
+                ],
+            ],
+        ]);
     }
 }

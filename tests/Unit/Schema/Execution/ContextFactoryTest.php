@@ -9,36 +9,36 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ContextFactoryTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->singleton(CreatesContext::class, function () {
-            return new class() implements CreatesContext {
+        $app->singleton(CreatesContext::class, function (): CreatesContext {
+            return new class implements CreatesContext {
                 public function generate(Request $request)
                 {
                     return new class($request) implements GraphQLContext {
-                        public function __construct($request)
+                        /**
+                         * @var \Illuminate\Http\Request
+                         */
+                        protected $request;
+
+                        public function __construct(Request $request)
                         {
                             $this->request = $request;
                         }
 
-                        public function user()
+                        public function user(): void
                         {
-                            return null;
+                            //
                         }
 
-                        public function request()
+                        public function request(): Request
                         {
                             return $this->request;
                         }
 
-                        public function foo()
+                        public function foo(): string
                         {
                             return 'custom.context';
                         }
@@ -51,7 +51,7 @@ class ContextFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itCanGenerateCustomContext()
+    public function itCanGenerateCustomContext(): void
     {
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
@@ -59,21 +59,16 @@ class ContextFactoryTest extends TestCase
             context: String @field(resolver:\"{$resolver}\")
         }
         ";
-        $query = '
+
+        $this->query('
         {
             context
         }
-        ';
-        $result = $this->queryViaHttp($query);
-
-        $this->assertSame(
-            [
-                'data' => [
-                    'context' => 'custom.context',
-                ],
+        ')->assertJson([
+            'data' => [
+                'context' => 'custom.context',
             ],
-            $result
-        );
+        ]);
     }
 
     public function resolve($root, array $args, GraphQLContext $context): string

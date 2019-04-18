@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -12,7 +13,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsWhenMergingUniqueNodeListWithCollision()
+    public function itThrowsWhenMergingUniqueNodeListWithCollision(): void
     {
         $objectType1 = PartialParser::objectTypeDefinition('
         type User {
@@ -37,7 +38,7 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itMergesUniqueNodeListsWithOverwrite()
+    public function itMergesUniqueNodeListsWithOverwrite(): void
     {
         $objectType1 = PartialParser::objectTypeDefinition('
         type User {
@@ -61,8 +62,8 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(3, $objectType1->fields);
 
-        $firstNameField = collect($objectType1->fields)->first(function ($field) {
-            return 'first_name' === $field->name->value;
+        $firstNameField = (new Collection($objectType1->fields))->first(function ($field) {
+            return $field->name->value === 'first_name';
         });
 
         $this->assertCount(1, $firstNameField->directives);
@@ -71,10 +72,10 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractStringArguments()
+    public function itCanExtractStringArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: "baz")');
-        $this->assertEquals(
+        $this->assertSame(
             'baz',
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -83,11 +84,10 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractBooleanArguments()
+    public function itCanExtractBooleanArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: true)');
-        $this->assertEquals(
-            true,
+        $this->assertTrue(
             ASTHelper::directiveArgValue($directive, 'bar')
         );
     }
@@ -95,10 +95,10 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractArrayArguments()
+    public function itCanExtractArrayArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: ["one", "two"])');
-        $this->assertEquals(
+        $this->assertSame(
             ['one', 'two'],
             ASTHelper::directiveArgValue($directive, 'bar')
         );
@@ -107,11 +107,22 @@ class ASTHelperTest extends TestCase
     /**
      * @test
      */
-    public function itCanExtractObjectArguments()
+    public function itCanExtractObjectArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: { baz: "foobar" })');
-        $this->assertEquals(
+        $this->assertSame(
             ['baz' => 'foobar'],
+            ASTHelper::directiveArgValue($directive, 'bar')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itReturnsNullForNonExistingArgumentOnDirective(): void
+    {
+        $directive = PartialParser::directive('@foo');
+        $this->assertNull(
             ASTHelper::directiveArgValue($directive, 'bar')
         );
     }

@@ -2,16 +2,17 @@
 
 namespace Nuwave\Lighthouse\Exceptions;
 
-class AuthenticationException extends \Illuminate\Auth\AuthenticationException implements RendersErrorsExtensions
-{
+use Illuminate\Auth\AuthenticationException as IlluminateAuthenticationException;
 
+class AuthenticationException extends IlluminateAuthenticationException implements RendersErrorsExtensions
+{
     /**
      * Returns true when exception message is safe to be displayed to a client.
      *
      * @api
      * @return bool
      */
-    public function isClientSafe()
+    public function isClientSafe(): bool
     {
         return true;
     }
@@ -24,7 +25,7 @@ class AuthenticationException extends \Illuminate\Auth\AuthenticationException i
      * @api
      * @return string
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return 'authentication';
     }

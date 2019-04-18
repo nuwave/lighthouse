@@ -2,17 +2,22 @@
 
 namespace Tests\Utils\Resolvers;
 
-use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Support\Arr;
 
 class Foo
 {
-    public function bar($root, array $args, $context = null, ResolveInfo $info = null)
+    public function bar(): string
     {
         return 'foo.bar';
     }
 
-    public function baz($root, array $args, $context = null, ResolveInfo $info = null)
+    /**
+     * @param  mixed  $root
+     * @param  mixed[]  $args
+     * @return mixed
+     */
+    public function baz($root, array $args)
     {
-        return array_get($args, 'directive.0');
+        return Arr::get($args, 'directive.0');
     }
 }

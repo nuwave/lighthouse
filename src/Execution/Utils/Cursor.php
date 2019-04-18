@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Utils;
 
+use Illuminate\Support\Arr;
+
 /**
  * Encode and decode pagination cursors.
  *
@@ -9,7 +11,7 @@ namespace Nuwave\Lighthouse\Execution\Utils;
  * this basically just encodes an offset. This is enough to satisfy the constraints
  * that Relay has, but not a clean permanent solution.
  *
- * TODO: Fix this by implementing actual cursor pagination
+ * TODO Implement actual cursor pagination https://github.com/nuwave/lighthouse/issues/311
  */
 class Cursor
 {
@@ -20,22 +22,23 @@ class Cursor
      * this will return 0. That will effectively reset pagination, so the user gets the
      * first slice.
      *
-     * @param array $args
-     *
+     * @param  array  $args
      * @return int
      */
     public static function decode(array $args): int
     {
-        if(!$cursor = array_get($args, 'after')){
-            return 0;
+        if ($cursor = Arr::get($args, 'after')) {
+            return (int) base64_decode($cursor);
         }
 
-        return (int) base64_decode($cursor);
+        return 0;
     }
 
     /**
      * Encode the given offset to make the implementation opaque.
      *
+     * @param  int  $offset
+     * @return string
      */
     public static function encode(int $offset): string
     {

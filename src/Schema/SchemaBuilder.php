@@ -7,41 +7,42 @@ use GraphQL\Type\SchemaConfig;
 use Illuminate\Support\Collection;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\Directive;
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\FieldArgument;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Schema\Factories\ValueFactory;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class SchemaBuilder
 {
-    /** @var TypeRegistry */
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $typeRegistry;
-    /** @var ValueFactory */
-    protected $valueFactory;
-    /** @var NodeFactory */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $nodeFactory;
-    /** @var DefinitionNodeConverter */
+
+    /**
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     */
     protected $definitionNodeConverter;
 
     /**
-     * @param TypeRegistry            $typeRegistry
-     * @param ValueFactory            $valueFactory
-     * @param NodeFactory             $nodeFactory
-     * @param DefinitionNodeConverter $definitionNodeConverter
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @param  \Nuwave\Lighthouse\Schema\Factories\NodeFactory  $nodeFactory
+     * @param  \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter  $definitionNodeConverter
+     * @return void
      */
     public function __construct(
         TypeRegistry $typeRegistry,
-        ValueFactory $valueFactory,
         NodeFactory $nodeFactory,
         DefinitionNodeConverter $definitionNodeConverter
     ) {
         $this->typeRegistry = $typeRegistry;
-        $this->valueFactory = $valueFactory;
         $this->nodeFactory = $nodeFactory;
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
@@ -49,48 +50,44 @@ class SchemaBuilder
     /**
      * Build an executable schema from AST.
      *
-     * @param DocumentAST $documentAST
-     *
-     * @throws DirectiveException
-     * @return Schema
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \GraphQL\Type\Schema
      */
     public function build($documentAST)
     {
-        foreach($documentAST->typeDefinitions() as $typeDefinition){
+        /** @var \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition */
+        foreach ($documentAST->typeDefinitions() as $typeDefinition) {
             $type = $this->nodeFactory->handle($typeDefinition);
             $this->typeRegistry->register($type);
 
-            switch($type->name){
+            switch ($type->name) {
                 case 'Query':
-                    /** @var ObjectType $queryType */
+                    /** @var \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter $queryType */
                     $queryType = $type;
                     continue 2;
                 case 'Mutation':
-                    /** @var ObjectType $mutationType */
+                    /** @var \GraphQL\Type\Definition\ObjectType $mutationType */
                     $mutationType = $type;
                     continue 2;
                 case 'Subscription':
-                    /** @var ObjectType $subscriptionType */
+                    /** @var \GraphQL\Type\Definition\ObjectType $subscriptionType */
                     $subscriptionType = $type;
                     continue 2;
                 default:
-                    $types []= $type;
+                    $types[] = $type;
             }
         }
 
-        if(empty($queryType)){
-            throw new InvariantViolation("The root Query type must be present in the schema.");
+        if (empty($queryType)) {
+            throw new InvariantViolation(
+                'The root Query type must be present in the schema.'
+            );
         }
 
         $config = SchemaConfig::create()
             // Always set Query since it is required
             ->setQuery(
                 $queryType
-            )
-            // Not using lazy loading, as we do not have a way of discovering
-            // orphaned types at the moment
-            ->setTypes(
-                $types
             )
             ->setDirectives(
                 $this->convertDirectives($documentAST)
@@ -104,6 +101,11 @@ class SchemaBuilder
         if (isset($subscriptionType)) {
             $config->setSubscription($subscriptionType);
         }
+        // Not using lazy loading, as we do not have a way of discovering
+        // orphaned types at the moment
+        if (isset($types)) {
+            $config->setTypes($types);
+        }
 
         return new Schema($config);
     }
@@ -111,9 +113,8 @@ class SchemaBuilder
     /**
      * Set custom client directives.
      *
-     * @param DocumentAST $document
-     *
-     * @return Collection|Directive[]
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
+     * @return \Illuminate\Support\Collection<\GraphQL\Type\Definition\Directive>
      */
     protected function convertDirectives(DocumentAST $document): Collection
     {
@@ -122,12 +123,12 @@ class SchemaBuilder
                 return new Directive([
                     'name' => $directive->name->value,
                     'description' => data_get($directive->description, 'value'),
-                    'locations' => collect($directive->locations)
+                    'locations' => (new Collection($directive->locations))
                         ->map(function ($location) {
                             return $location->value;
                         })
                         ->toArray(),
-                    'args' => collect($directive->arguments)
+                    'args' => (new Collection($directive->arguments))
                         ->map(function (InputValueDefinitionNode $argument) {
                             $fieldArgumentConfig = [
                                 'name' => $argument->name->value,
