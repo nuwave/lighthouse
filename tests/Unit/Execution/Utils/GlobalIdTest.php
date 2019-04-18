@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Execution\Utils;
 
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 
 class GlobalIdTest extends TestCase
 {
