@@ -3,13 +3,31 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective
 {
+    /**
+     * The GlobalId resolver.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     */
+    protected $globalId;
+
+    /**
+     * GlobalIdDirective constructor.
+     *
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
+     * @return void
+     */
+    public function __construct(GlobalId $globalId)
+    {
+        $this->globalId = $globalId;
+    }
+
     /**
      * Name of the directive.
      *
@@ -37,7 +55,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
                 function () use ($type, $resolver) {
                     $resolvedValue = call_user_func_array($resolver, func_get_args());
 
-                    return GlobalId::encode(
+                    return $this->globalId->encode(
                         $type,
                         $resolvedValue
                     );
@@ -54,6 +72,6 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      */
     public function transform($argumentValue): array
     {
-        return GlobalId::decode($argumentValue);
+        return $this->globalId->decode($argumentValue);
     }
 }
