@@ -52,7 +52,7 @@ install:
 
 script:
   - if [[ $COVERAGE = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml; fi
-  - if [[ $STATIC_ANALYSIS = 1 ]]; then composer stan; fi
+  - if [[ $STATIC_ANALYSIS = 1 ]]; then composer require nunomaduro/larastan && composer stan; fi
   - if [[ $COVERAGE = 0 ]]; then vendor/bin/phpunit --colors=always --verbose; fi
 
 after_success:
