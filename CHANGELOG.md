@@ -6,10 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.2.1...master)
- 
+
 ### Added
 
 - Sync existing models in belongsToMany relations using nested mutations https://github.com/nuwave/lighthouse/pull/707
+
+### Changed
+
+- Declare a single named route which handles POST/GET instead of 2 seperate routes https://github.com/nuwave/lighthouse/pull/738
 
 ## [3.2.1](https://github.com/nuwave/lighthouse/compare/v3.2.0...v3.2.1) - 2019-04-12
 
