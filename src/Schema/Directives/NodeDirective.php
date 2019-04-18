@@ -42,9 +42,9 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
      * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
+     * @return \GraphQL\Type\Definition\Type
      */
-    public function handleNode(NodeValue $value, Closure $next): NodeValue
+    public function handleNode(NodeValue $value, Closure $next)
     {
         $this->nodeRegistry->registerNode(
             $value->getTypeDefinitionName(),
