@@ -94,7 +94,7 @@ class NodeFactory
             ->then(function (NodeValue $value) use ($definition): Type {
                 $nodeResolver = $this->directiveFactory->createNodeResolver($definition);
 
-                if($nodeResolver){
+                if ($nodeResolver) {
                     return $nodeResolver->resolveNode($value);
                 }
 
