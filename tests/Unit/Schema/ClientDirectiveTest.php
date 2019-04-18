@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives\Client;
+namespace Tests\Unit\Schema;
 
 use Tests\TestCase;
 use Illuminate\Support\Collection;

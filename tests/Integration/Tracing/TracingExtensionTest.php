@@ -21,13 +21,6 @@ SCHEMA;
         );
     }
 
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('lighthouse.extensions', [TracingExtension::class]);
-    }
-
     /**
      * @test
      */
