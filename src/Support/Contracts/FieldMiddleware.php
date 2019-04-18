@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 interface FieldMiddleware extends Directive
 {
     /**
-     * Resolve the field directive.
+     * Wrap around the final field resolver.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
      * @param  \Closure  $next

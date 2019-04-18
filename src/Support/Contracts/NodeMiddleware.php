@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Schema\Values\NodeValue;
 interface NodeMiddleware extends Directive
 {
     /**
-     * Handle node value.
+     * Handle a type AST as it is converted to an executable type.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
      * @param  \Closure  $next
