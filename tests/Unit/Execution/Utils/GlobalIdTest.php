@@ -2,18 +2,30 @@
 
 namespace Tests\Unit\Execution\Utils;
 
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 
 class GlobalIdTest extends TestCase
 {
+    /**
+     * @var \Nuwave\Lighthouse\Execution\Utils\GlobalId
+     */
+    private $globalIdResolver;
+
+    protected function setUp():void
+    {
+        parent::setUp();
+
+        $this->globalIdResolver = new GlobalId;
+    }
+
     /**
      * @test
      */
     public function itCanHandleGlobalIds(): void
     {
-        $globalId = app(GlobalId::class)->encode('User', 'asdf');
-        $idParts = app(GlobalId::class)->decode($globalId);
+        $globalId = $this->globalIdResolver->encode('User', 'asdf');
+        $idParts = $this->globalIdResolver->decode($globalId);
 
         $this->assertSame(['User', 'asdf'], $idParts);
     }
@@ -23,9 +35,9 @@ class GlobalIdTest extends TestCase
      */
     public function itCanDecodeJustTheId(): void
     {
-        $globalId = app(GlobalId::class)->encode('User', 123);
+        $globalId = $this->globalIdResolver->encode('User', 123);
 
-        $this->assertSame('123', app(GlobalId::class)->decodeID($globalId));
+        $this->assertSame('123', $this->globalIdResolver->decodeID($globalId));
     }
 
     /**
@@ -33,8 +45,8 @@ class GlobalIdTest extends TestCase
      */
     public function itCanDecodeJustTheType(): void
     {
-        $globalId = app(GlobalId::class)->encode('User', 123);
+        $globalId = $this->globalIdResolver->encode('User', 123);
 
-        $this->assertSame('User', app(GlobalId::class)->decodeType($globalId));
+        $this->assertSame('User', $this->globalIdResolver->decodeType($globalId));
     }
 }

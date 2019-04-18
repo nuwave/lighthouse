@@ -113,11 +113,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
-        $this->app->bind(GlobalIdContract::class, function () {
-            return $this->app->make(
-                config('lighthouse.global_id_resolver', GlobalId::class)
-            );
-        });
+        $this->app->bind(GlobalIdContract::class, GlobalId::class);
 
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
             /** @var \Illuminate\Http\Request $request */

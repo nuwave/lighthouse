@@ -9,6 +9,18 @@ use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 class NodeInterfaceTest extends DBTestCase
 {
     /**
+     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     */
+    private $globalIdResolver;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->globalIdResolver = app(GlobalId::class);
+    }
+
+    /**
      * @var mixed[]
      */
     protected $testTuples = [
@@ -33,8 +45,8 @@ class NodeInterfaceTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $firstGlobalId = app(GlobalId::class)->encode('User', $this->testTuples[1]['id']);
-        $secondGlobalId = app(GlobalId::class)->encode('User', $this->testTuples[2]['id']);
+        $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
+        $secondGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[2]['id']);
 
         $this->query('
         {
@@ -88,7 +100,7 @@ class NodeInterfaceTest extends DBTestCase
         $user = factory(User::class)->create(
             ['name' => 'Sepp']
         );
-        $globalId = app(GlobalId::class)->encode('User', $user->getKey());
+        $globalId = $this->globalIdResolver->encode('User', $user->getKey());
 
         $this->query('
         {
