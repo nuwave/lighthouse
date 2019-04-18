@@ -43,7 +43,6 @@ class Tracing
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
      * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $ManipulateAST
-     *
      * @return void
      */
     public function handleManipulateAST(ManipulateAST $ManipulateAST): void
@@ -143,7 +142,7 @@ class Tracing
      * @param  float|int  $end
      * @return int
      */
-    private function diffTimeInNanoseconds($start, $end): int
+    protected function diffTimeInNanoseconds($start, $end): int
     {
         if ($this->platformSupportsNanoseconds()) {
             return $end - $start;
@@ -161,7 +160,7 @@ class Tracing
      *
      * @return bool
      */
-    private function platformSupportsNanoseconds(): bool
+    protected function platformSupportsNanoseconds(): bool
     {
         return function_exists('hrtime');
     }

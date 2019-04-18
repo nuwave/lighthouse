@@ -1,8 +1,5 @@
 <?php
 
-use GraphQL\Error\Debug;
-use GraphQL\Validator\Rules\DisableIntrospection;
-
 return [
 
     /*
@@ -115,7 +112,7 @@ return [
     'security' => [
         'max_query_complexity' => 0,
         'max_query_depth' => 0,
-        'disable_introspection' => DisableIntrospection::DISABLED,
+        'disable_introspection' => \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
     /*
@@ -141,7 +138,7 @@ return [
     |
     */
 
-    'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
+    'debug' => \GraphQL\Error\Debug::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\Debug::INCLUDE_TRACE,
 
     /*
     |--------------------------------------------------------------------------
@@ -204,6 +201,19 @@ return [
     */
 
     'transactional_mutations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | New Between Directives
+    |--------------------------------------------------------------------------
+    |
+    | Use the new @whereBetween and @whereBetween directives that will
+    | replace their current implementation in v4 by setting this to true.
+    | As the old versions are removed, this will not have an effect anymore.
+    |
+    */
+
+    'new_between_directives' => false,
 
     /*
     |--------------------------------------------------------------------------

@@ -20,7 +20,7 @@ class MorphToTest extends DBTestCase
     }
     
     type Mutation {
-        createHour(input: CreateHourInput!): Hour @create(flatten: true)
+        createHour(input: CreateHourInput! @spread): Hour @create
     }
     
     input CreateHourInput {
@@ -32,7 +32,7 @@ class MorphToTest extends DBTestCase
     }
     ';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

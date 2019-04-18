@@ -518,6 +518,10 @@ class MutationExecutor
                 if ($operationKey === 'connect') {
                     $relation->attach($values);
                 }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
+                }
             });
         });
     }
@@ -538,6 +542,14 @@ class MutationExecutor
             (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
                 if ($operationKey === 'create') {
                     self::handleMultiRelationCreate(new Collection($values), $relation);
+                }
+
+                if ($operationKey === 'connect') {
+                    $relation->attach($values);
+                }
+
+                if ($operationKey === 'sync') {
+                    $relation->sync($values);
                 }
             });
         });

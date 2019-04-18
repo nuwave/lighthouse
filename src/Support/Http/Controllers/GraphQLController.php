@@ -30,7 +30,7 @@ class GraphQLController extends Controller
     /**
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesResponse
      */
-    private $createsResponse;
+    protected $createsResponse;
 
     /**
      * Inject middleware into request.

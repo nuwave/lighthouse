@@ -19,7 +19,7 @@ class ASTBuilder
     /**
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
-    private $directiveFactory;
+    protected $directiveFactory;
 
     /**
      * ASTBuilder constructor.
@@ -297,12 +297,12 @@ GRAPHQL
     /**
      * Add types that are used for the @orderBy directive.
      *
-     * @see \Nuwave\Lighthouse\Schema\Directives\Args\OrderByDirective
+     * @see \Nuwave\Lighthouse\Schema\Directives\OrderByDirective
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected function addOrderByTypes(DocumentAST $document)
+    protected function addOrderByTypes(DocumentAST $document): DocumentAST
     {
         return $document
             ->setDefinition(

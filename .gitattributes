@@ -11,8 +11,10 @@
 .styleci.yml export-ignore
 .travis.yml export-ignore
 _ide_helper.php export-ignore
+CHANGELOG.md export-ignore
 docker-compose.yml export-ignore
 Dockerfile export-ignore
+Dockerfile_xdebug export-ignore
 logo.png export-ignore
 netlify.toml export-ignore
 phpunit.xml.dist export-ignore

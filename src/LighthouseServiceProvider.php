@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse;
 
+use Closure;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
@@ -14,10 +16,13 @@ use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ScalarCommand;
 use Illuminate\Contracts\Container\Container;
 use Nuwave\Lighthouse\Console\MutationCommand;
+use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Execution\SingleResponse;
+use Nuwave\Lighthouse\Execution\Utils\GlobalId;
+use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
@@ -32,8 +37,11 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class LighthouseServiceProvider extends ServiceProvider
 {
@@ -105,6 +113,8 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(CreatesResponse::class, SingleResponse::class);
 
+        $this->app->bind(GlobalIdContract::class, GlobalId::class);
+
         $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
             /** @var \Illuminate\Http\Request $request */
             $request = $app->make('request');
@@ -121,6 +131,18 @@ class LighthouseServiceProvider extends ServiceProvider
             return new SchemaStitcher(
                 config('lighthouse.schema.register', '')
             );
+        });
+
+        $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
+        $this->app->bind(ProvidesSubscriptionResolver::class, function (): ProvidesSubscriptionResolver {
+            return new class() implements ProvidesSubscriptionResolver {
+                public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
+                {
+                    throw new Exception(
+                       'Add the SubscriptionServiceProvider to your config/app.php to enable subscriptions.'
+                   );
+                }
+            };
         });
 
         if ($this->app->runningInConsole()) {

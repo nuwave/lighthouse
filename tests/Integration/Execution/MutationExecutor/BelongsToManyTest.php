@@ -21,8 +21,8 @@ class BelongsToManyTest extends DBTestCase
     }
     
     type Mutation {
-        createRole(input: CreateRoleInput!): Role @create(flatten: true)
-        updateRole(input: UpdateRoleInput!): Role @update(flatten: true)
+        createRole(input: CreateRoleInput! @spread): Role @create
+        updateRole(input: UpdateRoleInput! @spread): Role @update
     }
 
     input CreateRoleInput {
@@ -33,6 +33,7 @@ class BelongsToManyTest extends DBTestCase
     input CreateUserRelation {
         create: [CreateUserInput!]
         connect: [ID!]
+        sync: [ID!]
     }
     
     input CreateUserInput {
@@ -60,7 +61,7 @@ class BelongsToManyTest extends DBTestCase
     }
     ';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -470,5 +471,47 @@ class BelongsToManyTest extends DBTestCase
 
         $this->assertNotNull(User::find(1));
         $this->assertNotNull(User::find(2));
+    }
+
+    /**
+     * @test
+     */
+    public function itCanSyncExistingUsersDuringCreateToABelongsToManyRelation()
+    {
+        factory(User::class, 2)->create();
+
+        $this->query('
+        mutation {
+            createRole(input: {
+                name: "foobar"
+                users: {
+                    sync: [
+                        1,2
+                    ]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createRole' => [
+                    'id' => '1',
+                    'name' => 'foobar',
+                    'users' => [
+                        [
+                            'id' => '1',
+                        ],
+                        [
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }

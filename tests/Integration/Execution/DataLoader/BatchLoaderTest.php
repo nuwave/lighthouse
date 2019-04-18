@@ -47,21 +47,23 @@ class BatchLoaderTest extends DBTestCase
         }
         ';
 
-        $this->postGraphQL([
-            [
-                'query' => $query,
-                'variables' => [
-                    'id' => $users[0]->getKey(),
+        $this
+            ->postGraphQL([
+                [
+                    'query' => $query,
+                    'variables' => [
+                        'id' => $users[0]->getKey(),
+                    ],
                 ],
-            ],
-            [
-                'query' => $query,
-                'variables' => [
-                    'id' => $users[1]->getKey(),
+                [
+                    'query' => $query,
+                    'variables' => [
+                        'id' => $users[1]->getKey(),
+                    ],
                 ],
-            ],
-        ])->assertJsonCount(2)
-        ->assertJsonCount(3, '0.data.user.tasks')
-        ->assertJsonCount(3, '1.data.user.tasks');
+            ])
+            ->assertJsonCount(2)
+            ->assertJsonCount(3, '0.data.user.tasks')
+            ->assertJsonCount(3, '1.data.user.tasks');
     }
 }

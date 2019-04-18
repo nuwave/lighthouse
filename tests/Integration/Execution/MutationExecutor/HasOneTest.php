@@ -22,8 +22,8 @@ class HasOneTest extends DBTestCase
     }
     
     type Mutation {
-        createTask(input: CreateTaskInput!): Task @create(flatten: true)
-        updateTask(input: UpdateTaskInput!): Task @update(flatten: true)
+        createTask(input: CreateTaskInput! @spread): Task @create
+        updateTask(input: UpdateTaskInput! @spread): Task @update
     }
     
     input CreateTaskInput {
@@ -57,7 +57,7 @@ class HasOneTest extends DBTestCase
     }
     ';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
