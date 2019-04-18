@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Execution\Utils;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 
 /**
- * Encode and decode globally unique IDs.
+ * The default encoding of global IDs in Lighthouse.
  *
  * The way that IDs are generated basically works like this:
  *
