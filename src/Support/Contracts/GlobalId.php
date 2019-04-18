@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Support\Contracts;
 
+/**
+ * Encode and decode globally unique IDs.
+ */
 interface GlobalId
 {
     /**
