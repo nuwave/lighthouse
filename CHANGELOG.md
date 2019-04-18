@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.4.0...master)
 
+### Changed
+
+- Declare a single named route which handles POST/GET instead of 2 seperate routes https://github.com/nuwave/lighthouse/pull/738
+
 ## [3.4.0](https://github.com/nuwave/lighthouse/compare/v3.3.0...v3.4.0) - 2019-04-18
 
 ### Added
