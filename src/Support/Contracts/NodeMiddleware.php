@@ -8,11 +8,11 @@ use Nuwave\Lighthouse\Schema\Values\NodeValue;
 interface NodeMiddleware extends Directive
 {
     /**
-     * Handle node value.
+     * Handle a type AST as it is converted to an executable type.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
      * @param  \Closure  $next
-     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
+     * @return \GraphQL\Type\Definition\Type
      */
     public function handleNode(NodeValue $value, Closure $next);
 }
