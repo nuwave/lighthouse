@@ -42,7 +42,9 @@ return [
 
     'route' => [
         'prefix' => '',
-        // 'middleware' => ['loghttp']
+        'middleware' => [
+            \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
+        ],
     ],
 
     /*
