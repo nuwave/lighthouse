@@ -17,6 +17,8 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
     }
 
     /**
+     * Apply a scout search to the builder.
+     *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
      * @param  mixed  $value
      * @return \Laravel\Scout\Builder

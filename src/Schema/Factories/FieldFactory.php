@@ -8,10 +8,11 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Builder;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
+use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -22,6 +23,7 @@ use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
+use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
@@ -66,6 +68,12 @@ class FieldFactory
      * @var \Nuwave\Lighthouse\Execution\Builder
      */
     protected $builder;
+
+    /**
+     * @var \Nuwave\Lighthouse\Execution\QueryFilter
+     * @deprecated
+     */
+    protected $queryFilter;
 
     /**
      * @var array
@@ -164,6 +172,8 @@ class FieldFactory
                 $this->validationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
                 $this->builder = new Builder();
 
+                $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
+
                 $argumentValues->each(
                     function (ArgumentValue $argumentValue): void {
                         $this->handleArgDirectivesRecursively(
@@ -191,6 +201,10 @@ class FieldFactory
                         );
                     }
                 }
+
+                $this->builder->setQueryFilter(
+                    $this->queryFilter
+                );
 
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
@@ -365,6 +379,18 @@ class FieldFactory
             if ($directive instanceof ArgBuilderDirective) {
                 $this->builder->addBuilderDirective(
                     $astNode->name->value,
+                    $directive
+                );
+            }
+
+            if ($directive instanceof ArgFilterDirective) {
+                $argumentName = $astNode->name->value;
+                $directiveDefinition = ASTHelper::directiveDefinition($astNode, $directive->name());
+                $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
+
+                $this->queryFilter->addArgumentFilter(
+                    $argumentName,
+                    $columnName,
                     $directive
                 );
             }

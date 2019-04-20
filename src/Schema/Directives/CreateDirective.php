@@ -49,6 +49,9 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName();
 
+                /*
+                 * @deprecated in favour of @spread
+                 */
                 if ($this->directiveArgValue('flatten', false)) {
                     $args = reset($args);
                 }

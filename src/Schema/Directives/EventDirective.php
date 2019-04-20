@@ -40,7 +40,6 @@ class EventDirective extends BaseDirective implements FieldMiddleware
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
      * @param  \Closure  $next
-     *
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
     public function handleField(FieldValue $value, Closure $next): FieldValue

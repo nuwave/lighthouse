@@ -17,17 +17,17 @@ class InDirective extends BaseDirective implements ArgBuilderDirective
     }
 
     /**
-     * Apply a simple "WHERE = $value" clause.
+     * Apply a simple "WHERE IN $values" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
-     * @param  mixed $value
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $values
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
      */
-    public function handleBuilder($builder, $value)
+    public function handleBuilder($builder, $values)
     {
         return $builder->whereIn(
             $this->directiveArgValue('key', $this->definitionNode->name->value),
-            $value
+            $values
         );
     }
 }

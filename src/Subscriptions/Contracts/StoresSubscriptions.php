@@ -37,6 +37,7 @@ interface StoresSubscriptions
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  string  $topic
+     * @return void
      */
     public function storeSubscriber(Subscriber $subscriber, string $topic);
 
@@ -44,7 +45,6 @@ interface StoresSubscriptions
      * Delete subscriber.
      *
      * @param  string  $channel
-     *
      * @return \Nuwave\Lighthouse\Subscriptions\Subscriber|null
      */
     public function deleteSubscriber(string $channel);

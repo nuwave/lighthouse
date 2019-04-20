@@ -22,6 +22,7 @@ interface BroadcastsSubscriptions
      * @param  \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription  $subscription
      * @param  string  $fieldName
      * @param  mixed  $root
+     * @return void
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root);
 
@@ -29,7 +30,6 @@ interface BroadcastsSubscriptions
      * Authorize the subscription.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function authorize(Request $request);

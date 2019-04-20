@@ -1,43 +1,92 @@
 # Custom Directives
 
-Lighthouse provides various convenient server side directives that can be applied to a lots of generic use cases.
-However you are free to create your own directives depending upon your needs. 
+Lighthouse provides general purpose server side directives.
 
-## Directive Types
-
-There are 3 different levels of directives in Lighthouse.
-
-* [Node Directives](#node-directives)
-* [Field Directives](#field-directives)
-* [Argument Directives](#argument-directives)
-
-They can be applied to different parts of the schema, according to the [DirectiveLocation](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
+As you grow your GraphQL schema, you may find the need for more specialized functionality.
+Learn how you can abstract logic in a composable and reusable manner by using custom directives.  
 
 ## Directive Class Naming Convention
 
-The class name of directive must follow the following pattern:
+Directives are implemented as PHP classes, each directive available
+in the schema corresponds to a single class.
+
+The class name of a directive must follow the following pattern:
 
     <Directive name in StudlyCase>Directive
 
 For example the class name of directive `@fooBar` must be `FooBarDirective`. 
 
+## Directive Interfaces
+
+Every directive must implement the interface [`\Nuwave\Lighthouse\Support\Contracts\Directive`](../../../src/Support/Contracts/Directive.php).
+It contains a single function `name` to specify the name the directive has in the schema.
+
+By itself though, directives that implement just this base interface do not do anything.
+Depending on what your directive should do, you can pick one or more of the provided
+directive interfaces to add functionality. They serve as the point of contact to Lighthouse.
+
+Depending on which interfaces you implement, a directive can be applied to different parts
+of the schema, according to the [specified directive location](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
+
 ## Node Directives
 
-// TODO
+These directives can generally be applied to [type definitions](../the-basics/types.md) in the schema.
+
+### NodeManipulator
+
+The [`\Nuwave\Lighthouse\Support\Contracts\NodeManipulator`](../../../src/Support/Contracts/NodeManipulator.php)
+interface can be used to manipulate the AST. 
+
+### NodeMiddleware
+
+The [`\Nuwave\Lighthouse\Support\Contracts\NodeMiddleware`](../../../src/Support/Contracts/NodeMiddleware.php)
+interface allows access to an AST node as it is converted to an executable type.
+
+### NodeResolves
+
+The [`\Nuwave\Lighthouse\Support\Contracts\NodeResolves`](../../../src/Support/Contracts/NodeResolver.php)
+interface can be used for custom conversion from AST values to an executable type.
 
 ## Field Directives
 
-// TODO
+Field directives can be applied to any [FieldDefinition](https://graphql.github.io/graphql-spec/June2018/#FieldDefinition)
+
+### FieldResolver
+
+Perhaps the most important directive interface, a [FieldResolver](../../../src/Support/Contracts/FieldResolver.php)
+let's you add a resolver for a field through a directive.
+
+It can be a great way to reuse resolver logic within a schema.
+
+### FieldMiddleware
+
+A [FieldMiddleware](../../../src/Support/Contracts/FieldMiddleware.php) directive allows you
+to wrap around the field resolver, just like [Laravel Middleware](https://laravel.com/docs/middleware).
+
+You may use it both to handle incoming values before reaching the final resolver
+as well as the outgoing result of resolving the field.
+
+### FieldManipulator
+
+An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](../../../src/Support/Contracts/FieldManipulator.php)
+directive can be used to manipulate the schema AST. 
 
 ## Argument Directives
 
-Argument directives are applied to the [InputValueDefinition](https://facebook.github.io/graphql/June2018/#InputValueDefinition).
+Argument directives can be applied to a [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition).
 
-There are 3 types of argument directives in Lighthouse.
+As arguments may be contained within a list in the schema definition, you must specify
+what your argument should apply to in addition to its function
+
+If it applies to the individual items within the list,
+implement the [ArgDirective](../../../src/Support/Contracts/ArgDirective.php) interface.
+
+Else, if it should apply to the whole list,
+implement the [ArgDirectiveForArray](../../../src/Support/Contracts/ArgDirectiveForArray.php) interface.
 
 ### ArgValidationDirective
 
-
+May be used to return custom rules and messages to use for validation of an argument.
 
 ### ArgTransformerDirective
 
@@ -110,6 +159,23 @@ class CreateUser
 }
 ```
 
+#### Evaluation Order
+
+Argument directives are evaluated in the order that they are defined in the schema.
+
+```graphql
+type Mutation {
+  createUser(
+    password: String @trim @rules(apply: ["min:10,max:20"]) @bcrypt
+  ): User
+}
+```
+
+In the given example, Lighthouse will take the value of the `password` argument and:
+1. Trim any whitespace
+1. Run validation on it
+1. Encrypt the password via `bcrypt`
+
 ### ArgBuilderDirective
 
 The `ArgBuilderDirective` allows using arguments passed by the client to dynamically
@@ -117,11 +183,11 @@ modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use the defined filters for resolving the query:
 
-* `@all`
-* `@paginate`
-* `@find`
-* `@first`
-* `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
+- `@all`
+- `@paginate`
+- `@find`
+- `@first`
+- `@hasMany` `@hasOne` `@belongsTo` `@belongsToMany`
 
 Take the following schema as an example:
 
@@ -175,9 +241,9 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
 
 The `handleBuilder` method takes two arguments:
 
-* `$builder`
+- `$builder`
 The query builder for applying the additional query on to.
-* `$value`
+- `$value`
 The value of the argument value that the `@eq` was applied on to.
 
 If you want to use a more complex value for manipulating a query,
@@ -192,24 +258,7 @@ type Query {
 }
 ```
 
-### Evaluation Order
+### ArgManipulator
 
-Argument directives are evaluated in the order that they are defined in the schema.
-
-```graphql
-type Mutation {
-  createUser(
-    password: String @trim @rules(apply: ["min:10,max:20"]) @bcrypt
-  ): User
-}
-```
-
-Notice the order how the argument directives were written.
-
-The evaluation process of the above example written in pseudo code can be:
- 
-```php
-$trimedValue = trim($password);
-// validate with the rules ["min:10,max:20"] ...
-$finalArgumentValue = bcrypt($trimedValue);
-```
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](../../../src/Support/Contracts/ArgManipulator.php)
+directive can be used to manipulate the schema AST. 

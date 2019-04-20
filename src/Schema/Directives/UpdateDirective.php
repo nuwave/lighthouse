@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
-use Nuwave\Lighthouse\Execution\Utils\GlobalId;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
 class UpdateDirective extends BaseDirective implements FieldResolver
@@ -18,12 +18,23 @@ class UpdateDirective extends BaseDirective implements FieldResolver
     protected $databaseManager;
 
     /**
+     * The GlobalId resolver.
+     *
+     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
+     */
+    protected $globalId;
+
+    /**
+     * UpdateDirective constructor.
+     *
      * @param  \Illuminate\Database\DatabaseManager  $databaseManager
+     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
      * @return void
      */
-    public function __construct(DatabaseManager $databaseManager)
+    public function __construct(DatabaseManager $databaseManager, GlobalId $globalId)
     {
         $this->databaseManager = $databaseManager;
+        $this->globalId = $globalId;
     }
 
     /**
@@ -50,12 +61,15 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName();
 
+                /*
+                 * @deprecated in favour of @spread
+                 */
                 if ($this->directiveArgValue('flatten', false)) {
                     $args = reset($args);
                 }
 
                 if ($this->directiveArgValue('globalId', false)) {
-                    $args['id'] = GlobalId::decodeId($args['id']);
+                    $args['id'] = $this->globalId->decodeId($args['id']);
                 }
 
                 $executeMutation = function () use ($model, $args): Model {

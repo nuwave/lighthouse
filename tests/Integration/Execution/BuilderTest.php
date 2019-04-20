@@ -1,12 +1,22 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\Execution;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class QueryFilterDirectiveTest extends DBTestCase
+class BuilderTest extends DBTestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        /*
+         * @deprecated once the new directives become the standard
+         */
+        $app['config']->set('new_between_directives', true);
+    }
+
     /**
      * @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User>
      */

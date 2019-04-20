@@ -14,6 +14,7 @@ trait SetUpDefer
 
     /**
      * @param  \Illuminate\Foundation\Application  $app
+     * @return void
      */
     protected function setUpDefer($app)
     {
