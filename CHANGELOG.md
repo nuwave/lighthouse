@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.4.0...master)
 
+### Added
+
+- Add `@whereConstraints` directive that offers flexible query capabilities to the client. Resolves #312
+
 ### Changed
 
 - Default the config to always set the `Accept: application/json` header https://github.com/nuwave/lighthouse/pull/743
@@ -34,10 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prefer usage of the `ArgBuilderDirective` instead of the `ArgFilterDirective` https://github.com/nuwave/lighthouse/pull/680
 - `@whereBetween` and `@whereNotBetween` will take a single input object
   instead of being spread across two args https://github.com/nuwave/lighthouse/pull/680
-
-### Added
-
-- Add `@whereConstraints` directive that offers flexible query capabilities to the client. Resolves #312
 
 ## [3.2.1](https://github.com/nuwave/lighthouse/compare/v3.2.0...v3.2.1) - 2019-04-12
 
