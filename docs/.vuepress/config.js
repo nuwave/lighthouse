@@ -1,4 +1,4 @@
-let versioning = require('./lib/versioning.js')
+const versioning = require('./lib/versioning.js')
 
 module.exports = {
     title: 'Lighthouse',
