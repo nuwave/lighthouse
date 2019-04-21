@@ -73,7 +73,7 @@ class LogBroadcaster implements Broadcaster
      * @param  array  $data
      * @return void
      */
-    public function broadcast(Subscriber $subscriber, array $data)
+    public function broadcast(Subscriber $subscriber, array $data): void
     {
         $this->broadcasts[$subscriber->channel] = $data;
     }
