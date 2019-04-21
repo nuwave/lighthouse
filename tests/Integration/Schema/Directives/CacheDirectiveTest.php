@@ -61,7 +61,7 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanPlaceCacheKeyOnAnyField()
+    public function itCanPlaceCacheKeyOnAnyField(): void
     {
         $resolver = addslashes(self::class).'@resolve';
         $this->schema = "
