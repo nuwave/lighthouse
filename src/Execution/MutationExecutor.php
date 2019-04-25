@@ -38,25 +38,64 @@ class MutationExecutor
 
         [$hasOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
 
-        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
-
         [$morphOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
+
+        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
 
         [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
 
         $model = self::saveModelWithPotentialParent($model, $remaining, $parentRelation);
 
-        self::executeCreateHasMany($model, $hasMany);
+        $createOneToMany = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+            $relation = $model->{$relationName}();
 
-        self::executeCreateHasOne($model, $hasOne);
+            if ($create = $nestedOperations['create'] ?? false) {
+                self::handleMultiRelationCreate(new Collection($create), $relation);
+            }
+        };
+        $hasMany->each($createOneToMany);
+        $morphMany->each($createOneToMany);
 
-        self::executeCreateMorphMany($model, $morphMany);
+        $createOneToOne = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
+            $relation = $model->{$relationName}();
 
-        self::executeCreateMorphOne($model, $morphOne);
+            if ($create = $nestedOperations['create'] ?? false) {
+                self::handleSingleRelationCreate(new Collection($create), $relation);
+            }
+        };
+        $hasOne->each($createOneToOne);
+        $morphOne->each($createOneToOne);
 
-        self::executeCreateBelongsToMany($model, $belongsToMany);
+        $createManyToMany = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
+            $relation = $model->{$relationName}();
 
-        self::executeCreateMorphToMany($model, $morphToMany);
+            if ($sync = $nestedOperations['sync'] ?? false) {
+                $relation->sync($sync);
+            }
+
+            if ($create = $nestedOperations['create'] ?? false) {
+                self::handleMultiRelationCreate(new Collection($create), $relation);
+            }
+
+            if ($update = $nestedOperations['update'] ?? false) {
+                (new Collection($update))->each(function ($singleValues) use ($relation): void {
+                    self::executeUpdate(
+                        $relation->getModel()->newInstance(),
+                        new Collection($singleValues),
+                        $relation
+                    );
+                });
+            }
+
+            if ($connect = $nestedOperations['connect'] ?? false) {
+                $relation->attach($connect);
+            }
+        };
+        $belongsToMany->each($createManyToMany);
+        $morphToMany->each($createManyToMany);
 
         return $model;
     }
@@ -86,42 +125,40 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             $relation = $model->{$relationName}();
 
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation, $model, $relationName): void {
-                if ($operationKey === 'create') {
-                    $belongsToModel = self::executeCreate($relation->getModel()->newInstance(), new Collection($values));
-                    $relation->associate($belongsToModel);
-                }
+            if($create = $nestedOperations['create'] ?? false){
+                $belongsToModel = self::executeCreate(
+                    $relation->getModel()->newInstance(),
+                    new Collection($create)
+                );
+                $relation->associate($belongsToModel);
+            }
 
-                if ($operationKey === 'connect') {
-                    // Inverse can be hasOne or hasMany
-                    /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
-                    $belongsTo = $model->{$relationName}();
-                    $belongsTo->associate($values);
-                }
+            if($connect = $nestedOperations['connect'] ?? false) {
+                // Inverse can be hasOne or hasMany
+                /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
+                $belongsTo = $model->{$relationName}();
+                $belongsTo->associate($connect);
+            }
 
-                if ($operationKey === 'update') {
-                    $belongsToModel = self::executeUpdate($relation->getModel()->newInstance(), new Collection($values));
-                    $relation->associate($belongsToModel);
-                }
+            if($update = $nestedOperations['update'] ?? false){
+                $belongsToModel = self::executeUpdate(
+                    $relation->getModel()->newInstance(),
+                    new Collection($update)
+                );
+                $relation->associate($belongsToModel);
+            }
 
-                // We proceed with disconnecting/deleting only if the given $values is truthy.
-                // There is no other information to be passed when issuing those operations,
-                // but GraphQL forces us to pass some value. It would be unintuitive for
-                // the end user if the given value had no effect on the execution.
-                if (
-                    $operationKey === 'disconnect'
-                    && $values
-                ) {
-                    $relation->dissociate();
-                }
+            // We proceed with disconnecting/deleting only if the given $values is truthy.
+            // There is no other information to be passed when issuing those operations,
+            // but GraphQL forces us to pass some value. It would be unintuitive for
+            // the end user if the given value had no effect on the execution.
+            if ($nestedOperations['disconnect'] ?? false) {
+                $relation->dissociate();
+            }
 
-                if (
-                    $operationKey === 'delete'
-                    && $values
-                ) {
-                    $relation->delete();
-                }
-            });
+            if ($nestedOperations['delete'] ?? false) {
+                $relation->delete();
+            }
         });
 
         if ($parentRelation && ! $parentRelation instanceof BelongsToMany) {
@@ -152,11 +189,7 @@ class MutationExecutor
     protected static function handleMultiRelationCreate(Collection $multiValues, Relation $relation): void
     {
         $multiValues->each(function ($singleValues) use ($relation): void {
-            self::executeCreate(
-                $relation->getModel()->newInstance(),
-                new Collection($singleValues),
-                $relation
-            );
+            self::handleSingleRelationCreate(new Collection($singleValues), $relation);
         });
     }
 
@@ -171,7 +204,7 @@ class MutationExecutor
     {
         self::executeCreate(
             $relation->getModel()->newInstance(),
-            new Collection($singleValues),
+            $singleValues,
             $relation
         );
     }
@@ -204,161 +237,99 @@ class MutationExecutor
 
         [$hasOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, HasOne::class);
 
-        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
-
         [$morphOne, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphOne::class);
+
+        [$belongsToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, BelongsToMany::class);
 
         [$morphToMany, $remaining] = self::partitionArgsByRelationType($reflection, $remaining, MorphToMany::class);
 
         $model = self::saveModelWithPotentialParent($model, $remaining, $parentRelation);
 
-        $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
+        $updateOneToMany = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
             $relation = $model->{$relationName}();
 
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
+            if ($create = $nestedOperations['create'] ?? false) {
+                self::handleMultiRelationCreate(new Collection($create), $relation);
+            }
 
-                if ($operationKey === 'update') {
-                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
-                    });
-                }
+            if ($update = $nestedOperations['update'] ?? false) {
+                (new Collection($update))->each(function ($singleValues) use ($relation): void {
+                    self::executeUpdate(
+                        $relation->getModel()->newInstance(),
+                        new Collection($singleValues),
+                        $relation
+                    );
+                });
+            }
 
-                if ($operationKey === 'delete') {
-                    $relation->getModel()::destroy($values);
-                }
-            });
-        });
+            if ($delete = $nestedOperations['delete'] ?? false) {
+                $relation->getModel()::destroy($delete);
+            }
+        };
+        $hasMany->each($updateOneToMany);
+        $morphMany->each($updateOneToMany);
 
-        $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
+        $updateOneToOne = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
             $relation = $model->{$relationName}();
 
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(new Collection($values), $relation);
-                }
+            if ($create = $nestedOperations['create'] ?? false) {
+                self::handleSingleRelationCreate(new Collection($create), $relation);
+            }
 
-                if ($operationKey === 'update') {
-                    self::executeUpdate($relation->getModel()->newInstance(), new Collection($values), $relation);
-                }
+            if ($update = $nestedOperations['update'] ?? false) {
+                self::executeUpdate(
+                    $relation->getModel()->newInstance(),
+                    new Collection($update),
+                    $relation
+                );
+            }
 
-                if ($operationKey === 'delete') {
-                    $relation->getModel()::destroy($values);
-                }
-            });
-        });
+            if ($delete = $nestedOperations['delete'] ?? false) {
+                $relation->getModel()::destroy($delete);
+            }
+        };
+        $hasOne->each($updateOneToOne);
+        $morphOne->each($updateOneToOne);
 
-        $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
+        $updateManyToMany = function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
             $relation = $model->{$relationName}();
 
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
+            if ($sync = $nestedOperations['sync'] ?? false) {
+                $relation->sync($sync);
+            }
 
-                if ($operationKey === 'update') {
-                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
-                    });
-                }
+            if ($create = $nestedOperations['create'] ?? false) {
+                self::handleMultiRelationCreate(new Collection($create), $relation);
+            }
 
-                if ($operationKey === 'delete') {
-                    $relation->getModel()::destroy($values);
-                }
-            });
-        });
+            if ($update = $nestedOperations['update'] ?? false) {
+                (new Collection($update))->each(function ($singleValues) use ($relation): void {
+                    self::executeUpdate(
+                        $relation->getModel()->newInstance(),
+                        new Collection($singleValues),
+                        $relation
+                    );
+                });
+            }
 
-        $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
-            $relation = $model->{$relationName}();
+            if ($delete = $nestedOperations['delete'] ?? false) {
+                $relation->detach($delete);
+                $relation->getModel()::destroy($delete);
+            }
 
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(new Collection($values), $relation);
-                }
+            if ($connect = $nestedOperations['connect'] ?? false) {
+                $relation->attach($connect);
+            }
 
-                if ($operationKey === 'update') {
-                    self::executeUpdate($relation->getModel()->newInstance(), new Collection($values), $relation);
-                }
-
-                if ($operationKey === 'delete') {
-                    $relation->getModel()::destroy($values);
-                }
-            });
-        });
-
-        $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
-
-                if ($operationKey === 'update') {
-                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
-                    });
-                }
-
-                if ($operationKey === 'delete') {
-                    $relation->detach($values);
-                    $relation->getModel()::destroy($values);
-                }
-
-                if ($operationKey === 'connect') {
-                    $relation->attach($values);
-                }
-
-                if ($operationKey === 'sync') {
-                    $relation->sync($values);
-                }
-
-                if ($operationKey === 'disconnect') {
-                    $relation->detach($values);
-                }
-            });
-        });
-
-        $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
-
-                if ($operationKey === 'update') {
-                    (new Collection($values))->each(function ($singleValues) use ($relation): void {
-                        self::executeUpdate($relation->getModel()->newInstance(), new Collection($singleValues), $relation);
-                    });
-                }
-
-                if ($operationKey === 'delete') {
-                    $relation->detach($values);
-                    $relation->getModel()::destroy($values);
-                }
-
-                if ($operationKey === 'connect') {
-                    $relation->attach($values);
-                }
-
-                if ($operationKey === 'sync') {
-                    $relation->sync($values);
-                }
-
-                if ($operationKey === 'disconnect') {
-                    $relation->detach($values);
-                }
-            });
-        });
+            if ($disconnect = $nestedOperations['disconnect'] ?? false) {
+                $relation->detach($disconnect);
+            }
+        };
+        $belongsToMany->each($updateManyToMany);
+        $morphToMany->each($updateManyToMany);
 
         return $model;
     }
@@ -411,147 +382,5 @@ class MutationExecutor
                 return $relationClass === $returnType->getName();
             }
         );
-    }
-
-    /**
-     * Execute a create on HasMany relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Support\Collection  $hasMany
-     * @return void
-     */
-    protected static function executeCreateHasMany(Model $model, Collection $hasMany): void
-    {
-        $hasMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
-            });
-        });
-    }
-
-    /**
-     * Execute a create on HasOne relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Support\Collection  $hasOne
-     * @return void
-     */
-    protected static function executeCreateHasOne(Model $model, Collection $hasOne): void
-    {
-        $hasOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasOne $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(new Collection($values), $relation);
-                }
-            });
-        });
-    }
-
-    /**
-     * Execute a create on MorphMany relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Support\Collection  $morphMany
-     * @return void
-     */
-    protected static function executeCreateMorphMany(Model $model, Collection $morphMany): void
-    {
-        $morphMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
-            });
-        });
-    }
-
-    /**
-     * Execute a create on MorphOne relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Support\Collection  $morphOne
-     * @return void
-     */
-    protected static function executeCreateMorphOne(Model $model, Collection $morphOne): void
-    {
-        $morphOne->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\MorphOne $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleSingleRelationCreate(new Collection($values), $relation);
-                }
-            });
-        });
-    }
-
-    /**
-     * Execute a create on BelongsTo relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Support\Collection  $belongsToMany
-     * @return void
-     */
-    protected static function executeCreateBelongsToMany(Model $model, Collection $belongsToMany): void
-    {
-        $belongsToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
-
-                if ($operationKey === 'connect') {
-                    $relation->attach($values);
-                }
-
-                if ($operationKey === 'sync') {
-                    $relation->sync($values);
-                }
-            });
-        });
-    }
-
-    /**
-     * Execute a create on MorphToMany relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Support\Collection  $morphToMany
-     * @return void
-     */
-    protected static function executeCreateMorphToMany(Model $model, Collection $morphToMany): void
-    {
-        $morphToMany->each(function (array $nestedOperations, string $relationName) use ($model): void {
-            /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
-            $relation = $model->{$relationName}();
-
-            (new Collection($nestedOperations))->each(function ($values, string $operationKey) use ($relation): void {
-                if ($operationKey === 'create') {
-                    self::handleMultiRelationCreate(new Collection($values), $relation);
-                }
-
-                if ($operationKey === 'connect') {
-                    $relation->attach($values);
-                }
-
-                if ($operationKey === 'sync') {
-                    $relation->sync($values);
-                }
-            });
-        });
     }
 }
