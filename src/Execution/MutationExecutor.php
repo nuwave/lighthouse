@@ -125,7 +125,7 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             $relation = $model->{$relationName}();
 
-            if($create = $nestedOperations['create'] ?? false){
+            if ($create = $nestedOperations['create'] ?? false) {
                 $belongsToModel = self::executeCreate(
                     $relation->getModel()->newInstance(),
                     new Collection($create)
@@ -133,14 +133,14 @@ class MutationExecutor
                 $relation->associate($belongsToModel);
             }
 
-            if($connect = $nestedOperations['connect'] ?? false) {
+            if ($connect = $nestedOperations['connect'] ?? false) {
                 // Inverse can be hasOne or hasMany
                 /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
                 $belongsTo = $model->{$relationName}();
                 $belongsTo->associate($connect);
             }
 
-            if($update = $nestedOperations['update'] ?? false){
+            if ($update = $nestedOperations['update'] ?? false) {
                 $belongsToModel = self::executeUpdate(
                     $relation->getModel()->newInstance(),
                     new Collection($update)
