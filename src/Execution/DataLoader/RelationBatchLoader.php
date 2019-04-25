@@ -101,14 +101,14 @@ class RelationBatchLoader extends BatchLoader
                 $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
                 break;
             case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-                // count must be set so we can safely get it like this
-                /** @var int $count */
-                $count = $this->args['count'];
-                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $count);
+                // first must be set so we can safely get it like this
+                /** @var int $first */
+                $first = $this->args[config('lighthouse.pagination_amount_argument')];
+                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $first);
 
                 $page = Arr::get($this->args, 'page', 1);
 
-                $modelRelationFetcher->loadRelationsForPage($count, $page);
+                $modelRelationFetcher->loadRelationsForPage($first, $page);
                 break;
             default:
                 $modelRelationFetcher->loadRelations();

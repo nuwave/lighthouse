@@ -92,6 +92,7 @@ abstract class TestCase extends BaseTestCase
                 'storage' => 'array',
                 'broadcaster' => 'log',
             ],
+            'pagination_amount_argument' => 'count'
         ]);
 
         $app['config']->set('app.debug', true);

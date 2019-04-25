@@ -27,7 +27,7 @@ class ComplexityDirectiveTest extends TestCase
             ->getComplexityFn();
 
         $this->assertSame(100, $complexityFn(10, ['first' => 10]));
-        $this->assertSame(100, $complexityFn(10, ['count' => 10]));
+        $this->assertSame(100, $complexityFn(10, [config('lighthouse.pagination_amount_argument') => 10]));
     }
 
     /**

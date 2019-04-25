@@ -162,7 +162,7 @@ class PaginationManipulator
         ");
 
         $inputValueDefinitions = [
-            self::countArgument('count', $defaultCount, $maxCount),
+            self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
             "\"The offset from which elements are returned.\"\npage: Int",
         ];
 
