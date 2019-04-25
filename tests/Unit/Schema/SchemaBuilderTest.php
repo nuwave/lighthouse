@@ -26,16 +26,56 @@ class SchemaBuilderTest extends TestCase
     /**
      * @test
      */
+    public function itGeneratesWithEmptyQueryType(): void
+    {
+        $schema = $this->buildSchema('
+        type Query
+        
+        extend type Query {
+            foo: Int
+        }
+        ');
+
+        $this->assertInstanceOf(Schema::class, $schema);
+        // This would throw if the schema were invalid
+        $schema->assertValid();
+    }
+
+    /**
+     * @test
+     */
+    public function itGeneratesWithEmptyMutationType(): void
+    {
+        $schema = $this->buildSchema('
+        type Query
+        
+        type Mutation
+        
+        extend type Mutation {
+            foo(bar: String! baz: String): String
+        }
+        ');
+
+        /** @var \GraphQL\Type\Definition\ObjectType $mutationObjectType */
+        $mutationObjectType = $schema->getType('Mutation');
+        $foo = $mutationObjectType->getField('foo');
+
+        $this->assertSame('foo', $foo->name);
+    }
+
+    /**
+     * @test
+     */
     public function itCanResolveEnumTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         "Role description"
         enum Role {
             "Company administrator."
-            ADMIN @enum(value:"admin")
+            ADMIN @enum(value: "admin")
 
             "Company employee."
-            EMPLOYEE @enum(value:"employee")
+            EMPLOYEE @enum(value: "employee")
         }
         ');
 
@@ -201,5 +241,32 @@ class SchemaBuilderTest extends TestCase
         $type = $schema->getType('Foo');
 
         $this->assertSame('yo?', $type->getField('bar')->description);
+    }
+
+    /**
+     * @test
+     */
+    public function itResolvesEnumDefaultValuesToInternalValues(): void
+    {
+        $schema = $this->buildSchema('
+        type Query {
+            foo(
+                bar: Baz = FOOBAR
+            ): Int
+        }
+        
+        enum Baz {
+            FOOBAR @enum(value: "internal")
+        }
+        ');
+
+        $this->assertSame(
+            'internal',
+            $schema
+                ->getQueryType()
+                ->getField('foo')
+                ->getArg('bar')
+                ->defaultValue
+        );
     }
 }

@@ -154,7 +154,6 @@ class CacheValue
      * Implode value to create string.
      *
      * @param  array  $items
-     *
      * @return string
      */
     protected function implode(array $items): string

@@ -82,7 +82,7 @@ class GraphQL
      *
      * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
      */
-    private $createsContext;
+    protected $createsContext;
 
     /**
      * GraphQL constructor.
@@ -191,19 +191,15 @@ class GraphQL
             $this->getValidationRules() + DocumentValidator::defaultRules()
         );
 
-        // Listeners of this event must return an array comprised of
-        // a single key and the extension content as the value, e.g.
-        // ['tracing' => ['some' => 'content']]
-        $extensionResults = $this->eventDispatcher->dispatch(
+        /** @var \Nuwave\Lighthouse\Execution\ExtensionsResponse[] $extensionsResponses */
+        $extensionsResponses = (array) $this->eventDispatcher->dispatch(
             new BuildExtensionsResponse
         );
 
-        // Ensure we preserve the extension keys while flattening
-        foreach ($extensionResults as $singleExtensionResult) {
-            $result->extensions = array_merge(
-                $result->extensions,
-                $singleExtensionResult
-            );
+        foreach ($extensionsResponses as $extensionsResponse) {
+            if ($extensionsResponse) {
+                $result->extensions[$extensionsResponse->key()] = $extensionsResponse->content();
+            }
         }
 
         $result->setErrorsHandler(
@@ -298,7 +294,7 @@ class GraphQL
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = $this->eventDispatcher->dispatch(
+        $additionalSchemas = (array) $this->eventDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );
 

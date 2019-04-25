@@ -71,8 +71,9 @@ class LogBroadcaster implements Broadcaster
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Subscriber  $subscriber
      * @param  array  $data
+     * @return void
      */
-    public function broadcast(Subscriber $subscriber, array $data)
+    public function broadcast(Subscriber $subscriber, array $data): void
     {
         $this->broadcasts[$subscriber->channel] = $data;
     }
@@ -85,9 +86,7 @@ class LogBroadcaster implements Broadcaster
      */
     public function broadcasts(?string $key = null): ?array
     {
-        return $key
-            ? Arr::get($this->broadcasts, $key)
-            : $this->broadcasts;
+        return Arr::get($this->broadcasts, $key);
     }
 
     /**

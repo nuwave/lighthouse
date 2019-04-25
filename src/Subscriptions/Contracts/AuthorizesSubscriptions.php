@@ -10,7 +10,6 @@ interface AuthorizesSubscriptions
      * Authorize subscription request.
      *
      * @param  \Illuminate\Http\Request  $request
-     *
      * @return bool
      */
     public function authorize(Request $request);

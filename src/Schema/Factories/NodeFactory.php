@@ -31,8 +31,8 @@ use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\UnionDirective;
-use Nuwave\Lighthouse\Schema\Directives\Nodes\InterfaceDirective;
+use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
+use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 
 class NodeFactory
 {
@@ -83,12 +83,7 @@ class NodeFactory
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
-        $type = $this->hasTypeResolver($definition)
-            ? $this->resolveTypeViaDirective($definition)
-            : $this->resolveTypeDefault($definition);
-
         $nodeValue = new NodeValue($definition);
-        $nodeValue->setType($type);
 
         return $this->pipeline
             ->send($nodeValue)
@@ -96,36 +91,15 @@ class NodeFactory
                 $this->directiveFactory->createNodeMiddleware($definition)
             )
             ->via('handleNode')
-            ->then(function (NodeValue $value) {
-                return $value;
-            })
-            ->getType();
-    }
+            ->then(function (NodeValue $value) use ($definition): Type {
+                $nodeResolver = $this->directiveFactory->createNodeResolver($definition);
 
-    /**
-     * Check if node has a type resolver directive.
-     *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
-     * @return bool
-     */
-    protected function hasTypeResolver(TypeDefinitionNode $definition): bool
-    {
-        return $this->directiveFactory->hasNodeResolver($definition);
-    }
+                if ($nodeResolver) {
+                    return $nodeResolver->resolveNode($value);
+                }
 
-    /**
-     * Use directive resolver to transform type.
-     *
-     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
-     * @return \GraphQL\Type\Definition\Type
-     */
-    protected function resolveTypeViaDirective(TypeDefinitionNode $definition): Type
-    {
-        return $this->directiveFactory
-            ->createNodeResolver($definition)
-            ->resolveNode(
-                new NodeValue($definition)
-            );
+                return $this->resolveType($definition);
+            });
     }
 
     /**
@@ -136,7 +110,7 @@ class NodeFactory
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    protected function resolveTypeDefault(TypeDefinitionNode $typeDefinition): Type
+    protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {
         // Ignore TypeExtensionNode since they are merged before we get here
         switch (get_class($typeDefinition)) {
@@ -169,7 +143,7 @@ class NodeFactory
             'name' => $enumDefinition->name->value,
             'description' => data_get($enumDefinition->description, 'value'),
             'values' => (new Collection($enumDefinition->values))
-                ->mapWithKeys(function (EnumValueDefinitionNode $field) {
+                ->mapWithKeys(function (EnumValueDefinitionNode $field): array {
                     // Get the directive that is defined on the field itself
                     $directive = ASTHelper::directiveDefinition($field, 'enum');
 
@@ -235,7 +209,7 @@ class NodeFactory
             'fields' => $this->resolveFieldsFunction($objectDefinition),
             'interfaces' => function () use ($objectDefinition) {
                 return (new Collection($objectDefinition->interfaces))
-                    ->map(function (NamedTypeNode $interface) {
+                    ->map(function (NamedTypeNode $interface): Type {
                         return $this->typeRegistry->get($interface->name->value);
                     })
                     ->toArray();
@@ -246,7 +220,7 @@ class NodeFactory
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|InterfaceTypeDefinitionNode  $definition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $definition
      * @return \Closure
      */
     protected function resolveFieldsFunction($definition): Closure
@@ -276,29 +250,18 @@ class NodeFactory
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
-            'fields' => $this->resolveInputFieldsFunction($inputDefinition),
+            'fields' => function () use ($inputDefinition) {
+                return (new Collection($inputDefinition->fields))
+                    ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
+                        $argumentValue = new ArgumentValue($inputValueDefinition);
+
+                        return [
+                            $inputValueDefinition->name->value => $this->argumentFactory->handle($argumentValue),
+                        ];
+                    })
+                    ->toArray();
+            },
         ]);
-    }
-
-    /**
-     * Returns a closure that lazy loads the Input Fields for a constructed type.
-     *
-     * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
-     * @return \Closure
-     */
-    protected function resolveInputFieldsFunction(InputObjectTypeDefinitionNode $definition): Closure
-    {
-        return function () use ($definition) {
-            return (new Collection($definition->fields))
-                ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
-                    $argumentValue = new ArgumentValue($inputValueDefinition);
-
-                    return [
-                        $inputValueDefinition->name->value => $this->argumentFactory->handle($argumentValue),
-                    ];
-                })
-                ->toArray();
-        };
     }
 
     /**

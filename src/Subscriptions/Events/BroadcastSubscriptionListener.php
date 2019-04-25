@@ -25,8 +25,9 @@ class BroadcastSubscriptionListener implements ShouldQueue
      * Handle the event.
      *
      * @param  \Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent  $event
+     * @return void
      */
-    public function handle(BroadcastSubscriptionEvent $event)
+    public function handle(BroadcastSubscriptionEvent $event): void
     {
         $this->broadcaster->broadcast(
             $event->subscription,
