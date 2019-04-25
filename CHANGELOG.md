@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The pagination field argument that controls the amount of results
   will default to `first` instead of `count` in v4. The config `pagination_amount_argument`
-  can be used to change the argument name now 
+  can be used to change the argument name now https://github.com/nuwave/lighthouse/pull/752
 
 ## [3.4.0](https://github.com/nuwave/lighthouse/compare/v3.3.0...v3.4.0) - 2019-04-18
 
