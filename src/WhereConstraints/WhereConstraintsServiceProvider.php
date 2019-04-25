@@ -42,7 +42,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                     )
                     ->setDefinition(
                         PartialParser::scalarTypeDefinition('
-                            scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
+                            scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
                         ')
                     );
             }
