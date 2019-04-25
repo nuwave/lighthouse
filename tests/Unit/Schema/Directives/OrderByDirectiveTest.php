@@ -22,7 +22,7 @@ class OrderByDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanOrderByTheGivenFieldAndSortOrderASC()
+    public function itCanOrderByTheGivenFieldAndSortOrderASC(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -57,7 +57,7 @@ class OrderByDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanOrderByTheGivenFieldAndSortOrderDESC()
+    public function itCanOrderByTheGivenFieldAndSortOrderDESC(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -92,7 +92,7 @@ class OrderByDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanOrderByMultipleFields()
+    public function itCanOrderByMultipleFields(): void
     {
         factory(User::class)->create(['name' => 'B', 'team_id' => 2]);
         factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
@@ -139,7 +139,7 @@ class OrderByDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itThrowsOnInvalidDefinition()
+    public function itThrowsOnInvalidDefinition(): void
     {
         $this->expectException(DefinitionException::class);
 

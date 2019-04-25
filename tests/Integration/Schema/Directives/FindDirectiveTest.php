@@ -142,4 +142,34 @@ class FindDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function itReturnsAnEmptyObjectWhenTheModelIsNotFound(): void
+    {
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            user(name: String @eq): User @find(model: "User")
+        }
+        ';
+
+        $this->query('
+        {
+            user(name: "A") {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => null,
+            ],
+        ])->assertStatus(200);
+    }
 }

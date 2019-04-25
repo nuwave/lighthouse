@@ -163,7 +163,7 @@ class SubscriptionRegistry
      * @param  \Nuwave\Lighthouse\Events\StartExecution  $startExecution
      * @return void
      */
-    public function handleStartExecution(StartExecution $startExecution)
+    public function handleStartExecution(StartExecution $startExecution): void
     {
         $this->subscribers = [];
     }
