@@ -1431,7 +1431,7 @@ within your schema.
 ```graphql
 input WhereConstraints {
     column: String
-    operator: String
+    operator: String = "="
     value: Mixed
     AND: [WhereConstraints!]
     OR: [WhereConstraints!]

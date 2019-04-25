@@ -32,7 +32,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                         PartialParser::inputObjectTypeDefinition('
                             input WhereConstraints {
                                 column: String
-                                operator: String
+                                operator: String = "="
                                 value: Mixed
                                 AND: [WhereConstraints!]
                                 OR: [WhereConstraints!]
