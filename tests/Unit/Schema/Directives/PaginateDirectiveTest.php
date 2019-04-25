@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use GraphQL\Type\Definition\FieldArgument;
 use Tests\TestCase;
+use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 
 class PaginateDirectiveTest extends TestCase
