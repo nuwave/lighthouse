@@ -1366,6 +1366,81 @@ input DateRange {
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
 
+## @whereConstraints
+
+Add a dynamically client-controlled where constraint to a fields query.
+
+### Setup
+
+**This is an experimental feature and not included in Lighthouse by default.**
+
+First, enable the service provider:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\Defer\DeferServiceProvider::class,
+],
+```
+
+It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
+
+    composer require mll-lab/graphql-php-scalars
+
+### Usage
+
+The argument it is defined on may have any name but **must** be
+of the input type `WhereConstraints`.
+
+```graphql
+type Query {
+    people(where: WhereConstraints @whereConstraints): [Person!]!
+}
+```
+
+This is how you can use it to construct a complex query
+that gets actors over age 37 who either have red hair or are at least 150cm.
+
+```graphql
+{
+  people(
+    filter: {
+      where: [
+        {
+          AND: [
+            { column: "age", operator: ">" value: 37 }
+            { column: "type", value: "Actor" }
+            {
+              OR: [
+                { column: "haircolour", value: "red" }
+                { column: "height", operator: ">=", value: 150 }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
+
+The definition for the `WhereConstraints` input is automatically included
+within your schema.
+
+```graphql
+input WhereConstraints {
+    column: String
+    operator: String
+    value: Mixed
+    AND: [WhereConstraints!]
+    OR: [WhereConstraints!]
+    NOT: [WhereConstraints!]
+}
+
+scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
+```
+
 ## @whereNotBetween
 
 Verify that a column's value lies outside of two values.
