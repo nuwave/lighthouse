@@ -12,14 +12,11 @@ The following configuration will be placed in `config/lighthouse.php`.
 ```php
 <?php
 
-use GraphQL\Error\Debug;
-use GraphQL\Validator\Rules\DisableIntrospection;
-
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | GraphQL endpoint
+    | GraphQL Endpoint
     |--------------------------------------------------------------------------
     |
     | Set the endpoint to which the GraphQL server responds.
@@ -31,7 +28,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Enable GET requests
+    | Enable GET Requests
     |--------------------------------------------------------------------------
     |
     | This setting controls if GET requests to the GraphQL endpoint are allowed.
@@ -42,7 +39,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Route configuration
+    | Route Configuration
     |--------------------------------------------------------------------------
     |
     | Additional configuration for the route group https://lumen.laravel.com/docs/routing#route-groups
@@ -57,12 +54,14 @@ return [
 
     'route' => [
         'prefix' => '',
-        // 'middleware' => ['loghttp']
+        'middleware' => [
+            \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
+        ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Schema declaration
+    | Schema Declaration
     |--------------------------------------------------------------------------
     |
     | This is a path that points to where your GraphQL schema is located
@@ -127,7 +126,7 @@ return [
     'security' => [
         'max_query_complexity' => 0,
         'max_query_depth' => 0,
-        'disable_introspection' => DisableIntrospection::DISABLED,
+        'disable_introspection' => \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
     /*
@@ -145,6 +144,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Pagination Amount Argument
+    |--------------------------------------------------------------------------
+    |
+    | Set the name to use for the generated argument on paginated fields
+    | that controls how many results are returned.
+    | This will default to "first" in v4.
+    |
+    */
+
+    'pagination_amount_argument' => 'count',
+
+    /*
+    |--------------------------------------------------------------------------
     | Debug
     |--------------------------------------------------------------------------
     |
@@ -153,7 +165,7 @@ return [
     |
     */
 
-    'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE,
+    'debug' => \GraphQL\Error\Debug::INCLUDE_DEBUG_MESSAGE | \GraphQL\Error\Debug::INCLUDE_TRACE,
 
     /*
     |--------------------------------------------------------------------------
@@ -216,6 +228,19 @@ return [
     */
 
     'transactional_mutations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | New Between Directives
+    |--------------------------------------------------------------------------
+    |
+    | Use the new @whereBetween and @whereBetween directives that will
+    | replace their current implementation in v4 by setting this to true.
+    | As the old versions are removed, this will not have an effect anymore.
+    |
+    */
+
+    'new_between_directives' => false,
 
     /*
     |--------------------------------------------------------------------------

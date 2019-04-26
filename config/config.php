@@ -4,7 +4,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | GraphQL endpoint
+    | GraphQL Endpoint
     |--------------------------------------------------------------------------
     |
     | Set the endpoint to which the GraphQL server responds.
@@ -16,7 +16,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Enable GET requests
+    | Enable GET Requests
     |--------------------------------------------------------------------------
     |
     | This setting controls if GET requests to the GraphQL endpoint are allowed.
@@ -27,7 +27,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Route configuration
+    | Route Configuration
     |--------------------------------------------------------------------------
     |
     | Additional configuration for the route group https://lumen.laravel.com/docs/routing#route-groups
@@ -49,7 +49,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Schema declaration
+    | Schema Declaration
     |--------------------------------------------------------------------------
     |
     | This is a path that points to where your GraphQL schema is located
@@ -129,6 +129,19 @@ return [
     */
 
     'paginate_max_count' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination Amount Argument
+    |--------------------------------------------------------------------------
+    |
+    | Set the name to use for the generated argument on paginated fields
+    | that controls how many results are returned.
+    | This will default to "first" in v4.
+    |
+    */
+
+    'pagination_amount_argument' => 'count',
 
     /*
     |--------------------------------------------------------------------------
