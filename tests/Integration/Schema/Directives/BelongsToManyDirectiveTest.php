@@ -72,12 +72,6 @@ class BelongsToManyDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount($this->rolesCount, 'data.user.roles');
-
-        $rolesCount = auth()
-            ->user()
-            ->roles()
-            ->count();
-        $this->assertSame($this->rolesCount, $rolesCount);
     }
 
     /**

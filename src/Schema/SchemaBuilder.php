@@ -22,7 +22,7 @@ class SchemaBuilder
     protected $typeRegistry;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     * @var \Nuwave\Lighthouse\Schema\Factories\NodeFactory
      */
     protected $nodeFactory;
 

@@ -335,7 +335,7 @@ class FieldFactory
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $astNode
      * @param  mixed[]  $argumentPath
      * @param  \Illuminate\Support\Collection  $directives
-     * @return mixed
+     * @return void
      */
     protected function handleArgDirectives(
         InputValueDefinitionNode $astNode,

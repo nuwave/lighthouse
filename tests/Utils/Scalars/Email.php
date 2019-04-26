@@ -33,6 +33,13 @@ class Email extends ScalarType
         return $value;
     }
 
+    /**
+     * @param  \GraphQL\Language\AST\VariableNode|\GraphQL\Language\AST\NullValueNode|\GraphQL\Language\AST\IntValueNode|\GraphQL\Language\AST\FloatValueNode|\GraphQL\Language\AST\StringValueNode|\GraphQL\Language\AST\BooleanValueNode|\GraphQL\Language\AST\EnumValueNode|\GraphQL\Language\AST\ListValueNode|\GraphQL\Language\AST\ObjectValueNode  $valueNode
+     * @param  array|null  $variables
+     * @return mixed|string
+     *
+     * @throws \GraphQL\Error\Error
+     */
     public function parseLiteral($valueNode, ?array $variables = null)
     {
         if (! $valueNode instanceof StringValueNode) {
