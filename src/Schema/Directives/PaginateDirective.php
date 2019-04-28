@@ -91,7 +91,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                     $context,
                     $resolveInfo,
                     $args['page'] ?? 1,
-                    $args['count']
+                    $args[config('lighthouse.pagination_amount_argument')]
                 );
             }
         );

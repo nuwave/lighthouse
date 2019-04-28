@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Tests\Constants;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use CreateTestbenchTagsTable;
 
 class CreateDirectiveTest extends DBTestCase
 {
@@ -108,7 +108,7 @@ class CreateDirectiveTest extends DBTestCase
             'data' => [
                 'createTag' => [
                     'name' => 'foobar',
-                    'default_string' => CreateTestbenchTagsTable::DEFAULT_STRING,
+                    'default_string' => Constants::TAGS_DEFAULT_STRING,
                 ],
             ],
         ]);

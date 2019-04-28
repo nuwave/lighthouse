@@ -15,25 +15,16 @@ class PaginatorField
      */
     public function paginatorInfoResolver(LengthAwarePaginator $root): array
     {
-        $count = $root->count();
-        $currentPage = $root->currentPage();
-        $firstItem = $root->firstItem();
-        $hasMorePages = $root->hasMorePages();
-        $lastItem = $root->lastItem();
-        $lastPage = $root->lastPage();
-        $perPage = $root->perPage();
-        $total = $root->total();
-
-        return compact(
-            'count',
-            'currentPage',
-            'firstItem',
-            'hasMorePages',
-            'lastItem',
-            'lastPage',
-            'perPage',
-            'total'
-        );
+        return [
+            'count' => $root->count(),
+            'currentPage' => $root->currentPage(),
+            'firstItem' => $root->firstItem(),
+            'hasMorePages' => $root->hasMorePages(),
+            'lastItem' => $root->lastItem(),
+            'lastPage' => $root->lastPage(),
+            'perPage' => $root->perPage(),
+            'total' => $root->total(),
+        ];
     }
 
     /**
