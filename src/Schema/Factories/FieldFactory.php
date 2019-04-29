@@ -170,7 +170,7 @@ class FieldFactory
                 $this->setResolverArguments(...func_get_args());
 
                 $this->validationErrorBuffer = app(ErrorBuffer::class)->setErrorType('validation');
-                $this->builder = new Builder();
+                $this->builder = new Builder;
 
                 $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
 
