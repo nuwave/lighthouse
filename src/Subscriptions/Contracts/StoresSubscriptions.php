@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Subscriptions\Subscriber;
 
 interface StoresSubscriptions
