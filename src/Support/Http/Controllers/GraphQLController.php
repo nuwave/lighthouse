@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Support\Http\Controllers;
 
 use Nuwave\Lighthouse\GraphQL;
 use Illuminate\Routing\Controller;
+use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -33,24 +34,32 @@ class GraphQLController extends Controller
     protected $createsResponse;
 
     /**
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
+    /**
      * Inject middleware into request.
      *
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesResponse  $createsResponse
+     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function __construct(
         GraphQL $graphQL,
         CreatesContext $createsContext,
         EventsDispatcher $eventsDispatcher,
-        CreatesResponse $createsResponse
+        CreatesResponse $createsResponse,
+        Container $container
     ) {
         $this->graphQL = $graphQL;
         $this->createsContext = $createsContext;
         $this->eventsDispatcher = $eventsDispatcher;
         $this->createsResponse = $createsResponse;
+        $this->container = $container;
     }
 
     /**
@@ -69,7 +78,14 @@ class GraphQLController extends Controller
             ? $this->executeBatched($request)
             : $this->graphQL->executeRequest($request);
 
-        return $this->createsResponse->createResponse($result);
+        $response = $this->createsResponse->createResponse($result);
+
+        // When handling multiple requests during the application lifetime,
+        // for example in tests, we need a new GraphQLRequest instance
+        // for each HTTP request, so we forget the singleton here.
+        $this->container->forgetInstance(GraphQLRequest::class);
+
+        return $response;
     }
 
     /**
