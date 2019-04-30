@@ -21,7 +21,7 @@ class ExtensionErrorHandler implements ErrorHandler
     {
         $underlyingException = $error->getPrevious();
 
-        if ($underlyingException && $underlyingException instanceof RendersErrorsExtensions) {
+        if ($underlyingException instanceof RendersErrorsExtensions) {
             // Reconstruct the error, passing in the extensions of the underlying exception
             $error = new Error(
                 $error->message,
