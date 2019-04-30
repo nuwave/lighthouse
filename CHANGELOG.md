@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.4.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.0...master)
+
+## [3.5.0](https://github.com/nuwave/lighthouse/compare/v3.4.0...v3.5.0)
 
 ### Changed
 
@@ -22,7 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Instantiate the `ErrorBuffer` directly, its dependencies can not be resolved through the container https://github.com/nuwave/lighthouse/pull/756
+- Instantiate the `ErrorBuffer` directly, its dependencies
+  can not be resolved through the container https://github.com/nuwave/lighthouse/pull/756
+- Refresh GraphQLRequest singleton between multiple requests to prevent
+  a common error in test execution https://github.com/nuwave/lighthouse/pull/761
 
 ## [3.4.0](https://github.com/nuwave/lighthouse/compare/v3.3.0...v3.4.0) - 2019-04-18
 
