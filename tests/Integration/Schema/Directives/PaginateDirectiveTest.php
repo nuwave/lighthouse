@@ -59,6 +59,34 @@ class PaginateDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itHandlesPaginationWithCountZero(): void
+    {
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users: [User!]! @paginate
+        }
+        ';
+
+        $this->query('
+        {
+            users(count: 0) {
+                data {
+                    id
+                }
+            }
+        }
+        ');
+        // TODO define what should happen here
+    }
+
+    /**
+     * @test
+     */
     public function itCanSpecifyCustomBuilder(): void
     {
         factory(User::class, 2)->create();

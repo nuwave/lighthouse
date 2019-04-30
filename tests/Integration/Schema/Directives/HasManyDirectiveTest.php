@@ -208,6 +208,39 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itHandlesPaginationWithCountZero(): void
+    {
+        $this->schema = '
+        type User {
+            tasks: [Task!]! @hasMany(type: "paginator")
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->query('
+        {
+            user {
+                tasks(count: 0) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ');
+        // TODO define what should happen here
+    }
+
+    /**
+     * @test
+     */
     public function relayTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
