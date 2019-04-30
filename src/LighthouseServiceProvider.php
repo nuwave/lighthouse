@@ -115,7 +115,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(GlobalIdContract::class, GlobalId::class);
 
-        $this->app->singleton(GraphQLRequest::class, function (Container $app): GraphQLRequest {
+        $this->app->bind(GraphQLRequest::class, function (Container $app): GraphQLRequest {
             /** @var \Illuminate\Http\Request $request */
             $request = $app->make('request');
 
