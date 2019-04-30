@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Default the config to always set the `Accept: application/json` header https://github.com/nuwave/lighthouse/pull/743
 - Declare a single named route which handles POST/GET instead of 2 seperate routes https://github.com/nuwave/lighthouse/pull/738
+- Apply the nested operations within a nested mutation in a consistent order
+  that makes sense https://github.com/nuwave/lighthouse/pull/754
 
 ### Deprecated
 
