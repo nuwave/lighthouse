@@ -82,9 +82,4 @@ class BuildSchemaStringTest extends TestCase
     {
         return 'foo';
     }
-
-    protected function getResolver(string $method): string
-    {
-        return addslashes(self::class)."@{$method}";
-    }
 }

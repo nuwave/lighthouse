@@ -53,7 +53,7 @@ class ContextFactoryTest extends TestCase
      */
     public function itCanGenerateCustomContext(): void
     {
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type Query {
             context: String @field(resolver:\"{$resolver}\")

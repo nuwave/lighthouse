@@ -12,7 +12,7 @@ class RenameDirectiveTest extends TestCase
      */
     public function itCanRenameAField(): void
     {
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
 
         $this->schema = "
         type Query {

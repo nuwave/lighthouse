@@ -44,7 +44,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -104,7 +104,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -166,7 +166,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type Post {
             title: String
@@ -231,7 +231,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type Comment {
             message: String
@@ -291,7 +291,7 @@ class DeferTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxExecutionTime(): void
     {
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -350,7 +350,7 @@ class DeferTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxNestedFields(): void
     {
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -419,7 +419,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -464,7 +464,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         directive @include(if: Boolean!) on FIELD
         directive @skip(if: Boolean!) on FIELD
@@ -515,7 +515,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -567,7 +567,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -612,7 +612,7 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -652,8 +652,8 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = addslashes(self::class).'@resolve';
-        $throw = addslashes(self::class).'@throw';
+        $resolver = $this->getResolver();
+        $throw = $this->getResolver('throw');
         $this->schema = "
         type User {
             name: String!

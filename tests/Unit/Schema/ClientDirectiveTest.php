@@ -17,7 +17,7 @@ class ClientDirectiveTest extends TestCase
      */
     public function itCanDefineAClientDirective(): void
     {
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
         $this->schema = '
         directive @filter(key: String = "default value") on FIELD
         

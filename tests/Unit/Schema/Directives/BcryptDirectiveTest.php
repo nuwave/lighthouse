@@ -152,13 +152,4 @@ class BcryptDirectiveTest extends TestCase
     {
         return $args['input'];
     }
-
-    /**
-     * @param  string  $method
-     * @return string
-     */
-    protected function getResolver(string $method = 'resolve'): string
-    {
-        return addslashes(self::class)."@{$method}";
-    }
 }

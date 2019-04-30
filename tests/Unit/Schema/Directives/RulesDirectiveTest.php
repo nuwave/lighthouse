@@ -18,7 +18,7 @@ class RulesDirectiveTest extends TestCase
     {
         parent::setUp();
 
-        $resolver = addslashes(self::class).'@resolve';
+        $resolver = $this->getResolver();
 
         $this->schema = "
         type Query {

@@ -34,7 +34,7 @@ class InterfaceTest extends DBTestCase
         }
         
         type Query {
-            namedThings: [Nameable!]! @field(resolver: "'.addslashes(self::class).'@fetchResults")
+            namedThings: [Nameable!]! @field(resolver: "'.$this->getResolver('fetchResults').'")
         }
         ';
 
@@ -70,7 +70,7 @@ class InterfaceTest extends DBTestCase
     public function itCanUseCustomTypeResolver(): void
     {
         $this->schema = '
-        interface Nameable @interface(resolveType: "'.addslashes(self::class).'@resolveType"){
+        interface Nameable @interface(resolveType: "'.$this->getResolver('resolveType').'"){
             name: String!
         }
 
@@ -80,7 +80,7 @@ class InterfaceTest extends DBTestCase
         }
 
         type Query {
-            namedThings: Nameable @field(resolver: "'.addslashes(self::class).'@fetchGuy")
+            namedThings: Nameable @field(resolver: "'.$this->getResolver('fetchGuy').'")
         }
         ';
 
@@ -123,7 +123,7 @@ class InterfaceTest extends DBTestCase
         }
         
         type Query {
-            namedThings: [Nameable!]! @field(resolver: "'.addslashes(self::class).'@fetchResults")
+            namedThings: [Nameable!]! @field(resolver: "'.$this->getResolver('fetchResults').'")
         }
         ';
 

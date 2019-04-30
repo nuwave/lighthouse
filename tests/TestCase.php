@@ -288,4 +288,15 @@ abstract class TestCase extends BaseTestCase
         }
         ';
     }
+
+    /**
+     * Get the test resolver.
+     *
+     * @param  string  $method
+     * @return string
+     */
+    protected function getResolver(string $method = 'resolve'): string
+    {
+        return addslashes(static::class)."@{$method}";
+    }
 }

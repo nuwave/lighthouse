@@ -15,7 +15,7 @@ class BuilderDirectiveTest extends DBTestCase
         $this->schema = '
         type Query {
             users(
-                limit: Int @builder(method: "'.addslashes(self::class).'@limit")
+                limit: Int @builder(method: "'.$this->getResolver('limit').'")
             ): [User!]! @all
         }
         
