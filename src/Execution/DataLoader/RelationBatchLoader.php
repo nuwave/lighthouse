@@ -83,7 +83,7 @@ class RelationBatchLoader extends BatchLoader
     {
         $modelRelationFetcher = $this->getRelationFetcher();
 
-        if($this->first !== null) {
+        if ($this->first !== null) {
             $modelRelationFetcher->loadRelationsForPage($this->first, $this->page);
         } else {
             $modelRelationFetcher->loadRelations();

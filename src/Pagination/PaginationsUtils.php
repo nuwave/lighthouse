@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Pagination;
 
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
-use Nuwave\Lighthouse\Pagination\Cursor;
 
 class PaginationsUtils
 {
@@ -33,17 +32,17 @@ class PaginationsUtils
      */
     public static function extractArgs(array $args, ?PaginationType $paginationType, ?int $paginateMaxCount): array
     {
-        if($paginationType->isConnection()){
+        if ($paginationType->isConnection()) {
             /** @var int $first */
             $first = $args['first'];
-            $page = PaginationsUtils::calculateCurrentPage(
+            $page = self::calculateCurrentPage(
                 $first,
                 Cursor::decode($args)
             );
         } else {
-                /** @var int $first */
-                $first = $args[config('lighthouse.pagination_amount_argument')];
-                $page = Arr::get($args, 'page', 1);
+            /** @var int $first */
+            $first = $args[config('lighthouse.pagination_amount_argument')];
+            $page = Arr::get($args, 'page', 1);
         }
 
         // Make sure the maximum pagination count is not exceeded

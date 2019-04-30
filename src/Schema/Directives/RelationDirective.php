@@ -6,13 +6,13 @@ use GraphQL\Deferred;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Pagination\PaginationManipulator;
-use Nuwave\Lighthouse\Pagination\PaginationsUtils;
-use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Pagination\PaginationType;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Pagination\PaginationsUtils;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 
@@ -42,7 +42,7 @@ abstract class RelationDirective extends BaseDirective
 
                     $constructorArgs += [
                         'first' => $first,
-                        'page' => $page
+                        'page' => $page,
                     ];
                 }
 

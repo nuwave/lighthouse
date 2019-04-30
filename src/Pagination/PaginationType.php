@@ -27,7 +27,7 @@ class PaginationType
      */
     public function __construct(string $paginationType)
     {
-        switch($paginationType){
+        switch ($paginationType) {
             case 'default':
             case 'paginator':
                 $this->type = self::TYPE_PAGINATOR;

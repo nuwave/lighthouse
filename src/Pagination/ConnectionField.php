@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Pagination;
 
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Pagination\Cursor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ConnectionField

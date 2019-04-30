@@ -32,7 +32,7 @@ class PaginationManipulator
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): DocumentAST {
-        if($paginationType->isConnection()){
+        if ($paginationType->isConnection()) {
             return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
         }
 
