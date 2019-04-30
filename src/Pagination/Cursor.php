@@ -1,6 +1,6 @@
 <?php
 
-namespace Nuwave\Lighthouse\Execution\Utils;
+namespace Nuwave\Lighthouse\Pagination;
 
 use Illuminate\Support\Arr;
 

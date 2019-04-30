@@ -131,13 +131,13 @@ class ModelRelationFetcher
      *
      * The relation will be converted to a `Paginator` instance.
      *
-     * @param  int  $perPage
+     * @param  int  $first
      * @param  int  $page
      * @param  string  $relationName
      * @param  \Closure  $relationConstraints
      * @return $this
      */
-    public function loadRelationForPage(int $perPage, int $page, string $relationName, Closure $relationConstraints): self
+    public function loadRelationForPage(int $first, int $page, string $relationName, Closure $relationConstraints): self
     {
         // Load the count of relations of models, this will be the `total` argument of `Paginator`.
         // Be aware that this will reload all the models entirely with the count of their relations,
@@ -147,8 +147,8 @@ class ModelRelationFetcher
         $relations = $this
             ->buildRelationsFromModels($relationName, $relationConstraints)
             ->map(
-                function (Relation $relation) use ($perPage, $page) {
-                    return $relation->forPage($page, $perPage);
+                function (Relation $relation) use ($first, $page) {
+                    return $relation->forPage($page, $first);
                 }
             );
 
@@ -163,7 +163,7 @@ class ModelRelationFetcher
 
         $this->associateRelationModels($relationName, $relationModels);
 
-        $this->convertRelationToPaginator($perPage, $page, $relationName);
+        $this->convertRelationToPaginator($first, $page, $relationName);
 
         return $this;
     }
@@ -328,24 +328,25 @@ class ModelRelationFetcher
     }
 
     /**
-     * @param  int  $perPage
+     * @param  int  $first
      * @param  int  $page
      * @param  string  $relationName
      * @return $this
      */
-    protected function convertRelationToPaginator(int $perPage, int $page, string $relationName): self
+    protected function convertRelationToPaginator(int $first, int $page, string $relationName): self
     {
-        $this->models->each(function (Model $model) use ($page, $perPage, $relationName) {
+        $this->models->each(function (Model $model) use ($page, $first, $relationName) {
             $total = $model->getAttribute(
                 $this->getRelationCountName($relationName)
             );
 
+            $paginator =
             $paginator = app()->makeWith(
                 LengthAwarePaginator::class,
                 [
                     'items' => $model->getRelation($relationName),
                     'total' => $total,
-                    'perPage' => $perPage,
+                    'perPage' => $first,
                     'currentPage' => $page,
                     'options' => [],
                 ]

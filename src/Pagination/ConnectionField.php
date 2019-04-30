@@ -1,9 +1,9 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Types;
+namespace Nuwave\Lighthouse\Pagination;
 
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\Utils\Cursor;
+use Nuwave\Lighthouse\Pagination\Cursor;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ConnectionField
