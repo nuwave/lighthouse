@@ -24,8 +24,8 @@ class MultipleRequestsTest extends TestCase
         }
         ')->assertJson([
             'data' => [
-                'return' => 'foo'
-            ]
+                'return' => 'foo',
+            ],
         ]);
 
         $this->query('
@@ -34,8 +34,8 @@ class MultipleRequestsTest extends TestCase
         }
         ')->assertJson([
            'data' => [
-               'return' => 'bar'
-           ]
+               'return' => 'bar',
+           ],
         ]);
     }
 
