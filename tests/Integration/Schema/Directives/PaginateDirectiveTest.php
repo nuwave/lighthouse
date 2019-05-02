@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Error\Error;
 use Tests\DBTestCase;
+use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
@@ -85,7 +85,7 @@ class PaginateDirectiveTest extends DBTestCase
         ->assertJson([
             'data' => [
                 'users' => null,
-            ]
+            ],
         ])
         ->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }

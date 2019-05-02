@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Error\Error;
 use Tests\DBTestCase;
+use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -242,8 +242,8 @@ class HasManyDirectiveTest extends DBTestCase
                 'user' => [
                     'id' => $this->user->id,
                     'tasks' => null,
-                ]
-            ]
+                ],
+            ],
         ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
