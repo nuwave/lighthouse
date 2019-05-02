@@ -288,4 +288,15 @@ abstract class TestCase extends BaseTestCase
         }
         ';
     }
+
+    /**
+     * Get a fully qualified reference to a method that is defined on the test class.
+     *
+     * @param  string  $method
+     * @return string
+     */
+    protected function qualifyTestResolver(string $method = 'resolve'): string
+    {
+        return addslashes(static::class).'@'.$method;
+    }
 }

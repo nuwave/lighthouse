@@ -11,12 +11,11 @@ class MultipleRequestsTest extends TestCase
      */
     public function itCanFireMultipleRequestsInOneTest(): void
     {
-        $resolver = addslashes(self::class).'@resolve';
-        $this->schema = "
+        $this->schema = '
         type Query {
-            return(this: String!): String @field(resolver:\"{$resolver}\")
+            return(this: String!): String @field(resolver:"'.$this->qualifyTestResolver().'")
         }
-        ";
+        ';
 
         $this->query('
         {

@@ -18,17 +18,15 @@ class RulesDirectiveTest extends TestCase
     {
         parent::setUp();
 
-        $resolver = addslashes(self::class).'@resolve';
-
         $this->schema = "
         type Query {
             foo(bar: String @rules(apply: [\"required\"])): User
-                @field(resolver: \"{$resolver}\")
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
 
         type Mutation {
             foo(bar: String @rules(apply: [\"required\"])): User
-                @field(resolver: \"{$resolver}\")
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
 
         type User {

@@ -35,12 +35,10 @@ class ComplexityDirectiveTest extends TestCase
      */
     public function itCanSetCustomComplexityResolver(): void
     {
-        $resolver = addslashes(self::class);
-
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             posts: [Post!]!
-                @complexity(resolver: "'.$resolver.'@complexity")
+                @complexity(resolver: "'.$this->qualifyTestResolver('complexity').'")
                 @hasMany
         }
         
