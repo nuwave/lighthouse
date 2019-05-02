@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.0...master)
 
+### Fixed
+
+- Throw error if pagination amount `<= 0` is requested https://github.com/nuwave/lighthouse/pull/765
+
 ## [3.5.0](https://github.com/nuwave/lighthouse/compare/v3.4.0...v3.5.0)
 
 ### Changed
