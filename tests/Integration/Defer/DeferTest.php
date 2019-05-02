@@ -44,7 +44,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -52,7 +51,7 @@ class DeferTest extends TestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -104,7 +103,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -112,7 +110,7 @@ class DeferTest extends TestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -166,7 +164,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type Post {
             title: String
@@ -178,7 +175,7 @@ class DeferTest extends TestCase
         }
         
         type Query {
-            posts: [Post] @field(resolver: \"{$resolver}\")
+            posts: [Post] @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -231,7 +228,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type Comment {
             message: String
@@ -248,7 +244,7 @@ class DeferTest extends TestCase
         }
         
         type Query {
-            posts: [Post] @field(resolver: \"{$resolver}\")
+            posts: [Post] @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -291,7 +287,6 @@ class DeferTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxExecutionTime(): void
     {
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -299,7 +294,7 @@ class DeferTest extends TestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -350,7 +345,6 @@ class DeferTest extends TestCase
      */
     public function itCancelsDefermentAfterMaxNestedFields(): void
     {
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -358,7 +352,7 @@ class DeferTest extends TestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -419,7 +413,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -427,7 +420,7 @@ class DeferTest extends TestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -464,7 +457,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         directive @include(if: Boolean!) on FIELD
         directive @skip(if: Boolean!) on FIELD
@@ -475,7 +467,7 @@ class DeferTest extends TestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -515,7 +507,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -523,7 +514,7 @@ class DeferTest extends TestCase
         }
 
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -567,7 +558,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -575,12 +565,12 @@ class DeferTest extends TestCase
         }
         
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         
         type Mutation {
             updateUser(name: String!): User
-                @field(resolver: \"{$resolver}\")
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -612,7 +602,6 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             name: String!
@@ -620,7 +609,7 @@ class DeferTest extends TestCase
         }
         
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -652,16 +641,14 @@ class DeferTest extends TestCase
             ],
         ];
 
-        $resolver = $this->getResolver();
-        $throw = $this->getResolver('throw');
         $this->schema = "
         type User {
             name: String!
-            parent: User @field(resolver: \"{$throw}\")
+            parent: User @field(resolver: \"{$this->qualifyTestResolver('throw')}\")
         }
         
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 

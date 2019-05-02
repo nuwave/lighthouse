@@ -29,7 +29,6 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanStoreResolverResultInCache(): void
     {
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             id: ID!
@@ -37,7 +36,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -63,7 +62,6 @@ class CacheDirectiveTest extends DBTestCase
      */
     public function itCanPlaceCacheKeyOnAnyField(): void
     {
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             id: ID!
@@ -72,7 +70,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 
@@ -102,7 +100,6 @@ class CacheDirectiveTest extends DBTestCase
         $this->be($user);
         $cacheKey = "auth:{$user->getKey()}:user:1:name";
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type User {
             id: ID!
@@ -110,7 +107,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         
         type Query {
-            user: User @field(resolver: \"{$resolver}\")
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 

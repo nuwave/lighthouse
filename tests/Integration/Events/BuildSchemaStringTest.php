@@ -32,21 +32,17 @@ class BuildSchemaStringTest extends TestCase
         app('events')->listen(
             BuildSchemaString::class,
             function (BuildSchemaString $buildSchemaString): string {
-                $resolver = $this->getResolver('resolveSayHello');
-
                 return "
                 extend type Query {
-                    sayHello: String @field(resolver: \"{$resolver}\")
+                    sayHello: String @field(resolver: \"{$this->qualifyTestResolver('throw')}\")
                 }
                 ";
             }
         );
 
-        $resolver = $this->getResolver('resolveFoo');
-
         $this->schema = "
         type Query {
-            foo: String @field(resolver: \"{$resolver}\")
+            foo: String @field(resolver: \"{$this->qualifyTestResolver('resolveFoo')}\")
         }
         ";
 

@@ -14,12 +14,12 @@ class BcryptDirectiveTest extends TestCase
         $this->schema = '
         type Mutation {
             foo(bar: String @bcrypt): Foo
-                @field(resolver: "'.$this->getResolver().'")
+                @field(resolver: "'.$this->qualifyTestResolver().'")
         }
         
         type Query {
             foo(bar: String @bcrypt): Foo
-                @field(resolver: "'.$this->getResolver().'")
+                @field(resolver: "'.$this->qualifyTestResolver().'")
         }
         
         type Foo {
@@ -58,7 +58,7 @@ class BcryptDirectiveTest extends TestCase
         $this->schema = '
         type Query {
             user(input: UserInput): User
-                @field(resolver: "'.$this->getResolver('resolveUser').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
         type User {

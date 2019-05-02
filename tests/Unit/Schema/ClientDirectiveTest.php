@@ -17,12 +17,11 @@ class ClientDirectiveTest extends TestCase
      */
     public function itCanDefineAClientDirective(): void
     {
-        $resolver = $this->getResolver();
         $this->schema = '
         directive @filter(key: String = "default value") on FIELD
         
         type Query {
-            foo: String @field(resolver: "'.$resolver.'")
+            foo: String @field(resolver: "'.$this->qualifyTestResolver().'")
         }
         ';
 

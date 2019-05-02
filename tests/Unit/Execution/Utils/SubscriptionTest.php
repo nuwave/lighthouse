@@ -43,10 +43,9 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $resolver = $this->getResolver();
         $this->schema = "
         type Query {
-            subscription: String @field(resolver: \"{$resolver}\")
+            subscription: String @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
         ";
 

@@ -44,7 +44,7 @@ class DeferDBTest extends DBTestCase
             'company_id' => $company->getKey(),
         ]);
 
-        $resolver = $this->getResolver();
+        $resolver = $this->qualifyTestResolver();
         self::$resolver = function () use ($user): User {
             return $user;
         };
@@ -103,7 +103,7 @@ class DeferDBTest extends DBTestCase
         ]);
         $user = $users[0];
 
-        $resolver = $this->getResolver();
+        $resolver = $this->qualifyTestResolver();
         self::$resolver = function () use ($user): User {
             return $user;
         };
@@ -183,7 +183,7 @@ class DeferDBTest extends DBTestCase
                 ]);
             });
 
-        $resolver = $this->getResolver();
+        $resolver = $this->qualifyTestResolver();
         self::$resolver = function () use ($companies): Collection {
             return $companies;
         };

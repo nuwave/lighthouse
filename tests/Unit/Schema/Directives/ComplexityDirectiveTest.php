@@ -38,7 +38,7 @@ class ComplexityDirectiveTest extends TestCase
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
             posts: [Post!]!
-                @complexity(resolver: "'.$this->getResolver('complexity').'")
+                @complexity(resolver: "'.$this->qualifyTestResolver('complexity').'")
                 @hasMany
         }
         

@@ -70,8 +70,6 @@ class UnionTest extends DBTestCase
      */
     public function schemaAndQuery(bool $withCustomTypeResolver): array
     {
-        $fieldResolver = $this->getResolver('fetchResults');
-
         $prefix = $withCustomTypeResolver
             ? 'Custom'
             : '';
@@ -93,7 +91,7 @@ class UnionTest extends DBTestCase
             }
             
             type Query {
-                stuff: [Stuff!]! @field(resolver: \"{$fieldResolver}\")
+                stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver()}\")
             }
             ",
             "

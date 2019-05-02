@@ -23,7 +23,7 @@ class CanDirectiveTest extends TestCase
         type Query {
             user: User!
                 @can('.$argumentName.': "adminOnly")
-                @field(resolver: "'.$this->getResolver('resolveUser').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
         type User {
@@ -57,7 +57,7 @@ class CanDirectiveTest extends TestCase
         type Query {
             user: User!
                 @can('.$argumentName.': "adminOnly")
-                @field(resolver: "'.$this->getResolver('resolveUser').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
         type User {
@@ -97,7 +97,7 @@ class CanDirectiveTest extends TestCase
         type Query {
             user: User!
                 @can('.$argumentName.': "guestOnly")
-                @field(resolver: "'.$this->getResolver('resolveUser').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
         type User {
@@ -137,7 +137,7 @@ class CanDirectiveTest extends TestCase
         type Query {
             user: User!
                 @can('.$argumentName.': ["adminOnly", "alwaysTrue"])
-                @field(resolver: "'.$this->getResolver('resolveUser').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
         type User {
@@ -173,7 +173,7 @@ class CanDirectiveTest extends TestCase
         type Query {
             user: User!
                 @can('.$argumentName.': "dependingOnArg", args: [false])
-                @field(resolver: "'.$this->getResolver('resolveUser').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
         type User {

@@ -13,7 +13,7 @@ class MultipleRequestsTest extends TestCase
     {
         $this->schema = '
         type Query {
-            return(this: String!): String @field(resolver:"'.$this->getResolver().'")
+            return(this: String!): String @field(resolver:"'.$this->qualifyTestResolver().'")
         }
         ';
 

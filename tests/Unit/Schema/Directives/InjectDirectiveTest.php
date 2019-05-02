@@ -23,7 +23,7 @@ class InjectDirectiveTest extends DBTestCase
         type Query {
             me: User!
                 @inject(context: "user.id", name: "user_id")
-                @field(resolver: "'.$this->getResolver('resolveUser').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         ';
 
