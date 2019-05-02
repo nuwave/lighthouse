@@ -41,18 +41,24 @@ class WithDirective extends RelationDirective implements FieldMiddleware
                     $loader = BatchLoader::instance(
                         RelationBatchLoader::class,
                         $resolveInfo->path,
-                        $this->toLoaderConstructorArguments($parent, $args, $context, $resolveInfo)
+                        [
+                            'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
+                            'args' => $args,
+                            'scopes' => $this->directiveArgValue('scopes', []),
+                            'resolveInfo' => $resolveInfo,
+                        ]
                     );
 
                     return new Deferred(function () use ($loader, $resolver, $parent, $args, $context, $resolveInfo) {
-                        return $loader->load(
-                            $parent->getKey(),
-                            ['parent' => $parent]
-                        )->then(
-                            function () use ($resolver, $parent, $args, $context, $resolveInfo) {
-                                return $resolver($parent, $args, $context, $resolveInfo);
-                            }
-                        );
+                        return $loader
+                            ->load(
+                                $parent->getKey(),
+                                ['parent' => $parent]
+                            )->then(
+                                function () use ($resolver, $parent, $args, $context, $resolveInfo) {
+                                    return $resolver($parent, $args, $context, $resolveInfo);
+                                }
+                            );
                     });
                 }
             )
