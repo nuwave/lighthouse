@@ -10,7 +10,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Pagination\PaginationsUtils;
+use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -38,7 +38,7 @@ abstract class RelationDirective extends BaseDirective
                 if ($paginationType = $this->paginationType()) {
                     /** @var int $first */
                     /** @var int $page */
-                    [$first, $page] = PaginationsUtils::extractArgs($args, $paginationType, $this->paginateMaxCount());
+                    [$first, $page] = PaginationUtils::extractArgs($args, $paginationType, $this->paginateMaxCount());
 
                     $constructorArgs += [
                         'first' => $first,

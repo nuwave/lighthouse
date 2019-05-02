@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Error\Error;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
@@ -68,7 +69,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         
         type Query {
-            users: [User!]! @paginate
+            users: [User!] @paginate
         }
         ';
 
@@ -80,8 +81,13 @@ class PaginateDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-        // TODO define what should happen here
+        ')
+        ->assertJson([
+            'data' => [
+                'users' => null,
+            ]
+        ])
+        ->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     /**

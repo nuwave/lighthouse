@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use GraphQL\Error\Error;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
@@ -212,7 +213,8 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = '
         type User {
-            tasks: [Task!]! @hasMany(type: "paginator")
+            id: ID
+            tasks: [Task!] @hasMany(type: "paginator")
         }
         
         type Task {
@@ -227,6 +229,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->query('
         {
             user {
+                id
                 tasks(count: 0) {
                     data {
                         id
@@ -234,8 +237,14 @@ class HasManyDirectiveTest extends DBTestCase
                 }
             }
         }
-        ');
-        // TODO define what should happen here
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $this->user->id,
+                    'tasks' => null,
+                ]
+            ]
+        ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     /**

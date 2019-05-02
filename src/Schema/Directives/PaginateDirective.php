@@ -11,7 +11,7 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Pagination\PaginationsUtils;
+use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
@@ -61,7 +61,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
                 /** @var int $first */
                 /** @var int $page */
-                [$first, $page] = PaginationsUtils::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
+                [$first, $page] = PaginationUtils::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
 
                 if ($this->directiveHasArgument('builder')) {
                     $query = call_user_func(

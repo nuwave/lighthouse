@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Pagination;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 
-class PaginationsUtils
+class PaginationUtils
 {
     /**
      * Calculate the current page to inform the user about the pagination state.
@@ -43,6 +43,12 @@ class PaginationsUtils
             /** @var int $first */
             $first = $args[config('lighthouse.pagination_amount_argument')];
             $page = Arr::get($args, 'page', 1);
+        }
+
+        if ($first <= 0) {
+            throw new Error(
+                "Requested pagination amount must be more than 0, got $first"
+            );
         }
 
         // Make sure the maximum pagination count is not exceeded
