@@ -7,7 +7,6 @@ use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class HasManyDirectiveTest extends DBTestCase
 {
@@ -644,7 +643,7 @@ class HasManyDirectiveTest extends DBTestCase
      */
     public function itThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
