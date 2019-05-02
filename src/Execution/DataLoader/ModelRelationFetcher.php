@@ -340,7 +340,6 @@ class ModelRelationFetcher
                 $this->getRelationCountName($relationName)
             );
 
-            $paginator =
             $paginator = app()->makeWith(
                 LengthAwarePaginator::class,
                 [
