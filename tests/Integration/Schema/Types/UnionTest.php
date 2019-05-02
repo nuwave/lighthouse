@@ -43,7 +43,7 @@ class UnionTest extends DBTestCase
     /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function fetchResults(): Collection
+    public function resolve(): Collection
     {
         $users = User::all();
         $posts = Post::all();

@@ -34,7 +34,7 @@ class BuildSchemaStringTest extends TestCase
             function (BuildSchemaString $buildSchemaString): string {
                 return "
                 extend type Query {
-                    sayHello: String @field(resolver: \"{$this->qualifyTestResolver('throw')}\")
+                    sayHello: String @field(resolver: \"{$this->qualifyTestResolver('resolveSayHello')}\")
                 }
                 ";
             }
