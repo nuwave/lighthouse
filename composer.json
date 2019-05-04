@@ -38,6 +38,7 @@
         "mockery/mockery": "^1.0",
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.x-dev",
         "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*",
+        "phpbench/phpbench": "@dev",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
