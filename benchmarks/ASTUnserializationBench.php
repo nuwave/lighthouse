@@ -1,6 +1,7 @@
 <?php
 
 use GraphQL\Language\Parser;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
 /**
  * @BeforeMethods({"prepareSchema"})
@@ -46,7 +47,7 @@ SCHEMA;
         );
 
         $this->documentAST = serialize(
-            \Nuwave\Lighthouse\Schema\AST\DocumentAST::fromSource(self::SCHEMA)
+            DocumentAST::fromSource(self::SCHEMA)
         );
     }
 
