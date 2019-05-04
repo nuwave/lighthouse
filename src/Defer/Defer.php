@@ -84,7 +84,7 @@ class Defer implements CreatesResponse
             PartialParser::directive('@deferrable')
         );
 
-        $manipulateAST->documentAST->setDefinition(
+        $manipulateAST->documentAST->setDirectiveDefinition(
             PartialParser::directiveDefinition('directive @defer(if: Boolean) on FIELD')
         );
     }

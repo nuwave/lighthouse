@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -58,8 +57,8 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, TypeDefini
     /**
      * Apply manipulations from a type definition node.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
      * @return void
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)

@@ -257,8 +257,3 @@ type Query {
     ): [User!]! @paginate
 }
 ```
-
-### ArgManipulator
-
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](../../../src/Support/Contracts/ArgManipulator.php)
-directive can be used to manipulate the schema AST. 

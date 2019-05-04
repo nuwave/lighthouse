@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Factories;
+namespace Tests\Unit\Schema;
 
 use Closure;
 use Tests\TestCase;
@@ -13,20 +13,20 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
-class NodeFactoryTest extends TestCase
+class TypeRegistryTest extends TestCase
 {
     /**
-     * Node factory.
+     * The type registry.
      *
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
-    protected $factory;
+    protected $typeRegistry;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->factory = app(TypeRegistry::class);
+        $this->typeRegistry = app(TypeRegistry::class);
     }
 
     /**
@@ -40,7 +40,7 @@ class NodeFactoryTest extends TestCase
         }
         ');
         /** @var \GraphQL\Type\Definition\EnumType $enumType */
-        $enumType = $this->factory->handle($enumNode);
+        $enumType = $this->typeRegistry->handle($enumNode);
 
         $this->assertInstanceOf(EnumType::class, $enumType);
         $this->assertSame('Role', $enumType->name);
@@ -58,7 +58,7 @@ class NodeFactoryTest extends TestCase
         }
         ');
         /** @var \GraphQL\Type\Definition\EnumType $enumType */
-        $enumType = $this->factory->handle($enumNode);
+        $enumType = $this->typeRegistry->handle($enumNode);
 
         $this->assertInstanceOf(EnumType::class, $enumType);
         $this->assertSame('Role', $enumType->name);
@@ -74,7 +74,7 @@ class NodeFactoryTest extends TestCase
         scalar Email
         ');
         /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
-        $scalarType = $this->factory->handle($scalarNode);
+        $scalarType = $this->typeRegistry->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
         $this->assertSame('Email', $scalarType->name);
@@ -89,7 +89,7 @@ class NodeFactoryTest extends TestCase
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
         ');
         /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
-        $scalarType = $this->factory->handle($scalarNode);
+        $scalarType = $this->typeRegistry->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
         $this->assertSame('DateTime', $scalarType->name);
@@ -104,7 +104,7 @@ class NodeFactoryTest extends TestCase
         scalar SomeEmail @scalar(class: "Email")
         ');
         /** @var \GraphQL\Type\Definition\ScalarType $scalarType */
-        $scalarType = $this->factory->handle($scalarNode);
+        $scalarType = $this->typeRegistry->handle($scalarNode);
 
         $this->assertInstanceOf(ScalarType::class, $scalarType);
         $this->assertSame('SomeEmail', $scalarType->name);
@@ -121,7 +121,7 @@ class NodeFactoryTest extends TestCase
         }
         ');
         /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
-        $interfaceType = $this->factory->handle($interfaceNode);
+        $interfaceType = $this->typeRegistry->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
         $this->assertSame('Foo', $interfaceType->name);
@@ -139,7 +139,7 @@ class NodeFactoryTest extends TestCase
         }
         ');
         /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
-        $interfaceType = $this->factory->handle($interfaceNode);
+        $interfaceType = $this->typeRegistry->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
         $this->assertSame('Nameable', $interfaceType->name);
@@ -156,7 +156,7 @@ class NodeFactoryTest extends TestCase
         }
         ');
         /** @var \GraphQL\Type\Definition\InterfaceType $interfaceType */
-        $interfaceType = $this->factory->handle($interfaceNode);
+        $interfaceType = $this->typeRegistry->handle($interfaceNode);
 
         $this->assertInstanceOf(InterfaceType::class, $interfaceType);
         $this->assertSame('Bar', $interfaceType->name);
@@ -171,7 +171,7 @@ class NodeFactoryTest extends TestCase
         union Foo = Bar
         ');
         /** @var \GraphQL\Type\Definition\UnionType $unionType */
-        $unionType = $this->factory->handle($unionNode);
+        $unionType = $this->typeRegistry->handle($unionNode);
 
         $this->assertInstanceOf(UnionType::class, $unionType);
         $this->assertSame('Foo', $unionType->name);
@@ -189,7 +189,7 @@ class NodeFactoryTest extends TestCase
         }
         ');
         /** @var \GraphQL\Type\Definition\ObjectType $objectType */
-        $objectType = $this->factory->handle($objectTypeNode);
+        $objectType = $this->typeRegistry->handle($objectTypeNode);
 
         $this->assertInstanceOf(ObjectType::class, $objectType);
         $this->assertSame('User', $objectType->name);
@@ -207,7 +207,7 @@ class NodeFactoryTest extends TestCase
         }
         ');
         /** @var \GraphQL\Type\Definition\InputObjectType $inputObjectType */
-        $inputObjectType = $this->factory->handle($inputNode);
+        $inputObjectType = $this->typeRegistry->handle($inputNode);
 
         $this->assertInstanceOf(InputObjectType::class, $inputObjectType);
         $this->assertSame('UserInput', $inputObjectType->name);

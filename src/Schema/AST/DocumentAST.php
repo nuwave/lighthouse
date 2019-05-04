@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\AST;
 
 use Exception;
 use Serializable;
-use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\Node;
@@ -13,11 +12,12 @@ use GraphQL\Language\AST\TypeExtensionNode;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class DocumentAST implements Serializable
 {
     /**
+     * The types within the schema.
+     *
      * ['foo' => FooType].
      *
      * @var NodeList<TypeDefinitionNode>
@@ -25,13 +25,20 @@ class DocumentAST implements Serializable
     public $types = [];
 
     /**
+     * The type extensions within the parsed document.
+     *
+     * Will NOT be kept after unserialization, as the type
+     * extensions are merged with the types before.
+     *
      * ['foo' => [0 => FooExtension, 1 => FooExtension]].
      *
-     * @var NodeListMap<NodeList<TypeExtensionNode>>
+     * @var NodeList<TypeExtensionNode>[]
      */
     public $typeExtensions = [];
 
     /**
+     * Client directive definitions.
+     *
      * ['foo' => FooDirective].
      *
      * @var NodeList<DirectiveDefinitionNode>
@@ -64,15 +71,17 @@ class DocumentAST implements Serializable
 
         $instance = new self;
 
+        // Store the types in an associative array for quick lookup
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
                 $instance->types[$definition->name->value] = $definition;
             } elseif ($definition instanceof TypeExtensionNode) {
+                // Multiple type extensions for the same name can exist
                 $instance->typeExtensions[$definition->name->value] [] = $definition;
             } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
-                throw new \Exception(
+                throw new Exception(
                     'Unknown definition type'
                 );
             }
@@ -81,6 +90,14 @@ class DocumentAST implements Serializable
         return $instance;
     }
 
+    /**
+     * Serialize the final AST.
+     *
+     * We exclude the type extensions, as they are merged with
+     * the actual types at this point.
+     *
+     * @return string
+     */
     public function serialize(): string
     {
         $nodeToArray = function (Node $node) {
@@ -89,20 +106,23 @@ class DocumentAST implements Serializable
 
         return serialize([
             'types' => array_map($nodeToArray, $this->types),
-//            'typeExtensions' => serialize($this->typeExtensions),
             'directives' => array_map($nodeToArray, $this->directives),
         ]);
     }
 
+    /**
+     * Unserialize the AST.
+     *
+     * @param string $serialized
+     */
     public function unserialize($serialized): void
     {
         [
             'types' => $types,
-//            'typeExtensions' => unserialize($typeExtensions),
             'directives' => $directives,
         ] = unserialize($serialized);
 
-        // TODO ensure named offsets
+        // Utilize the NodeList for lazy unserialization
         $this->types = new NodeList($types);
         $this->directives = new NodeList($directives);
     }
@@ -111,7 +131,7 @@ class DocumentAST implements Serializable
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $type
      * @return $this
      */
-    public function setType(TypeDefinitionNode $type): self
+    public function setTypeDefinition(TypeDefinitionNode $type): self
     {
         $this->types[$type->name->value] = $type;
 
@@ -119,26 +139,13 @@ class DocumentAST implements Serializable
     }
 
     /**
-     * @param  \GraphQL\Language\AST\Node  $definitionNode
+     * @param  \GraphQL\Language\AST\DirectiveDefinitionNode  $directive
      * @return $this
      */
-    public function setDefinition(Node $definitionNode): self
+    public function setDirectiveDefinition(DirectiveDefinitionNode $directive): self
     {
-        if ($definitionNode instanceof DirectiveDefinitionNode) {
-            $this->directives[$definitionNode->name->value] = $definitionNode;
-        } elseif ($definitionNode instanceof TypeDefinitionNode) {
-            $this->types[$definitionNode->name->value] = $definitionNode;
-        } else {
-            throw new Exception(
-                'Unsupported type'
-            );
-        }
+        $this->directives[$directive->name->value] = $directive;
 
         return $this;
-    }
-
-    public function queryTypeDefinition(): ObjectTypeDefinitionNode
-    {
-        return $this->types['Query'];
     }
 }

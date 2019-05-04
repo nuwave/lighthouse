@@ -80,19 +80,6 @@ class ASTHelper
     }
 
     /**
-     * Create a clone of the original node.
-     *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @return \GraphQL\Language\AST\Node
-     */
-    public static function cloneNode(Node $node): Node
-    {
-        return AST::fromArray(
-            $node->toArray(true)
-        );
-    }
-
-    /**
      * @param  \GraphQL\Language\AST\Node  $definition
      * @return string
      */
@@ -191,21 +178,6 @@ class ASTHelper
     {
         return (new Collection($definitionNode->directives))
             ->first(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
-                return $directiveDefinitionNode->name->value === $name;
-            });
-    }
-
-    /**
-     * Check if a node has a particular directive defined upon it.
-     *
-     * @param  \GraphQL\Language\AST\Node  $definitionNode
-     * @param  string  $name
-     * @return bool
-     */
-    public static function hasDirectiveDefinition(Node $definitionNode, string $name): bool
-    {
-        return (new Collection($definitionNode->directives))
-            ->contains(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
                 return $directiveDefinitionNode->name->value === $name;
             });
     }

@@ -25,7 +25,7 @@ class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            $documentAST->queryTypeDefinition()
+            $documentAST->->types['Query']
         );
     }
 
@@ -61,7 +61,7 @@ class DocumentASTTest extends TestCase
 
         $this->assertSame(
             $overwrite,
-            $documentAST->queryTypeDefinition()
+            $documentAST->->types['Query']
         );
     }
 
@@ -84,7 +84,7 @@ class DocumentASTTest extends TestCase
         );
 
         /** @var ObjectTypeDefinitionNode $queryType */
-        $queryType = $reserialized->queryTypeDefinition();
+        $queryType = $reserialized->->types['Query'];
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
             $queryType

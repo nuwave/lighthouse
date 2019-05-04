@@ -65,9 +65,9 @@ class TypeRegistry
     protected $documentAST;
 
     /**
-     * @param \Nuwave\Lighthouse\Support\Pipeline $pipeline
-     * @param \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory $directiveFactory
-     * @param \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory $argumentFactory
+     * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @param  \Nuwave\Lighthouse\Schema\Factories\ArgumentFactory  $argumentFactory
      * @return void
      */
     public function __construct(
@@ -80,6 +80,23 @@ class TypeRegistry
         $this->argumentFactory = $argumentFactory;
     }
 
+    /**
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return $this
+     */
+    public function setDocumentAST(DocumentAST $documentAST): self
+    {
+        $this->documentAST = $documentAST;
+
+        return $this;
+    }
+
+    /**
+     * Get the given GraphQL type by name.
+     *
+     * @param  string  $name
+     * @return \GraphQL\Type\Definition\Type
+     */
     public function get(string $name): Type
     {
         if (! isset($this->types[$name])) {
@@ -92,9 +109,9 @@ class TypeRegistry
     }
 
     /**
-     * Transform node to type.
+     * Transform a definition node to an executable type.
      *
-     * @param \GraphQL\Language\AST\TypeDefinitionNode $definition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
      * @return \GraphQL\Type\Definition\Type
      */
     public function handle(TypeDefinitionNode $definition): Type
@@ -119,9 +136,9 @@ class TypeRegistry
     }
 
     /**
-     * Transform value to type.
+     * The default type transformations.
      *
-     * @param \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
      * @return \GraphQL\Type\Definition\Type
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -150,7 +167,7 @@ class TypeRegistry
     }
 
     /**
-     * @param \GraphQL\Language\AST\EnumTypeDefinitionNode $enumDefinition
+     * @param  \GraphQL\Language\AST\EnumTypeDefinitionNode  $enumDefinition
      * @return \GraphQL\Type\Definition\EnumType
      */
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
@@ -178,7 +195,7 @@ class TypeRegistry
     }
 
     /**
-     * @param \GraphQL\Language\AST\ScalarTypeDefinitionNode $scalarDefinition
+     * @param  \GraphQL\Language\AST\ScalarTypeDefinitionNode  $scalarDefinition
      * @return \GraphQL\Type\Definition\ScalarType
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
@@ -214,7 +231,7 @@ class TypeRegistry
     }
 
     /**
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $objectDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectDefinition
      * @return \GraphQL\Type\Definition\ObjectType
      */
     protected function resolveObjectType(ObjectTypeDefinitionNode $objectDefinition): ObjectType
@@ -236,7 +253,7 @@ class TypeRegistry
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode $definition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $definition
      * @return \Closure
      */
     protected function resolveFieldsFunction($definition): Closure
@@ -258,7 +275,7 @@ class TypeRegistry
     }
 
     /**
-     * @param \GraphQL\Language\AST\InputObjectTypeDefinitionNode $inputDefinition
+     * @param  \GraphQL\Language\AST\InputObjectTypeDefinitionNode  $inputDefinition
      * @return \GraphQL\Type\Definition\InputObjectType
      */
     protected function resolveInputObjectType(InputObjectTypeDefinitionNode $inputDefinition): InputObjectType
@@ -281,7 +298,7 @@ class TypeRegistry
     }
 
     /**
-     * @param \GraphQL\Language\AST\InterfaceTypeDefinitionNode $interfaceDefinition
+     * @param  \GraphQL\Language\AST\InterfaceTypeDefinitionNode  $interfaceDefinition
      * @return \GraphQL\Type\Definition\InterfaceType
      */
     protected function resolveInterfaceType(InterfaceTypeDefinitionNode $interfaceDefinition): InterfaceType
@@ -333,7 +350,7 @@ class TypeRegistry
     }
 
     /**
-     * @param \GraphQL\Language\AST\UnionTypeDefinitionNode $unionDefinition
+     * @param  \GraphQL\Language\AST\UnionTypeDefinitionNode  $unionDefinition
      * @return \GraphQL\Type\Definition\UnionType
      */
     protected function resolveUnionType(UnionTypeDefinitionNode $unionDefinition): UnionType
@@ -372,16 +389,5 @@ class TypeRegistry
             },
             'resolveType' => $typeResolver,
         ]);
-    }
-
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return $this
-     */
-    public function setDocumentAST(DocumentAST $documentAST): self
-    {
-        $this->documentAST = $documentAST;
-
-        return $this;
     }
 }

@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Illuminate\Http\Request;
-use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -25,7 +24,8 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
 
-class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeDefinitionManipulator, TypeExtensionManipulator
+class MiddlewareDirective extends BaseDirective
+    implements FieldMiddleware, TypeDefinitionManipulator, TypeExtensionManipulator
 {
     /**
      * todo remove as soon as name() is static itself.
@@ -118,8 +118,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
     /**
      * Apply manipulations from a type definition node.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
      * @return void
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
@@ -133,7 +133,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    public function addMiddlewareDirectiveToFields($objectType): void
+    public function addMiddlewareDirectiveToFields(&$objectType): void
     {
         if (
             ! $objectType instanceof ObjectTypeDefinitionNode
@@ -168,8 +168,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
     /**
      * Apply manipulations from a type definition node.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\TypeExtensionNode $typeExtension
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtension
      * @return void
      */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension)

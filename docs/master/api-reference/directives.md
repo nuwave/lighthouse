@@ -555,27 +555,6 @@ that globally identifies the User and can be used for querying the `node` endpoi
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
-## @group
-
-Apply common settings to all fields of an Object Type.
-
-Set a common namespace for the [@field](#field) and the [@complexity](#complexity) directives
-that are defined on the fields of the defined type.
-
-```graphql
-extend type Query @group(namespace: "App\\Authentication") {
-  activeUsers @field(resolver: "User@getActiveUsers")
-}
-```
-
-Set common middleware on a set of Queries/Mutations.
-
-```graphql
-type Mutation @group(middleware: ["api:auth"]) {
-    createPost(title: String!): Post
-}
-```
-
 ## @hasMany
 
 Corresponds to [Eloquent's HasMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).

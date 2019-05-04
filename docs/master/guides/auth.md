@@ -3,7 +3,8 @@
 ### Get the current user
 
 Lighthouse provides a really simple way to fetch the information of the currently authenticated user.
-Just add a field that returns your `User` type and decorate it with the [@auth](../api-reference/directives.md#auth) directive.
+Just add a field that returns your `User` type
+and decorate it with the [@auth](../api-reference/directives.md#auth) directive.
 
 ```graphql
 type Query {
@@ -28,7 +29,8 @@ or `null` if the request is not authenticated.
 ### Restrict access to fields
 
 Lighthouse allows you to restrict field operations to a certain group of users.
-Use the [@can](../api-reference/directives.md#can) directive to leverage [Laravel Policies](https://laravel.com/docs/5.6/authorization) for authorization.
+Use the [@can](../api-reference/directives.md#can) directive to leverage
+[Laravel Policies](https://laravel.com/docs/5.6/authorization) for authorization.
 
 ### Apply auth middleware
 
@@ -44,10 +46,11 @@ type Query {
 }
 ```
 
-If you need to apply middleware to a group of fields, you can put [@middleware](../api-reference/directives.md#middleware) on an Object type.
+If you need to apply middleware to multiple fields, just use [@middleware](../api-reference/directives.md#middleware)
+on a `type` or an `extend type` definition.
 
 ```graphql
-extend type Query @group(middleware: ["auth:admin"]){
+extend type Query @middleware(checks: ["auth:admin"]){
   adminInfo: Secrets
   nukeCodes: [NukeCode!]!
 }
