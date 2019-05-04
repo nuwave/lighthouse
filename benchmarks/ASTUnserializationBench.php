@@ -1,5 +1,7 @@
 <?php
 
+namespace Benchmarks;
+
 use GraphQL\Language\Parser;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 
