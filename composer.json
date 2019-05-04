@@ -58,7 +58,8 @@
         "test": "phpunit --colors=always",
         "test:unit": "phpunit --colors=always --testsuite Unit",
         "test:integration": "phpunit --colors=always --testsuite Integration",
-        "stan": "phpstan analyse --memory-limit 2048M"
+        "stan": "phpstan analyse --memory-limit 2048M",
+        "bench": "phpbench run"
     },
     "extra": {
         "laravel": {

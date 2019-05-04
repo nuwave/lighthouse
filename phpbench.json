@@ -4,9 +4,9 @@
     "reports": {
         "ast": {
             "extends": "aggregate",
-            "title": "AST (de-)serialization",
-            "description": "Efficiently serialize and deserialize the schema AST",
-            "cols": [ "subject", "mode" ]
+            "title": "AST unserialization",
+            "description": "Efficiently unserialize the schema AST",
+            "cols": ["subject", "mean", "diff"]
         }
     }
 }
