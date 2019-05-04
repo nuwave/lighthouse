@@ -24,8 +24,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
 
-class MiddlewareDirective extends BaseDirective
-    implements FieldMiddleware, TypeDefinitionManipulator, TypeExtensionManipulator
+class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeDefinitionManipulator, TypeExtensionManipulator
 {
     /**
      * todo remove as soon as name() is static itself.
