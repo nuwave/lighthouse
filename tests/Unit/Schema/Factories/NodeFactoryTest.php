@@ -9,9 +9,9 @@ use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\InterfaceType;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class NodeFactoryTest extends TestCase
 {

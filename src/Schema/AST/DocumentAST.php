@@ -3,45 +3,36 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use Exception;
-use GraphQL\Language\AST\NodeList;
-use GraphQL\Language\AST\TypeDefinitionNode;
 use Serializable;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\Node;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\DocumentNode;
-use GraphQL\Language\AST\DefinitionNode;
+use GraphQL\Language\AST\NodeList;
 use GraphQL\Language\AST\TypeExtensionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\ParseException;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
-use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
-use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 
 class DocumentAST implements Serializable
 {
     /**
-     * ['foo' => FooType]
+     * ['foo' => FooType].
      *
      * @var NodeList<TypeDefinitionNode>
      */
     public $types = [];
 
     /**
-     * ['foo' => [0 => FooExtension, 1 => FooExtension]]
+     * ['foo' => [0 => FooExtension, 1 => FooExtension]].
      *
      * @var NodeListMap<NodeList<TypeExtensionNode>>
      */
     public $typeExtensions = [];
 
     /**
-     * ['foo' => FooDirective]
+     * ['foo' => FooDirective].
      *
      * @var NodeList<DirectiveDefinitionNode>
      */
@@ -73,12 +64,12 @@ class DocumentAST implements Serializable
 
         $instance = new self;
 
-        foreach($documentNode->definitions as $definition) {
-            if($definition instanceof TypeDefinitionNode){
+        foreach ($documentNode->definitions as $definition) {
+            if ($definition instanceof TypeDefinitionNode) {
                 $instance->types[$definition->name->value] = $definition;
-            } elseif ($definition instanceof TypeExtensionNode){
-                $instance->typeExtensions[$definition->name->value] []= $definition;
-            } elseif($definition instanceof DirectiveDefinitionNode){
+            } elseif ($definition instanceof TypeExtensionNode) {
+                $instance->typeExtensions[$definition->name->value] [] = $definition;
+            } elseif ($definition instanceof DirectiveDefinitionNode) {
                 $instance->directives[$definition->name->value] = $definition;
             } else {
                 throw new \Exception(
@@ -133,9 +124,9 @@ class DocumentAST implements Serializable
      */
     public function setDefinition(Node $definitionNode): self
     {
-        if($definitionNode instanceof DirectiveDefinitionNode){
+        if ($definitionNode instanceof DirectiveDefinitionNode) {
             $this->directives[$definitionNode->name->value] = $definitionNode;
-        } elseif($definitionNode instanceof TypeDefinitionNode){
+        } elseif ($definitionNode instanceof TypeDefinitionNode) {
             $this->types[$definitionNode->name->value] = $definitionNode;
         } else {
             throw new Exception(

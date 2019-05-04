@@ -12,7 +12,6 @@ use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
@@ -242,9 +241,9 @@ class ASTHelper
      */
     public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): void
     {
-        foreach($documentAST->types as $typeDefinition) {
-            if($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                foreach($typeDefinition->fields as $fieldDefinition) {
+        foreach ($documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                foreach ($typeDefinition->fields as $fieldDefinition) {
                     $fieldDefinition->directives = $fieldDefinition->directives->merge([$directive]);
                 }
             }

@@ -5,10 +5,6 @@ namespace Nuwave\Lighthouse\Schema;
 use Closure;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
-use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
@@ -22,6 +18,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
@@ -31,10 +28,13 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
+use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 
 class TypeRegistry
@@ -82,7 +82,7 @@ class TypeRegistry
 
     public function get(string $name): Type
     {
-        if (!isset($this->types[$name])) {
+        if (! isset($this->types[$name])) {
             $this->types[$name] = $this->handle(
                 $this->documentAST->types[$name]
             );
@@ -195,13 +195,13 @@ class TypeRegistry
 
         $className = Utils::namespaceClassname(
             $className,
-            (array)config('lighthouse.namespaces.scalars'),
+            (array) config('lighthouse.namespaces.scalars'),
             function (string $className): bool {
                 return is_subclass_of($className, ScalarType::class);
             }
         );
 
-        if (!$className) {
+        if (! $className) {
             throw new DefinitionException(
                 "No matching subclass of GraphQL\Type\Definition\ScalarType of found for the scalar {$scalarName}"
             );
@@ -295,7 +295,7 @@ class TypeRegistry
         } else {
             $interfaceClass = Utils::namespaceClassname(
                 $nodeName,
-                (array)config('lighthouse.namespaces.interfaces'),
+                (array) config('lighthouse.namespaces.interfaces'),
                 function (string $className): bool {
                     return method_exists($className, 'resolveType');
                 }
@@ -347,7 +347,7 @@ class TypeRegistry
         } else {
             $unionClass = Utils::namespaceClassname(
                 $nodeName,
-                (array)config('lighthouse.namespaces.unions'),
+                (array) config('lighthouse.namespaces.unions'),
                 function (string $className): bool {
                     return method_exists($className, 'resolveType');
                 }

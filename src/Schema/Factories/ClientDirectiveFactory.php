@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\NameNode;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\FieldArgument;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 
 class ClientDirectiveFactory
 {
@@ -20,7 +20,8 @@ class ClientDirectiveFactory
      * @param  \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter  $definitionNodeConverter
      * @return void
      */
-    public function __construct(DefinitionNodeConverter $definitionNodeConverter) {
+    public function __construct(DefinitionNodeConverter $definitionNodeConverter)
+    {
         $this->definitionNodeConverter = $definitionNodeConverter;
     }
 
@@ -34,7 +35,7 @@ class ClientDirectiveFactory
     {
         $arguments = [];
         /** @var InputValueDefinitionNode $argument */
-        foreach($directive->arguments as $argument) {
+        foreach ($directive->arguments as $argument) {
             $fieldArgumentConfig = [
                 'name' => $argument->name->value,
                 'description' => data_get($argument->description, 'value'),
@@ -47,7 +48,7 @@ class ClientDirectiveFactory
                 ];
             }
 
-            $arguments []= new FieldArgument($fieldArgumentConfig);
+            $arguments [] = new FieldArgument($fieldArgumentConfig);
         }
 
         return new Directive([

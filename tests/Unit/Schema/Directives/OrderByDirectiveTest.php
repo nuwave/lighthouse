@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class OrderByDirectiveTest extends DBTestCase
 {

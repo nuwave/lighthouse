@@ -3,11 +3,11 @@
 namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
-use GraphQL\Language\AST\DirectiveDefinitionNode;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class DocumentASTTest extends TestCase

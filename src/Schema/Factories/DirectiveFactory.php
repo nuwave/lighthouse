@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Language\AST\TypeExtensionNode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\TypeExtensionNode;
 use Illuminate\Contracts\Events\Dispatcher;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -27,8 +27,8 @@ use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
-use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
 
 class DirectiveFactory
 {

@@ -2,22 +2,17 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\Node;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
+use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeExtensionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
-use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Events\BuildSchemaString;
+use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 
 class ASTBuilder
 {
@@ -79,7 +74,7 @@ class ASTBuilder
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = (array)$this->eventDispatcher->dispatch(
+        $additionalSchemas = (array) $this->eventDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );
 
@@ -252,7 +247,7 @@ class ASTBuilder
 
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if (!$hasTypeImplementingNode) {
+        if (! $hasTypeImplementingNode) {
             return;
         }
 
@@ -276,7 +271,7 @@ GRAPHQL
             [
                 PartialParser::fieldDefinition(
                     'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
-                )
+                ),
             ]
         );
     }

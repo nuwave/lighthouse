@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use ArrayAccess;
+use Serializable;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
-use Serializable;
 
 class NodeListMap implements ArrayAccess, Serializable
 {
@@ -69,11 +69,10 @@ class NodeListMap implements ArrayAccess, Serializable
 
     public function serialize(): string
     {
-
     }
 
     /**
-     * Constructs the object
+     * Constructs the object.
      * @link https://php.net/manual/en/serializable.unserialize.php
      * @param string $serialized <p>
      * The string representation of the object.
