@@ -51,7 +51,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Benchmarks\\": "benchmarks"
         }
     },
     "scripts": {
