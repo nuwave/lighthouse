@@ -78,7 +78,7 @@ class PaginateDirectiveTest extends TestCase
             name: String!
         }
 
-        extend type Query @group {
+        extend type Query {
             users: [User!]! @paginate
         }
         ');
