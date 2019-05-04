@@ -4,14 +4,15 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Language\AST\Node;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\NodeValue;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
 
-class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
+class ModelDirective extends BaseDirective implements NodeMiddleware, TypeDefinitionManipulator
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\NodeRegistry
@@ -55,12 +56,14 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, NodeManipu
     }
 
     /**
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * Apply manipulations from a type definition node.
+     *
+     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
+     * @param \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition
+     * @return void
      */
-    public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        return ASTHelper::attachNodeInterfaceToObjectType($node, $documentAST);
+        ASTHelper::attachNodeInterfaceToObjectType($typeDefinition);
     }
 }

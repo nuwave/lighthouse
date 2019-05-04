@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use Exception;
+use GraphQL\Language\AST\NodeList;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Serializable;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
@@ -24,60 +27,25 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 class DocumentAST implements Serializable
 {
     /**
-     * A map from definition name to the definition node.
+     * ['foo' => FooType]
      *
-     * @var \GraphQL\Type\Definition\ObjectType<\GraphQL\Language\AST\DefinitionNode>
+     * @var NodeList<TypeDefinitionNode>
      */
-    protected $definitionMap;
+    public $types = [];
 
     /**
-     * A collection of type extensions.
+     * ['foo' => [0 => FooExtension, 1 => FooExtension]]
      *
-     * @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
+     * @var NodeListMap<NodeList<TypeExtensionNode>>
      */
-    protected $typeExtensionsMap;
+    public $typeExtensions = [];
 
     /**
-     * @param  \GraphQL\Language\AST\DocumentNode  $documentNode
-     * @return void
-     */
-    public function __construct(DocumentNode $documentNode)
-    {
-        /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode> $typeExtensions */
-        /** @var \Illuminate\Support\Collection<\GraphQL\Language\AST\DefinitionNode> $definitionNodes */
-        // We can not store type extensions in the map, since they do not have unique names
-        [$typeExtensions, $definitionNodes] = (new Collection($documentNode->definitions))
-            ->partition(function (DefinitionNode $definitionNode): bool {
-                return $definitionNode instanceof TypeExtensionNode;
-            });
-
-        $this->typeExtensionsMap = $typeExtensions
-            ->mapWithKeys(function (TypeExtensionNode $node): array {
-                return [$this->typeExtensionUniqueKey($node) => $node];
-            });
-
-        $this->definitionMap = $definitionNodes
-            ->mapWithKeys(function (DefinitionNode $node): array {
-                return [$node->name->value => $node];
-            });
-    }
-
-    /**
-     * Return a unique key that identifies a type extension.
+     * ['foo' => FooDirective]
      *
-     * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtensionNode
-     * @return string
+     * @var NodeList<DirectiveDefinitionNode>
      */
-    protected function typeExtensionUniqueKey(TypeExtensionNode $typeExtensionNode): string
-    {
-        $fieldNames = (new Collection($typeExtensionNode->fields))
-            ->map(function ($field): string {
-                return $field->name->value;
-            })
-            ->implode(':');
-
-        return $typeExtensionNode->name->value.$fieldNames;
-    }
+    public $directives = [];
 
     /**
      * Create a new DocumentAST instance from a schema.
@@ -90,12 +58,10 @@ class DocumentAST implements Serializable
     public static function fromSource(string $schema): self
     {
         try {
-            return new static(
-                Parser::parse(
-                    $schema,
-                    // Ignore location since it only bloats the AST
-                    ['noLocation' => true]
-                )
+            $documentNode = Parser::parse(
+                $schema,
+                // Ignore location since it only bloats the AST
+                ['noLocation' => true]
             );
         } catch (SyntaxError $syntaxError) {
             // Throw our own error class instead, since otherwise a schema definition
@@ -104,221 +70,84 @@ class DocumentAST implements Serializable
                 $syntaxError->getMessage()
             );
         }
+
+        $instance = new self;
+
+        foreach($documentNode->definitions as $definition) {
+            if($definition instanceof TypeDefinitionNode){
+                $instance->types[$definition->name->value] = $definition;
+            } elseif ($definition instanceof TypeExtensionNode){
+                $instance->typeExtensions[$definition->name->value] []= $definition;
+            } elseif($definition instanceof DirectiveDefinitionNode){
+                $instance->directives[$definition->name->value] = $definition;
+            } else {
+                throw new \Exception(
+                    'Unknown definition type'
+                );
+            }
+        }
+
+        return $instance;
     }
 
-    /**
-     * Strip out irrelevant information to make serialization more efficient.
-     *
-     * @return string
-     */
     public function serialize(): string
     {
-        return serialize(
-            $this->definitionMap
-                ->mapWithKeys(function (DefinitionNode $node, string $key): array {
-                    return [$key => AST::toArray($node)];
-                })
-        );
+        $nodeToArray = function (Node $node) {
+            return $node->toArray(true);
+        };
+
+        return serialize([
+            'types' => array_map($nodeToArray, $this->types),
+//            'typeExtensions' => serialize($this->typeExtensions),
+            'directives' => array_map($nodeToArray, $this->directives),
+        ]);
     }
 
-    /**
-     * Construct from the string representation.
-     *
-     * @param  string  $serialized
-     * @return void
-     */
     public function unserialize($serialized): void
     {
-        $this->definitionMap = unserialize($serialized)
-            ->mapWithKeys(function (array $node, string $key): array {
-                return [$key => AST::fromArray($node)];
-            });
+        [
+            'types' => $types,
+//            'typeExtensions' => unserialize($typeExtensions),
+            'directives' => $directives,
+        ] = unserialize($serialized);
+
+        // TODO ensure named offsets
+        $this->types = new NodeList($types);
+        $this->directives = new NodeList($directives);
     }
 
     /**
-     * Get all type definitions from the document.
-     *
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeDefinitionNode>
-     */
-    public function typeDefinitions(): Collection
-    {
-        return $this->definitionMap
-            ->filter(function (DefinitionNode $node) {
-                return $node instanceof ScalarTypeDefinitionNode
-                    || $node instanceof ObjectTypeDefinitionNode
-                    || $node instanceof InterfaceTypeDefinitionNode
-                    || $node instanceof UnionTypeDefinitionNode
-                    || $node instanceof EnumTypeDefinitionNode
-                    || $node instanceof InputObjectTypeDefinitionNode;
-            });
-    }
-
-    /**
-     * Get all definitions for directives.
-     *
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\DirectiveDefinitionNode>
-     */
-    public function directiveDefinitions(): Collection
-    {
-        return $this->definitionsByType(DirectiveDefinitionNode::class);
-    }
-
-    /**
-     * Get all extensions that apply to a named type.
-     *
-     * @param  string  $extendedTypeName
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
-     */
-    public function extensionsForType(string $extendedTypeName): Collection
-    {
-        return $this->typeExtensionsMap
-            ->filter(function (TypeExtensionNode $typeExtension) use ($extendedTypeName): bool {
-                return $extendedTypeName === $typeExtension->name->value;
-            });
-    }
-
-    /**
-     * Return all the type extensions.
-     *
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\TypeExtensionNode>
-     */
-    public function typeExtensions(): Collection
-    {
-        return $this->typeExtensionsMap;
-    }
-
-    /**
-     * Get all definitions for object types.
-     *
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\ObjectTypeDefinitionNode>
-     */
-    public function objectTypeDefinitions(): Collection
-    {
-        return $this->definitionsByType(ObjectTypeDefinitionNode::class);
-    }
-
-    /**
-     * Get a single object type definition by name.
-     *
-     * @param  string  $name
-     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
-     */
-    public function objectTypeDefinition(string $name): ?ObjectTypeDefinitionNode
-    {
-        return $this->objectTypeDefinitions()
-            ->first(function (ObjectTypeDefinitionNode $objectType) use ($name): bool {
-                return $objectType->name->value === $name;
-            });
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\InputObjectTypeDefinitionNode>
-     */
-    public function inputObjectTypeDefinitions(): Collection
-    {
-        return $this->definitionsByType(InputObjectTypeDefinitionNode::class);
-    }
-
-    /**
-     * @param  string  $name
-     * @return \GraphQL\Language\AST\InputObjectTypeDefinitionNode|null
-     */
-    public function inputObjectTypeDefinition(string $name): ?InputObjectTypeDefinitionNode
-    {
-        return $this->inputObjectTypeDefinitions()
-            ->first(function (InputObjectTypeDefinitionNode $inputType) use ($name): bool {
-                return $inputType->name->value === $name;
-            });
-    }
-
-    /**
-     * Get all interface definitions.
-     *
-     * @return \Illuminate\Support\Collection<\GraphQL\Language\AST\InterfaceTypeDefinitionNode>
-     */
-    public function interfaceDefinitions(): Collection
-    {
-        return $this->definitionsByType(InterfaceTypeDefinitionNode::class);
-    }
-
-    /**
-     * Get the root query type definition.
-     *
-     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
-     */
-    public function queryTypeDefinition(): ?ObjectTypeDefinitionNode
-    {
-        return $this->objectTypeDefinition('Query');
-    }
-
-    /**
-     * Get the root mutation type definition.
-     *
-     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
-     */
-    public function mutationTypeDefinition(): ?ObjectTypeDefinitionNode
-    {
-        return $this->objectTypeDefinition('Mutation');
-    }
-
-    /**
-     * Get the root subscription type definition.
-     *
-     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
-     */
-    public function subscriptionTypeDefinition(): ?ObjectTypeDefinitionNode
-    {
-        return $this->objectTypeDefinition('Subscription');
-    }
-
-    /**
-     * Get all definitions of a given type.
-     *
-     * @param  string  $typeClassName
-     * @return \Illuminate\Support\Collection
-     */
-    protected function definitionsByType(string $typeClassName): Collection
-    {
-        return $this->definitionMap
-            ->filter(function (Node $node) use ($typeClassName) {
-                return $node instanceof $typeClassName;
-            });
-    }
-
-    /**
-     * Add a single field to the query type.
-     *
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $type
      * @return $this
      */
-    public function addFieldToQueryType(FieldDefinitionNode $field): self
+    public function setType(TypeDefinitionNode $type): self
     {
-        $query = $this->queryTypeDefinition();
-        $query->fields = ASTHelper::mergeNodeList($query->fields, [$field]);
-
-        $this->setDefinition($query);
+        $this->types[$type->name->value] = $type;
 
         return $this;
     }
 
     /**
-     * @param  \GraphQL\Language\AST\DefinitionNode  $newDefinition
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
      * @return $this
      */
-    public function setDefinition(DefinitionNode $newDefinition): self
+    public function setDefinition(Node $definitionNode): self
     {
-        if ($newDefinition instanceof TypeExtensionNode) {
-            $this->typeExtensionsMap->put(
-                $this->typeExtensionUniqueKey($newDefinition),
-                $newDefinition
-            );
+        if($definitionNode instanceof DirectiveDefinitionNode){
+            $this->directives[$definitionNode->name->value] = $definitionNode;
+        } elseif($definitionNode instanceof TypeDefinitionNode){
+            $this->types[$definitionNode->name->value] = $definitionNode;
         } else {
-            $this->definitionMap->put(
-                $newDefinition->name->value,
-                $newDefinition
+            throw new Exception(
+                'Unsupported type'
             );
         }
 
         return $this;
+    }
+
+    public function queryTypeDefinition(): ObjectTypeDefinitionNode
+    {
+        return $this->types['Query'];
     }
 }

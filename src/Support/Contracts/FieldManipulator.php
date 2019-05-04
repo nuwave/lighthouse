@@ -9,16 +9,16 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 interface FieldManipulator extends Directive
 {
     /**
-     * Manipulate the AST.
+     * Manipulate the AST based on a field definition.
      *
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
-    public function manipulateSchema(
-        FieldDefinitionNode $fieldDefinition,
-        ObjectTypeDefinitionNode $parentType,
-        DocumentAST $current
+    public function manipulateFieldDefinition(
+        DocumentAST &$documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode &$parentType
     );
 }

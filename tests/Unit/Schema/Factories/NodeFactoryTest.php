@@ -11,14 +11,14 @@ use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\Factories\NodeFactory;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
 
 class NodeFactoryTest extends TestCase
 {
     /**
      * Node factory.
      *
-     * @var \Nuwave\Lighthouse\Schema\Factories\NodeFactory
+     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
     protected $factory;
 
@@ -26,7 +26,7 @@ class NodeFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = app(NodeFactory::class);
+        $this->factory = app(TypeRegistry::class);
     }
 
     /**

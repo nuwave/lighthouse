@@ -74,17 +74,17 @@ class Defer implements CreatesResponse
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $ManipulateAST
+     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $manipulateAST
      * @return void
      */
-    public function handleManipulateAST(ManipulateAST $ManipulateAST): void
+    public function handleManipulateAST(ManipulateAST $manipulateAST): void
     {
-        $ManipulateAST->documentAST = ASTHelper::attachDirectiveToObjectTypeFields(
-            $ManipulateAST->documentAST,
+        ASTHelper::attachDirectiveToObjectTypeFields(
+            $manipulateAST->documentAST,
             PartialParser::directive('@deferrable')
         );
 
-        $ManipulateAST->documentAST->setDefinition(
+        $manipulateAST->documentAST->setDefinition(
             PartialParser::directiveDefinition('directive @defer(if: Boolean) on FIELD')
         );
     }

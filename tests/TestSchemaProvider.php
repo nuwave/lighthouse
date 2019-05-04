@@ -17,9 +17,9 @@ class TestSchemaProvider implements SchemaSourceProvider
      * @param  string  $schema
      * @return void
      */
-    public function __construct(string $schema)
+    public function __construct(string &$schema)
     {
-        $this->schema = $schema;
+        $this->schema = &$schema;
     }
 
     /**

@@ -192,13 +192,15 @@ class MiddlewareDirectiveTest extends TestCase
      */
     public function itAddsMiddlewareDirectiveToFields(): void
     {
-        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
-        $astBuilder = app(ASTBuilder::class);
-        $document = $astBuilder->build('
+        $this->schema = '
         type Query @middleware(checks: ["auth", "Tests\\\Utils\\\Middleware\\\Authenticate", "api"]) {
             foo: Int
         } 
-        ');
+        ';
+
+        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
+        $astBuilder = app(ASTBuilder::class);
+        $document = $astBuilder->build($this->schema);
 
         $queryType = $document->queryTypeDefinition();
 

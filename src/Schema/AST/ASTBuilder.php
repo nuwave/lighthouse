@@ -3,12 +3,17 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use GraphQL\Language\AST\Node;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Events\BuildSchemaString;
+use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
@@ -17,180 +22,153 @@ use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 class ASTBuilder
 {
     /**
+     * The directive factory.
+     *
      * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
      */
     protected $directiveFactory;
 
     /**
+     * The event dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
+     * The schema source provider.
+     *
+     * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
+     */
+    protected $schemaSourceProvider;
+
+    /**
+     * The document AST.
+     *
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     */
+    protected $documentAST;
+
+    /**
      * ASTBuilder constructor.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
+     * @param \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory $directiveFactory
+     * @param \Illuminate\Contracts\Events\Dispatcher $eventDispatcher
+     * @param \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider $schemaSourceProvider
      * @return void
      */
-    public function __construct(DirectiveFactory $directiveFactory)
-    {
+    public function __construct(
+        DirectiveFactory $directiveFactory,
+        EventDispatcher $eventDispatcher,
+        SchemaSourceProvider $schemaSourceProvider
+    ) {
         $this->directiveFactory = $directiveFactory;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->schemaSourceProvider = $schemaSourceProvider;
     }
 
     /**
-     * Convert the base schema string into an AST by applying different manipulations.
+     * Get the schema string and build an AST out of it.
      *
-     * @param  string  $schema
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public function build(string $schema): DocumentAST
+    public function build(): DocumentAST
     {
-        $document = DocumentAST::fromSource($schema);
+        $schemaString = $this->schemaSourceProvider->getSchemaString();
 
-        // Node manipulators may be defined on type extensions
-        $document = $this->applyNodeManipulators($document);
-        // After they have been applied, we can safely merge them
-        $document = $this->mergeTypeExtensions($document);
+        // Allow to register listeners that add in additional schema definitions.
+        // This can be used by plugins to hook into the schema building process
+        // while still allowing the user to add in their schema as usual.
+        $additionalSchemas = (array)$this->eventDispatcher->dispatch(
+            new BuildSchemaString($schemaString)
+        );
 
-        $document = $this->applyFieldManipulators($document);
-        $document = $this->applyArgManipulators($document);
-
-        $document = $this->addPaginationInfoTypes($document);
-
-        $document = $this->addOrderByTypes($document);
-
-        return $this->addNodeSupport($document);
-    }
-
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected function applyNodeManipulators(DocumentAST $document): DocumentAST
-    {
-        return $document
-            ->typeDefinitions()
-            // Iterate over both of those at once, as it does not matter at this point
-            ->concat(
-                $document->typeExtensions()
+        $this->documentAST = DocumentAST::fromSource(
+            implode(
+                PHP_EOL,
+                Arr::prepend($additionalSchemas, $schemaString)
             )
-            ->reduce(
-                function (DocumentAST $document, Node $node): DocumentAST {
-                    return $this->directiveFactory
-                        ->createNodeManipulators($node)
-                        ->reduce(
-                            function (DocumentAST $document, NodeManipulator $nodeManipulator) use ($node): DocumentAST {
-                                return $nodeManipulator->manipulateSchema($node, $document);
-                            },
-                            $document
-                        );
-                },
-                $document
-            );
+        );
+
+        // Apply transformations from directives
+        $this->applyTypeDefinitionManipulators();
+        $this->applyTypeExtensionManipulators();
+        $this->applyFieldManipulators();
+
+        $this->addPaginationInfoTypes();
+        $this->addNodeSupport();
+        $this->addOrderByTypes();
+
+        // Listeners may manipulate the DocumentAST that is passed by reference
+        // into the ManipulateAST event. This can be useful for extensions
+        // that want to programmatically change the schema.
+        $this->eventDispatcher->dispatch(
+            new ManipulateAST($this->documentAST)
+        );
+
+        return $this->documentAST;
     }
 
-    /**
-     * The final schema must not contain type extensions, so we merge them here.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected function mergeTypeExtensions(DocumentAST $document): DocumentAST
+    protected function applyTypeDefinitionManipulators(): void
     {
-        $document->objectTypeDefinitions()->each(
-            function (ObjectTypeDefinitionNode $objectType) use ($document) {
-                $name = $objectType->name->value;
-
-                $objectType = $document
-                    ->extensionsForType($name)
-                    ->reduce(
-                        function (ObjectTypeDefinitionNode $relatedObjectType, ObjectTypeExtensionNode $typeExtension): ObjectTypeDefinitionNode {
-                            $relatedObjectType->fields = ASTHelper::mergeUniqueNodeList(
-                                $relatedObjectType->fields,
-                                $typeExtension->fields
-                            );
-
-                            return $relatedObjectType;
-                        },
-                        $objectType
-                    );
-
-                // Modify the original document by overwriting the definition with the merged one
-                $document->setDefinition($objectType);
+        foreach ($this->documentAST->types as $typeDefinition) {
+            /** @var \Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator $typeDefinitionManipulator */
+            foreach (
+                $this->directiveFactory->createTypeDefinitionManipulators($typeDefinition)
+                as $typeDefinitionManipulator
+            ) {
+                $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
             }
-        );
-
-        return $document;
+        }
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected function applyFieldManipulators(DocumentAST $document): DocumentAST
+    protected function applyTypeExtensionManipulators(): void
     {
-        return $document->objectTypeDefinitions()->reduce(
-            function (DocumentAST $document, ObjectTypeDefinitionNode $objectType): DocumentAST {
-                return (new Collection($objectType->fields))->reduce(
-                    function (DocumentAST $document, FieldDefinitionNode $fieldDefinition) use ($objectType): DocumentAST {
-                        return $this->directiveFactory
-                            ->createFieldManipulators($fieldDefinition)
-                            ->reduce(
-                                function (DocumentAST $document, FieldManipulator $fieldManipulator) use ($fieldDefinition, $objectType): DocumentAST {
-                                    return $fieldManipulator->manipulateSchema($fieldDefinition, $objectType, $document);
-                                },
-                                $document
-                            );
-                    },
-                    $document
-                );
-            },
-            $document
-        );
+        foreach ($this->documentAST->typeExtensions as $typeName => $typeExtensionsList) {
+            /** @var \GraphQL\Language\AST\TypeExtensionNode $typeExtension */
+            foreach ($typeExtensionsList as $typeExtension) {
+                /** @var \Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator $typeExtensionManipulator */
+                foreach (
+                    $this->directiveFactory->createTypeExtensionManipulators($typeExtension)
+                    as $typeExtensionManipulator
+                ) {
+                    $typeExtensionManipulator->manipulatetypeExtension($this->documentAST, $typeExtension);
+                }
+
+                // After manipulation on the type extension has been done,
+                // we can merge its fields with the original type
+                if ($typeExtension instanceof ObjectTypeExtensionNode) {
+                    $relatedObjectType = $this->documentAST->types[$typeName];
+
+                    $relatedObjectType->fields = ASTHelper::mergeUniqueNodeList(
+                        $relatedObjectType->fields,
+                        $typeExtension->fields
+                    );
+                }
+            }
+        }
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected function applyArgManipulators(DocumentAST $document): DocumentAST
+    protected function applyFieldManipulators(): void
     {
-        return $document->objectTypeDefinitions()->reduce(
-            function (DocumentAST $document, ObjectTypeDefinitionNode $parentType): DocumentAST {
-                return (new Collection($parentType->fields))->reduce(
-                    function (DocumentAST $document, FieldDefinitionNode $parentField) use ($parentType): DocumentAST {
-                        return (new Collection($parentField->arguments))->reduce(
-                            function (DocumentAST $document, InputValueDefinitionNode $argDefinition) use ($parentType, $parentField): DocumentAST {
-                                return $this->directiveFactory
-                                    ->createArgManipulators($argDefinition)
-                                    ->reduce(
-                                        function (DocumentAST $document, ArgManipulator $argManipulator) use (
-                                            $argDefinition,
-                                            $parentField,
-                                            $parentType
-                                        ): DocumentAST {
-                                            return $argManipulator->manipulateSchema(
-                                                $argDefinition,
-                                                $parentField,
-                                                $parentType,
-                                                $document
-                                            );
-                                        },
-                                        $document
-                                    );
-                            },
-                            $document
-                        );
-                    },
-                    $document
-                );
-            },
-            $document
-        );
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    /** @var \Nuwave\Lighthouse\Support\Contracts\FieldManipulator $fieldManipulator */
+                    foreach (
+                        $this->directiveFactory->createFieldManipulators($fieldDefinition)
+                        as $fieldManipulator
+                    ) {
+                        $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
+                    }
+                }
+            }
+        }
     }
 
-    /**
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected function addPaginationInfoTypes(DocumentAST $document): DocumentAST
+    protected function addPaginationInfoTypes(): void
     {
-        return $document
+        $this->documentAST
             ->setDefinition(
                 PartialParser::objectTypeDefinition('
                     type PaginatorInfo {
@@ -254,57 +232,64 @@ class ASTBuilder
     /**
      * Inject the node type and a node field into Query.
      *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
-    protected function addNodeSupport(DocumentAST $document): DocumentAST
+    protected function addNodeSupport(): void
     {
-        $hasTypeImplementingNode = $document
-            ->objectTypeDefinitions()
-            ->contains(function (ObjectTypeDefinitionNode $objectType): bool {
-                return (new Collection($objectType->interfaces))
-                    ->contains(function (NamedTypeNode $interface): bool {
-                        return $interface->name->value === 'Node';
-                    });
-            });
+        $hasTypeImplementingNode = false;
+
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                /** @var NamedTypeNode $interface */
+                foreach ($typeDefinition->interfaces as $interface) {
+                    if ($interface->name->value === 'Node') {
+                        $hasTypeImplementingNode = true;
+                        break 2;
+                    }
+                }
+            }
+        }
 
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if (! $hasTypeImplementingNode) {
-            return $document;
+        if (!$hasTypeImplementingNode) {
+            return;
         }
 
         $globalId = config('lighthouse.global_id_field');
         // Double slashes to escape the slashes in the namespace.
-        return $document
-            ->setDefinition(
-                PartialParser::interfaceTypeDefinition(<<<GRAPHQL
+        $this->documentAST->setDefinition(
+            PartialParser::interfaceTypeDefinition(<<<GRAPHQL
 "Node global interface"	
 interface Node @interface(resolveType: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolveType") {	
-  "Global identifier that can be used to resolve any Node implementation."
-  $globalId: ID!	
+"Global identifier that can be used to resolve any Node implementation."
+$globalId: ID!	
 }	
 GRAPHQL
-                )
             )
-            ->addFieldToQueryType(
+        );
+
+        /** @var ObjectTypeDefinitionNode $queryType */
+        $queryType = $this->documentAST->queryTypeDefinition();
+        $queryType->fields = ASTHelper::mergeNodeList(
+            $queryType->fields,
+            [
                 PartialParser::fieldDefinition(
                     'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
                 )
-            );
+            ]
+        );
     }
 
     /**
      * Add types that are used for the @orderBy directive.
      *
+     * @return void
      * @see \Nuwave\Lighthouse\Schema\Directives\OrderByDirective
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $document
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    protected function addOrderByTypes(DocumentAST $document): DocumentAST
+    protected function addOrderByTypes(): void
     {
-        return $document
+        $this->documentAST
             ->setDefinition(
                 PartialParser::enumTypeDefinition('
                     enum SortOrder {

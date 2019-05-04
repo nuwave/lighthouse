@@ -135,18 +135,4 @@ class OrderByDirectiveTest extends DBTestCase
             ],
         ]);
     }
-
-    /**
-     * @test
-     */
-    public function itThrowsOnInvalidDefinition(): void
-    {
-        $this->expectException(DefinitionException::class);
-
-        $this->buildSchema('
-        type Query {
-            foo(bar: Int @orderBy): Int
-        }
-        ');
-    }
 }

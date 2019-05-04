@@ -32,18 +32,18 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     }
 
     /**
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
-    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        return PaginationManipulator::transformToPaginatedField(
+        PaginationManipulator::transformToPaginatedField(
             $this->paginationType(),
             $fieldDefinition,
             $parentType,
-            $current,
+            $documentAST,
             $this->directiveArgValue('defaultCount'),
             $this->paginateMaxCount()
         );

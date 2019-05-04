@@ -3,10 +3,14 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Language\AST\TypeExtensionNode;
 use Illuminate\Http\Request;
 use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NodeList;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -23,7 +27,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 
-class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
+class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeDefinitionManipulator, TypeExtensionManipulator
 {
     /**
      * todo remove as soon as name() is static itself.
@@ -96,67 +100,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     }
 
     /**
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
-    {
-        return $documentAST->setDefinition(
-            self::addMiddlewareDirectiveToFields(
-                $node,
-                $this->directiveArgValue('checks')
-            )
-        );
-    }
-
-    /**
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
-     * @param  array  $middlewareArgValue
-     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    public static function addMiddlewareDirectiveToFields($objectType, $middlewareArgValue)
-    {
-        if (
-            ! $objectType instanceof ObjectTypeDefinitionNode
-            && ! $objectType instanceof ObjectTypeExtensionNode
-        ) {
-            throw new DirectiveException(
-                'The '.self::NAME.' directive may only be placed on fields or object types.'
-            );
-        }
-
-        $middlewareArgValue = (new Collection($middlewareArgValue))
-            ->map(function (string $middleware) : string {
-                // Add slashes, as re-parsing of the values removes a level of slashes
-                return addslashes($middleware);
-            })
-            ->implode('", "');
-
-        $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
-
-        $objectType->fields = new NodeList(
-            (new Collection($objectType->fields))
-                ->map(function (FieldDefinitionNode $fieldDefinition) use ($middlewareDirective): FieldDefinitionNode {
-                    // If the field already has middleware defined, skip over it
-                    // Field middleware are more specific then those defined on a type
-                    if (ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
-                        return $fieldDefinition;
-                    }
-
-                    $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
-
-                    return $fieldDefinition;
-                })
-                ->toArray()
-        );
-
-        return $objectType;
-    }
-
-    /**
      * @param  mixed  $middlewareArgValue
      * @return \Illuminate\Support\Collection<string>
      */
@@ -172,5 +115,67 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                 return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
             })
             ->flatten();
+    }
+
+    /**
+     * Apply manipulations from a type definition node.
+     *
+     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
+     * @param \GraphQL\Language\AST\TypeDefinitionNode $typeDefinition
+     * @return void
+     */
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
+    {
+        self::addMiddlewareDirectiveToFields($typeDefinition);
+    }
+
+    /**
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
+     * @return void
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     */
+    public function addMiddlewareDirectiveToFields($objectType): void
+    {
+        if (
+            ! $objectType instanceof ObjectTypeDefinitionNode
+            && ! $objectType instanceof ObjectTypeExtensionNode
+        ) {
+            throw new DirectiveException(
+                'The '.self::NAME.' directive may only be placed on fields or object types.'
+            );
+        }
+
+        $middlewareArgValue = (new Collection($this->directiveArgValue('checks')))
+            ->map(function (string $middleware) : string {
+                // Add slashes, as re-parsing of the values removes a level of slashes
+                return addslashes($middleware);
+            })
+            ->implode('", "');
+
+        $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
+
+        /** @var FieldDefinitionNode $fieldDefinition */
+        foreach($objectType->fields as $fieldDefinition) {
+            // If the field already has middleware defined, skip over it
+            // Field middleware are more specific then those defined on a type
+            if (ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
+                return;
+            }
+
+            $fieldDefinition->directives = $fieldDefinition->directives->merge([$middlewareDirective]);
+        }
+    }
+
+    /**
+     * Apply manipulations from a type definition node.
+     *
+     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
+     * @param \GraphQL\Language\AST\TypeExtensionNode $typeExtension
+     * @return void
+     */
+    public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension)
+    {
+        self::addMiddlewareDirectiveToFields($typeExtension);
     }
 }

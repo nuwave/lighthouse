@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Language\AST\TypeExtensionNode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
@@ -26,6 +27,8 @@ use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 
 class DirectiveFactory
 {
@@ -95,7 +98,8 @@ class DirectiveFactory
      */
     public function create(string $directiveName, $definitionNode = null): Directive
     {
-        $directive = $this->resolve($directiveName) ?? $this->createOrFail($directiveName);
+        $directive = $this->resolve($directiveName)
+            ?? $this->createOrFail($directiveName);
 
         return $definitionNode
             ? $this->hydrate($directive, $definitionNode)
@@ -249,6 +253,24 @@ class DirectiveFactory
     public function createNodeManipulators(Node $node): Collection
     {
         return $this->createAssociatedDirectivesOfType($node, NodeManipulator::class);
+    }
+
+    /**
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator>
+     */
+    public function createTypeDefinitionManipulators(TypeDefinitionNode $typeDefinition): Collection
+    {
+        return $this->createAssociatedDirectivesOfType($typeDefinition, TypeDefinitionManipulator::class);
+    }
+
+    /**
+     * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtension
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator>
+     */
+    public function createTypeExtensionManipulators(TypeExtensionNode $typeExtension): Collection
+    {
+        return $this->createAssociatedDirectivesOfType($typeExtension, TypeExtensionManipulator::class);
     }
 
     /**
