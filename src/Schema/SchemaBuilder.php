@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use function Functional\map;
 use GraphQL\Type\Schema;
+use function Functional\map;
 use GraphQL\Type\SchemaConfig;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory;
