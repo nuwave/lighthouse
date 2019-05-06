@@ -2,11 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use GraphQL\Language\AST\TypeDefinitionNode;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use function Functional\map;
 use GraphQL\Type\SchemaConfig;
+use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory;
 
@@ -75,7 +75,7 @@ class SchemaBuilder
             function () use ($documentAST): array {
                 return map(
                     $documentAST->types,
-                    function(TypeDefinitionNode $typeDefinition): Type {
+                    function (TypeDefinitionNode $typeDefinition): Type {
                         return $this->typeRegistry->get(
                             $typeDefinition->name->value
                         );
