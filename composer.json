@@ -30,6 +30,7 @@
         "illuminate/routing": "5.5.*|5.6.*|5.7.*|5.8.*",
         "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*",
         "illuminate/validation": "5.5.*|5.6.*|5.7.*|5.8.*",
+        "lstrojny/functional-php": "^1.9",
         "opis/closure": "^3.0",
         "webonyx/graphql-php": "^0.13"
     },

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use function Functional\map;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -50,9 +51,9 @@ class SchemaBuilder
         );
 
         $config->setDirectives(
-            array_map(
-                [$this->clientDirectiveFactory, 'handle'],
-                $documentAST->directives
+            map(
+                $documentAST->directives,
+                [$this->clientDirectiveFactory, 'handle']
             )
         );
 
