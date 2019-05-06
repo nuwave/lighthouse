@@ -50,13 +50,6 @@ class SchemaBuilder
             $this->typeRegistry->get('Query')
         );
 
-        $config->setDirectives(
-            map(
-                $documentAST->directives,
-                [$this->clientDirectiveFactory, 'handle']
-            )
-        );
-
         // Those are optional so only add them if they are present in the schema
         if (isset($documentAST->types['Mutation'])) {
             $config->setMutation(
@@ -69,8 +62,29 @@ class SchemaBuilder
             );
         }
 
+        // Use lazy type loading to prevent unnecessary work
         $config->setTypeLoader(
             [$this->typeRegistry, 'get']
+        );
+
+        // This is just used for introspection, it is required
+        // to be able to retrieve all the types in the schema
+        $config->setTypes(
+            function() use ($documentAST): array {
+                return map(
+                    $documentAST->types,
+                    [$this->typeRegistry, 'handle']
+                );
+            }
+        );
+
+        // There is no way to resolve client directives lazily,
+        // so we convert them eagerly
+        $config->setDirectives(
+            map(
+                $documentAST->directives,
+                [$this->clientDirectiveFactory, 'handle']
+            )
         );
 
         return new Schema($config);
