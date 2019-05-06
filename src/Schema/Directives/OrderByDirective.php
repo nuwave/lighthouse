@@ -61,9 +61,11 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
         ObjectTypeDefinitionNode &$parentType
     ): void {
         // Users may define this as NonNull if they want
+        // Because we need to validate the structure regardless,
+        // we unwrap it by one level if it is
         $expectedOrderByClause = $argDefinition->type instanceof NonNullTypeNode
-            ? $argDefinition
-            : $expectedOrderByClause = $argDefinition->type;
+            ? $argDefinition->type
+            : $argDefinition;
 
         if (
             data_get(
