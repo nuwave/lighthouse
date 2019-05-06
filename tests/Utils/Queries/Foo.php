@@ -25,6 +25,11 @@ class Foo
         return self::THE_ANSWER;
     }
 
+    /**
+     * Calculate the complexity.
+     *
+     * @return int
+     */
     public function complexity(): int
     {
         return self::THE_ANSWER;

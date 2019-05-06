@@ -783,6 +783,31 @@ type User @model {
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
+## @namespace
+
+Redefine the default namespaces used in other directives.
+
+The following example applies the namespace `App\Blog`
+to the `@field` directive used on the `posts` field.
+
+```graphql
+type Query {
+  posts: [Post!]! @field(resolver: "Post@resolveAll") @namespace(field: "App\\Blog")
+}
+```
+
+When used upon an object type or an object type extension, the namespace
+applies to fields of the type as well. This allows you to specify
+a common namespace for a group of fields.
+
+```graphql
+extend type Query @namespace(field: "App\\Blog") {
+  posts: [Post!]! @field(resolver: "Post@resolveAll")
+}
+```
+
+An `@namespace` directive defined on a field wins in case of a conflict.
+
 ## @neq
 
 Place a not equals operator `!=` on an Eloquent query.

@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
-use Illuminate\Routing\Router;
 use Tests\Utils\Middleware\CountRuns;
 use Tests\Utils\Middleware\Authenticate;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -211,6 +210,34 @@ class MiddlewareDirectiveTest extends TestCase
             [
                 'auth',
                 Authenticate::class,
+                'api',
+            ],
+            $fieldMiddlewares
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itPrefersFieldMiddlewareOverTypeMiddleware(): void
+    {
+        $this->schema = '
+        type Query @middleware(checks: ["auth"]) {
+            foo: Int @middleware(checks: ["api"])
+        } 
+        ';
+
+        /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
+        $astBuilder = app(ASTBuilder::class);
+        $document = $astBuilder->build($this->schema);
+
+        $queryType = $document->types['Query'];
+
+        $middlewareOnFooArguments = $queryType->fields[0]->directives[0];
+        $fieldMiddlewares = ASTHelper::directiveArgValue($middlewareOnFooArguments, 'checks');
+
+        $this->assertSame(
+            [
                 'api',
             ],
             $fieldMiddlewares

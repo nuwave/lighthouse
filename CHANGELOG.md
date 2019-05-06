@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.1...master)
 
+### Removed
+
+- `@group` directive was removed in favour of `@middleware` and `@namespace` https://github.com/nuwave/lighthouse/pull/768
+
 ## [3.5.1](https://github.com/nuwave/lighthouse/compare/v3.5.0...v3.5.1)
 
 ### Fixed
