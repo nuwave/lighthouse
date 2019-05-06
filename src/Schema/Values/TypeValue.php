@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Values;
 
 use GraphQL\Language\AST\TypeDefinitionNode;
 
-class NodeValue
+class TypeValue
 {
     /**
      * Current GraphQL type.

@@ -22,9 +22,9 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
-use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeDefinitionManipulator, TypeExtensionManipulator
+class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
     /**
      * todo remove as soon as name() is static itself.

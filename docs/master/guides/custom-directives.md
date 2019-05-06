@@ -28,24 +28,33 @@ directive interfaces to add functionality. They serve as the point of contact to
 Depending on which interfaces you implement, a directive can be applied to different parts
 of the schema, according to the [specified directive location](https://facebook.github.io/graphql/June2018/#DirectiveLocation).
 
-## Node Directives
+## Type Directives
 
 These directives can generally be applied to [type definitions](../the-basics/types.md) in the schema.
 
-### NodeManipulator
+### TypeManipulator
 
-The [`\Nuwave\Lighthouse\Support\Contracts\NodeManipulator`](../../../src/Support/Contracts/NodeManipulator.php)
-interface can be used to manipulate the AST. 
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeManipulator`](../../../src/Support/Contracts/TypeManipulator.php)
+interface can be used to manipulate the AST from a type definition node. 
 
-### NodeMiddleware
+### TypeMiddleware
 
-The [`\Nuwave\Lighthouse\Support\Contracts\NodeMiddleware`](../../../src/Support/Contracts/NodeMiddleware.php)
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeMiddleware`](../../../src/Support/Contracts/TypeMiddleware.php)
 interface allows access to an AST node as it is converted to an executable type.
 
-### NodeResolves
+### TypeResolver
 
-The [`\Nuwave\Lighthouse\Support\Contracts\NodeResolves`](../../../src/Support/Contracts/NodeResolver.php)
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeResolver`](../../../src/Support/Contracts/TypeResolver.php)
 interface can be used for custom conversion from AST values to an executable type.
+
+## Type Extension Directives
+
+These directives can generally be applied to [type extensions](https://graphql.github.io/graphql-spec/June2018/#sec-Type-Extensions) in the schema.
+
+### TypeExtensionManipulator
+
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator`](../../../src/Support/Contracts/TypeExtensionManipulator.php)
+interface can be used to manipulate the AST from a type extension node. 
 
 ## Field Directives
 

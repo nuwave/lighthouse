@@ -15,20 +15,19 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
-use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
+use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
-use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
 class DirectiveFactory
 {
@@ -43,7 +42,7 @@ class DirectiveFactory
      *
      * @var string[]
      */
-    protected $resolved = [];
+    protected $resolvedClassnames = [];
 
     /**
      * The paths used for locating directive classes.
@@ -114,7 +113,7 @@ class DirectiveFactory
      */
     protected function resolve(string $directiveName): ?Directive
     {
-        if ($className = Arr::get($this->resolved, $directiveName)) {
+        if ($className = Arr::get($this->resolvedClassnames, $directiveName)) {
             return app($className);
         }
 
@@ -156,11 +155,11 @@ class DirectiveFactory
     {
         // Bail to respect the priority of namespaces, the first
         // resolved directive is kept
-        if (in_array($directiveName, $this->resolved, true)) {
+        if (in_array($directiveName, $this->resolvedClassnames, true)) {
             return $this;
         }
 
-        $this->resolved[$directiveName] = $className;
+        $this->resolvedClassnames[$directiveName] = $className;
 
         return $this;
     }
@@ -172,7 +171,7 @@ class DirectiveFactory
      */
     public function setResolved(string $directiveName, string $className): self
     {
-        $this->resolved[$directiveName] = $className;
+        $this->resolvedClassnames[$directiveName] = $className;
 
         return $this;
     }
@@ -182,7 +181,7 @@ class DirectiveFactory
      */
     public function clearResolved(): self
     {
-        $this->resolved = [];
+        $this->resolvedClassnames = [];
 
         return $this;
     }
@@ -191,13 +190,13 @@ class DirectiveFactory
      * Set the given definition on the directive.
      *
      * @param  \Nuwave\Lighthouse\Support\Contracts\Directive  $directive
-     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
+     * @param  \GraphQL\Language\AST\Node  $node
      * @return \Nuwave\Lighthouse\Support\Contracts\Directive
      */
-    protected function hydrate(Directive $directive, $definitionNode): Directive
+    protected function hydrate(Directive $directive, Node $node): Directive
     {
         return $directive instanceof BaseDirective
-            ? $directive->hydrate($definitionNode)
+            ? $directive->hydrate($node)
             : $directive;
     }
 
@@ -247,21 +246,12 @@ class DirectiveFactory
     }
 
     /**
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\NodeManipulator>
-     */
-    public function createNodeManipulators(Node $node): Collection
-    {
-        return $this->createAssociatedDirectivesOfType($node, NodeManipulator::class);
-    }
-
-    /**
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator>
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\TypeManipulator>
      */
-    public function createTypeDefinitionManipulators(TypeDefinitionNode $typeDefinition): Collection
+    public function createTypeManipulators(TypeDefinitionNode $typeDefinition): Collection
     {
-        return $this->createAssociatedDirectivesOfType($typeDefinition, TypeDefinitionManipulator::class);
+        return $this->createAssociatedDirectivesOfType($typeDefinition, TypeManipulator::class);
     }
 
     /**
@@ -295,12 +285,12 @@ class DirectiveFactory
      * Get the node resolver directive for the given type definition.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $node
-     * @return \Nuwave\Lighthouse\Support\Contracts\NodeResolver|null
+     * @return \Nuwave\Lighthouse\Support\Contracts\TypeResolver|null
      */
-    public function createNodeResolver(TypeDefinitionNode $node): ?NodeResolver
+    public function createTypeResolver(TypeDefinitionNode $node): ?TypeResolver
     {
         /* @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->createSingleDirectiveOfType($node, NodeResolver::class);
+        return $this->createSingleDirectiveOfType($node, TypeResolver::class);
     }
 
     /**
@@ -309,9 +299,9 @@ class DirectiveFactory
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
      * @return bool
      */
-    public function hasNodeResolver(TypeDefinitionNode $typeDefinition): bool
+    public function hasTypeResolver(TypeDefinitionNode $typeDefinition): bool
     {
-        return $this->createNodeResolver($typeDefinition) instanceof NodeResolver;
+        return $this->createTypeResolver($typeDefinition) instanceof TypeResolver;
     }
 
     /**
@@ -350,12 +340,12 @@ class DirectiveFactory
     /**
      * Get all middleware directive for a type definitions.
      *
-     * @param  \GraphQL\Language\AST\Node  $typeDefinition
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\NodeMiddleware>
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\TypeMiddleware>
      */
-    public function createNodeMiddleware(Node $typeDefinition): Collection
+    public function createTypeMiddleware(TypeDefinitionNode $typeDefinition): Collection
     {
-        return $this->createAssociatedDirectivesOfType($typeDefinition, NodeMiddleware::class);
+        return $this->createAssociatedDirectivesOfType($typeDefinition, TypeMiddleware::class);
     }
 
     /**
@@ -364,7 +354,7 @@ class DirectiveFactory
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware>
      */
-    public function createFieldMiddleware($fieldDefinition): Collection
+    public function createFieldMiddleware(FieldDefinitionNode $fieldDefinition): Collection
     {
         return $this->createAssociatedDirectivesOfType($fieldDefinition, FieldMiddleware::class);
     }

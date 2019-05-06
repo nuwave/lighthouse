@@ -7,11 +7,11 @@ use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-class ModelDirective extends BaseDirective implements NodeMiddleware, TypeDefinitionManipulator
+class ModelDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\NodeRegistry
@@ -40,11 +40,11 @@ class ModelDirective extends BaseDirective implements NodeMiddleware, TypeDefini
     /**
      * Handle type construction.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $value
      * @param  \Closure  $next
      * @return \GraphQL\Type\Definition\Type
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handleNode(TypeValue $value, Closure $next)
     {
         $this->nodeRegistry->registerModel(
             $value->getTypeDefinitionName(),

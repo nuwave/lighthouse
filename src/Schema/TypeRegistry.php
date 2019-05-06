@@ -19,7 +19,7 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
@@ -116,19 +116,19 @@ class TypeRegistry
      */
     public function handle(TypeDefinitionNode $definition): Type
     {
-        $nodeValue = new NodeValue($definition);
+        $typeValue = new TypeValue($definition);
 
         return $this->pipeline
-            ->send($nodeValue)
+            ->send($typeValue)
             ->through(
-                $this->directiveFactory->createNodeMiddleware($definition)
+                $this->directiveFactory->createTypeMiddleware($definition)
             )
             ->via('handleNode')
-            ->then(function (NodeValue $value) use ($definition): Type {
-                $nodeResolver = $this->directiveFactory->createNodeResolver($definition);
+            ->then(function (TypeValue $value) use ($definition): Type {
+                $typeResolver = $this->directiveFactory->createTypeResolver($definition);
 
-                if ($nodeResolver) {
-                    return $nodeResolver->resolveNode($value);
+                if ($typeResolver) {
+                    return $typeResolver->resolveNode($value);
                 }
 
                 return $this->resolveType($definition);
@@ -262,7 +262,7 @@ class TypeRegistry
             return (new Collection($definition->fields))
                 ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition): array {
                     $fieldValue = new FieldValue(
-                        new NodeValue($definition),
+                        new TypeValue($definition),
                         $fieldDefinition
                     );
 

@@ -111,9 +111,9 @@ class ASTBuilder
     protected function applyTypeDefinitionManipulators(): void
     {
         foreach ($this->documentAST->types as $typeDefinition) {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator $typeDefinitionManipulator */
+            /** @var \Nuwave\Lighthouse\Support\Contracts\TypeManipulator $typeDefinitionManipulator */
             foreach (
-                $this->directiveFactory->createTypeDefinitionManipulators($typeDefinition)
+                $this->directiveFactory->createTypeManipulators($typeDefinition)
                 as $typeDefinitionManipulator
             ) {
                 $typeDefinitionManipulator->manipulateTypeDefinition($this->documentAST, $typeDefinition);
