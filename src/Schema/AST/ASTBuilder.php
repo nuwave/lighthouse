@@ -283,7 +283,7 @@ GRAPHQL
         );
 
         /** @var ObjectTypeDefinitionNode $queryType */
-        $queryType = $this->documentAST - Ytypes['Query'];
+        $queryType = $this->documentAST->types['Query'];
         $queryType->fields = ASTHelper::mergeNodeList(
             $queryType->fields,
             [
