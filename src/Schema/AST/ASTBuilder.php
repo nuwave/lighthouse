@@ -185,7 +185,7 @@ class ASTBuilder
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
                 foreach ($typeDefinition->fields as $fieldDefinition) {
-                    foreach($fieldDefinition->arguments as $argumentDefinition) {
+                    foreach ($fieldDefinition->arguments as $argumentDefinition) {
                         /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
                         foreach (
                             $this->directiveFactory->createArgManipulators($argumentDefinition)
