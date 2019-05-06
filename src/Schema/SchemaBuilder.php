@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\Language\AST\TypeDefinitionNode;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use function Functional\map;
 use GraphQL\Type\SchemaConfig;
@@ -73,7 +75,11 @@ class SchemaBuilder
             function() use ($documentAST): array {
                 return map(
                     $documentAST->types,
-                    [$this->typeRegistry, 'handle']
+                    function(TypeDefinitionNode $typeDefinition): Type {
+                        return $this->typeRegistry->get(
+                            $typeDefinition->name->value
+                        );
+                    }
                 );
             }
         );
