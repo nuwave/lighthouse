@@ -250,10 +250,15 @@ If you want to use a more complex value for manipulating a query,
 you can build a `ArgBuilderDirective` to work with lists or nested input objects.
 Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is one example of this.
 
-```graphql        
+```graphql
 type Query {
     users(
         createdBetween: [Date!]! @whereBetween(key: "created_at")
     ): [User!]! @paginate
 }
 ```
+
+### ArgManipulator	
+
+ An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](../../../src/Support/Contracts/ArgManipulator.php)	
+directive can be used to manipulate the schema AST. 

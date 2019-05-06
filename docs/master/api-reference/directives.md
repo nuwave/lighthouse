@@ -256,7 +256,7 @@ If you pass an `id` argument it will look for an instance of the expected model 
 type Query {
     post(id: ID @eq): Post @can(ability: "view")
 }
-``` 
+```
 
 ```php
 class PostPolicy

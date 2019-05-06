@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class OrderByDirectiveTest extends DBTestCase
 {
@@ -133,5 +134,19 @@ class OrderByDirectiveTest extends DBTestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsOnInvalidDefinition(): void
+    {
+        $this->expectException(DefinitionException::class);
+
+        $this->buildSchema('
+        type Query {
+            foo(bar: Int @orderBy): Int
+        }
+        ');
     }
 }

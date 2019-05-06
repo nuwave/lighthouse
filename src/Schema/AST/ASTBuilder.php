@@ -87,6 +87,7 @@ class ASTBuilder
         $this->applyTypeDefinitionManipulators();
         $this->applyTypeExtensionManipulators();
         $this->applyFieldManipulators();
+        $this->applyArgManipulators();
 
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
@@ -168,6 +169,35 @@ class ASTBuilder
                         as $fieldManipulator
                     ) {
                         $fieldManipulator->manipulateFieldDefinition($this->documentAST, $fieldDefinition, $typeDefinition);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Apply directives on args that can manipulate the AST.
+     *
+     * @return void
+     */
+    protected function applyArgManipulators(): void
+    {
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    foreach($fieldDefinition->arguments as $argumentDefinition) {
+                        /** @var \Nuwave\Lighthouse\Support\Contracts\ArgManipulator $argManipulator */
+                        foreach (
+                            $this->directiveFactory->createArgManipulators($argumentDefinition)
+                            as $argManipulator
+                        ) {
+                            $argManipulator->manipulateArgDefinition(
+                                $this->documentAST,
+                                $argumentDefinition,
+                                $fieldDefinition,
+                                $typeDefinition
+                            );
+                        }
                     }
                 }
             }

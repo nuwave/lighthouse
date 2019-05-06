@@ -18,6 +18,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\NodeResolver;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
@@ -279,6 +280,15 @@ class DirectiveFactory
     public function createFieldManipulators(FieldDefinitionNode $fieldDefinition): Collection
     {
         return $this->createAssociatedDirectivesOfType($fieldDefinition, FieldManipulator::class);
+    }
+
+    /**
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $inputValueDefinition
+     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\ArgManipulator>
+     */
+    public function createArgManipulators(InputValueDefinitionNode $inputValueDefinition): Collection
+    {
+        return $this->createAssociatedDirectivesOfType($inputValueDefinition, ArgManipulator::class);
     }
 
     /**

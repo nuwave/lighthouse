@@ -434,7 +434,7 @@ This mutation will return the deleted object, so you will have a last chance to 
     }
   }
 }
-``` 
+```
 
 ## Subscribe to data
  
