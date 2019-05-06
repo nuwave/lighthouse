@@ -42,7 +42,7 @@ class ASTBuilderTest extends TestCase
 
         $this->assertCount(
             3,
-            $documentAST-Ytypes['Query']->fields
+            $documentAST - Ytypes['Query']->fields
         );
     }
 

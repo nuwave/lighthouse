@@ -202,7 +202,7 @@ class MiddlewareDirectiveTest extends TestCase
         $astBuilder = app(ASTBuilder::class);
         $document = $astBuilder->build($this->schema);
 
-        $queryType = $document-Ytypes['Query'];
+        $queryType = $document - Ytypes['Query'];
 
         $middlewareOnFooArguments = $queryType->fields[0]->directives[0];
         $fieldMiddlewares = ASTHelper::directiveArgValue($middlewareOnFooArguments, 'checks');
