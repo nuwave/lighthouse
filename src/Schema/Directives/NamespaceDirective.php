@@ -2,14 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeExtensionNode;
-use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Language\AST\TypeExtensionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
+use GraphQL\Language\AST\ObjectTypeExtensionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
+use Nuwave\Lighthouse\Support\Contracts\TypeDefinitionManipulator;
 
 /**
  * Redefine the default namespaces used in other directives.
@@ -40,14 +40,13 @@ class NamespaceDirective extends BaseDirective implements TypeDefinitionManipula
     {
         $namespaceDirective = $this->directiveDefinition();
 
-        foreach($objectType->fields as $fieldDefinition){
-
-            if(
+        foreach ($objectType->fields as $fieldDefinition) {
+            if (
                 $existingNamespaces = ASTHelper::directiveDefinition(
                     $fieldDefinition,
-                    NamespaceDirective::NAME
+                    self::NAME
                 )
-            ){
+            ) {
                 $namespaceDirective->arguments = $namespaceDirective->arguments->merge($existingNamespaces->arguments);
             }
 
@@ -64,7 +63,7 @@ class NamespaceDirective extends BaseDirective implements TypeDefinitionManipula
      */
     public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
-        if($typeDefinition instanceof ObjectTypeDefinitionNode) {
+        if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
             $this->addNamespacesToFields($typeDefinition);
         }
     }
@@ -78,7 +77,7 @@ class NamespaceDirective extends BaseDirective implements TypeDefinitionManipula
      */
     public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension)
     {
-        if($typeExtension instanceof ObjectTypeExtensionNode) {
+        if ($typeExtension instanceof ObjectTypeExtensionNode) {
             $this->addNamespacesToFields($typeExtension);
         }
     }
