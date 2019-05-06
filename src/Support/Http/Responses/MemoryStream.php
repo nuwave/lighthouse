@@ -34,7 +34,7 @@ class MemoryStream extends Stream implements CanStreamResponse
 
                     return [$path => $response];
                 })
-                ->toArray();
+                ->all();
         }
 
         $this->chunks[] = $data;

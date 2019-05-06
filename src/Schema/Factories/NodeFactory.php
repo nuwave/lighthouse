@@ -157,7 +157,7 @@ class NodeFactory
                         ],
                     ];
                 })
-                ->toArray(),
+                ->all(),
         ]);
     }
 
@@ -212,7 +212,7 @@ class NodeFactory
                     ->map(function (NamedTypeNode $interface): Type {
                         return $this->typeRegistry->get($interface->name->value);
                     })
-                    ->toArray();
+                    ->all();
             },
         ]);
     }
@@ -237,7 +237,7 @@ class NodeFactory
                         $fieldDefinition->name->value => app(FieldFactory::class)->handle($fieldValue),
                     ];
                 })
-                ->toArray();
+                ->all();
         };
     }
 
@@ -259,7 +259,7 @@ class NodeFactory
                             $inputValueDefinition->name->value => $this->argumentFactory->handle($argumentValue),
                         ];
                     })
-                    ->toArray();
+                    ->all();
             },
         ]);
     }
@@ -352,7 +352,7 @@ class NodeFactory
                             $type->name->value
                         );
                     })
-                    ->toArray();
+                    ->all();
             },
             'resolveType' => $typeResolver,
         ]);
