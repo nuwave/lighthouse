@@ -90,7 +90,7 @@ type Comment {
 
 ### Many To Many
 
-While [many-to-many relationships](https://laravel.com/docs/5.7/eloquent-relationships#many-to-many)
+While [many-to-many relationships](https://laravel.com/docs/eloquent-relationships#many-to-many)
 are a bit more work to set up in Laravel, defining them in Lighthouse is a breeze.
 Use the [@belongsToMany](../api-reference/directives.md#belongstomany) directive to define it.
 
