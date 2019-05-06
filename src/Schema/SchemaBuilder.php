@@ -72,7 +72,7 @@ class SchemaBuilder
         // This is just used for introspection, it is required
         // to be able to retrieve all the types in the schema
         $config->setTypes(
-            function() use ($documentAST): array {
+            function () use ($documentAST): array {
                 return map(
                     $documentAST->types,
                     function(TypeDefinitionNode $typeDefinition): Type {
