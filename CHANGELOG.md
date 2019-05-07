@@ -13,15 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `input` arguments that were `@spread` into the parent can now be optional https://github.com/nuwave/lighthouse/pull/774
 
+### Deprecated
+
+- The class `SubscriptionExceptionHandler` will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
+
 ## [3.5.1](https://github.com/nuwave/lighthouse/compare/v3.5.0...v3.5.1)
 
 ### Fixed
 
 - Throw error if pagination amount `<= 0` is requested https://github.com/nuwave/lighthouse/pull/765
-
-### Deprecated
-
-- The class `SubscriptionExceptionHandler` will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
 
 ## [3.5.0](https://github.com/nuwave/lighthouse/compare/v3.4.0...v3.5.0)
 
