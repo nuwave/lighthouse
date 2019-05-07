@@ -39,7 +39,7 @@ class SpreadDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'id' => 2
+                    'id' => 2,
                 ],
             ],
         ]);

@@ -192,7 +192,7 @@ class FieldFactory
                     $inputValues = $this->argValue($argumentPath);
 
                     // If no input is given, there is nothing to spread
-                    if(!$inputValues){
+                    if (! $inputValues) {
                         continue;
                     }
 
@@ -202,7 +202,7 @@ class FieldFactory
                     // The last part of the path is the name of the input value,
                     // the exact thing we want to remove
                     array_pop($argumentPath);
-                    
+
                     foreach ($inputValues as $key => $value) {
                         $this->setArgValue(
                             array_merge($argumentPath, [$key]),
