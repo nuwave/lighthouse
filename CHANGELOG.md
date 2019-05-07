@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `input` arguments that were `@spread` into the parent can now be optional https://github.com/nuwave/lighthouse/pull/774
+- You can now omit an `input` argument from a query that uses
+  the `@spread` directive without getting an error https://github.com/nuwave/lighthouse/pull/774
 
 ### Deprecated
 
