@@ -5,17 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.1...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.2...master)
+
+## [3.5.2](https://github.com/nuwave/lighthouse/compare/v3.5.1...v3.5.2)
+
+### Fixed
+
+- You can now omit an `input` argument from a query that uses
+  the `@spread` directive without getting an error https://github.com/nuwave/lighthouse/pull/774
+
+### Deprecated
+
+- The class `SubscriptionExceptionHandler` will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
 
 ## [3.5.1](https://github.com/nuwave/lighthouse/compare/v3.5.0...v3.5.1)
 
 ### Fixed
 
 - Throw error if pagination amount `<= 0` is requested https://github.com/nuwave/lighthouse/pull/765
-
-### Deprecated
-
-- The class `SubscriptionExceptionHandler` will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
 
 ## [3.5.0](https://github.com/nuwave/lighthouse/compare/v3.4.0...v3.5.0)
 
