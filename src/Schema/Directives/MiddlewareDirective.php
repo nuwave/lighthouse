@@ -150,7 +150,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
 
                     return $fieldDefinition;
                 })
-                ->toArray()
+                ->all()
         );
 
         return $objectType;
