@@ -14,7 +14,7 @@ class SpreadDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->schema = "
+        $this->schema = '
         type Query{
             user(input: UserInput @spread): User @first
         }
@@ -24,7 +24,7 @@ class SpreadDirectiveTest extends DBTestCase
         input UserInput{
             id: ID @eq
         }
-        ";
+        ';
 
         $this->query('{
             user{
@@ -34,7 +34,7 @@ class SpreadDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'id' => 1
+                    'id' => 1,
                 ],
             ],
         ]);
@@ -47,7 +47,7 @@ class SpreadDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->schema = "
+        $this->schema = '
         type Query{
             user(input: UserInput @spread): User @first
         }
@@ -57,7 +57,7 @@ class SpreadDirectiveTest extends DBTestCase
         input UserInput{
             id: ID @eq
         }
-        ";
+        ';
 
         $this->query('{
             user(input: {id: 1}){
@@ -67,11 +67,9 @@ class SpreadDirectiveTest extends DBTestCase
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'id' => 1
+                    'id' => 1,
                 ],
             ],
         ]);
     }
-
-
 }

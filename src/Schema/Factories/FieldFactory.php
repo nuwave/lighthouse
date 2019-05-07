@@ -193,7 +193,7 @@ class FieldFactory
                     $this->unsetArgValue($argumentPath);
 
                     array_pop($argumentPath);
-                    
+
                     if (is_array($inputValues)) {
                         foreach ($inputValues as $key => $value) {
                             $this->setArgValue(
