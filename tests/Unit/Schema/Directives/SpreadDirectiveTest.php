@@ -10,31 +10,36 @@ class SpreadDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itResolvesWhenSpreadedInputDoesNotExistOnQuery(): void
+    public function itSpreadsTheInputIntoTheQuery(): void
     {
-        factory(User::class)->create();
+        factory(User::class, 2)->create();
 
         $this->schema = '
-        type Query{
+        type Query {
             user(input: UserInput @spread): User @first
         }
-        type User{
+
+        type User {
             id: ID
         }
-        input UserInput{
+
+        input UserInput {
             id: ID @eq
         }
         ';
 
-        $this->query('{
-            user{
+        $this->query('
+        {
+            user(input: {
+                id: 2
+            }) {
                 id
             }
         }
         ')->assertJson([
             'data' => [
                 'user' => [
-                    'id' => 1,
+                    'id' => 2
                 ],
             ],
         ]);
@@ -43,24 +48,27 @@ class SpreadDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itResolvesWhenSpreadedInputDoesExistOnQuery(): void
+    public function itIgnoresSpreadedInputIfNotGiven(): void
     {
         factory(User::class)->create();
 
         $this->schema = '
-        type Query{
+        type Query {
             user(input: UserInput @spread): User @first
         }
-        type User{
+
+        type User {
             id: ID
         }
-        input UserInput{
+
+        input UserInput {
             id: ID @eq
         }
         ';
 
-        $this->query('{
-            user(input: {id: 1}){
+        $this->query('
+        {
+            user{
                 id
             }
         }

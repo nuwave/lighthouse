@@ -105,7 +105,7 @@ class FieldFactory
      *
      * @var array[]
      */
-    protected $spreadPaths = [];
+    protected $pathsToSpread = [];
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
@@ -188,19 +188,26 @@ class FieldFactory
 
                 // Apply the argument spreadings after we are finished with all
                 // the other argument handling
-                foreach ($this->spreadPaths as $argumentPath) {
+                foreach ($this->pathsToSpread as $argumentPath) {
                     $inputValues = $this->argValue($argumentPath);
+
+                    // If no input is given, there is nothing to spread
+                    if(!$inputValues){
+                        continue;
+                    }
+
+                    // We remove the value from where it was defined before
                     $this->unsetArgValue($argumentPath);
 
+                    // The last part of the path is the name of the input value,
+                    // the exact thing we want to remove
                     array_pop($argumentPath);
-
-                    if (is_array($inputValues)) {
-                        foreach ($inputValues as $key => $value) {
-                            $this->setArgValue(
-                                array_merge($argumentPath, [$key]),
-                                $value
-                            );
-                        }
+                    
+                    foreach ($inputValues as $key => $value) {
+                        $this->setArgValue(
+                            array_merge($argumentPath, [$key]),
+                            $value
+                        );
                     }
                 }
 
@@ -272,7 +279,7 @@ class FieldFactory
             })
             && $type instanceof InputObjectType
         ) {
-            $this->spreadPaths [] = $argumentPath;
+            $this->pathsToSpread [] = $argumentPath;
         }
 
         // Handle the argument itself. At this point, it can be wrapped
