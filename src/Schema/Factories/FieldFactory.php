@@ -193,12 +193,14 @@ class FieldFactory
                     $this->unsetArgValue($argumentPath);
 
                     array_pop($argumentPath);
-
-                    foreach ($inputValues as $key => $value) {
-                        $this->setArgValue(
-                            array_merge($argumentPath, [$key]),
-                            $value
-                        );
+                    
+                    if (is_array($inputValues)) {
+                        foreach ($inputValues as $key => $value) {
+                            $this->setArgValue(
+                                array_merge($argumentPath, [$key]),
+                                $value
+                            );
+                        }
                     }
                 }
 
