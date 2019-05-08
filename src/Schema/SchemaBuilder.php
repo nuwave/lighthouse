@@ -3,9 +3,7 @@
 namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Type\Schema;
-use function Functional\map;
 use GraphQL\Type\SchemaConfig;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory;
@@ -73,25 +71,25 @@ class SchemaBuilder
         // to be able to retrieve all the types in the schema
         $config->setTypes(
             function () use ($documentAST): array {
-                return map(
-                    $documentAST->types,
-                    function (TypeDefinitionNode $typeDefinition): Type {
-                        return $this->typeRegistry->get(
-                            $typeDefinition->name->value
-                        );
-                    }
-                );
+                $types = [];
+                /** @var TypeDefinitionNode $typeDefinition */
+                foreach($documentAST->types as $typeDefinition){
+                    $types []= $this->typeRegistry->get(
+                        $typeDefinition->name->value
+                    );
+                }
+
+                return $types;
             }
         );
 
         // There is no way to resolve client directives lazily,
         // so we convert them eagerly
-        $config->setDirectives(
-            map(
-                $documentAST->directives,
-                [$this->clientDirectiveFactory, 'handle']
-            )
-        );
+        $clientDirectives = [];
+        foreach($documentAST->directives as $directiveDefinition) {
+            $clientDirectives []= $this->clientDirectiveFactory->handle($directiveDefinition);
+        }
+        $config->setDirectives($clientDirectives);
 
         return new Schema($config);
     }
