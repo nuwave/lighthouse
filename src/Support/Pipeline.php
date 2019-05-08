@@ -19,7 +19,7 @@ class Pipeline extends BasePipeline
     public function through($pipes)
     {
         if ($pipes instanceof Collection) {
-            $pipes = $pipes->toArray();
+            $pipes = $pipes->all();
         }
 
         return parent::through($pipes);

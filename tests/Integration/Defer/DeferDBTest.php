@@ -164,7 +164,7 @@ class DeferDBTest extends DBTestCase
                     return ['email' => $user->email];
                 })
                 ->values()
-                ->toArray(),
+                ->all(),
             $deferredUsers['user.company.users']['data']
         );
     }
@@ -245,7 +245,7 @@ class DeferDBTest extends DBTestCase
                             'company' => null,
                         ];
                     })
-                    ->toArray(),
+                    ->all(),
                 $deferredUsers[$key]['data']
             );
         });
