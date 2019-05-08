@@ -73,8 +73,8 @@ class SchemaBuilder
             function () use ($documentAST): array {
                 $types = [];
                 /** @var TypeDefinitionNode $typeDefinition */
-                foreach($documentAST->types as $typeDefinition){
-                    $types []= $this->typeRegistry->get(
+                foreach ($documentAST->types as $typeDefinition) {
+                    $types [] = $this->typeRegistry->get(
                         $typeDefinition->name->value
                     );
                 }
@@ -86,8 +86,8 @@ class SchemaBuilder
         // There is no way to resolve client directives lazily,
         // so we convert them eagerly
         $clientDirectives = [];
-        foreach($documentAST->directives as $directiveDefinition) {
-            $clientDirectives []= $this->clientDirectiveFactory->handle($directiveDefinition);
+        foreach ($documentAST->directives as $directiveDefinition) {
+            $clientDirectives [] = $this->clientDirectiveFactory->handle($directiveDefinition);
         }
         $config->setDirectives($clientDirectives);
 
