@@ -61,7 +61,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 };
 
                 return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection()->transaction($executeMutation)
+                    ? $this->databaseManager->connection($model->getConnectionName())->transaction($executeMutation)
                     : $executeMutation();
             }
         );
