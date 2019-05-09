@@ -806,7 +806,7 @@ extend type Query @namespace(field: "App\\Blog") {
 }
 ```
 
-An `@namespace` directive defined on a field wins in case of a conflict.
+A `@namespace` directive defined on a field directive wins in case of a conflict.
 
 ## @neq
 
