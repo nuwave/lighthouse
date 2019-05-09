@@ -2,19 +2,19 @@
 
 namespace Tests\Integration;
 
-use Illuminate\Foundation\Testing\TestResponse;
-use Illuminate\Support\Collection;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Tests\Utils\Scalars\Email;
+use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Illuminate\Foundation\Testing\TestResponse;
 
 class IntrospectionTest extends TestCase
 {
     /**
      * @see https://gist.github.com/craigbeck/b90915d49fda19d5b2b17ead14dcd6da
      */
-    const INTROSPECTION_QUERY = /** @lang GraphQL */
-        <<<GRAPHQL
+    const INTROSPECTION_QUERY = /* @lang GraphQL */
+        <<<'GRAPHQL'
   query IntrospectionQuery {
     __schema {
       queryType { name }
@@ -145,7 +145,6 @@ GRAPHQL;
             $this->placeholderQuery()
         );
 
-
         $this->assertTrue(
             $this->isTypeNamePresent('Email')
         );
@@ -161,7 +160,7 @@ GRAPHQL;
     protected function isTypeNamePresent(string $typeName): bool
     {
         return (new Collection($this->introspectionResult->jsonGet('data.__schema.types')))
-            ->contains(function(array $type) use ($typeName): bool {
+            ->contains(function (array $type) use ($typeName): bool {
                 return $type['name'] === $typeName;
             });
     }

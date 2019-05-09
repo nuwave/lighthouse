@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema;
 
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
-use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Factories\ClientDirectiveFactory;
 
