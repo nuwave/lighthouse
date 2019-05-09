@@ -109,6 +109,19 @@ class TypeRegistry
     }
 
     /**
+     * Register an executable GraphQL type.
+     *
+     * @param  \GraphQL\Type\Definition\Type  $type
+     * @return $this
+     */
+    public function register(Type $type): self
+    {
+        $this->types[$type->name] = $type;
+
+        return $this;
+    }
+
+    /**
      * Transform a definition node to an executable type.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition
