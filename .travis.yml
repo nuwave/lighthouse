@@ -47,12 +47,10 @@ matrix:
 before_install:
   - phpenv config-rm xdebug.ini || true
   - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - travis_retry composer self-update
-  - travis_retry composer global require hirak/prestissimo --update-no-dev
-  - travis_retry composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
 
 install:
-  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
+  - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
+  - composer install --prefer-dist --no-interaction --no-suggest
 
 script:
   - if [[ $COVERAGE = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml; fi
