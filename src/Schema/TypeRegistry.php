@@ -122,6 +122,26 @@ class TypeRegistry
     }
 
     /**
+     * Return all possible types that are registered.
+     *
+     * @return \GraphQL\Type\Definition\Type[]
+     */
+    public function possibleTypes(): array
+    {
+        // Make sure all the types from the AST are eagerly converted
+        /** @var TypeDefinitionNode $typeDefinition */
+        foreach ($this->documentAST->types as $typeDefinition) {
+            $name = $typeDefinition->name->value;
+
+            if (! isset($this->types[$name])) {
+                $this->types[$name] = $this->handle($typeDefinition);
+            }
+        }
+
+        return $this->types;
+    }
+
+    /**
      * Transform a definition node to an executable type.
      *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $definition

@@ -70,17 +70,7 @@ class SchemaBuilder
         // This is just used for introspection, it is required
         // to be able to retrieve all the types in the schema
         $config->setTypes(
-            function () use ($documentAST): array {
-                $types = [];
-                /** @var TypeDefinitionNode $typeDefinition */
-                foreach ($documentAST->types as $typeDefinition) {
-                    $types [] = $this->typeRegistry->get(
-                        $typeDefinition->name->value
-                    );
-                }
-
-                return $types;
-            }
+            [$this->typeRegistry, 'possibleTypes']
         );
 
         // There is no way to resolve client directives lazily,
