@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.2...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.3...master)
+
+## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
+
+### Fixed
+
+- Respect the model's connection for database transaction during `@create` and `@update` https://github.com/nuwave/lighthouse/pull/777
 
 ## [3.5.2](https://github.com/nuwave/lighthouse/compare/v3.5.1...v3.5.2)
 
