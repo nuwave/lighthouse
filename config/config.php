@@ -67,14 +67,14 @@ return [
     | Schema Cache
     |--------------------------------------------------------------------------
     |
-    | A large part of schema generation is parsing the schema into an AST.
-    | This operation is pretty expensive so it is recommended to enable
-    | caching in production mode, especially for large schemas.
+    | A large part of schema generation consists of parsing and AST manipulation.
+    | This operation is very expensive, so it is highly recommended to enable
+    | caching of the final schema to optimize performance of large schemas.
     |
     */
 
     'cache' => [
-        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
+        'enable' => env('LIGHTHOUSE_CACHE_ENABLE', true),
         'key' => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
     ],
 
