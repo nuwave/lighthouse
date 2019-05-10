@@ -29,6 +29,9 @@ If you are coming from libraries such as [Folkloreatelier/laravel-graphql](https
 is originally based upon [webonyx/graphql-php](https://github.com/webonyx/graphql-php),
 you should be able to reuse much of your existing code.
 
+You can also register your existing types within Lighthouse's type registry, so you
+won't have to rewrite them in SDL: [Use native PHP types](../guides/native-php-types.md).
+
 Resolver functions share the same [common signature](../api-reference/resolvers.md#resolver-function-signature),
 so you should be able to reuse any logic you have written for Queries/Mutations.
 
