@@ -42,7 +42,7 @@ class LaravelEnumTypeTest extends DBTestCase
         );
 
         $typeAdmistrator = [
-            'type' => 'Administrator'
+            'type' => 'Administrator',
         ];
 
         $this->query('
