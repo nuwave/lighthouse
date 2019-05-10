@@ -3,7 +3,7 @@
 Assuming you read through the previous chapters, you should be familiar with the basics
 of schema definition by now.
 
-You might have some funky extra bits in the schema definitions such as `@paginate`,
+You might have seen some funky extra bits in the schema definitions such as `@paginate`,
 `@rules` or `@hasMany`. Those are called *directives* and are the primary way
 to add functionality to your GraphQL schema.
 
@@ -64,4 +64,4 @@ Explore the docs to find out more or look into the [directives API reference](..
 for a complete list of all available directives.
 
 Implementing your own directives is a great way to add reusable functionality to your schema,
-learn how you can [implement your own directives](../custom-directives).
+learn how you can [implement your own directives](../custom-directives/getting-started.md).

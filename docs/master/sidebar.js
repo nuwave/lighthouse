@@ -47,7 +47,7 @@ module.exports = [{
             'custom-directives/getting-started',
             'custom-directives/node-directives',
             'custom-directives/field-directives',
-            'custom-directives/arg-directives',
+            'custom-directives/argument-directives',
         ]
     },
     {
