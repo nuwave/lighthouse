@@ -11,14 +11,14 @@ module.exports = [{
         title: 'The Basics',
         children: [
             'the-basics/schema',
-            'the-basics/fields',
             'the-basics/types',
+            'the-basics/fields',
+            'the-basics/directives',
         ]
     },
     {
         title: 'Queries',
         children: [
-            ['queries/getting-started', 'Getting Started'],
             'queries/pagination',
             'queries/resolvers',
             'queries/relay',
@@ -42,19 +42,21 @@ module.exports = [{
         ]
     },
     {
+        title: 'Custom Directives',
+        children: [
+            'custom-directives/getting-started',
+            'custom-directives/node-directives',
+            'custom-directives/field-directives',
+            'custom-directives/arg-directives',
+        ]
+    },
+    {
         title: 'Security',
         children: [
             ['security/getting-started', 'Getting Started'],
             'security/authentication',
             'security/authorization',
             'security/validation',
-        ]
-    },
-    {
-        title: 'Directives',
-        children: [
-            ['directives/getting-started', 'Getting Started'],
-            ['directives/custom-directives', 'Creating Your Own'],
         ]
     },
     {

@@ -5,16 +5,12 @@ The entrypoints to any GraphQL API are the fields of the root types `Query`, `Mu
 *Every* field has a function associated with it that is called when the field
 is requested as part of a query. This function is called a **resolver**.
 
-The following section will teach you how to define a resolver for your fields
-and how you can utilize Lighthouse's built-in resolvers.
-
-## Resolving fields
-
 As is the tradition of our people, this section will teach you how to say "hello world!" through Lighthouse.
 
-### Schema definition
+## Schema definition
 
-The following schema defines a simple field called `hello` that returns a `String`.
+We start out by defining the simples possible schema: The root `Query` type
+with a single field called `hello` that returns a `String`.
 
 ```graphql
 type Query {
@@ -22,6 +18,7 @@ type Query {
 }
 ```
 
+This defines the shape of our data and informs the client what they can expect.
 You need to implement the actual resolver next.
 
 ### Defining resolvers
@@ -29,7 +26,7 @@ You need to implement the actual resolver next.
 By default, Lighthouse looks for a class with the capitalized name of the field in `App\GraphQL\Queries`
 or `App\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
 
-In this case, our field is called `hello` so we need to define our class as follows:
+In this case, our field is a query and is called `hello`, so we need to define our class as follows:
 
 ```php
 <?php
@@ -61,7 +58,7 @@ Now your schema can be queried.
 }
 ```
 
-And will return the following response:
+This query will return the following response:
 
 ```json
 {
@@ -71,7 +68,7 @@ And will return the following response:
 }
 ```
 
-### Fields with arguments
+## Fields with arguments
 
 As we learned, *every* field has a resolver function associated with it.
 Just like functions, fields can take arguments to control their behaviour.
@@ -81,7 +78,7 @@ that is used to construct the greeting.
 
 ```graphql
 type Query {
-    greet(name: String!): String
+  greet(name: String!): String
 }
 ```
 
@@ -148,7 +145,7 @@ Now we can use our query like this:
 }
 ```
 
-### Resolving non-root fields
+## Resolving non-root fields
 
 As mentioned, every field in the schema has a resolver - but what
 about fields that are not on one of the root types?
@@ -180,7 +177,7 @@ First, the resolver for `user` will be called. Let's suppose it returns an insta
 of `App\Model\User`.
 
 Next, the field sub-selection will be resolved - the two requested fields are `id` and `name`.
-Since we resolved the User already in the parent field, we do not want to fetch it again
+Since we already resolved the User in the parent field, we do not want to fetch it again
 to get it's attributes.
 
 Conveniently, the first argument of each resolver is the return value of the parent
@@ -200,9 +197,8 @@ function resolveUserId(User $user): string
 ```
 
 Writing out each such resolver would be pretty repetitive.
-We can utilize the fourth and final resolver argument `ResolveInfo`,
-which will give us access to the requested field name,
-to dynamically access the matching property.
+We can utilize the fourth and final resolver argument `ResolveInfo`, which will give us access
+to the requested field name, to dynamically access the matching property.
 
 ```php
 <?php
