@@ -18,7 +18,7 @@ For example the class name of directive `@fooBar` must be `FooBarDirective`.
 
 ## Directive Interfaces
 
-Every directive must implement the interface [`\Nuwave\Lighthouse\Support\Contracts\Directive`](../../../src/Support/Contracts/Directive.php).
+Every directive must implement the interface [`\Nuwave\Lighthouse\Support\Contracts\Directive`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/Directive.php).
 It contains a single function `name` to specify the name the directive has in the schema.
 
 By itself though, directives that implement just this base interface do not do anything.
@@ -34,17 +34,17 @@ These directives can generally be applied to [type definitions](../the-basics/ty
 
 ### TypeManipulator
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeManipulator`](../../../src/Support/Contracts/TypeManipulator.php)
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeManipulator.php)
 interface can be used to manipulate the AST from a type definition node. 
 
 ### TypeMiddleware
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeMiddleware`](../../../src/Support/Contracts/TypeMiddleware.php)
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeMiddleware`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeMiddleware.php)
 interface allows access to an AST node as it is converted to an executable type.
 
 ### TypeResolver
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeResolver`](../../../src/Support/Contracts/TypeResolver.php)
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeResolver.php)
 interface can be used for custom conversion from AST values to an executable type.
 
 ## Type Extension Directives
@@ -53,7 +53,7 @@ These directives can generally be applied to [type extensions](https://graphql.g
 
 ### TypeExtensionManipulator
 
-The [`\Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator`](../../../src/Support/Contracts/TypeExtensionManipulator.php)
+The [`\Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeExtensionManipulator.php)
 interface can be used to manipulate the AST from a type extension node. 
 
 ## Field Directives
@@ -62,14 +62,14 @@ Field directives can be applied to any [FieldDefinition](https://graphql.github.
 
 ### FieldResolver
 
-Perhaps the most important directive interface, a [FieldResolver](../../../src/Support/Contracts/FieldResolver.php)
+Perhaps the most important directive interface, a [`\Nuwave\Lighthouse\Support\Contracts\FieldResolver`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldResolver.php)
 let's you add a resolver for a field through a directive.
 
 It can be a great way to reuse resolver logic within a schema.
 
 ### FieldMiddleware
 
-A [FieldMiddleware](../../../src/Support/Contracts/FieldMiddleware.php) directive allows you
+A [`\Nuwave\Lighthouse\Support\Contracts\FieldMiddleware`](https://github.com/nuwave/lighthouse/tree/master/Support/Contracts/FieldMiddleware.php) directive allows you
 to wrap around the field resolver, just like [Laravel Middleware](https://laravel.com/docs/middleware).
 
 You may use it both to handle incoming values before reaching the final resolver
@@ -77,7 +77,7 @@ as well as the outgoing result of resolving the field.
 
 ### FieldManipulator
 
-An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](../../../src/Support/Contracts/FieldManipulator.php)
+An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
 directive can be used to manipulate the schema AST. 
 
 ## Argument Directives
@@ -85,21 +85,24 @@ directive can be used to manipulate the schema AST.
 Argument directives can be applied to a [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition).
 
 As arguments may be contained within a list in the schema definition, you must specify
-what your argument should apply to in addition to its function
+what your argument should apply to in addition to its function.
 
-If it applies to the individual items within the list,
-implement the [ArgDirective](../../../src/Support/Contracts/ArgDirective.php) interface.
+- If it applies to the individual items within the list,
+  implement the [`\Nuwave\Lighthouse\Support\Contracts\ArgDirective`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirective.php) interface.
+- Else, if it should apply to the whole list,
+  implement the [`\Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgDirectiveForArray.php) interface.
 
-Else, if it should apply to the whole list,
-implement the [ArgDirectiveForArray](../../../src/Support/Contracts/ArgDirectiveForArray.php) interface.
+You must implement exactly one of those two interfaces in order for an argument directive to work.
 
 ### ArgValidationDirective
 
-May be used to return custom rules and messages to use for validation of an argument.
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgValidationDirective.php)
+may be used to return custom rules and messages to use for validation of an argument.
 
 ### ArgTransformerDirective
 
-The `ArgTransformerDirective` takes an incoming value an returns a new value. 
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
+takes an incoming value an returns a new value. 
 
 Let's take a look at the built-in `@trim` directive.
 
@@ -134,9 +137,6 @@ class TrimDirective implements ArgTransformerDirective
     }
 }
 ```
-
-To create an `ArgTransformerDirective` you must implement the `ArgTransformerDirective` interface.
-This interface requires you to implement a method called `transform`.
 
 The `transform` method takes an argument which represents the actual incoming value that is given
 to an argument in a query and is expected to transform the value and return it.
@@ -187,7 +187,8 @@ In the given example, Lighthouse will take the value of the `password` argument 
 
 ### ArgBuilderDirective
 
-The `ArgBuilderDirective` allows using arguments passed by the client to dynamically
+An [`\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php)
+directive allows using arguments passed by the client to dynamically
 modify the database query that Lighthouse creates for a field.
 
 Currently, the following directives use the defined filters for resolving the query:
@@ -269,5 +270,5 @@ type Query {
 
 ### ArgManipulator	
 
- An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](../../../src/Support/Contracts/ArgManipulator.php)	
+ An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)	
 directive can be used to manipulate the schema AST. 
