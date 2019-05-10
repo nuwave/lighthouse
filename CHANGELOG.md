@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.3...master)
 
+### Deprecated
+
+- The `controller` config option will be removed in v4 
+
 ## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
 
 ### Fixed
