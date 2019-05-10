@@ -45,16 +45,16 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $previousResolver = $value->getResolver();
-        $fieldType = $value->getField()->type;
+        $previousResolver = $fieldValue->getResolver();
+        $fieldType = $fieldValue->getField()->type;
 
-        $value->setResolver(
+        $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
                 $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
                     return $previousResolver($root, $args, $context, $resolveInfo);
@@ -71,7 +71,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
             }
         );
 
-        return $next($value);
+        return $next($fieldValue);
     }
 
     /**
