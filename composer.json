@@ -21,12 +21,6 @@
         "issues": "https://github.com/nuwave/lighthouse/issues",
         "source": "https://github.com/nuwave/lighthouse"
     },
-    "repositories": [
-        {
-            "url": "https://github.com/mll-lab/laravel-enum.git",
-            "type": "git"
-        }
-    ],
     "require": {
         "php": ">= 7.1",
         "ext-json": "*",
@@ -40,7 +34,7 @@
         "webonyx/graphql-php": "^0.13"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "dev-master",
+        "bensampo/laravel-enum": "^1.19",
         "laravel/scout": "^4.0",
         "mockery/mockery": "^1.0",
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.x-dev",
