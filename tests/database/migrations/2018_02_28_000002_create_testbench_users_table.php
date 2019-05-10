@@ -19,7 +19,7 @@ class CreateTestbenchUsersTable extends Migration
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
-            $table->enum('type', UserType::getValues());
+            $table->enum('type', UserType::getValues())->nullable();
             $table->timestamps();
         });
     }
