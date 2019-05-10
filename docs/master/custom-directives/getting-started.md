@@ -77,15 +77,15 @@ class UpperCaseDirective implements Directive, FieldMiddleware
     /**
      * Wrap around the final field resolver.
      *
-     * @param \Nuwave\Lighthouse\Schema\Values\FieldValue $value
+     * @param \Nuwave\Lighthouse\Schema\Values\FieldValue $fieldValue
      * @param \Closure $next
-     * @return mixed
+     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next)
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         // Retrieve the existing resolver function
         /** @var Closure $previousResolver */
-        $previousResolver = $value->getResolver();
+        $previousResolver = $fieldValue->getResolver();
 
         // Wrap around the resolver
         $wrappedResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($previousResolver) {
@@ -98,10 +98,10 @@ class UpperCaseDirective implements Directive, FieldMiddleware
 
         // Place the wrapped resolver back upon the FieldValue
         // It is not resolved right now - we just prepare it
-        $value->setResolver($wrappedResolver);
+        $fieldValue->setResolver($wrappedResolver);
 
         // Keep the middleware chain going
-        return $next($value);
+        return $next($fieldValue);
     }
 }
 ```
