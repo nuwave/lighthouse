@@ -1,8 +1,5 @@
 # Creating Your Own Directive
 
-[[toc]]
-
----
 
 Lighthouse provides general purpose server side directives.
 
