@@ -12,18 +12,7 @@ module.exports = [{
         children: [
             'the-basics/schema',
             'the-basics/fields',
-        ]
-    },
-    {
-        title: 'Types',
-        children: [
-            ['types/getting-started', 'Getting Started'],
-            'types/objects',
-            'types/scalars',
-            'types/enums',
-            'types/inputs',
-            'types/interfaces',
-            'types/unions',
+            'the-basics/types',
         ]
     },
     {
@@ -44,6 +33,16 @@ module.exports = [{
         ]
     },
     {
+        title: 'Subscriptions',
+        children: [
+            ['subscriptions/getting-started', 'Getting Started'],
+            'subscriptions/setup',
+            'subscriptions/defining-fields',
+            'subscriptions/trigger-subscriptions',
+            'subscriptions/filtering-subscriptions',
+        ]
+    },
+    {
         title: 'Security',
         children: [
             ['security/getting-started', 'Getting Started'],
@@ -60,12 +59,11 @@ module.exports = [{
         ]
     },
     {
-        title: 'Extensions',
+        title: 'Performance',
         children: [
-            ['extensions/getting-started', 'Getting Started'],
-            'extensions/subscriptions',
-            'extensions/deferred',
-            'extensions/tracing',
+            ['performance/getting-started', 'Getting Started'],
+            'performance/deferred',
+            'performance/tracing',
         ]
     },
     {
