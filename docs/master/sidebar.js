@@ -36,7 +36,6 @@ module.exports = [{
         title: 'Subscriptions',
         children: [
             ['subscriptions/getting-started', 'Getting Started'],
-            'subscriptions/setup',
             'subscriptions/defining-fields',
             'subscriptions/trigger-subscriptions',
             'subscriptions/filtering-subscriptions',
