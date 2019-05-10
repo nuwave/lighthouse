@@ -104,7 +104,6 @@ module.exports = [{
             'guides/validation',
             'guides/relationships',
             'guides/file-uploads',
-            'guides/custom-directives',
             'guides/error-handling',
             'guides/plugin-development'
         ]
