@@ -41,17 +41,17 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $type = $value->getParentName();
-        $resolver = $value->getResolver();
+        $type = $fieldValue->getParentName();
+        $resolver = $fieldValue->getResolver();
 
         return $next(
-            $value->setResolver(
+            $fieldValue->setResolver(
                 function () use ($type, $resolver) {
                     $resolvedValue = call_user_func_array($resolver, func_get_args());
 
