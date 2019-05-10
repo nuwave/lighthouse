@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.org/nuwave/lighthouse.svg?branch=master)](https://travis-ci.org/nuwave/lighthouse)
 [![codecov](https://codecov.io/gh/nuwave/lighthouse/branch/master/graph/badge.svg)](https://codecov.io/gh/nuwave/lighthouse)
+[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
 [![StyleCI](https://github.styleci.io/repos/59965104/shield?branch=master)](https://github.styleci.io/repos/59965104)
 [![Packagist](https://img.shields.io/packagist/dt/nuwave/lighthouse.svg)](https://packagist.org/packages/nuwave/lighthouse)
 [![GitHub license](https://img.shields.io/github/license/nuwave/lighthouse.svg)](https://github.com/nuwave/lighthouse/blob/master/LICENSE)
@@ -18,15 +19,20 @@ giving you full control over your data.
 
 ## [Documentation](https://lighthouse-php.com/)
 
-The documentation for Lighthouse is located in the [docs folder](/docs).
-We also have a website over at [lighthouse-php.com](https://lighthouse-php.com/).
+The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
+
+If you like reading plain markdown, you can also find the source files in the  [docs folder](/docs).
 
 ## Get started
 
-If you have an existing Laravel project, all you really need is two steps:
+If you have an existing Laravel project, all you really need
+to get up and running is a few steps:
 
 1. Install via `composer require nuwave/lighthouse`
-2. Define your schema in `graphql/schema.graphql`
+2. Publish the default schema `php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema`
+3. Use something like [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground) to explore your GraphQL endpoint
+
+Check out [the docs](https://lighthouse-php.com/) to learn more.
 
 ## Get involved
 

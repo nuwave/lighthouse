@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Values;
 
-use GraphQL\Type\Definition\Type;
 use GraphQL\Language\AST\TypeDefinitionNode;
 
 class NodeValue
@@ -15,7 +14,7 @@ class NodeValue
     protected $type;
 
     /**
-     * Current definition node.
+     * The underlying type definition node.
      *
      * @var \GraphQL\Language\AST\TypeDefinitionNode
      */
@@ -35,29 +34,6 @@ class NodeValue
     public function __construct(TypeDefinitionNode $typeDefinition)
     {
         $this->typeDefinition = $typeDefinition;
-    }
-
-    /**
-     * Get resolved type.
-     *
-     * @return \GraphQL\Type\Definition\Type|null
-     */
-    public function getType(): ?Type
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set the executable type.
-     *
-     * @param  \GraphQL\Type\Definition\Type  $type
-     * @return $this
-     */
-    public function setType(Type $type): self
-    {
-        $this->type = $type;
-
-        return $this;
     }
 
     /**

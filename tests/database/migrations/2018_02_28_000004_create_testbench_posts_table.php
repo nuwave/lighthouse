@@ -14,8 +14,8 @@ class CreateTestbenchPostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
-            $table->string('body');
-            $table->unsignedInteger('user_id');
+            $table->string('body')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('task_id');
             $table->unsignedInteger('parent_id')->nullable();
             $table->timestamps();

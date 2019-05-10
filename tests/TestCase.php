@@ -5,12 +5,12 @@ namespace Tests;
 use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use Nuwave\Lighthouse\GraphQL;
 use Tests\Utils\Middleware\CountRuns;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Illuminate\Foundation\Testing\TestResponse;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -47,6 +47,7 @@ abstract class TestCase extends BaseTestCase
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
+     * @return void
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -90,6 +91,7 @@ abstract class TestCase extends BaseTestCase
                 'storage' => 'array',
                 'broadcaster' => 'log',
             ],
+            'pagination_amount_argument' => 'count',
         ]);
 
         $app['config']->set('app.debug', true);
@@ -126,6 +128,7 @@ abstract class TestCase extends BaseTestCase
      * are fully dumped to the console when making requests.
      *
      * @param  \Illuminate\Foundation\Application  $app
+     * @return void
      */
     protected function resolveApplicationExceptionHandler($app)
     {
@@ -211,12 +214,34 @@ abstract class TestCase extends BaseTestCase
      */
     protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
-        $this->app->forgetInstance(GraphQLRequest::class);
-
         return $this->postJson(
             'graphql',
             $data,
             $headers
+        );
+    }
+
+    /**
+     * Send a multipart form request.
+     *
+     * This is used for file uploads conforming to the specification:
+     * https://github.com/jaydenseric/graphql-multipart-request-spec
+     *
+     * @param  mixed[]  $parameters
+     * @param  mixed[]  $files
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    protected function postGraphQLMultipart(array $parameters, array $files): TestResponse
+    {
+        return $this->call(
+            'POST',
+            'graphql',
+            $parameters,
+            [],
+            $files,
+            $this->transformHeadersToServerVars([
+                'Content-Type' => 'multipart/form-data',
+            ])
         );
     }
 
@@ -244,7 +269,9 @@ abstract class TestCase extends BaseTestCase
     {
         $this->schema = $schema;
 
-        return graphql()->prepSchema();
+        return $this->app
+            ->make(GraphQL::class)
+            ->prepSchema();
     }
 
     /**
@@ -260,5 +287,16 @@ abstract class TestCase extends BaseTestCase
             foo: Int
         }
         ';
+    }
+
+    /**
+     * Get a fully qualified reference to a method that is defined on the test class.
+     *
+     * @param  string  $method
+     * @return string
+     */
+    protected function qualifyTestResolver(string $method = 'resolve'): string
+    {
+        return addslashes(static::class).'@'.$method;
     }
 }

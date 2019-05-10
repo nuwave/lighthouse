@@ -3,7 +3,9 @@
 namespace Nuwave\Lighthouse\Subscriptions;
 
 use Illuminate\Http\Request;
+use Nuwave\Lighthouse\GraphQL;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
@@ -12,6 +14,11 @@ use Nuwave\Lighthouse\Subscriptions\Events\BroadcastSubscriptionEvent;
 
 class SubscriptionBroadcaster implements BroadcastsSubscriptions
 {
+    /**
+     * @var \Nuwave\Lighthouse\GraphQL
+     */
+    protected $graphQL;
+
     /**
      * @var \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions
      */
@@ -33,22 +40,33 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     protected $broadcastManager;
 
     /**
+     * @var \Illuminate\Events\Dispatcher
+     */
+    protected $eventsDispatcher;
+
+    /**
+     * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions  $auth
      * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator  $iterator
      * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
+     * @param  \Illuminate\Events\Dispatcher  $eventsDispatcher
      * @return void
      */
     public function __construct(
+        GraphQL $graphQL,
         AuthorizesSubscriptions $auth,
         StorageManager $storage,
         SubscriptionIterator $iterator,
-        BroadcastManager $broadcastManager
+        BroadcastManager $broadcastManager,
+        EventsDispatcher $eventsDispatcher
     ) {
+        $this->graphQL = $graphQL;
         $this->auth = $auth;
         $this->storage = $storage;
         $this->iterator = $iterator;
         $this->broadcastManager = $broadcastManager;
+        $this->eventsDispatcher = $eventsDispatcher;
     }
 
     /**
@@ -61,7 +79,9 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      */
     public function queueBroadcast(GraphQLSubscription $subscription, string $fieldName, $root): void
     {
-        event(new BroadcastSubscriptionEvent($subscription, $fieldName, $root));
+        $this->eventsDispatcher->dispatch(
+            new BroadcastSubscriptionEvent($subscription, $fieldName, $root)
+        );
     }
 
     /**
@@ -85,7 +105,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
         $this->iterator->process(
             $subscribers,
             function (Subscriber $subscriber) use ($root): void {
-                $data = graphql()->executeQuery(
+                $data = $this->graphQL->executeQuery(
                     $subscriber->query,
                     $subscriber->context,
                     $subscriber->args,

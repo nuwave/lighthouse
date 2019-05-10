@@ -95,10 +95,10 @@ in a single PR.
 
 1. First, finish your work on `docs/master`.
 
-1. Enter a new version number.
+1. Enter a new version number. We only tag minor releases, so `3.1` will get separate
+docs, but `3.1.4` will not.
 
-
-    yarn docs:version 3.1
+        yarn docs:version 3.1
 
 This will copy the contents of `docs/master/` into `docs/<version>/`
 and place a new version number in `docs/.vuepress/versions.json`.

@@ -9,10 +9,12 @@
         "laravel-graphql"
     ],
     "license": "MIT",
+    "homepage": "https://lighthouse-php.com",
     "authors": [
         {
             "name": "Christopher Moore",
-            "email": "chris@nuwavecommerce.com"
+            "email": "chris@nuwavecommerce.com",
+            "homepage": "https://www.nuwavecommerce.com"
         }
     ],
     "support": {
@@ -36,28 +38,29 @@
         "mockery/mockery": "^1.0",
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.x-dev",
         "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*",
+        "phpbench/phpbench": "@dev",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
-        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflows - integrated with Laravel"
+        "mll-lab/laravel-graphql-playground": "GraphQL IDE for better development workflow - integrated with Laravel"
     },
     "autoload": {
         "psr-4": {
             "Nuwave\\Lighthouse\\": "src/"
-        },
-        "files": [
-            "src/Support/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Benchmarks\\": "benchmarks"
         }
     },
     "scripts": {
         "test": "phpunit --colors=always",
         "test:unit": "phpunit --colors=always --testsuite Unit",
-        "test:integration": "phpunit --colors=always --testsuite Integration"
+        "test:integration": "phpunit --colors=always --testsuite Integration",
+        "stan": "phpstan analyse --memory-limit 2048M",
+        "bench": "phpbench run"
     },
     "extra": {
         "laravel": {

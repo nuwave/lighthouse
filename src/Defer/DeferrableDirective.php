@@ -21,7 +21,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     /**
      * @var \Nuwave\Lighthouse\Defer\Defer
      */
-    private $defer;
+    protected $defer;
 
     /**
      * @param  \Nuwave\Lighthouse\Defer\Defer  $defer
@@ -51,13 +51,13 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
      */
     public function handleField(FieldValue $value, Closure $next): FieldValue
     {
-        $resolver = $value->getResolver();
+        $previousResolver = $value->getResolver();
         $fieldType = $value->getField()->type;
 
         $value->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $fieldType) {
-                $wrappedResolver = function () use ($resolver, $root, $args, $context, $resolveInfo) {
-                    return $resolver($root, $args, $context, $resolveInfo);
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver, $fieldType) {
+                $wrappedResolver = function () use ($previousResolver, $root, $args, $context, $resolveInfo) {
+                    return $previousResolver($root, $args, $context, $resolveInfo);
                 };
                 $path = implode('.', $resolveInfo->path);
 
@@ -67,7 +67,7 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
 
                 return $this->defer->isStreaming()
                     ? $this->defer->findOrResolve($wrappedResolver, $path)
-                    : $resolver($root, $args, $context, $resolveInfo);
+                    : $previousResolver($root, $args, $context, $resolveInfo);
             }
         );
 

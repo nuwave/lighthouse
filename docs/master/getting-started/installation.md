@@ -4,6 +4,9 @@
 
 ---
 
+The following section teaches you how to install Lighthouse in your project.
+Make sure you familiarize yourself with [the basics](../the-basics/schema.md) before diving in.
+
 ## Install via composer
 
 ```bash
@@ -16,7 +19,7 @@ Lighthouse includes a default schema to get you going right away. Publish
 it using the following `artisan` command:
 
 ```bash
-$ php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider" --tag=schema
+$ php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
 ```
 
 Learn more about how a GraphQL schema works by reading up on the [schema basics](../the-basics/schema.md)

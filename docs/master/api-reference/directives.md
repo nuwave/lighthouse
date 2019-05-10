@@ -152,6 +152,40 @@ type Mutation {
 }
 ```
 
+## @builder
+
+Use an argument to modify the query builder for a field.
+
+```graphql
+type Query {
+    users(
+        limit: Int @builder(method: "App\MyClass@limit")
+    ): [User!]! @all
+}
+```
+
+You must point to a `method` which will receive the builder instance
+and the argument value and can apply additional constraints to the query.
+
+```php
+namespace App;
+
+class MyClass
+{
+
+     * Add a limit constrained upon the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function limit($builder, int $value)
+    {
+        return $builder->limit($value);
+    }
+}
+```
+
 ## @cache
 
 Cache the result of a resolver.
@@ -206,15 +240,30 @@ type Mutation {
 }
 ```
 
-This is currently limited to doing [general checks on a resource and not a specific instance](https://laravel.com/docs/authorization#methods-without-models).
-The defined function on the policy will receive the currently authenticated user.
-
 ```php
 class PostPolicy
 {
     public function create(User $user): bool
     {
         return $user->is_admin;
+    }
+}
+```
+
+If you pass an `id` argument it will look for an instance of the expected model instance.
+
+```graphql
+type Query {
+    post(id: ID @eq): Post @can(ability: "view")
+}
+``` 
+
+```php
+class PostPolicy
+{
+    public function update(User $user, Post $post): bool
+    {
+        return $user->id === $post->author_id;
     }
 }
 ```
@@ -289,15 +338,26 @@ type Mutation {
 ```
 
 If you are using a single input object as an argument, you must tell Lighthouse
-to `flatten` it before applying it to the resolver.
+to spread out the nested values before applying it to the resolver.
+
+_Note_: The usage of `flatten` is deprecated.
 
 ```graphql
 type Mutation {
-    createPost(input: CreatePostInput!): Post @create(flatten: true)
+    createPost(input: CreatePostInput! @spread): Post @create
 }
 
 input CreatePostInput {
     title: String!
+}
+```
+
+If the name of the Eloquent model does not match the return type of the field,
+or is located in a non-default namespace, set it with the `model` argument.
+
+```graphql
+type Mutation {
+    createPost(title: String!): Post @create(model: "Foo\\Bar\\MyPost")
 }
 ```
 
@@ -327,6 +387,15 @@ deleted models.
 ```graphql
 type Mutation {
     deletePosts(id: [ID!]!): [Post!]! @delete
+}
+```
+
+If the name of the Eloquent model does not match the return type of the field,
+or is located in a non-default namespace, set it with the `model` argument.
+
+```graphql
+type Mutation {
+    deletePost(id: ID!): Post @delete(model: "Bar\\Baz\\MyPost")
 }
 ```
 
@@ -459,13 +528,13 @@ type User {
 ## @event
 
 Fire an event after a mutation has taken place.
-It requires the `fire` argument that should be
+It requires the `dispatch` argument that should be
 the class name of the event you want to fire.
 
 ```graphql
 type Mutation {
     createPost(title: String!, content: String!): Post
-        @event(fire: "App\\Events\\PostCreated")
+        @event(dispatch: "App\\Events\\PostCreated")
 }
 ```
 
@@ -482,6 +551,9 @@ type User {
 
 Instead of the original ID, the `id` field will now return a base64-encoded String
 that globally identifies the User and can be used for querying the `node` endpoint.
+
+You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
+own mechanism of encoding/decoding global ids.
 
 ## @group
 
@@ -729,6 +801,9 @@ type User @model {
 }
 ```
 
+You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
+own mechanism of encoding/decoding global ids.
+
 ## @neq
 
 Place a not equals operator `!=` on an Eloquent query.
@@ -781,6 +856,50 @@ type Query {
     posts(excludeIds: [Int!] @notIn(key: "id")): [Post!]! @paginate
 }
 ```
+
+## @orderBy
+
+Sort a result list by one or more given fields.
+
+```graphql
+type Query {
+    posts(orderBy: [OrderByClause!] @orderBy): [Post!]!
+}
+```
+
+The `OrderByClause` input is automatically added to the schema,
+together with the `SortOrder` enum.
+
+```graphql
+input OrderByClause{
+    field: String!
+    order: SortOrder!
+}
+
+enum SortOrder {
+    ASC
+    DESC
+}
+```
+
+Querying a field that has an `orderBy` argument looks like this:
+
+```graphql
+{
+    posts (
+        orderBy: [
+            {
+                field: "postedAt"
+                order: ASC
+            }
+        ]
+    ) {
+        title
+    }
+}
+```
+
+You may pass more than one sorting option to add a secondary ordering.
 
 ## @paginate
 
@@ -850,6 +969,16 @@ query {
 }
 ```
 
+Lighthouse allows you to specify a global maximum for the number of items a user
+can request through pagination through the config. You may also overwrite this
+per field with the `maxCount` argument:
+
+```graphql
+type Query {
+    posts: [Post!]! @paginate(maxCount: 10)
+}
+```
+
 By default, Lighthouse looks for an Eloquent model in the configured default namespace, with the same
 name as the returned type. You can overwrite this by setting the `model` argument.
 
@@ -902,7 +1031,7 @@ type User {
 
 ## @rules
 
-Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/5.6/validation#available-validation-rules).
+Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
 
 ```graphql
 type Query {
@@ -928,7 +1057,7 @@ You can customize the error message for a particular argument.
 
 ## @rulesForArray
 
-Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/5.6/validation#available-validation-rules).
+Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
 
 ```graphql
 type Mutation {
@@ -998,6 +1127,52 @@ type Query {
     posts(search: String @search(within: "my.index")): [Post!]! @paginate
 }
 ```
+
+## @spread
+
+Spread out the nested values of an input object into it's parent.
+
+```graphql
+type Mutation {
+    updatePost(
+        id: ID!
+        input: PostInput! @spread
+    ): Post @update
+}
+
+input PostInput {
+    title: String!
+    body: String
+}
+```
+
+The chema does not change, client side usage works the same:
+
+```graphql
+mutation {
+    updatePost(
+        id: 12 
+        input: {
+            title: "My awesome title"
+        }
+    ) {
+        id
+    }
+}   
+```
+
+Internally, the arguments will be transformed into a flat structure before
+they are passed along to the resolver:
+
+```php
+[
+    'id' => 12
+    'title' = 'My awesome title'
+]
+```
+
+Note that Lighthouse spreads out the arguments **after** all other `ArgDirectives` have
+been applied, e.g. validation, transformation.
 
 ## @subscription
 
@@ -1120,7 +1295,8 @@ type Mutation {
 }
 ```
 
-If the name of the Eloquent model does not match the return type of the field, set it with the `model` argument.
+If the name of the Eloquent model does not match the return type of the field,
+or is located in a non-default namespace, set it with the `model` argument.
 
 ```graphql
 type Mutation {
@@ -1130,7 +1306,7 @@ type Mutation {
 
 ## @where
 
-Specify that an argument is used as a [where filter](https://laravel.com/docs/5.7/queries#where-clauses).
+Specify that an argument is used as a [where filter](https://laravel.com/docs/queries#where-clauses).
 
 You can specify simple operators:
 
@@ -1152,6 +1328,10 @@ type Query {
 
 Verify that a column's value is between two values.
 
+### Old syntax
+
+_Attention: This following use is deprecated and will be removed in v4._
+
 _Note: You will need to add a `key` to the column to want to query for each date_
 
 ```graphql
@@ -1163,9 +1343,36 @@ type Query {
 }
 ```
 
+### New syntax
+
+_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
+
+The type of the input value should be either an `input` object with two
+fields or a list of values.
+
+```graphql
+type Query {
+    posts(
+        created_at: DateRange @whereBetween
+    ): [Post!]! @all
+}
+
+input DateRange {
+    from: Date!
+    to: Date!
+}
+```
+
+If the name of the argument does not match the database column,
+pass the actual column name as the `key`.
+
 ## @whereNotBetween
 
 Verify that a column's value lies outside of two values.
+
+### Old syntax
+
+_Attention: This following use is deprecated and will be removed in v4._
 
 _Note: You will need to add a `key` to the column to want to query for each date_
 
@@ -1175,6 +1382,26 @@ type Query {
         bornBefore: Date! @whereNotBetween(key: "created_at")
         bornAfter: Date! @whereNotBetween(key: "created_at")
     ): [User!]! @all
+}
+```
+
+### New syntax
+
+_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
+
+The type of the input value should be either an `input` object with two
+fields or a list of values.
+
+```graphql
+type Query {
+    posts(
+        notCreatedDuring: DateRange @whereNotBetween(key: "created_at")
+    ): [Post!]! @all
+}
+
+input DateRange {
+    from: Date!
+    to: Date!
 }
 ```
 

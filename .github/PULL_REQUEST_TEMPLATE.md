@@ -1,5 +1,6 @@
 - [ ] Added or updated tests
 - [ ] Added Docs for all relevant versions
+- [ ] Updated the changelog
 
 **Related Issue/Intent**
 

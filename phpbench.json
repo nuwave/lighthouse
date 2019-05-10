@@ -1,0 +1,12 @@
+{
+    "bootstrap": "vendor/autoload.php",
+    "path": "benchmarks",
+    "reports": {
+        "ast": {
+            "extends": "aggregate",
+            "title": "AST unserialization",
+            "description": "Efficiently unserialize the schema AST",
+            "cols": ["subject", "mean", "diff"]
+        }
+    }
+}

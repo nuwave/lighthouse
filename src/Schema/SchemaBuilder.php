@@ -22,7 +22,7 @@ class SchemaBuilder
     protected $typeRegistry;
 
     /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     * @var \Nuwave\Lighthouse\Schema\Factories\NodeFactory
      */
     protected $nodeFactory;
 
@@ -91,7 +91,7 @@ class SchemaBuilder
             )
             ->setDirectives(
                 $this->convertDirectives($documentAST)
-                    ->toArray()
+                    ->all()
             );
 
         // Those are optional so only add them if they are present in the schema
@@ -127,7 +127,7 @@ class SchemaBuilder
                         ->map(function ($location) {
                             return $location->value;
                         })
-                        ->toArray(),
+                        ->all(),
                     'args' => (new Collection($directive->arguments))
                         ->map(function (InputValueDefinitionNode $argument) {
                             $fieldArgumentConfig = [
@@ -144,7 +144,7 @@ class SchemaBuilder
 
                             return new FieldArgument($fieldArgumentConfig);
                         })
-                        ->toArray(),
+                        ->all(),
                     'astNode' => $directive,
                 ]);
             });

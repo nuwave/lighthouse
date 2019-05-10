@@ -2,13 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\QueryFilter;
-use Nuwave\Lighthouse\Execution\Utils\Cursor;
-use Nuwave\Lighthouse\Execution\Utils\Pagination;
-use Nuwave\Lighthouse\Schema\Directives\Fields\PaginationManipulator;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -34,35 +29,49 @@ class RelationBatchLoader extends BatchLoader
     protected $scopes;
 
     /**
-     * The ResolveInfo of the currently executing field. Used for retrieving
-     * the QueryFilter.
+     * The ResolveInfo of the currently executing field.
      *
      * @var \GraphQL\Type\Definition\ResolveInfo
      */
     protected $resolveInfo;
 
     /**
-     * The pagination type can either be "connection", "paginator" or null, in which case there is no pagination.
+     * Present when using pagination, the amount of rows to be fetched.
      *
-     * @var string|null
+     * @var int|null
      */
-    protected $paginationType;
+    protected $first;
+
+    /**
+     * Present when using pagination, the page to be fetched.
+     *
+     * @var int|null
+     */
+    protected $page;
 
     /**
      * @param  string  $relationName
-     * @param  array  $args
+     * @param  mixed[]  $args
      * @param  string[]  $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @param  string|null  $paginationType
+     * @param  int|null  $first
+     * @param  int|null  $page
      * @return void
      */
-    public function __construct(string $relationName, array $args, array $scopes, ResolveInfo $resolveInfo, string $paginationType = null)
-    {
+    public function __construct(
+        string $relationName,
+        array $args,
+        array $scopes,
+        ResolveInfo $resolveInfo,
+        ?int $first = null,
+        ?int $page = null
+    ) {
         $this->relationName = $relationName;
         $this->args = $args;
         $this->scopes = $scopes;
         $this->resolveInfo = $resolveInfo;
-        $this->paginationType = $paginationType;
+        $this->first = $first;
+        $this->page = $page;
     }
 
     /**
@@ -74,26 +83,10 @@ class RelationBatchLoader extends BatchLoader
     {
         $modelRelationFetcher = $this->getRelationFetcher();
 
-        switch ($this->paginationType) {
-            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                // first is an required argument
-                $first = $this->args['first'];
-                $after = Cursor::decode($this->args);
-
-                $currentPage = Pagination::calculateCurrentPage($first, $after);
-
-                $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
-                break;
-            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-                // count must be set so we can safely get it like this
-                $count = $this->args['count'];
-                $page = Arr::get($this->args, 'page', 1);
-
-                $modelRelationFetcher->loadRelationsForPage($count, $page);
-                break;
-            default:
-                $modelRelationFetcher->loadRelations();
-                break;
+        if ($this->first !== null) {
+            $modelRelationFetcher->loadRelationsForPage($this->first, $this->page);
+        } else {
+            $modelRelationFetcher->loadRelations();
         }
 
         return $modelRelationFetcher->getRelationDictionary($this->relationName);
@@ -109,12 +102,10 @@ class RelationBatchLoader extends BatchLoader
         return new ModelRelationFetcher(
             $this->getParentModels(),
             [$this->relationName => function ($query) {
-                return QueryFilter::apply(
-                    $query,
-                    $this->args,
-                    $this->scopes,
-                    $this->resolveInfo
-                );
+                return $this->resolveInfo
+                    ->builder
+                    ->addScopes($this->scopes)
+                    ->apply($query, $this->args);
             }]
         );
     }

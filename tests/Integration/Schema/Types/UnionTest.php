@@ -14,6 +14,7 @@ class UnionTest extends DBTestCase
      * @dataProvider withAndWithoutCustomTypeResolver
      * @param  string  $schema
      * @param  string  $query
+     * @return void
      */
     public function itCanResolveUnionTypes(string $schema, string $query): void
     {
@@ -42,7 +43,7 @@ class UnionTest extends DBTestCase
     /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function fetchResults(): Collection
+    public function resolve(): Collection
     {
         $users = User::all();
         $posts = Post::all();
@@ -69,8 +70,6 @@ class UnionTest extends DBTestCase
      */
     public function schemaAndQuery(bool $withCustomTypeResolver): array
     {
-        $fieldResolver = addslashes(self::class).'@fetchResults';
-
         $prefix = $withCustomTypeResolver
             ? 'Custom'
             : '';
@@ -92,7 +91,7 @@ class UnionTest extends DBTestCase
             }
             
             type Query {
-                stuff: [Stuff!]! @field(resolver: \"{$fieldResolver}\")
+                stuff: [Stuff!]! @field(resolver: \"{$this->qualifyTestResolver()}\")
             }
             ",
             "

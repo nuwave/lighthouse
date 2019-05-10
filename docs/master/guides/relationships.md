@@ -90,7 +90,7 @@ type Comment {
 
 ### Many To Many
 
-While [many-to-many relationships](https://laravel.com/docs/5.7/eloquent-relationships#many-to-many)
+While [many-to-many relationships](https://laravel.com/docs/eloquent-relationships#many-to-many)
 are a bit more work to set up in Laravel, defining them in Lighthouse is a breeze.
 Use the [@belongsToMany](../api-reference/directives.md#belongstomany) directive to define it.
 
@@ -177,7 +177,7 @@ We will start of by defining a mutation to create a post.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput!): Post @create(flatten: true)
+  createPost(input: CreatePostInput! @spread): Post @create
 }
 ```
 
@@ -201,12 +201,14 @@ It has to be named just like the relationship method that is defined on the `Pos
 input CreateAuthorRelation {
   connect: ID
   create: CreateUserInput
+  update: UpdateUserInput
 }
 ```
 
-There are two possible operations that you can expose on a `BelongsTo` relationship:
+There are 3 possible operations that you can expose on a `BelongsTo` relationship when creating:
 - `connect` it to an existing model
-- `create` and attach a new related model
+- `create` a new related model and attach it
+- `update` an existing model and attach it
 
 Finally, you need to define the input that allows you to create a new `User`.
 
@@ -284,26 +286,40 @@ mutation {
 }
 ```
 
-You may also allow the user to change or remove a relation.
+When issuing an update, you can also allow the user to remove a relation.
+Both `disconnect` and `delete` remove the association to the author,
+but `delete` also removes the author model itself.
 
 ```graphql
 type Mutation {
-  updatePost(input: UpdatePostInput!): Post @update(flatten: true)
+  updatePost(input: UpdatePostInput! @spread): Post @update
 }
 
 input UpdatePostInput {
   title: String
-  author: ID
+  author: UpdateAuthorRelation
+}
+
+input UpdateAuthorRelation {
+  connect: ID
+  create: CreateUserInput
+  update: UpdateUserInput
+  disconnect: Boolean
+  delete: Boolean
 }
 ```
 
-If you want to remove a relation, simply set it to `null`,
+You must pass a truthy value to `disconnect` and `delete` for them to actually run.
+This structure was chosen as it is consistent with updating `BelongsToMany` relationships
+and allows the query string to be mostly static, taking a variable value to control its behaviour.
 
 ```graphql
-mutation {
+mutation UpdatePost($disconnectAuthor: Boolean){
   updatePost(input: {
     title: "An updated title"
-    author: null
+    author: {
+      disconnect: $disconnectAuthor
+    }
   }){
     title
     author {
@@ -312,6 +328,9 @@ mutation {
   }
 }
 ```
+
+The `author` relationship will only be disconnected if the value of the variable
+`$disconnectAuthor` is `true`, if `false` or `null` are passed, it will not change.
 
 ```json
 {
@@ -331,7 +350,7 @@ of by defining a mutation to create an `User`.
 
 ```graphql
 type Mutation {
-  createUser(input: CreateUserInput!): User @create(flatten: true)
+  createUser(input: CreateUserInput! @spread): User @create
 }
 ```
 
@@ -401,60 +420,111 @@ mutation {
 }
 ```
 
-### Belongs To Many
+When updating a `User`, further nested operations become possible.
+It is up to you which ones you want to expose through the schema definition.
 
+The following example covers the full range of possible operations:
+`create`, `update` and `delete`.
 
 ```graphql
 type Mutation {
-  createPost(input: CreatePostInput!): Post @create(flatten: true)
+  updateUser(input: UpdateUserInput! @spread): User @update
 }
 
-input CreateAuthorRelation {
-  connect: [ID]
-  create: [CreateAuthorInput]
+input UpdateUserInput {
+  id: ID!
+  name: String
+  posts: UpdatePostsRelation
 }
 
-input CreateAuthorInput {
-  name: String!
+input UpdatePostsRelation {
+  create: [CreatePostInput!]
+  update: [UpdatePostInput!]
+  delete: [ID!]
+}
+
+input CreatePostInput {
+  title: String!
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+}
+```
+
+```graphql
+mutation {
+  updateUser(input: {
+    id: 3,
+    name: "Phillip"
+    posts: {
+      create: [
+        {
+          title: "A new post"
+        }
+      ],
+      update: [
+        {
+          id: 45,
+          title: "This post is updated"
+        }
+      ],
+      delete: [
+        8,
+      ]
+    }
+  }){
+    id
+    posts {
+      id
+    }
+  }
+}
+```
+
+### Belongs To Many
+
+A belongs to many relation allows you to create new related models as well
+as attaching existing ones.
+
+```graphql
+type Mutation {
+  createPost(input: CreatePostInput! @spread): Post @create
 }
 
 input CreatePostInput {
   title: String!
   authors: CreateAuthorRelation
 }
+
+input CreateAuthorRelation {
+  create: [CreateAuthorInput!]
+  connect: [ID!]
+  sync: [ID!]
+}
+
+input CreateAuthorInput {
+  name: String!
+}
 ```
 
-Just pass the ID of the models you want to associate.
+Just pass the ID of the models you want to associate or their full information
+to create a new relation.
 
 ```graphql
 mutation {
   createPost(input: {
     title: "My new Post"
     authors: {
-      connect: [123,124]
-    }
-  }){
-    id
-    authors {
-      name
-    }
-  }
-}
-```
-
-Or create a new ones.
-
-```graphql
-mutation {
-  createPost(input: {
-    title: "My new Post"
-    author: {
-      create: [{
-        name: "Herbert"
-      },
-      {
-        name: "Bro"
-      }]  
+      create: [
+        {
+          name: "Herbert"
+        }
+      ]
+      connect: [
+        123
+      ]
     }
   }){
     id
@@ -472,34 +542,78 @@ Lighthouse will detect the relationship and attach/create it.
   "data": {
     "createPost": {
       "id": 456,
-      "authors": [{
-        "name": "Herbert"
-      },
-      {
-        "name": "Bro"
-      }]
+      "authors": [
+        {
+          "id": 165,
+          "name": "Herbert"
+        },
+        {
+          "id": 123,
+          "name": "Franz"
+        }
+      ]
     }
   }
+}
+```
+
+It is also possible to use the `sync` operation to ensure only the given IDs
+will be contained withing the relation.
+
+```graphql
+mutation {
+  createPost(input: {
+    title: "My new Post"
+    authors: {
+      sync: [
+        123
+      ]
+    }
+  }){
+    id
+    authors {
+      name
+    }
+  }
+}
+```
+
+Updates on BelongsToMany relations may expose up to 6 nested operations.
+
+```graphql
+type Mutation {
+  updatePost(input: UpdatePostInput! @spread): Post @create
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  authors: UpdateAuthorRelation
+}
+
+input UpdateAuthorRelation {
+  create: [CreateAuthorInput!]
+  connect: [ID!]
+  update: [UpdateAuthorInput!]
+  sync: [ID!]
+  delete: [ID!]
+  disconnect: [ID!]
+}
+
+input CreateAuthorInput {
+  name: String!
+}
+
+input CreateAuthorInput {
+  name: String!
 }
 ```
 
 ### MorphTo
 
 ```graphql
-type Task {
-  id: ID
-  name: String
-  hour: Hour
-}
-
-type Hour {
-  id: ID
-  weekday: Int
-  hourable: Task
-}
-
 type Mutation {
-  createHour(input: CreateHourInput!): Hour @create(flatten: true)
+  createHour(input: CreateHourInput! @spread): Hour @create
 }
 
 input CreateHourInput {
@@ -509,21 +623,113 @@ input CreateHourInput {
   to: String
   weekday: Int
 }
+
+type Hour {
+  id: ID
+  weekday: Int
+  hourable: Task
+}
+
+type Task {
+  id: ID
+  name: String
+  hour: Hour
+}
 ```
 
 ```graphql
 mutation {
   createHour(input: {
-      hourable_type: "App\\\Task"
-      hourable_id: 1
-      weekday: 2
+    hourable_type: "App\\\Task"
+    hourable_id: 1
+    weekday: 2
   }) {
+    id
+    weekday
+    hourable {
       id
-      weekday
-      hourable {
-          id
-          name
-      }
+      name
+    }
   }
 }
 ```
+
+### Morph To Many
+
+A morph to many relation allows you to create new related models as well
+as attaching existing ones.
+
+```graphql
+type Mutation {
+  createTask(input: CreateTaskInput!): Task @create(flatten: true)
+}
+
+input CreateTaskInput {
+  name: String!
+  tags: CreateTagRelation
+}
+
+input CreateTagRelation {
+  create: [CreateTagInput!]
+  sync: [ID!]
+  connect: [ID!]
+}
+
+input CreateTagInput {
+  name: String!
+}
+
+type Task {
+  id: ID!
+  name: String!
+  tags: [Tag!]!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+}
+```
+
+In this example, the tag with id `1` already exists in the database. The query connects this tag to the task using the `MorphToMany` relationship.
+ 
+```graphql
+mutation {
+  createTask(input: {
+    name: "Loundry"
+    tags: {
+      connect: [1]
+    }
+  }) {
+    tags {
+      id
+      name
+    }
+  }
+}
+```
+
+You can either use `connect` or `sync` during creation. 
+
+When you want to create a new tag while creating the task,
+you need use the `create` operation to provide an array of `CreateTagInput`:
+
+```graphql
+mutation {
+  createTask(input: {
+    name: "Loundry"
+      tags: {
+        create: [
+          {
+            name: "home"
+          }
+        ]
+      }
+  }) {
+    tags {
+      id
+      name
+    }
+  }
+}
+``` 

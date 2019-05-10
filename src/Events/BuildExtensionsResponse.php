@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\Events;
 /**
  * Fires after a query was resolved.
  *
- * Listeners of this event must return an array comprised of
- * a single key and the extension content as the value, e.g.
- * ['tracing' => ['some' => 'content']]
+ * Listeners of this event may return an instance of
+ * @see \Nuwave\Lighthouse\Execution\ExtensionsResponse
+ * that is then added to the response.
  */
 class BuildExtensionsResponse
 {

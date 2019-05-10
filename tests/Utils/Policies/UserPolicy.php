@@ -21,6 +21,11 @@ class UserPolicy
         return $user === null;
     }
 
+    public function view(User $user, User $otherUser): bool
+    {
+        return $otherUser !== null;
+    }
+
     public function dependingOnArg($user, bool $pass): bool
     {
         return $pass;

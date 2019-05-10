@@ -58,7 +58,8 @@ We also defined the inverse relationship from `Post` to `Person` through the `au
 
 Lighthouse is a PHP package that allows you to serve a GraphQL endpoint from your Laravel application.
 
-It greatly reduces the boilerplate required to create a schema, integrates well with any Laravel project,
+It greatly reduces the boilerplate required to create a schema,
+integrates well with any Laravel project,
 and is highly customizable giving you full control over your data.
 
 The whole process of building your own GraphQL server can be described in 3 steps:
@@ -89,22 +90,23 @@ You can download the source code for this tutorial at [https://github.com/nuwave
 
 ## Installation
 
-Create a new Laravel project. You can use an existing project if you like,
-but you may have to adapt as we go along. Read more about [installing Laravel](https://laravel.com/docs/#installing-laravel).
+Create a new Laravel project.
+You can use an existing project if you like, but you may have to adapt as we go along.
+Read more about [installing Laravel](https://laravel.com/docs/#installing-laravel).
 
     laravel new lighthouse-tutorial
 
 In this tutorial we will use [Laravel GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground)
-as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers. Of course, we will use Lighthouse as the GraphQL Server.
+as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
+Of course, we will use Lighthouse as the GraphQL Server.
 
     composer require nuwave/lighthouse mll-lab/laravel-graphql-playground
 
 Then publish the configurations files and the default schema.
 
-
 ```bash
 # lighthouse
-php artisan vendor:publish --provider="Nuwave\Lighthouse\Providers\LighthouseServiceProvider"
+php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider"
 
 # playground
 php artisan vendor:publish --provider="MLL\GraphQLPlayground\GraphQLPlaygroundServiceProvider"
@@ -112,7 +114,7 @@ php artisan vendor:publish --provider="MLL\GraphQLPlayground\GraphQLPlaygroundSe
 
 The default schema will be published to `graphql/schema.graphql`.
 
-Consult the [Laravel docs on database configuration](https://laravel.com/docs/5.7/database#configuration)
+Consult the [Laravel docs on database configuration](https://laravel.com/docs/database#configuration)
 and ensure you have a working database set up.
 
 Run database migrations to create the `users` table:
@@ -124,7 +126,9 @@ Seed the database with some fake users:
     php artisan tinker
     factory('App\User', 10)->create();
 
-Now you are ready to start your server. Use [Homestead](https://laravel.com/docs/5.7/homestead), [Valet](https://laravel.com/docs/5.7/valet) or:
+Now you are ready to start your server.
+Use [Homestead](https://laravel.com/docs/homestead),
+[Valet](https://laravel.com/docs/5.7/valet) or:
 
     php artisan serve
 
@@ -285,7 +289,8 @@ class User extends Authenticatable
 
 ## The Magic
 
-Let's edit `routes/graphql/schema.graphql` and define our blog schema, based on the Eloquent Models we created.
+Let's edit `routes/graphql/schema.graphql` and define our blog schema,
+based on the Eloquent Models we created.
 
 First, we define the root Query type which contains two different queries for retrieving posts.
 
@@ -300,7 +305,8 @@ The way that Lighthouse knows how to resolve the queries is a combination of con
 naming - the type name `Post` is also the name of our Model - and the use of server-side directives.
 
 - [`@all`](../api-reference/directives.md#all) just gets you a list of all `Post` models
-- [`@find`](../api-reference/directives.md#find) and [`@eq`](../api-reference/directives.md#eq) are combined to retrieve a single `Post` by its ID
+- [`@find`](../api-reference/directives.md#find) and [`@eq`](../api-reference/directives.md#eq)
+  are combined to retrieve a single `Post` by its ID
 
 
 Then, we add additional type definitions that clearly define the shape of our data. 
@@ -340,7 +346,8 @@ Just like in Eloquent, we express the relationship between our types using the
 
 ## The Final Test
 
-Insert some fake data into your database, you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.
+Insert some fake data into your database,
+you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.
 
 Visit [http://127.0.0.1:8000/graphql-playground](http://127.0.0.1:8000/graphql-playground) and try the following query:
 
@@ -361,16 +368,16 @@ Visit [http://127.0.0.1:8000/graphql-playground](http://127.0.0.1:8000/graphql-p
 }
 ```
 
-You should get a list of all the posts in your database, together will all the comments and user information
-defined upon.
+You should get a list of all the posts in your database,
+together will all the comments and user information defined upon.
 
-I hope this example shows a taste of the power of GraphQL and how Lighthouse makes it
-easy to build your own server with Laravel. 
+I hope this example shows a taste of the power of GraphQL
+and how Lighthouse makes it easy to build your own server with Laravel. 
 
 ## Next Steps
 
-The app you just build might use some more features. Here are a few ideas on what you might add
-to learn more about Lighthouse.
+The app you just build might use some more features.
+Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../api-reference/directives.md#paginate)
 - [Create and update posts and comments](../the-basics/fields.md#mutate-data)
