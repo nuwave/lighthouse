@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.3...master)
 
+### Added
+
+- Add `@whereConstraints` directive that offers flexible query capabilities to the client https://github.com/nuwave/lighthouse/pull/753
+
 ## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
 
 ### Fixed
@@ -31,10 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Throw error if pagination amount `<= 0` is requested https://github.com/nuwave/lighthouse/pull/765
 
 ## [3.5.0](https://github.com/nuwave/lighthouse/compare/v3.4.0...v3.5.0)
-
-### Added
-
-- Add `@whereConstraints` directive that offers flexible query capabilities to the client https://github.com/nuwave/lighthouse/pull/753
 
 ### Changed
 
