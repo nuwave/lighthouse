@@ -1031,7 +1031,7 @@ type User {
 
 ## @rules
 
-Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/5.6/validation#available-validation-rules).
+Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
 
 ```graphql
 type Query {
@@ -1057,7 +1057,7 @@ You can customize the error message for a particular argument.
 
 ## @rulesForArray
 
-Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/5.6/validation#available-validation-rules).
+Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
 
 ```graphql
 type Mutation {
@@ -1306,7 +1306,7 @@ type Mutation {
 
 ## @where
 
-Specify that an argument is used as a [where filter](https://laravel.com/docs/5.7/queries#where-clauses).
+Specify that an argument is used as a [where filter](https://laravel.com/docs/queries#where-clauses).
 
 You can specify simple operators:
 

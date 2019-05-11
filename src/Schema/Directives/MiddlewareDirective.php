@@ -65,19 +65,19 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $middleware = $this->getQualifiedMiddlewareNames(
             $this->directiveArgValue('checks')
         );
-        $resolver = $value->getResolver();
+        $resolver = $fieldValue->getResolver();
 
         return $next(
-            $value->setResolver(
+            $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver, $middleware) {
                     return $this->pipeline
                         ->send($context->request())
@@ -150,7 +150,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
 
                     return $fieldDefinition;
                 })
-                ->toArray()
+                ->all()
         );
 
         return $objectType;

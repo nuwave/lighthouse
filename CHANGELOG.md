@@ -5,7 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.4.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.3...master)
+
+## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
+
+### Fixed
+
+- Respect the model's connection for database transaction during `@create` and `@update` https://github.com/nuwave/lighthouse/pull/777
+
+## [3.5.2](https://github.com/nuwave/lighthouse/compare/v3.5.1...v3.5.2)
+
+### Fixed
+
+- You can now omit an `input` argument from a query that uses
+  the `@spread` directive without getting an error https://github.com/nuwave/lighthouse/pull/774
+
+### Deprecated
+
+- The class `SubscriptionExceptionHandler` will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
+
+## [3.5.1](https://github.com/nuwave/lighthouse/compare/v3.5.0...v3.5.1)
+
+### Fixed
+
+- Throw error if pagination amount `<= 0` is requested https://github.com/nuwave/lighthouse/pull/765
+
+## [3.5.0](https://github.com/nuwave/lighthouse/compare/v3.4.0...v3.5.0)
 
 ### Added
 
@@ -14,13 +39,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Default the config to always set the `Accept: application/json` header https://github.com/nuwave/lighthouse/pull/743
-- Declare a single named route which handles POST/GET instead of 2 seperate routes https://github.com/nuwave/lighthouse/pull/738
+- Declare a single named route which handles POST/GET instead of 2 separate routes https://github.com/nuwave/lighthouse/pull/738
+- Apply the nested operations within a nested mutation in a consistent order
+  that makes sense https://github.com/nuwave/lighthouse/pull/754
 
 ### Deprecated
 
 - The pagination field argument that controls the amount of results
   will default to `first` instead of `count` in v4. The config `pagination_amount_argument`
   can be used to change the argument name now https://github.com/nuwave/lighthouse/pull/752
+
+### Fixed
+
+- Instantiate the `ErrorBuffer` directly, its dependencies
+  can not be resolved through the container https://github.com/nuwave/lighthouse/pull/756
+- Refresh GraphQLRequest singleton between multiple requests to prevent
+  a common error in test execution https://github.com/nuwave/lighthouse/pull/761
 
 ## [3.4.0](https://github.com/nuwave/lighthouse/compare/v3.3.0...v3.4.0) - 2019-04-18
 

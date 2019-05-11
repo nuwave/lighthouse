@@ -39,7 +39,7 @@ class ResponseStream extends Stream implements CanStreamResponse
                                 ? (int) $partial
                                 : $partial;
                         })
-                        ->toArray();
+                        ->all();
 
                     $errors = $this->chunkError($path, $data);
                     if (! empty($errors)) {

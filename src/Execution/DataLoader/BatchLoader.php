@@ -85,9 +85,10 @@ abstract class BatchLoader
     public static function instanceKey(array $path): string
     {
         return (new Collection($path))
-            ->filter(function ($path) {
-                // Ignore numeric path entries, as those signify an array of fields
-                // Those are the very purpose for this batch loader, so they must not be included.
+            ->filter(function ($path): bool {
+                // Ignore numeric path entries, as those signify an array of fields.
+                // Combining the queries for those is the very purpose of the
+                // batch loader, so they must not be included.
                 return ! is_numeric($path);
             })
             ->implode('_');
@@ -97,7 +98,7 @@ abstract class BatchLoader
      * Load object by key.
      *
      * @param  mixed  $key
-     * @param  array  $metaInfo
+     * @param  mixed[]  $metaInfo
      * @return \GraphQL\Deferred
      */
     public function load($key, array $metaInfo = []): Deferred
@@ -120,7 +121,7 @@ abstract class BatchLoader
      *
      * The result has to be an associative array: [key => result]
      *
-     * @return array
+     * @return mixed[]
      */
     abstract public function resolve(): array;
 }

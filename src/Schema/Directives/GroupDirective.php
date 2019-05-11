@@ -85,7 +85,7 @@ class GroupDirective extends BaseDirective implements NodeManipulator
 
                     return $fieldDefinition;
                 })
-                ->toArray()
+                ->all()
         );
 
         return $objectType;

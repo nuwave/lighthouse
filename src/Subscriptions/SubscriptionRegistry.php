@@ -146,7 +146,7 @@ class SubscriptionRegistry
                     ->map(function (FieldNode $field): string {
                         return $field->name->value;
                     })
-                    ->toArray();
+                    ->all();
             })
             ->map(function ($subscriptionField): GraphQLSubscription {
                 return Arr::get(

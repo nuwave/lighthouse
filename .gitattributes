@@ -1,6 +1,7 @@
 * text=auto
 
 /.github export-ignore
+/benchmarks export-ignore
 /docs export-ignore
 /tests export-ignore
 .codecov.yml export-ignore
@@ -16,4 +17,6 @@ Dockerfile export-ignore
 Dockerfile_xdebug export-ignore
 logo.png export-ignore
 netlify.toml export-ignore
+phpbench.json export-ignore
+phpstan.neon export-ignore
 phpunit.xml.dist export-ignore

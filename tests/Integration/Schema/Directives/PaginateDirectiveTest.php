@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
@@ -54,6 +55,39 @@ class PaginateDirectiveTest extends DBTestCase
                 ],
             ],
         ])->assertJsonCount(5, 'data.users.data');
+    }
+
+    /**
+     * @test
+     */
+    public function itHandlesPaginationWithCountZero(): void
+    {
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users: [User!] @paginate
+        }
+        ';
+
+        $this->query('
+        {
+            users(count: 0) {
+                data {
+                    id
+                }
+            }
+        }
+        ')
+        ->assertJson([
+            'data' => [
+                'users' => null,
+            ],
+        ])
+        ->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     /**

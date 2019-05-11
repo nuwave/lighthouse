@@ -217,3 +217,13 @@ The docs for Lighthouse are located in [`/docs`](/docs).
 You can check out the [Docs README](/docs/.github/README.md) for more information on how to to contribute to the docs.
 
 We keep a [changelog](/CHANGELOG.md) to inform users about changes in our releases.
+
+## Benchmarks
+
+We use [phpbench](https://github.com/phpbench/phpbench) for running benchmarks
+on performance critical pieces of code.
+
+Run the reports that are defined in `phpbench.json` via the command line,
+for example:
+
+    vendor/bin/phpbench run --report=ast

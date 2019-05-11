@@ -23,16 +23,16 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $relations = $this->directiveArgValue('relations', []);
-        $resolver = $value->getResolver();
+        $resolver = $fieldValue->getResolver();
 
-        return $next($value->setResolver(function () use ($resolver, $relations) {
+        return $next($fieldValue->setResolver(function () use ($resolver, $relations) {
             $result = call_user_func_array($resolver, func_get_args());
             ($result instanceof Deferred)
                 ? $result->then(function (Collection &$items) use ($relations) {

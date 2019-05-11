@@ -33,24 +33,24 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
         $this->setNodeKey(
-            $value->getParent()
+            $fieldValue->getParent()
         );
 
-        $value = $next($value);
-        $resolver = $value->getResolver();
+        $fieldValue = $next($fieldValue);
+        $resolver = $fieldValue->getResolver();
         $maxAge = $this->directiveArgValue('maxAge');
         $privateCache = $this->directiveArgValue('private', false);
 
-        return $value->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($value, $resolver, $maxAge, $privateCache) {
+        return $fieldValue->setResolver(function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($fieldValue, $resolver, $maxAge, $privateCache) {
             $cacheValue = new CacheValue([
-                'field_value' => $value,
+                'field_value' => $fieldValue,
                 'root' => $root,
                 'args' => $args,
                 'context' => $context,
