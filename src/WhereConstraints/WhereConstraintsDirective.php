@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective
 {
     const NAME = 'whereConstraints';
+    const INVALID_COLUMN_MESSAGE = 'Column names may contain only alphanumerics or underscores, and may not begin with a digit.';
 
     /**
      * Name of the directive.
@@ -65,6 +66,12 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
                     "Did not receive a value to match the WhereConstraints for column {$column}."
                 );
             }
+
+            if( ! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)){
+                throw new Error(
+                    self::INVALID_COLUMN_MESSAGE
+                );
+            };
 
             $where = $nestedOr
                 ? 'orWhere'

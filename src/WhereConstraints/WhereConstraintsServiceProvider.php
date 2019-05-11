@@ -32,7 +32,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                         PartialParser::inputObjectTypeDefinition('
                             input WhereConstraints {
                                 column: String
-                                operator: String = "="
+                                operator: Operator = EQ
                                 value: Mixed
                                 AND: [WhereConstraints!]
                                 OR: [WhereConstraints!]
@@ -44,7 +44,8 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                         PartialParser::scalarTypeDefinition('
                             scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
                         ')
-                    );
+                    )
+                ;
             }
         );
     }

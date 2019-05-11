@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\WhereConstraints;
 
+use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
@@ -17,6 +18,17 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     
     type Query {
         users(where: WhereConstraints @whereConstraints): [User!]! @all
+    }
+    
+    enum Operator {
+        EQ @enum(value: "=")
+        NEQ @enum(value: "!=")
+        GT @enum(value: ">")
+        GTE @enum(value: ">=")
+        LT @enum(value: "<")
+        LTE @enum(value: "<=")
+        LIKE @enum(value: "LIKE")
+        NOT_LIKE @enum(value: "NOT_LIKE")
     }
     ';
 
@@ -61,7 +73,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             users(
                 where: {
                     column: "id"
-                    operator: ">"
+                    operator: GT
                     value: 1
                 }
             ) {
@@ -85,12 +97,12 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                     AND: [
                         {
                             column: "id"
-                            operator: ">"
+                            operator: GT
                             value: 1
                         }
                         {
                             column: "id"
-                            operator: "<"
+                            operator: LT
                             value: 3
                         }
                     ]
@@ -154,5 +166,30 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(2, 'data.users');
+    }
+
+    /**
+     * @test
+     */
+    public function itRejectsInvalidColumnName(): void
+    {
+        $result =$this->query('
+        {
+            users(
+                where: {
+                    NOT: [
+                        {
+                            column: "Robert\'); DROP TABLE Students;--"
+                            value: "https://xkcd.com/327/"
+                        }
+                    ]
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJsonFragment([
+            'message' => WhereConstraintsDirective::INVALID_COLUMN_MESSAGE,
+        ]);
     }
 }

@@ -1386,6 +1386,23 @@ It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql
 
     composer require mll-lab/graphql-php-scalars
 
+Finally, add an enum type `Operator` to your schema. Depending on your
+database, you may want to allow different internal values. This default
+should work for most databases:
+
+```graphql
+enum Operator {
+    EQ @enum(value: "=")
+    NEQ @enum(value: "!=")
+    GT @enum(value: ">")
+    GTE @enum(value: ">=")
+    LT @enum(value: "<")
+    LTE @enum(value: "<=")
+    LIKE @enum(value: "LIKE")
+    NOT_LIKE @enum(value: "NOT_LIKE")
+}
+```
+
 ### Usage
 
 The argument it is defined on may have any name but **must** be
@@ -1407,12 +1424,12 @@ that gets actors over age 37 who either have red hair or are at least 150cm.
       where: [
         {
           AND: [
-            { column: "age", operator: ">" value: 37 }
+            { column: "age", operator: GT value: 37 }
             { column: "type", value: "Actor" }
             {
               OR: [
                 { column: "haircolour", value: "red" }
-                { column: "height", operator: ">=", value: 150 }
+                { column: "height", operator: GTE, value: 150 }
               ]
             }
           ]
@@ -1431,7 +1448,7 @@ within your schema.
 ```graphql
 input WhereConstraints {
     column: String
-    operator: String = "="
+    operator: String = EQ
     value: Mixed
     AND: [WhereConstraints!]
     OR: [WhereConstraints!]
