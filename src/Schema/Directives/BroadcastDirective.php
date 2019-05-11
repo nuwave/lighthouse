@@ -23,18 +23,18 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $value = $next($value);
-        $resolver = $value->getResolver();
+        $fieldValue = $next($fieldValue);
+        $resolver = $fieldValue->getResolver();
         $subscriptionField = $this->directiveArgValue('subscription');
         $shouldQueue = $this->directiveArgValue('shouldQueue');
 
-        return $value->setResolver(function () use ($resolver, $subscriptionField, $shouldQueue) {
+        return $fieldValue->setResolver(function () use ($resolver, $subscriptionField, $shouldQueue) {
             $resolved = call_user_func_array($resolver, func_get_args());
 
             if ($resolved instanceof Deferred) {
