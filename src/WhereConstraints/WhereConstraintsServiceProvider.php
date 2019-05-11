@@ -26,7 +26,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
 
         $dispatcher->listen(
             ManipulateAST::class,
-            function(ManipulateAST $manipulateAST): void {
+            function (ManipulateAST $manipulateAST): void {
                 $manipulateAST->documentAST
                     ->setDefinition(
                         PartialParser::inputObjectTypeDefinition('
@@ -44,8 +44,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                         PartialParser::scalarTypeDefinition('
                             scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
                         ')
-                    )
-                ;
+                    );
             }
         );
     }

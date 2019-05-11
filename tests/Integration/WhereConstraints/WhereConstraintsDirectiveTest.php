@@ -2,10 +2,10 @@
 
 namespace Tests\Integration\WhereConstraints;
 
-use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
-use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
+use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
 
 class WhereConstraintsDirectiveTest extends DBTestCase
 {
@@ -173,7 +173,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
      */
     public function itRejectsInvalidColumnName(): void
     {
-        $result =$this->query('
+        $result = $this->query('
         {
             users(
                 where: {
