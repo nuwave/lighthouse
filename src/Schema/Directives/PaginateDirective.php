@@ -7,13 +7,14 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Execution\Utils\Cursor;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Execution\Utils\Pagination;
+use Nuwave\Lighthouse\Pagination\PaginationType;
+use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
@@ -39,7 +40,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
     {
         return PaginationManipulator::transformToPaginatedField(
-            $this->getPaginationType(),
+            $this->paginationType(),
             $fieldDefinition,
             $parentType,
             $current,
@@ -56,44 +57,49 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        switch ($this->getPaginationType()) {
-            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                return $this->connectionTypeResolver($fieldValue);
-            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-            default:
-                return $this->paginatorTypeResolver($fieldValue);
-        }
-    }
+        return $fieldValue->setResolver(
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
+                /** @var int $first */
+                /** @var int $page */
+                [$first, $page] = PaginationUtils::extractArgs($args, $this->paginationType(), $this->paginateMaxCount());
 
-    /**
-     * @return string
-     */
-    protected function getPaginationType(): string
-    {
-        return PaginationManipulator::assertValidPaginationType(
-            $this->directiveArgValue('type', PaginationManipulator::PAGINATION_TYPE_PAGINATOR)
+                if ($this->directiveHasArgument('builder')) {
+                    $query = call_user_func(
+                        $this->getResolverFromArgument('builder'),
+                        $root,
+                        $args,
+                        $context,
+                        $resolveInfo
+                    );
+                } else {
+                    /** @var \Illuminate\Database\Eloquent\Model $model */
+                    $model = $this->getPaginatorModel();
+                    $query = $model::query();
+                }
+
+                $query = $resolveInfo
+                    ->builder
+                    ->addScopes(
+                        $this->directiveArgValue('scopes', [])
+                    )
+                    ->apply(
+                        $query,
+                        $args
+                    );
+
+                if ($query instanceof ScoutBuilder) {
+                    return $query->paginate($first, 'page', $page);
+                }
+
+                return $query->paginate($first, ['*'], 'page', $page);
+            }
         );
     }
 
-    /**
-     * Create a paginator resolver.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    protected function paginatorTypeResolver(FieldValue $value): FieldValue
+    protected function paginationType(): PaginationType
     {
-        return $value->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
-                return $this->getPaginatedResults(
-                    $root,
-                    $args,
-                    $context,
-                    $resolveInfo,
-                    $args['page'] ?? 1,
-                    $args['count']
-                );
-            }
+        return new PaginationType(
+            $this->directiveArgValue('type', PaginationType::TYPE_PAGINATOR)
         );
     }
 
@@ -106,80 +112,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     {
         return $this->directiveArgValue('maxCount')
             ?? config('lighthouse.paginate_max_count');
-    }
-
-    /**
-     * Create a connection resolver.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    protected function connectionTypeResolver(FieldValue $value): FieldValue
-    {
-        return $value->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator {
-                $first = $args['first'];
-
-                return $this->getPaginatedResults(
-                    $root,
-                    $args,
-                    $context,
-                    $resolveInfo,
-                    Pagination::calculateCurrentPage(
-                        $first,
-                        Cursor::decode($args)
-                    ),
-                    $first
-                );
-            }
-        );
-    }
-
-    /**
-     * @param  null  $root
-     * @param  mixed[]  $args
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
-     * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @param  int  $page
-     * @param  int  $first
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    protected function getPaginatedResults($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo, int $page, int $first): LengthAwarePaginator
-    {
-        Pagination::throwIfPaginateMaxCountExceeded(
-            $this->paginateMaxCount(),
-            $first
-        );
-
-        if ($this->directiveHasArgument('builder')) {
-            $query = call_user_func(
-                $this->getResolverFromArgument('builder'),
-                $root,
-                $args,
-                $context,
-                $resolveInfo
-            );
-        } else {
-            /** @var \Illuminate\Database\Eloquent\Model $model */
-            $model = $this->getPaginatorModel();
-            $query = $model::query();
-        }
-
-        $query = $resolveInfo
-            ->builder
-            ->addScopes(
-                $this->directiveArgValue('scopes', [])
-            )
-            ->apply(
-                $query,
-                $args
-            );
-
-        if ($query instanceof ScoutBuilder) {
-            return $query->paginate($first, 'page', $page);
-        }
-
-        return $query->paginate($first, ['*'], 'page', $page);
     }
 
     /**

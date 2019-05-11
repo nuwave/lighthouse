@@ -2,12 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\DataLoader;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Utils\Cursor;
-use Nuwave\Lighthouse\Execution\Utils\Pagination;
-use Nuwave\Lighthouse\Schema\Directives\PaginationManipulator;
 
 class RelationBatchLoader extends BatchLoader
 {
@@ -40,26 +36,26 @@ class RelationBatchLoader extends BatchLoader
     protected $resolveInfo;
 
     /**
-     * The pagination type can either be "connection", "paginator" or null, in which case there is no pagination.
-     *
-     * @var string|null
-     */
-    protected $paginationType;
-
-    /**
-     * The paginator can be limited to only allow querying a maximum number of items.
+     * Present when using pagination, the amount of rows to be fetched.
      *
      * @var int|null
      */
-    protected $paginateMaxCount;
+    protected $first;
+
+    /**
+     * Present when using pagination, the page to be fetched.
+     *
+     * @var int|null
+     */
+    protected $page;
 
     /**
      * @param  string  $relationName
      * @param  mixed[]  $args
      * @param  string[]  $scopes
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
-     * @param  string|null  $paginationType
-     * @param  int|null  $paginateMaxCount
+     * @param  int|null  $first
+     * @param  int|null  $page
      * @return void
      */
     public function __construct(
@@ -67,15 +63,15 @@ class RelationBatchLoader extends BatchLoader
         array $args,
         array $scopes,
         ResolveInfo $resolveInfo,
-        ?string $paginationType = null,
-        ?int $paginateMaxCount = null
+        ?int $first = null,
+        ?int $page = null
     ) {
         $this->relationName = $relationName;
         $this->args = $args;
         $this->scopes = $scopes;
         $this->resolveInfo = $resolveInfo;
-        $this->paginationType = $paginationType;
-        $this->paginateMaxCount = $paginateMaxCount;
+        $this->first = $first;
+        $this->page = $page;
     }
 
     /**
@@ -87,32 +83,10 @@ class RelationBatchLoader extends BatchLoader
     {
         $modelRelationFetcher = $this->getRelationFetcher();
 
-        switch ($this->paginationType) {
-            case PaginationManipulator::PAGINATION_TYPE_CONNECTION:
-                // first is an required argument
-                /** @var int $first */
-                $first = $this->args['first'];
-                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $first);
-
-                $after = Cursor::decode($this->args);
-
-                $currentPage = Pagination::calculateCurrentPage($first, $after);
-
-                $modelRelationFetcher->loadRelationsForPage($first, $currentPage);
-                break;
-            case PaginationManipulator::PAGINATION_TYPE_PAGINATOR:
-                // count must be set so we can safely get it like this
-                /** @var int $count */
-                $count = $this->args['count'];
-                Pagination::throwIfPaginateMaxCountExceeded($this->paginateMaxCount, $count);
-
-                $page = Arr::get($this->args, 'page', 1);
-
-                $modelRelationFetcher->loadRelationsForPage($count, $page);
-                break;
-            default:
-                $modelRelationFetcher->loadRelations();
-                break;
+        if ($this->first !== null) {
+            $modelRelationFetcher->loadRelationsForPage($this->first, $this->page);
+        } else {
+            $modelRelationFetcher->loadRelations();
         }
 
         return $modelRelationFetcher->getRelationDictionary($this->relationName);

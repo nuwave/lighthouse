@@ -11,7 +11,6 @@ use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Illuminate\Foundation\Testing\TestResponse;
-use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -92,6 +91,7 @@ abstract class TestCase extends BaseTestCase
                 'storage' => 'array',
                 'broadcaster' => 'log',
             ],
+            'pagination_amount_argument' => 'count',
         ]);
 
         $app['config']->set('app.debug', true);
@@ -214,11 +214,10 @@ abstract class TestCase extends BaseTestCase
      */
     protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
-        $this->app->forgetInstance(GraphQLRequest::class);
-
         return $this->postJson(
             'graphql',
-            $data
+            $data,
+            $headers
         );
     }
 
@@ -288,5 +287,16 @@ abstract class TestCase extends BaseTestCase
             foo: Int
         }
         ';
+    }
+
+    /**
+     * Get a fully qualified reference to a method that is defined on the test class.
+     *
+     * @param  string  $method
+     * @return string
+     */
+    protected function qualifyTestResolver(string $method = 'resolve'): string
+    {
+        return addslashes(static::class).'@'.$method;
     }
 }

@@ -27,32 +27,38 @@ class WithDirective extends RelationDirective implements FieldMiddleware
     /**
      * Eager load a relation on the parent instance.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $resolver = $value->getResolver();
+        $resolver = $fieldValue->getResolver();
 
         return $next(
-            $value->setResolver(
+            $fieldValue->setResolver(
                 function (Model $parent, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver): Deferred {
                     $loader = BatchLoader::instance(
                         RelationBatchLoader::class,
                         $resolveInfo->path,
-                        $this->toLoaderConstructorArguments($parent, $args, $context, $resolveInfo)
+                        [
+                            'relationName' => $this->directiveArgValue('relation', $this->definitionNode->name->value),
+                            'args' => $args,
+                            'scopes' => $this->directiveArgValue('scopes', []),
+                            'resolveInfo' => $resolveInfo,
+                        ]
                     );
 
                     return new Deferred(function () use ($loader, $resolver, $parent, $args, $context, $resolveInfo) {
-                        return $loader->load(
-                            $parent->getKey(),
-                            ['parent' => $parent]
-                        )->then(
-                            function () use ($resolver, $parent, $args, $context, $resolveInfo) {
-                                return $resolver($parent, $args, $context, $resolveInfo);
-                            }
-                        );
+                        return $loader
+                            ->load(
+                                $parent->getKey(),
+                                ['parent' => $parent]
+                            )->then(
+                                function () use ($resolver, $parent, $args, $context, $resolveInfo) {
+                                    return $resolver($parent, $args, $context, $resolveInfo);
+                                }
+                            );
                     });
                 }
             )

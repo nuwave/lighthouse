@@ -135,7 +135,7 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->bind(ProvidesResolver::class, ResolverProvider::class);
         $this->app->bind(ProvidesSubscriptionResolver::class, function (): ProvidesSubscriptionResolver {
-            return new class() implements ProvidesSubscriptionResolver {
+            return new class implements ProvidesSubscriptionResolver {
                 public function provideSubscriptionResolver(FieldValue $fieldValue): Closure
                 {
                     throw new Exception(

@@ -23,18 +23,18 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
     /**
      * Resolve the field directive.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldFieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldFieldValue, Closure $next): FieldValue
     {
         if ($this->directiveHasArgument('resolver')) {
             [$className, $methodName] = $this->getMethodArgumentParts('resolver');
 
             $namespacedClassName = $this->namespaceClassName(
                 $className,
-                $fieldValue->defaultNamespacesForParent()
+                $fieldFieldValue->defaultNamespacesForParent()
             );
 
             $resolver = Utils::constructResolver($namespacedClassName, $methodName);
@@ -43,7 +43,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
                 $complexity = Arr::get(
                     $args,
                     'first',
-                    Arr::get($args, 'count', 1)
+                    Arr::get($args, config('lighthouse.pagination_amount_argument'), 1)
                 );
 
                 return $childrenComplexity * $complexity;
@@ -51,7 +51,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
         }
 
         return $next(
-            $fieldValue->setComplexity($resolver)
+            $fieldFieldValue->setComplexity($resolver)
         );
     }
 }

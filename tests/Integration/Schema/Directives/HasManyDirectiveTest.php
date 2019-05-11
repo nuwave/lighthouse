@@ -3,10 +3,10 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class HasManyDirectiveTest extends DBTestCase
 {
@@ -203,6 +203,47 @@ class HasManyDirectiveTest extends DBTestCase
             'Maximum number of 3 requested items exceeded. Fetch smaller chunks.',
             $result->jsonGet('errors.0.message')
         );
+    }
+
+    /**
+     * @test
+     */
+    public function itHandlesPaginationWithCountZero(): void
+    {
+        $this->schema = '
+        type User {
+            id: ID
+            tasks: [Task!] @hasMany(type: "paginator")
+        }
+        
+        type Task {
+            id: Int!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->query('
+        {
+            user {
+                id
+                tasks(count: 0) {
+                    data {
+                        id
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'id' => $this->user->id,
+                    'tasks' => null,
+                ],
+            ],
+        ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
     /**
@@ -602,7 +643,7 @@ class HasManyDirectiveTest extends DBTestCase
      */
     public function itThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {

@@ -29,7 +29,7 @@ class CanDirectiveDbTest extends DBTestCase
         type Query {
             user(id: ID @eq): User
                 @can('.$argumentName.': "view")
-                @field(resolver: "'.addslashes(self::class).'@resolveUser")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
         type User {
@@ -80,7 +80,7 @@ class CanDirectiveDbTest extends DBTestCase
         type Query {
             post(id: ID @eq): Post
                 @can('.$argumentName.': "view")
-                @field(resolver: "'.addslashes(self::class).'@resolvePost")
+                @field(resolver: "'.$this->qualifyTestResolver('resolvePost').'")
         }
         
         type Post {

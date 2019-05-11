@@ -4,6 +4,9 @@ namespace Nuwave\Lighthouse\Support\Contracts;
 
 use Throwable;
 
+/**
+ * @deprecated will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
+ */
 interface SubscriptionExceptionHandler
 {
     /**

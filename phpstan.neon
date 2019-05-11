@@ -1,0 +1,14 @@
+includes:
+- ./vendor/nunomaduro/larastan/extension.neon
+parameters:
+  level: 1
+  paths:
+  - benchmarks
+  - config
+  - src
+  - tests
+  excludes_analyse:
+  - %rootDir%/../../../tests/database/*
+  ignoreErrors:
+  - '#Call to an undefined method Tests\\TestCase::decodeResponseJson().#'
+  - '#Call to an undefined static method Illuminate\\Support\\Facades\\Event::assertDispatched().#'

@@ -25,6 +25,6 @@ abstract class Stream
                 return Str::startsWith(implode('.', $error['path']), $path);
             })
             ->values()
-            ->toArray();
+            ->all();
     }
 }

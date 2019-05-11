@@ -1,61 +1,22 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\Pagination;
 
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Types\PaginatorField;
-use Nuwave\Lighthouse\Schema\Types\ConnectionField;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class PaginationManipulator
 {
-    // The default is offset-based pagination
-    const PAGINATION_TYPE_PAGINATOR = 'paginator';
-    const PAGINATION_ALIAS_DEFAULT = 'default';
-
-    // Those are both aliases for a Connection style pagination
-    const PAGINATION_TYPE_CONNECTION = 'connection';
-    const PAGINATION_ALIAS_RELAY = 'relay';
-
-    /**
-     * Apply possible aliases and throw if the given pagination type is invalid.
-     *
-     * @param  string  $paginationType
-     * @return string
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    public static function assertValidPaginationType(string $paginationType): string
-    {
-        if ($paginationType === self::PAGINATION_ALIAS_RELAY) {
-            return self::PAGINATION_TYPE_CONNECTION;
-        }
-
-        if ($paginationType === self::PAGINATION_ALIAS_DEFAULT) {
-            return self::PAGINATION_TYPE_PAGINATOR;
-        }
-
-        if (in_array($paginationType, [
-            self::PAGINATION_TYPE_PAGINATOR,
-            self::PAGINATION_TYPE_CONNECTION,
-        ])) {
-            return $paginationType;
-        }
-
-        throw new DirectiveException("Found invalid pagination type: {$paginationType}");
-    }
-
     /**
      * Transform the definition for a field to a field with pagination.
      *
      * This makes either an offset-based Paginator or a cursor-based Connection.
      * The types in between are automatically generated and applied to the schema.
      *
-     * @param  string  $paginationType
+     * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
@@ -64,20 +25,18 @@ class PaginationManipulator
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public static function transformToPaginatedField(
-        string $paginationType,
+        PaginationType $paginationType,
         FieldDefinitionNode $fieldDefinition,
         ObjectTypeDefinitionNode $parentType,
         DocumentAST $current,
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): DocumentAST {
-        switch (self::assertValidPaginationType($paginationType)) {
-            case self::PAGINATION_TYPE_CONNECTION:
-                return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
-            case self::PAGINATION_TYPE_PAGINATOR:
-            default:
-                return self::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
+        if ($paginationType->isConnection()) {
+            return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
         }
+
+        return self::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
     }
 
     /**
@@ -162,7 +121,7 @@ class PaginationManipulator
         ");
 
         $inputValueDefinitions = [
-            self::countArgument('count', $defaultCount, $maxCount),
+            self::countArgument(config('lighthouse.pagination_amount_argument'), $defaultCount, $maxCount),
             "\"The offset from which elements are returned.\"\npage: Int",
         ];
 

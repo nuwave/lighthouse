@@ -24,8 +24,6 @@ class SubscriptionTest extends TestCase
     {
         parent::setUp();
 
-        $resolver = addslashes(self::class).'@resolve';
-
         $this->schema = "
         type Post {
             body: String
@@ -37,7 +35,7 @@ class SubscriptionTest extends TestCase
         
         type Mutation {
             createPost(post: String!): Post
-                @field(resolver: \"{$resolver}\")
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
                 @broadcast(subscription: \"onPostCreated\")
         }
         

@@ -1,16 +1,12 @@
 <?php
 
+use Tests\Constants;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateTestbenchTagsTable extends Migration
 {
-    /**
-     * Constants.
-     */
-    const DEFAULT_STRING = 'this is the default string';
-
     /**
      * Run the migrations.
      */
@@ -19,7 +15,7 @@ class CreateTestbenchTagsTable extends Migration
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('default_string')->default(self::DEFAULT_STRING);
+            $table->string('default_string')->default(Constants::TAGS_DEFAULT_STRING);
             $table->timestamps();
         });
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives\Client;
+namespace Tests\Unit\Schema;
 
 use Tests\TestCase;
 use Illuminate\Support\Collection;
@@ -17,12 +17,11 @@ class ClientDirectiveTest extends TestCase
      */
     public function itCanDefineAClientDirective(): void
     {
-        $resolver = addslashes(self::class).'@resolve';
         $this->schema = '
         directive @filter(key: String = "default value") on FIELD
         
         type Query {
-            foo: String @field(resolver: "'.$resolver.'")
+            foo: String @field(resolver: "'.$this->qualifyTestResolver().'")
         }
         ';
 

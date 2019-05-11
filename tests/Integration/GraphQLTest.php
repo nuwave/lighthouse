@@ -87,7 +87,8 @@ class GraphQLTest extends DBTestCase
                             function (Task $task): array {
                                 return ['name' => $task->name];
                             }
-                        )->toArray(),
+                        )
+                        ->all(),
                 ],
             ],
         ]);
@@ -121,7 +122,7 @@ class GraphQLTest extends DBTestCase
                         ->map(function (Task $task): array {
                             return ['name' => $task->name];
                         })
-                        ->toArray(),
+                        ->all(),
                 ],
             ],
         ]);

@@ -95,7 +95,7 @@ in a single PR.
 
 1. First, finish your work on `docs/master`.
 
-1. Enter a new version number. We only tag minor releases, so `3.1` will get seperate
+1. Enter a new version number. We only tag minor releases, so `3.1` will get separate
 docs, but `3.1.4` will not.
 
         yarn docs:version 3.1

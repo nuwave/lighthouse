@@ -6,7 +6,6 @@ use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class BelongsToManyDirectiveTest extends DBTestCase
 {
@@ -72,12 +71,6 @@ class BelongsToManyDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount($this->rolesCount, 'data.user.roles');
-
-        $rolesCount = auth()
-            ->user()
-            ->roles()
-            ->count();
-        $this->assertSame($this->rolesCount, $rolesCount);
     }
 
     /**
@@ -257,7 +250,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
      */
     public function itThrowsErrorWithUnknownTypeArg(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {

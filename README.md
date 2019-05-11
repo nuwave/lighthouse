@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.org/nuwave/lighthouse.svg?branch=master)](https://travis-ci.org/nuwave/lighthouse)
 [![codecov](https://codecov.io/gh/nuwave/lighthouse/branch/master/graph/badge.svg)](https://codecov.io/gh/nuwave/lighthouse)
+[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
 [![StyleCI](https://github.styleci.io/repos/59965104/shield?branch=master)](https://github.styleci.io/repos/59965104)
 [![Packagist](https://img.shields.io/packagist/dt/nuwave/lighthouse.svg)](https://packagist.org/packages/nuwave/lighthouse)
 [![GitHub license](https://img.shields.io/github/license/nuwave/lighthouse.svg)](https://github.com/nuwave/lighthouse/blob/master/LICENSE)
