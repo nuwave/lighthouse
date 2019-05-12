@@ -57,9 +57,11 @@ scalar Email @scalar(class: "MLL\\GraphQLScalars\\Email")
 ## Enum
 
 Enums are types with a restricted set of values (similar to `enum` found in database migrations).
-They are defined as a list of `UPPERCASE` string keys. You can define the actual values through
-the [@enum](../api-reference/directives.md#enum) directive.
+They are defined as a list of `UPPERCASE` string keys.
 
+### Schema definition
+
+You can define the actual values through the [@enum](../api-reference/directives.md#enum) directive.
 
 ```graphql
 enum EmploymentStatus {
@@ -126,6 +128,96 @@ enum Role {
 ```
 
 The PHP internal value of the field `ADMIN` will be `string('ADMIN')`.
+
+### Native PHP definition
+
+If you want to reuse enum definitions or constants from PHP, you can also
+register a native PHP enum type [through the TypeRegistry](../guides/native-php-types.md).
+
+Just define a [EnumType](http://webonyx.github.io/graphql-php/type-system/enum-types/) and
+register it:
+
+```php
+use GraphQL\Type\Definition\EnumType;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+
+$episodeEnum = new EnumType([
+    'name' => 'Episode',
+    'description' => 'One of the films in the Star Wars Trilogy',
+    'values' => [
+        'NEWHOPE' => [
+            'value' => 4,
+            'description' => 'Released in 1977.'
+        ],
+        'EMPIRE' => [
+            'value' => 5,
+            'description' => 'Released in 1980.'
+        ],
+        'JEDI' => [
+            'value' => 6,
+            'description' => 'Released in 1983.'
+        ],
+    ]
+]);
+
+// Resolve this through the container, as it is a singleton
+$typeRegistry = app(TypeRegistry::class);
+
+$typeRegistry->register($episodeEnum);
+```
+
+If you are using [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
+you can use a convenient wrapper to construct an enum type from it.
+
+Given the following enum:
+
+```php
+<?php
+
+namespace App\Enums;
+
+use BenSampo\Enum\Enum;
+
+final class UserType extends Enum
+{
+    const Administrator = 0;
+    const Moderator = 1;
+    const Subscriber = 2;
+    const SuperAdministrator = 3;
+}
+```
+
+This is how you can register it in a ServiceProvider. Make sure to wrap it
+in a `LaravelEnumType`.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\GraphQL;
+
+use App\Enums\UserType;
+use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Schema\TypeRegistry;
+use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+
+class GraphQLServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\TypeRegistry  $typeRegistry
+     * @return void
+     */
+    public function boot(TypeRegistry $typeRegistry): void
+    {
+        $typeRegistry->register(
+             new LaravelEnumType(UserType::class)
+        );
+    }
+}
+```
 
 ## Input
 

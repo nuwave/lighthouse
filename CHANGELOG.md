@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `@whereConstraints` directive that offers flexible query capabilities to the client https://github.com/nuwave/lighthouse/pull/753
+- Add convenience wrapper for registering Enum types based on [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
+  https://github.com/nuwave/lighthouse/pull/779
+
+### Deprecated
+
+- The `controller` config option will be removed in v4 https://github.com/nuwave/lighthouse/pull/781
 
 ## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
 
