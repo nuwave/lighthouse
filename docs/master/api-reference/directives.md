@@ -1366,6 +1366,98 @@ input DateRange {
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
 
+## @whereConstraints
+
+Add a dynamically client-controlled where constraint to a fields query.
+
+### Setup
+
+**This is an experimental feature and not included in Lighthouse by default.**
+
+First, enable the service provider:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\Defer\DeferServiceProvider::class,
+],
+```
+
+It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
+
+    composer require mll-lab/graphql-php-scalars
+
+Finally, add an enum type `Operator` to your schema. Depending on your
+database, you may want to allow different internal values. This default
+should work for most databases:
+
+```graphql
+enum Operator {
+    EQ @enum(value: "=")
+    NEQ @enum(value: "!=")
+    GT @enum(value: ">")
+    GTE @enum(value: ">=")
+    LT @enum(value: "<")
+    LTE @enum(value: "<=")
+    LIKE @enum(value: "LIKE")
+    NOT_LIKE @enum(value: "NOT_LIKE")
+}
+```
+
+### Usage
+
+The argument it is defined on may have any name but **must** be
+of the input type `WhereConstraints`.
+
+```graphql
+type Query {
+    people(where: WhereConstraints @whereConstraints): [Person!]!
+}
+```
+
+This is how you can use it to construct a complex query
+that gets actors over age 37 who either have red hair or are at least 150cm.
+
+```graphql
+{
+  people(
+    filter: {
+      where: [
+        {
+          AND: [
+            { column: "age", operator: GT value: 37 }
+            { column: "type", value: "Actor" }
+            {
+              OR: [
+                { column: "haircolour", value: "red" }
+                { column: "height", operator: GTE, value: 150 }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
+
+The definition for the `WhereConstraints` input is automatically included
+within your schema.
+
+```graphql
+input WhereConstraints {
+    column: String
+    operator: String = EQ
+    value: Mixed
+    AND: [WhereConstraints!]
+    OR: [WhereConstraints!]
+    NOT: [WhereConstraints!]
+}
+
+scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
+```
+
 ## @whereNotBetween
 
 Verify that a column's value lies outside of two values.

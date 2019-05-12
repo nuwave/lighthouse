@@ -288,9 +288,9 @@ GRAPHQL
                 )
             )
             ->addFieldToQueryType(
-                PartialParser::fieldDefinition(
-                    'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
-                )
+                PartialParser::fieldDefinition('
+                    node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
+                ')
             );
     }
 
