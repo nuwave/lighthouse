@@ -1312,7 +1312,7 @@ You can specify simple operators:
 
 ```graphql
 type Query {
-    postsSearchTitle(title: String! @where(operator: "like")): [Post!]! @all
+    postsSearchTitle(title: String! @where(operator: "like")): [Post!]! @hasMany
 }
 ```
 
@@ -1320,7 +1320,7 @@ Or use the additional clauses that Laravel provides:
 
 ```graphql
 type Query {
-    postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @all
+    postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @hasMany
 }
 ```
 
