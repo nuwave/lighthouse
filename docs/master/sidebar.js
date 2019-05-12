@@ -21,6 +21,7 @@ module.exports = [{
         children: [
             'queries/pagination',
             'queries/resolvers',
+            'queries/relationships',
             'queries/relay',
         ]
     },
@@ -29,7 +30,9 @@ module.exports = [{
         children: [
             ['mutations/getting-started', 'Getting Started'],
             'mutations/resolvers',
+            'mutations/relationships',
             'mutations/relay',
+            'mutations/file-uploads',
         ]
     },
     {
@@ -83,7 +86,9 @@ module.exports = [{
             ['package-development/getting-started', 'Getting Started'],
             'package-development/schema',
             'package-development/request',
+            'package-development/events',
             'package-development/directives',
+            'package-development/resolver',
 
         ],
     },
@@ -102,12 +107,7 @@ module.exports = [{
         children: [
             'guides/schema-organisation',
             'guides/relay',
-            'guides/auth',
-            'guides/validation',
-            'guides/relationships',
-            'guides/file-uploads',
             'guides/error-handling',
-            'guides/plugin-development',
             'guides/native-php-types'
         ]
     },
