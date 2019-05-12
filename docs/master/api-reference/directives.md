@@ -11,6 +11,7 @@ type Query {
 ```
 
 ### Definition
+
 ```graphql
 directive @auth(
   """
@@ -45,6 +46,7 @@ This assumes your model has the same name as the type you are returning and is d
 in the default model namespace `App`. [You can change this configuration](../getting-started/configuration.md).
 
 ### Definition
+
 ```graphql
 directive @all(
   """
@@ -99,6 +101,25 @@ class Post extends Model
 }
 ```
 
+### Definition
+
+```graphql
+directive @belongsTo(  
+  """
+  Specify the method in the class to use.
+  This is only needed when the relationship method has a different name.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 The directive accepts an optional `relation` argument if your relationship method
 has a different name than the field.
 
@@ -137,6 +158,35 @@ class User extends Model
 }
 ```
 
+### Definition
+
+```graphql
+directive @belongsToMany(
+  """
+  Specify the default quantity of elements to be returned.
+  """
+  defaultCount: Int = 25
+  
+  """
+  Specify the maximum quantity of elements to be returned.
+  """
+  maxCount: Int
+  
+  """
+  Specify the method in the class to use.
+  This is only needed when the relationship method has a different name.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 The directive accepts an optional `relation` argument if your relationship method
 has a different name than the field.
 
@@ -158,6 +208,12 @@ type Mutation {
 }
 ```
 
+### Definition
+
+```graphql
+directive @bcrypt on FIELD_DEFINITION
+```
+
 ## @broadcast
 
 Broadcast the results of a mutation to subscribed clients.
@@ -171,6 +227,24 @@ type Mutation {
         @broadcast(subscription: "postCreated")
 }
 ```
+
+### Definition
+
+```graphql
+directive @broadcast(
+  """
+  Name of the subscription.
+  """
+  subscription: String
+  
+  """
+  Specify whether or not the job should be queued.
+  """
+  shouldQueue: Boolean
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 You may override the default queueing behaviour from the configuration by
 passing the `shouldQueue` argument. 
@@ -229,6 +303,24 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @belongsToMany(
+  """
+  Set the expiration in seconds.
+  """
+  maxAge: Int
+  
+  """
+  Limit access to data, to currently authenticated user.
+  """
+  private: Int
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 You can set an expiration time in seconds
 if you want to invalidate the cache after a while.
 
@@ -256,6 +348,12 @@ type GithubProfile {
     username: String @cacheKey
     repos: [Repository] @cache
 }
+```
+
+### Definition
+
+```graphql
+directive @cacheKey on FIELD_DEFINITION
 ```
 
 ## @can
