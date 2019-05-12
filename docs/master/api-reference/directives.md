@@ -10,6 +10,18 @@ type Query {
 }
 ```
 
+### Definition
+```graphql
+directive @auth(
+  """
+  Which guard to use.
+  """
+  guard: String
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If you need to use a guard besides the default to resolve the authenticated user,
 you can pass the guard name as the `guard` argument
 
@@ -31,6 +43,24 @@ type Query {
 
 This assumes your model has the same name as the type you are returning and is defined
 in the default model namespace `App`. [You can change this configuration](../getting-started/configuration.md).
+
+### Definition
+```graphql
+directive @all(
+  """
+  Specify the model class to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 If you need to use a different model for a single field, you can pass a class name as the `model` argument.
 
