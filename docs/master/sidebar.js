@@ -26,7 +26,8 @@ module.exports = [{
             'guides/file-uploads',
             'guides/custom-directives',
             'guides/error-handling',
-            'guides/plugin-development'
+            'guides/plugin-development',
+            'guides/native-php-types'
         ]
     },
     {
