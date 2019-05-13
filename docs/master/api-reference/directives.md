@@ -452,6 +452,7 @@ type Query {
 directive @complexity(
   """
   Provide your own function to calculate complexity.
+  Specify a fully qualified class name (FQCN) and method.
   """
   resolver: String
 ) on FIELD_DEFINITION
@@ -815,7 +816,7 @@ type Mutation {
 ```graphql
 directive @event(  
   """
-  Specify the event-class to dispatch.
+  Specify the fully qualified class name (FQCN) of the event dispatch.
   """
   dispatch: String
 ) on FIELD_DEFINITION
@@ -1106,6 +1107,18 @@ class Commentable
 }
 ```
 
+### Definition
+
+```graphql
+directive @interface(      
+  """
+  Provide your own type-resolver function.
+  Specify a fully qualified class name (FQCN) and method.
+  """
+  resolver: String
+) on OBJECT
+```
+
 ## @method
 
 Call a method with a given `name` on the class that represents a type to resolve a field.
@@ -1122,6 +1135,17 @@ This calls a method `App\User::findMySpecialData` with [the typical resolver arg
 The first argument is an instance of the class itself,
 so the method can be `public static` if needed.
 
+### Definition
+
+```graphql
+directive @method(      
+  """
+  Specify the method of which to fetch the data from.
+  """
+  name: String
+) on FIELD_DEFINITION
+```
+
 ## @middleware
 
 Run Laravel middleware for a specific field. This can be handy to reuse existing
@@ -1132,6 +1156,21 @@ type Query {
     users: [User!]! @middleware(checks: ["auth:api"]) @all
 }
 ```
+
+### Definition
+
+```graphql
+directive @middleware(      
+  """
+  Specify which middleware to run. 
+  Pass in either a fully qualified class name, an alias or
+  a middleware group - or any combination of them.
+  """
+  checks: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 You can define middleware just like you would in Laravel. Pass in either a fully qualified
 class name, an alias or a middleware group - or any combination of them.
@@ -1189,6 +1228,13 @@ type User @model {
 
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
+
+
+### Definition
+
+```graphql
+directive @model on OBJECT
+```
 
 ## @neq
 
