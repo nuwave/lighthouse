@@ -1378,7 +1378,7 @@ First, enable the service provider:
 
 ```php
 'providers' => [
-    \Nuwave\Lighthouse\Defer\DeferServiceProvider::class,
+    \Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider::class,
 ],
 ```
 
