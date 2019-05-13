@@ -5,6 +5,7 @@ namespace Tests\Unit\Schema\Directives;
 use Tests\TestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Resolvers\Foo;
+use GraphQL\Type\Definition\Directive;
 
 class DeprecatedDirectiveTest extends TestCase
 {
@@ -17,11 +18,11 @@ class DeprecatedDirectiveTest extends TestCase
         $resolver = addslashes(Foo::class).'@bar';
         $this->schema = "
         type Query {
-            foo: String 
+            foo: String @field(resolver: \"{$resolver}\")
                 @deprecated(reason: \"{$reason}\") 
-                @field(resolver: \"{$resolver}\")
-            bar: String
-                @field(resolver: \"{$resolver}\")
+            withDefaultReason: String @field(resolver: \"{$resolver}\")
+                @deprecated
+            bar: String @field(resolver: \"{$resolver}\")
         }
         ";
 
@@ -60,8 +61,17 @@ class DeprecatedDirectiveTest extends TestCase
                 return $field['isDeprecated'];
             }
         );
-        $this->assertCount(1, $deprecatedFields);
-        $this->assertSame($reason, $deprecatedFields[0]['deprecationReason']);
+        $this->assertCount(2, $deprecatedFields);
+        $this->assertSame(
+            $reason,
+            $deprecatedFields[0]['deprecationReason'],
+            'Should show user-defined deprecation reason.'
+        );
+        $this->assertSame(
+            Directive::DEFAULT_DEPRECATION_REASON,
+            $deprecatedFields[1]['deprecationReason'],
+            'Should fallback to the default deprecation reason'
+        );
 
         $this->query('
         {
