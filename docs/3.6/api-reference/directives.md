@@ -10,19 +10,6 @@ type Query {
 }
 ```
 
-### Definition
-
-```graphql
-directive @auth(
-  """
-  Which guard to use.
-  """
-  guard: String
-) on FIELD_DEFINITION
-```
-
-### Examples
-
 If you need to use a guard besides the default to resolve the authenticated user,
 you can pass the guard name as the `guard` argument
 
@@ -44,25 +31,6 @@ type Query {
 
 This assumes your model has the same name as the type you are returning and is defined
 in the default model namespace `App`. [You can change this configuration](../getting-started/configuration.md).
-
-### Definition
-
-```graphql
-directive @all(
-  """
-  Specify the model class to use.
-  This is only needed when the default model resolution does not work.
-  """
-  model: String
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 If you need to use a different model for a single field, you can pass a class name as the `model` argument.
 
@@ -100,25 +68,6 @@ class Post extends Model
     }
 }
 ```
-
-### Definition
-
-```graphql
-directive @belongsTo(  
-  """
-  Specify the method in the class to use.
-  This is only needed when the relationship method has a different name.
-  """
-  relation: String
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 The directive accepts an optional `relation` argument if your relationship method
 has a different name than the field.
@@ -158,35 +107,6 @@ class User extends Model
 }
 ```
 
-### Definition
-
-```graphql
-directive @belongsToMany(
-  """
-  Specify the default quantity of elements to be returned.
-  """
-  defaultCount: Int = 25
-  
-  """
-  Specify the maximum quantity of elements to be returned.
-  """
-  maxCount: Int
-  
-  """
-  Specify the method in the class to use.
-  This is only needed when the relationship method has a different name.
-  """
-  relation: String
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-) on FIELD_DEFINITION
-```
-
-### Examples
-
 The directive accepts an optional `relation` argument if your relationship method
 has a different name than the field.
 
@@ -208,12 +128,6 @@ type Mutation {
 }
 ```
 
-### Definition
-
-```graphql
-directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
 ## @broadcast
 
 Broadcast the results of a mutation to subscribed clients.
@@ -227,24 +141,6 @@ type Mutation {
         @broadcast(subscription: "postCreated")
 }
 ```
-
-### Definition
-
-```graphql
-directive @broadcast(
-  """
-  Name of the subscription that should be retriggered as a result of this operation..
-  """
-  subscription: String
-  
-  """
-  Specify whether or not the job should be queued.
-  """
-  shouldQueue: Boolean
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 You may override the default queueing behaviour from the configuration by
 passing the `shouldQueue` argument. 
@@ -303,24 +199,6 @@ type Query {
 }
 ```
 
-### Definition
-
-```graphql
-directive @cache(
-  """
-  Set the expiration in seconds.
-  """
-  maxAge: Int
-  
-  """
-  Limit access to data, to currently authenticated user.
-  """
-  private: Int
-) on FIELD_DEFINITION
-```
-
-### Examples
-
 You can set an expiration time in seconds
 if you want to invalidate the cache after a while.
 
@@ -350,12 +228,6 @@ type GithubProfile {
 }
 ```
 
-### Definition
-
-```graphql
-directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
 ## @can
 
 Check a Laravel Policy to ensure the current user is authorized to access a field.
@@ -377,24 +249,6 @@ class PostPolicy
     }
 }
 ```
-
-### Definition
-
-```graphql
-directive @can(
-  """
-  The ability to check permissions for.
-  """
-  ability: String
-  
-  """
-  Additional arguments for policy check. 
-  """
-  args: [String!]
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 If you pass an `id` argument it will look for an instance of the expected model instance.
 
@@ -446,19 +300,6 @@ type Query {
 }
 ```
 
-### Definition
-
-```graphql
-directive @complexity(
-  """
-  Provide your own function to calculate complexity.
-  """
-  resolver: String
-) on FIELD_DEFINITION
-```
-
-### Examples
-
 You can provide your own function to calculate complexity.
 
 ```graphql
@@ -496,20 +337,6 @@ type Mutation {
 }
 ```
 
-### Definition
-
-```graphql
-directive @create(  
-  """
-  Specify the model class to use.
-  This is only needed when the default model resolution does not work.
-  """
-  model: String
-) on FIELD_DEFINITION
-```
-
-### Examples
-
 If you are using a single input object as an argument, you must tell Lighthouse
 to spread out the nested values before applying it to the resolver.
 
@@ -543,19 +370,6 @@ type Mutation {
     deletePost(id: ID!): Post @delete
 }
 ```
-
-### Definition
-
-```graphql
-directive @delete(  
-  """
-  Specify whether to use normal IDs or GlobalIDs.
-  """
-  globalId: Boolean = false
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 If you use global ids, you can set the `globalId` argument to `true`.
 Lighthouse will decode the id for you automatically.
@@ -598,17 +412,6 @@ type Query {
 }
 ```
 
-### Definition
-
-```graphql
-directive @deprecated(  
-  """
-  Explain why this field is deprecated.
-  """
-  reason: String
-) on FIELD_DEFINITION
-```
-
 ## @field
 
 Specify a custom resolver function for a single field.
@@ -625,24 +428,6 @@ type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\PostMutator@create")
 }
 ```
-
-### Definition
-
-```graphql
-directive @field(
-  """
-  Supply additional data to the resolver.
-  """
-  args: [String!]
-  
-  """
-  Namespace and method to be resolved.
-  """
-  resolver: String
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 If your field is defined on the root types `Query` or `Mutation`, you can take advantage
 of the default namespaces that are defined in the [configuration](../getting-started/configuration.md). The following
@@ -674,25 +459,6 @@ type Query {
 }
 ```
 
-### Definition
-
-```graphql
-directive @find(  
-  """
-  Specify the model class to use.
-  This is only needed when the default model resolution does not work.
-  """
-  model: String
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-) on FIELD_DEFINITION
-```
-
-### Examples
-
 This throws when more then one result is returned.
 Use [@first](#first) if you can not ensure that.
 
@@ -713,25 +479,6 @@ type Query {
     userByFirstName(first_name: String! @eq): User @first
 }
 ```
-
-### Definition
-
-```graphql
-directive @first(  
-  """
-  Specify the model class to use.
-  This is only needed when the default model resolution does not work.
-  """
-  model: String
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 Other then [@find](#find), this will not throw an error if more then one items are in the collection.
 
@@ -769,20 +516,6 @@ type User {
 }
 ```
 
-### Definition
-
-```graphql
-directive @eq(  
-  """
-  Specify the database column to compare. 
-  Only required if database column has a different name than the attribute in your schema.
-  """
-  key: String
-) on FIELD_DEFINITION
-```
-
-### Examples
-
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
 
@@ -805,17 +538,6 @@ type Mutation {
 }
 ```
 
-### Definition
-
-```graphql
-directive @event(  
-  """
-  Specify the event-class to dispatch.
-  """
-  dispatch: String
-) on FIELD_DEFINITION
-```
-
 ## @globalId
 
 Converts an ID to a global ID.
@@ -826,14 +548,6 @@ type User {
     name: String
 }
 ```
-
-### Definition
-
-```graphql
-directive @globalId on FIELD_DEFINITION
-```
-
-### Examples
 
 Instead of the original ID, the `id` field will now return a base64-encoded String
 that globally identifies the User and can be used for querying the `node` endpoint.
@@ -853,24 +567,6 @@ extend type Query @group(namespace: "App\\Authentication") {
   activeUsers @field(resolver: "User@getActiveUsers")
 }
 ```
-
-### Definition
-
-```graphql
-directive @group(  
-  """
-  Specify which middleware to apply to all child-fields.
-  """
-  middleware: [String!]
-  
-  """
-  Specify the namespace for the middleware.
-  """
-  namespace: String
-) on FIELD_DEFINITION
-```
-
-### Examples
 
 Set common middleware on a set of Queries/Mutations.
 

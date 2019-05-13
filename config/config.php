@@ -172,10 +172,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | GraphQL Controller
+    | DEPRECATED GraphQL Controller
     |--------------------------------------------------------------------------
     |
     | Specify which controller (and method) you want to handle GraphQL requests.
+    | This option will be removed in v4.
     |
     */
 
