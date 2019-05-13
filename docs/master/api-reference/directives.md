@@ -1,37 +1,5 @@
 # Directives
 
-## @auth
-
-Return the currently authenticated user as the result of a query.
-
-```graphql
-type Query {
-    me: User @auth
-}
-```
-
-### Definition
-
-```graphql
-directive @auth(
-  """
-  Which guard to use.
-  """
-  guard: String
-) on FIELD_DEFINITION
-```
-
-### Examples
-
-If you need to use a guard besides the default to resolve the authenticated user,
-you can pass the guard name as the `guard` argument
-
-```graphql
-type Query {
-    me: User @auth(guard: "api")
-}
-```
-
 ## @all
 
 Fetch all Eloquent models and return the collection as the result for a field.
@@ -69,6 +37,38 @@ If you need to use a different model for a single field, you can pass a class na
 ```graphql
 type Query {
     posts: [Post!]! @all(model: "App\\Blog\\BlogEntry")
+}
+```
+
+## @auth
+
+Return the currently authenticated user as the result of a query.
+
+```graphql
+type Query {
+    me: User @auth
+}
+```
+
+### Definition
+
+```graphql
+directive @auth(
+  """
+  Which guard to use.
+  """
+  guard: String
+) on FIELD_DEFINITION
+```
+
+### Examples
+
+If you need to use a guard besides the default to resolve the authenticated user,
+you can pass the guard name as the `guard` argument
+
+```graphql
+type Query {
+    me: User @auth(guard: "api")
 }
 ```
 
