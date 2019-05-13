@@ -1335,7 +1335,7 @@ You may pass more than one sorting option to add a secondary ordering.
 
 ## @paginate
 
-Transform a field so it returns a paginated list.
+Query multiple entries as a paginated list.
 
 ```graphql
 type Query {
@@ -1372,6 +1372,52 @@ And can be queried like this:
     }
 }
 ```
+
+### Definition
+
+```graphql
+"""
+Query multiple entries as a paginated list.
+"""
+directive @paginate(
+  """
+  Which pagination style to use.
+  Allowed values: paginator, connection.
+  """
+  type: String = "paginator"
+
+  """
+  Specify the model class to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+  
+  """
+  Overwrite the paginate_max_count setting value to limit the
+  amount of items that a user can request per page.
+  """
+  maxCount: Int
+
+  """
+  Use a default value for the amount of returned items
+  in case the client does not request it explicitly
+  """
+  defaultCount: Int
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
