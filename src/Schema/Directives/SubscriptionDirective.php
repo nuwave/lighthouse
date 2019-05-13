@@ -6,10 +6,14 @@ use Nuwave\Lighthouse\Support\Contracts\Directive;
 
 /**
  * This directive exists as a placeholder and can be used
- * to point to a custom SubscriptionField class.
+ * to point to a custom subscription class.
+ *
+ * @see \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription
  */
 class SubscriptionDirective implements Directive
 {
+    const NAME = 'subscription';
+
     /**
      * Name of the directive.
      *
@@ -17,6 +21,6 @@ class SubscriptionDirective implements Directive
      */
     public function name(): string
     {
-        return 'subscription';
+        return self::NAME;
     }
 }
