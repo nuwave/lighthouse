@@ -378,6 +378,29 @@ class PostPolicy
 }
 ```
 
+### Definition
+
+```graphql
+directive @can(
+  """
+  The ability to check permissions for.
+  """
+  ability: String
+  
+  """
+  Additional arguments for policy check. 
+  """
+  args: [String!]
+  
+  """
+  Limit access to data, to currently authenticated user.
+  """
+  private: Boolean
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If you pass an `id` argument it will look for an instance of the expected model instance.
 
 ```graphql
@@ -428,6 +451,19 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @complexity(
+  """
+  Provide your own function to calculate complexity.
+  """
+  resolver: String
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 You can provide your own function to calculate complexity.
 
 ```graphql
@@ -465,6 +501,20 @@ type Mutation {
 }
 ```
 
+### Definition
+
+```graphql
+directive @create(  
+  """
+  Specify the model class to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If you are using a single input object as an argument, you must tell Lighthouse
 to spread out the nested values before applying it to the resolver.
 
@@ -498,6 +548,19 @@ type Mutation {
     deletePost(id: ID!): Post @delete
 }
 ```
+
+### Definition
+
+```graphql
+directive @delete(  
+  """
+  Specify whether to use normal IDs or GlobalIDs.
+  """
+  globalId: Boolean
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 If you use global ids, you can set the `globalId` argument to `true`.
 Lighthouse will decode the id for you automatically.
@@ -540,6 +603,17 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @deprecated(  
+  """
+  Explain why this field is deprecated.
+  """
+  reason: String
+) on FIELD_DEFINITION
+```
+
 ## @field
 
 Specify a custom resolver function for a single field.
@@ -556,6 +630,24 @@ type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\PostMutator@create")
 }
 ```
+
+### Definition
+
+```graphql
+directive @field(
+  """
+  Supply additional data to the resolver.
+  """
+  args: [String!]
+  
+  """
+  Namespace and method to be resolved.
+  """
+  resolver: String
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 If your field is defined on the root types `Query` or `Mutation`, you can take advantage
 of the default namespaces that are defined in the [configuration](../getting-started/configuration.md). The following
@@ -587,6 +679,25 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @find(  
+  """
+  Specify the model class to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 This throws when more then one result is returned.
 Use [@first](#first) if you can not ensure that.
 
@@ -607,6 +718,25 @@ type Query {
     userByFirstName(first_name: String! @eq): User @first
 }
 ```
+
+### Definition
+
+```graphql
+directive @first(  
+  """
+  Specify the model class to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 Other then [@find](#find), this will not throw an error if more then one items are in the collection.
 
@@ -644,6 +774,20 @@ type User {
 }
 ```
 
+### Definition
+
+```graphql
+directive @eq(  
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
 
@@ -666,6 +810,17 @@ type Mutation {
 }
 ```
 
+### Definition
+
+```graphql
+directive @event(  
+  """
+  Specify the event-class to dispatch.
+  """
+  dispatch: String
+) on FIELD_DEFINITION
+```
+
 ## @globalId
 
 Converts an ID to a global ID.
@@ -676,6 +831,14 @@ type User {
     name: String
 }
 ```
+
+### Definition
+
+```graphql
+directive @globalId on FIELD_DEFINITION
+```
+
+### Examples
 
 Instead of the original ID, the `id` field will now return a base64-encoded String
 that globally identifies the User and can be used for querying the `node` endpoint.
@@ -695,6 +858,24 @@ extend type Query @group(namespace: "App\\Authentication") {
   activeUsers @field(resolver: "User@getActiveUsers")
 }
 ```
+
+### Definition
+
+```graphql
+directive @group(  
+  """
+  Specify which middleware to apply to all child-fields.
+  """
+  middleware: [String!]
+  
+  """
+  Specify the namespace for the middleware.
+  """
+  namespace: String
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 Set common middleware on a set of Queries/Mutations.
 
