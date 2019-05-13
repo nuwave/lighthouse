@@ -165,7 +165,7 @@ directive @belongsToMany(
   """
   Specify the default quantity of elements to be returned.
   """
-  defaultCount: Int = 25
+  defaultCount: Int
   
   """
   Specify the maximum quantity of elements to be returned.
@@ -890,6 +890,35 @@ type User {
 }
 ```
 
+### Definition
+
+```graphql
+directive @hasMany(
+  """
+  Specify the default quantity of elements to be returned.
+  """
+  defaultCount: Int
+  
+  """
+  Specify the maximum quantity of elements to be returned.
+  """
+  maxCount: Int
+      
+  """
+  Specify the method in the class to use.
+  This is only needed when the relationship method has a different name.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 You can return the related models paginated by setting the `type`.
 
 ```graphql
@@ -918,6 +947,25 @@ type User {
 }
 ```
 
+### Definition
+
+```graphql
+directive @hasOne(      
+  """
+  Specify the method in the class to use.
+  This is only needed when the relationship method has a different name.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If the name of the relationship on the Eloquent model is different than the field name,
 you can override it by setting `relation`.
 
@@ -937,6 +985,17 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @in(      
+  """
+  Specify the column of which, one of the supplied values must be in.
+  """
+  key: String
+) on ARGUMENT_DEFINITION
+```
+
 ## @inject
 
 Inject a value from the context object into the arguments.
@@ -951,6 +1010,24 @@ type Mutation {
 
 This is useful to ensure that the authenticated user's `id` is
 automatically used for creating new models and can not be manipulated.
+
+### Definition
+
+```graphql
+directive @inject(      
+  """
+  Specify the column that data will be written to.
+  """
+  context: String
+  
+  """
+  Specify the input attribute name.
+  """
+  name: [String!]
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+### Examples
 
 If you are using an Input Object as an argument, you can use dot notation to
 set a nested argument.
