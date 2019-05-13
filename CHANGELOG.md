@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Use the spec-compliant default deprecation reason for `@deprecate` directive
+- Use the spec-compliant default deprecation reason for `@deprecate` directive https://github.com/nuwave/lighthouse/pull/787
 
 ## [3.6.0](https://github.com/nuwave/lighthouse/compare/v3.5.3...v3.6.0)
 
