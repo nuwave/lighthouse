@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Type\Definition\Directive;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
 class DeprecatedDirective extends BaseDirective implements FieldMiddleware
@@ -30,13 +30,7 @@ class DeprecatedDirective extends BaseDirective implements FieldMiddleware
      */
     public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $reason = $this->directiveArgValue('reason');
-
-        if (! $reason) {
-            throw new DirectiveException(
-                "The @{$this->name()} directive requires a `reason` argument [defined on {$fieldValue->getParentName()}]"
-            );
-        }
+        $reason = $this->directiveArgValue('reason', Directive::DEFAULT_DEPRECATION_REASON);
 
         $fieldValue->setDeprecationReason($reason);
 
