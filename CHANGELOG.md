@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.3...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.6.0...master)
+
+## [3.6.0](https://github.com/nuwave/lighthouse/compare/v3.5.3...v3.6.0)
+
+### Added
+
+- Add `@whereConstraints` directive that offers flexible query capabilities to the client https://github.com/nuwave/lighthouse/pull/753
+- Add convenience wrapper for registering Enum types based on [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
+  https://github.com/nuwave/lighthouse/pull/779
+
+### Deprecated
+
+- The `controller` config option will be removed in v4 https://github.com/nuwave/lighthouse/pull/781
 
 ## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
 
