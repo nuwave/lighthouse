@@ -642,7 +642,8 @@ directive @field(
   args: [String!]
   
   """
-  Namespace and method to be resolved.
+  Function to be resolved.
+  Specify a fully qualified class name (FQCN) and method.
   """
   resolver: String
 ) on FIELD_DEFINITION
@@ -1246,6 +1247,17 @@ type User {
 }
 ```
 
+### Definition
+
+```graphql
+directive @neq(  
+  """
+  Specify the database column to compare. 
+  """
+  key: String
+) on FIELD_DEFINITION
+```
+
 ## @node
 
 Store a type's resolver functions in Lighthouse's node registry.
@@ -1279,6 +1291,17 @@ type User @node(
 public function resolveNodeType($value): \GraphQL\Type\Definition\Type
 ```
 
+### Definition
+```graphql
+directive @node(
+  """
+  Function to be resolved.
+  Specify a fully qualified class name (FQCN) and method.
+  """
+  resolver: String
+) on FIELD_DEFINITION
+```
+
 ## @notIn
 
 Filter a column by an array using a `whereNotIn` clause.
@@ -1289,6 +1312,17 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @notIn(      
+  """
+  Specify the column of which, none of the supplied values are allowed to be in.
+  """
+  key: String
+) on ARGUMENT_DEFINITION
+```
+
 ## @orderBy
 
 Sort a result list by one or more given fields.
@@ -1297,6 +1331,12 @@ Sort a result list by one or more given fields.
 type Query {
     posts(orderBy: [OrderByClause!] @orderBy): [Post!]!
 }
+```
+
+### Definition
+
+```graphql
+directive @orderBy on ARGUMENT_DEFINITION
 ```
 
 The `OrderByClause` input is automatically added to the schema,
@@ -1505,6 +1545,16 @@ Rename a field on the server side, e.g. convert from snake_case to camelCase.
 type User {
     createdAt: String! @rename(attribute: "created_at")
 }
+```
+
+### Definition
+```graphql
+directive @rename(
+  """
+  Specify the name of the model attribute from which to fetch the data
+  """
+  attribute: String
+) on FIELD_DEFINITION
 ```
 
 ## @rules
