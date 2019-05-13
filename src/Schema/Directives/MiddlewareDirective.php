@@ -164,6 +164,9 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     {
         /** @var \Illuminate\Routing\Router $router */
         $router = app('router');
+        if (!($router instanceof \Illuminate\Routing\Router)) {
+            $router = new LumenRouterFake(app());
+        }
         $middleware = $router->getMiddleware();
         $middlewareGroups = $router->getMiddlewareGroups();
 
@@ -172,5 +175,48 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                 return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
             })
             ->flatten();
+    }
+}
+
+class LumenRouterFake
+{
+    /**
+     * @var \Laravel\Lumen\Application
+     */
+    private $lumenApp;
+
+    public function __construct(\Laravel\Lumen\Application $lumenApp)
+    {
+        $this->lumenApp = $lumenApp;
+    }
+
+    public function getMiddleware(): array
+    {
+        $globalMiddleware = self::accessProtected($this->lumenApp, 'middleware');
+        $routeMiddleware = self::accessProtected($this->lumenApp, 'routeMiddleware');
+        return array_merge($globalMiddleware, $routeMiddleware);
+    }
+
+    public function getMiddlewareGroups(): array
+    {
+        return []; // Lumen doesn't have middleware groups
+    }
+
+    /**
+     * Get the value of a protected member variable of an object.
+     *
+     * @param object $obj Object with protected field
+     * @param string $prop Name of object's protected field
+     * @return array|mixed Value of object's protected field
+     */
+    private static function accessProtected($obj, $prop) {
+        try {
+            $reflection = new \ReflectionClass($obj);
+            $property = $reflection->getProperty($prop);
+            $property->setAccessible(true);
+            return $property->getValue($obj);
+        } catch (\ReflectionException $ex) {
+            return [];
+        }
     }
 }
