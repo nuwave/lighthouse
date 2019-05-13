@@ -588,7 +588,7 @@ type Mutation {
 ## @deprecated
 
 You can mark fields as deprecated by adding the `@deprecated` directive and providing a
-`reason` (required). Deprecated fields are not included in introspection queries unless
+`reason`. Deprecated fields are not included in introspection queries unless
 requested and they can still be queried by clients.
 
 ```graphql
@@ -601,11 +601,16 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Marks an element of a GraphQL schema as no longer supported.
+"""
 directive @deprecated(  
   """
-  Explain why this field is deprecated.
+  Explains why this element was deprecated, usually also including a
+  suggestion for how to access supported similar data. Formatted
+  in [Markdown](https://daringfireball.net/projects/markdown/).
   """
-  reason: String
+  reason: String = "No longer supported"
 ) on FIELD_DEFINITION
 ```
 
