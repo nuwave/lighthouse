@@ -18,13 +18,11 @@ class DeprecatedDirectiveTest extends TestCase
         $resolver = addslashes(Foo::class).'@bar';
         $this->schema = "
         type Query {
-            foo: String 
+            foo: String @field(resolver: \"{$resolver}\")
                 @deprecated(reason: \"{$reason}\") 
-                @field(resolver: \"{$resolver}\")
-            bar: String
-                @field(resolver: \"{$resolver}\")
-            withDefaultReason: String
-                @field(resolver: \"{$resolver}\")
+            withDefaultReason: String @field(resolver: \"{$resolver}\")
+                @deprecated
+            bar: String @field(resolver: \"{$resolver}\")
         }
         ";
 
