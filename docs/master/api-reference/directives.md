@@ -211,7 +211,7 @@ type Mutation {
 ### Definition
 
 ```graphql
-directive @bcrypt on FIELD_DEFINITION
+directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @broadcast
@@ -233,7 +233,7 @@ type Mutation {
 ```graphql
 directive @broadcast(
   """
-  Name of the subscription.
+  Name of the subscription that should be retriggered as a result of this operation..
   """
   subscription: String
   
@@ -306,7 +306,7 @@ type Query {
 ### Definition
 
 ```graphql
-directive @belongsToMany(
+directive @cache(
   """
   Set the expiration in seconds.
   """
@@ -353,7 +353,7 @@ type GithubProfile {
 ### Definition
 
 ```graphql
-directive @cacheKey on FIELD_DEFINITION
+directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @can
@@ -391,11 +391,6 @@ directive @can(
   Additional arguments for policy check. 
   """
   args: [String!]
-  
-  """
-  Limit access to data, to currently authenticated user.
-  """
-  private: Boolean
 ) on FIELD_DEFINITION
 ```
 
@@ -556,7 +551,7 @@ directive @delete(
   """
   Specify whether to use normal IDs or GlobalIDs.
   """
-  globalId: Boolean
+  globalId: Boolean = false
 ) on FIELD_DEFINITION
 ```
 
