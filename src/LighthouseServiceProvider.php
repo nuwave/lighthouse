@@ -40,6 +40,9 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Support\Compatibility\MiddlewareBridge;
+use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareBridge;
+use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareBridge;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -143,6 +146,16 @@ class LighthouseServiceProvider extends ServiceProvider
                    );
                 }
             };
+        });
+
+        $this->app->singleton(MiddlewareBridge::class, function (Container $app): MiddlewareBridge {
+            if ($app instanceof \Illuminate\Foundation\Application) {
+                return new LaravelMiddlewareBridge($app->get('router'));
+            } elseif ($app instanceof \Laravel\Lumen\Application) {
+                return new LumenMiddlewareBridge($app);
+            }
+
+            throw new Exception('Could not correctly determine Laravel framework flavor');
         });
 
         if ($this->app->runningInConsole()) {
