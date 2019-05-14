@@ -53,9 +53,12 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Return the currently authenticated user as the result of a query.
+"""
 directive @auth(
   """
-  Which guard to use.
+  Use a particular guard to retreive the user.
   """
   guard: String
 ) on FIELD_DEFINITION
@@ -292,12 +295,17 @@ class MyClass
 ```
 
 ### Definition
+
 ```graphql
+"""
+Use an argument to modify the query builder for a field.
+"""
 directive @builder(
   """
-  Specify the argument from which to get the query builder.
+  Reference a method that is passed the query builder.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   """
-  method: String
+  method: String!
 ) on FIELD_DEFINITION
 ```
 
@@ -319,14 +327,15 @@ type Query {
 ```graphql
 directive @cache(
   """
-  Set the expiration in seconds.
+  Set the duration it takes for the cache to expire in seconds.
+  If not given, the result will be stored forever.
   """
   maxAge: Int
-  
+
   """
-  Limit access to data, to currently authenticated user.
+  Limit access to cached data to the currently authenticated user.
   """
-  private: Int
+  private: Boolean = false
 ) on FIELD_DEFINITION
 ```
 
@@ -841,9 +850,9 @@ type Mutation {
 ```graphql
 directive @event(  
   """
-  Specify the fully qualified class name (FQCN) of the event dispatch.
+  Specify the fully qualified class name (FQCN) of the event to dispatch.
   """
-  dispatch: String
+  dispatch: String!
 ) on FIELD_DEFINITION
 ```
 
@@ -1021,7 +1030,8 @@ type Query {
 ```graphql
 directive @in(      
   """
-  Specify the column of which, one of the supplied values must be in.
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
   """
   key: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
@@ -1047,14 +1057,18 @@ automatically used for creating new models and can not be manipulated.
 ```graphql
 directive @inject(      
   """
-  Specify the column that data will be written to.
+  A path to the property of the context that will be injected.
+  If the value is nested within the context, you may use dot notation
+  to get it, e.g. "user.id".
   """
-  context: String
-  
+  context: String!
+
   """
-  Specify the input attribute name.
+  The target name of the argument into which the value is injected.
+  You can use dot notation to set the value at arbitrary depth
+  within the incoming argument.
   """
-  name: [String!]
+  name: String!
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -1281,6 +1295,7 @@ type User {
 directive @neq(  
   """
   Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema. 
   """
   key: String
 ) on FIELD_DEFINITION
@@ -1565,12 +1580,14 @@ type User {
 ```
 
 ### Definition
+
 ```graphql
 directive @rename(
   """
-  Specify the name of the model attribute from which to fetch the data
+  Specify the original name of the property/key that the field
+  value can be retrieved from.
   """
-  attribute: String
+  attribute: String!
 ) on FIELD_DEFINITION
 ```
 
@@ -1580,24 +1597,30 @@ Validate an argument using [Laravel's built-in validation rules](https://laravel
 
 ```graphql
 type Query {
-    users(countryCode: String @rules(apply: ["string", "size:2"])): [User!]!
-        @paginate
+    users(
+      countryCode: String @rules(apply: ["string", "size:2"])
+    ): [User!]! @all
 }
 ```
 
 ### Definition
 
 ```graphql
+"""
+Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+"""
 directive @rules(
   """
-  Specify the validation-rules to apply to the field.
+  Specify the validation rules to apply to the field.
   """
   apply: [String!]
   
   """
   Specify the messages to return if the validators fail.
+  Specified as an input object that maps rules to messages,
+  e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: [String!]
+  messages: [RulesMessageMap!]
 ) on INPUT_FIELD_DEFINITION
 ```
 
@@ -1624,23 +1647,30 @@ Run validation on an array itself, using [Laravel's built-in validation rules](h
 
 ```graphql
 type Mutation {
-  saveIcecream(flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])): Icecream
+  saveIcecream(
+    flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])
+  ): Icecream
 }
 ```
 
 ### Definition
 
 ```graphql
+"""
+Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+"""
 directive @rulesForArray(
   """
-  Specify the validation-rules to apply to the field.
+  Specify the validation rules to apply to the field.
   """
   apply: [String!]
   
   """
   Specify the messages to return if the validators fail.
+  Specified as an input object that maps rules to messages,
+  e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
-  messages: [String!]
+  messages: [RulesMessageMap!]
 ) on INPUT_FIELD_DEFINITION
 ```
 
