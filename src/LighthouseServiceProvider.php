@@ -155,7 +155,7 @@ class LighthouseServiceProvider extends ServiceProvider
                 return new LumenMiddlewareBridge($app);
             }
 
-            throw new Exception('Could not correctly determine Laravel framework flavor');
+            throw new Exception('Could not correctly determine Laravel framework flavor.');
         });
 
         if ($this->app->runningInConsole()) {
