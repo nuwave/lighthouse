@@ -291,6 +291,16 @@ class MyClass
 }
 ```
 
+### Definition
+```graphql
+directive @builder(
+  """
+  Specify the argument from which to get the query builder.
+  """
+  method: String
+) on FIELD_DEFINITION
+```
+
 ## @cache
 
 Cache the result of a resolver.
@@ -1575,6 +1585,24 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @rules(
+  """
+  Specify the validation-rules to apply to the field.
+  """
+  apply: [String!]
+  
+  """
+  Specify the messages to return if the validators fail.
+  """
+  messages: [String!]
+) on INPUT_FIELD_DEFINITION
+```
+
+### Examples
+
 Rules can also be defined on Input Object Values.
 
 ```graphql
@@ -1599,6 +1627,24 @@ type Mutation {
   saveIcecream(flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])): Icecream
 }
 ```
+
+### Definition
+
+```graphql
+directive @rulesForArray(
+  """
+  Specify the validation-rules to apply to the field.
+  """
+  apply: [String!]
+  
+  """
+  Specify the messages to return if the validators fail.
+  """
+  messages: [String!]
+) on INPUT_FIELD_DEFINITION
+```
+
+### Examples
 
 You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
 both the size and the contents of an argument array.
