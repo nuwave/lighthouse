@@ -151,7 +151,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->app->singleton(MiddlewareAdapter::class, function (Container $app): MiddlewareAdapter {
             // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
             if ($app instanceof \Illuminate\Foundation\Application) {
-                return new LaravelMiddlewareAdapter($app->get('router'));
+                return new LaravelMiddlewareAdapter($app->get(\Illuminate\Routing\Router::class));
             } elseif ($app instanceof \Laravel\Lumen\Application) {
                 return new LumenMiddlewareAdapter($app);
             }
