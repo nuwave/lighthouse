@@ -22,7 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
-use Nuwave\Lighthouse\Support\Compatibility\MiddlewareBridge;
+use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
 {
@@ -43,20 +43,20 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     protected $createsContext;
 
     /**
-     * @var MiddlewareBridge
+     * @var MiddlewareAdapter
      */
-    private $middlewareBridge;
+    private $middlewareAdapter;
 
     /**
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
-     * @param  \Nuwave\Lighthouse\Support\Compatibility\MiddlewareBridge  $middlewareBridge
+     * @param  \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter  $middlewareAdapter
      */
-    public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareBridge $middlewareBridge)
+    public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareAdapter $middlewareAdapter)
     {
         $this->pipeline = $pipeline;
         $this->createsContext = $createsContext;
-        $this->middlewareBridge = $middlewareBridge;
+        $this->middlewareAdapter = $middlewareAdapter;
     }
 
     /**
@@ -169,8 +169,8 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
      */
     protected function getQualifiedMiddlewareNames($middlewareArgValue): Collection
     {
-        $middleware = $this->middlewareBridge->getMiddleware();
-        $middlewareGroups = $this->middlewareBridge->getMiddlewareGroups();
+        $middleware = $this->middlewareAdapter->getMiddleware();
+        $middlewareGroups = $this->middlewareAdapter->getMiddlewareGroups();
 
         return (new Collection($middlewareArgValue))
             ->map(function (string $name) use ($middleware, $middlewareGroups): array {

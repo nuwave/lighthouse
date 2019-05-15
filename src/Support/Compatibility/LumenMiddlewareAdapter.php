@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Support\Compatibility;
 use Nuwave\Lighthouse\Support\Utils;
 use Laravel\Lumen\Application;
 
-class LumenMiddlewareBridge implements MiddlewareBridge
+class LumenMiddlewareAdapter implements MiddlewareAdapter
 {
     /**
      * @var Application

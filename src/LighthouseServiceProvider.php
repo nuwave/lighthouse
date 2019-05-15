@@ -40,9 +40,9 @@ use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
-use Nuwave\Lighthouse\Support\Compatibility\MiddlewareBridge;
-use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareBridge;
-use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareBridge;
+use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
+use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
+use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -148,11 +148,12 @@ class LighthouseServiceProvider extends ServiceProvider
             };
         });
 
-        $this->app->singleton(MiddlewareBridge::class, function (Container $app): MiddlewareBridge {
+        $this->app->singleton(MiddlewareAdapter::class, function (Container $app): MiddlewareAdapter {
+            // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
             if ($app instanceof \Illuminate\Foundation\Application) {
-                return new LaravelMiddlewareBridge($app->get('router'));
+                return new LaravelMiddlewareAdapter($app->get('router'));
             } elseif ($app instanceof \Laravel\Lumen\Application) {
-                return new LumenMiddlewareBridge($app);
+                return new LumenMiddlewareAdapter($app);
             }
 
             throw new Exception('Could not correctly determine Laravel framework flavor.');

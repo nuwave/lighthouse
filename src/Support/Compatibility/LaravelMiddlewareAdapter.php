@@ -4,7 +4,7 @@ namespace Nuwave\Lighthouse\Support\Compatibility;
 
 use Illuminate\Routing\Router;
 
-class LaravelMiddlewareBridge implements MiddlewareBridge
+class LaravelMiddlewareAdapter implements MiddlewareAdapter
 {
     /**
      * @var Router

@@ -2,7 +2,7 @@
 
 namespace Nuwave\Lighthouse\Support\Compatibility;
 
-interface MiddlewareBridge
+interface MiddlewareAdapter
 {
     /**
      * Get all of the defined middleware short-hand names.
