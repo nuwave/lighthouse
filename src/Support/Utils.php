@@ -3,9 +3,9 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use ReflectionClass;
 use ReflectionException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class Utils
 {

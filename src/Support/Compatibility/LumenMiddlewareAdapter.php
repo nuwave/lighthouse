@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Support\Compatibility;
 
-use Nuwave\Lighthouse\Support\Utils;
 use Laravel\Lumen\Application;
+use Nuwave\Lighthouse\Support\Utils;
 
 class LumenMiddlewareAdapter implements MiddlewareAdapter
 {
@@ -24,6 +24,7 @@ class LumenMiddlewareAdapter implements MiddlewareAdapter
     {
         $globalMiddleware = Utils::accessProtected($this->app, 'middleware', []);
         $routeMiddleware = Utils::accessProtected($this->app, 'routeMiddleware', []);
+
         return array_merge($globalMiddleware, $routeMiddleware);
     }
 
