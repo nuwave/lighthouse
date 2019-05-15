@@ -44,11 +44,9 @@
         "laravel/scout": "^4.0",
         "mll-lab/graphql-php-scalars": "^2.1",
         "mockery/mockery": "^1.0",
-        "nunomaduro/larastan": "^0.3.16",
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.x-dev",
         "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*",
         "phpbench/phpbench": "@dev",
-        "phpstan/phpstan": "^0.11.6",
         "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
