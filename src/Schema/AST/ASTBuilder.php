@@ -317,9 +317,9 @@ GRAPHQL
         $queryType->fields = ASTHelper::mergeNodeList(
             $queryType->fields,
             [
-                PartialParser::fieldDefinition(
-                    'node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")'
-                ),
+                PartialParser::fieldDefinition('
+                    node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
+                '),
             ]
         );
     }

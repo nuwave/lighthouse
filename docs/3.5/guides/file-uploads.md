@@ -64,13 +64,13 @@ or look at the [specification examples](https://github.com/jaydenseric/graphql-m
 
 To test the example above, prepare a file you can upload.
 
-```sh
+```bash
 echo "test content" > my_file.txt
 ```
 
 Then, send a request to upload the file to your server:
 
-```sh
+```bash
 curl localhost/graphql \
   -F operations='{ "query": "mutation ($file: Upload!) { upload(file: $file) }", "variables": { "file": null } }' \
   -F map='{ "0": ["variables.file"] }' \

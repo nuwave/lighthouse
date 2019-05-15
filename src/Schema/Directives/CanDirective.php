@@ -26,16 +26,16 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     /**
      * Ensure the user is authorized to access this field.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
      * @param  \Closure  $next
      * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
      */
-    public function handleField(FieldValue $value, Closure $next): FieldValue
+    public function handleField(FieldValue $fieldValue, Closure $next): FieldValue
     {
-        $previousResolver = $value->getResolver();
+        $previousResolver = $fieldValue->getResolver();
 
         return $next(
-            $value->setResolver(
+            $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
                     $gate = app(Gate::class);
                     $gateArguments = $this->getGateArguments();

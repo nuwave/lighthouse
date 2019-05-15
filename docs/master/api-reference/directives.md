@@ -1,24 +1,5 @@
 # Directives
 
-## @auth
-
-Return the currently authenticated user as the result of a query.
-
-```graphql
-type Query {
-    me: User @auth
-}
-```
-
-If you need to use a guard besides the default to resolve the authenticated user,
-you can pass the guard name as the `guard` argument
-
-```graphql
-type Query {
-    me: User @auth(guard: "api")
-}
-```
-
 ## @all
 
 Fetch all Eloquent models and return the collection as the result for a field.
@@ -32,11 +13,65 @@ type Query {
 This assumes your model has the same name as the type you are returning and is defined
 in the default model namespace `App`. [You can change this configuration](../getting-started/configuration.md).
 
+### Definition
+
+```graphql
+directive @all(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If you need to use a different model for a single field, you can pass a class name as the `model` argument.
 
 ```graphql
 type Query {
     posts: [Post!]! @all(model: "App\\Blog\\BlogEntry")
+}
+```
+
+## @auth
+
+Return the currently authenticated user as the result of a query.
+
+```graphql
+type Query {
+    me: User @auth
+}
+```
+
+### Definition
+
+```graphql
+"""
+Return the currently authenticated user as the result of a query.
+"""
+directive @auth(
+  """
+  Use a particular guard to retreive the user.
+  """
+  guard: String
+) on FIELD_DEFINITION
+```
+
+### Examples
+
+If you need to use a guard besides the default to resolve the authenticated user,
+you can pass the guard name as the `guard` argument
+
+```graphql
+type Query {
+    me: User @auth(guard: "api")
 }
 ```
 
@@ -68,6 +103,25 @@ class Post extends Model
     }
 }
 ```
+
+### Definition
+
+```graphql
+directive @belongsTo(  
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 The directive accepts an optional `relation` argument if your relationship method
 has a different name than the field.
@@ -107,6 +161,35 @@ class User extends Model
 }
 ```
 
+### Definition
+
+```graphql
+directive @belongsToMany(
+  """
+  Specify the default quantity of elements to be returned.
+  """
+  defaultCount: Int
+  
+  """
+  Specify the maximum quantity of elements to be returned.
+  """
+  maxCount: Int
+  
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 The directive accepts an optional `relation` argument if your relationship method
 has a different name than the field.
 
@@ -128,12 +211,16 @@ type Mutation {
 }
 ```
 
+### Definition
+
+```graphql
+directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
 ## @broadcast
 
 Broadcast the results of a mutation to subscribed clients.
 [Read more about subscriptions](../extensions/subscriptions.md)
-
-The `subscription` argument must reference the name of a subscription field. 
 
 ```graphql
 type Mutation {
@@ -141,6 +228,27 @@ type Mutation {
         @broadcast(subscription: "postCreated")
 }
 ```
+
+The `subscription` argument must reference the name of a subscription field. 
+
+### Definition
+
+```graphql
+directive @broadcast(
+  """
+  Name of the subscription that should be retriggered as a result of this operation..
+  """
+  subscription: String!
+
+  """
+  Specify whether or not the job should be queued.
+  This defaults to the global config option `lighthouse.subscriptions.queue_broadcasts`.
+  """
+  shouldQueue: Boolean
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 You may override the default queueing behaviour from the configuration by
 passing the `shouldQueue` argument. 
@@ -186,6 +294,21 @@ class MyClass
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Use an argument to modify the query builder for a field.
+"""
+directive @builder(
+  """
+  Reference a method that is passed the query builder.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  """
+  method: String!
+) on FIELD_DEFINITION
+```
+
 ## @cache
 
 Cache the result of a resolver.
@@ -198,6 +321,25 @@ type Query {
     highestKnownPrimeNumber: Int! @cache
 }
 ```
+
+### Definition
+
+```graphql
+directive @cache(
+  """
+  Set the duration it takes for the cache to expire in seconds.
+  If not given, the result will be stored forever.
+  """
+  maxAge: Int
+
+  """
+  Limit access to cached data to the currently authenticated user.
+  """
+  private: Boolean = false
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 You can set an expiration time in seconds
 if you want to invalidate the cache after a while.
@@ -228,6 +370,12 @@ type GithubProfile {
 }
 ```
 
+### Definition
+
+```graphql
+directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
 ## @can
 
 Check a Laravel Policy to ensure the current user is authorized to access a field.
@@ -249,6 +397,24 @@ class PostPolicy
     }
 }
 ```
+
+### Definition
+
+```graphql
+directive @can(
+  """
+  The ability to check permissions for.
+  """
+  ability: String
+  
+  """
+  Additional arguments for policy check. 
+  """
+  args: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 If you pass an `id` argument it will look for an instance of the expected model instance.
 
@@ -292,13 +458,32 @@ Because of this, Lighthouse does **not** validate that the user is authenticated
 
 ## @complexity
 
-Place on fields to perform analysis to calculate a query complexity score before execution. [Read More](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+Perform calculation of a fields complexity score before execution.
 
 ```graphql
 type Query {
     posts: [Post!]! @complexity
 }
 ```
+
+[Read More about query complexity analysis](http://webonyx.github.io/graphql-php/security/#query-complexity-analysis)
+
+### Definition
+
+```graphql
+"""
+Customize the calculation of a fields complexity score before execution.
+"""
+directive @complexity(
+  """
+  Reference a function to customize the complexity score calculation.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  """
+  resolver: String
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 You can provide your own function to calculate complexity.
 
@@ -309,8 +494,8 @@ type Query {
 }
 ```
 
-A custom complexity function may look like the following.
-You may look up the [complexity function signature](resolvers.md#complexity-function-signature)
+A custom complexity function may look like the following,
+refer to the [complexity function signature](resolvers.md#complexity-function-signature).
 
 ```php
 namespace App\Security;
@@ -336,6 +521,20 @@ type Mutation {
     createPost(title: String!): Post @create
 }
 ```
+
+### Definition
+
+```graphql
+directive @create(  
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 If you are using a single input object as an argument, you must tell Lighthouse
 to spread out the nested values before applying it to the resolver.
@@ -363,13 +562,31 @@ type Mutation {
 
 ## @delete
 
-Delete a model with a given id field. The field must be an `ID` type.
+Delete one or more models by their ID.
 
 ```graphql
 type Mutation {
     deletePost(id: ID!): Post @delete
 }
 ```
+
+### Definition
+
+```graphql
+"""
+Delete one or more models by their ID.
+The field must have an single non-null argument that may be a list.
+"""
+directive @delete(
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 If you use global ids, you can set the `globalId` argument to `true`.
 Lighthouse will decode the id for you automatically.
@@ -402,7 +619,7 @@ type Mutation {
 ## @deprecated
 
 You can mark fields as deprecated by adding the `@deprecated` directive and providing a
-`reason` (required). Deprecated fields are not included in introspection queries unless
+`reason`. Deprecated fields are not included in introspection queries unless
 requested and they can still be queried by clients.
 
 ```graphql
@@ -412,9 +629,25 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Marks an element of a GraphQL schema as no longer supported.
+"""
+directive @deprecated(  
+  """
+  Explains why this element was deprecated, usually also including a
+  suggestion for how to access supported similar data. Formatted
+  in [Markdown](https://daringfireball.net/projects/markdown/).
+  """
+  reason: String = "No longer supported"
+) on FIELD_DEFINITION
+```
+
 ## @field
 
-Specify a custom resolver function for a single field.
+Assign a resolver function to a field.
 
 In most cases, you do not even need this directive. Make sure you read about
 the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data),
@@ -429,13 +662,35 @@ type Mutation {
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Assign a resolver function to a field.
+"""
+directive @field(
+  """
+  A reference to the resolver function to be used.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  """
+  resolver: String!
+
+  """
+  Supply additional data to the resolver.
+  """
+  args: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If your field is defined on the root types `Query` or `Mutation`, you can take advantage
 of the default namespaces that are defined in the [configuration](../getting-started/configuration.md). The following
 will look for a class in `App\GraphQL\Queries` by default.
 
 ```graphql
 type Query {
-  usersTotal: Int @field("Statistics@usersTotal")
+  usersTotal: Int @field(resolver: "Statistics@usersTotal")
 }
 ```
 
@@ -459,6 +714,25 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @find(  
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 This throws when more then one result is returned.
 Use [@first](#first) if you can not ensure that.
 
@@ -480,6 +754,25 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @first(  
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 Other then [@find](#find), this will not throw an error if more then one items are in the collection.
 
 If your model does not sit in the default namespace, you can overwrite it.
@@ -493,7 +786,7 @@ type Query {
 
 ## @enum
 
-Map the underlying value to an enum key. When dealing with the Enum type in your code,
+Assign an internal value to an enum key. When dealing with the Enum type in your code,
 you will receive the defined value instead of the string key.
 
 ```graphql
@@ -506,6 +799,21 @@ enum Role {
 You do not need this directive if the internal value of each enum key
 is an identical string. [Read more about enum types](../the-basics/types.md#enum)
 
+### Definition
+
+```graphql
+"""
+Assign an internal value to an enum key.
+"""
+directive @enum(
+  """
+  The internal value of the enum key.
+  You can use any constant literal value: https://graphql.github.io/graphql-spec/draft/#sec-Input-Values
+  """
+  value: Mixed
+) on ENUM_VALUE
+```
+
 ## @eq
 
 Place an equal operator on an Eloquent query.
@@ -515,6 +823,20 @@ type User {
     posts(category: String @eq): [Post!]! @hasMany
 }
 ```
+
+### Definition
+
+```graphql
+directive @eq(  
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 If the name of the argument does not match the database column,
 pass the actual column name as the `key`.
@@ -538,6 +860,17 @@ type Mutation {
 }
 ```
 
+### Definition
+
+```graphql
+directive @event(  
+  """
+  Specify the fully qualified class name (FQCN) of the event to dispatch.
+  """
+  dispatch: String!
+) on FIELD_DEFINITION
+```
+
 ## @globalId
 
 Converts an ID to a global ID.
@@ -548,6 +881,14 @@ type User {
     name: String
 }
 ```
+
+### Definition
+
+```graphql
+directive @globalId on FIELD_DEFINITION
+```
+
+### Examples
 
 Instead of the original ID, the `id` field will now return a base64-encoded String
 that globally identifies the User and can be used for querying the `node` endpoint.
@@ -564,6 +905,35 @@ type User {
     posts: [Post!]! @hasMany
 }
 ```
+
+### Definition
+
+```graphql
+directive @hasMany(
+  """
+  Specify the default quantity of elements to be returned.
+  """
+  defaultCount: Int
+  
+  """
+  Specify the maximum quantity of elements to be returned.
+  """
+  maxCount: Int
+      
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 You can return the related models paginated by setting the `type`.
 
@@ -593,6 +963,25 @@ type User {
 }
 ```
 
+### Definition
+
+```graphql
+directive @hasOne(      
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
+
 If the name of the relationship on the Eloquent model is different than the field name,
 you can override it by setting `relation`.
 
@@ -612,6 +1001,18 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @in(      
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
 ## @inject
 
 Inject a value from the context object into the arguments.
@@ -627,6 +1028,28 @@ type Mutation {
 This is useful to ensure that the authenticated user's `id` is
 automatically used for creating new models and can not be manipulated.
 
+### Definition
+
+```graphql
+directive @inject(      
+  """
+  A path to the property of the context that will be injected.
+  If the value is nested within the context, you may use dot notation
+  to get it, e.g. "user.id".
+  """
+  context: String!
+
+  """
+  The target name of the argument into which the value is injected.
+  You can use dot notation to set the value at arbitrary depth
+  within the incoming argument.
+  """
+  name: String!
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+### Examples
+
 If you are using an Input Object as an argument, you can use dot notation to
 set a nested argument.
 
@@ -640,10 +1063,11 @@ type Mutation {
 
 ## @interface
 
+Use a custom resolver to determine the concrete type of an interface.
+
 Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding
 to use this directive, you probably don't need it.
 
-You can point Lighthouse to a custom type resolver.
 Set the `resolver` argument to a function that returns the implementing Object Type.
 
 ```graphql
@@ -699,6 +1123,21 @@ class Commentable
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Use a custom resolver to determine the concrete type of an interface.
+"""
+directive @interface(      
+  """
+  Reference to a custom type-resolver function.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  """
+  resolver: String!
+) on INTERFACE
+```
+
 ## @method
 
 Call a method with a given `name` on the class that represents a type to resolve a field.
@@ -715,6 +1154,17 @@ This calls a method `App\User::findMySpecialData` with [the typical resolver arg
 The first argument is an instance of the class itself,
 so the method can be `public static` if needed.
 
+### Definition
+
+```graphql
+directive @method(      
+  """
+  Specify the method of which to fetch the data from.
+  """
+  name: String
+) on FIELD_DEFINITION
+```
+
 ## @middleware
 
 Run Laravel middleware for a specific field. This can be handy to reuse existing
@@ -725,6 +1175,21 @@ type Query {
     users: [User!]! @middleware(checks: ["auth:api"]) @all
 }
 ```
+
+### Definition
+
+```graphql
+directive @middleware(      
+  """
+  Specify which middleware to run. 
+  Pass in either a fully qualified class name, an alias or
+  a middleware group - or any combination of them.
+  """
+  checks: [String!]
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 You can define middleware just like you would in Laravel. Pass in either a fully qualified
 class name, an alias or a middleware group - or any combination of them.
@@ -783,6 +1248,13 @@ type User @model {
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
+
+### Definition
+
+```graphql
+directive @model on OBJECT
+```
+
 ## @namespace
 
 Redefine the default namespaces used in other directives.
@@ -795,6 +1267,18 @@ type Query {
   posts: [Post!]! @field(resolver: "Post@resolveAll") @namespace(field: "App\\Blog")
 }
 ```
+
+### Definition
+
+```graphql
+"""
+Redefine the default namespaces used in other directives.
+The arguments are a map from directive names to namespaces.
+"""
+directive @namespace on FIELD_DEFINITION | OBJECT
+```
+
+### Examples
 
 When used upon an object type or an object type extension, the namespace
 applies to fields of the type as well. This allows you to specify
@@ -818,11 +1302,21 @@ type User {
 }
 ```
 
+### Definition
+
+```graphql
+directive @neq(  
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema. 
+  """
+  key: String
+) on FIELD_DEFINITION
+```
+
 ## @node
 
-Store a type's resolver functions in Lighthouse's node registry.
-The `resolver` argument has to specify a function which will be passed the
-decoded `id` and resolves to a result.
+Register a type for relay global object identification.
 
 ```graphql
 type User @node(resolver: "App\\GraphQL\\NodeResolver@resolveUser") {
@@ -830,25 +1324,26 @@ type User @node(resolver: "App\\GraphQL\\NodeResolver@resolveUser") {
 }
 ```
 
+The `resolver` argument has to specify a function which will be passed the
+decoded `id` and resolves to a result.
+
 ```php
-public function resolveUser(string $id): \App\User
+function resolveUser($id): \App\User
 ```
 
-The `typeResolver` is responsible for determining the GraphQL type the result
-belongs to. Lighthouse provides a default implementation, but you can override
-it if the need arises.
+### Definition
 
 ```graphql
-type User @node(
-    resolver: "App\\GraphQL\\NodeResolver@resolveUser"
-    typeResolver: "App\\GraphQL\\NodeResolver@resolveNodeType"
-  ) {
-  name: String!
-}
-```
-
-```php
-public function resolveNodeType($value): \GraphQL\Type\Definition\Type
+"""
+Register a type for relay global object identification.
+"""
+directive @node(
+  """
+  Reference to resolver function.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  """
+  resolver: String!
+) on FIELD_DEFINITION
 ```
 
 ## @notIn
@@ -861,6 +1356,18 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+directive @notIn(      
+  """
+  Specify the name of the column.
+  Only required if it differs from the name of the argument.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
 ## @orderBy
 
 Sort a result list by one or more given fields.
@@ -869,6 +1376,12 @@ Sort a result list by one or more given fields.
 type Query {
     posts(orderBy: [OrderByClause!] @orderBy): [Post!]!
 }
+```
+
+### Definition
+
+```graphql
+directive @orderBy on ARGUMENT_DEFINITION
 ```
 
 The `OrderByClause` input is automatically added to the schema,
@@ -907,7 +1420,7 @@ You may pass more than one sorting option to add a secondary ordering.
 
 ## @paginate
 
-Transform a field so it returns a paginated list.
+Query multiple entries as a paginated list.
 
 ```graphql
 type Query {
@@ -944,6 +1457,52 @@ And can be queried like this:
     }
 }
 ```
+
+### Definition
+
+```graphql
+"""
+Query multiple entries as a paginated list.
+"""
+directive @paginate(
+  """
+  Which pagination style to use.
+  Allowed values: paginator, connection.
+  """
+  type: String = "paginator"
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+  
+  """
+  Overwrite the paginate_max_count setting value to limit the
+  amount of items that a user can request per page.
+  """
+  maxCount: Int
+
+  """
+  Use a default value for the amount of returned items
+  in case the client does not request it explicitly
+  """
+  defaultCount: Int
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 The `type` of pagination defaults to `paginator`, but may also be set to a Relay
 compliant `connection`.
@@ -1033,16 +1592,52 @@ type User {
 }
 ```
 
+### Definition
+
+```graphql
+directive @rename(
+  """
+  Specify the original name of the property/key that the field
+  value can be retrieved from.
+  """
+  attribute: String!
+) on FIELD_DEFINITION
+```
+
 ## @rules
 
 Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
 
 ```graphql
 type Query {
-    users(countryCode: String @rules(apply: ["string", "size:2"])): [User!]!
-        @paginate
+    users(
+      countryCode: String @rules(apply: ["string", "size:2"])
+    ): [User!]! @all
 }
 ```
+
+### Definition
+
+```graphql
+"""
+Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+"""
+directive @rules(
+  """
+  Specify the validation rules to apply to the field.
+  """
+  apply: [String!]
+  
+  """
+  Specify the messages to return if the validators fail.
+  Specified as an input object that maps rules to messages,
+  e.g. { email: "Must be a valid email", max: "The input was too long" }
+  """
+  messages: [RulesMessageMap!]
+) on INPUT_FIELD_DEFINITION
+```
+
+### Examples
 
 Rules can also be defined on Input Object Values.
 
@@ -1065,9 +1660,34 @@ Run validation on an array itself, using [Laravel's built-in validation rules](h
 
 ```graphql
 type Mutation {
-  saveIcecream(flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])): Icecream
+  saveIcecream(
+    flavors: [IcecreamFlavor!]! @rulesForArray(apply: ["min:3"])
+  ): Icecream
 }
 ```
+
+### Definition
+
+```graphql
+"""
+Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+"""
+directive @rulesForArray(
+  """
+  Specify the validation rules to apply to the field.
+  """
+  apply: [String!]
+  
+  """
+  Specify the messages to return if the validators fail.
+  Specified as an input object that maps rules to messages,
+  e.g. { email: "Must be a valid email", max: "The input was too long" }
+  """
+  messages: [RulesMessageMap!]
+) on INPUT_FIELD_DEFINITION
+```
+
+### Examples
 
 You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
 both the size and the contents of an argument array.
@@ -1085,21 +1705,31 @@ type Mutation {
 
 ## @scalar
 
-Point Lighthouse to your scalar definition class.
+Reference a class implementing a scalar definition.
 [Learn how to implement your own scalar.](http://webonyx.github.io/graphql-php/type-system/scalar-types/)
-
-Lighthouse looks into your default scalar namespace for a class with the same name.
-You do not need to specify the directive in that case.
-
-```graphql
-scalar DateTime
-```
-
-Pass the class name if it is different from the scalar type.
 
 ```graphql
 scalar DateTime @scalar(class: "DateTimeScalar")
 ```
+
+If you follow the namespace convention, you do not need this directive.
+Lighthouse looks into your configured scalar namespace for a class with the same name.
+
+### Definition
+
+```graphql
+"""
+Reference a class implementing a scalar definition.
+"""
+directive @scalar(
+  """
+  Reference to a class that extends `\GraphQL\Type\Definition\ScalarType`.
+  """
+  class: String!
+) on SCALAR
+```
+
+### Examples
 
 If your class is not in the default namespace, pass a fully qualified class name.
 
@@ -1110,18 +1740,32 @@ scalar DateTime
 
 ## @search
 
-Creates a full-text search argument.
-
-This directive will make an argument use [Laravel Scout](https://laravel.com/docs/master/scout)
-to make a full-text search, what driver you use for Scout is up to you.
-
-The `search` method of the model is called with the value of the argument.
+Perform a full-text by the given input value.
 
 ```graphql
 type Query {
     posts(search: String @search): [Post!]! @paginate
 }
 ```
+
+The `search()` method of the model is called with the value of the argument,
+using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
+
+### Definition
+
+```graphql
+"""
+Perform a full-text by the given input value.
+"""
+directive @search(
+  """
+  Specify a custom index to use for search.
+  """
+  within: String
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 Normally the search will be performed using the index specified by the model's `searchableAs` method.
 However, in some situation a custom index might be needed, this can be achieved by using the argument `within`.
@@ -1134,7 +1778,7 @@ type Query {
 
 ## @spread
 
-Spread out the nested values of an input object into it's parent.
+Spread out the nested values of an argument of type input object into it's parent.
 
 ```graphql
 type Mutation {
@@ -1150,7 +1794,7 @@ input PostInput {
 }
 ```
 
-The chema does not change, client side usage works the same:
+The schema does not change, client side usage works the same:
 
 ```graphql
 mutation {
@@ -1178,9 +1822,19 @@ they are passed along to the resolver:
 Note that Lighthouse spreads out the arguments **after** all other `ArgDirectives` have
 been applied, e.g. validation, transformation.
 
+### Definition
+
+```graphql
+"""
+Spread out the nested values of an argument of type input object into it's parent.
+"""
+directive @spread on ARGUMENT_DEFINITION
+```
+
 ## @subscription
 
-Declare a class to handle the broadcasting of a subscription to clients.
+Reference a class to handle the broadcasting of a subscription to clients.
+The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
 
 If you follow the default naming conventions for [defining subscription fields](../extensions/subscriptions.md#defining-fields)
 you do not need this directive. It is only useful if you need to override the default namespace.
@@ -1194,11 +1848,24 @@ type Subscription {
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Reference a class to handle the broadcasting of a subscription to clients.
+The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+"""
+directive @subscription(
+  """
+  A reference to a subclass of `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
+  """
+  class: String!
+) on FIELD_DEFINITION
+```
+
 ## @trim
 
-***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.md#argtransformerdirective).
-
-Run the `trim` function on the argument it is defined on.
+Run the `trim` function on an input value.
 
 ```graphql
 type Mutation {
@@ -1206,13 +1873,21 @@ type Mutation {
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Run the `trim` function on an input value.
+"""
+directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
 ## @union
+
+Use a custom function to determine the concrete type of unions.
 
 Make sure you read the [basics about Unions](../the-basics/types.md#union) before deciding
 to use this directive, you probably don't need it.
-
-You can point Lighthouse to a custom type resolver.
-Set the `resolver` argument to a function that returns the implementing Object Type.
 
 ```graphql
 type User {
@@ -1229,7 +1904,7 @@ union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
 ```
 
 The function receives the value of the parent field as its single argument and must
-return an Object Type. You can get the appropriate Object Type from Lighthouse's type registry.
+resolve an Object Type from Lighthouse's `TypeRegistry`.
 
 ```php
 <?php
@@ -1274,15 +1949,53 @@ class Person
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Use a custom function to determine the concrete type of unions.
+"""
+directive @union(
+  """
+  Reference a function that returns the implementing Object Type.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  """
+  resolveType: String!
+) on UNION
+```
+
 ## @update
 
-Update an Eloquent model.
+Update an Eloquent model with the input values of the field.
 
 ```graphql
 type Mutation {
     updatePost(id: ID!, content: String): Post @update
 }
 ```
+
+### Definition
+
+```graphql
+"""
+Update an Eloquent model with the input values of the field.
+"""
+directive @update(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION
+```
+
+### Examples
 
 Lighthouse uses the argument `id` to fetch the model by its primary key.
 This will work even if your model has a differently named primary key,
@@ -1310,7 +2023,7 @@ type Mutation {
 
 ## @where
 
-Specify that an argument is used as a [where filter](https://laravel.com/docs/queries#where-clauses).
+Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
 
 You can specify simple operators:
 
@@ -1328,9 +2041,63 @@ type Query {
 }
 ```
 
+### Definition
+
+```graphql
+"""
+Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
+"""
+directive @where(
+  """
+  Specify the operator to use within the WHERE condition.
+  """
+  operator: String = "="
+
+  """
+  Use Laravel's where clauses upon the query builder.
+  """
+  clause: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
 ## @whereBetween
 
 Verify that a column's value is between two values.
+
+```graphql
+type Query {
+    posts(
+        created_at: DateRange @whereBetween
+    ): [Post!]! @all
+}
+
+input DateRange {
+    from: Date!
+    to: Date!
+}
+```
+
+The type of the input value this is defined upon should be
+an `input` object with two fields.
+
+_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
+
+### Definition
+
+```graphql
+"""
+Verify that a column's value is between two values.
+The type of the input value this is defined upon should be
+an `input` object with two fields.
+"""
+directive @whereNotBetween(
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
 
 ### Old syntax
 
@@ -1347,17 +2114,118 @@ type Query {
 }
 ```
 
-### New syntax
+## @whereConstraints
+
+Add a dynamically client-controlled where constraint to a fields query.
+
+### Definition
+
+```graphql
+"""
+Add a dynamically client-controlled where constraint to a fields query.
+The input value it is defined on may have any name but **must** be
+of the input type `WhereConstraints`.
+"""
+directive @whereConstraints on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+### Setup
+
+**This is an experimental feature and not included in Lighthouse by default.**
+
+First, enable the service provider:
+
+```php
+'providers' => [
+    \Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider::class,
+],
+```
+
+It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
+
+    composer require mll-lab/graphql-php-scalars
+
+Finally, add an enum type `Operator` to your schema. Depending on your
+database, you may want to allow different internal values. This default
+should work for most databases:
+
+```graphql
+enum Operator {
+    EQ @enum(value: "=")
+    NEQ @enum(value: "!=")
+    GT @enum(value: ">")
+    GTE @enum(value: ">=")
+    LT @enum(value: "<")
+    LTE @enum(value: "<=")
+    LIKE @enum(value: "LIKE")
+    NOT_LIKE @enum(value: "NOT_LIKE")
+}
+```
+
+### Usage
+
+```graphql
+type Query {
+    people(where: WhereConstraints @whereConstraints): [Person!]!
+}
+```
+
+This is how you can use it to construct a complex query
+that gets actors over age 37 who either have red hair or are at least 150cm.
+
+```graphql
+{
+  people(
+    filter: {
+      where: [
+        {
+          AND: [
+            { column: "age", operator: GT value: 37 }
+            { column: "type", value: "Actor" }
+            {
+              OR: [
+                { column: "haircolour", value: "red" }
+                { column: "height", operator: GTE, value: 150 }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ) {
+    name
+  }
+}
+```
+
+The definition for the `WhereConstraints` input is automatically included
+within your schema.
+
+```graphql
+input WhereConstraints {
+    column: String
+    operator: String = EQ
+    value: Mixed
+    AND: [WhereConstraints!]
+    OR: [WhereConstraints!]
+    NOT: [WhereConstraints!]
+}
+
+scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
+```
+
+## @whereNotBetween
+
+Verify that a column's value lies outside of two values.
+The type of the input value this is defined upon should be
+an `input` object with two fields.
 
 _Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
-
-The type of the input value should be either an `input` object with two
-fields or a list of values.
 
 ```graphql
 type Query {
     posts(
-        created_at: DateRange @whereBetween
+        notCreatedDuring: DateRange @whereNotBetween(key: "created_at")
     ): [Post!]! @all
 }
 
@@ -1367,12 +2235,22 @@ input DateRange {
 }
 ```
 
-If the name of the argument does not match the database column,
-pass the actual column name as the `key`.
+### Definition
 
-## @whereNotBetween
-
+```graphql
+"""
 Verify that a column's value lies outside of two values.
+The type of the input value this is defined upon should be
+an `input` object with two fields.
+"""
+directive @whereNotBetween(
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
 
 ### Old syntax
 
@@ -1389,26 +2267,6 @@ type Query {
 }
 ```
 
-### New syntax
-
-_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
-
-The type of the input value should be either an `input` object with two
-fields or a list of values.
-
-```graphql
-type Query {
-    posts(
-        notCreatedDuring: DateRange @whereNotBetween(key: "created_at")
-    ): [Post!]! @all
-}
-
-input DateRange {
-    from: Date!
-    to: Date!
-}
-```
-
 ## @with
 
 Eager-load an Eloquent relation.
@@ -1419,6 +2277,26 @@ type User {
         @with(relation: "tasks")
         @method(name: "getTaskSummary")
 }
+```
+
+### Definition
+
+```graphql
+"""
+Eager-load an Eloquent relation.
+"""
+directive @with(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
 ```
 
 This can be a useful optimization for fields that are not returned directly
