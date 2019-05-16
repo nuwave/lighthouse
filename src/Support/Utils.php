@@ -58,11 +58,13 @@ class Utils
     }
 
     /**
-     * Get the value of a protected member variable of an object. Returns a default value in case of error.
+     * Get the value of a protected member variable of an object.
      *
-     * @param  object  $object  Object with protected member.
+     * Returns a default value in case of error.
+     *
+     * @param  mixed  $object  Object with protected member.
      * @param  string  $memberName  Name of object's protected member.
-     * @param  null|mixed  $default  Default value to return in case of access error.
+     * @param  mixed|null  $default  Default value to return in case of access error.
      * @return mixed  Value of object's protected member.
      */
     public static function accessProtected($object, string $memberName, $default = null)

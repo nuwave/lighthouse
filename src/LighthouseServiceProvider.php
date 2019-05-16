@@ -4,11 +4,14 @@ namespace Nuwave\Lighthouse;
 
 use Closure;
 use Exception;
+use Illuminate\Foundation\Application as LaravelApplication;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
+use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
@@ -150,13 +153,17 @@ class LighthouseServiceProvider extends ServiceProvider
 
         $this->app->singleton(MiddlewareAdapter::class, function (Container $app): MiddlewareAdapter {
             // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
-            if ($app instanceof \Illuminate\Foundation\Application) {
-                return new LaravelMiddlewareAdapter($app->get(\Illuminate\Routing\Router::class));
-            } elseif ($app instanceof \Laravel\Lumen\Application) {
+            if ($app instanceof LaravelApplication) {
+                return new LaravelMiddlewareAdapter(
+                    $app->get(Router::class)
+                );
+            } elseif ($app instanceof LumenApplication) {
                 return new LumenMiddlewareAdapter($app);
             }
 
-            throw new Exception('Could not correctly determine Laravel framework flavor.');
+            throw new Exception(
+                'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
+            );
         });
 
         if ($this->app->runningInConsole()) {

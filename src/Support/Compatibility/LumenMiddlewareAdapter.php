@@ -8,18 +8,26 @@ use Nuwave\Lighthouse\Support\Utils;
 class LumenMiddlewareAdapter implements MiddlewareAdapter
 {
     /**
-     * @var Application
+     * @var \Laravel\Lumen\Application
      */
-    private $app;
+    protected $app;
 
     /**
-     * @param Application $app
+     * Create a middleware adapter for Lumen applications.
+     *
+     * @param  \Laravel\Lumen\Application  $app
+     * @return void
      */
     public function __construct(Application $app)
     {
         $this->app = $app;
     }
 
+    /**
+     * Get all of the defined middleware short-hand names.
+     *
+     * @return string[]
+     */
     public function getMiddleware(): array
     {
         $globalMiddleware = Utils::accessProtected($this->app, 'middleware', []);
@@ -28,8 +36,14 @@ class LumenMiddlewareAdapter implements MiddlewareAdapter
         return array_merge($globalMiddleware, $routeMiddleware);
     }
 
+    /**
+     * Get all of the defined middleware groups.
+     *
+     * @return string[]
+     */
     public function getMiddlewareGroups(): array
     {
-        return []; // Lumen doesn't have middleware groups
+        // Lumen doesn't have middleware groups
+        return [];
     }
 }

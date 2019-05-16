@@ -43,14 +43,17 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     protected $createsContext;
 
     /**
-     * @var MiddlewareAdapter
+     * @var \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter
      */
     private $middlewareAdapter;
 
     /**
+     * Create a new middleware directive instance.
+     *
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @param  \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter  $middlewareAdapter
+     * @return void
      */
     public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareAdapter $middlewareAdapter)
     {
@@ -100,6 +103,22 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                 }
             )
         );
+    }
+
+    /**
+     * @param  string|string[]  $middlewareArgValue
+     * @return \Illuminate\Support\Collection<string>
+     */
+    protected function getQualifiedMiddlewareNames($middlewareArgValue): Collection
+    {
+        $middleware = $this->middlewareAdapter->getMiddleware();
+        $middlewareGroups = $this->middlewareAdapter->getMiddlewareGroups();
+
+        return (new Collection($middlewareArgValue))
+            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
+                return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
+            })
+            ->flatten();
     }
 
     /**
@@ -161,21 +180,5 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
         );
 
         return $objectType;
-    }
-
-    /**
-     * @param  mixed  $middlewareArgValue
-     * @return \Illuminate\Support\Collection<string>
-     */
-    protected function getQualifiedMiddlewareNames($middlewareArgValue): Collection
-    {
-        $middleware = $this->middlewareAdapter->getMiddleware();
-        $middlewareGroups = $this->middlewareAdapter->getMiddlewareGroups();
-
-        return (new Collection($middlewareArgValue))
-            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
-                return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
-            })
-            ->flatten();
     }
 }
