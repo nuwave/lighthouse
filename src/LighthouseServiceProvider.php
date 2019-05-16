@@ -4,14 +4,12 @@ namespace Nuwave\Lighthouse;
 
 use Closure;
 use Exception;
-use Illuminate\Foundation\Application as LaravelApplication;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Routing\Router;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
-use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
@@ -29,6 +27,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
+use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
@@ -42,6 +41,7 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Illuminate\Foundation\Application as LaravelApplication;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
@@ -162,7 +162,7 @@ class LighthouseServiceProvider extends ServiceProvider
             }
 
             throw new Exception(
-                'Could not correctly determine Laravel framework flavor, got ' . get_class($app) . '.'
+                'Could not correctly determine Laravel framework flavor, got '.get_class($app).'.'
             );
         });
 
