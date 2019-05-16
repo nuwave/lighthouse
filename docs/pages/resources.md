@@ -11,6 +11,7 @@ sidebar: false
 
 ## Tutorials
 
+- [Building a GraphQL Server with Laravel](https://www.toptal.com/graphql/laravel-graphql-server-tutorial)
 - [Video Walkthrough by Christopher Moore](https://youtu.be/y19EaW2X7ac)
 - [GraphQL in Laravel done right](https://medium.com/@olivernybroe/graphql-in-laravel-done-right-9cf123d5601b)
 - [Testing GraphQL with Laravel](https://medium.com/@olivernybroe/testing-graphql-with-laravel-4d6201b40f68)
