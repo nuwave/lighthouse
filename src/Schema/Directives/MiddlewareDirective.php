@@ -22,6 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, NodeManipulator
 {
@@ -42,14 +43,23 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
     protected $createsContext;
 
     /**
+     * @var \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter
+     */
+    private $middlewareAdapter;
+
+    /**
+     * Create a new middleware directive instance.
+     *
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter  $middlewareAdapter
      * @return void
      */
-    public function __construct(Pipeline $pipeline, CreatesContext $createsContext)
+    public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareAdapter $middlewareAdapter)
     {
         $this->pipeline = $pipeline;
         $this->createsContext = $createsContext;
+        $this->middlewareAdapter = $middlewareAdapter;
     }
 
     /**
@@ -93,6 +103,22 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
                 }
             )
         );
+    }
+
+    /**
+     * @param  string|string[]  $middlewareArgValue
+     * @return \Illuminate\Support\Collection<string>
+     */
+    protected function getQualifiedMiddlewareNames($middlewareArgValue): Collection
+    {
+        $middleware = $this->middlewareAdapter->getMiddleware();
+        $middlewareGroups = $this->middlewareAdapter->getMiddlewareGroups();
+
+        return (new Collection($middlewareArgValue))
+            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
+                return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
+            })
+            ->flatten();
     }
 
     /**
@@ -154,23 +180,5 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Node
         );
 
         return $objectType;
-    }
-
-    /**
-     * @param  mixed  $middlewareArgValue
-     * @return \Illuminate\Support\Collection<string>
-     */
-    protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
-    {
-        /** @var \Illuminate\Routing\Router $router */
-        $router = app('router');
-        $middleware = $router->getMiddleware();
-        $middlewareGroups = $router->getMiddlewareGroups();
-
-        return (new Collection($middlewareArgValue))
-            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
-                return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
-            })
-            ->flatten();
     }
 }

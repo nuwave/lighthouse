@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Routing\Router;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -26,6 +27,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Console\ClearCacheCommand;
 use Nuwave\Lighthouse\Console\PrintSchemaCommand;
 use Nuwave\Lighthouse\Execution\GraphQLValidator;
+use Laravel\Lumen\Application as LumenApplication;
 use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
@@ -39,7 +41,11 @@ use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
+use Illuminate\Foundation\Application as LaravelApplication;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
+use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
+use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
+use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
@@ -143,6 +149,21 @@ class LighthouseServiceProvider extends ServiceProvider
                    );
                 }
             };
+        });
+
+        $this->app->singleton(MiddlewareAdapter::class, function (Container $app): MiddlewareAdapter {
+            // prefer using fully-qualified class names here when referring to Laravel-only or Lumen-only classes
+            if ($app instanceof LaravelApplication) {
+                return new LaravelMiddlewareAdapter(
+                    $app->get(Router::class)
+                );
+            } elseif ($app instanceof LumenApplication) {
+                return new LumenMiddlewareAdapter($app);
+            }
+
+            throw new Exception(
+                'Could not correctly determine Laravel framework flavor, got '.get_class($app).'.'
+            );
         });
 
         if ($this->app->runningInConsole()) {
