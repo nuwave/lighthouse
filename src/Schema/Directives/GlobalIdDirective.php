@@ -73,8 +73,8 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
      */
     public function transform($argumentValue)
     {
-        if($decode = $this->directiveArgValue('decode')) {
-            switch($decode) {
+        if ($decode = $this->directiveArgValue('decode')) {
+            switch ($decode) {
                 case 'TYPE':
                     return $this->globalId->decodeType($argumentValue);
                 case 'ID':

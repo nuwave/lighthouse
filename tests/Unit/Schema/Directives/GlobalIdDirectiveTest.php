@@ -37,7 +37,7 @@ class GlobalIdDirectiveTest extends TestCase
         }        
         ')->assertJson([
             'data' => [
-                'foo' => $this->globalId->encode('Query', Foo::THE_ANSWER)
+                'foo' => $this->globalId->encode('Query', Foo::THE_ANSWER),
             ],
         ]);
     }
@@ -84,9 +84,9 @@ class GlobalIdDirectiveTest extends TestCase
                     'id' => 'bar',
                     'array' => [
                         'Foo',
-                        'bar'
-                    ]
-                ]
+                        'bar',
+                    ],
+                ],
             ],
         ]);
     }
