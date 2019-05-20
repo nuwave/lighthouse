@@ -1,5 +1,4 @@
-
-## Argument Directives
+# Argument Directives
 
 Argument directives can be applied to a [InputValueDefinition](https://graphql.github.io/graphql-spec/June2018/#InputValueDefinition).
 
@@ -13,12 +12,12 @@ what your argument should apply to in addition to its function.
 
 You must implement exactly one of those two interfaces in order for an argument directive to work.
 
-### ArgValidationDirective
+## ArgValidationDirective
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgValidationDirective.php)
 may be used to return custom rules and messages to use for validation of an argument.
 
-### ArgTransformerDirective
+## ArgTransformerDirective
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)
 takes an incoming value an returns a new value. 
@@ -87,7 +86,7 @@ class CreateUser
 }
 ```
 
-#### Evaluation Order
+### Evaluation Order
 
 Argument directives are evaluated in the order that they are defined in the schema.
 
@@ -104,7 +103,7 @@ In the given example, Lighthouse will take the value of the `password` argument 
 1. Run validation on it
 1. Encrypt the password via `bcrypt`
 
-### ArgBuilderDirective
+## ArgBuilderDirective
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgBuilderDirective.php)
 directive allows using arguments passed by the client to dynamically
@@ -187,7 +186,7 @@ type Query {
 }
 ```
 
-### ArgManipulator
+## ArgManipulator
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/ArgManipulator.php)
 directive can be used to manipulate the schema AST. 

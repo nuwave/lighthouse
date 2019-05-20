@@ -437,4 +437,4 @@ This mutation will return the deleted object, so you will have a last chance to 
 Lighthouse allows you to serve GraphQL subscriptions. Compared to queries and
 mutations, a more elaborate setup is required.
  
-[Read more about how to set up subscriptions](../extensions/subscriptions.md)
+[Read more about how to set up subscriptions](../subscriptions/getting-started.md)
