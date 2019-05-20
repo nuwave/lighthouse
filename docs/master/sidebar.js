@@ -65,9 +65,11 @@ module.exports = [{
     {
         title: 'Performance',
         children: [
-            ['performance/getting-started', 'Getting Started'],
+            'performance/schema-caching',
+            ['performance/n-plus-one', 'The N+1 Query Problem'],
             'performance/deferred',
             'performance/tracing',
+            'performance/server-configuration',
         ]
     },
     {
