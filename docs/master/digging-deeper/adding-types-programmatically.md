@@ -1,12 +1,20 @@
-# Native PHP types
+# Adding Types Programmatically
+
+You might want to add additional types to the schema programmatically.
+
+## Additional Schema Definitions
+
+If you want to use the SDL to define additional types dynamically,
+you can listen for the [`BuildSchemaString`](../api-reference/events.md#buildschemastring)
+event and add in schema definitions as a simple string.
+
+## Native PHP types
 
 While Lighthouse is a schema first GraphQL server and primarily uses the SDL,
 you can also use native PHP type definitions.
 
 Check out the [webonyx/graphql-php documentation](http://webonyx.github.io/graphql-php/type-system/)
 on how to define types.  
-
-## Use Cases
 
 Note that you will not have access to a large portion of Lighthouse functionality
 that is provided through server-side directives and the definition is much more verbose.

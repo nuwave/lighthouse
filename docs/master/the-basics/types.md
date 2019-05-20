@@ -132,7 +132,7 @@ The PHP internal value of the field `ADMIN` will be `string('ADMIN')`.
 ### Native PHP definition
 
 If you want to reuse enum definitions or constants from PHP, you can also
-register a native PHP enum type [through the TypeRegistry](../digging-deeper/native-php-types.md).
+register a native PHP enum type [through the TypeRegistry](../digging-deeper/adding-types-programmatically.md#native-php-types).
 
 Just define a [EnumType](http://webonyx.github.io/graphql-php/type-system/enum-types/) and
 register it:

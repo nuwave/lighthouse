@@ -49,7 +49,7 @@ module.exports = [{
             'digging-deeper/schema-organisation',
             'digging-deeper/relay',
             'digging-deeper/error-handling',
-            'digging-deeper/native-php-types',
+            'digging-deeper/adding-types-programmatically',
             'digging-deeper/file-uploads',
             'digging-deeper/extending-lighthouse'
         ]

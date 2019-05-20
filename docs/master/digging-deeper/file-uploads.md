@@ -1,9 +1,9 @@
-# Uploading a file
+# File Uploads
 
 Lighthouse allows you to upload files using a multipart form request
 as defined in [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
 
-## Preparing your schema
+## Setup
 
 In order to accept file uploads, you must add the `Upload` scalar to your schema.
 
@@ -56,7 +56,7 @@ class Upload
 }
 ```
 
-## Client-side usage
+## Client-side Usage
 
 In order to upload a file, you must send a `multipart/form-data` request.
 Use any of the [available client implementations](https://github.com/jaydenseric/graphql-multipart-request-spec#client)
