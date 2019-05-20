@@ -56,6 +56,20 @@ You can customize the error message for a particular argument.
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
 ```
 
+### Validating For Uniqueness
+
+Using the [`unique`](https://laravel.com/docs/5.8/validation#rule-unique)
+validation rule can be a bit tricky.
+
+If the argument is nested within an input object, the argument path will not
+match the column name, so you have to specify the column name explicitly.
+
+```graphql
+input CreateUserInput {
+  email: String @rules(apply: ["unique:users,email_address"])
+}
+```
+
 ## Validating Arrays
 
 When you are passing in an array as an argument to a field, you might
