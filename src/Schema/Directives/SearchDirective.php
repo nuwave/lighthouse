@@ -25,8 +25,6 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function handleBuilder($builder, $value)
     {
-        $within = $this->directiveArgValue('within');
-
         /** @var \Illuminate\Database\Eloquent\Model $modelClass */
         $modelClass = get_class(
             $builder->getModel()
@@ -35,7 +33,7 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
         /** @var \Laravel\Scout\Builder $builder */
         $builder = $modelClass::search($value);
 
-        if ($within !== null) {
+        if ($within = $this->directiveArgValue('within')) {
             $builder->within($within);
         }
 

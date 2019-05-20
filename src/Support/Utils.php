@@ -3,6 +3,8 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
+use ReflectionClass;
+use ReflectionException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class Utils
@@ -53,5 +55,28 @@ class Utils
         }
 
         return Closure::fromCallable([app($className), $methodName]);
+    }
+
+    /**
+     * Get the value of a protected member variable of an object.
+     *
+     * Returns a default value in case of error.
+     *
+     * @param  mixed  $object  Object with protected member.
+     * @param  string  $memberName  Name of object's protected member.
+     * @param  mixed|null  $default  Default value to return in case of access error.
+     * @return mixed  Value of object's protected member.
+     */
+    public static function accessProtected($object, string $memberName, $default = null)
+    {
+        try {
+            $reflection = new ReflectionClass($object);
+            $property = $reflection->getProperty($memberName);
+            $property->setAccessible(true);
+
+            return $property->getValue($object);
+        } catch (ReflectionException $ex) {
+            return $default;
+        }
     }
 }

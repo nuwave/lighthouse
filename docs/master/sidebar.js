@@ -107,7 +107,8 @@ module.exports = [{
             'guides/relationships',
             'guides/file-uploads',
             'guides/error-handling',
-            'guides/plugin-development'
+            'guides/plugin-development',
+            'guides/native-php-types'
         ]
     },
 ];

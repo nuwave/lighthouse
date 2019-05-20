@@ -5,7 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.5.3...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.6.1...master)
+
+### Added
+
+- Add compatibility layer to allow `@middleware` to support Lumen https://github.com/nuwave/lighthouse/pull/786
+- Add option `decode` to `@globaldId` to control the result of decoding https://github.com/nuwave/lighthouse/pull/796
+
+## [3.6.1](https://github.com/nuwave/lighthouse/compare/v3.6.0...v3.6.1)
+
+### Fixed
+
+- Use the spec-compliant default deprecation reason for `@deprecate` directive https://github.com/nuwave/lighthouse/pull/787
+
+## [3.6.0](https://github.com/nuwave/lighthouse/compare/v3.5.3...v3.6.0)
+
+### Added
+
+- Add `@whereConstraints` directive that offers flexible query capabilities to the client https://github.com/nuwave/lighthouse/pull/753
+- Add convenience wrapper for registering Enum types based on [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
+  https://github.com/nuwave/lighthouse/pull/779
+
+### Deprecated
+
+- The `controller` config option will be removed in v4 https://github.com/nuwave/lighthouse/pull/781
 
 ## [3.5.3](https://github.com/nuwave/lighthouse/compare/v3.5.2...v3.5.3)
 
