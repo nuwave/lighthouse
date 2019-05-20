@@ -109,7 +109,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
-        /** @deprecated */
+        /* @deprecated */
         $this->app->alias(GraphQL::class, 'graphql');
 
         $this->app->singleton(DirectiveFactory::class);
