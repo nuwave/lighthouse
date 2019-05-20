@@ -56,10 +56,10 @@ module.exports = [{
     {
         title: 'Security',
         children: [
-            ['security/getting-started', 'Getting Started'],
             'security/authentication',
             'security/authorization',
             'security/validation',
+            'security/resource-exhaustion',
         ]
     },
     {
