@@ -99,6 +99,7 @@ module.exports = [{
             'api-reference/resolvers',
             'api-reference/scalars',
             'api-reference/events',
+            'api-reference/commands',
         ]
     },
 

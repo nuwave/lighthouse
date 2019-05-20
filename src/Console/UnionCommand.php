@@ -16,7 +16,7 @@ class UnionCommand extends LighthouseGeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a class for an Union type.';
+    protected $description = 'Create a class for a GraphQL union type.';
 
     /**
      * The type of class being generated.
