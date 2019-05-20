@@ -17,23 +17,22 @@ module.exports = [{
         ]
     },
     {
-        title: 'Queries',
+        title: 'Eloquent',
         children: [
-            'queries/pagination',
-            'queries/resolvers',
-            'queries/relationships',
-            'queries/relay',
+            ['eloquent/getting-started', 'Getting Started'],
+            'eloquent/relationships',
+            'eloquent/nested-mutations',
         ]
     },
     {
-        title: 'Mutations',
+        title: "Testing",
         children: [
-            ['mutations/getting-started', 'Getting Started'],
-            'mutations/resolvers',
-            'mutations/relationships',
-            'mutations/relay',
-            'mutations/file-uploads',
-        ]
+            ['testing/getting-started', 'Getting Started'],
+            'testing/playground',
+            'testing/integration',
+            'testing/unit',
+            'testing/mocking',
+        ],
     },
     {
         title: 'Subscriptions',
@@ -42,6 +41,17 @@ module.exports = [{
             'subscriptions/defining-fields',
             'subscriptions/trigger-subscriptions',
             'subscriptions/filtering-subscriptions',
+        ]
+    },
+    {
+        title: 'Digging Deeper',
+        children: [
+            'digging-deeper/schema-organisation',
+            'digging-deeper/relay',
+            'digging-deeper/error-handling',
+            'digging-deeper/native-php-types',
+            'digging-deeper/file-uploads',
+            'digging-deeper/extending-lighthouse'
         ]
     },
     {
@@ -73,28 +83,6 @@ module.exports = [{
         ]
     },
     {
-        title: "Testing",
-        children: [
-            ['testing/getting-started', 'Getting Started'],
-            'testing/playground',
-            'testing/integration',
-            'testing/unit',
-            'testing/mocking',
-        ],
-    },
-    {
-        title: "Package Development",
-        children: [
-            ['package-development/getting-started', 'Getting Started'],
-            'package-development/schema',
-            'package-development/request',
-            'package-development/events',
-            'package-development/directives',
-            'package-development/resolver',
-
-        ],
-    },
-    {
         title: 'API Reference',
         children: [
             'api-reference/directives',
@@ -102,16 +90,6 @@ module.exports = [{
             'api-reference/scalars',
             'api-reference/events',
             'api-reference/commands',
-        ]
-    },
-
-    { // TODO: remove this section
-        title: 'Guides',
-        children: [
-            'guides/schema-organisation',
-            'guides/relay',
-            'guides/error-handling',
-            'guides/native-php-types'
         ]
     },
 ];

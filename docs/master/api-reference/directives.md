@@ -201,8 +201,6 @@ type User {
 
 ## @bcrypt
 
-***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.md#argtransformerdirective).
-
 Run the `bcrypt` function on the argument it is defined on.
 
 ```graphql
@@ -220,7 +218,7 @@ directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ## @broadcast
 
 Broadcast the results of a mutation to subscribed clients.
-[Read more about subscriptions](../extensions/subscriptions.md)
+[Read more about subscriptions](../subscriptions/getting-started.md)
 
 ```graphql
 type Mutation {
@@ -1859,7 +1857,7 @@ directive @spread on ARGUMENT_DEFINITION
 Reference a class to handle the broadcasting of a subscription to clients.
 The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
 
-If you follow the default naming conventions for [defining subscription fields](../extensions/subscriptions.md#defining-fields)
+If you follow the default naming conventions for [defining subscription fields](../subscriptions/defining-fields.md)
 you do not need this directive. It is only useful if you need to override the default namespace.
 
 ```graphql
@@ -2326,4 +2324,4 @@ This can be a useful optimization for fields that are not returned directly
 but rather used for resolving other fields.
 
 If you just want to return the relation itself as-is,
-look into [handling Eloquent relationships](../guides/relationships.md).
+look into [handling Eloquent relationships](../eloquent/relationships.md).

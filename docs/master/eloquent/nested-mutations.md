@@ -1,12 +1,9 @@
-# Eloquent Relationships
+# Nested Mutations
 
-[[toc]]
+Lighthouse allows you to create, update or delete models and their associated relationships
+all in one single mutation.
 
-## Introduction
-
-
-Lighthouse allows you to create, update or delete your relationships in
-a single mutation.
+## Return Types Required
 
 You have to define return types on your relationship methods so that Lighthouse
 can detect them.
@@ -30,14 +27,15 @@ class Post extends Model
 }
 ```
 
+## Partial Failure
+
 By default, all mutations are wrapped in a database transaction.
 If any of the nested operations fail, the whole mutation is aborted
 and no changes are written to the database.
+
 You can change this setting [in the configuration](../getting-started/configuration.md).
 
-## Defining Relationships
-
-### Belongs To
+## Belongs To
 
 We will start of by defining a mutation to create a post.
 
@@ -209,7 +207,7 @@ The `author` relationship will only be disconnected if the value of the variable
 }
 ```
 
-### Has Many
+## Has Many
 
 The counterpart to a `BelongsTo` relationship is `HasMany`. We will start
 of by defining a mutation to create an `User`.
@@ -349,7 +347,7 @@ mutation {
 }
 ```
 
-### Belongs To Many
+## Belongs To Many
 
 A belongs to many relation allows you to create new related models as well
 as attaching existing ones.
@@ -475,7 +473,7 @@ input CreateAuthorInput {
 }
 ```
 
-### MorphTo
+## MorphTo
 
 ```graphql
 type Mutation {
@@ -520,7 +518,7 @@ mutation {
 }
 ```
 
-### Morph To Many
+## Morph To Many
 
 A morph to many relation allows you to create new related models as well
 as attaching existing ones.

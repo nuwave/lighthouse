@@ -1,11 +1,6 @@
 # Eloquent Relationships
 
-[[toc]]
-
-## Introduction
-
-Eloquent relationships can be accessed just like any other properties.
-This makes it super easy to use in your schema.
+Just like in Laravel, you can define [Eloquent Relationships](https://laravel.com/docs/eloquent-relationships) in your schema.
 
 Suppose you have defined the following model:
 
@@ -41,21 +36,20 @@ type Post {
 }
 ```
 
-This approach is fine if performance is not super critical or if you only fetch a single post.
-However, as your queries become larger and more complex, you might want to optimize performance.
+Because Laravel relationships can be accessed just like regular properties on your model,
+the default field resolver will work just fine.
 
-## Defining Relationships
+## Avoiding the N+1 performance problem
 
-Just like in Laravel, you can define [Eloquent Relationships](https://laravel.com/docs/eloquent-relationships) in your schema.
+When accessing Eloquent relationships as properties, the relationship data is "lazy loaded".
+This means the relationship data is not actually loaded until you first access the property. 
+
+This leads to a common performance pitfall that comes with the nested nature of GraphQL queries:
+the so-called N+1 query problem. [Learn more](../performance/n-plus-one.md).
+
 Lighthouse has got you covered with specialized directives that optimize the Queries for you.
 
-Suppose you want to load a list of posts and associated comments. When you tell
-Lighthouse about the relationship, it automatically eager loads the comments when you need them.
-
-For special cases, you can use [`@with`](../api-reference/directives.md#with) to eager-load a relation
-without returning it directly.
-
-### One To One
+## One To One
 
 Use the [@hasOne](../api-reference/directives.md#hasone) directive to define a [one-to-one relationship](https://laravel.com/docs/eloquent-relationships#one-to-one)
 between two types in your schema.
@@ -74,7 +68,7 @@ type Phone {
 }
 ```
 
-### One To Many
+## One To Many
 
 Use the [@hasMany](../api-reference/directives.md#hasmany) directive to define a [one-to-many relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
 
@@ -92,7 +86,7 @@ type Comment {
 }
 ```
 
-### Many To Many
+## Many To Many
 
 While [many-to-many relationships](https://laravel.com/docs/eloquent-relationships#many-to-many)
 are a bit more work to set up in Laravel, defining them in Lighthouse is a breeze.
@@ -112,7 +106,7 @@ type Role {
 }
 ```
 
-## Defining custom names
+## Renaming relations
 
 When you define a relation, Lighthouse assumes that the field and the relationship
 method have the same name. If you need to name your field differently, you have to
