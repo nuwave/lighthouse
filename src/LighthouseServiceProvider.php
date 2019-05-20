@@ -60,8 +60,6 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
-
         $this->publishes([
             __DIR__.'/../config/config.php' => $this->app->make('path.config').DIRECTORY_SEPARATOR.'lighthouse.php',
         ], 'config');
@@ -108,7 +106,10 @@ class LighthouseServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
+
         $this->app->singleton(GraphQL::class);
+        /** @deprecated */
         $this->app->alias(GraphQL::class, 'graphql');
 
         $this->app->singleton(DirectiveFactory::class);
