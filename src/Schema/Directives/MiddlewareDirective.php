@@ -123,24 +123,6 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
     }
 
     /**
-     * @param  mixed  $middlewareArgValue
-     * @return \Illuminate\Support\Collection<string>
-     */
-    protected static function getQualifiedMiddlewareNames($middlewareArgValue): Collection
-    {
-        /** @var \Illuminate\Routing\Router $router */
-        $router = app('router');
-        $middleware = $router->getMiddleware();
-        $middlewareGroups = $router->getMiddlewareGroups();
-
-        return (new Collection($middlewareArgValue))
-            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
-                return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
-            })
-            ->flatten();
-    }
-
-    /**
      * Apply manipulations from a type definition node.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
