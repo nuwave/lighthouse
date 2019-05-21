@@ -30,7 +30,6 @@ module.exports = [{
             ['testing/getting-started', 'Getting Started'],
             'testing/playground',
             'testing/integration',
-            'testing/unit',
             'testing/mocking',
         ],
     },
