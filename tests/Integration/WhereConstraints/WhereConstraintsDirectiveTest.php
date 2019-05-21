@@ -222,7 +222,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                     [
                         'id' => $userNamedEmptyString->id,
                         'name' => $userNamedEmptyString->name,
-                    ]
+                    ],
                 ],
             ],
         ]);
