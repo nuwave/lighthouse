@@ -192,4 +192,25 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'message' => WhereConstraintsDirective::INVALID_COLUMN_MESSAGE,
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function itQueriesEmptyStrings(): void
+    {
+        $this->query('
+        {
+            users(
+                where: {
+                    column: "id"
+                    value: ""
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertExactJson([
+            'data' => ['users' => []],
+        ]);
+    }
 }

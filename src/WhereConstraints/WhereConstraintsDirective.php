@@ -61,11 +61,13 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
         }
 
         if ($column = $whereConstraints['column'] ?? null) {
-            if (! $value = $whereConstraints['value']) {
+            if (! isset($whereConstraints['value'])) {
                 throw new Error(
                     "Did not receive a value to match the WhereConstraints for column {$column}."
                 );
             }
+
+            $value = $whereConstraints['value'];
 
             if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
                 throw new Error(
