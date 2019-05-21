@@ -199,9 +199,10 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     public function itQueriesEmptyStrings(): void
     {
         factory(User::class, 3)->create();
-        $user = factory(User::class, 1)->create([
+        $users = factory(User::class, 1)->create([
             'name' => '',
         ]);
+
         $this->query('
         {
             users(
@@ -216,10 +217,12 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'users' => [
-                    'id'   => $user->id,
-                    'name' => $user->name,
-                ],
+                'users' => $users->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                    ];
+                })->all(),
             ],
         ]);
     }
