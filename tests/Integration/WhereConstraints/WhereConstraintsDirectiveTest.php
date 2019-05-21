@@ -198,19 +198,29 @@ class WhereConstraintsDirectiveTest extends DBTestCase
      */
     public function itQueriesEmptyStrings(): void
     {
+        factory(User::class, 3)->create();
+        $user = factory(User::class, 1)->create([
+            'name' => '',
+        ]);
         $this->query('
         {
             users(
                 where: {
-                    column: "id"
+                    column: "name"
                     value: ""
                 }
             ) {
                 id
+                name
             }
         }
-        ')->assertExactJson([
-            'data' => ['users' => []],
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'id'   => $user->id,
+                    'name' => $user->name,
+                ]
+            ],
         ]);
     }
 }
