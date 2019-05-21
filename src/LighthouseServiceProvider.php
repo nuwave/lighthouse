@@ -68,9 +68,7 @@ class LighthouseServiceProvider extends ServiceProvider
             __DIR__.'/../assets/default-schema.graphql' => $configRepository->get('lighthouse.schema.register'),
         ], 'schema');
 
-        if ($configRepository->get('lighthouse.controller')) {
-            $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
-        }
+        $this->loadRoutesFrom(__DIR__.'/Support/Http/routes.php');
 
         $validationFactory->resolver(
             function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {
