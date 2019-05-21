@@ -270,8 +270,9 @@ class GraphQL
         if (empty($this->documentAST)) {
             $this->documentAST = config('lighthouse.cache.enable')
                 ? app('cache')
-                    ->rememberForever(
+                    ->remember(
                         config('lighthouse.cache.key'),
+                        config('lighthouse.cache.ttl'),
                         function (): DocumentAST {
                             return $this->buildAST();
                         }
