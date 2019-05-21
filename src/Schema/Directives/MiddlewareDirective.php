@@ -23,6 +23,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
+use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 
 class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
 {
@@ -43,14 +44,23 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
     protected $createsContext;
 
     /**
+     * @var \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter
+     */
+    private $middlewareAdapter;
+
+    /**
+     * Create a new middleware directive instance.
+     *
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
+     * @param  \Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter  $middlewareAdapter
      * @return void
      */
-    public function __construct(Pipeline $pipeline, CreatesContext $createsContext)
+    public function __construct(Pipeline $pipeline, CreatesContext $createsContext, MiddlewareAdapter $middlewareAdapter)
     {
         $this->pipeline = $pipeline;
         $this->createsContext = $createsContext;
+        $this->middlewareAdapter = $middlewareAdapter;
     }
 
     /**
@@ -94,6 +104,22 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
                 }
             )
         );
+    }
+
+    /**
+     * @param  string|string[]  $middlewareArgValue
+     * @return \Illuminate\Support\Collection<string>
+     */
+    protected function getQualifiedMiddlewareNames($middlewareArgValue): Collection
+    {
+        $middleware = $this->middlewareAdapter->getMiddleware();
+        $middlewareGroups = $this->middlewareAdapter->getMiddlewareGroups();
+
+        return (new Collection($middlewareArgValue))
+            ->map(function (string $name) use ($middleware, $middlewareGroups): array {
+                return (array) MiddlewareNameResolver::resolve($name, $middleware, $middlewareGroups);
+            })
+            ->flatten();
     }
 
     /**

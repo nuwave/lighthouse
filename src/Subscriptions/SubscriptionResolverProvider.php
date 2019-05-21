@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Schema\Directives\SubscriptionDirective;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 use Nuwave\Lighthouse\Subscriptions\Exceptions\UnauthorizedSubscriber;
 
@@ -44,7 +45,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
     {
         $fieldName = $fieldValue->getFieldName();
 
-        if ($directive = ASTHelper::directiveDefinition($fieldValue->getField(), 'subscription')) {
+        if ($directive = ASTHelper::directiveDefinition($fieldValue->getField(), SubscriptionDirective::NAME)) {
             $className = ASTHelper::directiveArgValue($directive, 'class');
         } else {
             $className = Str::studly($fieldName);
