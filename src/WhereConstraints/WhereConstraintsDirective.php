@@ -67,8 +67,6 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
                 );
             }
 
-            $value = $whereConstraints['value'];
-
             if (! \Safe\preg_match('/^(?![0-9])[A-Za-z0-9_-]*$/', $column)) {
                 throw new Error(
                     self::INVALID_COLUMN_MESSAGE
@@ -82,7 +80,7 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
             $builder->{$where}(
                 $column,
                 $whereConstraints['operator'],
-                $value
+                $whereConstraints['value']
             );
         }
 
