@@ -47,7 +47,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(
                 where: {
@@ -68,7 +68,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(
                 where: {
@@ -90,7 +90,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(
                 where: {
@@ -121,7 +121,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(
                 where: {
@@ -150,7 +150,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     {
         factory(User::class, 3)->create();
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(
                 where: {
@@ -173,7 +173,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
      */
     public function itRejectsInvalidColumnName(): void
     {
-        $result = $this->query('
+        $result = $this->queryGraphQL('
         {
             users(
                 where: {

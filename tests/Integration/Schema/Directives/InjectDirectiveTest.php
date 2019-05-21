@@ -35,7 +35,7 @@ class InjectDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             createTask(input: {
                 name: "foo"

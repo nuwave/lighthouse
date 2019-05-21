@@ -28,7 +28,7 @@ class SpreadDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user(input: {
                 id: 2
@@ -66,7 +66,7 @@ class SpreadDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user{
                 id

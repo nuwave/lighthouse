@@ -45,7 +45,7 @@ class LaravelEnumTypeTest extends DBTestCase
             'type' => 'Administrator',
         ];
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             createUser(type: Administrator) {
                 type
@@ -53,7 +53,7 @@ class LaravelEnumTypeTest extends DBTestCase
         }
         ')->assertJsonFragment($typeAdmistrator);
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user(type: Administrator) {
                 type

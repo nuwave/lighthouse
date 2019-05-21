@@ -27,7 +27,7 @@ class InjectDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             me {
                 id

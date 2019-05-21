@@ -25,7 +25,7 @@ class ManipulateResultTest extends TestCase
             }
         );
 
-        $this->query('
+        $this->queryGraphQL('
         {
             foo
         }

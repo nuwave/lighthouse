@@ -19,7 +19,7 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             bar
         }        
@@ -41,7 +41,7 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             bar
         }        
@@ -63,7 +63,7 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             bar
         }        
@@ -87,7 +87,7 @@ class FieldDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             bar
         }        

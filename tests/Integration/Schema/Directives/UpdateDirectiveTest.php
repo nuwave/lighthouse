@@ -30,7 +30,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateCompany(
                 id: 1
@@ -76,7 +76,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateCompany(input: {
                 id: 1
@@ -118,7 +118,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateCategory(
                 category_id: 1
@@ -178,7 +178,7 @@ class UpdateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateUser(input: {
                 id: 1

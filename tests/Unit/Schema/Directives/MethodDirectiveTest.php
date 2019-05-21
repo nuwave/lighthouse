@@ -22,7 +22,7 @@ class MethodDirectiveTest extends TestCase
      */
     public function itWillCallAMethodToResolveField(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         {
             foo {
                 bar
@@ -42,7 +42,7 @@ class MethodDirectiveTest extends TestCase
      */
     public function itWillCallAMethodWithArgsToResolveField(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         {
             foo {
                 bar(baz: "asdf")

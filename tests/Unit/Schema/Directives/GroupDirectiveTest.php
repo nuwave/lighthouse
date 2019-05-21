@@ -23,7 +23,7 @@ class GroupDirectiveTest extends TestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->queryGraphQL('
         {
             me
         }
@@ -33,7 +33,7 @@ class GroupDirectiveTest extends TestCase
             ],
         ]);
 
-        $this->query('
+        $this->queryGraphQL('
         {
             you
         }
@@ -55,7 +55,7 @@ class GroupDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             me
         }
@@ -83,7 +83,7 @@ class GroupDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             withFoo
             withNothing

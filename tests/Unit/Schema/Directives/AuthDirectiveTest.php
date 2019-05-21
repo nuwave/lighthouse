@@ -25,7 +25,7 @@ class AuthDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 foo
@@ -59,7 +59,7 @@ class AuthDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 foo

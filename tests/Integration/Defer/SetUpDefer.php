@@ -33,7 +33,7 @@ trait SetUpDefer
      */
     protected function getStreamedChunks(string $query): array
     {
-        $this->query($query)
+        $this->queryGraphQL($query)
             ->baseResponse
             ->send();
 

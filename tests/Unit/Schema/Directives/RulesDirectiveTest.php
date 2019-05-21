@@ -71,7 +71,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanValidateQueryRootFieldArguments(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         {
             foo {
                 first_name
@@ -102,7 +102,7 @@ class RulesDirectiveTest extends TestCase
                 'foo' => null,
             ],
         ])->assertJson(
-            $this->query('
+            $this->queryGraphQL('
         mutation {
             foo {
                 first_name
@@ -117,7 +117,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanReturnValidFieldsAndErrorMessagesForInvalidFields(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         {
             foo(bar: "foo") {
                 first_name
@@ -147,7 +147,7 @@ class RulesDirectiveTest extends TestCase
                 ],
             ],
         ])->assertJson(
-            $this->query('
+            $this->queryGraphQL('
         mutation {
             foo(bar: "foo") {
                 first_name
@@ -164,7 +164,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanValidateRootMutationFieldArgs(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             foo {
                 first_name
@@ -178,7 +178,7 @@ class RulesDirectiveTest extends TestCase
             ],
         ])->assertJsonCount(1, 'errors')
         ->assertJson(
-            $this->query('
+            $this->queryGraphQL('
         {
             foo {
                 first_name
@@ -195,7 +195,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanValidateArrayType(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         {
             foo(bar: "got it") {
                 input_object(
@@ -259,7 +259,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanReturnCorrectValidationForInputObjects(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         {
             foo(bar: "got it") {
                 input_object(

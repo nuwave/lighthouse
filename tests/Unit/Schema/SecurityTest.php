@@ -64,7 +64,7 @@ class SecurityTest extends TestCase
 
     protected function assertMaxQueryComplexityIs1(): void
     {
-        $result = $this->query('
+        $result = $this->queryGraphQL('
         {
             user {
                 name
@@ -80,7 +80,7 @@ class SecurityTest extends TestCase
 
     protected function assertMaxQueryDepthIs1(): void
     {
-        $result = $this->query('
+        $result = $this->queryGraphQL('
         {
             user {
                 user {
@@ -100,7 +100,7 @@ class SecurityTest extends TestCase
 
     protected function assertIntrospectionIsDisabled(): void
     {
-        $result = $this->query('
+        $result = $this->queryGraphQL('
         {
             __schema {
                 queryType {

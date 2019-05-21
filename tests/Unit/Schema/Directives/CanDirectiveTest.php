@@ -31,7 +31,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name
@@ -65,7 +65,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name
@@ -105,7 +105,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name
@@ -145,7 +145,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name
@@ -181,7 +181,7 @@ class CanDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name

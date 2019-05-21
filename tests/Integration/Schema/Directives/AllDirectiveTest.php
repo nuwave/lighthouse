@@ -26,7 +26,7 @@ class AllDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users {
                 id
@@ -60,7 +60,7 @@ class AllDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users {
                 posts {
@@ -115,7 +115,7 @@ class AllDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(name: "'.$userName.'") {
                 id

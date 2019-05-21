@@ -25,7 +25,7 @@ class ClientDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             foo @filter(key: "baz")
         }

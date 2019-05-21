@@ -37,7 +37,7 @@ class DeprecatedDirectiveTest extends TestCase
             }
         }
         ';
-        $this->query($introspectionQuery)
+        $this->queryGraphQL($introspectionQuery)
             ->assertJsonCount(1, 'data.__schema.queryType.fields');
 
         $includeDeprecatedIntrospectionQuery = '
@@ -53,7 +53,7 @@ class DeprecatedDirectiveTest extends TestCase
             }
         }
         ';
-        $result = $this->query($includeDeprecatedIntrospectionQuery);
+        $result = $this->queryGraphQL($includeDeprecatedIntrospectionQuery);
 
         $deprecatedFields = Arr::where(
             $result->jsonGet('data.__schema.queryType.fields'),
@@ -73,7 +73,7 @@ class DeprecatedDirectiveTest extends TestCase
             'Should fallback to the default deprecation reason'
         );
 
-        $this->query('
+        $this->queryGraphQL('
         {
             foo
         }

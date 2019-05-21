@@ -40,7 +40,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         ";
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name
@@ -74,7 +74,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         ";
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name
@@ -111,7 +111,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         ";
 
-        $this->query('
+        $this->queryGraphQL('
         {
             user {
                 name
@@ -146,7 +146,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(count: 5) {
                 data {
@@ -212,13 +212,13 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $firstResponse = $this->query($query);
+        $firstResponse = $this->queryGraphQL($query);
 
         $posts = $this->cache->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $cachedResponse = $this->query($query);
+        $cachedResponse = $this->queryGraphQL($query);
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(
@@ -279,13 +279,13 @@ class CacheDirectiveTest extends DBTestCase
             }
         });
 
-        $firstResponse = $this->query($query);
+        $firstResponse = $this->queryGraphQL($query);
 
         $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
-        $cachedResponse = $this->query($query);
+        $cachedResponse = $this->queryGraphQL($query);
 
         $this->assertSame(1, $dbQueryCountForPost, 'This query should only run once and be cached on the second run.');
         $this->assertSame(

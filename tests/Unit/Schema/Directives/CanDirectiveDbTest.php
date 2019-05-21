@@ -38,7 +38,7 @@ class CanDirectiveDbTest extends DBTestCase
         }
         ';
 
-        $this->query("
+        $this->queryGraphQL("
         {
             user(id: {$user->getKey()}) {
                 name
@@ -89,7 +89,7 @@ class CanDirectiveDbTest extends DBTestCase
         }
         ';
 
-        $this->query("
+        $this->queryGraphQL("
         {
             post(id: {$postB->getKey()}) {
                 title

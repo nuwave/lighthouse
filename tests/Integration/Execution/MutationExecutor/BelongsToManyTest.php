@@ -73,7 +73,7 @@ class BelongsToManyTest extends DBTestCase
      */
     public function itCanCreateWithNewBelongsToMany(): void
     {
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -118,7 +118,7 @@ class BelongsToManyTest extends DBTestCase
         factory(User::class)->create(['name' => 'user_one']);
         factory(User::class)->create(['name' => 'user_two']);
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             createRole(input: {
                 name: "foobar"
@@ -165,7 +165,7 @@ class BelongsToManyTest extends DBTestCase
             'name' => 'is_admin',
         ]);
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateRole(input: {
                 id: 1
@@ -226,7 +226,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateRole(input: {
                 id: 1
@@ -289,7 +289,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateRole(input: {
                 id: 1
@@ -341,7 +341,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateRole(input: {
                 id: 1
@@ -390,7 +390,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class)->create()
             );
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateRole(input: {
                 id: 1
@@ -438,7 +438,7 @@ class BelongsToManyTest extends DBTestCase
                 factory(User::class, 2)->create()
             );
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             updateRole(input: {
                 id: 1
@@ -480,7 +480,7 @@ class BelongsToManyTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->query('
+        $this->queryGraphQL('
         mutation {
             createRole(input: {
                 name: "foobar"

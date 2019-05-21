@@ -29,7 +29,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $this->query($query)->assertJson([
+        $this->queryGraphQL($query)->assertJson([
             'data' => [
                 'foo' => 1,
             ],
@@ -70,7 +70,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             foo
         }
@@ -100,7 +100,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             foo
         }
@@ -127,7 +127,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             foo
         }
@@ -155,7 +155,7 @@ class MiddlewareDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->queryGraphQL('
         {
             foo
             pass

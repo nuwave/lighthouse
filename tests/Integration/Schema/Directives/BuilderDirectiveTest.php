@@ -26,7 +26,7 @@ class BuilderDirectiveTest extends DBTestCase
 
         factory(User::class, 2)->create();
 
-        $this->query('
+        $this->queryGraphQL('
         {
             users(limit: 1) {
                 id
