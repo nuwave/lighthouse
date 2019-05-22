@@ -21,3 +21,7 @@ sidebar: false
 
 - [mll-lab/laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground)
 - [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars)
+
+## Clientside packages
+
+- [Buoy - A Lighthouse-client for Angular](https://ngx-buoy.com)
