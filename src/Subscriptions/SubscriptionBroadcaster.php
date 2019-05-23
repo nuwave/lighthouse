@@ -40,7 +40,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     protected $broadcastManager;
 
     /**
-     * @var \Illuminate\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventsDispatcher;
 
@@ -50,7 +50,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator  $iterator
      * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
-     * @param  \Illuminate\Events\Dispatcher  $eventsDispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
      * @return void
      */
     public function __construct(
