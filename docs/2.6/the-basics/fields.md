@@ -16,12 +16,12 @@ type Query {
 ```
 
 You need to implement the actual resolver next. Lighthouse looks for a class with the capitalized name of the
-field in `App\Http\GraphQL\Queries` and calls its `resolve` function.
+field in `App\GraphQL\Queries` and calls its `resolve` function.
 
 ```php
 <?php
 
-namespace App\Http\GraphQL\Queries;
+namespace App\GraphQL\Queries;
 
 class Hello
 {
