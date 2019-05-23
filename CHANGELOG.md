@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix querying for falsy values through `@whereConstraints` https://github.com/nuwave/lighthouse/pull/800
+- Use `Illuminate\Contracts\Events\Dispatcher` instead of concrete implementation in SubscriptionBroadcaster https://github.com/nuwave/lighthouse/pull/805
 
 ## [3.6.1](https://github.com/nuwave/lighthouse/compare/v3.6.0...v3.6.1)
 
