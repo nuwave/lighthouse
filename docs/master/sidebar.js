@@ -27,7 +27,6 @@ module.exports = [{
     {
         title: "Testing",
         children: [
-            ['testing/getting-started', 'Getting Started'],
             'testing/playground',
             'testing/integration',
             'testing/mocking',
