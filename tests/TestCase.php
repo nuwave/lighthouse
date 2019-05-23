@@ -58,43 +58,54 @@ abstract class TestCase extends BaseTestCase
             }
         );
 
-        $app['config']->set('lighthouse', [
-            'namespaces' => [
-                'models' => [
-                    'Tests\\Utils\\Models',
-                    'Tests\\Utils\\ModelsSecondary',
-                ],
-                'queries' => [
-                    'Tests\\Utils\\Queries',
-                    'Tests\\Utils\\QueriesSecondary',
-                ],
-                'mutations' => [
-                    'Tests\\Utils\\Mutations',
-                    'Tests\\Utils\\MutationsSecondary',
-                ],
-                'subscriptions' => 'Tests\\Utils\\Subscriptions',
-                'interfaces' => [
-                    'Tests\\Utils\\Interfaces',
-                    'Tests\\Utils\\InterfacesSecondary',
-                ],
-                'scalars' => [
-                    'Tests\\Utils\\Scalars',
-                    'Tests\\Utils\\ScalarsSecondary',
-                ],
-                'unions' => [
-                    'Tests\\Utils\\Unions',
-                    'Tests\\Utils\\UnionsSecondary',
-                ],
+        /** @var \Illuminate\Config\Repository $config */
+        $config = $app['config'];
+
+        $config->set('lighthouse.namespaces', [
+            'models' => [
+                'Tests\\Utils\\Models',
+                'Tests\\Utils\\ModelsSecondary',
             ],
-            'debug' => Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE /*| Debug::RETHROW_INTERNAL_EXCEPTIONS*/ | Debug::RETHROW_UNSAFE_EXCEPTIONS,
-            'subscriptions' => [
-                'storage' => 'array',
-                'broadcaster' => 'log',
+            'queries' => [
+                'Tests\\Utils\\Queries',
+                'Tests\\Utils\\QueriesSecondary',
             ],
-            'pagination_amount_argument' => 'count',
+            'mutations' => [
+                'Tests\\Utils\\Mutations',
+                'Tests\\Utils\\MutationsSecondary',
+            ],
+            'subscriptions' => 'Tests\\Utils\\Subscriptions',
+            'interfaces' => [
+                'Tests\\Utils\\Interfaces',
+                'Tests\\Utils\\InterfacesSecondary',
+            ],
+            'scalars' => [
+                'Tests\\Utils\\Scalars',
+                'Tests\\Utils\\ScalarsSecondary',
+            ],
+            'unions' => [
+                'Tests\\Utils\\Unions',
+                'Tests\\Utils\\UnionsSecondary',
+            ],
         ]);
 
-        $app['config']->set('app.debug', true);
+        $config->set(
+            'lighthouse.debug',
+            Debug::INCLUDE_DEBUG_MESSAGE
+            | Debug::INCLUDE_TRACE
+            /*| Debug::RETHROW_INTERNAL_EXCEPTIONS*/
+            | Debug::RETHROW_UNSAFE_EXCEPTIONS
+        );
+
+        $config->set(
+            'lighthouse.subscriptions',
+            [
+                'storage' => 'array',
+                'broadcaster' => 'log',
+            ]
+        );
+
+        $config->set('app.debug', true);
 
         TestResponse::macro(
             'assertErrorCategory',

@@ -32,14 +32,3 @@ composer require mll-lab/laravel-graphql-playground
 
 You can also use any external client with Lighthouse, make sure to point it to the URL defined in
 the config. Per default, the endpoint lives at `/graphql` 
-
-## Using the Facade
-
-If you want to use the GraphQL facade, add it to your `config/app.php` file
-
-```php
-'aliases' => [
-    // ...
-    'GraphQL' => Nuwave\Lighthouse\Support\Facades\GraphQLFacade::class,
-]
-```

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix querying for falsy values through `@whereConstraints` https://github.com/nuwave/lighthouse/pull/800
 
+### Deprecated
+
+- The `GraphQL` facade and the container alias `graphql` will be removed in v4 
+
 ## [3.6.1](https://github.com/nuwave/lighthouse/compare/v3.6.0...v3.6.1)
 
 ### Fixed
