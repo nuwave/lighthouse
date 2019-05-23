@@ -1,4 +1,4 @@
-# File Uploads
+# Uploading files
 
 Lighthouse allows you to upload files using a multipart form request
 as defined in [graphql-multipart-request-spec](https://github.com/jaydenseric/graphql-multipart-request-spec).
