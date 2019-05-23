@@ -4,6 +4,9 @@ namespace Nuwave\Lighthouse\Support\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * @deprecated will be removed in v4
+ */
 class GraphQLFacade extends Facade
 {
     /**

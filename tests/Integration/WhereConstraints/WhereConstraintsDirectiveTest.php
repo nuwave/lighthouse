@@ -173,7 +173,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
      */
     public function itRejectsInvalidColumnName(): void
     {
-        $result = $this->query('
+        $this->query('
         {
             users(
                 where: {
@@ -190,6 +190,41 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         }
         ')->assertJsonFragment([
             'message' => WhereConstraintsDirective::INVALID_COLUMN_MESSAGE,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itQueriesEmptyStrings(): void
+    {
+        factory(User::class, 3)->create();
+
+        $userNamedEmptyString = factory(User::class)->create([
+            'name' => '',
+        ]);
+
+        $this->query('
+        {
+            users(
+                where: {
+                    column: "name"
+                    value: ""
+                }
+            ) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => $userNamedEmptyString->id,
+                        'name' => $userNamedEmptyString->name,
+                    ],
+                ],
+            ],
         ]);
     }
 }
