@@ -76,7 +76,7 @@ trait MakesGraphQLRequests
     }
 
     /**
-     * Send a multipart form request.
+     * Send a multipart form request to GraphQL.
      *
      * This is used for file uploads conforming to the specification:
      * https://github.com/jaydenseric/graphql-multipart-request-spec
@@ -85,7 +85,7 @@ trait MakesGraphQLRequests
      * @param  mixed[]  $files
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    protected function postGraphQLMultipart(array $parameters, array $files): TestResponse
+    protected function multipartGraphQL(array $parameters, array $files): TestResponse
     {
         return $this->call(
             'POST',
