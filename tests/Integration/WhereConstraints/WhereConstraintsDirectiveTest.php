@@ -204,7 +204,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'name' => '',
         ]);
 
-        $this->query('
+        $this->graphQL('
         {
             users(
                 where: {
