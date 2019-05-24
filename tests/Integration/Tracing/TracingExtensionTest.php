@@ -26,7 +26,7 @@ SCHEMA;
      */
     public function itCanAddTracingExtensionMetaToResult(): void
     {
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             foo
         }

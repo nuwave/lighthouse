@@ -17,7 +17,7 @@ class MultipleRequestsTest extends TestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             return(this: "foo")
         }
@@ -27,7 +27,7 @@ class MultipleRequestsTest extends TestCase
             ],
         ]);
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             return(this: "bar")
         }

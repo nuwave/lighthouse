@@ -48,7 +48,7 @@ class NodeInterfaceTest extends DBTestCase
         $firstGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[1]['id']);
         $secondGlobalId = $this->globalIdResolver->encode('User', $this->testTuples[2]['id']);
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             first: node(id: "'.$firstGlobalId.'") {
                 id
@@ -102,7 +102,7 @@ class NodeInterfaceTest extends DBTestCase
         );
         $globalId = $this->globalIdResolver->encode('User', $user->getKey());
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             node(id: "'.$globalId.'") {
                 id

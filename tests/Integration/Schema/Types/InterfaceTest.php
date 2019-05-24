@@ -38,7 +38,7 @@ class InterfaceTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             namedThings {
                 name
@@ -84,7 +84,7 @@ class InterfaceTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             namedThings {
                 name
@@ -127,7 +127,7 @@ class InterfaceTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryGraphQL('{
+        $result = $this->graphQL('{
             __schema {
                 types {
                     kind

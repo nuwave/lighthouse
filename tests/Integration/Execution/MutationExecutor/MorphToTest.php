@@ -46,7 +46,7 @@ class MorphToTest extends DBTestCase
     {
         factory(Task::class)->create(['name' => 'first_task']);
 
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation {
             createHour(input: {
                 hourable_type: "Tests\\\Utils\\\Models\\\Task"

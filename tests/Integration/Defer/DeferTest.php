@@ -424,7 +424,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->queryGraphQL('
+        $this->graphQL('
         { 
             user {
                 name
@@ -471,7 +471,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->queryGraphQL('
+        $this->graphQL('
         { 
             user {
                 name
@@ -518,7 +518,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->queryGraphQL('
+        $this->graphQL('
         fragment UserWithParent on User {
             name
             parent {
@@ -574,7 +574,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation UpdateUser {
             updateUser(name: "John Doe") {
                 name 
@@ -613,7 +613,7 @@ class DeferTest extends TestCase
         }
         ";
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 name

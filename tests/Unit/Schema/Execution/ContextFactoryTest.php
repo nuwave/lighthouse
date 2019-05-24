@@ -59,7 +59,7 @@ class ContextFactoryTest extends TestCase
         }
         ";
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             context
         }

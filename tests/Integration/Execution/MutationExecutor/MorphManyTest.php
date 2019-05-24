@@ -67,7 +67,7 @@ class MorphManyTest extends DBTestCase
      */
     public function itCanCreateWithNewMorphMany(): void
     {
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -106,7 +106,7 @@ class MorphManyTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -151,7 +151,7 @@ class MorphManyTest extends DBTestCase
                 factory(Hour::class)->create()
             );
 
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -197,7 +197,7 @@ class MorphManyTest extends DBTestCase
                 factory(Hour::class)->create()
             );
 
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1

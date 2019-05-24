@@ -22,7 +22,7 @@ class RenameDirectiveTest extends TestCase
         }
         ";
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             bar {
                 bar
@@ -55,7 +55,7 @@ class RenameDirectiveTest extends TestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             fooBar
         }

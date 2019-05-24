@@ -64,7 +64,7 @@ class BelongsToTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 company {
@@ -104,7 +104,7 @@ class BelongsToTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 account {
@@ -149,7 +149,7 @@ class BelongsToTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 company {
@@ -202,7 +202,7 @@ class BelongsToTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             products(count: 2) {     
                 data{

@@ -61,7 +61,7 @@ class QueryFilterTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(count: 5 start: "'.$start.'" end: "'.$end.'") {
                 data {
@@ -103,7 +103,7 @@ class QueryFilterTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(count: 5 start: "'.$start.'" end: "'.$end.'") {
                 data {

@@ -26,7 +26,7 @@ class UnionTest extends DBTestCase
 
         $this->schema = $schema;
 
-        $this->queryGraphQL($query)->assertJsonStructure([
+        $this->graphQL($query)->assertJsonStructure([
             'data' => [
                 'stuff' => [
                     [

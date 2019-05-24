@@ -28,7 +28,7 @@ class ManipulatingASTTest extends TestCase
             );
         });
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             foo
         }

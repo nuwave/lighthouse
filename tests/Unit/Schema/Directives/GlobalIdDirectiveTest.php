@@ -31,7 +31,7 @@ class GlobalIdDirectiveTest extends TestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             foo
         }        
@@ -65,7 +65,7 @@ class GlobalIdDirectiveTest extends TestCase
 
         $globalId = $this->globalId->encode('Foo', 'bar');
 
-        $this->queryGraphQL("
+        $this->graphQL("
         {
             foo(
                 type: \"{$globalId}\"

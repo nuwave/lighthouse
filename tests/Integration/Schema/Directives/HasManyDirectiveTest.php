@@ -68,7 +68,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertSame(4, $tasksWithoutGlobalScope);
 
         // Ensure global scopes are respected here
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 tasks {
@@ -101,7 +101,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 tasks(foo: 2) {
@@ -136,7 +136,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 tasks(count: 2) {
@@ -187,7 +187,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             user {
                 tasks(count: 5) {
@@ -225,7 +225,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 id
@@ -267,7 +267,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             user {
                 tasks(first: 5) {
@@ -308,7 +308,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             user {
                 tasks(count: 3) {
@@ -347,7 +347,7 @@ class HasManyDirectiveTest extends DBTestCase
          }
          ';
 
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             user {
                 tasks(first: 3) {
@@ -386,7 +386,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 tasks {
@@ -435,7 +435,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 tasks(first: 2) {
@@ -482,7 +482,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 tasks {
@@ -530,7 +530,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         { 
             user { 
                 tasks(first: 2) { 
@@ -598,7 +598,7 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         { 
             posts {
                 id

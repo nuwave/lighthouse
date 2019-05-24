@@ -22,7 +22,7 @@ class TrimDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation {
             createCompany(name: "    foo     ") {
                 id

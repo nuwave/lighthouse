@@ -50,7 +50,7 @@ trait MakesGraphQLRequests
      * @param  string  $query
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    protected function queryGraphQL(string $query): TestResponse
+    protected function graphQL(string $query): TestResponse
     {
         return $this->postGraphQL(
             [

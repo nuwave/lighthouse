@@ -62,7 +62,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 roles {
@@ -93,7 +93,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 roles(count: 2) {
@@ -143,7 +143,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user {
                 roles(first: 2) {
@@ -202,7 +202,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         { 
             user { 
                 roles(first: 2) { 

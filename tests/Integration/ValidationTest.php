@@ -82,7 +82,7 @@ class ValidationTest extends TestCase
      */
     public function itValidatesDifferentPathsIndividually(): void
     {
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             foo(
                 input: [
@@ -118,7 +118,7 @@ class ValidationTest extends TestCase
      */
     public function itValidatesList(): void
     {
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             foo(
                 list: [
@@ -143,7 +143,7 @@ class ValidationTest extends TestCase
      */
     public function itValidatesInputCount(): void
     {
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             foo(
                 stringList: [
@@ -184,7 +184,7 @@ class ValidationTest extends TestCase
      */
     public function itPassesIfNothingRequiredIsMissing(): void
     {
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             foo(required: "foo")
         }
@@ -200,7 +200,7 @@ class ValidationTest extends TestCase
      */
     public function itEvaluatesArgDirectivesInDefinitionOrder(): void
     {
-        $validPasswordResult = $this->queryGraphQL('
+        $validPasswordResult = $this->graphQL('
         {
             password(password: " 1234567 ")
         }
@@ -210,7 +210,7 @@ class ValidationTest extends TestCase
         $this->assertNotSame(' 1234567 ', $password);
         $this->assertTrue(password_verify('1234567', $password));
 
-        $invalidPasswordResult = $this->queryGraphQL('
+        $invalidPasswordResult = $this->graphQL('
         {
             password(password: " 1234 ")
         }
@@ -228,7 +228,7 @@ class ValidationTest extends TestCase
      */
     public function itEvaluatesConditionalValidation(): void
     {
-        $validPasswordResult = $this->queryGraphQL('
+        $validPasswordResult = $this->graphQL('
         {
             password
         }
@@ -236,7 +236,7 @@ class ValidationTest extends TestCase
 
         $this->assertSame('no-password', $validPasswordResult->jsonGet('data.password'));
 
-        $invalidPasswordResult = $this->queryGraphQL('
+        $invalidPasswordResult = $this->graphQL('
         {
             password(id: "foo")
         }
@@ -254,7 +254,7 @@ class ValidationTest extends TestCase
      */
     public function itEvaluatesInputArgValidation(): void
     {
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             password(id: "bar", password: "123456")
         }
@@ -272,7 +272,7 @@ class ValidationTest extends TestCase
      */
     public function itEvaluatesNonNullInputArgValidation(): void
     {
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             email(
                 userId: 1
@@ -288,7 +288,7 @@ class ValidationTest extends TestCase
             ],
         ]);
 
-        $invalidEmailResult = $this->queryGraphQL('
+        $invalidEmailResult = $this->graphQL('
         {
             email(
                 userId: 1
@@ -313,7 +313,7 @@ class ValidationTest extends TestCase
      */
     public function itErrorsIfSomethingRequiredIsMissing(): void
     {
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             foo
         }

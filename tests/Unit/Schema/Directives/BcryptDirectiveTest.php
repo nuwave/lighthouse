@@ -27,7 +27,7 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $passwordFromMutation = $this->queryGraphQL('
+        $passwordFromMutation = $this->graphQL('
         mutation {
             foo(bar: "password"){
                 bar
@@ -38,7 +38,7 @@ class BcryptDirectiveTest extends TestCase
         $this->assertNotSame('password', $passwordFromMutation);
         $this->assertTrue(password_verify('password', $passwordFromMutation));
 
-        $passwordFromQuery = $this->queryGraphQL('
+        $passwordFromQuery = $this->graphQL('
         {
             foo(bar: "123"){
                 bar
@@ -74,7 +74,7 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         query {
             user(input: {
                 password: "password"

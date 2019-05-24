@@ -51,7 +51,7 @@ class BuildSchemaStringTest extends TestCase
             foo
         }
         ';
-        $this->queryGraphQL($queryForBaseSchema)->assertJson([
+        $this->graphQL($queryForBaseSchema)->assertJson([
             'data' => [
                 'foo' => 'foo',
             ],
@@ -62,7 +62,7 @@ class BuildSchemaStringTest extends TestCase
             sayHello
         }
         ';
-        $this->queryGraphQL($queryForAdditionalSchema)->assertJson([
+        $this->graphQL($queryForAdditionalSchema)->assertJson([
             'data' => [
                 'sayHello' => 'hello',
             ],

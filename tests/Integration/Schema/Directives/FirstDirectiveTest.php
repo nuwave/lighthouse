@@ -27,7 +27,7 @@ class FirstDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'B']);
         $userC = factory(User::class)->create(['name' => 'C']);
 
-        $this->queryGraphQL("
+        $this->graphQL("
         {
             user(id: {$userB->id}){
                 name
@@ -62,7 +62,7 @@ class FirstDirectiveTest extends DBTestCase
         $userB = factory(User::class)->create(['name' => 'A']);
         $userC = factory(User::class)->create(['name' => 'B']);
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             user(name: "A") {
                 id

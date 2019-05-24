@@ -65,7 +65,7 @@ class SearchDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             posts(count: 10 search: "great") {
                 data {
@@ -135,7 +135,7 @@ class SearchDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             posts(count: 10 search: "great") {
                 data {
@@ -201,7 +201,7 @@ class SearchDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             posts(count: 10 search: "great") {
                 data {

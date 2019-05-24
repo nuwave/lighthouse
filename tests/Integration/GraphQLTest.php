@@ -69,7 +69,7 @@ class GraphQLTest extends DBTestCase
      */
     public function itResolvesQueryViaPostRequest(): void
     {
-        $this->queryGraphQL('
+        $this->graphQL('
         query UserWithTasks {
             user {
                 email
@@ -203,7 +203,7 @@ class GraphQLTest extends DBTestCase
      */
     public function itRejectsInvalidQuery(): void
     {
-        $result = $this->queryGraphQL('
+        $result = $this->graphQL('
         {
             nonExistingField
         }

@@ -43,7 +43,7 @@ class EventDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->queryGraphQL('
+        $this->graphQL('
         mutation {
             createCompany(name: "foo") {
                 id

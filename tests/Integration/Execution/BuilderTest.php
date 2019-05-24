@@ -47,7 +47,7 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(id: '.$this->users->first()->getKey().') {
                 id
@@ -71,7 +71,7 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(
                 input: {
@@ -95,7 +95,7 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(id: '.$this->users->first()->getKey().') {
                 id
@@ -118,7 +118,7 @@ class BuilderTest extends DBTestCase
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(include: ['.$user1.', '.$user2.']) {
                 id
@@ -141,7 +141,7 @@ class BuilderTest extends DBTestCase
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(exclude: ['.$user1.', '.$user2.']) {
                 id
@@ -163,7 +163,7 @@ class BuilderTest extends DBTestCase
 
         $user1 = $this->users->first()->getKey();
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(id: '.$user1.') {
                 id
@@ -189,7 +189,7 @@ class BuilderTest extends DBTestCase
         $user1 = $this->users->first()->getKey();
         $user2 = $this->users->last()->getKey();
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(start: '.$user1.' end: '.$user2.') {
                 id
@@ -222,7 +222,7 @@ class BuilderTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(
                 createdBetween: ["'.$start.'", "'.$end.'"]
@@ -262,7 +262,7 @@ class BuilderTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(
                 created: {
@@ -300,7 +300,7 @@ class BuilderTest extends DBTestCase
         $start = now()->subDay()->startOfDay()->format('Y-m-d H:i:s');
         $end = now()->subDay()->endOfDay()->format('Y-m-d H:i:s');
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(
                 notCreatedBetween: ["'.$start.'", "'.$end.'"]
@@ -334,7 +334,7 @@ class BuilderTest extends DBTestCase
 
         $year = now()->subYear()->format('Y');
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(created_at: "'.$year.'") {
                 id
@@ -357,7 +357,7 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             users(name: "'.$this->users->first()->name.'") {
                 id

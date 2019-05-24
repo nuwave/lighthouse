@@ -37,7 +37,7 @@ class CustomDefaultResolverTest extends TestCase
             return self::CUSTOM_RESOLVER_RESULT;
         });
 
-        $this->queryGraphQL('
+        $this->graphQL('
         {
             foo {
                 bar
