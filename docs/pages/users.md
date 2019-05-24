@@ -21,5 +21,8 @@ sidebar: false
     <a href="https://worksome.co.uk">
       <img src="/img/users/worksome.png" alt="Worksome" title="Worksome - Platform for local freelancers">
     </a>
+    <a href="https://utecca.com">
+      <img src="/img/users/utecca.svg" alt="Utecca" title="Utecca">
+    </a>
   </div>
 </div>
