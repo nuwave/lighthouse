@@ -61,7 +61,7 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
         }
 
         if ($column = $whereConstraints['column'] ?? null) {
-            if (! $value = $whereConstraints['value']) {
+            if (! isset($whereConstraints['value'])) {
                 throw new Error(
                     "Did not receive a value to match the WhereConstraints for column {$column}."
                 );
@@ -80,7 +80,7 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
             $builder->{$where}(
                 $column,
                 $whereConstraints['operator'],
-                $value
+                $whereConstraints['value']
             );
         }
 

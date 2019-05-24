@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add compatibility layer to allow `@middleware` to support Lumen https://github.com/nuwave/lighthouse/pull/786
 - Add option `decode` to `@globaldId` to control the result of decoding https://github.com/nuwave/lighthouse/pull/796
+- Add config option `cache.ttl` for customizing expiration time of schema cache https://github.com/nuwave/lighthouse/pull/801
+
+### Fixed
+
+- Fix querying for falsy values through `@whereConstraints` https://github.com/nuwave/lighthouse/pull/800
+- Use `Illuminate\Contracts\Events\Dispatcher` instead of concrete implementation in SubscriptionBroadcaster https://github.com/nuwave/lighthouse/pull/805
+
+### Deprecated
+
+- The `GraphQL` facade and the container alias `graphql` will be removed in v4 
 
 ## [3.6.1](https://github.com/nuwave/lighthouse/compare/v3.6.0...v3.6.1)
 

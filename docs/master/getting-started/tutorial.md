@@ -254,7 +254,7 @@ Remember to run the migrations:
 
     php artisan migrate
 
-Finally, add the `posts` relation to `app/Users.php`
+Finally, add the `posts` relation to `app/User.php`
 
 ```php
 <?php

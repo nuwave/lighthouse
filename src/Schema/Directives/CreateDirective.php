@@ -47,7 +47,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
             function ($root, array $args): Model {
                 $modelClassName = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClassName();
+                $model = new $modelClassName;
 
                 /*
                  * @deprecated in favour of @spread
