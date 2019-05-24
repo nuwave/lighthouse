@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\GraphQL;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
+use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
@@ -40,7 +40,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
     protected $broadcastManager;
 
     /**
-     * @var \Illuminate\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventsDispatcher;
 
@@ -50,7 +50,7 @@ class SubscriptionBroadcaster implements BroadcastsSubscriptions
      * @param  \Nuwave\Lighthouse\Subscriptions\StorageManager  $storage
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionIterator  $iterator
      * @param  \Nuwave\Lighthouse\Subscriptions\BroadcastManager  $broadcastManager
-     * @param  \Illuminate\Events\Dispatcher  $eventsDispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
      * @return void
      */
     public function __construct(
