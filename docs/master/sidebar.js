@@ -42,14 +42,6 @@ module.exports = [{
         ]
     },
     {
-        title: 'Frontend',
-        children: [
-            ['frontend/getting-started', 'Getting Started'],
-            'frontend/vue',
-            'frontend/angular'
-        ]
-    },
-    {
         title: 'Digging Deeper',
         children: [
             'digging-deeper/schema-organisation',
