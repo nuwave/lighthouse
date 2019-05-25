@@ -76,3 +76,7 @@ curl localhost/graphql \
   -F map='{ "0": ["variables.file"] }' \
   -F 0=@my_file.txt
 ```
+
+## Testing
+
+Refer to [testing file uploads in PHPUnit](../testing/phpunit.md#simulating-file-uploads).

@@ -1,12 +1,13 @@
-module.exports = [{
-    title: 'Getting Started',
-    children: [
-        'getting-started/installation',
-        'getting-started/configuration',
-        'getting-started/tutorial',
-        'getting-started/migrating-to-lighthouse'
-    ]
-},
+module.exports = [
+    {
+        title: 'Getting Started',
+        children: [
+            'getting-started/installation',
+            'getting-started/configuration',
+            'getting-started/tutorial',
+            'getting-started/migrating-to-lighthouse'
+        ]
+    },
     {
         title: 'The Basics',
         children: [
@@ -27,9 +28,7 @@ module.exports = [{
     {
         title: "Testing",
         children: [
-            'testing/playground',
-            'testing/integration',
-            'testing/mocking',
+            'testing/phpunit',
         ],
     },
     {
