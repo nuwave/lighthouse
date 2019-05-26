@@ -329,10 +329,10 @@ class RulesDirectiveTest extends TestCase
         }
         ')->assertJsonFragment([
             'rules' => [
-                FooBarRule::MESSAGE
+                FooBarRule::MESSAGE,
             ],
             'rulesForArray' => [
-                FooBarRule::MESSAGE
+                FooBarRule::MESSAGE,
             ],
         ]);
     }
