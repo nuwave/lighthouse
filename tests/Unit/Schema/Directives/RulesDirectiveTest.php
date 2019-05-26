@@ -318,7 +318,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itUsesCustomRuleClass(): void
     {
-        $this->query('
+        $this->graphQL('
         mutation {
             withCustomRuleClass(
                 rules: "baz"
