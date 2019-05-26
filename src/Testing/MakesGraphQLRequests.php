@@ -69,7 +69,7 @@ trait MakesGraphQLRequests
     protected function postGraphQL(array $data, array $headers = []): TestResponse
     {
         return $this->postJson(
-            config('lighthouse.route_name'),
+            $this->graphQLEndpointUrl(),
             $data,
             $headers
         );
@@ -89,7 +89,7 @@ trait MakesGraphQLRequests
     {
         return $this->call(
             'POST',
-            config('lighthouse.route_name'),
+            $this->graphQLEndpointUrl(),
             $parameters,
             [],
             $files,
@@ -97,5 +97,21 @@ trait MakesGraphQLRequests
                 'Content-Type' => 'multipart/form-data',
             ])
         );
+    }
+
+    /**
+     * Return the full URL to the GraphQL endpoint.
+     *
+     * @return string
+     */
+    private function graphQLEndpointUrl(): string
+    {
+        $path = config('lighthouse.route_name');
+
+        if($prefix = config('lighthouse.route.prefix')){
+            $path = $prefix . $path;
+        }
+
+        return $path;
     }
 }
