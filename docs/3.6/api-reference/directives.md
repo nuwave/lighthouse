@@ -1049,17 +1049,6 @@ input CreatePostInput {
 }
 ```
 
-You can also pass your own custom rules,  like so:
-```bash
-php artisan make:rule MyCustomRule
-```
-Then you can assign the namespace to your rules.
-```graphql
-input CreatePostInput {
-    title: String @rules(apply: ["required", "App\\Rules\\MyCustomRule"])
-}
-```
-
 You can customize the error message for a particular argument.
 
 ```graphql
@@ -1089,8 +1078,6 @@ type Mutation {
    ): File
 }
 ```
-
-`Note`: You can also use custom rules when defining your @rulesForArray directive. See: [@rules](../api-reference/directives.md#rules) for more info.
 
 ## @scalar
 
