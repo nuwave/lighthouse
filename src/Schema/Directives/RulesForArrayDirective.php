@@ -34,6 +34,13 @@ class RulesForArrayDirective extends BaseDirective implements ArgValidationDirec
             $rules = Arr::prepend($rules, 'array');
         }
 
+        // Resolve custom rule namespace, if possible.
+        foreach ($rules as $key => $rule) {
+            if (class_exists($rule)) {
+                $rules[$key] = resolve($rule);
+            }
+        }
+
         return [$this->argumentPathAsDotNotation() => $rules];
     }
 
