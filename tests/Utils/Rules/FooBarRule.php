@@ -6,15 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 
 class FooBarRule implements Rule
 {
-    /**
-     * Create a new rule instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
+    const MESSAGE = 'This rule was triggered.';
 
     /**
      * Determine if the validation rule passes.
@@ -26,18 +18,7 @@ class FooBarRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $valid = true;
-
-        $value = is_array($value) ? $value : [$value];
-
-        foreach ($value as $item) {
-            if ($item !== 'baz') {
-                $valid = false;
-                break;
-            }
-        }
-
-        return $valid;
+        return false;
     }
 
     /**
@@ -47,6 +28,6 @@ class FooBarRule implements Rule
      */
     public function message()
     {
-        return 'Some FooBarRule error message.';
+        return self::MESSAGE;
     }
 }

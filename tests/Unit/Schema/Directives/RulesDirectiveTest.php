@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
+use Tests\Utils\Rules\FooBarRule;
 
 class RulesDirectiveTest extends TestCase
 {
@@ -26,13 +27,13 @@ class RulesDirectiveTest extends TestCase
 
         type Mutation {
             foo(bar: String @rules(apply: [\"required\"])): User 
-            @field(resolver: \"{$this->qualifyTestResolver()}\")
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
             
-            fooRule(bar: String @rules(apply: [\"required\", \"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])): User 
-            @field(resolver: \"{$this->qualifyTestResolver()}\")
-            
-            fooRulesForArray(bar: [String!]! @rulesForArray(apply: [\"required\", \"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])): User 
-            @field(resolver: \"{$this->qualifyTestResolver()}\")
+            withCustomRuleClass(
+                rules: String @rules(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
+                rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"]) 
+            ): User
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
 
         type User {
@@ -315,39 +316,23 @@ class RulesDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itCanValidateUsingCustomRule(): void
+    public function itUsesCustomRuleClass(): void
     {
         $this->query('
         mutation {
-            fooRule(bar: "baz") {
+            withCustomRuleClass(
+                rules: "baz"
+                rulesForArray: []
+            ) {
                 first_name
             }
         }
-        ')->assertJson([
-            'data' => [
-                'fooRule' => [
-                    'first_name' => 'John',
-                ],
+        ')->assertJsonFragment([
+            'rules' => [
+                FooBarRule::MESSAGE
             ],
-        ]);
-    }
-
-    /**
-     * @test
-     */
-    public function itCanValidateUsingCustomRulesForArray(): void
-    {
-        $this->query('
-        mutation {
-            fooRulesForArray(bar: ["baz", "baz"]) {
-                first_name
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'fooRulesForArray' => [
-                    'first_name' => 'John',
-                ],
+            'rulesForArray' => [
+                FooBarRule::MESSAGE
             ],
         ]);
     }
