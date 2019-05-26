@@ -30,7 +30,7 @@ class RulesDirective extends BaseDirective implements ArgValidationDirective, Ha
 
         // Resolve custom rule namespace, if possible.
         foreach ($rules as $key => $rule) {
-            if (strpos($rule, 'App\Rules') === 0) {
+            if (class_exists($rule)) {
                 $rules[$key] = resolve($rule);
             }
         }
