@@ -67,7 +67,7 @@ class MorphOneTest extends DBTestCase
      */
     public function itCanCreateWithNewMorphOne(): void
     {
-        $this->query('
+        $this->graphQL('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -104,7 +104,7 @@ class MorphOneTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -147,7 +147,7 @@ class MorphOneTest extends DBTestCase
                 factory(Hour::class)->create()
             );
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -191,7 +191,7 @@ class MorphOneTest extends DBTestCase
                 factory(Hour::class)->create()
             );
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1

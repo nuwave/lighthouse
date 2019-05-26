@@ -29,7 +29,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             users(count: 5) {
                 paginatorInfo {
@@ -73,7 +73,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             users(count: 0) {
                 data {
@@ -109,7 +109,7 @@ class PaginateDirectiveTest extends DBTestCase
         ';
 
         // The custom builder is supposed to change the sort order
-        $this->query('
+        $this->graphQL('
         {
             users(count: 1) {
                 data {
@@ -169,7 +169,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             users(count: 3, page: 1) {
                 paginatorInfo {
@@ -244,7 +244,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             users(first: 5) {
                 pageInfo {
@@ -285,7 +285,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             users(first: 5) {
                 pageInfo {
@@ -339,7 +339,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             users(count: 5) {
                 paginatorInfo {
@@ -393,7 +393,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         {
             users(count: 1) {
                 data {
@@ -423,7 +423,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             users {
                 paginatorInfo {
@@ -469,7 +469,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $resultFromDefaultPagination = $this->query('
+        $resultFromDefaultPagination = $this->graphQL('
         {
             users1(count: 10) {
                 data {
@@ -485,7 +485,7 @@ class PaginateDirectiveTest extends DBTestCase
             $resultFromDefaultPagination->jsonGet('errors.0.message')
         );
 
-        $resultFromRelayPagination = $this->query('
+        $resultFromRelayPagination = $this->graphQL('
         {
             users2(first: 10) {
                 edges {
@@ -525,7 +525,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ';
 
-        $result = $this->query('
+        $result = $this->graphQL('
         {
             users1(count: 10) {
                 data {
@@ -541,7 +541,7 @@ class PaginateDirectiveTest extends DBTestCase
             $result->jsonGet('errors.0.message')
         );
 
-        $this->query('
+        $this->graphQL('
         {
             users2(count: 10) {
                 data {

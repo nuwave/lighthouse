@@ -1,6 +1,9 @@
 <?php
 
-app('router')->group(config('lighthouse.route', []), function (): void {
+/** @var \Illuminate\Contracts\Routing\Registrar $router */
+$router = app('router');
+
+$router->group(config('lighthouse.route', []), function () use ($router): void {
     $routeName = config('lighthouse.route_name', 'graphql');
     $controller = config('lighthouse.controller');
 
@@ -8,7 +11,7 @@ app('router')->group(config('lighthouse.route', []), function (): void {
         ? ['GET', 'POST']
         : ['POST'];
 
-    app('router')->match($methods, $routeName, [
+    $router->match($methods, $routeName, [
         'as' => 'lighthouse.graphql',
         'uses' => $controller,
     ]);

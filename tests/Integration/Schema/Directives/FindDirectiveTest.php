@@ -28,7 +28,7 @@ class FindDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query("
+        $this->graphQL("
         {
             user(id:{$userB->id}) {
                 name
@@ -60,7 +60,7 @@ class FindDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query("
+        $this->graphQL("
         {
             user(id:{$userA->id}) {
                 name
@@ -91,7 +91,7 @@ class FindDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             user(name: "A") {
                 name
@@ -126,7 +126,7 @@ class FindDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             user(name: "A" company: "CompanyA") {
                 id
@@ -159,7 +159,7 @@ class FindDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             user(name: "A") {
                 id

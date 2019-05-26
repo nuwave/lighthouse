@@ -58,7 +58,7 @@ class WithDirectiveTest extends DBTestCase
             $user->relationLoaded('tasks')
         );
 
-        $this->query('
+        $this->graphQL('
         {
             user {
                 task_count_string

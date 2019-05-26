@@ -25,7 +25,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createCompany(name: "foo") {
                 id
@@ -62,7 +62,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createCompany(input: {
                 name: "foo"
@@ -97,7 +97,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createTag(name: "foobar"){
                 name
@@ -154,7 +154,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -224,7 +224,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -294,7 +294,7 @@ class CreateDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createUser(input: {
                 name: "foo"

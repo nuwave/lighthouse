@@ -68,7 +68,7 @@ class HasManyTest extends DBTestCase
      */
     public function itCanCreateWithNewHasMany(): void
     {
-        $this->query('
+        $this->graphQL('
         mutation {
             createUser(input: {
                 name: "foo"
@@ -109,7 +109,7 @@ class HasManyTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateUser(input: {
                 id: 1
@@ -156,7 +156,7 @@ class HasManyTest extends DBTestCase
                 factory(Task::class)->create()
             );
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateUser(input: {
                 id: 1
@@ -204,7 +204,7 @@ class HasManyTest extends DBTestCase
                 factory(Task::class)->create()
             );
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateUser(input: {
                 id: 1

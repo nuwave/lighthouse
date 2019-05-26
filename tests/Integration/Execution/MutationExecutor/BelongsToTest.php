@@ -71,7 +71,7 @@ class BelongsToTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -104,7 +104,7 @@ class BelongsToTest extends DBTestCase
      */
     public function itCanCreateWithNewBelongsTo(): void
     {
-        $this->query('
+        $this->graphQL('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -143,7 +143,7 @@ class BelongsToTest extends DBTestCase
             'name' => 'foo',
         ]);
 
-        $this->query('
+        $this->graphQL('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -183,7 +183,7 @@ class BelongsToTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -227,7 +227,7 @@ class BelongsToTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -271,7 +271,7 @@ class BelongsToTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
