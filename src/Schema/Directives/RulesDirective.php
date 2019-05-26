@@ -28,7 +28,9 @@ class RulesDirective extends BaseDirective implements ArgValidationDirective, Ha
     {
         $rules = $this->directiveArgValue('apply');
 
-        // Resolve custom rule namespace, if possible.
+        // Custom rules may be referenced through their fully qualified class name.
+        // The Laravel validator expects a class instance to be passed, so we
+        // resolve any given rule where a corresponding class exists.
         foreach ($rules as $key => $rule) {
             if (class_exists($rule)) {
                 $rules[$key] = resolve($rule);
