@@ -89,8 +89,6 @@ class ModelRelationFetcher
      */
     protected function setModels($models): self
     {
-        // We can not use the collect() helper here, since we require this
-        // to be an Eloquent Collection
         $this->models = $models instanceof EloquentCollection
             ? $models
             : new EloquentCollection($models);
