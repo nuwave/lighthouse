@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
+use Tests\Utils\Rules\FooBarRule;
 
 class RulesDirectiveTest extends TestCase
 {
@@ -25,7 +26,13 @@ class RulesDirectiveTest extends TestCase
         }
 
         type Mutation {
-            foo(bar: String @rules(apply: [\"required\"])): User
+            foo(bar: String @rules(apply: [\"required\"])): User 
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
+            
+            withCustomRuleClass(
+                rules: String @rules(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
+                rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"]) 
+            ): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
 
@@ -302,6 +309,30 @@ class RulesDirectiveTest extends TestCase
                         ],
                     ],
                 ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itUsesCustomRuleClass(): void
+    {
+        $this->query('
+        mutation {
+            withCustomRuleClass(
+                rules: "baz"
+                rulesForArray: []
+            ) {
+                first_name
+            }
+        }
+        ')->assertJsonFragment([
+            'rules' => [
+                FooBarRule::MESSAGE,
+            ],
+            'rulesForArray' => [
+                FooBarRule::MESSAGE,
             ],
         ]);
     }
