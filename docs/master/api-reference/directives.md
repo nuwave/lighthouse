@@ -1629,7 +1629,7 @@ directive @rename(
 
 ## @rules
 
-Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
 
 ```graphql
 type Query {
@@ -1643,14 +1643,16 @@ type Query {
 
 ```graphql
 """
-Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
 directive @rules(
   """
   Specify the validation rules to apply to the field.
+  This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
+  or the fully qualified class name of a custom validation rule.
   """
   apply: [String!]
-  
+
   """
   Specify the messages to return if the validators fail.
   Specified as an input object that maps rules to messages,
@@ -1677,9 +1679,15 @@ You can customize the error message for a particular argument.
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
 ```
 
+Reference custom validation rules by their fully qualified class name.
+
+```graphql
+@rules(apply: ["App\\Rules\\MyCustomRule"])
+```
+
 ## @rulesForArray
 
-Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 
 ```graphql
 type Mutation {
@@ -1693,14 +1701,16 @@ type Mutation {
 
 ```graphql
 """
-Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
 directive @rulesForArray(
   """
   Specify the validation rules to apply to the field.
+  This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
+  or the fully qualified class name of a custom validation rule.
   """
   apply: [String!]
-  
+
   """
   Specify the messages to return if the validators fail.
   Specified as an input object that maps rules to messages,
