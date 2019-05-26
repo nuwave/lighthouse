@@ -16,7 +16,7 @@ class ScalarCommand extends LighthouseGeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a class for a Scalar type.';
+    protected $description = 'Create a class for a GraphQL scalar type.';
 
     /**
      * The type of class being generated.

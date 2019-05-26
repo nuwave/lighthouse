@@ -1,7 +1,6 @@
 # Installation
 
 The following section teaches you how to install Lighthouse in your project.
-Make sure you familiarize yourself with [the basics](../the-basics/schema.md) before diving in.
 
 ## Install via composer
 
@@ -18,17 +17,14 @@ it using the following `artisan` command:
 php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
 ```
 
-Learn more about how a GraphQL schema works by reading up on the [schema basics](../the-basics/schema.md)
+## Install GraphQL DevTools
 
-## Use GraphQL DevTools
-
-Lighthouse does not include additional GraphQL tooling, such as the GraphiQL editor.
-To integrate a web UI to query your GraphQL endpoint with your Laravel installation, we recommend
+To make use of the amazing tooling around GraphQL, we recommend
 installing [GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground)
 
 ```bash
 composer require mll-lab/laravel-graphql-playground
 ```
 
-You can also use any external client with Lighthouse, make sure to point it to the URL defined in
-the config. Per default, the endpoint lives at `/graphql` 
+You can use any GraphQL client with Lighthouse, make sure to point it to the URL defined in
+the config. By default, the endpoint lives at `/graphql`. 

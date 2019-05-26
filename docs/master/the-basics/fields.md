@@ -5,16 +5,12 @@ The entrypoints to any GraphQL API are the fields of the root types `Query`, `Mu
 *Every* field has a function associated with it that is called when the field
 is requested as part of a query. This function is called a **resolver**.
 
-The following section will teach you how to define a resolver for your fields
-and how you can utilize Lighthouse's built-in resolvers.
-
-## Resolving fields
+## Hello World
 
 As is the tradition of our people, this section will teach you how to say "hello world!" through Lighthouse.
 
-### Schema definition
-
-The following schema defines a simple field called `hello` that returns a `String`.
+We start out by defining the simples possible schema: The root `Query` type
+with a single field called `hello` that returns a `String`.
 
 ```graphql
 type Query {
@@ -22,14 +18,13 @@ type Query {
 }
 ```
 
+This defines the shape of our data and informs the client what they can expect.
 You need to implement the actual resolver next.
-
-### Defining resolvers
 
 By default, Lighthouse looks for a class with the capitalized name of the field in `App\GraphQL\Queries`
 or `App\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
 
-In this case, our field is called `hello` so we need to define our class as follows:
+In this case, our field is a query and is called `hello`, so we need to define our class as follows:
 
 ```php
 <?php
@@ -61,7 +56,7 @@ Now your schema can be queried.
 }
 ```
 
-And will return the following response:
+This query will return the following response:
 
 ```json
 {
@@ -71,7 +66,7 @@ And will return the following response:
 }
 ```
 
-### Fields with arguments
+## Fields with arguments
 
 As we learned, *every* field has a resolver function associated with it.
 Just like functions, fields can take arguments to control their behaviour.
@@ -81,7 +76,7 @@ that is used to construct the greeting.
 
 ```graphql
 type Query {
-    greet(name: String!): String
+  greet(name: String!): String
 }
 ```
 
@@ -148,7 +143,7 @@ Now we can use our query like this:
 }
 ```
 
-### Resolving non-root fields
+## Resolving non-root fields
 
 As mentioned, every field in the schema has a resolver - but what
 about fields that are not on one of the root types?
@@ -180,7 +175,7 @@ First, the resolver for `user` will be called. Let's suppose it returns an insta
 of `App\Model\User`.
 
 Next, the field sub-selection will be resolved - the two requested fields are `id` and `name`.
-Since we resolved the User already in the parent field, we do not want to fetch it again
+Since we already resolved the User in the parent field, we do not want to fetch it again
 to get it's attributes.
 
 Conveniently, the first argument of each resolver is the return value of the parent
@@ -200,9 +195,8 @@ function resolveUserId(User $user): string
 ```
 
 Writing out each such resolver would be pretty repetitive.
-We can utilize the fourth and final resolver argument `ResolveInfo`,
-which will give us access to the requested field name,
-to dynamically access the matching property.
+We can utilize the fourth and final resolver argument `ResolveInfo`, which will give us access
+to the requested field name, to dynamically access the matching property.
 
 ```php
 <?php
@@ -228,217 +222,4 @@ If you need to implement custom resolvers for fields that are not on one of the
 root types `Query` or `Mutation`, you can use either the
 [@field](../api-reference/directives.md#field) or [@method](../api-reference/directives.md#method) directive.
 
-You may also [change the default resolver](../guides/plugin-development.md#change-the-default-resolver) if you need.
-
-## Query data
-
-Lighthouse provides many resolvers that are already built-in, so you do not have to define them yourself.
-The following is not a comprehensive list of all resolvers but should give you an idea of what you can do.
-
-### Fetch a list of models
-
-Since you are already using Laravel, you might as well use Eloquent to fetch the data for your Query.
-Let's say you defined your `User` type like this:
-
-```graphql
-type User {
-  id: ID!
-  name: String!
-}
-```
-
-Instead of defining your own resolver manually, you can just rely on Lighthouse to build the Query for you.
-
-```graphql
-type Query {
-  users: [User!]! @all
-}
-```
-
-The [@all](../api-reference/directives.md#all) directive will assume the name of your model to be the same as
-the return type of the Field you are trying to resolve and automatically uses Eloquent to resolve the field.
-
-The following query:
-
-```graphql
-{
-  users {
-    id
-    name
-  }
-}  
-```
-
-Will return the following result:
-
-```json
-{
-  "data": {
-    "users": [
-      {"id": 1, "name": "James Bond"},
-      {"id": 2, "name": "Madonna"}
-    ]
-  }
-}
-```
-
-### Adding query constraints
-
-Lighthouse provides built-in directives to enhance your queries by giving
-additional query capabilities to the client.
-
-The following field allows you to fetch a single User by ID.
-
-```graphql
-type Query {
-  user(id: ID! @eq): User @find
-}
-```
-
-You can query this field like this:
-
-```graphql
-{
-  user(id: 69){
-    name
-  }
-}
-```
-
-And, if found, receive a result like this:
-
-```json
-{
-  "data": {
-    "user": {
-      "name": "Chuck Norris"
-    }
-  }
-}
-```
-
-## Mutate data
-
-Per convention, a GraphQL *Query* is not allowed to change data.
-You will need to define a *Mutation* for that.
-Mutations look just like queries, but only they can create, update or delete data.
-
-The following examples will show you how to make changes to a single model.
-If you need to save multiple related models at once, look into [Mutating Relationships](../guides/relationships.md#mutating-relationships).
-
-### Create
-
-The easiest way to create data on your server is to use the [@create](../api-reference/directives.md#create) in combination
-with an existing Laravel model.
-
-```graphql
-type Mutation {
-  createUser(name: String!): User! @create
-}
-```
-
-This will take the arguments that the `createUser` field receives and use them to create a new model instance.
-
-```graphql
-mutation {
-  createUser(name: "Donald"){
-    id
-    name
-  }
-}
-```
-
-The newly created user is returned as a result:
-
-```json
-{
-  "data": {
-    "createUser": {
-      "id": "123",
-      "name": "Donald"
-    }
-  }
-}
-```
-
-### Update
-
-You can easily add a way to update your data with the [@update](../api-reference/directives.md#update) directive.
-
-```graphql
-type Mutation {
-  updateUser(id: ID!, name: String): User @update
-}
-```
-
-Since GraphQL allows you to update just parts of your data, it is best to have all arguments except `id` as optional.
-
-```graphql
-mutation {
-  updateUser(id: "123" name: "Hillary"){
-    id
-    name
-  }
-}
-```
-
-```json
-{
-  "data": {
-    "updateUser": {
-      "id": "123",
-      "name": "Hillary"
-    }
-  }
-}
-```
-
-Be aware that while a create operation will always return a result, provided you pass valid data, the update
-may fail to find the model you provided and return `null`:
-
-```json
-{
-  "data": {
-    "updateUser": null
-  }
-}
-```
-
-### Delete
-
-Deleting data through your GraphQL API is really easy with the [@delete](../api-reference/directives.md#delete) directive. Dangerously easy.
-
-```graphql
-type Mutation {
-  deleteUser(id: ID!): User @delete
-}
-```
-
-Simply call it with the ID of the user you want to delete.
-
-```graphql
-mutation {
-  deleteUser(id: "123"){
-    secret
-  }
-}
-```
-
-This mutation will return the deleted object, so you will have a last chance to look at the data. Use it wisely.
-
-```json
-{
-  "data": {
-    "deleteUser": {
-      "secret": "Pink is my favorite color!"
-    }
-  }
-}
-``` 
-
-## Subscribe to data
- 
-Lighthouse allows you to serve GraphQL subscriptions. Compared to queries and
-mutations, a more elaborate setup is required.
- 
-[Read more about how to set up subscriptions](../extensions/subscriptions.md)
+You may also [change the default resolver](../digging-deeper/extending-lighthouse.md#changing-the-default-resolver) if you need.

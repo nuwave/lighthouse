@@ -39,7 +39,7 @@ scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload
 ```
 
 This Scalar can only be used as an argument, not as a return type.
-For more information, please refer to the [file uploads guide](../guides/file-uploads.md).
+For more information, please refer to the [file uploads guide](../digging-deeper/file-uploads.md).
 
 The multipart form request is handled by Lighthouse, the resolver gets passed
 an instance of [`\Illuminate\Http\UploadedFile`](https://laravel.com/api/5.8/Illuminate/Http/UploadedFile.html)

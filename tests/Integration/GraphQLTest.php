@@ -266,7 +266,7 @@ class GraphQLTest extends DBTestCase
                 'operations' => /* @lang JSON */
                     '
                     {
-                        "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
                         "variables": {
                             "file": null
                         }
@@ -301,13 +301,13 @@ class GraphQLTest extends DBTestCase
                     '
                     [
                         {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
                             "variables": {
                                 "file": null
                             }
                         },
                         {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)} ",
                             "variables": {
                                 "file": null
                             }

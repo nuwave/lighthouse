@@ -19,7 +19,7 @@ class ValidateSchemaCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Validate the defined schema.';
+    protected $description = 'Validate the GraphQL schema definition.';
 
     /**
      * Execute the console command.
