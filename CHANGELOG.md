@@ -9,10 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support custom rules for `@rules` and `@rulesForArray` directive.
 - Add compatibility layer to allow `@middleware` to support Lumen https://github.com/nuwave/lighthouse/pull/786
 - Add option `decode` to `@globaldId` to control the result of decoding https://github.com/nuwave/lighthouse/pull/796
 - Add config option `cache.ttl` for customizing expiration time of schema cache https://github.com/nuwave/lighthouse/pull/801
+- Support custom rule classes in `@rules` and `@rulesForArray` https://github.com/nuwave/lighthouse/pull/812
 
 ### Fixed
 
