@@ -25,7 +25,7 @@ class PrintSchemaCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Print the resulting schema.';
+    protected $description = 'Compile the final GraphQL schema and print the result.';
 
     /**
      * Execute the console command.

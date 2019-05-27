@@ -101,7 +101,7 @@ class SubscriptionTest extends TestCase
     public function itCanBroadcastSubscriptions(): void
     {
         $this->subscribe();
-        $this->query('
+        $this->graphQL('
         mutation {
             createPost(post: "Foobar") {
                 body
@@ -123,7 +123,7 @@ class SubscriptionTest extends TestCase
      */
     public function itThrowsWithMissingOperationName(): void
     {
-        $this->query('
+        $this->graphQL('
         subscription {
             onPostCreated {
                 body

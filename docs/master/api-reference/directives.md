@@ -201,8 +201,6 @@ type User {
 
 ## @bcrypt
 
-***Directive Type***: [ArgTransformerDirective](../guides/custom-directives.md#argtransformerdirective).
-
 Run the `bcrypt` function on the argument it is defined on.
 
 ```graphql
@@ -220,7 +218,7 @@ directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ## @broadcast
 
 Broadcast the results of a mutation to subscribed clients.
-[Read more about subscriptions](../extensions/subscriptions.md)
+[Read more about subscriptions](../subscriptions/getting-started.md)
 
 ```graphql
 type Mutation {
@@ -1627,7 +1625,7 @@ directive @rename(
 
 ## @rules
 
-Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
 
 ```graphql
 type Query {
@@ -1641,14 +1639,16 @@ type Query {
 
 ```graphql
 """
-Validate an argument using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
 directive @rules(
   """
   Specify the validation rules to apply to the field.
+  This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
+  or the fully qualified class name of a custom validation rule.
   """
   apply: [String!]
-  
+
   """
   Specify the messages to return if the validators fail.
   Specified as an input object that maps rules to messages,
@@ -1675,9 +1675,15 @@ You can customize the error message for a particular argument.
 @rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
 ```
 
+Reference custom validation rules by their fully qualified class name.
+
+```graphql
+@rules(apply: ["App\\Rules\\MyCustomRule"])
+```
+
 ## @rulesForArray
 
-Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 
 ```graphql
 type Mutation {
@@ -1691,14 +1697,16 @@ type Mutation {
 
 ```graphql
 """
-Run validation on an array itself, using [Laravel's built-in validation rules](https://laravel.com/docs/validation#available-validation-rules).
+Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
 directive @rulesForArray(
   """
   Specify the validation rules to apply to the field.
+  This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
+  or the fully qualified class name of a custom validation rule.
   """
   apply: [String!]
-  
+
   """
   Specify the messages to return if the validators fail.
   Specified as an input object that maps rules to messages,
@@ -1857,7 +1865,7 @@ directive @spread on ARGUMENT_DEFINITION
 Reference a class to handle the broadcasting of a subscription to clients.
 The given class must extend `\Nuwave\Lighthouse\Schema\Types\GraphQLSubscription`.
 
-If you follow the default naming conventions for [defining subscription fields](../extensions/subscriptions.md#defining-fields)
+If you follow the default naming conventions for [defining subscription fields](../subscriptions/defining-fields.md)
 you do not need this directive. It is only useful if you need to override the default namespace.
 
 ```graphql
@@ -2050,7 +2058,7 @@ You can specify simple operators:
 
 ```graphql
 type Query {
-    postsSearchTitle(title: String! @where(operator: "like")): [Post!]! @hasMany
+    postsSearchTitle(title: String! @where(operator: "like")): [Post!]! @all
 }
 ```
 
@@ -2058,7 +2066,7 @@ Or use the additional clauses that Laravel provides:
 
 ```graphql
 type Query {
-    postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @hasMany
+    postsByYear(created_at: Int! @where(clause: "whereYear")): [Post!]! @all
 }
 ```
 
@@ -2324,4 +2332,4 @@ This can be a useful optimization for fields that are not returned directly
 but rather used for resolving other fields.
 
 If you just want to return the relation itself as-is,
-look into [handling Eloquent relationships](../guides/relationships.md).
+look into [handling Eloquent relationships](../eloquent/relationships.md).

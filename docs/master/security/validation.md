@@ -50,8 +50,6 @@ mutation {
 }
 ```
 
-### Customize Messages
-
 You can customize the error message for a particular argument.
 
 ```graphql

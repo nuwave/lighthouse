@@ -3,6 +3,7 @@
 namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
+use Tests\Utils\Rules\FooBarRule;
 
 class RulesDirectiveTest extends TestCase
 {
@@ -25,7 +26,13 @@ class RulesDirectiveTest extends TestCase
         }
 
         type Mutation {
-            foo(bar: String @rules(apply: [\"required\"])): User
+            foo(bar: String @rules(apply: [\"required\"])): User 
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
+            
+            withCustomRuleClass(
+                rules: String @rules(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"])
+                rulesForArray: [String!]! @rulesForArray(apply: [\"Tests\\\\Utils\\\\Rules\\\\FooBarRule\"]) 
+            ): User
                 @field(resolver: \"{$this->qualifyTestResolver()}\")
         }
 
@@ -71,7 +78,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanValidateQueryRootFieldArguments(): void
     {
-        $this->query('
+        $this->graphQL('
         {
             foo {
                 first_name
@@ -102,7 +109,7 @@ class RulesDirectiveTest extends TestCase
                 'foo' => null,
             ],
         ])->assertJson(
-            $this->query('
+            $this->graphQL('
         mutation {
             foo {
                 first_name
@@ -117,7 +124,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanReturnValidFieldsAndErrorMessagesForInvalidFields(): void
     {
-        $this->query('
+        $this->graphQL('
         {
             foo(bar: "foo") {
                 first_name
@@ -147,7 +154,7 @@ class RulesDirectiveTest extends TestCase
                 ],
             ],
         ])->assertJson(
-            $this->query('
+            $this->graphQL('
         mutation {
             foo(bar: "foo") {
                 first_name
@@ -164,7 +171,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanValidateRootMutationFieldArgs(): void
     {
-        $this->query('
+        $this->graphQL('
         mutation {
             foo {
                 first_name
@@ -178,7 +185,7 @@ class RulesDirectiveTest extends TestCase
             ],
         ])->assertJsonCount(1, 'errors')
         ->assertJson(
-            $this->query('
+            $this->graphQL('
         {
             foo {
                 first_name
@@ -195,7 +202,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanValidateArrayType(): void
     {
-        $this->query('
+        $this->graphQL('
         {
             foo(bar: "got it") {
                 input_object(
@@ -259,7 +266,7 @@ class RulesDirectiveTest extends TestCase
      */
     public function itCanReturnCorrectValidationForInputObjects(): void
     {
-        $this->query('
+        $this->graphQL('
         {
             foo(bar: "got it") {
                 input_object(
@@ -302,6 +309,30 @@ class RulesDirectiveTest extends TestCase
                         ],
                     ],
                 ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itUsesCustomRuleClass(): void
+    {
+        $this->graphQL('
+        mutation {
+            withCustomRuleClass(
+                rules: "baz"
+                rulesForArray: []
+            ) {
+                first_name
+            }
+        }
+        ')->assertJsonFragment([
+            'rules' => [
+                FooBarRule::MESSAGE,
+            ],
+            'rulesForArray' => [
+                FooBarRule::MESSAGE,
             ],
         ]);
     }

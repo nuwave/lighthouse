@@ -1,5 +1,6 @@
 # Tutorial
 
+
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
 with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
@@ -377,4 +378,4 @@ Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../api-reference/directives.md#paginate)
 - [Create and update posts and comments](../the-basics/fields.md#mutate-data)
-- [Validate the inputs that are sent to your server](../guides/validation.md)
+- [Validate the inputs that are sent to your server](../security/validation.md)

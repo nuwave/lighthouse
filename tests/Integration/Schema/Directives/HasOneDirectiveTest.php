@@ -32,7 +32,7 @@ class HasOneDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             tasks {
                 post {

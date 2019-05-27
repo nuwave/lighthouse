@@ -25,7 +25,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             deleteUser(id: 1) {
                 id
@@ -60,7 +60,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             deleteUsers(id: [1, 2]) {
                 name
@@ -89,7 +89,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             deleteUser(id: 1) {
                 name
@@ -116,7 +116,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             deleteUser {
                 name
@@ -143,7 +143,7 @@ class DeleteDirectiveTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             deleteUser {
                 name

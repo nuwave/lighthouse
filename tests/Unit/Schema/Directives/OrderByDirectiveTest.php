@@ -27,7 +27,7 @@ class OrderByDirectiveTest extends DBTestCase
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
 
-        $this->query('
+        $this->graphQL('
         {
             users(
                 orderBy: [
@@ -62,7 +62,7 @@ class OrderByDirectiveTest extends DBTestCase
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
 
-        $this->query('
+        $this->graphQL('
         {
             users(
                 orderBy: [
@@ -98,7 +98,7 @@ class OrderByDirectiveTest extends DBTestCase
         factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
         factory(User::class)->create(['name' => 'C', 'team_id' => 2]);
 
-        $this->query('
+        $this->graphQL('
         {
             users(
                 orderBy: [

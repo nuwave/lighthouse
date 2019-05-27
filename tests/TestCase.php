@@ -14,10 +14,13 @@ use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
+    use MakesGraphQLRequests;
+
     /**
      * This variable is injected the main GraphQL class
      * during execution of each test. It may be set either
@@ -199,61 +202,6 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
 
         CountRuns::$runCounter = 0;
-    }
-
-    /**
-     * Execute a query as if it was sent as a request to the server.
-     *
-     * @param  string  $query
-     * @return \Illuminate\Foundation\Testing\TestResponse
-     */
-    protected function query(string $query): TestResponse
-    {
-        return $this->postGraphQL(
-            [
-                'query' => $query,
-            ]
-        );
-    }
-
-    /**
-     * Execute a query as if it was sent as a request to the server.
-     *
-     * @param  mixed[]  $data
-     * @param  mixed[]  $headers
-     * @return \Illuminate\Foundation\Testing\TestResponse
-     */
-    protected function postGraphQL(array $data, array $headers = []): TestResponse
-    {
-        return $this->postJson(
-            'graphql',
-            $data,
-            $headers
-        );
-    }
-
-    /**
-     * Send a multipart form request.
-     *
-     * This is used for file uploads conforming to the specification:
-     * https://github.com/jaydenseric/graphql-multipart-request-spec
-     *
-     * @param  mixed[]  $parameters
-     * @param  mixed[]  $files
-     * @return \Illuminate\Foundation\Testing\TestResponse
-     */
-    protected function postGraphQLMultipart(array $parameters, array $files): TestResponse
-    {
-        return $this->call(
-            'POST',
-            'graphql',
-            $parameters,
-            [],
-            $files,
-            $this->transformHeadersToServerVars([
-                'Content-Type' => 'multipart/form-data',
-            ])
-        );
     }
 
     /**

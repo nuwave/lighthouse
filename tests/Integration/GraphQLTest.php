@@ -69,7 +69,7 @@ class GraphQLTest extends DBTestCase
      */
     public function itResolvesQueryViaPostRequest(): void
     {
-        $this->query('
+        $this->graphQL('
         query UserWithTasks {
             user {
                 email
@@ -203,7 +203,7 @@ class GraphQLTest extends DBTestCase
      */
     public function itRejectsInvalidQuery(): void
     {
-        $result = $this->query('
+        $result = $this->graphQL('
         {
             nonExistingField
         }
@@ -233,7 +233,7 @@ class GraphQLTest extends DBTestCase
      */
     public function itResolvesQueryViaMultipartRequest(): void
     {
-        $this->postGraphQLMultipart(
+        $this->multipartGraphQL(
             [
                 'operations' => /* @lang JSON */
                     '
@@ -261,12 +261,12 @@ class GraphQLTest extends DBTestCase
      */
     public function itResolvesUploadViaMultipartRequest(): void
     {
-        $this->postGraphQLMultipart(
+        $this->multipartGraphQL(
             [
                 'operations' => /* @lang JSON */
                     '
                     {
-                        "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                        "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
                         "variables": {
                             "file": null
                         }
@@ -295,19 +295,19 @@ class GraphQLTest extends DBTestCase
      */
     public function itResolvesUploadViaBatchedMultipartRequest(): void
     {
-        $this->postGraphQLMultipart(
+        $this->multipartGraphQL(
             [
                 'operations' => /* @lang JSON */
                     '
                     [
                         {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file) }",
                             "variables": {
                                 "file": null
                             }
                         },
                         {
-                            "query": "mutation Upload($file: Upload!) { upload(file: $file)}",
+                            "query": "mutation Upload($file: Upload!) { upload(file: $file)} ",
                             "variables": {
                                 "file": null
                             }

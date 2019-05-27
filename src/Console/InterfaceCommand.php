@@ -16,7 +16,7 @@ class InterfaceCommand extends LighthouseGeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a class for an Interface type.';
+    protected $description = 'Create a class for a GraphQL interface type.';
 
     /**
      * The type of class being generated.

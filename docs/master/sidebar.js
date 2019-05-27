@@ -1,4 +1,5 @@
-module.exports = [{
+module.exports = [
+    {
         title: 'Getting Started',
         children: [
             'getting-started/installation',
@@ -13,29 +14,69 @@ module.exports = [{
             'the-basics/schema',
             'the-basics/types',
             'the-basics/fields',
+            'the-basics/directives',
         ]
     },
     {
-        title: 'Guides',
+        title: 'Eloquent',
         children: [
-            'guides/schema-organisation',
-            'guides/relay',
-            'guides/auth',
-            'guides/validation',
-            'guides/relationships',
-            'guides/file-uploads',
-            'guides/custom-directives',
-            'guides/error-handling',
-            'guides/plugin-development',
-            'guides/native-php-types'
+            ['eloquent/getting-started', 'Getting Started'],
+            'eloquent/relationships',
+            'eloquent/nested-mutations',
         ]
     },
     {
-        title: 'Extensions',
+        title: "Testing",
         children: [
-            'extensions/subscriptions',
-            'extensions/deferred',
-            'extensions/tracing'
+            'testing/phpunit',
+        ],
+    },
+    {
+        title: 'Subscriptions',
+        children: [
+            ['subscriptions/getting-started', 'Getting Started'],
+            'subscriptions/defining-fields',
+            'subscriptions/trigger-subscriptions',
+            'subscriptions/filtering-subscriptions',
+        ]
+    },
+    {
+        title: 'Digging Deeper',
+        children: [
+            'digging-deeper/schema-organisation',
+            'digging-deeper/relay',
+            'digging-deeper/error-handling',
+            'digging-deeper/adding-types-programmatically',
+            'digging-deeper/file-uploads',
+            'digging-deeper/extending-lighthouse'
+        ]
+    },
+    {
+        title: 'Custom Directives',
+        children: [
+            ['custom-directives/getting-started', 'Getting Started'],
+            'custom-directives/node-directives',
+            'custom-directives/field-directives',
+            'custom-directives/argument-directives',
+        ]
+    },
+    {
+        title: 'Security',
+        children: [
+            'security/authentication',
+            'security/authorization',
+            'security/validation',
+            ['security/resource-exhaustion', 'Resource Exhaustion'],
+        ]
+    },
+    {
+        title: 'Performance',
+        children: [
+            'performance/schema-caching',
+            ['performance/n-plus-one', 'The N+1 Query Problem'],
+            'performance/deferred',
+            'performance/tracing',
+            'performance/server-configuration',
         ]
     },
     {
@@ -45,6 +86,7 @@ module.exports = [{
             'api-reference/resolvers',
             'api-reference/scalars',
             'api-reference/events',
+            'api-reference/commands',
         ]
-    }
-]
+    },
+];

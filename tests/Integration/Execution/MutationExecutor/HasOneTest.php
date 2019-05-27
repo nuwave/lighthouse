@@ -69,7 +69,7 @@ class HasOneTest extends DBTestCase
      */
     public function itCanCreateWithNewHasOne(): void
     {
-        $this->query('
+        $this->graphQL('
         mutation {
             createTask(input: {
                 name: "foo"
@@ -108,7 +108,7 @@ class HasOneTest extends DBTestCase
     {
         factory(Task::class)->create();
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -153,7 +153,7 @@ class HasOneTest extends DBTestCase
                 factory(Post::class)->create()
             );
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
@@ -199,7 +199,7 @@ class HasOneTest extends DBTestCase
                 factory(Post::class)->create()
             );
 
-        $this->query('
+        $this->graphQL('
         mutation {
             updateTask(input: {
                 id: 1
