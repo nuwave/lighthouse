@@ -55,7 +55,7 @@ module.exports = [
         title: 'Custom Directives',
         children: [
             ['custom-directives/getting-started', 'Getting Started'],
-            'custom-directives/node-directives',
+            'custom-directives/type-directives',
             'custom-directives/field-directives',
             'custom-directives/argument-directives',
         ]

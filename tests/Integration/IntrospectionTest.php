@@ -154,7 +154,7 @@ GRAPHQL;
     {
         $this->schema = $schema;
 
-        $this->introspectionResult = $this->query(self::INTROSPECTION_QUERY);
+        $this->introspectionResult = $this->graphQL(self::INTROSPECTION_QUERY);
     }
 
     protected function isTypeNamePresent(string $typeName): bool

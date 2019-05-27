@@ -17,7 +17,7 @@ class NamespaceDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             foo
         }
@@ -39,7 +39,7 @@ class NamespaceDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             foo
         }
@@ -61,7 +61,7 @@ class NamespaceDirectiveTest extends TestCase
         }
         ';
 
-        $this->query('
+        $this->graphQL('
         {
             foo
         }
