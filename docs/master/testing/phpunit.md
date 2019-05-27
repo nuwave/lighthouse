@@ -12,6 +12,7 @@ from within a PHPUnit test. Just add the `MakesGraphQLRequests` trait to your te
 
 namespace Tests;
 
++use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
