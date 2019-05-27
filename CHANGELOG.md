@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.7.0...master)
 
-## [3.6.1](https://github.com/nuwave/lighthouse/compare/v3.6.1...v3.7.0)
+## [3.7.0](https://github.com/nuwave/lighthouse/compare/v3.6.1...v3.7.0)
 
 ### Added
 
