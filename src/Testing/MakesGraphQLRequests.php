@@ -109,7 +109,7 @@ trait MakesGraphQLRequests
         $path = config('lighthouse.route_name');
 
         if ($prefix = config('lighthouse.route.prefix')) {
-            $path = $prefix.$path;
+            $path = $prefix.'/'.$path;
         }
 
         return $path;
