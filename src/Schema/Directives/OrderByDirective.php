@@ -48,7 +48,7 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
      *
      * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
      * @param \GraphQL\Language\AST\InputValueDefinitionNode $argDefinition
-     * @param \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition
+     * @param \GraphQL\Language\AST\FieldDefinitionNode $parentField
      * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
      * @return void
      *
@@ -57,7 +57,7 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$fieldDefinition,
+        FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     ): void {
         // Users may define this as NonNull if they want
@@ -80,7 +80,7 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
             ) !== 'OrderByClause'
         ) {
             throw new DefinitionException(
-              "Must define the argument type of {$argDefinition->name->value} on field {$fieldDefinition->name->value} as [OrderByClause!]."
+              "Must define the argument type of {$argDefinition->name->value} on field {$parentField->name->value} as [OrderByClause!]."
             );
         }
     }

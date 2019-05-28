@@ -71,9 +71,9 @@ class DocumentAST implements Serializable
 
         $instance = new self;
 
-        // Store the types in an associative array for quick lookup
         foreach ($documentNode->definitions as $definition) {
             if ($definition instanceof TypeDefinitionNode) {
+                // Store the types in an associative array for quick lookup
                 $instance->types[$definition->name->value] = $definition;
             } elseif ($definition instanceof TypeExtensionNode) {
                 // Multiple type extensions for the same name can exist
@@ -93,14 +93,14 @@ class DocumentAST implements Serializable
     /**
      * Serialize the final AST.
      *
-     * We exclude the type extensions, as they are merged with
-     * the actual types at this point.
+     * We exclude the type extensions stored in $typeExtensions,
+     * as they are merged with the actual types at this point.
      *
      * @return string
      */
     public function serialize(): string
     {
-        $nodeToArray = function (Node $node) {
+        $nodeToArray = function (Node $node): array {
             return $node->toArray(true);
         };
 
@@ -122,12 +122,17 @@ class DocumentAST implements Serializable
             'directives' => $directives,
         ] = unserialize($serialized);
 
-        // Utilize the NodeList for lazy unserialization
+        // Utilize the NodeList for lazy unserialization for performance gains.
+        // Until they are accessed by name, they are kept in their array form.
         $this->types = new NodeList($types);
         $this->directives = new NodeList($directives);
     }
 
     /**
+     * Set a type definition in the AST.
+     *
+     * This operation will overwrite existing definitions with the same name.
+     *
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $type
      * @return $this
      */
@@ -139,6 +144,10 @@ class DocumentAST implements Serializable
     }
 
     /**
+     * Set a directive definition in the AST.
+     *
+     * This operation will overwrite existing definitions with the same name.
+     *
      * @param  \GraphQL\Language\AST\DirectiveDefinitionNode  $directive
      * @return $this
      */

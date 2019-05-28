@@ -14,14 +14,14 @@ interface ArgManipulator extends Directive
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,
         InputValueDefinitionNode &$argDefinition,
-        FieldDefinitionNode &$fieldDefinition,
+        FieldDefinitionNode &$parentField,
         ObjectTypeDefinitionNode &$parentType
     );
 }
