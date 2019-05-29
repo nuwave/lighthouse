@@ -63,26 +63,16 @@ class DirectiveFactory
     public function __construct(Dispatcher $dispatcher)
     {
         // When looking for a directive by name, the namespaces are tried in order
-        $directives = new Collection([
+        $this->directiveBaseNamespaces = (new Collection([
             // User defined directives (top priority)
             config('lighthouse.namespaces.directives'),
 
             // Plugin developers defined directives
             $dispatcher->dispatch(new RegisterDirectiveNamespaces),
-        ]);
 
-        /*
-         * Allow a smooth transition away from the deprecated between directives.
-         * @deprecated
-         */
-        if (config('new_between_directives')) {
-            $directives->push('Nuwave\\Lighthouse\\Between');
-        }
-
-        // Lighthouse defined directives
-        $directives->push('Nuwave\\Lighthouse\\Schema\\Directives');
-
-        $this->directiveBaseNamespaces = $directives
+            // Lighthouse defined directives
+            'Nuwave\\Lighthouse\\Schema\\Directives',
+        ]))
             ->flatten()
             ->filter()
             ->all();
