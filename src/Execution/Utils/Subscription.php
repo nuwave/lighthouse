@@ -6,7 +6,7 @@ use Throwable;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
-use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
 
 class Subscription
@@ -55,7 +55,7 @@ class Subscription
                 $root
             );
         } catch (Throwable $e) {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler $exceptionHandler */
+            /** @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler $exceptionHandler */
             $exceptionHandler = app(SubscriptionExceptionHandler::class);
 
             $exceptionHandler->handleBroadcastError($e);
