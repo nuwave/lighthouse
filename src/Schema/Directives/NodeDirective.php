@@ -3,15 +3,15 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
-use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
-use Nuwave\Lighthouse\Support\Contracts\NodeMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\NodeManipulator;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
+use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 
-class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipulator
+class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\NodeRegistry
@@ -40,11 +40,11 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     /**
      * Handle type construction.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $value
+     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $value
      * @param  \Closure  $next
      * @return \GraphQL\Type\Definition\Type
      */
-    public function handleNode(NodeValue $value, Closure $next)
+    public function handleNode(TypeValue $value, Closure $next)
     {
         $this->nodeRegistry->registerNode(
             $value->getTypeDefinitionName(),
@@ -55,12 +55,14 @@ class NodeDirective extends BaseDirective implements NodeMiddleware, NodeManipul
     }
 
     /**
-     * @param  \GraphQL\Language\AST\Node  $node
+     * Apply manipulations from a type definition node.
+     *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
+     * @return void
      */
-    public function manipulateSchema(Node $node, DocumentAST $documentAST): DocumentAST
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
     {
-        return ASTHelper::attachNodeInterfaceToObjectType($node, $documentAST);
+        ASTHelper::attachNodeInterfaceToObjectType($typeDefinition);
     }
 }

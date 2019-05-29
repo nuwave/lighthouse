@@ -61,26 +61,26 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
-    public function manipulateSchema(FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current): DocumentAST
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $paginationType = $this->paginationType();
 
         // We default to not changing the field if no pagination type is set explicitly.
         // This makes sense for relations, as there should not be too many entries.
         if (! $paginationType) {
-            return $current;
+            return;
         }
 
-        return PaginationManipulator::transformToPaginatedField(
+        PaginationManipulator::transformToPaginatedField(
             $paginationType,
             $fieldDefinition,
             $parentType,
-            $current,
+            $documentAST,
             $this->directiveArgValue('defaultCount'),
             $this->paginateMaxCount()
         );

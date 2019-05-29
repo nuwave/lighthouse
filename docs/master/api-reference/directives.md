@@ -420,7 +420,7 @@ If you pass an `id` argument it will look for an instance of the expected model 
 type Query {
     post(id: ID @eq): Post @can(ability: "view")
 }
-``` 
+```
 
 ```php
 class PostPolicy
@@ -915,45 +915,6 @@ split into type and ID.
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
-## @group
-
-Apply common settings to all fields of an Object Type.
-
-Set a common namespace for the [@field](#field) and the [@complexity](#complexity) directives
-that are defined on the fields of the defined type.
-
-```graphql
-extend type Query @group(namespace: "App\\Authentication") {
-  activeUsers @field(resolver: "User@getActiveUsers")
-}
-```
-
-### Definition
-
-```graphql
-directive @group(  
-  """
-  Specify which middleware to apply to all child-fields.
-  """
-  middleware: [String!]
-  
-  """
-  Specify the namespace for the middleware.
-  """
-  namespace: String
-) on FIELD_DEFINITION
-```
-
-### Examples
-
-Set common middleware on a set of Queries/Mutations.
-
-```graphql
-type Mutation @group(middleware: ["api:auth"]) {
-    createPost(title: String!): Post
-}
-```
-
 ## @hasMany
 
 Corresponds to [Eloquent's HasMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
@@ -1312,6 +1273,43 @@ own mechanism of encoding/decoding global ids.
 ```graphql
 directive @model on OBJECT
 ```
+
+## @namespace
+
+Redefine the default namespaces used in other directives.
+
+The following example applies the namespace `App\Blog`
+to the `@field` directive used on the `posts` field.
+
+```graphql
+type Query {
+  posts: [Post!]! @field(resolver: "Post@resolveAll") @namespace(field: "App\\Blog")
+}
+```
+
+### Definition
+
+```graphql
+"""
+Redefine the default namespaces used in other directives.
+The arguments are a map from directive names to namespaces.
+"""
+directive @namespace on FIELD_DEFINITION | OBJECT
+```
+
+### Examples
+
+When used upon an object type or an object type extension, the namespace
+applies to fields of the type as well. This allows you to specify
+a common namespace for a group of fields.
+
+```graphql
+extend type Query @namespace(field: "App\\Blog") {
+  posts: [Post!]! @field(resolver: "Post@resolveAll")
+}
+```
+
+A `@namespace` directive defined on a field directive wins in case of a conflict.
 
 ## @neq
 

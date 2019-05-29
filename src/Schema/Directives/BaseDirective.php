@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Language\AST\Node;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Language\AST\DirectiveNode;
 use Illuminate\Database\Eloquent\Model;
@@ -17,19 +18,17 @@ abstract class BaseDirective implements Directive
     /**
      * The node the directive is defined on.
      *
-     * @var \GraphQL\Language\AST\TypeSystemDefinitionNode
+     * @var \GraphQL\Language\AST\Node
      */
     protected $definitionNode;
 
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *
-     * @todo Make this type annotation a hard requirement as soon as the underlying implementation is fixed
-     *
-     * @param  \GraphQL\Language\AST\TypeSystemDefinitionNode  $definitionNode
+     * @param  \GraphQL\Language\AST\Node  $definitionNode
      * @return $this
      */
-    public function hydrate($definitionNode): self
+    public function hydrate(Node $definitionNode): self
     {
         $this->definitionNode = $definitionNode;
 

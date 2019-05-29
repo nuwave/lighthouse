@@ -19,24 +19,24 @@ class PaginationManipulator
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
     public static function transformToPaginatedField(
         PaginationType $paginationType,
-        FieldDefinitionNode $fieldDefinition,
-        ObjectTypeDefinitionNode $parentType,
-        DocumentAST $current,
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode &$parentType,
+        DocumentAST &$documentAST,
         ?int $defaultCount = null,
         ?int $maxCount = null
-    ): DocumentAST {
+    ): void {
         if ($paginationType->isConnection()) {
-            return self::registerConnection($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
+            self::registerConnection($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount);
+        } else {
+            self::registerPaginator($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount);
         }
-
-        return self::registerPaginator($fieldDefinition, $parentType, $current, $defaultCount, $maxCount);
     }
 
     /**
@@ -47,15 +47,15 @@ class PaginationManipulator
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
     public static function registerConnection(
-        FieldDefinitionNode $fieldDefinition,
-        ObjectTypeDefinitionNode $parentType,
-        DocumentAST $documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode &$parentType,
+        DocumentAST &$documentAST,
         ?int $defaultCount = null,
         ?int $maxCount = null
-    ): DocumentAST {
+    ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
         $connectionTypeName = "{$fieldTypeName}Connection";
@@ -87,9 +87,8 @@ class PaginationManipulator
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
 
-        return $documentAST->setDefinition($connectionType)
-                           ->setDefinition($connectionEdge)
-                           ->setDefinition($parentType);
+        $documentAST->setTypeDefinition($connectionType);
+        $documentAST->setTypeDefinition($connectionEdge);
     }
 
     /**
@@ -100,15 +99,15 @@ class PaginationManipulator
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
     public static function registerPaginator(
-        FieldDefinitionNode $fieldDefinition,
-        ObjectTypeDefinitionNode $parentType,
-        DocumentAST $documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode &$parentType,
+        DocumentAST &$documentAST,
         ?int $defaultCount = null,
         ?int $maxCount = null
-    ): DocumentAST {
+    ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
         $paginatorTypeName = "{$fieldTypeName}Paginator";
         $paginatorFieldClassName = addslashes(PaginatorField::class);
@@ -131,10 +130,7 @@ class PaginationManipulator
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
 
-        $documentAST->setDefinition($paginatorType);
-        $documentAST->setDefinition($parentType);
-
-        return $documentAST;
+        $documentAST->setTypeDefinition($paginatorType);
     }
 
     /**

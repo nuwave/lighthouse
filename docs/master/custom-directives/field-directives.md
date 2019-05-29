@@ -20,4 +20,4 @@ as well as the outgoing result of resolving the field.
 ## FieldManipulator
 
 An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
-directive can be used to manipulate the schema AST. 
+directive can be used to manipulate the schema AST.

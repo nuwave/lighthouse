@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Language\AST\NonNullTypeNode;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\InputValueDefinitionNode;
@@ -47,20 +46,26 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
     /**
      * Validate the input argument definition.
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
+     * @param \GraphQL\Language\AST\InputValueDefinitionNode $argDefinition
+     * @param \GraphQL\Language\AST\FieldDefinitionNode $parentField
+     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
+     * @return void
+     *
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
-    public function manipulateSchema(InputValueDefinitionNode $argDefinition, FieldDefinitionNode $fieldDefinition, ObjectTypeDefinitionNode $parentType, DocumentAST $current)
-    {
-        $expectedOrderByClause = ASTHelper::cloneNode($argDefinition);
-
+    public function manipulateArgDefinition(
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
+    ): void {
         // Users may define this as NonNull if they want
-        if ($argDefinition->type instanceof NonNullTypeNode) {
-            $expectedOrderByClause = $argDefinition->type;
-        }
+        // Because we need to validate the structure regardless,
+        // we unwrap it by one level if it is
+        $expectedOrderByClause = $argDefinition->type instanceof NonNullTypeNode
+            ? $argDefinition->type
+            : $argDefinition;
 
         if (
             data_get(
@@ -71,13 +76,12 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
                 .'.type'
                 // input objects
                 .'.type.name.value'
+                // that are exactly of type
             ) !== 'OrderByClause'
         ) {
             throw new DefinitionException(
-              "Must define the argument type of {$argDefinition->name->value} on field {$fieldDefinition->name->value} as [OrderByClause!]."
+              "Must define the argument type of {$argDefinition->name->value} on field {$parentField->name->value} as [OrderByClause!]."
             );
         }
-
-        return $current;
     }
 }

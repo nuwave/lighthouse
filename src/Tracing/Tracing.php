@@ -42,13 +42,13 @@ class Tracing
     /**
      * Set the tracing directive on all fields of the query to enable tracing them.
      *
-     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $ManipulateAST
+     * @param  \Nuwave\Lighthouse\Events\ManipulateAST  $manipulateAST
      * @return void
      */
-    public function handleManipulateAST(ManipulateAST $ManipulateAST): void
+    public function handleManipulateAST(ManipulateAST $manipulateAST): void
     {
         ASTHelper::attachDirectiveToObjectTypeFields(
-            $ManipulateAST->documentAST,
+            $manipulateAST->documentAST,
             PartialParser::directive('@tracing')
         );
     }

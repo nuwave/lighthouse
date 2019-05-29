@@ -11,7 +11,7 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\NodeValue;
+use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -133,18 +133,18 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     /**
      * Set node's cache key.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $nodeValue
+     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $typeValue
      * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    protected function setNodeKey(NodeValue $nodeValue): void
+    protected function setNodeKey(TypeValue $typeValue): void
     {
-        if ($nodeValue->getCacheKey()) {
+        if ($typeValue->getCacheKey()) {
             return;
         }
 
-        $fields = data_get($nodeValue->getTypeDefinition(), 'fields', []);
+        $fields = data_get($typeValue->getTypeDefinition(), 'fields', []);
         $nodeKey = (new Collection($fields))->reduce(function (?string $key, FieldDefinitionNode $field): ?string {
             if ($key) {
                 return $key;
@@ -174,12 +174,12 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
             });
         }
 
-        if (! $nodeKey && $nodeValue->getTypeDefinitionName() !== 'Query') {
+        if (! $nodeKey && $typeValue->getTypeDefinitionName() !== 'Query') {
             throw new DirectiveException(
-                "No @cacheKey or ID field defined on {$nodeValue->getTypeDefinitionName()}"
+                "No @cacheKey or ID field defined on {$typeValue->getTypeDefinitionName()}"
             );
         }
 
-        $nodeValue->setCacheKey($nodeKey);
+        $typeValue->setCacheKey($nodeKey);
     }
 }

@@ -388,7 +388,7 @@ class PaginateDirectiveTest extends DBTestCase
             name: String!
         }
 
-        extend type Query @group {
+        extend type Query {
             users: [User!]! @paginate(model: "User")
         }
         '.$this->placeholderQuery();

@@ -28,7 +28,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
             ManipulateAST::class,
             function (ManipulateAST $manipulateAST): void {
                 $manipulateAST->documentAST
-                    ->setDefinition(
+                    ->setTypeDefinition(
                         PartialParser::inputObjectTypeDefinition('
                             input WhereConstraints {
                                 column: String
@@ -40,7 +40,7 @@ class WhereConstraintsServiceProvider extends ServiceProvider
                             }
                         ')
                     )
-                    ->setDefinition(
+                    ->setTypeDefinition(
                         PartialParser::scalarTypeDefinition('
                             scalar Mixed @scalar(class: "MLL\\\GraphQLScalars\\\Mixed")
                         ')

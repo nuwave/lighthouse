@@ -4,26 +4,22 @@ namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Schema;
-use Illuminate\Support\Arr;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Validator\Rules\QueryDepth;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Validator\DocumentValidator;
-use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use GraphQL\Validator\Rules\QueryComplexity;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Events\ManipulateResult;
-use Nuwave\Lighthouse\Events\BuildSchemaString;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
 use GraphQL\Validator\Rules\DisableIntrospection;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 
 class GraphQL
@@ -48,13 +44,6 @@ class GraphQL
      * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
      */
     protected $schemaBuilder;
-
-    /**
-     * The schema source provider.
-     *
-     * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
-     */
-    protected $schemaSourceProvider;
 
     /**
      * The pipeline.
@@ -88,7 +77,6 @@ class GraphQL
      * GraphQL constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\SchemaBuilder  $schemaBuilder
-     * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
      * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
@@ -97,14 +85,12 @@ class GraphQL
      */
     public function __construct(
         SchemaBuilder $schemaBuilder,
-        SchemaSourceProvider $schemaSourceProvider,
         Pipeline $pipeline,
         EventDispatcher $eventDispatcher,
         ASTBuilder $astBuilder,
         CreatesContext $createsContext
     ) {
         $this->schemaBuilder = $schemaBuilder;
-        $this->schemaSourceProvider = $schemaSourceProvider;
         $this->pipeline = $pipeline;
         $this->eventDispatcher = $eventDispatcher;
         $this->astBuilder = $astBuilder;
@@ -274,45 +260,12 @@ class GraphQL
                         config('lighthouse.cache.key'),
                         config('lighthouse.cache.ttl'),
                         function (): DocumentAST {
-                            return $this->buildAST();
+                            return $this->astBuilder->build();
                         }
                     )
-                : $this->buildAST();
+                : $this->astBuilder->build();
         }
 
         return $this->documentAST;
-    }
-
-    /**
-     * Get the schema string and build an AST out of it.
-     *
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected function buildAST(): DocumentAST
-    {
-        $schemaString = $this->schemaSourceProvider->getSchemaString();
-
-        // Allow to register listeners that add in additional schema definitions.
-        // This can be used by plugins to hook into the schema building process
-        // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = (array) $this->eventDispatcher->dispatch(
-            new BuildSchemaString($schemaString)
-        );
-
-        $documentAST = $this->astBuilder->build(
-            implode(
-                PHP_EOL,
-                Arr::prepend($additionalSchemas, $schemaString)
-            )
-        );
-
-        // Listeners may manipulate the DocumentAST that is passed by reference
-        // into the ManipulateAST event. This can be useful for extensions
-        // that want to programmatically change the schema.
-        $this->eventDispatcher->dispatch(
-            new ManipulateAST($documentAST)
-        );
-
-        return $documentAST;
     }
 }

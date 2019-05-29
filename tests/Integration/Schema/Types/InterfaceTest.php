@@ -6,8 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Team;
 use Tests\Utils\Models\User;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class InterfaceTest extends DBTestCase
 {
@@ -127,7 +128,8 @@ class InterfaceTest extends DBTestCase
         }
         ';
 
-        $result = $this->graphQL('{
+        $result = $this->graphQL('
+        {
             __schema {
                 types {
                     kind
@@ -140,14 +142,13 @@ class InterfaceTest extends DBTestCase
         }
         ');
 
-        $interface = Collection ::make($result->jsonGet('data.__schema.types'))
-            ->toBase()
+        $interface = (new Collection($result->jsonGet('data.__schema.types')))
             ->firstWhere('name', 'Nameable');
 
         $this->assertCount(2, $interface['possibleTypes']);
     }
 
-    public function fetchResults(): Collection
+    public function fetchResults(): EloquentCollection
     {
         $users = User::all();
         $teams = Team::all();

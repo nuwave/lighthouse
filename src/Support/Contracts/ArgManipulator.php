@@ -12,16 +12,16 @@ interface ArgManipulator extends Directive
     /**
      * Manipulate the AST.
      *
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
-     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public function manipulateSchema(
-        InputValueDefinitionNode $argDefinition,
-        FieldDefinitionNode $fieldDefinition,
-        ObjectTypeDefinitionNode $parentType,
-        DocumentAST $current
+    public function manipulateArgDefinition(
+        DocumentAST &$documentAST,
+        InputValueDefinitionNode &$argDefinition,
+        FieldDefinitionNode &$parentField,
+        ObjectTypeDefinitionNode &$parentType
     );
 }

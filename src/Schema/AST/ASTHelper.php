@@ -12,7 +12,6 @@ use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Language\AST\NonNullTypeNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
@@ -78,19 +77,6 @@ class ASTHelper
             ->all();
 
         return self::mergeNodeList($remainingDefinitions, $addition);
-    }
-
-    /**
-     * Create a clone of the original node.
-     *
-     * @param  \GraphQL\Language\AST\Node  $node
-     * @return \GraphQL\Language\AST\Node
-     */
-    public static function cloneNode(Node $node): Node
-    {
-        return AST::fromArray(
-            $node->toArray(true)
-        );
     }
 
     /**
@@ -197,21 +183,6 @@ class ASTHelper
     }
 
     /**
-     * Check if a node has a particular directive defined upon it.
-     *
-     * @param  \GraphQL\Language\AST\Node  $definitionNode
-     * @param  string  $name
-     * @return bool
-     */
-    public static function hasDirectiveDefinition(Node $definitionNode, string $name): bool
-    {
-        return (new Collection($definitionNode->directives))
-            ->contains(function (DirectiveNode $directiveDefinitionNode) use ($name): bool {
-                return $directiveDefinitionNode->name->value === $name;
-            });
-    }
-
-    /**
      * Directives might have an additional namespace associated with them, set via the "@namespace" directive.
      *
      * @param  \GraphQL\Language\AST\Node  $definitionNode
@@ -222,7 +193,7 @@ class ASTHelper
     {
         $namespaceDirective = static::directiveDefinition(
             $definitionNode,
-            (new NamespaceDirective)->name()
+            NamespaceDirective::NAME
         );
 
         return $namespaceDirective
@@ -238,43 +209,26 @@ class ASTHelper
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  \GraphQL\Language\AST\DirectiveNode  $directive
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
-    public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): DocumentAST
+    public static function attachDirectiveToObjectTypeFields(DocumentAST $documentAST, DirectiveNode $directive): void
     {
-        return $documentAST->objectTypeDefinitions()
-            ->reduce(
-                function (DocumentAST $document, ObjectTypeDefinitionNode $objectType) use ($directive): DocumentAST {
-                    if (! data_get($objectType, 'name.value')) {
-                        return $document;
-                    }
-
-                    $objectType->fields = new NodeList(
-                        (new Collection($objectType->fields))
-                            ->map(function (FieldDefinitionNode $field) use ($directive): FieldDefinitionNode {
-                                $field->directives = $field->directives->merge([$directive]);
-
-                                return $field;
-                            })
-                            ->all()
-                    );
-
-                    $document->setDefinition($objectType);
-
-                    return $document;
-                },
-                $documentAST
-            );
+        foreach ($documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                foreach ($typeDefinition->fields as $fieldDefinition) {
+                    $fieldDefinition->directives = $fieldDefinition->directives->merge([$directive]);
+                }
+            }
+        }
     }
 
     /**
-     * This adds an Interface called "Node" to an ObjectType definition.
+     * Add the "Node" interface and a global ID field to an object type.
      *
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $objectType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode
      */
-    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType, DocumentAST $documentAST): DocumentAST
+    public static function attachNodeInterfaceToObjectType(ObjectTypeDefinitionNode $objectType): ObjectTypeDefinitionNode
     {
         $objectType->interfaces = self::mergeNodeList(
             $objectType->interfaces,
@@ -291,6 +245,6 @@ class ASTHelper
         );
         $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
 
-        return $documentAST->setDefinition($objectType);
+        return $objectType;
     }
 }

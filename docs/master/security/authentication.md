@@ -41,7 +41,8 @@ type Query {
 }
 ```
 
-If you need to apply middleware to a group of fields, you can put [@middleware](../api-reference/directives.md#middleware) on an Object type.
+If you need to apply middleware to multiple fields, just use [@middleware](../api-reference/directives.md#middleware)
+on a `type` or an `extend type` definition.
 
 ```graphql
 extend type Query @middleware(checks: ["auth:admin"]){

@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\ParseException;
+use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class DocumentASTTest extends TestCase
@@ -24,7 +25,7 @@ class DocumentASTTest extends TestCase
 
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            $documentAST->queryTypeDefinition()
+            $documentAST->types['Query']
         );
     }
 
@@ -42,31 +43,6 @@ class DocumentASTTest extends TestCase
     /**
      * @test
      */
-    public function itCanSetDefinition(): void
-    {
-        $documentAST = DocumentAST::fromSource('
-        type Query {
-            foo: Int
-        }
-        ');
-
-        $objectType = PartialParser::objectTypeDefinition('
-        type Mutation {
-            bar: Int
-        }
-        ');
-
-        $documentAST->setDefinition($objectType);
-
-        $this->assertInstanceOf(
-            ObjectTypeDefinitionNode::class,
-            $documentAST->mutationTypeDefinition()
-        );
-    }
-
-    /**
-     * @test
-     */
     public function itOverwritesDefinitionWithSameName(): void
     {
         $documentAST = DocumentAST::fromSource('
@@ -75,17 +51,17 @@ class DocumentASTTest extends TestCase
         }
         ');
 
-        $objectType = PartialParser::objectTypeDefinition('
+        $overwrite = PartialParser::objectTypeDefinition('
         type Query {
             bar: Int
         }
         ');
 
-        $documentAST->setDefinition($objectType);
+        $documentAST->types[$overwrite->name->value] = $overwrite;
 
         $this->assertSame(
-            'bar',
-            $documentAST->queryTypeDefinition()->fields[0]->name->value
+            $overwrite,
+            $documentAST->types['Query']
         );
     }
 
@@ -98,20 +74,30 @@ class DocumentASTTest extends TestCase
         type Query {
             foo: Int
         }
+
+        directive @foo on FIELD
         ');
 
+        /** @var DocumentAST $reserialized */
         $reserialized = unserialize(
             serialize($documentAST)
         );
 
+        /** @var ObjectTypeDefinitionNode $queryType */
+        $queryType = $reserialized->types['Query'];
         $this->assertInstanceOf(
             ObjectTypeDefinitionNode::class,
-            $reserialized->queryTypeDefinition()
+            $queryType
         );
 
         $this->assertInstanceOf(
             FieldDefinitionNode::class,
-            $reserialized->queryTypeDefinition()->fields[0]
+            $queryType->fields[0]
+        );
+
+        $this->assertInstanceOf(
+            DirectiveDefinitionNode::class,
+            $reserialized->directives['foo']
         );
     }
 }

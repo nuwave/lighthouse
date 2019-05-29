@@ -25,7 +25,7 @@ class ASTBuilderTest extends TestCase
      */
     public function itCanMergeTypeExtensionFields(): void
     {
-        $documentAST = $this->astBuilder->build('
+        $this->schema = '
         type Query {
             foo: String
         }
@@ -37,13 +37,12 @@ class ASTBuilderTest extends TestCase
         extend type Query {
             baz: Boolean
         }
-        ');
+        ';
+        $documentAST = $this->astBuilder->build();
 
         $this->assertCount(
             3,
-            $documentAST
-                ->queryTypeDefinition()
-                ->fields
+            $documentAST->types['Query']->fields
         );
     }
 
@@ -52,8 +51,7 @@ class ASTBuilderTest extends TestCase
      */
     public function itDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
-        $this->expectException(DefinitionException::class);
-        $this->astBuilder->build('
+        $this->schema = '
         type Query {
             foo: String
         }
@@ -61,6 +59,9 @@ class ASTBuilderTest extends TestCase
         extend type Query {
             foo: Int
         }
-        ');
+        ';
+
+        $this->expectException(DefinitionException::class);
+        $this->astBuilder->build();
     }
 }

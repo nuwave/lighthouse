@@ -27,7 +27,7 @@ class FieldValue
     /**
      * The parent type of the field.
      *
-     * @var \Nuwave\Lighthouse\Schema\Values\NodeValue
+     * @var \Nuwave\Lighthouse\Schema\Values\TypeValue
      */
     protected $parent;
 
@@ -62,11 +62,11 @@ class FieldValue
     /**
      * Create new field value instance.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\NodeValue  $parent
+     * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $parent
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $field
      * @return void
      */
-    public function __construct(NodeValue $parent, FieldDefinitionNode $field)
+    public function __construct(TypeValue $parent, FieldDefinitionNode $field)
     {
         $this->parent = $parent;
         $this->field = $field;
@@ -128,9 +128,9 @@ class FieldValue
     }
 
     /**
-     * @return \Nuwave\Lighthouse\Schema\Values\NodeValue
+     * @return \Nuwave\Lighthouse\Schema\Values\TypeValue
      */
-    public function getParent(): NodeValue
+    public function getParent(): TypeValue
     {
         return $this->parent;
     }
