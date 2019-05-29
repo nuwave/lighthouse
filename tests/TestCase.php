@@ -213,8 +213,7 @@ abstract class TestCase extends BaseTestCase
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema
-            .$this->placeholderQuery()
+            $schema.$this->placeholderQuery()
         );
     }
 
