@@ -135,7 +135,6 @@ So let's take a look at the built-in `@eq` directive.
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class EqDirective extends BaseDirective implements ArgBuilderDirective
