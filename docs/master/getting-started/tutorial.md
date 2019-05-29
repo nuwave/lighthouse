@@ -377,5 +377,5 @@ The app you just build might use some more features.
 Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../api-reference/directives.md#paginate)
-- [Create and update posts and comments](../the-basics/fields.md#mutate-data)
+- [Create and update eloquent models](../eloquent/getting-started.md#create)
 - [Validate the inputs that are sent to your server](../security/validation.md)
