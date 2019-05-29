@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nuwave\Lighthouse\Schema\Types;
 
 use BenSampo\Enum\Enum;
+use InvalidArgumentException;
 use GraphQL\Type\Definition\EnumType;
 
 /**
@@ -26,7 +27,7 @@ class LaravelEnumType extends EnumType
     public function __construct(string $enumClass)
     {
         if (! is_subclass_of($enumClass, Enum::class)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Must pass an instance of \BenSampo\Enum\Enum, got {$enumClass}."
             );
         }
