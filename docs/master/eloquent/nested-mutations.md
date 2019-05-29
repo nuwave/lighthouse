@@ -525,7 +525,7 @@ as attaching existing ones.
 
 ```graphql
 type Mutation {
-  createTask(input: CreateTaskInput!): Task @create(flatten: true)
+  createTask(input: CreateTaskInput! @spread): Task @create
 }
 
 input CreateTaskInput {
