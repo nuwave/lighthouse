@@ -80,7 +80,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
                 $model = $modelClass::find($idOrIds);
 
                 if (! $model) {
-                    return null;
+                    return;
                 }
 
                 if ($model instanceof Model) {

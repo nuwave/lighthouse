@@ -74,7 +74,7 @@ class CompanyWasCreatedEvent
     public $company;
 
     /**
-     * CompanyWasCreatedEvent constructor
+     * CompanyWasCreatedEvent constructor.
      * @param  \Tests\Utils\Models\Company  $company
      * @return void
      */
