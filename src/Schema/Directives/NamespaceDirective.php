@@ -75,7 +75,7 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
      * @param \GraphQL\Language\AST\TypeExtensionNode $typeExtension
      * @return void
      */
-    public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension)
+    public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
         if ($typeExtension instanceof ObjectTypeExtensionNode) {
             $this->addNamespacesToFields($typeExtension);

@@ -54,7 +54,8 @@ class WithDirective extends RelationDirective implements FieldMiddleware
                             ->load(
                                 $parent->getKey(),
                                 ['parent' => $parent]
-                            )->then(
+                            )
+                            ->then(
                                 function () use ($resolver, $parent, $args, $context, $resolveInfo) {
                                     return $resolver($parent, $args, $context, $resolveInfo);
                                 }

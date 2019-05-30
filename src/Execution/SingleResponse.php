@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Symfony\Component\HttpFoundation\Response;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 
 class SingleResponse implements CreatesResponse
@@ -12,7 +13,7 @@ class SingleResponse implements CreatesResponse
      * @param  mixed[]  $result
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function createResponse(array $result)
+    public function createResponse(array $result): Response
     {
         return response($result);
     }

@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Defer;
 
+use Illuminate\Support\Collection as BaseCollection;
 use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
@@ -251,8 +252,10 @@ class DeferDBTest extends DBTestCase
         });
 
         $deferredCompanies = $chunks[2];
+
         $this->assertCount(6, $deferredCompanies);
-        (new Collection($deferredCompanies))->toBase()->each(function (array $item) use ($companies): void {
+
+        (new BaseCollection($deferredCompanies))->each(function (array $item) use ($companies): void {
             $item = $item['data'];
             $this->assertArrayHasKey('name', $item);
 

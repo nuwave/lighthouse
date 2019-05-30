@@ -6,7 +6,7 @@ use Faker\Generator as Faker;
 use Tests\Utils\Models\Company;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(User::class, function (Faker $faker) {
+$factory->define(User::class, function (Faker $faker): array {
     return [
         'company_id' => function () {
             return factory(Company::class)->create()->getKey();

@@ -17,7 +17,7 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
         $task = factory(Task::class)->create();
         $tags = factory(Tag::class, 3)->create();
 
-        $tags->each(function (Tag $tag) use ($task) {
+        $tags->each(function (Tag $tag) use ($task): void {
             DB::table('taggables')->insert([
                 'tag_id' => $tag->id,
                 'taggable_id' => $task->id,

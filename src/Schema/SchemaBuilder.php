@@ -38,7 +38,7 @@ class SchemaBuilder
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return \GraphQL\Type\Schema
      */
-    public function build(DocumentAST $documentAST)
+    public function build(DocumentAST $documentAST): Schema
     {
         $config = SchemaConfig::create();
 

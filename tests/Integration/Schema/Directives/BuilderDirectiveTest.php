@@ -35,6 +35,11 @@ class BuilderDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
+    /**
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  int  $value
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
     public function limit($builder, int $value)
     {
         return $builder->limit($value);

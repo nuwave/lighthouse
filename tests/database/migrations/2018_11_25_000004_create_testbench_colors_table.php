@@ -11,7 +11,7 @@ class CreateTestbenchColorsTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('colors', function (Blueprint $table) {
+        Schema::create('colors', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('name');
             $table->timestamps();

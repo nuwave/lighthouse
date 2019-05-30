@@ -6,7 +6,7 @@ use Faker\Generator as Faker;
 use Tests\Utils\Models\Comment;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(Comment::class, function (Faker $faker) {
+$factory->define(Comment::class, function (Faker $faker): array {
     return [
         'comment' => $faker->sentence,
         'user_id' => function () {

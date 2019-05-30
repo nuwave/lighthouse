@@ -184,7 +184,7 @@ class ModelRelationFetcher
         $reloadedModels = $query
             ->whereKey($ids)
             ->get()
-            ->filter(function (Model $model) use ($ids) {
+            ->filter(function (Model $model) use ($ids): bool {
                 return in_array(
                     $model->getKey(),
                     $ids,
@@ -219,7 +219,7 @@ class ModelRelationFetcher
     protected function buildRelationsFromModels(string $relationName, Closure $relationConstraints): Collection
     {
         return $this->models->toBase()->map(
-            function (Model $model) use ($relationName, $relationConstraints) {
+            function (Model $model) use ($relationName, $relationConstraints): Relation {
                 $relation = $this->getRelationInstance($relationName);
 
                 $relation->addEagerConstraints([$model]);
@@ -265,7 +265,7 @@ class ModelRelationFetcher
         $withProperty = $reflection->getProperty('with');
         $withProperty->setAccessible(true);
 
-        $with = array_filter((array) $withProperty->getValue($model), function ($relation) use ($model) {
+        $with = array_filter((array) $withProperty->getValue($model), function ($relation) use ($model): bool {
             return ! $model->relationLoaded($relation);
         });
 
@@ -299,7 +299,7 @@ class ModelRelationFetcher
     {
         return $this->models
             ->mapWithKeys(
-                function (Model $model) use ($relationName) {
+                function (Model $model) use ($relationName): array {
                     return [$this->buildKey($model->getKey()) => $model->getRelation($relationName)];
                 }
             )->all();
@@ -333,7 +333,7 @@ class ModelRelationFetcher
      */
     protected function convertRelationToPaginator(int $first, int $page, string $relationName): self
     {
-        $this->models->each(function (Model $model) use ($page, $first, $relationName) {
+        $this->models->each(function (Model $model) use ($page, $first, $relationName): void {
             $total = $model->getAttribute(
                 $this->getRelationCountName($relationName)
             );

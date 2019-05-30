@@ -412,17 +412,17 @@ class FieldFactory
         }
     }
 
-    protected function argValueExists(array $argumentPath)
+    protected function argValueExists(array $argumentPath): bool
     {
         return Arr::has($this->args, implode('.', $argumentPath));
     }
 
-    protected function setArgValue(array $argumentPath, $value)
+    protected function setArgValue(array $argumentPath, $value): array
     {
         return Arr::set($this->args, implode('.', $argumentPath), $value);
     }
 
-    protected function unsetArgValue(array $argumentPath)
+    protected function unsetArgValue(array $argumentPath): void
     {
         Arr::forget($this->args, implode('.', $argumentPath));
     }

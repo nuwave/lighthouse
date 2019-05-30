@@ -273,7 +273,7 @@ class TypeRegistry
             'name' => $objectDefinition->name->value,
             'description' => data_get($objectDefinition->description, 'value'),
             'fields' => $this->resolveFieldsFunction($objectDefinition),
-            'interfaces' => function () use ($objectDefinition) {
+            'interfaces' => function () use ($objectDefinition): array {
                 return (new Collection($objectDefinition->interfaces))
                     ->map(function (NamedTypeNode $interface): Type {
                         return $this->get($interface->name->value);
@@ -316,7 +316,7 @@ class TypeRegistry
         return new InputObjectType([
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
-            'fields' => function () use ($inputDefinition) {
+            'fields' => function () use ($inputDefinition): array {
                 return (new Collection($inputDefinition->fields))
                     ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
                         $argumentValue = new ArgumentValue($inputValueDefinition);
@@ -411,9 +411,9 @@ class TypeRegistry
         return new UnionType([
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
-            'types' => function () use ($unionDefinition) {
+            'types' => function () use ($unionDefinition): array {
                 return (new Collection($unionDefinition->types))
-                    ->map(function (NamedTypeNode $type) {
+                    ->map(function (NamedTypeNode $type): Type {
                         return $this->get(
                             $type->name->value
                         );

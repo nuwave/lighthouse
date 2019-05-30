@@ -210,10 +210,10 @@ class DirectiveFactory
     protected function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {
         return (new Collection($node->directives))
-            ->map(function (DirectiveNode $directive) use ($node) {
+            ->map(function (DirectiveNode $directive) use ($node): Directive {
                 return $this->create($directive->name->value, $node);
             })
-            ->filter(function (Directive $directive) use ($directiveClass) {
+            ->filter(function (Directive $directive) use ($directiveClass): bool {
                 return $directive instanceof $directiveClass;
             });
     }

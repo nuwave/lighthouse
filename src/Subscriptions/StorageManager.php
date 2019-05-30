@@ -74,7 +74,7 @@ class StorageManager implements StoresSubscriptions
      * @param  string  $topic
      * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Subscriptions\Subscriber>
      */
-    public function subscribersByTopic(string $topic)
+    public function subscribersByTopic(string $topic): Collection
     {
         $key = self::TOPIC_KEY.".{$topic}";
 

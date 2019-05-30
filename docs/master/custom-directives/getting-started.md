@@ -88,7 +88,7 @@ class UpperCaseDirective implements Directive, FieldMiddleware
         $previousResolver = $fieldValue->getResolver();
 
         // Wrap around the resolver
-        $wrappedResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($previousResolver) {
+        $wrappedResolver = function ($root, array $args, GraphQLContext $context, ResolveInfo $info) use ($previousResolver): string {
             // Call the resolver, passing along the resolver arguments
             /** @var string $result */
             $result = $previousResolver($root, $args, $context, $info);
