@@ -6,8 +6,8 @@ use Throwable;
 use InvalidArgumentException;
 use Nuwave\Lighthouse\GraphQL;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry;
-use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 
 class Subscription
 {
