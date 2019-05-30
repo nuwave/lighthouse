@@ -21,15 +21,25 @@ return [
     |
     | Controls the HTTP route that your GraphQL server responds to.
     |
-    | Beware that middleware defined here runs before the GraphQL execution phase.
-    | Make sure that errors result in spec-compliant responses. For field level
-    | granularity, you may use the @middleware directive instead.
-    |
     */
 
     'route' => [
+        /*
+         * The URI the endpoint responds to, e.g. mydomain.com/graphql.
+         */
         'uri' => 'graphql',
-        'as' => 'graphql',
+
+        /*
+         * Lighthouse creates a named route for convenient URL generation and redirects.
+         */
+        'name' => 'graphql',
+
+        /*
+         *
+         * Beware that middleware defined here runs before the GraphQL execution phase,
+         * so you have to take extra care to return spec-compliant error responses.
+         * To apply middleware on a field level, use the @middleware directive.
+         */
         'middleware' => [
             \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
         ],
