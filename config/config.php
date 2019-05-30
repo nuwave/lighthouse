@@ -8,6 +8,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Controls the HTTP route that your GraphQL server responds to.
+    | You may set `route` => false, to disable the default route
+    | registration and take full control.
     |
     */
 
