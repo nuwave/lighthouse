@@ -1,6 +1,6 @@
 <?php
 
-if($routeConfig = config('lighthouse.route')) {
+if ($routeConfig = config('lighthouse.route')) {
     /** @var \Illuminate\Contracts\Routing\Registrar $router */
     $router = app('router');
 
