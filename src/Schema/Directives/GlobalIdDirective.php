@@ -53,7 +53,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
 
         return $next(
             $fieldValue->setResolver(
-                function () use ($type, $resolver) {
+                function () use ($type, $resolver): string {
                     $resolvedValue = call_user_func_array($resolver, func_get_args());
 
                     return $this->globalId->encode(

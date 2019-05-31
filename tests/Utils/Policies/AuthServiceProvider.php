@@ -12,7 +12,7 @@ class AuthServiceProvider extends \Illuminate\Foundation\Support\Providers\AuthS
         Post::class => PostPolicy::class,
     ];
 
-    public function boot()
+    public function boot(): void
     {
         $this->registerPolicies();
     }

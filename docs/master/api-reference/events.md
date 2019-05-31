@@ -43,7 +43,6 @@ class StartRequest
      * StartRequest constructor.
      *
      * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
-     *
      * @return void
      */
     public function __construct(GraphQLRequest $request)

@@ -45,8 +45,9 @@ class EventDirectiveTest extends DBTestCase
             ],
         ]);
 
-        Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event) {
-            return $event->company->id === 1 && $event->company->name === 'foo';
+        Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event): bool {
+            return $event->company->id === 1
+                && $event->company->name === 'foo';
         });
     }
 }
@@ -58,6 +59,11 @@ class CompanyWasCreatedEvent
      */
     public $company;
 
+    /**
+     * CompanyWasCreatedEvent constructor.
+     * @param  \Tests\Utils\Models\Company  $company
+     * @return void
+     */
     public function __construct(Company $company)
     {
         $this->company = $company;

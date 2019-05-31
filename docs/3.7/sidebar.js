@@ -38,6 +38,7 @@ module.exports = [
             'subscriptions/defining-fields',
             'subscriptions/trigger-subscriptions',
             'subscriptions/filtering-subscriptions',
+            'subscriptions/client-implementations',
         ]
     },
     {

@@ -21,7 +21,7 @@ class LaravelEnumTypeTest extends DBTestCase
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
 
-    public function testUseLaravelEnumType()
+    public function testUseLaravelEnumType(): void
     {
         $this->schema = '
         type Query {

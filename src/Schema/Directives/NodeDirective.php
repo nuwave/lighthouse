@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
+use GraphQL\Type\Definition\Type;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -44,7 +45,7 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
      * @param  \Closure  $next
      * @return \GraphQL\Type\Definition\Type
      */
-    public function handleNode(TypeValue $value, Closure $next)
+    public function handleNode(TypeValue $value, Closure $next): Type
     {
         $this->nodeRegistry->registerNode(
             $value->getTypeDefinitionName(),
@@ -61,7 +62,7 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
      * @return void
      */
-    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         ASTHelper::attachNodeInterfaceToObjectType($typeDefinition);
     }

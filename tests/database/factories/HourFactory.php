@@ -5,7 +5,7 @@ use Tests\Utils\Models\Task;
 use Faker\Generator as Faker;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(Hour::class, function (Faker $faker) {
+$factory->define(Hour::class, function (Faker $faker): array {
     return [
         'from' => $faker->time('H:i'),
         'to' => $faker->time('H:i'),
