@@ -104,14 +104,8 @@ trait MakesGraphQLRequests
      *
      * @return string
      */
-    private function graphQLEndpointUrl(): string
+    protected function graphQLEndpointUrl(): string
     {
-        $path = config('lighthouse.route_name');
-
-        if ($prefix = config('lighthouse.route.prefix')) {
-            $path = $prefix.'/'.$path;
-        }
-
-        return $path;
+        return config('lighthouse.route.uri');
     }
 }
