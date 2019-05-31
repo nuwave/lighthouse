@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Remove `@group` directive in favour of `@middleware` and `@namespace` https://github.com/nuwave/lighthouse/pull/768
+- Remove the `ArgFilterDirective` interface in favour of the `ArgBuilderDirective` interface https://github.com/nuwave/lighthouse/pull/821
+- Remove the old style `@whereBetween` and `@whereNotBetween` directives https://github.com/nuwave/lighthouse/pull/821
 
 ## [3.7.0](https://github.com/nuwave/lighthouse/compare/v3.6.1...v3.7.0)
 

@@ -182,8 +182,13 @@ Lighthouse's [`@whereBetween`](../api-reference/directives.md#wherebetween) is o
 ```graphql
 type Query {
     users(
-        createdBetween: [Date!]! @whereBetween(key: "created_at")
+        createdBetween: DateRange @whereBetween(key: "created_at")
     ): [User!]! @paginate
+}
+
+input DateRange {
+    from: Date!
+    to: Date!
 }
 ```
 

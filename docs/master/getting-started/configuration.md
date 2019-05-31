@@ -209,19 +209,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | New Between Directives
-    |--------------------------------------------------------------------------
-    |
-    | Use the new @whereBetween and @whereBetween directives that will
-    | replace their current implementation in v4 by setting this to true.
-    | As the old versions are removed, this will not have an effect anymore.
-    |
-    */
-
-    'new_between_directives' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | GraphQL Subscriptions
     |--------------------------------------------------------------------------
     |
