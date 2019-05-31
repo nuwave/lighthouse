@@ -15,7 +15,7 @@ class BatchLoaderTest extends DBTestCase
     {
         $users = factory(User::class, 2)
             ->create()
-            ->each(function (User $user) {
+            ->each(function (User $user): void {
                 factory(Task::class, 3)->create([
                     'user_id' => $user->getKey(),
                 ]);

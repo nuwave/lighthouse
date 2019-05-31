@@ -9,10 +9,8 @@ use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Execution\Builder;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
-use Nuwave\Lighthouse\Execution\QueryFilter;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
@@ -23,7 +21,6 @@ use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
-use Nuwave\Lighthouse\Support\Contracts\ArgFilterDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
@@ -68,12 +65,6 @@ class FieldFactory
      * @var \Nuwave\Lighthouse\Execution\Builder
      */
     protected $builder;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\QueryFilter
-     * @deprecated
-     */
-    protected $queryFilter;
 
     /**
      * @var array
@@ -172,8 +163,6 @@ class FieldFactory
                 $this->validationErrorBuffer = (new ErrorBuffer)->setErrorType('validation');
                 $this->builder = new Builder;
 
-                $this->queryFilter = QueryFilter::getInstance($this->fieldValue);
-
                 $argumentValues->each(
                     function (ArgumentValue $argumentValue): void {
                         $this->handleArgDirectivesRecursively(
@@ -210,10 +199,6 @@ class FieldFactory
                         );
                     }
                 }
-
-                $this->builder->setQueryFilter(
-                    $this->queryFilter
-                );
 
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
@@ -391,18 +376,6 @@ class FieldFactory
                     $directive
                 );
             }
-
-            if ($directive instanceof ArgFilterDirective) {
-                $argumentName = $astNode->name->value;
-                $directiveDefinition = ASTHelper::directiveDefinition($astNode, $directive->name());
-                $columnName = ASTHelper::directiveArgValue($directiveDefinition, 'key', $argumentName);
-
-                $this->queryFilter->addArgumentFilter(
-                    $argumentName,
-                    $columnName,
-                    $directive
-                );
-            }
         }
 
         // If directives remain, snapshot the state that we are in now
@@ -412,17 +385,17 @@ class FieldFactory
         }
     }
 
-    protected function argValueExists(array $argumentPath)
+    protected function argValueExists(array $argumentPath): bool
     {
         return Arr::has($this->args, implode('.', $argumentPath));
     }
 
-    protected function setArgValue(array $argumentPath, $value)
+    protected function setArgValue(array $argumentPath, $value): array
     {
         return Arr::set($this->args, implode('.', $argumentPath), $value);
     }
 
-    protected function unsetArgValue(array $argumentPath)
+    protected function unsetArgValue(array $argumentPath): void
     {
         Arr::forget($this->args, implode('.', $argumentPath));
     }

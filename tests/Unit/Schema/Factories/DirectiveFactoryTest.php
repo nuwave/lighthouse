@@ -51,7 +51,6 @@ class DirectiveFactoryTest extends TestCase
     }
 
     /**
-     * @deprecated this test is for compatibility reasons and can likely be removed in v3
      * @test
      */
     public function itSkipsHydrationForNonBaseDirectives(): void

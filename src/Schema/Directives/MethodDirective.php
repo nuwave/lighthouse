@@ -27,6 +27,7 @@ class MethodDirective extends BaseDirective implements FieldResolver
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
+        /** @var string $method */
         $method = $this->directiveArgValue(
             'name',
             $this->definitionNode->name->value

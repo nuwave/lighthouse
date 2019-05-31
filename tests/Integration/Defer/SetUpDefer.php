@@ -16,7 +16,7 @@ trait SetUpDefer
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function setUpDefer($app)
+    protected function setUpDefer($app): void
     {
         $this->stream = new MemoryStream;
 

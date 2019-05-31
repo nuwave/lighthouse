@@ -9,9 +9,9 @@ class CreateTestbenchHoursTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('hours', function (Blueprint $table) {
+        Schema::create('hours', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('hourable_type', 15);
             $table->unsignedInteger('hourable_id');
@@ -26,7 +26,7 @@ class CreateTestbenchHoursTable extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('hours');
     }

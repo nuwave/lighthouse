@@ -645,10 +645,6 @@ directive @deprecated(
 
 Assign a resolver function to a field.
 
-In most cases, you do not even need this directive. Make sure you read about
-the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data),
-as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolvers).
-
 Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
 
 ```graphql
@@ -2107,8 +2103,6 @@ input DateRange {
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 
-_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
-
 ### Definition
 
 ```graphql
@@ -2124,21 +2118,6 @@ directive @whereNotBetween(
   """
   key: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
-### Old syntax
-
-_Attention: This following use is deprecated and will be removed in v4._
-
-_Note: You will need to add a `key` to the column to want to query for each date_
-
-```graphql
-type Query {
-    posts(
-        createdAfter: Date! @whereBetween(key: "created_at")
-        createdBefore: String! @whereBetween(key: "created_at")
-    ): [Post!]! @all
-}
 ```
 
 ## @whereConstraints
@@ -2247,8 +2226,6 @@ Verify that a column's value lies outside of two values.
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 
-_Attention: To use this new definition style, set the config `new_between_directives` in `lighthouse.php`._
-
 ```graphql
 type Query {
     posts(
@@ -2277,21 +2254,6 @@ directive @whereNotBetween(
   """
   key: String
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
-### Old syntax
-
-_Attention: This following use is deprecated and will be removed in v4._
-
-_Note: You will need to add a `key` to the column to want to query for each date_
-
-```graphql
-type Query {
-    users(
-        bornBefore: Date! @whereNotBetween(key: "created_at")
-        bornAfter: Date! @whereNotBetween(key: "created_at")
-    ): [User!]! @all
-}
 ```
 
 ## @with
