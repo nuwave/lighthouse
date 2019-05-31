@@ -56,7 +56,7 @@ abstract class TestCase extends BaseTestCase
     {
         $app->bind(
             SchemaSourceProvider::class,
-            function () {
+            function (): TestSchemaProvider {
                 return new TestSchemaProvider($this->schema);
             }
         );

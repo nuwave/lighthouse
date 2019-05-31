@@ -11,7 +11,7 @@ class CreateTestbenchProductsTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table): void {
             $table->string('barcode');
             $table->string('uuid');
             $table->string('name');

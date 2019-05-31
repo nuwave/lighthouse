@@ -6,7 +6,7 @@ use Tests\Utils\Models\User;
 use Faker\Generator as Faker;
 
 /* @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(Post::class, function (Faker $faker) {
+$factory->define(Post::class, function (Faker $faker): array {
     return [
         'title' => $faker->title,
         'body' => $faker->sentence,

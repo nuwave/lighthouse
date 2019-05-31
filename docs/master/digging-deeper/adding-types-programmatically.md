@@ -58,7 +58,7 @@ class GraphQLServiceProvider extends ServiceProvider
         $typeRegistry->register(
              new ObjectType([
                  'name' => 'User',
-                 'fields' => function() use ($typeRegistry) {
+                 'fields' => function() use ($typeRegistry): array {
                      return [
                          'email' => [
                              'type' => Type::string()

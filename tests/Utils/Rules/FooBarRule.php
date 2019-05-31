@@ -16,7 +16,7 @@ class FooBarRule implements Rule
      *
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
         return false;
     }
@@ -26,7 +26,7 @@ class FooBarRule implements Rule
      *
      * @return string
      */
-    public function message()
+    public function message(): string
     {
         return self::MESSAGE;
     }

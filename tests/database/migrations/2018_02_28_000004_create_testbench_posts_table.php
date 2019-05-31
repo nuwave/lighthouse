@@ -11,7 +11,7 @@ class CreateTestbenchPostsTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('posts', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('title');
             $table->string('body')->nullable();
@@ -21,7 +21,7 @@ class CreateTestbenchPostsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::table('posts', function (Blueprint $table) {
+        Schema::table('posts', function (Blueprint $table): void {
             $table->foreign('parent_id')
                 ->references('id')
                 ->on('posts');

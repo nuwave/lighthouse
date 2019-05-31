@@ -59,12 +59,13 @@ class DeleteDirective extends BaseDirective implements FieldResolver
                     );
                 }
 
+                /** @var string|int|string[] $idOrIds */
                 $idOrIds = reset($args);
                 if ($this->directiveArgValue('globalId', false)) {
                     // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
                     if ($argumentDefinition->type->type->kind === NodeKind::LIST_TYPE) {
                         $idOrIds = array_map(
-                            function ($id) {
+                            function (string $id): string {
                                 return $this->globalId->decodeID($id);
                             },
                             $idOrIds
@@ -74,6 +75,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver
                     }
                 }
 
+                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
                 $modelClass = $this->getModelClass();
                 $model = $modelClass::find($idOrIds);
 
