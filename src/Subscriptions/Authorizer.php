@@ -6,8 +6,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Nuwave\Lighthouse\Schema\Types\GraphQLSubscription;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
-use Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler;
 use Nuwave\Lighthouse\Subscriptions\Contracts\AuthorizesSubscriptions;
+use Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler;
 
 class Authorizer implements AuthorizesSubscriptions
 {
@@ -22,14 +22,14 @@ class Authorizer implements AuthorizesSubscriptions
     protected $registry;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler
+     * @var \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler
      */
     protected $exceptionHandler;
 
     /**
      * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions  $storage
      * @param  \Nuwave\Lighthouse\Subscriptions\SubscriptionRegistry  $registry
-     * @param  \Nuwave\Lighthouse\Support\Contracts\SubscriptionExceptionHandler  $exceptionHandler
+     * @param  \Nuwave\Lighthouse\Subscriptions\Contracts\SubscriptionExceptionHandler  $exceptionHandler
      * @return void
      */
     public function __construct(
