@@ -69,7 +69,7 @@ class QueryAST
     protected function definitionsByType(string $typeClassName): Collection
     {
         return $this->definitions
-            ->filter(function (Node $node) use ($typeClassName) {
+            ->filter(function (Node $node) use ($typeClassName): bool {
                 return $node instanceof $typeClassName;
             });
     }

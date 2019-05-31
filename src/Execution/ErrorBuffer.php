@@ -44,7 +44,7 @@ class ErrorBuffer
      */
     protected function defaultExceptionResolver(): Closure
     {
-        return function (string $errorMessage) {
+        return function (string $errorMessage): GenericException {
             return (new GenericException($errorMessage))
                 ->setExtensions([$this->errorType => $this->errors])
                 ->setCategory($this->errorType);

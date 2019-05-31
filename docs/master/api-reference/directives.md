@@ -647,10 +647,6 @@ directive @deprecated(
 
 Assign a resolver function to a field.
 
-In most cases, you do not even need this directive. Make sure you read about
-the built in directives for [querying data](../the-basics/fields.md#query-data) and [mutating data](../the-basics/fields.md#mutate-data),
-as well as the convention based approach to [implementing custom resolvers](../the-basics/fields.md#custom-resolvers).
-
 Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
 
 ```graphql

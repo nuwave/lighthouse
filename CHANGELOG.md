@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Lazily load types from the schema. Directives defined on parts of the schema that are not used within the current
   query are no longer run on every request https://github.com/nuwave/lighthouse/pull/768
 - Simplify the default route configuration https://github.com/nuwave/lighthouse/pull/820
+- Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
 
 ### Removed
 

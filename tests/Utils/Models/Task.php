@@ -22,7 +22,7 @@ class Task extends Model
         parent::boot();
 
         // This is used to test that this scope works in all kinds of queries
-        static::addGlobalScope('no_cleaning', function (Builder $builder) {
+        static::addGlobalScope('no_cleaning', function (Builder $builder): void {
             $builder->where('name', '!=', 'cleaning');
         });
     }

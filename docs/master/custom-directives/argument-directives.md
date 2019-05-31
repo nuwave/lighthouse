@@ -74,9 +74,11 @@ When you resolve the field, the argument will hold the "transformed" value.
 
 namespace App\GraphQL\Mutations;
 
+use App\User;
+
 class CreateUser
 {
-    public function resolve($root, array $args)
+    public function resolve($root, array $args): User
     {
         return User::create([
             // This will be the trimmed value of the `name` argument
@@ -135,7 +137,6 @@ So let's take a look at the built-in `@eq` directive.
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class EqDirective extends BaseDirective implements ArgBuilderDirective

@@ -98,12 +98,12 @@ class CanDirectiveDbTest extends DBTestCase
         ")->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
-    public function resolveUser($root, array $args)
+    public function resolveUser($root, array $args): ?User
     {
         return User::where('id', $args['id'])->first();
     }
 
-    public function resolvePost($root, array $args)
+    public function resolvePost($root, array $args): ?User
     {
         return Post::where('id', $args['id'])->first();
     }

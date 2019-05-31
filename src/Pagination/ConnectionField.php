@@ -41,7 +41,7 @@ class ConnectionField
     {
         $firstItem = $paginator->firstItem();
 
-        return $paginator->values()->map(function ($item, $index) use ($firstItem) {
+        return $paginator->values()->map(function ($item, $index) use ($firstItem): array {
             return [
                 'cursor' => Cursor::encode($firstItem + $index),
                 'node' => $item,

@@ -62,7 +62,7 @@ class ASTHelperTest extends TestCase
 
         $this->assertCount(3, $objectType1->fields);
 
-        $firstNameField = (new Collection($objectType1->fields))->first(function ($field) {
+        $firstNameField = (new Collection($objectType1->fields))->first(function ($field): bool {
             return $field->name->value === 'first_name';
         });
 

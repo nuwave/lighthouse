@@ -129,7 +129,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
      * @param  \GraphQL\Language\AST\TypeDefinitionNode  $typeDefinition
      * @return void
      */
-    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition)
+    public function manipulateTypeDefinition(DocumentAST &$documentAST, TypeDefinitionNode &$typeDefinition): void
     {
         self::addMiddlewareDirectiveToFields($typeDefinition);
     }
@@ -179,7 +179,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
      * @param  \GraphQL\Language\AST\TypeExtensionNode  $typeExtension
      * @return void
      */
-    public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension)
+    public function manipulateTypeExtension(DocumentAST &$documentAST, TypeExtensionNode &$typeExtension): void
     {
         self::addMiddlewareDirectiveToFields($typeExtension);
     }
