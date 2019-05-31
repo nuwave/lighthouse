@@ -379,7 +379,7 @@ class MutationExecutor
                     return false;
                 }
 
-                return $relationClass === $returnType->getName();
+                return is_a($returnType->getName(), $relationClass, true);
             }
         );
     }
