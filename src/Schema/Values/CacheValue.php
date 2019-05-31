@@ -123,19 +123,22 @@ class CacheValue
 
         ksort($args);
 
-        return (new Collection($args))->map(function ($value, $key) {
-            $keyValue = is_array($value)
-                ? json_encode($value, true)
-                : $value;
+        return (new Collection($args))
+            ->map(function ($value, $key): string {
+                $keyValue = is_array($value)
+                    ? json_encode($value, true)
+                    : $value;
 
-            return "{$key}:{$keyValue}";
-        });
+                return "{$key}:{$keyValue}";
+            });
     }
 
     /**
      * Set the field key.
+     *
+     * @return void
      */
-    protected function setFieldKey()
+    protected function setFieldKey(): void
     {
         if (! $this->fieldValue || ! $this->rootValue) {
             return;

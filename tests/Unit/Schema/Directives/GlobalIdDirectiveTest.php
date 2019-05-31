@@ -91,7 +91,7 @@ class GlobalIdDirectiveTest extends TestCase
         ]);
     }
 
-    public function resolve($root, array $args)
+    public function resolve($root, array $args): array
     {
         return $args;
     }

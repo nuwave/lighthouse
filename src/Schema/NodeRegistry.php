@@ -6,6 +6,7 @@ use Closure;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -78,7 +79,7 @@ class NodeRegistry
      */
     public function registerModel(string $typeName, string $modelName): self
     {
-        $this->nodeResolver[$typeName] = function ($id) use ($modelName) {
+        $this->nodeResolver[$typeName] = function ($id) use ($modelName): ?Model {
             return $modelName::find($id);
         };
 
@@ -89,7 +90,7 @@ class NodeRegistry
      * Get the appropriate resolver for the node and call it with the decoded id.
      *
      * @param  mixed|null  $rootValue
-     * @param  array  $args
+     * @param  mixed[]  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
      * @return mixed

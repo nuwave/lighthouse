@@ -11,7 +11,7 @@ class CreateTestbenchTasksTable extends Migration
      */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('tasks', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('user_id')->nullable();
             $table->string('name')->unique();

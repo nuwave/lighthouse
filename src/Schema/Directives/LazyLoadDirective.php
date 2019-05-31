@@ -33,9 +33,11 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
         $resolver = $fieldValue->getResolver();
 
         return $next($fieldValue->setResolver(function () use ($resolver, $relations) {
+            /** @var \GraphQL\Deferred|\Illuminate\Database\Eloquent\Model $result */
             $result = call_user_func_array($resolver, func_get_args());
+
             ($result instanceof Deferred)
-                ? $result->then(function (Collection &$items) use ($relations) {
+                ? $result->then(function (Collection &$items) use ($relations): Collection {
                     $items->load($relations);
 
                     return $items;

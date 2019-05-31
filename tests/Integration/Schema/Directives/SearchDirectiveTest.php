@@ -114,7 +114,7 @@ class SearchDirectiveTest extends DBTestCase
         $this->engine->shouldReceive('paginate')
             ->with(
                 Mockery::on(
-                    function ($argument) {
+                    function ($argument): bool {
                         return $argument->index === 'my.index';
                     }
                 ),

@@ -8,24 +8,10 @@ use Illuminate\Support\Facades\Event;
 
 class EventDirectiveTest extends DBTestCase
 {
-    public function eventDirectiveArgumentAliases(): array
-    {
-        return [
-            ['dispatch'],
-            /*
-             * @deprecated The aliases for dispatch will be removed in v4
-             */
-            ['fire'],
-            ['class'],
-        ];
-    }
-
     /**
-     * @dataProvider eventDirectiveArgumentAliases
-     * @param  string  $argumentName
      * @test
      */
-    public function itDispatchesAnEvent(string $argumentName): void
+    public function itDispatchesAnEvent(): void
     {
         Event::fake([
             CompanyWasCreatedEvent::class,
@@ -39,7 +25,7 @@ class EventDirectiveTest extends DBTestCase
         
         type Mutation {
             createCompany(name: String): Company @create
-                @event('.$argumentName.': "Tests\\\\Integration\\\\Schema\\\\Directives\\\\CompanyWasCreatedEvent")
+                @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\CompanyWasCreatedEvent")
         }
         '.$this->placeholderQuery();
 
@@ -59,8 +45,9 @@ class EventDirectiveTest extends DBTestCase
             ],
         ]);
 
-        Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event) {
-            return $event->company->id === 1 && $event->company->name === 'foo';
+        Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event): bool {
+            return $event->company->id === 1
+                && $event->company->name === 'foo';
         });
     }
 }
@@ -72,6 +59,11 @@ class CompanyWasCreatedEvent
      */
     public $company;
 
+    /**
+     * CompanyWasCreatedEvent constructor.
+     * @param  \Tests\Utils\Models\Company  $company
+     * @return void
+     */
     public function __construct(Company $company)
     {
         $this->company = $company;

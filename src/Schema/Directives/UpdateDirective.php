@@ -61,13 +61,6 @@ class UpdateDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName;
 
-                /*
-                 * @deprecated in favour of @spread
-                 */
-                if ($this->directiveArgValue('flatten', false)) {
-                    $args = reset($args);
-                }
-
                 if ($this->directiveArgValue('globalId', false)) {
                     $args['id'] = $this->globalId->decodeId($args['id']);
                 }

@@ -1,12 +1,9 @@
 <?php
 
-namespace Nuwave\Lighthouse\Support\Contracts;
+namespace Nuwave\Lighthouse\Subscriptions\Contracts;
 
 use Throwable;
 
-/**
- * @deprecated will be moved to the namespace Nuwave\Lighthouse\Subscriptions\Contracts
- */
 interface SubscriptionExceptionHandler
 {
     /**
