@@ -537,8 +537,6 @@ directive @create(
 If you are using a single input object as an argument, you must tell Lighthouse
 to spread out the nested values before applying it to the resolver.
 
-_Note_: The usage of `flatten` is deprecated.
-
 ```graphql
 type Mutation {
     createPost(input: CreatePostInput! @spread): Post @create

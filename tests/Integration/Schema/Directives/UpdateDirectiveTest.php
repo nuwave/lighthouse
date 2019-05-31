@@ -66,8 +66,8 @@ class UpdateDirectiveTest extends DBTestCase
         
         type Mutation {
             updateCompany(
-                input: UpdateCompanyInput
-            ): Company @update(flatten: true)
+                input: UpdateCompanyInput @spread
+            ): Company @update
         }
         
         input UpdateCompanyInput {
