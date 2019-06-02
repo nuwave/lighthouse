@@ -23,7 +23,6 @@
             <directory suffix=".php">src/</directory>
             <exclude>
                 <file>src/LaravelServiceProvider.php</file>
-                <file>src/Support/helpers.php</file>
             </exclude>
         </whitelist>
     </filter>
