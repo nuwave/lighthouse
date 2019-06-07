@@ -1649,7 +1649,7 @@ directive @rules(
   This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
   or the fully qualified class name of a custom validation rule.
   """
-  apply: [String!]
+  apply: [String!]!
 
   """
   Specify the messages to return if the validators fail.
@@ -1707,7 +1707,7 @@ directive @rulesForArray(
   This can either be a reference to any of Laravel's built-in validation rules: https://laravel.com/docs/validation#available-validation-rules,
   or the fully qualified class name of a custom validation rule.
   """
-  apply: [String!]
+  apply: [String!]!
 
   """
   Specify the messages to return if the validators fail.
