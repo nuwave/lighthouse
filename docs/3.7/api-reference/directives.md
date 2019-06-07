@@ -1657,7 +1657,7 @@ directive @rules(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: [RulesMessageMap!]
-) on INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Examples
@@ -1715,7 +1715,7 @@ directive @rulesForArray(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: [RulesMessageMap!]
-) on INPUT_FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Examples
