@@ -3,8 +3,8 @@
 namespace Tests\Unit\Schema\Factories;
 
 use Closure;
-use ReflectionProperty;
 use Tests\TestCase;
+use ReflectionProperty;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
