@@ -47,7 +47,11 @@ class DirectiveFactoryTest extends TestCase
         ');
 
         $fieldDirective = $this->directiveFactory->create('field', $fieldDefinition);
-        $this->assertAttributeSame($fieldDefinition, 'definitionNode', $fieldDirective);
+
+        $definitionNode = new \ReflectionProperty($fieldDirective, 'definitionNode');
+        $definitionNode->setAccessible(true);
+
+        $this->assertEquals($fieldDefinition, $definitionNode->getValue($fieldDirective));
     }
 
     /**
