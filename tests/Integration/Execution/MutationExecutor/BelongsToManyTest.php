@@ -520,13 +520,14 @@ class BelongsToManyTest extends DBTestCase
      */
     public function itCanDisconnectAllRelatedModelsOnEmptySync(): void
     {
-        factory(User::class)->create();
-        factory(Role::class)
-            ->create()
-            ->users()
-            ->attach(
-                factory(User::class)->create()
-            );
+        /** @var User $user */
+        $user = factory(User::class)->create();
+        /** @var Role $role */
+        $role = $user->roles()->save(
+            factory(Role::class)->make()
+        );
+
+        $this->assertCount(1, $role->users);
 
         $this->graphQL('
         mutation {
@@ -552,8 +553,8 @@ class BelongsToManyTest extends DBTestCase
             ],
         ]);
 
-        /** @var Role $role */
-        $role = Role::first();
-        $this->assertCount(0, $role->users()->get());
+        $role->refresh();
+
+        $this->assertCount(0, $role->users);
     }
 }
