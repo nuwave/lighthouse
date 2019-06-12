@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema\Factories;
 
 use Closure;
 use Tests\TestCase;
+use ReflectionProperty;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -47,7 +48,14 @@ class DirectiveFactoryTest extends TestCase
         ');
 
         $fieldDirective = $this->directiveFactory->create('field', $fieldDefinition);
-        $this->assertAttributeSame($fieldDefinition, 'definitionNode', $fieldDirective);
+
+        $definitionNode = new ReflectionProperty($fieldDirective, 'definitionNode');
+        $definitionNode->setAccessible(true);
+
+        $this->assertSame(
+            $fieldDefinition,
+            $definitionNode->getValue($fieldDirective)
+        );
     }
 
     /**
