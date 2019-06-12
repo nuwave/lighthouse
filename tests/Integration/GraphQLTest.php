@@ -209,8 +209,10 @@ class GraphQLTest extends DBTestCase
         }
         ');
 
+        // TODO remove as we stop supporting Laravel 5.5/PHPUnit 6
         $assertContains = method_exists($this, 'assertStringContainsString')
-            ? 'assertStringContainsString' : 'assertContains';
+            ? 'assertStringContainsString'
+            : 'assertContains';
 
         $this->{$assertContains}(
             'nonExistingField',
