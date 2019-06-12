@@ -297,7 +297,7 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
             $relation = $model->{$relationName}();
 
-            if (isset($nestedOperations['sync'])){
+            if (isset($nestedOperations['sync'])) {
                 $relation->sync($nestedOperations['sync']);
             }
 
