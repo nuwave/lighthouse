@@ -50,8 +50,8 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
             $relation = $model->{$relationName}();
 
-            if ($create = $nestedOperations['create'] ?? false) {
-                self::handleMultiRelationCreate(new Collection($create), $relation);
+            if (isset($nestedOperations['create'])) {
+                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
         };
         $hasMany->each($createOneToMany);
@@ -61,8 +61,8 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
             $relation = $model->{$relationName}();
 
-            if ($create = $nestedOperations['create'] ?? false) {
-                self::handleSingleRelationCreate(new Collection($create), $relation);
+            if (isset($nestedOperations['create'])) {
+                self::handleSingleRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
         };
         $hasOne->each($createOneToOne);
@@ -72,16 +72,16 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
             $relation = $model->{$relationName}();
 
-            if ($sync = $nestedOperations['sync'] ?? false) {
-                $relation->sync($sync);
+            if (isset($nestedOperations['sync'])) {
+                $relation->sync($nestedOperations['sync']);
             }
 
-            if ($create = $nestedOperations['create'] ?? false) {
-                self::handleMultiRelationCreate(new Collection($create), $relation);
+            if (isset($nestedOperations['create'])) {
+                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
 
-            if ($update = $nestedOperations['update'] ?? false) {
-                (new Collection($update))->each(function ($singleValues) use ($relation): void {
+            if (isset($nestedOperations['update'])) {
+                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
                     self::executeUpdate(
                         $relation->getModel()->newInstance(),
                         new Collection($singleValues),
@@ -90,8 +90,8 @@ class MutationExecutor
                 });
             }
 
-            if ($connect = $nestedOperations['connect'] ?? false) {
-                $relation->attach($connect);
+            if (isset($nestedOperations['connect'])) {
+                $relation->attach($nestedOperations['connect']);
             }
         };
         $belongsToMany->each($createManyToMany);
@@ -125,25 +125,25 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $relation */
             $relation = $model->{$relationName}();
 
-            if ($create = $nestedOperations['create'] ?? false) {
+            if (isset($nestedOperations['create'])) {
                 $belongsToModel = self::executeCreate(
                     $relation->getModel()->newInstance(),
-                    new Collection($create)
+                    new Collection($nestedOperations['create'])
                 );
                 $relation->associate($belongsToModel);
             }
 
-            if ($connect = $nestedOperations['connect'] ?? false) {
+            if (isset($nestedOperations['connect'])) {
                 // Inverse can be hasOne or hasMany
                 /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
                 $belongsTo = $model->{$relationName}();
-                $belongsTo->associate($connect);
+                $belongsTo->associate($nestedOperations['connect']);
             }
 
-            if ($update = $nestedOperations['update'] ?? false) {
+            if (isset($nestedOperations['update'])) {
                 $belongsToModel = self::executeUpdate(
                     $relation->getModel()->newInstance(),
-                    new Collection($update)
+                    new Collection($nestedOperations['update'])
                 );
                 $relation->associate($belongsToModel);
             }
@@ -249,12 +249,12 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\HasMany|\Illuminate\Database\Eloquent\Relations\MorphMany $relation */
             $relation = $model->{$relationName}();
 
-            if ($create = $nestedOperations['create'] ?? false) {
-                self::handleMultiRelationCreate(new Collection($create), $relation);
+            if (isset($nestedOperations['create'])) {
+                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
 
-            if ($update = $nestedOperations['update'] ?? false) {
-                (new Collection($update))->each(function ($singleValues) use ($relation): void {
+            if (isset($nestedOperations['update'])) {
+                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
                     self::executeUpdate(
                         $relation->getModel()->newInstance(),
                         new Collection($singleValues),
@@ -263,8 +263,8 @@ class MutationExecutor
                 });
             }
 
-            if ($delete = $nestedOperations['delete'] ?? false) {
-                $relation->getModel()::destroy($delete);
+            if (isset($nestedOperations['delete'])) {
+                $relation->getModel()::destroy($nestedOperations['delete']);
             }
         };
         $hasMany->each($updateOneToMany);
@@ -274,20 +274,20 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
             $relation = $model->{$relationName}();
 
-            if ($create = $nestedOperations['create'] ?? false) {
-                self::handleSingleRelationCreate(new Collection($create), $relation);
+            if (isset($nestedOperations['create'])) {
+                self::handleSingleRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
 
-            if ($update = $nestedOperations['update'] ?? false) {
+            if (isset($nestedOperations['update'])) {
                 self::executeUpdate(
                     $relation->getModel()->newInstance(),
-                    new Collection($update),
+                    new Collection($nestedOperations['update']),
                     $relation
                 );
             }
 
-            if ($delete = $nestedOperations['delete'] ?? false) {
-                $relation->getModel()::destroy($delete);
+            if (isset($nestedOperations['delete'])) {
+                $relation->getModel()::destroy($nestedOperations['delete']);
             }
         };
         $hasOne->each($updateOneToOne);
@@ -297,16 +297,16 @@ class MutationExecutor
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany|\Illuminate\Database\Eloquent\Relations\MorphToMany $relation */
             $relation = $model->{$relationName}();
 
-            if ($sync = $nestedOperations['sync'] ?? false) {
-                $relation->sync($sync);
+            if (isset($nestedOperations['sync'])) {
+                $relation->sync($nestedOperations['sync']);
             }
 
-            if ($create = $nestedOperations['create'] ?? false) {
-                self::handleMultiRelationCreate(new Collection($create), $relation);
+            if (isset($nestedOperations['create'])) {
+                self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
 
-            if ($update = $nestedOperations['update'] ?? false) {
-                (new Collection($update))->each(function ($singleValues) use ($relation): void {
+            if (isset($nestedOperations['update'])) {
+                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
                     self::executeUpdate(
                         $relation->getModel()->newInstance(),
                         new Collection($singleValues),
@@ -315,17 +315,17 @@ class MutationExecutor
                 });
             }
 
-            if ($delete = $nestedOperations['delete'] ?? false) {
-                $relation->detach($delete);
-                $relation->getModel()::destroy($delete);
+            if (isset($nestedOperations['delete'])) {
+                $relation->detach($nestedOperations['delete']);
+                $relation->getModel()::destroy($nestedOperations['delete']);
             }
 
-            if ($connect = $nestedOperations['connect'] ?? false) {
-                $relation->attach($connect);
+            if (isset($nestedOperations['connect'])) {
+                $relation->attach($nestedOperations['connect']);
             }
 
-            if ($disconnect = $nestedOperations['disconnect'] ?? false) {
-                $relation->detach($disconnect);
+            if (isset($nestedOperations['disconnect'])) {
+                $relation->detach($nestedOperations['disconnect']);
             }
         };
         $belongsToMany->each($updateManyToMany);

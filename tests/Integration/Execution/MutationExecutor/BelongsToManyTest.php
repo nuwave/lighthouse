@@ -514,4 +514,47 @@ class BelongsToManyTest extends DBTestCase
             ],
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function itCanDisconnectAllRelatedModelsOnEmptySync(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+        /** @var Role $role */
+        $role = $user->roles()->save(
+            factory(Role::class)->make()
+        );
+
+        $this->assertCount(1, $role->users);
+
+        $this->graphQL('
+        mutation {
+            updateRole(input: {
+                id: 1
+                users: {
+                    sync: []
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'updateRole' => [
+                    'id' => '1',
+                    'users' => [],
+                ],
+            ],
+        ]);
+
+        $role->refresh();
+
+        $this->assertCount(0, $role->users);
+    }
 }
