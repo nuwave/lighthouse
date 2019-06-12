@@ -209,7 +209,10 @@ class GraphQLTest extends DBTestCase
         }
         ');
 
-        $this->assertStringContainsString(
+        $assertContains = method_exists($this, 'assertStringContainsString')
+            ? 'assertStringContainsString' : 'assertContains';
+
+        $this->{$assertContains}(
             'nonExistingField',
             $result->jsonGet('errors.0.message')
         );
