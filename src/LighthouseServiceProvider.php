@@ -32,7 +32,6 @@ use Nuwave\Lighthouse\Console\SubscriptionCommand;
 use Nuwave\Lighthouse\Execution\LighthouseRequest;
 use Nuwave\Lighthouse\Schema\Source\SchemaStitcher;
 use Nuwave\Lighthouse\Console\ValidateSchemaCommand;
-use Illuminate\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Execution\MultipartFormRequest;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -44,6 +43,7 @@ use Nuwave\Lighthouse\Support\Contracts\CanStreamResponse;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Nuwave\Lighthouse\Support\Http\Responses\ResponseStream;
 use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\Compatibility\LumenMiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Compatibility\LaravelMiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId as GlobalIdContract;
@@ -55,7 +55,7 @@ class LighthouseServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @param  \Illuminate\Validation\Factory  $validationFactory
-     * @param  \Illuminate\Config\Repository  $configRepository
+     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
      * @return void
      */
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void

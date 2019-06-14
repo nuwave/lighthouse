@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\Subscriptions;
 use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Nuwave\Lighthouse\Events\StartExecution;
-use Illuminate\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Events\BuildExtensionsResponse;
 use Nuwave\Lighthouse\Subscriptions\Iterators\SyncIterator;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 use Nuwave\Lighthouse\Subscriptions\Contracts\ContextSerializer;
 use Nuwave\Lighthouse\Subscriptions\Contracts\StoresSubscriptions;
@@ -23,7 +23,7 @@ class SubscriptionServiceProvider extends ServiceProvider
 {
     /**
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
-     * @param  \Illuminate\Config\Repository  $configRepository
+     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
      * @return void
      */
     public function boot(EventsDispatcher $eventsDispatcher, ConfigRepository $configRepository): void

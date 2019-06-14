@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Avoid growing the memory extensively when doing complex AST manipulation https://github.com/nuwave/lighthouse/pull/768
 - Make nested mutations work with subclassed relationship types https://github.com/nuwave/lighthouse/pull/825
 - Allow empty arrays and other falsy values as input for nested mutation operations like "sync" https://github.com/nuwave/lighthouse/pull/830
+- Use `Illuminate\Contracts\Config\Repository` instead of `Illuminate\COnfig\Repository` https://github.com/nuwave/lighthouse/issues/832
 
 ### Changed
 
