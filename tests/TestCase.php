@@ -61,7 +61,7 @@ abstract class TestCase extends BaseTestCase
             }
         );
 
-        /** @var \Illuminate\Config\Repository $config */
+        /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $app['config'];
 
         $config->set('lighthouse.namespaces', [
