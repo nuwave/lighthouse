@@ -355,4 +355,30 @@ class BuilderTest extends DBTestCase
         }
         ')->assertJsonCount(1, 'data.users');
     }
+
+    /**
+     * @test
+     */
+    public function itCanAttachMultipleWhereFiltersToQuery(): void
+    {
+        $this->schema .= '
+        type Query {
+            users(updated_at: String @where(operator: "<", clause: "whereDate") @where(operator: ">=", clause: "whereDate")): [User!]! @all
+        }
+        ';
+
+        $user = $this->users->first();
+        $user->updated_at = now()->addYear();
+        $user->save();
+
+        $date = $user->updated_at->format('Y');
+
+        $this->graphQL('
+        {
+            users(updated_at: "'.$date.'") {
+                id
+            }
+        }
+        ')->assertJsonCount(5, 'data.users');
+    }
 }
