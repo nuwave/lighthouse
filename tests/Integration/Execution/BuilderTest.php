@@ -7,16 +7,10 @@ use Tests\Utils\Models\User;
 
 class BuilderTest extends DBTestCase
 {
-    /**
-     * @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\User>
-     */
-    protected $users;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->users = factory(User::class, 5)->create();
         $this->schema = '
         type User {
             id: ID!
@@ -36,10 +30,11 @@ class BuilderTest extends DBTestCase
             users(id: ID @eq): [User!]! @all
         }
         ';
+        $users = factory(User::class, 2)->create();
 
         $this->graphQL('
         {
-            users(id: '.$this->users->first()->getKey().') {
+            users(id: '.$users->first()->getKey().') {
                 id
             }
         }
@@ -60,12 +55,13 @@ class BuilderTest extends DBTestCase
             id: ID @eq
         }
         ';
+        $users = factory(User::class, 2)->create();
 
         $this->graphQL('
         {
             users(
                 input: {
-                    id: '.$this->users->first()->getKey().'
+                    id: '.$users->first()->getKey().'
                 }
             ) {
                 id
@@ -84,14 +80,15 @@ class BuilderTest extends DBTestCase
             users(id: ID @neq): [User!]! @all
         }
         ';
+        $users = factory(User::class, 3)->create();
 
         $this->graphQL('
         {
-            users(id: '.$this->users->first()->getKey().') {
+            users(id: '.$users->first()->getKey().') {
                 id
             }
         }
-        ')->assertJsonCount(4, 'data.users');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -105,8 +102,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
 
         $this->graphQL('
         {
@@ -128,8 +125,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
 
         $this->graphQL('
         {
@@ -151,7 +148,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
+        $users = factory(User::class, 3)->create();
+        $user1 = $users->first()->getKey();
 
         $this->graphQL('
         {
@@ -159,7 +157,7 @@ class BuilderTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(4, 'data.users');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -176,8 +174,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user1 = $this->users->first()->getKey();
-        $user2 = $this->users->last()->getKey();
+        $user1 = factory(User::class)->create();
+        $user2 = factory(User::class)->create();
 
         $this->graphQL('
         {
@@ -201,11 +199,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subDay();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -220,7 +215,7 @@ class BuilderTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertJsonCount(1, 'data.users');
     }
 
     /**
@@ -241,11 +236,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subDay();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -263,7 +255,7 @@ class BuilderTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertJsonCount(1, 'data.users');
     }
 
     /**
@@ -279,11 +271,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subDay();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subDay();
         $user->save();
 
@@ -298,7 +287,7 @@ class BuilderTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(3, 'data.users');
+        ')->assertJsonCount(2, 'data.users');
     }
 
     /**
@@ -314,11 +303,8 @@ class BuilderTest extends DBTestCase
         }
         ';
 
-        $user = $this->users[0];
-        $user->created_at = now()->subYear();
-        $user->save();
-
-        $user = $this->users[1];
+        factory(User::class, 2)->create();
+        $user = factory(User::class)->create();
         $user->created_at = now()->subYear();
         $user->save();
 
@@ -330,7 +316,7 @@ class BuilderTest extends DBTestCase
                 id
             }
         }
-        ')->assertJsonCount(2, 'data.users');
+        ')->assertJsonCount(1, 'data.users');
     }
 
     /**
@@ -347,9 +333,11 @@ class BuilderTest extends DBTestCase
         }
         ';
 
+        $users = factory(User::class, 3)->create();
+
         $this->graphQL('
         {
-            users(name: "'.$this->users->first()->name.'") {
+            users(name: "'.$users->first()->name.'") {
                 id
             }
         }
@@ -363,22 +351,32 @@ class BuilderTest extends DBTestCase
     {
         $this->schema .= '
         type Query {
-            users(updated_at: String @where(operator: "<", clause: "whereDate") @where(operator: ">=", clause: "whereDate")): [User!]! @all
+            users(
+                name: String
+                    @where(operator: "=")
+                    @where(operator: "=", key: "email")
+            ): [User!]! @all
         }
         ';
 
-        $user = $this->users->first();
-        $user->updated_at = now()->addYear();
-        $user->save();
-
-        $date = $user->updated_at->format('Y');
+        $username = 'foo@bar.baz';
+        factory(User::class)->create([
+            'name' => $username
+        ]);
+        factory(User::class)->create([
+            'email' => $username
+        ]);
+        factory(User::class)->create([
+            'name' => $username,
+            'email' => $username
+        ]);
 
         $this->graphQL('
         {
-            users(updated_at: "'.$date.'") {
+            users(name: "'.$username.'") {
                 id
             }
         }
-        ')->assertJsonCount(5, 'data.users');
+        ')->assertJsonCount(1, 'data.users');
     }
 }
