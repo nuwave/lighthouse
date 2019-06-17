@@ -10,7 +10,9 @@ class Builder
     /**
      * A map from argument names to associated query builder directives.
      *
-     * @var ArgBuilderDirective[]
+     * [string $argumentName => ArgBuilderDirective[]]
+     *
+     * @var ArgBuilderDirective[][]
      */
     protected $builderDirectives = [];
 
@@ -31,9 +33,12 @@ class Builder
     public function apply($builder, array $args)
     {
         foreach ($args as $key => $value) {
-            /** @var \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective $builderDirective */
-            if ($builderDirective = Arr::get($this->builderDirectives, $key)) {
-                $builder = $builderDirective->handleBuilder($builder, $value);
+            /** @var \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective[] $builderDirectives */
+            if ($builderDirectives = Arr::get($this->builderDirectives, $key)) {
+                /** @var \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective $builderDirective */
+                foreach($builderDirectives as $builderDirective) {
+                    $builder = $builderDirective->handleBuilder($builder, $value);
+                }
             }
         }
 
@@ -66,7 +71,7 @@ class Builder
      */
     public function addBuilderDirective(string $argumentName, ArgBuilderDirective $argBuilderDirective): self
     {
-        $this->builderDirectives[$argumentName] = $argBuilderDirective;
+        $this->builderDirectives[$argumentName] []= $argBuilderDirective;
 
         return $this;
     }
