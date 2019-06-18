@@ -31,7 +31,7 @@ class WhereDirective extends BaseDirective implements ArgBuilderDirective
         $clause = $this->directiveArgValue('clause', 'where');
 
         return $builder->{$clause}(
-            $this->directiveArgValue('key', $table . '.' . $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $table.'.'.$this->definitionNode->name->value),
             $operator = $this->directiveArgValue('operator', '='),
             $value
         );

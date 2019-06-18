@@ -62,10 +62,5 @@ class User extends Authenticatable
         return $query
             ->join('companies', 'users.company_id', '=', 'companies.id')
             ->where('companies.name', $args['company']);
-        
-        /*return $query->whereHas('company', function (Builder $q) use ($args): void {
-            $q->where('name', $args['company']);
-        })->dd();*/
-        
     }
 }

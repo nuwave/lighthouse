@@ -30,7 +30,7 @@ class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirect
         $table = $builder->getModel()->getTable();
 
         return $builder->whereNotBetween(
-            $this->directiveArgValue('key', $table . '.' . $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $table.'.'.$this->definitionNode->name->value),
             $values
         );
     }

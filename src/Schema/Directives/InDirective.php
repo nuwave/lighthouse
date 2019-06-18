@@ -28,7 +28,7 @@ class InDirective extends BaseDirective implements ArgBuilderDirective
         $table = $builder->getModel()->getTable();
 
         return $builder->whereIn(
-            $this->directiveArgValue('key', $table . '.' . $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $table.'.'.$this->definitionNode->name->value),
             $values
         );
     }
