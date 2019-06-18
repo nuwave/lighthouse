@@ -42,7 +42,7 @@ class AllDirective extends BaseDirective implements FieldResolver
                         $modelClass::query(),
                         $args
                     )
-                    ->get();
+                    ->get((new $modelClass())->getTable() . '.*');
             }
         );
     }

@@ -43,7 +43,7 @@ class FindDirective extends BaseDirective implements FieldResolver
                         $model::query(),
                         $args
                     )
-                    ->get();
+                    ->get((new $model())->getTable() . '.*');
 
                 if ($results->count() > 1) {
                     throw new Error('The query returned more than one result.');

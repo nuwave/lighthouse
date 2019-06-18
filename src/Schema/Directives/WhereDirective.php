@@ -25,11 +25,13 @@ class WhereDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function handleBuilder($builder, $value)
     {
+        $table = $builder->getModel()->getTable();
+
         // Allow users to overwrite the default "where" clause, e.g. "whereYear"
         $clause = $this->directiveArgValue('clause', 'where');
 
         return $builder->{$clause}(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $table . '.' . $this->definitionNode->name->value),
             $operator = $this->directiveArgValue('operator', '='),
             $value
         );

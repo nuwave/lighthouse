@@ -25,8 +25,10 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective
      */
     public function handleBuilder($builder, $value)
     {
+        $table = $builder->getModel()->getTable();
+
         return $builder->where(
-            $this->directiveArgValue('key', $this->definitionNode->name->value),
+            $this->directiveArgValue('key', $table . '.' . $this->definitionNode->name->value),
             '<>',
             $value
         );
