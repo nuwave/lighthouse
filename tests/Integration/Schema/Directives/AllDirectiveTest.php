@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
+use Tests\Utils\Models\Company;
 
 class AllDirectiveTest extends DBTestCase
 {
@@ -34,6 +35,37 @@ class AllDirectiveTest extends DBTestCase
             }
         }
         ')->assertJsonCount(2, 'data.users');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanUseScopes(): void
+    {
+        $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
+        $userA = factory(User::class)->create(['name' => 'A', 'company_id' => $companyA->id]);
+        $userB = factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
+        $userC = factory(User::class)->create(['name' => 'C', 'company_id' => $companyA->id]);
+
+        $this->schema = '
+        type User {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            users(company: String!): [User!]! @all(model: "User", scopes: ["companyName"])
+        }
+        ';
+
+        $this->graphQL('
+        {
+            users(company: "CompanyA") {
+                id
+                name
+            }
+        }
+        ')->assertJsonCount(3, 'data.users');
     }
 
     /**

@@ -108,8 +108,8 @@ class FindDirectiveTest extends DBTestCase
         $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
         $companyB = factory(Company::class)->create(['name' => 'CompanyB']);
         $userA = factory(User::class)->create(['name' => 'A', 'company_id' => $companyA->id]);
-        $userB = factory(User::class)->create(['name' => 'A', 'company_id' => $companyB->id]);
-        $userC = factory(User::class)->create(['name' => 'B', 'company_id' => $companyA->id]);
+        $userB = factory(User::class)->create(['name' => 'B', 'company_id' => $companyB->id]);
+        $userC = factory(User::class)->create(['name' => 'C', 'company_id' => $companyA->id]);
 
         $this->schema = '
         type Company {
@@ -122,7 +122,7 @@ class FindDirectiveTest extends DBTestCase
         }
         
         type Query {
-            user(name: String @eq, company: String!): User @find(model: "User" scopes: [companyName])
+            user(name: String @eq, company: String!): User @find(model: "User" scopes: ["companyName"])
         }
         ';
 
