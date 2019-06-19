@@ -4,8 +4,8 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\Utils\Policies\UserPolicy;
+use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 class CanDirectiveTest extends TestCase
 {

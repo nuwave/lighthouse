@@ -57,12 +57,12 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                     if (isset($args['id'])) {
                         $modelOrModels = $modelClass::findOrFail($args['id']);
 
-                        if($modelOrModels instanceof Model) {
+                        if ($modelOrModels instanceof Model) {
                             $modelOrModels = [$modelOrModels];
                         }
 
                         /** @var \Illuminate\Database\Eloquent\Model $model */
-                        foreach($modelOrModels as $model){
+                        foreach ($modelOrModels as $model) {
                             $this->authorize($context->user(), $model);
                         }
                     } else {

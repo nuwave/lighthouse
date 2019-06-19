@@ -5,8 +5,8 @@ namespace Tests\Unit\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
-use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Tests\Utils\Policies\UserPolicy;
+use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 class CanDirectiveDbTest extends DBTestCase
 {
@@ -139,7 +139,7 @@ class CanDirectiveDbTest extends DBTestCase
                     ],
                     [
                         'title' => 'Harry Potter and the Chamber of Secrets',
-                    ]
+                    ],
                 ],
             ],
         ]);
