@@ -6,29 +6,27 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
+use Tests\Utils\Policies\UserPolicy;
 
 class CanDirectiveDbTest extends DBTestCase
 {
     /**
      * @test
-     * @dataProvider provideAcceptableArgumentNames
-     *
-     * @param  string  $argumentName
-     * @return void
      */
-    public function itPassesIfModelInstanceIsNotNull(string $argumentName): void
+    public function itPassesIfModelInstanceIsNotNull(): void
     {
-        $user = User::create([
-            'name' => 'admin',
-        ]);
-        $this->be($user);
+        $this->be(
+            new User([
+                'name' => UserPolicy::ADMIN,
+            ])
+        );
 
         $user = factory(User::class)->create(['name' => 'foo']);
 
         $this->schema = '
         type Query {
             user(id: ID @eq): User
-                @can('.$argumentName.': "view")
+                @can(ability: "view")
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
@@ -55,17 +53,14 @@ class CanDirectiveDbTest extends DBTestCase
 
     /**
      * @test
-     * @dataProvider provideAcceptableArgumentNames
-     *
-     * @param  string  $argumentName
-     * @return void
      */
-    public function itThrowsIfNotAuthorized(string $argumentName): void
+    public function itThrowsIfNotAuthorized(): void
     {
-        $user = User::create([
-            'name' => 'admin',
-        ]);
-        $this->be($user);
+        $this->be(
+            new User([
+                'name' => UserPolicy::ADMIN,
+            ])
+        );
 
         $userB = User::create([
             'name' => 'foo',
@@ -79,7 +74,7 @@ class CanDirectiveDbTest extends DBTestCase
         $this->schema = '
         type Query {
             post(id: ID @eq): Post
-                @can('.$argumentName.': "view")
+                @can(ability: "view")
                 @field(resolver: "'.$this->qualifyTestResolver('resolvePost').'")
         }
         
@@ -100,15 +95,11 @@ class CanDirectiveDbTest extends DBTestCase
 
     /**
      * @test
-     * @dataProvider provideAcceptableArgumentNames
-     *
-     * @param  string  $argumentName
-     * @return void
      */
-    public function itCanHandleMultipleModels(string $argumentName): void
+    public function itCanHandleMultipleModels(): void
     {
         $user = User::create([
-            'name' => 'admin',
+            'name' => UserPolicy::ADMIN,
         ]);
         $this->be($user);
 
@@ -125,7 +116,7 @@ class CanDirectiveDbTest extends DBTestCase
         type Query {
             deletePosts(id: [ID!]!): [Post!]!
                 @delete
-                @can('.$argumentName.': "delete")
+                @can(ability: "delete")
         }
         
         type Post {
@@ -162,16 +153,5 @@ class CanDirectiveDbTest extends DBTestCase
     public function resolvePost($root, array $args): ?User
     {
         return Post::where('id', $args['id'])->first();
-    }
-
-    /**
-     * @return array[]
-     */
-    public function provideAcceptableArgumentNames(): array
-    {
-        return [
-            ['if'],
-            ['ability'],
-        ];
     }
 }
