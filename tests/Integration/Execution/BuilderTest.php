@@ -361,14 +361,14 @@ class BuilderTest extends DBTestCase
 
         $username = 'foo@bar.baz';
         factory(User::class)->create([
-            'name' => $username
+            'name' => $username,
         ]);
         factory(User::class)->create([
-            'email' => $username
+            'email' => $username,
         ]);
         factory(User::class)->create([
             'name' => $username,
-            'email' => $username
+            'email' => $username,
         ]);
 
         $this->graphQL('

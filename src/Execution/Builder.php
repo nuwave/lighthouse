@@ -36,7 +36,7 @@ class Builder
             /** @var \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective[] $builderDirectives */
             if ($builderDirectives = Arr::get($this->builderDirectives, $key)) {
                 /** @var \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective $builderDirective */
-                foreach($builderDirectives as $builderDirective) {
+                foreach ($builderDirectives as $builderDirective) {
                     $builder = $builderDirective->handleBuilder($builder, $value);
                 }
             }
@@ -71,7 +71,7 @@ class Builder
      */
     public function addBuilderDirective(string $argumentName, ArgBuilderDirective $argBuilderDirective): self
     {
-        $this->builderDirectives[$argumentName] []= $argBuilderDirective;
+        $this->builderDirectives[$argumentName] [] = $argBuilderDirective;
 
         return $this;
     }
