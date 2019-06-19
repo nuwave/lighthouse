@@ -98,6 +98,62 @@ class CanDirectiveDbTest extends DBTestCase
         ")->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
+    /**
+     * @test
+     * @dataProvider provideAcceptableArgumentNames
+     *
+     * @param  string  $argumentName
+     * @return void
+     */
+    public function itCanHandleMultipleModels(string $argumentName): void
+    {
+        $user = User::create([
+            'name' => 'admin',
+        ]);
+        $this->be($user);
+
+        $postA = factory(Post::class)->create([
+            'user_id' => $user->getKey(),
+            'title' => 'Harry Potter and the Half-Blood Prince',
+        ]);
+        $postB = factory(Post::class)->create([
+            'user_id' => $user->getKey(),
+            'title' => 'Harry Potter and the Chamber of Secrets',
+        ]);
+
+        $this->schema = '
+        type Query {
+            deletePosts(id: [ID!]!): [Post!]!
+                @delete
+                @can('.$argumentName.': "delete")
+        }
+        
+        type Post {
+            id: ID!
+            title: String!
+        }
+        ';
+
+        $this->graphQL("
+        {
+            deletePosts(id: [{$postA->getKey()}, {$postB->getKey()}]) {
+                title
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                'deletePosts' => [
+                    [
+                        'title' => 'Harry Potter and the Half-Blood Prince',
+                    ],
+                    [
+                        'title' => 'Harry Potter and the Chamber of Secrets',
+                    ]
+                ],
+            ],
+        ]);
+    }
+
     public function resolveUser($root, array $args): ?User
     {
         return User::where('id', $args['id'])->first();

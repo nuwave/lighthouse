@@ -49,7 +49,14 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
                     $this->getAbilities()->each(
                         function (string $ability) use ($context, $gate, $gateArguments): void {
-                            $this->authorize($context->user(), $gate, $ability, $gateArguments);
+                            if ($gateArguments[0] instanceof Collection) {
+                                /** @var Collection $gateArguments[0] */
+                                $gateArguments[0]->each(function ($argument) use ($context, $gate, $ability) {
+                                    $this->authorize($context->user(), $gate, $ability, [$argument]);
+                                });
+                            } else {
+                                $this->authorize($context->user(), $gate, $ability, $gateArguments);
+                            }
                         }
                     );
 
