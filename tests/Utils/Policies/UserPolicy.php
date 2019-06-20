@@ -6,9 +6,11 @@ use Tests\Utils\Models\User;
 
 class UserPolicy
 {
+    const ADMIN = 'admin';
+
     public function adminOnly(User $user): bool
     {
-        return $user->name === 'admin';
+        return $user->name === self::ADMIN;
     }
 
     public function alwaysTrue(): bool
