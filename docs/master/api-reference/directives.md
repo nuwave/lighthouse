@@ -2139,7 +2139,7 @@ directive @whereConstraints on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 **This is an experimental feature and not included in Lighthouse by default.**
 
-First, enable the service provider:
+Add the service provider to your `config/app.php`
 
 ```php
 'providers' => [
@@ -2147,11 +2147,11 @@ First, enable the service provider:
 ],
 ```
 
-It depends upon [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
+Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
     composer require mll-lab/graphql-php-scalars
 
-Finally, add an enum type `Operator` to your schema. Depending on your
+Add an enum type `Operator` to your schema. Depending on your
 database, you may want to allow different internal values. This default
 should work for most databases:
 
