@@ -1629,6 +1629,8 @@ type Query {
 }
 ```
 
+Read more in the [validation docs](../security/validation.md#validating-arguments).
+
 ### Definition
 
 ```graphql
@@ -1652,29 +1654,6 @@ directive @rules(
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
-### Examples
-
-Rules can also be defined on Input Object Values.
-
-```graphql
-input CreatePostInput {
-    title: String @rules(apply: ["required"])
-    content: String @rules(apply: ["min:50", "max:150"])
-}
-```
-
-You can customize the error message for a particular argument.
-
-```graphql
-@rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
-```
-
-Reference custom validation rules by their fully qualified class name.
-
-```graphql
-@rules(apply: ["App\\Rules\\MyCustomRule"])
-```
-
 ## @rulesForArray
 
 Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
@@ -1686,6 +1665,8 @@ type Mutation {
   ): Icecream
 }
 ```
+
+Read more in the [validation docs](../security/validation.md#validating-arrays).
 
 ### Definition
 
@@ -1708,22 +1689,6 @@ directive @rulesForArray(
   """
   messages: [RulesMessageMap!]
 ) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-```
-
-### Examples
-
-You can also combine this with [@rules](../api-reference/directives.md#rules) to validate
-both the size and the contents of an argument array.
-For example, you might require a list of at least 3 valid emails to be passed.
-
-```graphql
-type Mutation {
-  attachEmails(
-    email: [String!]!
-      @rules(apply: ["email"])
-      @rulesForArray(apply: ["min:3"])
-   ): File
-}
 ```
 
 ## @scalar

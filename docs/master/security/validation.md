@@ -50,13 +50,16 @@ mutation {
 }
 ```
 
-You can customize the error message for a particular argument.
+## Validating Input Objects
+
+Rules can be defined upon Input Object Values.
 
 ```graphql
-@rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
+input CreatePostInput {
+    title: String @rules(apply: ["required"])
+    content: String @rules(apply: ["min:50", "max:150"])
+}
 ```
-
-### Validating For Uniqueness
 
 Using the [`unique`](https://laravel.com/docs/5.8/validation#rule-unique)
 validation rule can be a bit tricky.
@@ -93,4 +96,20 @@ type Mutation {
       @rulesForArray(apply: ["min:3"])
    ): File
 }
+```
+
+## Custom Error Messages
+
+You can customize the error message for a particular argument.
+
+```graphql
+@rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
+```
+
+## Custom Validation Rules
+
+Reference custom validation rules by their fully qualified class name.
+
+```graphql
+@rules(apply: ["App\\Rules\\MyCustomRule"])
 ```
