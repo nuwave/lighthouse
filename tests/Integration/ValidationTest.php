@@ -5,6 +5,7 @@ namespace Tests\Integration;
 use Tests\TestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
 
@@ -326,6 +327,56 @@ class ValidationTest extends TestCase
         $this->assertValidationKeysSame([
             'required',
         ], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itSetsArgumentsOnCustomArgValidationDirective(): void
+    {
+        $this->schema = '
+        type Mutation {
+            updateUser(
+                input: UpdateUserInput @complexValidation
+            ): User @update
+        }
+        
+        input UpdateUserInput {
+            id: ID
+            name: String
+        }
+        
+        type User {
+            id: ID
+            name: String
+        }
+        '.$this->placeholderQuery();
+
+        factory(User::class)->create([
+            'name' => 'foo'
+        ]);
+
+        factory(User::class)->create([
+            'name' => 'bar'
+        ]);
+
+        $duplicateName = $this->graphQL('
+        mutation {
+            updateUserInput(
+                input: {
+                    id: 1
+                    name: "bar"
+                }
+            ) {
+                id
+            }
+        } 
+        ');
+
+        $this->assertValidationKeysSame(
+            ['unique'],
+            $duplicateName
+        );
     }
 
     /**

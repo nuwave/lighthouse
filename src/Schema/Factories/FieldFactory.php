@@ -356,6 +356,10 @@ class FieldFactory
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
             if ($directive instanceof ArgValidationDirective) {
+                if (method_exists($directive,'setResolverArguments')){
+                    $directive->setResolverArguments(...$this->getResolverArguments());
+                }
+
                 // We gather the rules from all arguments and then run validation in one full swoop
                 $this->rules = array_merge($this->rules, $directive->getRules());
                 $this->messages = array_merge($this->messages, $directive->getMessages());
