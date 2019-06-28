@@ -134,10 +134,7 @@ class MutationExecutor
             }
 
             if (isset($nestedOperations['connect'])) {
-                // Inverse can be hasOne or hasMany
-                /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
-                $belongsTo = $model->{$relationName}();
-                $belongsTo->associate($nestedOperations['connect']);
+                $relation->associate($nestedOperations['connect']);
             }
 
             if (isset($nestedOperations['update'])) {
