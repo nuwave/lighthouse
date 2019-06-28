@@ -4,8 +4,8 @@ namespace Tests\Utils\Directives;
 
 use Illuminate\Contracts\Validation\Rule;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
+use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 
 class ComplexValidationDirective extends BaseDirective implements ArgValidationDirective
 {

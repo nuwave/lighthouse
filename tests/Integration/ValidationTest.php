@@ -353,11 +353,11 @@ class ValidationTest extends TestCase
         '.$this->placeholderQuery();
 
         factory(User::class)->create([
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
 
         factory(User::class)->create([
-            'name' => 'bar'
+            'name' => 'bar',
         ]);
 
         $duplicateName = $this->graphQL('

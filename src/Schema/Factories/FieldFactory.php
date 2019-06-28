@@ -356,7 +356,7 @@ class FieldFactory
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
             if ($directive instanceof ArgValidationDirective) {
-                if (method_exists($directive,'setResolverArguments')){
+                if (method_exists($directive, 'setResolverArguments')) {
                     $directive->setResolverArguments(...$this->getResolverArguments());
                 }
 
