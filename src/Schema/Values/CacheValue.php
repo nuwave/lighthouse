@@ -68,13 +68,14 @@ class CacheValue
     public function getKey(): string
     {
         $argKeys = $this->argKeys();
+        $user = app('auth')->user();
 
         return $this->implode([
-            $this->privateCache
+            $this->privateCache && $user
                 ? 'auth'
                 : null,
-            $this->privateCache
-                ? app('auth')->user()->getKey()
+            $this->privateCache && $user
+                ? $user->getKey()
                 : null,
             strtolower($this->resolveInfo->parentType->name),
             $this->fieldKey,
