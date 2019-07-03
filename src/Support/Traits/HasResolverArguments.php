@@ -144,8 +144,8 @@ trait HasResolverArguments
      */
     public function passResolverArguments($receiver)
     {
-        if (is_iterable($receiver)){
-            foreach($receiver as $single){
+        if (is_iterable($receiver)) {
+            foreach ($receiver as $single) {
                 $this->passResolverArguments($single);
             }
         }

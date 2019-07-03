@@ -36,7 +36,7 @@ class ComplexValidationDirective extends ValidationDirective
     public function getMessages(): array
     {
         return [
-            'input.name.unique' => self::UNIQUE_VALIDATION_MESSAGE
+            'input.name.unique' => self::UNIQUE_VALIDATION_MESSAGE,
         ];
     }
 }

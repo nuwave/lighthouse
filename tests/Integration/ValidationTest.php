@@ -5,10 +5,10 @@ namespace Tests\Integration;
 use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Tests\Utils\Directives\ComplexValidationDirective;
 use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
+use Tests\Utils\Directives\ComplexValidationDirective;
 
 class ValidationTest extends DBTestCase
 {
