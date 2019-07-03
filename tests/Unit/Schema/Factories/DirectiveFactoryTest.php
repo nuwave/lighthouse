@@ -98,13 +98,13 @@ class DirectiveFactoryTest extends TestCase
     /**
      * @test
      */
-    public function itCanCreateFieldResolverDirective(): void
+    public function itCanCreateSingleDirective(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: [Foo!]! @hasMany
         ');
 
-        $resolver = $this->directiveFactory->createFieldResolver($fieldDefinition);
+        $resolver = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
         $this->assertInstanceOf(FieldResolver::class, $resolver);
     }
 
@@ -119,19 +119,19 @@ class DirectiveFactoryTest extends TestCase
             bar: [Bar!]! @hasMany @belongsTo
         ');
 
-        $this->directiveFactory->createFieldResolver($fieldDefinition);
+        $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
     }
 
     /**
      * @test
      */
-    public function itCanCreateCollectionOfFieldMiddleware(): void
+    public function itCanCreateMultipleDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             bar: String @can(if: ["viewBar"]) @event
         ');
 
-        $middleware = $this->directiveFactory->createFieldMiddleware($fieldDefinition);
+        $middleware = $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinition, FieldMiddleware::class);
         $this->assertCount(2, $middleware);
     }
 }

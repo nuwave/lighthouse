@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
@@ -16,6 +17,8 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
@@ -55,6 +58,11 @@ class FieldFactory
      * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver
      */
     protected $providesSubscriptionResolver;
+
+    /**
+     * @var \Illuminate\Contracts\Validation\Factory
+     */
+    protected $validationFactory;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
@@ -104,6 +112,7 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver  $providesResolver
      * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver  $providesSubscriptionResolver
+     * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
      * @return void
      */
     public function __construct(
@@ -111,13 +120,15 @@ class FieldFactory
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
         ProvidesResolver $providesResolver,
-        ProvidesSubscriptionResolver $providesSubscriptionResolver
+        ProvidesSubscriptionResolver $providesSubscriptionResolver,
+        ValidationFactory $validationFactory
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
         $this->providesResolver = $providesResolver;
         $this->providesSubscriptionResolver = $providesSubscriptionResolver;
+        $this->validationFactory = $validationFactory;
     }
 
     /**
@@ -131,7 +142,7 @@ class FieldFactory
         $fieldDefinitionNode = $fieldValue->getField();
 
         // Directives have the first priority for defining a resolver for a field
-        if ($resolverDirective = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
+        if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
             $this->fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
             $this->fieldValue = $fieldValue->setResolver(
@@ -141,10 +152,14 @@ class FieldFactory
             );
         }
 
+        $fieldMiddleware = $this->passResolverArguments(
+            $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
+        );
+
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
             ->through(
-                $this->directiveFactory->createFieldMiddleware($fieldDefinitionNode)
+                $fieldMiddleware
             )
             ->via('handleField')
             ->then(
@@ -256,7 +271,9 @@ class FieldFactory
             return;
         }
 
-        $directives = $this->directiveFactory->createArgDirectives($astNode);
+        $directives = $this->passResolverArguments(
+            $this->directiveFactory->createAssociatedDirectivesOfType($astNode, ArgDirective::class)
+        );
 
         if (
             $directives->contains(function (Directive $directive): bool {
@@ -356,10 +373,6 @@ class FieldFactory
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
             if ($directive instanceof ArgValidationDirective) {
-                if (method_exists($directive, 'setResolverArguments')) {
-                    $directive->setResolverArguments(...$this->getResolverArguments());
-                }
-
                 // We gather the rules from all arguments and then run validation in one full swoop
                 $this->rules = array_merge($this->rules, $directive->getRules());
                 $this->messages = array_merge($this->messages, $directive->getMessages());

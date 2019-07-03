@@ -2,14 +2,12 @@
 
 namespace Tests\Utils\Directives;
 
-use Illuminate\Contracts\Validation\Rule;
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
-use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
+use Illuminate\Validation\Rule;
+use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
 
-class ComplexValidationDirective extends BaseDirective implements ArgValidationDirective
+class ComplexValidationDirective extends ValidationDirective
 {
-    use HasResolverArguments;
+    const UNIQUE_VALIDATION_MESSAGE = 'Used to test this exact validation is triggered';
 
     /**
      * Name of the directive.
@@ -27,8 +25,8 @@ class ComplexValidationDirective extends BaseDirective implements ArgValidationD
     public function getRules(): array
     {
         return [
-            'id' => ['required'],
-            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
+            'input.id' => ['required'],
+            'input.name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
         ];
     }
 
@@ -37,6 +35,8 @@ class ComplexValidationDirective extends BaseDirective implements ArgValidationD
      */
     public function getMessages(): array
     {
-        return [];
+        return [
+            'input.name.unique' => self::UNIQUE_VALIDATION_MESSAGE
+        ];
     }
 }

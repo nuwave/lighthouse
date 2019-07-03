@@ -2,14 +2,15 @@
 
 namespace Tests\Integration;
 
-use Tests\TestCase;
+use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Tests\Utils\Directives\ComplexValidationDirective;
 use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
 
-class ValidationTest extends TestCase
+class ValidationTest extends DBTestCase
 {
     protected $schema = '
     type Query {
@@ -332,13 +333,15 @@ class ValidationTest extends TestCase
     /**
      * @test
      */
-    public function itSetsArgumentsOnCustomArgValidationDirective(): void
+    public function itSetsArgumentsOnCustomValidationDirective(): void
     {
         $this->schema = '
         type Mutation {
             updateUser(
-                input: UpdateUserInput @complexValidation
-            ): User @update
+                input: UpdateUserInput
+            ): User
+                @complexValidation
+                @update
         }
         
         input UpdateUserInput {
@@ -362,7 +365,7 @@ class ValidationTest extends TestCase
 
         $duplicateName = $this->graphQL('
         mutation {
-            updateUserInput(
+            updateUser(
                 input: {
                     id: 1
                     name: "bar"
@@ -373,9 +376,13 @@ class ValidationTest extends TestCase
         } 
         ');
 
-        $this->assertValidationKeysSame(
-            ['unique'],
-            $duplicateName
+        $this->assertSame(
+            [
+                'input.name' => [
+                    ComplexValidationDirective::UNIQUE_VALIDATION_MESSAGE,
+                ],
+            ],
+            $duplicateName->jsonGet('errors.0.extensions.validation')
         );
     }
 

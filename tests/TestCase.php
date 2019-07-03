@@ -90,6 +90,9 @@ abstract class TestCase extends BaseTestCase
                 'Tests\\Utils\\Unions',
                 'Tests\\Utils\\UnionsSecondary',
             ],
+            'directives' => [
+                'Tests\\Utils\\Directives',
+            ],
         ]);
 
         $config->set(

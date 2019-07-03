@@ -5,6 +5,8 @@ namespace Nuwave\Lighthouse\Schema;
 use Closure;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
@@ -154,11 +156,12 @@ class TypeRegistry
         return $this->pipeline
             ->send($typeValue)
             ->through(
-                $this->directiveFactory->createTypeMiddleware($definition)
+                $this->directiveFactory->createAssociatedDirectivesOfType($definition, TypeMiddleware::class)
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                $typeResolver = $this->directiveFactory->createTypeResolver($definition);
+                /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
+                $typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class);
 
                 if ($typeResolver) {
                     return $typeResolver->resolveNode($value);

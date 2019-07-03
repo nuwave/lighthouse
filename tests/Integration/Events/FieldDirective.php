@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Utils\Directives;
+namespace Tests\Integration\Events;
 
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 

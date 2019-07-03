@@ -3,14 +3,14 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 /**
- * Run Laravel validation on an argument.
+ * Run Laravel validation on field arguments.
  *
  * https://laravel.com/docs/validation
  */
 interface ArgValidationDirective extends ArgDirective
 {
     /**
-     * Return validation rules for this argument.
+     * Return validation rules for the arguments.
      *
      * @return array
      */

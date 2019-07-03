@@ -97,9 +97,9 @@ class NodeInterfaceTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        $user = factory(User::class)->create(
-            ['name' => 'Sepp']
-        );
+        $user = factory(User::class)->create([
+            'name' => 'Sepp'
+        ]);
         $globalId = $this->globalIdResolver->encode('User', $user->getKey());
 
         $this->graphQL('
