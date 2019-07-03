@@ -1739,6 +1739,11 @@ type Query {
 The `search()` method of the model is called with the value of the argument,
 using the driver you configured for [Laravel Scout](https://laravel.com/docs/master/scout).
 
+Take care when using the `@search` directive in combination with other directives
+that influence the database query. The usual query builder `Eloquent\Builder`
+will be replaced by a `Scout\Builder`, which does not support the same methods and operations.
+Regular filters such as [`@eq`](#eq) or [`@in`](#in) still work, but scopes do not.
+
 ### Definition
 
 ```graphql
