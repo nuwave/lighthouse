@@ -9,7 +9,7 @@ is requested as part of a query. This function is called a **resolver**.
 
 As is the tradition of our people, this section will teach you how to say "hello world!" through Lighthouse.
 
-We start out by defining the simples possible schema: The root `Query` type
+We start out by defining the simplest possible schema: The root `Query` type
 with a single field called `hello` that returns a `String`.
 
 ```graphql
