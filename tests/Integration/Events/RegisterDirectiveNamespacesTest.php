@@ -20,7 +20,10 @@ class RegisterDirectiveNamespacesTest extends TestCase
         $app->make('events')->listen(
             RegisterDirectiveNamespaces::class,
             function (): array {
-                return ['Tests\\Utils\\Directives'];
+                return [
+                    'Tests\\Utils\\Directives',
+                    'Tests\\Integration\\Events',
+                ];
             }
         );
 

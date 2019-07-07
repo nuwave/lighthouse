@@ -70,7 +70,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
      */
     public function name(): string
     {
-        return 'middleware';
+        return self::NAME;
     }
 
     /**
