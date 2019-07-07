@@ -312,7 +312,7 @@ directive @builder(
 Cache the result of a resolver.
 
 The cache is created on the first request and is cached forever by default.
-Use this for values that change seldomly and take long to fetch/compute.
+Use this for values that change seldom and take long to fetch/compute.
 
 ```graphql
 type Query {
@@ -359,7 +359,7 @@ type Query {
 
 ## @cacheKey
 
-When generating a cached result for a resolver, Lighthouse produces a unique key for each type. By default, Lighthouse will look for a field with the `ID` type to generate the key. If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+Specify the field to use as a key when creating a cache.
 
 ```graphql
 type GithubProfile {
@@ -368,9 +368,16 @@ type GithubProfile {
 }
 ```
 
+When generating a cached result for a resolver, Lighthouse produces a unique key for each type.
+By default, Lighthouse will look for a field with the `ID` type to generate the key.
+If you'd like to use a different field (i.e., an external API id) you can mark the field with the `@cacheKey` directive.
+
 ### Definition
 
 ```graphql
+"""
+Specify the field to use as a key when creating a cache.
+"""
 directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
