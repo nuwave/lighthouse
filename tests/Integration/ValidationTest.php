@@ -387,6 +387,83 @@ class ValidationTest extends DBTestCase
     }
 
     /**
+     * @test
+     */
+    public function itCombinesFieldValidationAndArgumentValidation(): void
+    {
+        $this->schema = '
+        type Mutation {
+            createUser(
+                foo: String @rules(apply: ["max:5"])
+            ): User
+                @fooValidation
+                @create
+        }
+        
+        type User {
+            id: ID
+            name: String
+        }
+        '.$this->placeholderQuery();
+
+        $result = $this->graphQL('
+        mutation {
+            createUser(
+                foo: "  ?!?  "
+            ) {
+                id
+            }
+        } 
+        ');
+
+        $this->assertCount(
+            2,
+            $result->jsonGet('errors.0.extensions.validation.foo')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCombinesArgumentValidationByPausingAndResuming(): void
+    {
+        $this->markTestSkipped('
+        This should work once we can reliably depend upon repeatable directives.
+        As of now, the rules of the second @rules directive are not considered
+        and Lighthouse uses those of the first directive.
+        ');
+
+        $this->schema = '
+        type Mutation {
+            createUser(
+                foo: String @rules(apply: ["max:5"]) @trim @rules(apply: ["min:4"])
+            ): User
+                @create
+        }
+        
+        type User {
+            id: ID
+            name: String
+        }
+        '.$this->placeholderQuery();
+
+        $result = $this->graphQL('
+        mutation {
+            createUser(
+                foo: "  ?!?  "
+            ) {
+                id
+            }
+        } 
+        ');
+
+        $this->assertCount(
+            2,
+            $result->jsonGet('errors.0.extensions.validation.foo')
+        );
+    }
+
+    /**
      * Assert that the returned result contains an exactly defined array of validation keys.
      *
      * @param  array  $keys

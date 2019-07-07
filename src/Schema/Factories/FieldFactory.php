@@ -155,6 +155,7 @@ class FieldFactory
         $fieldMiddleware = $this->passResolverArguments(
             $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
         );
+        $this->validationErrorBuffer = (new ErrorBuffer)->setErrorType('validation');
 
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
@@ -175,7 +176,6 @@ class FieldFactory
             function () use ($argumentValues, $resolverWithMiddleware) {
                 $this->setResolverArguments(...func_get_args());
 
-                $this->validationErrorBuffer = (new ErrorBuffer)->setErrorType('validation');
                 $this->builder = new Builder;
 
                 $argumentValues->each(
@@ -218,7 +218,23 @@ class FieldFactory
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
 
-                return $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
+                try {
+                    $result = $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
+                } catch (\Illuminate\Validation\ValidationException $validationException) {
+                    $this->addValidationErrorsToBuffer(
+                        $validationException->errors()
+                    );
+                }
+
+                $path = implode(
+                    '.',
+                    $this->resolveInfo()->path
+                );
+                $this->validationErrorBuffer->flush(
+                    "Validation failed for the field [$path]."
+                );
+
+                return $result;
             }
         );
 
@@ -439,33 +455,24 @@ class FieldFactory
             return;
         }
 
-        $validator = validator(
+        /** @var \Nuwave\Lighthouse\Execution\GraphQLValidator $validator */
+        $validator = $this->validationFactory->make(
             $this->args,
             $this->rules,
             $this->messages,
+            // The presence of those custom attributes ensures we get a GraphQLValidator
             [
                 'root' => $this->root,
                 'context' => $this->context,
-                // This makes it so that we get an instance of our own Validator class
                 'resolveInfo' => $this->resolveInfo,
             ]
         );
 
         if ($validator->fails()) {
-            foreach ($validator->errors()->getMessages() as $key => $errorMessages) {
-                foreach ($errorMessages as $errorMessage) {
-                    $this->validationErrorBuffer->push($errorMessage, $key);
-                }
-            }
+            $this->addValidationErrorsToBuffer(
+                $validator->errors()->getMessages()
+            );
         }
-
-        $path = implode(
-            '.',
-            $this->resolveInfo()->path
-        );
-        $this->validationErrorBuffer->flush(
-            "Validation failed for the field [$path]."
-        );
 
         // reset rules and messages
         $this->rules = [];
@@ -508,5 +515,14 @@ class FieldFactory
                 ];
             })
             ->all();
+    }
+
+    protected function addValidationErrorsToBuffer(array $validationErrors): void
+    {
+        foreach ($validationErrors as $key => $errorMessages) {
+            foreach ($errorMessages as $errorMessage) {
+                $this->validationErrorBuffer->push($errorMessage, $key);
+            }
+        }
     }
 }

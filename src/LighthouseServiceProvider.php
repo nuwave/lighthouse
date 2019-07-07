@@ -73,7 +73,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $validationFactory->resolver(
             function ($translator, array $data, array $rules, array $messages, array $customAttributes): Validator {
                 // This determines whether we are resolving a GraphQL field
-                return Arr::get($customAttributes, 'resolveInfo') instanceof ResolveInfo
+                return Arr::has($customAttributes, ['root', 'context', 'resolveInfo'])
                     ? new GraphQLValidator($translator, $data, $rules, $messages, $customAttributes)
                     : new Validator($translator, $data, $rules, $messages, $customAttributes);
             }
