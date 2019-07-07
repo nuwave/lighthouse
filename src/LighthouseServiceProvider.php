@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Router;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
-use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
