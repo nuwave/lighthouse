@@ -139,13 +139,13 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
         // First priority: Look for a field with the @cacheKey directive
         /** @var FieldDefinitionNode $field */
-        foreach($typeDefinition->fields as $field) {
+        foreach ($typeDefinition->fields as $field) {
             $hasCacheKey = (new Collection($field->directives))
                 ->contains(function (DirectiveNode $directive): bool {
                     return $directive->name->value === 'cacheKey';
                 });
 
-            if($hasCacheKey) {
+            if ($hasCacheKey) {
                 $typeValue->setCacheKey(
                     $field->name->value
                 );
@@ -156,8 +156,8 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
         // Second priority: Look for a Non-Null field with the ID type
         /** @var FieldDefinitionNode $field */
-        foreach($typeDefinition->fields as $field) {
-            if(
+        foreach ($typeDefinition->fields as $field) {
+            if (
                 $field->type instanceof NonNullTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {

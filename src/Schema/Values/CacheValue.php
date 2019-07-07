@@ -142,7 +142,7 @@ class CacheValue
             ->getCacheKey();
 
         if ($cacheFieldKey) {
-           return data_get($this->rootValue, $cacheFieldKey);
+            return data_get($this->rootValue, $cacheFieldKey);
         }
     }
 
