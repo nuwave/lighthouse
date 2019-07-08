@@ -218,6 +218,7 @@ class FieldFactory
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
 
+                $result = null;
                 try {
                     $result = $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
                 } catch (\Illuminate\Validation\ValidationException $validationException) {
