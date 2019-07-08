@@ -4,22 +4,22 @@ about: Report a bug to help us improve Lighthouse
 
 ---
 
-<!-- If you are not sure the problem you are having is actually an issue within Lighthouse,
-you can hop into Slack first. We will help you figure out what is wrong. -->
+<!-- Please file a bug report only if there is a problem within Lighthouse.
+To get help on an issue or ask a question, you can visit our Slack channel. -->
 
 **Describe the bug**
 
-<!-- A clear and concise description of what the bug is. -->
+<!-- In what way is Lighthouse behaving incorrectly or unexpectedly? -->
 
-**Expected behavior**
+**Expected behavior/Solution**
 
-<!-- A clear and concise description of what you expected to happen. -->
+<!-- What do you think should happen instead? How could the issue be resolved?-->
 
-**Schema**
+**Steps to reproduce**
 
-```graphql
-# Add in relevant parts of your schema definition
-```
+1.
+2.
+3.
 
 **Output/Logs**
 
@@ -35,8 +35,3 @@ you can hop into Slack first. We will help you figure out what is wrong. -->
 
 Lighthouse Version:
 Laravel Version:
-PHP Version:
-
-**Additional context**
-
-<!-- Add any other context about the problem here. -->
