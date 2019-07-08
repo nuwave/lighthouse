@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   query are no longer run on every request https://github.com/nuwave/lighthouse/pull/768
 - Simplify the default route configuration https://github.com/nuwave/lighthouse/pull/820
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
+- The pagination field argument that controls the amount of results
+  now default tos `first` instead of `count`. The config `pagination_amount_argument`
+  can be used to change the argument name https://github.com/nuwave/lighthouse/pull/
 
 ### Removed
 
