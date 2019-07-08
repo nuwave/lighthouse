@@ -137,7 +137,7 @@ return [
     |
     | Set the name to use for the generated argument on paginated fields
     | that controls how many results are returned.
-    | This will default to "first" in v4.
+    | This setting will be removed in v5.
     |
     */
 

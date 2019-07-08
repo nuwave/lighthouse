@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
 - The pagination field argument that controls the amount of results
   now default tos `first` instead of `count`. The config `pagination_amount_argument`
-  can be used to change the argument name https://github.com/nuwave/lighthouse/pull/
+  can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
 
 ### Removed
 
@@ -43,6 +43,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `dispatch` aliases `fire` and `class` for dispatching through `@event` https://github.com/nuwave/lighthouse/pull/823
 - Remove the `GraphQL` facade and the container alias `graphql` https://github.com/nuwave/lighthouse/pull/824
 - Remove the alias `if` for specifying the `ability` that has to be met in `@can` https://github.com/nuwave/lighthouse/pull/838
+
+### Deprecated
+
+- The configuration option `pagination_amount_argument` will be removed in v5
 
 ## [3.7.0](https://github.com/nuwave/lighthouse/compare/v3.6.1...v3.7.0)
 
