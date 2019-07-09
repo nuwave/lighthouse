@@ -18,17 +18,17 @@ class UserPolicy
         return true;
     }
 
-    public function guestOnly($user = null): bool
+    public function guestOnly($viewer = null): bool
     {
-        return $user === null;
+        return $viewer === null;
     }
 
-    public function view(User $user, User $otherUser): bool
+    public function view(User $viewer, User $queriedUser): bool
     {
-        return $otherUser !== null;
+        return true;
     }
 
-    public function dependingOnArg($user, bool $pass): bool
+    public function dependingOnArg($viewer, bool $pass): bool
     {
         return $pass;
     }

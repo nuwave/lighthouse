@@ -403,10 +403,16 @@ directive @can(
   """
   The ability to check permissions for.
   """
-  ability: String
+  ability: String!
   
   """
-  Additional arguments for policy check. 
+  The name of the argument that is used to find a specific model
+  instance against which the permissions should be checked.
+  """
+  find: String
+  
+  """
+  Additional arguments that are passed to `Gate::check`. 
   """
   args: [String!]
 ) on FIELD_DEFINITION
@@ -414,11 +420,12 @@ directive @can(
 
 ### Examples
 
-If you pass an `id` argument it will look for an instance of the expected model instance.
+You may specify an argument that is used to find a specific model
+instance against which the permissions should be checked.
 
 ```graphql
 type Query {
-    post(id: ID @eq): Post @can(ability: "view")
+    post(id: ID @eq): Post @can(ability: "view", find: "id")
 }
 ```
 
