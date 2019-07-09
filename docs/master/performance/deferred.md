@@ -1,8 +1,8 @@
 # Deferred Fields
 
 ::: warning
-Currently the `@defer` directive requires Apollo Client in alpha,
-although there has been talk of merging some pending PRs after the GraphQL Summit which starts today.
+Currently the `@defer` directive requires Apollo Client in alpha.
+Track the state of the PR here: https://github.com/apollographql/apollo-client/pull/3686
 :::
 
 Deferring fields allows you to prioritize fetching data needed to render the most important content

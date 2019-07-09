@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Defer;
 
+use Nuwave\Lighthouse\Defer\DeferrableDirective;
 use Tests\TestCase;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
@@ -29,6 +30,31 @@ class DeferTest extends TestCase
         return array_merge(
             parent::getPackageProviders($app),
             [DeferServiceProvider::class]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itAddsTheDeferClientDirective(): void
+    {
+        $this->schema = $this->placeholderQuery();
+
+        $introspection = $this->graphQL('
+          query IntrospectionQuery {
+            __schema {
+              directives {
+                name
+              }
+            }
+          }
+        ');
+
+        $this->assertTrue(
+            in_array(
+                'defer',
+                $introspection->jsonGet('data.__schema.directives.*.name')
+            )
         );
     }
 
@@ -142,6 +168,69 @@ class DeferTest extends TestCase
         $nestedDeferred = Arr::get($chunks[2], 'user.parent.parent');
         $this->assertArrayHasKey('name', $nestedDeferred['data']);
         $this->assertSame(self::$data['parent']['parent']['name'], $nestedDeferred['data']['name']);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanDeferNestedFieldsOnMutations(): void
+    {
+        self::$data = [
+            'name' => 'John Doe',
+            'parent' => [
+                'name' => 'Jane Doe',
+            ],
+        ];
+
+        $this->schema = "
+        type User {
+            name: String!
+            parent: User
+        }
+        
+        type Query {
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+        }
+        
+        type Mutation {
+            updateUser(name: String!): User
+                @field(resolver: \"{$this->qualifyTestResolver()}\")
+        }
+        ";
+
+        $chunks = $this->getStreamedChunks('
+        mutation { 
+            updateUser(
+                name: "Foo"
+            ) {
+                name
+                parent @defer {
+                    name
+                }
+            }
+        }
+        ');
+
+        $this->assertSame(
+            [
+                [
+                    'data' => [
+                        'updateUser' => [
+                            'name' => 'John Doe',
+                            'parent' => null,
+                        ],
+                    ],
+                ],
+                [
+                    'updateUser.parent' => [
+                        'data' => [
+                            'name' => 'Jane Doe',
+                        ],
+                    ],
+                ],
+            ],
+            $chunks
+        );
     }
 
     /**
@@ -401,10 +490,10 @@ class DeferTest extends TestCase
      */
     public function itThrowsExceptionOnNunNullableFields(): void
     {
-        config([
-            'lighthouse.defer.max_nested_fields' => 1,
-            'app.debug' => false,
-        ]);
+//        config([
+//            'lighthouse.defer.max_nested_fields' => 1,
+//            'app.debug' => false,
+//        ]);
 
         self::$data = [
             'name' => 'John Doe',
@@ -436,7 +525,7 @@ class DeferTest extends TestCase
         ')->assertJson([
             'errors' => [
                 [
-                    'message' => 'The @defer directive cannot be placed on a Non-Nullable field.',
+                    'message' => DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD,
                 ],
             ],
         ]);
@@ -445,7 +534,7 @@ class DeferTest extends TestCase
     /**
      * @test
      */
-    public function itSkipsDeferWithIncludeAndSkipDirectives(): void
+    public function itDoesNotDeferWithIncludeAndSkipDirectives(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -473,23 +562,26 @@ class DeferTest extends TestCase
 
         $this->graphQL('
         { 
-            user {
+            userInclude: user {
                 name
-                parent @defer @include(if: true) {
+                parent @defer @include(if: false) {
                     name
-                    parent @defer @skip(if: true) {
-                        name
-                    }
+                }
+            }
+            userSkip: user {
+                name
+                parent @defer @skip(if: true) {
+                    name
                 }
             }
         }
-        ')->assertJson([
+        ')->assertExactJson([
             'data' => [
-                'user' => [
+                'userInclude' => [
                     'name' => 'John Doe',
-                    'parent' => [
-                        'name' => 'Jane Doe',
-                    ],
+                ],
+                'userSkip' => [
+                    'name' => 'John Doe',
                 ],
             ],
         ]);
@@ -542,20 +634,11 @@ class DeferTest extends TestCase
 
     /**
      * @test
-     *
-     * @todo Ensure that this functions the same way as Apollo Server.
-     * Currently in the documentation it just says "Not Supported" instead
-     * of specifying if it throws an error or not.
-     *
-     * https://www.apollographql.com/docs/react/features/defer-support.html#defer-usage
      */
-    public function itSkipsDeferredFieldsOnMutations(): void
+    public function itThrowsIfTryingToDeferRootMutationFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
-            'parent' => [
-                'name' => 'Jane Doe',
-            ],
         ];
 
         $this->schema = "
@@ -576,16 +659,15 @@ class DeferTest extends TestCase
 
         $this->graphQL('
         mutation UpdateUser {
-            updateUser(name: "John Doe") {
+            updateUser(name: "John Doe") @defer {
                 name 
-                parent @defer {
-                    name
-                }
             }
         }
         ')->assertJson([
-            'data' => [
-                'updateUser' => self::$data,
+            'errors' => [
+                [
+                    'message' => DeferrableDirective::THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD,
+                ],
             ],
         ]);
     }
