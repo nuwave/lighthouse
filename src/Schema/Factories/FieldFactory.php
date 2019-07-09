@@ -25,7 +25,7 @@ use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
@@ -389,10 +389,10 @@ class FieldFactory
             // Pause the iteration once we hit any directive that has to do
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
-            if ($directive instanceof ArgValidationDirective) {
+            if ($directive instanceof ProvidesRules) {
                 // We gather the rules from all arguments and then run validation in one full swoop
-                $this->rules = array_merge($this->rules, $directive->getRules());
-                $this->messages = array_merge($this->messages, $directive->getMessages());
+                $this->rules = array_merge($this->rules, $directive->rules());
+                $this->messages = array_merge($this->messages, $directive->messages());
 
                 break;
             }

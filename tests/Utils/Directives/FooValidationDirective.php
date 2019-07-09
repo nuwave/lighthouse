@@ -19,7 +19,7 @@ class FooValidationDirective extends ValidationDirective
     /**
      * @return mixed[]
      */
-    public function getRules(): array
+    public function rules(): array
     {
         return [
             'foo' => ['alpha'],
@@ -29,7 +29,7 @@ class FooValidationDirective extends ValidationDirective
     /**
      * @return string[]
      */
-    public function getMessages(): array
+    public function messages(): array
     {
         return [];
     }

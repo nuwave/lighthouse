@@ -3,23 +3,23 @@
 namespace Nuwave\Lighthouse\Support\Contracts;
 
 /**
- * Run Laravel validation on field arguments.
+ * Provide rules and custom messages for field validation.
  *
  * https://laravel.com/docs/validation
  */
-interface ArgValidationDirective extends ArgDirective
+interface ProvidesRules
 {
     /**
      * Return validation rules for the arguments.
      *
      * @return array
      */
-    public function getRules(): array;
+    public function rules(): array;
 
     /**
      * Return custom messages for the rules.
      *
      * @return array
      */
-    public function getMessages(): array;
+    public function messages(): array;
 }

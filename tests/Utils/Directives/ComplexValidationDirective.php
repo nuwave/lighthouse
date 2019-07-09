@@ -22,7 +22,7 @@ class ComplexValidationDirective extends ValidationDirective
     /**
      * @return mixed[]
      */
-    public function getRules(): array
+    public function rules(): array
     {
         return [
             'input.id' => ['required'],
@@ -33,7 +33,7 @@ class ComplexValidationDirective extends ValidationDirective
     /**
      * @return string[]
      */
-    public function getMessages(): array
+    public function messages(): array
     {
         return [
             'input.name.unique' => self::UNIQUE_VALIDATION_MESSAGE,

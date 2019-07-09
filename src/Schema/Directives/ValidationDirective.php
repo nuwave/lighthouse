@@ -5,13 +5,13 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
-use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
-abstract class ValidationDirective extends BaseDirective implements FieldMiddleware, ArgValidationDirective
+abstract class ValidationDirective extends BaseDirective implements FieldMiddleware, ProvidesRules
 {
     use HasResolverArguments;
 
@@ -46,8 +46,8 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
                     $validator = $this->validationFactory
                         ->make(
                             $args,
-                            $this->getRules(),
-                            $this->getMessages(),
+                            $this->rules(),
+                            $this->messages(),
                             // The presence of those custom attributes ensures we get a GraphQLValidator
                             [
                                 'root' => $root,
