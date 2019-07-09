@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 class CanDirectiveDbTest extends DBTestCase
@@ -77,13 +77,13 @@ class CanDirectiveDbTest extends DBTestCase
         ';
 
         $this->expectException(ModelNotFoundException::class);
-        $this->graphQL("
+        $this->graphQL('
         {
-            user(id: \"not-present\") {
+            user(id: "not-present") {
                 name
             }
         }
-        ");
+        ');
     }
 
     /**
