@@ -146,21 +146,11 @@ class UpdateUserValidationDirective extends ValidationDirective
     /**
      * @return mixed[]
      */
-    public function getRules(): array
+    public function rules(): array
     {
         return [
             'id' => ['required'],
             'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getMessages(): array
-    {
-        return [
-            'name.unique' => 'The chosen username is not available',
         ];
     }
 }
@@ -172,4 +162,18 @@ Use it in your schema upon the field you want to validate.
 type Mutation {
   updateUser(id: ID, name: String): User @updateUserValidation
 }
+```
+
+You can customize the messages for the given rules by implementing the `messages` function.
+
+```php
+    /**
+     * @return string[]
+     */
+    public function messages(): array
+    {
+        return [
+            'name.unique' => 'The chosen username is not available',
+        ];
+    }
 ```
