@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\Defer;
 
-use Nuwave\Lighthouse\Defer\DeferrableDirective;
 use Tests\TestCase;
 use GraphQL\Error\Error;
 use Illuminate\Support\Arr;
 use Nuwave\Lighthouse\Defer\Defer;
+use Nuwave\Lighthouse\Defer\DeferrableDirective;
 use Nuwave\Lighthouse\Defer\DeferServiceProvider;
 
 class DeferTest extends TestCase
