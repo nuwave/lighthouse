@@ -32,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Make sure to review your `config/lighthouse.php` and bring it up to date
   with the latest changes in the base configuration file https://github.com/nuwave/lighthouse/pull/820
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
+- Make the argument used for finding a model to check @can against configurable.
+  The previous behaviour of implicitely using the `id` argument for finding a specific
+  model to authorize against now no longer works. https://github.com/nuwave/lighthouse/pull/856
 
 ### Removed
 
