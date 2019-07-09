@@ -1,10 +1,17 @@
 <?php
 
+use Illuminate\Support\Str;
+
 if ($routeConfig = config('lighthouse.route')) {
-    /** @var \Illuminate\Routing\Router|\Laravel\Lumen\Routing\Router $router */
+    /** @var \Illuminate\Contracts\Routing\Registrar $router */
     $router = app('router');
 
-    $router->addRoute(
+    $method = 'addRoute';
+    if (Str::startsWith(app()->version(), '5.5.')) {
+        $method = 'match';
+    }
+
+    $router->$method(
         ['GET', 'POST'],
         $routeConfig['uri'] ?? 'graphql',
         [
