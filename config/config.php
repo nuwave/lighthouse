@@ -96,13 +96,12 @@ return [
     |
     | Control how Lighthouse handles security related query validation.
     | This configures the options from http://webonyx.github.io/graphql-php/security/
-    | A setting of "0" means that the validation rule is disabled.
     |
     */
 
     'security' => [
-        'max_query_complexity' => 0,
-        'max_query_depth' => 0,
+        'max_query_complexity' => \GraphQL\Validator\Rules\QueryComplexity::DISABLED,
+        'max_query_depth' => \GraphQL\Validator\Rules\QueryDepth::DISABLED,
         'disable_introspection' => \GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],
 
