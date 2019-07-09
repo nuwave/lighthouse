@@ -6,7 +6,7 @@ if ($routeConfig = config('lighthouse.route')) {
     /** @var \Illuminate\Contracts\Routing\Registrar|\Laravel\Lumen\Routing\Router $router */
     $router = app('router');
 
-    $method = Str::contains($this->app->version(), 'Lumen')
+    $method = Str::contains(app()->version(), 'Lumen')
         ? 'addRoute'
         : 'match';
 
