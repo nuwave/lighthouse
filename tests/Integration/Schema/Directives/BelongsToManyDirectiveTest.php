@@ -96,7 +96,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->graphQL('
         {
             user {
-                roles(count: 2) {
+                roles(first: 2) {
                     paginatorInfo {
                         count
                         hasMorePages

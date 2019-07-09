@@ -139,7 +139,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->graphQL('
         {
             user {
-                tasks(count: 2) {
+                tasks(first: 2) {
                     paginatorInfo {
                         count
                         hasMorePages
@@ -190,7 +190,7 @@ class HasManyDirectiveTest extends DBTestCase
         $result = $this->graphQL('
         {
             user {
-                tasks(count: 5) {
+                tasks(first: 5) {
                     data {
                         id
                     }
@@ -229,7 +229,7 @@ class HasManyDirectiveTest extends DBTestCase
         {
             user {
                 id
-                tasks(count: 0) {
+                tasks(first: 0) {
                     data {
                         id
                     }
@@ -311,7 +311,7 @@ class HasManyDirectiveTest extends DBTestCase
         $result = $this->graphQL('
         {
             user {
-                tasks(count: 3) {
+                tasks(first: 3) {
                     data {
                         id
                     }

@@ -1445,7 +1445,7 @@ The schema definition is automatically transformed to this:
 
 ```graphql
 type Query {
-    posts(count: Int!, page: Int): PostPaginator
+    posts(first: Int!, page: Int): PostPaginator
 }
 
 type PostPaginator {
@@ -1458,7 +1458,7 @@ And can be queried like this:
 
 ```graphql
 {
-    posts(count: 10) {
+    posts(first: 10) {
         data {
             id
             title

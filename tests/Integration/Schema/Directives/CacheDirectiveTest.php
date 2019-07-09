@@ -148,7 +148,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 5) {
+            users(first: 5) {
                 data {
                     id
                     name
@@ -196,7 +196,7 @@ class CacheDirectiveTest extends DBTestCase
             user(id: '.$user->getKey().') {
                 id
                 name
-                posts(count: 3) {
+                posts(first: 3) {
                     data {
                         title
                     }
@@ -263,7 +263,7 @@ class CacheDirectiveTest extends DBTestCase
             user(id: '.$user->getKey().') {
                 id
                 name
-                posts(count: 3) {
+                posts(first: 3) {
                     data {
                         title
                     }

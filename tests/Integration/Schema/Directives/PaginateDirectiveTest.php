@@ -31,7 +31,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 5) {
+            users(first: 5) {
                 paginatorInfo {
                     count
                     total
@@ -75,7 +75,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 0) {
+            users(first: 0) {
                 data {
                     id
                 }
@@ -111,7 +111,7 @@ class PaginateDirectiveTest extends DBTestCase
         // The custom builder is supposed to change the sort order
         $this->graphQL('
         {
-            users(count: 1) {
+            users(first: 1) {
                 data {
                     id
                 }
@@ -171,21 +171,21 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 3, page: 1) {
+            users(first: 3, page: 1) {
                 paginatorInfo {
                     count
                     total
                     currentPage
                 }
                 data {
-                    posts(count: 2, page: 2) {
+                    posts(first: 2, page: 2) {
                         paginatorInfo {
                             count
                             total
                             currentPage
                         }
                         data {
-                            comments(count: 1, page: 3) {
+                            comments(first: 1, page: 3) {
                                 paginatorInfo {
                                     count
                                     total
@@ -341,7 +341,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 5) {
+            users(first: 5) {
                 paginatorInfo {
                     count
                     currentPage
@@ -395,7 +395,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 1) {
+            users(first: 1) {
                 data {
                     id
                     name
@@ -471,7 +471,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $resultFromDefaultPagination = $this->graphQL('
         {
-            users1(count: 10) {
+            users1(first: 10) {
                 data {
                     id
                     name
@@ -527,7 +527,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $result = $this->graphQL('
         {
-            users1(count: 10) {
+            users1(first: 10) {
                 data {
                     id
                     name
@@ -543,7 +543,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users2(count: 10) {
+            users2(first: 10) {
                 data {
                     id
                     name
