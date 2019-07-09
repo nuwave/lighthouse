@@ -90,15 +90,19 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $resolvedValue = $resolver($root, $args, $context, $resolveInfo);
 
-            $expiresAt = $maxAge
-                ? Carbon::now()->addSeconds($maxAge)
-                : null;
+            $storeInCache = $maxAge
+                ? function($value) use ($cacheKey, $maxAge, $cache) {
+                    $cache->put($cacheKey, $value, Carbon::now()->addSeconds($maxAge));
+                }
+                : function($value) use ($cacheKey, $cache){
+                    $cache->forever($cacheKey, $value);
+                };
 
             ($resolvedValue instanceof Deferred)
-                ? $resolvedValue->then(function ($result) use ($cache, $cacheKey, $expiresAt): void {
-                    $cache->put($cacheKey, $result, $expiresAt);
+                ? $resolvedValue->then(function ($result) use ($storeInCache): void {
+                    $storeInCache($result);
                 })
-                : $cache->put($cacheKey, $resolvedValue, $expiresAt);
+                : $storeInCache($resolvedValue);
 
             return $resolvedValue;
         });
