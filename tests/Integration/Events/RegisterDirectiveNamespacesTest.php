@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Tests\Utils\Directives\FooDirective;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Tests\Utils\Directives\FieldDirective as TestFieldDirective;
+use Tests\Integration\Events\FieldDirective as TestFieldDirective;
 
 class RegisterDirectiveNamespacesTest extends TestCase
 {
@@ -20,7 +20,10 @@ class RegisterDirectiveNamespacesTest extends TestCase
         $app->make('events')->listen(
             RegisterDirectiveNamespaces::class,
             function (): array {
-                return ['Tests\\Utils\\Directives'];
+                return [
+                    'Tests\\Utils\\Directives',
+                    'Tests\\Integration\\Events',
+                ];
             }
         );
 

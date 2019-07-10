@@ -12,11 +12,6 @@ what your argument should apply to in addition to its function.
 
 You must implement exactly one of those two interfaces in order for an argument directive to work.
 
-## ArgValidationDirective
-
-An [`\Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgValidationDirective.php)
-may be used to return custom rules and messages to use for validation of an argument.
-
 ## ArgTransformerDirective
 
 An [`\Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective`](https://github.com/nuwave/lighthouse/blob/master/src/Support/Contracts/ArgTransformerDirective.php)

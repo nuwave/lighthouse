@@ -2,13 +2,15 @@
 
 namespace Tests\Integration;
 
-use Tests\TestCase;
+use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Tests\Utils\Models\User;
 use Tests\Utils\Queries\Foo;
 use Illuminate\Foundation\Testing\TestResponse;
+use Tests\Utils\Directives\ComplexValidationDirective;
 
-class ValidationTest extends TestCase
+class ValidationTest extends DBTestCase
 {
     protected $schema = '
     type Query {
@@ -326,6 +328,139 @@ class ValidationTest extends TestCase
         $this->assertValidationKeysSame([
             'required',
         ], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function itSetsArgumentsOnCustomValidationDirective(): void
+    {
+        $this->schema = '
+        type Mutation {
+            updateUser(
+                input: UpdateUserInput
+            ): User
+                @complexValidation
+                @update
+        }
+        
+        input UpdateUserInput {
+            id: ID
+            name: String
+        }
+        
+        type User {
+            id: ID
+            name: String
+        }
+        '.$this->placeholderQuery();
+
+        factory(User::class)->create([
+            'name' => 'foo',
+        ]);
+
+        factory(User::class)->create([
+            'name' => 'bar',
+        ]);
+
+        $duplicateName = $this->graphQL('
+        mutation {
+            updateUser(
+                input: {
+                    id: 1
+                    name: "bar"
+                }
+            ) {
+                id
+            }
+        } 
+        ');
+
+        $this->assertSame(
+            [
+                'input.name' => [
+                    ComplexValidationDirective::UNIQUE_VALIDATION_MESSAGE,
+                ],
+            ],
+            $duplicateName->jsonGet('errors.0.extensions.validation')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCombinesFieldValidationAndArgumentValidation(): void
+    {
+        $this->schema = '
+        type Mutation {
+            createUser(
+                foo: String @rules(apply: ["max:5"])
+            ): User
+                @fooValidation
+                @create
+        }
+        
+        type User {
+            id: ID
+            name: String
+        }
+        '.$this->placeholderQuery();
+
+        $result = $this->graphQL('
+        mutation {
+            createUser(
+                foo: "  ?!?  "
+            ) {
+                id
+            }
+        } 
+        ');
+
+        $this->assertCount(
+            2,
+            $result->jsonGet('errors.0.extensions.validation.foo')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itCombinesArgumentValidationByPausingAndResuming(): void
+    {
+        $this->markTestSkipped('
+        This should work once we can reliably depend upon repeatable directives.
+        As of now, the rules of the second @rules directive are not considered
+        and Lighthouse uses those of the first directive.
+        ');
+
+        $this->schema = '
+        type Mutation {
+            createUser(
+                foo: String @rules(apply: ["max:5"]) @trim @rules(apply: ["min:4"])
+            ): User
+                @create
+        }
+        
+        type User {
+            id: ID
+            name: String
+        }
+        '.$this->placeholderQuery();
+
+        $result = $this->graphQL('
+        mutation {
+            createUser(
+                foo: "  ?!?  "
+            ) {
+                id
+            }
+        } 
+        ');
+
+        $this->assertCount(
+            2,
+            $result->jsonGet('errors.0.extensions.validation.foo')
+        );
     }
 
     /**

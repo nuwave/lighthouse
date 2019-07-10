@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add the `@namespace` directive as a replacement for the removed `@group` directive https://github.com/nuwave/lighthouse/pull/768
+- The `@defer` extension now supports deferring nested fields of mutations https://github.com/nuwave/lighthouse/pull/855
+- Add a simple way to define complex validation directives by extending `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective` https://github.com/nuwave/lighthouse/pull/846
 
 ### Fixed
 
@@ -19,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `Illuminate\Contracts\Config\Repository` instead of `Illuminate\Config\Repository` https://github.com/nuwave/lighthouse/issues/832
 - Allow checking the abilities with `@can` when issuing mass updates on multiple models https://github.com/nuwave/lighthouse/pull/838
 - Allow use of `private` in `@cache` directive even when the user is not authenticated.
+- Fix Lumen route registration https://github.com/nuwave/lighthouse/pull/853
+- Fix handling of `@include` directive, it is semantically opposite to `@skip`, when using it with `@defer` https://github.com/nuwave/lighthouse/pull/855
 
 ### Changed
 
@@ -29,8 +33,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable the schema caching option `lighthouse.cache.enable` by default https://github.com/nuwave/lighthouse/pull/768 
 - Lazily load types from the schema. Directives defined on parts of the schema that are not used within the current
   query are no longer run on every request https://github.com/nuwave/lighthouse/pull/768
-- Simplify the default route configuration https://github.com/nuwave/lighthouse/pull/820
+- Simplify the default route configuration.
+  Make sure to review your `config/lighthouse.php` and bring it up to date
+  with the latest changes in the base configuration file https://github.com/nuwave/lighthouse/pull/820
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
+- Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
 
 ### Removed
 

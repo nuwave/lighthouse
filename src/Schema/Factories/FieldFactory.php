@@ -16,15 +16,18 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver;
 
 class FieldFactory
@@ -55,6 +58,11 @@ class FieldFactory
      * @var \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver
      */
     protected $providesSubscriptionResolver;
+
+    /**
+     * @var \Illuminate\Contracts\Validation\Factory
+     */
+    protected $validationFactory;
 
     /**
      * @var \Nuwave\Lighthouse\Schema\Values\FieldValue
@@ -104,6 +112,7 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Support\Pipeline  $pipeline
      * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver  $providesResolver
      * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver  $providesSubscriptionResolver
+     * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
      * @return void
      */
     public function __construct(
@@ -111,13 +120,15 @@ class FieldFactory
         ArgumentFactory $argumentFactory,
         Pipeline $pipeline,
         ProvidesResolver $providesResolver,
-        ProvidesSubscriptionResolver $providesSubscriptionResolver
+        ProvidesSubscriptionResolver $providesSubscriptionResolver,
+        ValidationFactory $validationFactory
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
         $this->pipeline = $pipeline;
         $this->providesResolver = $providesResolver;
         $this->providesSubscriptionResolver = $providesSubscriptionResolver;
+        $this->validationFactory = $validationFactory;
     }
 
     /**
@@ -131,7 +142,7 @@ class FieldFactory
         $fieldDefinitionNode = $fieldValue->getField();
 
         // Directives have the first priority for defining a resolver for a field
-        if ($resolverDirective = $this->directiveFactory->createFieldResolver($fieldDefinitionNode)) {
+        if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
             $this->fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
             $this->fieldValue = $fieldValue->setResolver(
@@ -141,10 +152,15 @@ class FieldFactory
             );
         }
 
+        $fieldMiddleware = $this->passResolverArguments(
+            $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
+        );
+        $this->validationErrorBuffer = (new ErrorBuffer)->setErrorType('validation');
+
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
             ->through(
-                $this->directiveFactory->createFieldMiddleware($fieldDefinitionNode)
+                $fieldMiddleware
             )
             ->via('handleField')
             ->then(
@@ -160,7 +176,6 @@ class FieldFactory
             function () use ($argumentValues, $resolverWithMiddleware) {
                 $this->setResolverArguments(...func_get_args());
 
-                $this->validationErrorBuffer = (new ErrorBuffer)->setErrorType('validation');
                 $this->builder = new Builder;
 
                 $argumentValues->each(
@@ -203,7 +218,24 @@ class FieldFactory
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
 
-                return $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
+                $result = null;
+                try {
+                    $result = $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
+                } catch (\Illuminate\Validation\ValidationException $validationException) {
+                    $this->addValidationErrorsToBuffer(
+                        $validationException->errors()
+                    );
+                }
+
+                $path = implode(
+                    '.',
+                    $this->resolveInfo()->path
+                );
+                $this->validationErrorBuffer->flush(
+                    "Validation failed for the field [$path]."
+                );
+
+                return $result;
             }
         );
 
@@ -256,7 +288,9 @@ class FieldFactory
             return;
         }
 
-        $directives = $this->directiveFactory->createArgDirectives($astNode);
+        $directives = $this->passResolverArguments(
+            $this->directiveFactory->createAssociatedDirectivesOfType($astNode, ArgDirective::class)
+        );
 
         if (
             $directives->contains(function (Directive $directive): bool {
@@ -355,10 +389,10 @@ class FieldFactory
             // Pause the iteration once we hit any directive that has to do
             // with validation. We will resume running through the remaining
             // directives later, after we completed validation
-            if ($directive instanceof ArgValidationDirective) {
+            if ($directive instanceof ProvidesRules) {
                 // We gather the rules from all arguments and then run validation in one full swoop
-                $this->rules = array_merge($this->rules, $directive->getRules());
-                $this->messages = array_merge($this->messages, $directive->getMessages());
+                $this->rules = array_merge($this->rules, $directive->rules());
+                $this->messages = array_merge($this->messages, $directive->messages());
 
                 break;
             }
@@ -422,33 +456,24 @@ class FieldFactory
             return;
         }
 
-        $validator = validator(
+        /** @var \Nuwave\Lighthouse\Execution\GraphQLValidator $validator */
+        $validator = $this->validationFactory->make(
             $this->args,
             $this->rules,
             $this->messages,
+            // The presence of those custom attributes ensures we get a GraphQLValidator
             [
                 'root' => $this->root,
                 'context' => $this->context,
-                // This makes it so that we get an instance of our own Validator class
                 'resolveInfo' => $this->resolveInfo,
             ]
         );
 
         if ($validator->fails()) {
-            foreach ($validator->errors()->getMessages() as $key => $errorMessages) {
-                foreach ($errorMessages as $errorMessage) {
-                    $this->validationErrorBuffer->push($errorMessage, $key);
-                }
-            }
+            $this->addValidationErrorsToBuffer(
+                $validator->errors()->getMessages()
+            );
         }
-
-        $path = implode(
-            '.',
-            $this->resolveInfo()->path
-        );
-        $this->validationErrorBuffer->flush(
-            "Validation failed for the field [$path]."
-        );
 
         // reset rules and messages
         $this->rules = [];
@@ -491,5 +516,14 @@ class FieldFactory
                 ];
             })
             ->all();
+    }
+
+    protected function addValidationErrorsToBuffer(array $validationErrors): void
+    {
+        foreach ($validationErrors as $key => $errorMessages) {
+            foreach ($errorMessages as $errorMessage) {
+                $this->validationErrorBuffer->push($errorMessage, $key);
+            }
+        }
     }
 }
