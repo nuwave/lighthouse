@@ -148,7 +148,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(count: 5) {
+            users(first: 5) {
                 data {
                     id
                     name
@@ -157,7 +157,7 @@ class CacheDirectiveTest extends DBTestCase
         }
         ');
 
-        $result = $this->cache->get('query:users:count:5');
+        $result = $this->cache->get('query:users:first:5');
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertCount(5, $result);
@@ -196,7 +196,7 @@ class CacheDirectiveTest extends DBTestCase
             user(id: '.$user->getKey().') {
                 id
                 name
-                posts(count: 3) {
+                posts(first: 3) {
                     data {
                         title
                     }
@@ -214,7 +214,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $firstResponse = $this->graphQL($query);
 
-        $posts = $this->cache->get("user:{$user->getKey()}:posts:count:3");
+        $posts = $this->cache->get("user:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 
@@ -263,7 +263,7 @@ class CacheDirectiveTest extends DBTestCase
             user(id: '.$user->getKey().') {
                 id
                 name
-                posts(count: 3) {
+                posts(first: 3) {
                     data {
                         title
                     }
@@ -281,7 +281,7 @@ class CacheDirectiveTest extends DBTestCase
 
         $firstResponse = $this->graphQL($query);
 
-        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:count:3");
+        $posts = $this->cache->tags($tags)->get("user:{$user->getKey()}:posts:first:3");
         $this->assertInstanceOf(LengthAwarePaginator::class, $posts);
         $this->assertCount(3, $posts);
 

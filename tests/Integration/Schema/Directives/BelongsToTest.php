@@ -204,7 +204,7 @@ class BelongsToTest extends DBTestCase
 
         $this->graphQL('
         {
-            products(count: 2) {     
+            products(first: 2) {     
                 data{
                     barcode
                     uuid
