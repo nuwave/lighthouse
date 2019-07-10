@@ -50,6 +50,22 @@ mutation {
 }
 ```
 
+### Custom Error Messages
+
+You can customize the error message for a particular argument.
+
+```graphql
+@rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
+```
+
+### Custom Validation Rules
+
+Reference custom validation rules by their fully qualified class name.
+
+```graphql
+@rules(apply: ["App\\Rules\\MyCustomRule"])
+```
+
 ## Validating Input Objects
 
 Rules can be defined upon Input Object Values.
@@ -98,18 +114,66 @@ type Mutation {
 }
 ```
 
-## Custom Error Messages
+## Validate Fields
 
-You can customize the error message for a particular argument.
+In some cases, validation rules are more complex and need to use entirely custom logic
+or take multiple arguments into account.
 
-```graphql
-@rules(apply: ["max:140"], messages: { max: "Tweets have a limit of 140 characters"})
+To create a reusable validator that can be applied to fields, extend the base validation
+directive `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective`. Your custom directive
+class should be located in one of the configured default directive namespaces, e.g. `App\GraphQL\Directives`.
+
+```php
+<?php
+
+namespace App\GraphQL\Directives;
+
+use Illuminate\Validation\Rule;
+use Nuwave\Lighthouse\Schema\Directives\ValidationDirective;
+
+class UpdateUserValidationDirective extends ValidationDirective
+{
+    /**
+     * Name of the directive.
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'updateUserValidation';
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function rules(): array
+    {
+        return [
+            'id' => ['required'],
+            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
+        ];
+    }
+}
 ```
 
-## Custom Validation Rules
-
-Reference custom validation rules by their fully qualified class name.
+Use it in your schema upon the field you want to validate.
 
 ```graphql
-@rules(apply: ["App\\Rules\\MyCustomRule"])
+type Mutation {
+  updateUser(id: ID, name: String): User @updateUserValidation
+}
+```
+
+You can customize the messages for the given rules by implementing the `messages` function.
+
+```php
+    /**
+     * @return string[]
+     */
+    public function messages(): array
+    {
+        return [
+            'name.unique' => 'The chosen username is not available',
+        ];
+    }
 ```

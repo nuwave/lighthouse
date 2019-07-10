@@ -3,11 +3,12 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Support\Contracts\ArgValidationDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 
-class RulesDirective extends BaseDirective implements ArgValidationDirective, HasArgumentPathContract
+class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract
 {
     use HasArgumentPathTrait;
 
@@ -24,7 +25,7 @@ class RulesDirective extends BaseDirective implements ArgValidationDirective, Ha
     /**
      * @return mixed[]
      */
-    public function getRules(): array
+    public function rules(): array
     {
         $rules = $this->directiveArgValue('apply');
 
@@ -43,7 +44,7 @@ class RulesDirective extends BaseDirective implements ArgValidationDirective, Ha
     /**
      * @return string[]
      */
-    public function getMessages(): array
+    public function messages(): array
     {
         return (new Collection($this->directiveArgValue('messages')))
             ->mapWithKeys(function (string $message, string $rule): array {
