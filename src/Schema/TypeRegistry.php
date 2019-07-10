@@ -31,9 +31,11 @@ use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Support\Contracts\TypeResolver;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\UnionDirective;
 use Nuwave\Lighthouse\Schema\Factories\ArgumentFactory;
+use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Schema\Directives\InterfaceDirective;
 
@@ -154,11 +156,12 @@ class TypeRegistry
         return $this->pipeline
             ->send($typeValue)
             ->through(
-                $this->directiveFactory->createTypeMiddleware($definition)
+                $this->directiveFactory->createAssociatedDirectivesOfType($definition, TypeMiddleware::class)
             )
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
-                $typeResolver = $this->directiveFactory->createTypeResolver($definition);
+                /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
+                $typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class);
 
                 if ($typeResolver) {
                     return $typeResolver->resolveNode($value);
