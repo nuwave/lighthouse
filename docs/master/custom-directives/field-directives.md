@@ -21,3 +21,10 @@ as well as the outgoing result of resolving the field.
 
 An [`\Nuwave\Lighthouse\Support\Contracts\FieldManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/FieldManipulator.php)
 directive can be used to manipulate the schema AST.
+
+## ValidationDirective
+
+This directive type is implemented as an abstract class rather then a pure interface and allows
+you to define complex validation rules for a field with ease.
+
+[Read more about it in the Validation section](../security/validation.md#validate-fields).

@@ -135,4 +135,32 @@ trait HasResolverArguments
             $this->resolveInfo(),
         ];
     }
+
+    /**
+     * Pass the resolver arguments to a given class if it also uses this trait.
+     *
+     * @param  object|iterable<object>  $receiver
+     * @return object|iterable<object>
+     */
+    public function passResolverArguments($receiver)
+    {
+        if (is_iterable($receiver)) {
+            foreach ($receiver as $single) {
+                $this->passResolverArguments($single);
+            }
+        }
+
+        return $receiver;
+    }
+
+    /**
+     * @param  object  $receiver
+     * @return void
+     */
+    protected function passResolverArgumentsToObject($receiver): void
+    {
+        if (method_exists($receiver, 'setResolverArguments')) {
+            $receiver->setResolverArguments(...$this->getResolverArguments());
+        }
+    }
 }

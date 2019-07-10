@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add the `@namespace` directive as a replacement for the removed `@group` directive https://github.com/nuwave/lighthouse/pull/768
 - The `@defer` extension now supports deferring nested fields of mutations https://github.com/nuwave/lighthouse/pull/855
+- Add a simple way to define complex validation directives by extending `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective` https://github.com/nuwave/lighthouse/pull/846
 
 ### Fixed
 
@@ -35,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Make sure to review your `config/lighthouse.php` and bring it up to date
   with the latest changes in the base configuration file https://github.com/nuwave/lighthouse/pull/820
 - Move `SubscriptionExceptionHandler` into namespace `Nuwave\Lighthouse\Subscriptions\Contracts` https://github.com/nuwave/lighthouse/pull/819
+- Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
 
 ### Removed
 
