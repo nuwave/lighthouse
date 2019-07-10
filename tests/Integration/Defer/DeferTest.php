@@ -490,11 +490,6 @@ class DeferTest extends TestCase
      */
     public function itThrowsExceptionOnNunNullableFields(): void
     {
-//        config([
-//            'lighthouse.defer.max_nested_fields' => 1,
-//            'app.debug' => false,
-//        ]);
-
         self::$data = [
             'name' => 'John Doe',
             'parent' => [
