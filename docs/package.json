@@ -2,7 +2,7 @@
     "license": "MIT",
     "dependencies": {
         "fs-extra": "^7.0.1",
-        "vuepress": "^1.0.0-alpha.22",
+        "vuepress": "^1.0.2",
         "vuepress-theme-lighthouse": "file:./packages/vuepress-theme-lighthouse"
     },
     "scripts": {
