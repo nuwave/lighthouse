@@ -4,7 +4,7 @@
   </a>
 </div>
 
-<div align="center"
+<div align="center">
 
 # Lighthouse
 
