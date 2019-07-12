@@ -1,4 +1,8 @@
-<img src="logo.png" width="150" height="150">
+<div align="center">
+  <a href="https://www.lighthouse-php.com">
+    <img src="logo.png" alt=lighthouse-logo" width="150" height="150">
+  </a>
+</div>
 
 # Lighthouse
 
