@@ -5,6 +5,7 @@
 </div>
 
 <div align="center"
+
 # Lighthouse
 
 [![Build Status](https://travis-ci.org/nuwave/lighthouse.svg?branch=master)](https://travis-ci.org/nuwave/lighthouse)
