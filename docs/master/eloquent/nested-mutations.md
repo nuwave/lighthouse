@@ -468,7 +468,8 @@ input CreateAuthorInput {
   name: String!
 }
 
-input CreateAuthorInput {
+input UpdateAuthorInput {
+  id: ID!
   name: String!
 }
 ```
