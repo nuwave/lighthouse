@@ -446,7 +446,7 @@ Updates on BelongsToMany relations may expose up to 6 nested operations.
 
 ```graphql
 type Mutation {
-  updatePost(input: UpdatePostInput! @spread): Post @create
+  updatePost(input: UpdatePostInput! @spread): Post @update
 }
 
 input UpdatePostInput {
