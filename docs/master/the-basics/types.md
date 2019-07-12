@@ -238,7 +238,7 @@ type User {
 }
 
 type Mutation {
-  createUser(input: CreateUserInput!): User
+  createUser(input: CreateUserInput! @spread): User @create
 } 
 ```
 
