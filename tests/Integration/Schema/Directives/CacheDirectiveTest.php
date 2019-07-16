@@ -131,6 +131,39 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
+    {
+        $this->schema = "
+        type User {
+            id: ID!
+            name: String @cache(private: true)
+        }
+        
+        type Query {
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+        }
+        ";
+
+        $this->graphQL('
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get("user:1:name"));
+    }
+
+    /**
+     * @test
+     */
     public function itCanStorePaginateResolverInCache(): void
     {
         factory(User::class, 5)->create();
