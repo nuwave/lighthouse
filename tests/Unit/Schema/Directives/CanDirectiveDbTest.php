@@ -6,6 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Policies\UserPolicy;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 class CanDirectiveDbTest extends DBTestCase
@@ -13,7 +14,7 @@ class CanDirectiveDbTest extends DBTestCase
     /**
      * @test
      */
-    public function itPassesIfModelInstanceIsNotNull(): void
+    public function itQueriesForSpecificModel(): void
     {
         $this->be(
             new User([
@@ -26,7 +27,7 @@ class CanDirectiveDbTest extends DBTestCase
         $this->schema = '
         type Query {
             user(id: ID @eq): User
-                @can(ability: "view")
+                @can(ability: "view", find: "id")
                 @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
         }
         
@@ -54,6 +55,40 @@ class CanDirectiveDbTest extends DBTestCase
     /**
      * @test
      */
+    public function itFailsToFindSpecificModel(): void
+    {
+        $this->be(
+            new User([
+                'name' => UserPolicy::ADMIN,
+            ])
+        );
+
+        $this->schema = '
+        type Query {
+            user(id: ID @eq): User
+                @can(ability: "view", find: "id")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
+        }
+        
+        type User {
+            id: ID!
+            name: String!
+        }
+        ';
+
+        $this->expectException(ModelNotFoundException::class);
+        $this->graphQL('
+        {
+            user(id: "not-present") {
+                name
+            }
+        }
+        ');
+    }
+
+    /**
+     * @test
+     */
     public function itThrowsIfNotAuthorized(): void
     {
         $this->be(
@@ -73,8 +108,8 @@ class CanDirectiveDbTest extends DBTestCase
 
         $this->schema = '
         type Query {
-            post(id: ID @eq): Post
-                @can(ability: "view")
+            post(foo: ID @eq): Post
+                @can(ability: "view", find: "foo")
                 @field(resolver: "'.$this->qualifyTestResolver('resolvePost').'")
         }
         
@@ -86,7 +121,7 @@ class CanDirectiveDbTest extends DBTestCase
 
         $this->graphQL("
         {
-            post(id: {$postB->getKey()}) {
+            post(foo: {$postB->getKey()}) {
                 title
             }
         }
@@ -114,9 +149,9 @@ class CanDirectiveDbTest extends DBTestCase
 
         $this->schema = '
         type Query {
-            deletePosts(id: [ID!]!): [Post!]!
+            deletePosts(ids: [ID!]!): [Post!]!
                 @delete
-                @can(ability: "delete")
+                @can(ability: "delete", find: "ids")
         }
         
         type Post {
@@ -127,7 +162,7 @@ class CanDirectiveDbTest extends DBTestCase
 
         $this->graphQL("
         {
-            deletePosts(id: [{$postA->getKey()}, {$postB->getKey()}]) {
+            deletePosts(ids: [{$postA->getKey()}, {$postB->getKey()}]) {
                 title
             }
         }
