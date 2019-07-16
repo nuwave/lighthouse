@@ -163,13 +163,16 @@ The newly created user is returned as a result:
 }
 ```
 
-__Note__: Due to Laravel's protections against mass assignment, any arguments used in `@create` or `@update` must be added to the `$fillable` list in your model's file. For the above example in `User.php`, we would need:
+__Note__: Due to Laravel's protections against mass assignment, any arguments used in `@create` or `@update` must be added to the `$fillable` property in your Model. For the above example, we would need the following in `\App\Models\User`:
+
 ```php
-class User {
+class User extends Model
+{
   // ...
   protected $fillable = ["name"];
 }
 ```
+
 For more information, see the [laravel docs](https://laravel.com/docs/eloquent#mass-assignment).
 
 ## Update
