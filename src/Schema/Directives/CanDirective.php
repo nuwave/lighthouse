@@ -54,8 +54,8 @@ class CanDirective extends BaseDirective implements FieldMiddleware
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
                     $modelClass = $this->getModelClass();
 
-                    if (isset($args['id'])) {
-                        $modelOrModels = $modelClass::findOrFail($args['id']);
+                    if ($find = $this->directiveArgValue('find')) {
+                        $modelOrModels = $modelClass::findOrFail($args[$find]);
 
                         if ($modelOrModels instanceof Model) {
                             $modelOrModels = [$modelOrModels];
@@ -104,7 +104,7 @@ class CanDirective extends BaseDirective implements FieldMiddleware
     }
 
     /**
-     * Get additional arguments that are passed to `Gate::check`.
+     * Additional arguments that are passed to `Gate::check`.
      *
      * @return mixed[]
      */

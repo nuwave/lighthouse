@@ -40,7 +40,7 @@ class CacheValue
     /**
      * @var bool
      */
-    protected $privateCache;
+    protected $isPrivate;
 
     /**
      * Create instance of cache value.
@@ -55,9 +55,9 @@ class CacheValue
         $this->args = Arr::get($arguments, 'args');
         $this->context = Arr::get($arguments, 'context');
         $this->resolveInfo = Arr::get($arguments, 'resolve_info');
-        $this->privateCache = Arr::get($arguments, 'private_cache');
+        $this->isPrivate = Arr::get($arguments, 'is_private');
 
-        $this->setFieldKey();
+        $this->fieldKey = $this->fieldKey();
     }
 
     /**
@@ -71,10 +71,10 @@ class CacheValue
         $user = app('auth')->user();
 
         return $this->implode([
-            $this->privateCache && $user
+            $this->isPrivate && $user
                 ? 'auth'
                 : null,
-            $this->privateCache && $user
+            $this->isPrivate && $user
                 ? $user->getKey()
                 : null,
             strtolower($this->resolveInfo->parentType->name),
@@ -88,10 +88,6 @@ class CacheValue
 
     /**
      * Get cache tags.
-     *
-     * @todo Check to see if tags are available on the
-     * cache store (or add to config) and use tags to
-     * flush cache w/out args.
      *
      * @return array
      */
@@ -120,8 +116,8 @@ class CacheValue
      */
     protected function argKeys(): Collection
     {
+        // TODO use ->sortKeys() once we drop support for Laravel 5.5
         $args = $this->args;
-
         ksort($args);
 
         return (new Collection($args))
@@ -135,11 +131,11 @@ class CacheValue
     }
 
     /**
-     * Set the field key.
+     * Get the field key.
      *
-     * @return void
+     * @return mixed|void
      */
-    protected function setFieldKey(): void
+    protected function fieldKey()
     {
         if (! $this->fieldValue || ! $this->rootValue) {
             return;
@@ -150,7 +146,7 @@ class CacheValue
             ->getCacheKey();
 
         if ($cacheFieldKey) {
-            $this->fieldKey = data_get($this->rootValue, $cacheFieldKey);
+            return data_get($this->rootValue, $cacheFieldKey);
         }
     }
 
