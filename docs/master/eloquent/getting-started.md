@@ -68,7 +68,7 @@ The schema definition is automatically transformed to this:
 
 ```graphql
 type Query {
-    posts(count: Int!, page: Int): PostPaginator
+    posts(first: Int!, page: Int): PostPaginator
 }
 
 type PostPaginator {
@@ -81,7 +81,7 @@ And can be queried like this:
 
 ```graphql
 {
-    posts(count: 10) {
+    posts(first: 10) {
         data {
             id
             title
@@ -162,6 +162,18 @@ The newly created user is returned as a result:
   }
 }
 ```
+
+__Note__: Due to Laravel's protections against mass assignment, any arguments used in `@create` or `@update` must be added to the `$fillable` property in your Model. For the above example, we would need the following in `\App\Models\User`:
+
+```php
+class User extends Model
+{
+  // ...
+  protected $fillable = ["name"];
+}
+```
+
+For more information, see the [laravel docs](https://laravel.com/docs/eloquent#mass-assignment).
 
 ## Update
 

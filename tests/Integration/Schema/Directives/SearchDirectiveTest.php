@@ -67,7 +67,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            posts(count: 10 search: "great") {
+            posts(first: 10 search: "great") {
                 data {
                     id
                     title
@@ -137,7 +137,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            posts(count: 10 search: "great") {
+            posts(first: 10 search: "great") {
                 data {
                     id
                     title
@@ -203,7 +203,7 @@ class SearchDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            posts(count: 10 search: "great") {
+            posts(first: 10 search: "great") {
                 data {
                     id
                     title
