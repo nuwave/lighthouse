@@ -158,7 +158,7 @@ class CacheDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $this->assertSame('foobar', $this->cache->get("user:1:name"));
+        $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
     /**
