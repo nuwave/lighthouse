@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow empty arrays and other falsy values as input for nested mutation operations like "sync" https://github.com/nuwave/lighthouse/pull/830
 - Use `Illuminate\Contracts\Config\Repository` instead of `Illuminate\Config\Repository` https://github.com/nuwave/lighthouse/issues/832
 - Allow checking the abilities with `@can` when issuing mass updates on multiple models https://github.com/nuwave/lighthouse/pull/838
-- Allow use of `private` in `@cache` directive even when the user is not authenticated.
+- Allow use of `private` in `@cache` directive even when the user is not authenticated https://github.com/nuwave/lighthouse/pull/843
 - Fix Lumen route registration https://github.com/nuwave/lighthouse/pull/853
 - Fix handling of `@include` directive, it is semantically opposite to `@skip`, when using it with `@defer` https://github.com/nuwave/lighthouse/pull/855
 
