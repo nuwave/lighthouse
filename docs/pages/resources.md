@@ -22,6 +22,7 @@ sidebar: false
 
 - [mll-lab/laravel-graphql-playground](https://github.com/mll-lab/laravel-graphql-playground)
 - [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars)
+- [marvinrabe/laravel-graphql-test](https://github.com/marvinrabe/laravel-graphql-test)
 
 ## Recommended Clients
 
