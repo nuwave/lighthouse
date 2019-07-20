@@ -30,10 +30,11 @@ class PaginationManipulator
         ObjectTypeDefinitionNode &$parentType,
         DocumentAST &$documentAST,
         ?int $defaultCount = null,
-        ?int $maxCount = null
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null
     ): void {
         if ($paginationType->isConnection()) {
-            self::registerConnection($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount);
+            self::registerConnection($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount, $edgeType);
         } else {
             self::registerPaginator($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount);
         }
@@ -54,7 +55,8 @@ class PaginationManipulator
         ObjectTypeDefinitionNode &$parentType,
         DocumentAST &$documentAST,
         ?int $defaultCount = null,
-        ?int $maxCount = null
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
@@ -69,7 +71,7 @@ class PaginationManipulator
             }
         ");
 
-        $connectionEdge = PartialParser::objectTypeDefinition("
+        $connectionEdge = $edgeType ?? PartialParser::objectTypeDefinition("
             type $connectionEdgeName {
                 node: $fieldTypeName
                 cursor: String!

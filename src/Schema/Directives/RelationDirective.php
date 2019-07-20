@@ -82,7 +82,8 @@ abstract class RelationDirective extends BaseDirective
             $parentType,
             $documentAST,
             $this->directiveArgValue('defaultCount'),
-            $this->paginateMaxCount()
+            $this->paginateMaxCount(),
+            $this->edgeType($documentAST)
         );
     }
 
@@ -90,6 +91,27 @@ abstract class RelationDirective extends BaseDirective
     {
         if ($paginationType = $this->directiveArgValue('type')) {
             return new PaginationType($paginationType);
+        }
+
+        return null;
+    }
+    
+    /**
+     * @param Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @return GraphQL\Language\AST\ObjectTypeDefinitionNode|null
+     *
+     * @throws Nuwave\Lighthouse\Exceptions\DirectiveException
+     */
+    protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
+    {
+        if ($edgeType = $this->directiveArgValue('edgeType')) {
+            $edgeType = $current->objectTypeDefinition($edgeType);
+
+            if (!$edgeType) {
+                throw new DirectiveException('edgeType arg must provide a defined Type');
+            }
+
+            return $edgeType;
         }
 
         return null;
