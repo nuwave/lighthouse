@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ConnectionField
 {
@@ -50,8 +50,8 @@ class ConnectionField
         return $paginator->values()->map(function ($item, $index) use ($firstItem, $typeFields): array {
             $data = [];
 
-            foreach($typeFields as $field) {
-                switch($field->name) {
+            foreach ($typeFields as $field) {
+                switch ($field->name) {
                     case 'cursor':
                         $data['cursor'] = Cursor::encode($firstItem + $index);
                         break;

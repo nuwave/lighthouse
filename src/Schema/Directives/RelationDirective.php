@@ -95,7 +95,7 @@ abstract class RelationDirective extends BaseDirective
 
         return null;
     }
-    
+
     /**
      * @param Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
      * @return GraphQL\Language\AST\ObjectTypeDefinitionNode|null
@@ -107,7 +107,7 @@ abstract class RelationDirective extends BaseDirective
         if ($edgeType = $this->directiveArgValue('edgeType')) {
             $edgeType = $current->objectTypeDefinition($edgeType);
 
-            if (!$edgeType) {
+            if (! $edgeType) {
                 throw new DirectiveException('edgeType arg must provide a defined Type');
             }
 
