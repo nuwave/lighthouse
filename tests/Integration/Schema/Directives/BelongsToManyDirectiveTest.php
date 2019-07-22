@@ -216,9 +216,9 @@ class BelongsToManyDirectiveTest extends DBTestCase
                     'roles' => [
                         'edges' => [
                             [
-                                'meta' => 'new'
-                            ]
-                        ]
+                                'meta' => 'new',
+                            ],
+                        ],
                     ],
                 ],
             ],

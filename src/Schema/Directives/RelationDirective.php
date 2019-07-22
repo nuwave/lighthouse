@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Pagination\PaginationUtils;
