@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Pagination\PaginationUtils;
@@ -97,7 +98,7 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param Nuwave\Lighthouse\Schema\AST\DocumentAST  $current
+     * @param Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      *
      * @throws Nuwave\Lighthouse\Exceptions\DirectiveException
@@ -105,13 +106,11 @@ abstract class RelationDirective extends BaseDirective
     protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
     {
         if ($edgeType = $this->directiveArgValue('edgeType')) {
-            $edgeType = $current->objectTypeDefinition($edgeType);
-
-            if (! $edgeType) {
+            if (! isset($documentAST->types[$edgeType])) {
                 throw new DirectiveException('edgeType arg must provide a defined Type');
             }
 
-            return $edgeType;
+            return $documentAST->types[$edgeType];
         }
 
         return null;
