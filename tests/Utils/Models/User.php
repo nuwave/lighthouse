@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class)->withPivot(['meta']);
     }
 
     public function scopeCompanyName(Builder $query, array $args): Builder

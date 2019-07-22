@@ -37,7 +37,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
         $this->user
             ->roles()
-            ->attach($this->roles);
+            ->attach($this->roles, ['meta' => 'new']);
 
         $this->be($this->user);
     }
@@ -165,6 +165,60 @@ class BelongsToManyDirectiveTest extends DBTestCase
                         'pageInfo' => [
                             'hasNextPage' => true,
                         ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryBelongsToManyRelayConnectionWithCustomEdge(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "RoleEdge")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type RoleEdge {
+            node: Role
+            cursor: String!
+            meta: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'edges' => [
+                            [
+                                'meta' => 'new'
+                            ]
+                        ]
                     ],
                 ],
             ],
