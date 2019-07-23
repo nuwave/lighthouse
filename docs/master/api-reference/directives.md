@@ -841,7 +841,7 @@ directive @eq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on FIELD_DEFINITION
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION
 ```
 
 ### Examples
