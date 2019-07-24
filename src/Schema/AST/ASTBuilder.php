@@ -352,7 +352,7 @@ GRAPHQL
                 "Edge interface"
                 interface Edge {
                     "Pagination cursor"
-                    cursor: string!
+                    cursor: String!
                     
                     "Node object"
                     node: Node
