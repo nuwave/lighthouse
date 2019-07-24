@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow use of `private` in `@cache` directive even when the user is not authenticated https://github.com/nuwave/lighthouse/pull/843
 - Fix Lumen route registration https://github.com/nuwave/lighthouse/pull/853
 - Fix handling of `@include` directive, it is semantically opposite to `@skip`, when using it with `@defer` https://github.com/nuwave/lighthouse/pull/855
+- Allow querying for null values using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/872
 
 ### Changed
 
