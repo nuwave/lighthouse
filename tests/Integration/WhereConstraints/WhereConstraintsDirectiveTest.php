@@ -239,7 +239,6 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             'name' => null,
         ]);
 
-
         $this->graphQL('
         {
             users(
