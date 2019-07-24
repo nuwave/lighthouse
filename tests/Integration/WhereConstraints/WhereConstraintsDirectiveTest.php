@@ -227,4 +227,59 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function itCanQueryForNull(): void
+    {
+        factory(User::class, 3)->create();
+
+        $userNamedNull = factory(User::class)->create([
+            'name' => null,
+        ]);
+
+        $this->graphQL('
+        {
+            users(
+                where: {
+                    column: "name"
+                    value: null
+                }
+            ) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => $userNamedNull->id,
+                        'name' => $userNamedNull->name,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itRequiresAValueForAColumn(): void
+    {
+        $this->graphQL('
+        {
+            users(
+                where: {
+                    column: "no_value"
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJsonFragment([
+            'message' => WhereConstraintsDirective::missingValueForColumn('no_value'),
+        ]);
+    }
 }
