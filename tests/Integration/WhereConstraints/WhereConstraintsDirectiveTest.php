@@ -227,4 +227,40 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             ],
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function itQueriesNull(): void
+    {
+        factory(User::class, 3)->create();
+
+        $userNamedNull = factory(User::class)->create([
+            'name' => null,
+        ]);
+
+
+        $this->graphQL('
+        {
+            users(
+                where: {
+                    column: "name"
+                    value: null
+                }
+            ) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    [
+                        'id' => $userNamedNull->id,
+                        'name' => $userNamedNull->name,
+                    ],
+                ],
+            ],
+        ]);
+    }
 }
