@@ -61,9 +61,9 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
         }
 
         if ($column = $whereConstraints['column'] ?? null) {
-            if (! isset($whereConstraints['value'])) {
+            if (! array_key_exists('value', $whereConstraints)) {
                 throw new Error(
-                    "Did not receive a value to match the WhereConstraints for column {$column}."
+                    self::missingValueForColumn($column)
                 );
             }
 
@@ -85,5 +85,10 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
         }
 
         return $builder;
+    }
+
+    public static function missingValueForColumn(string $column): string
+    {
+        return "Did not receive a value to match the WhereConstraints for column {$column}.";
     }
 }
