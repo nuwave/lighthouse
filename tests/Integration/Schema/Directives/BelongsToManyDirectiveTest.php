@@ -332,6 +332,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
             node: Role
             cursor: String!
             meta: String
+            nofield: String
         }
         
         type Query {
@@ -345,6 +346,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 roles(first: 2) {
                     edges {
                         meta
+                        nofield
                         node {
                             id
                         }
@@ -359,6 +361,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                         'edges' => [
                             [
                                 'meta' => 'new',
+                                'nofield' => null
                             ],
                         ],
                     ],

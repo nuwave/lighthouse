@@ -68,7 +68,9 @@ class ConnectionField
                         default:
                             // All other fields on the return type are assumed to be part
                             // of the edge, so we try to locate them in the pivot attribute
-                            $data[$field->name] = $item->pivot->{$field->name};
+                            if (isset($item->pivot->{$field->name})) {
+                                $data[$field->name] = $item->pivot->{$field->name};
+                            }
                     }
                 }
 
