@@ -5,9 +5,11 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CreateDirective extends BaseDirective implements FieldResolver
 {
@@ -44,7 +46,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function ($root, array $args): Model {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
                 $modelClassName = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName;
