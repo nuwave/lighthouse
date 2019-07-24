@@ -86,4 +86,9 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
 
         return $builder;
     }
+
+    public static function missingValueForColumn(string $column): string
+    {
+        return "Did not receive a value to match the WhereConstraints for column {$column}.";
+    }
 }
