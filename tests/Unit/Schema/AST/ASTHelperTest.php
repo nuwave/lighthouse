@@ -126,4 +126,14 @@ class ASTHelperTest extends TestCase
             ASTHelper::directiveArgValue($directive, 'bar')
         );
     }
+
+    /**
+     * @test
+     */
+    public function itChecksWhetherTypeImplementsInterface()
+    {
+        $type = PartialParser::objectTypeDefinition('type CustomEdge implements Edge { foo: String }');
+        $this->assertTrue(ASTHelper::typeImplementsInterface($type, 'Edge'));
+        $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
+    }
 }
