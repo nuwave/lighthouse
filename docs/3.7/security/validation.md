@@ -94,3 +94,17 @@ type Mutation {
    ): File
 }
 ```
+
+## Using Custom Validation Rules
+
+You can use [custom validation rules](https://laravel.com/docs/5.8/validation#custom-validation-rules) by passing class name.
+
+```graphql
+type Mutation {
+  createUser(
+    name: String @rules(apply: "required", "App\\Rules\\MyCustomRule")
+    email: String @rules(apply: "required", "email", "unique:users,email")
+    password: String @rules(apply: "required", "min:5") @bcrypt
+   ): User
+}
+```

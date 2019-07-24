@@ -841,7 +841,7 @@ directive @eq(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Examples
@@ -1340,7 +1340,7 @@ directive @neq(
   Only required if database column has a different name than the attribute in your schema. 
   """
   key: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @node
@@ -1771,7 +1771,7 @@ directive @search(
   Specify a custom index to use for search.
   """
   within: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Examples
