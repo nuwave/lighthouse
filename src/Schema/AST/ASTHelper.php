@@ -34,7 +34,7 @@ class ASTHelper
      */
     public static function mergeNodeList($original, $addition): NodeList
     {
-        if (!$original instanceof NodeList) {
+        if (! $original instanceof NodeList) {
             $original = new NodeList($original);
         }
 
@@ -65,7 +65,7 @@ class ASTHelper
                     $newNames
                 );
 
-                if ($collisionOccurred && !$overwriteDuplicates) {
+                if ($collisionOccurred && ! $overwriteDuplicates) {
                     throw new DefinitionException(
                         "Duplicate definition {$oldName} found when merging."
                     );
@@ -107,7 +107,7 @@ class ASTHelper
 
         $type = data_get($node, 'type');
 
-        if (!$type) {
+        if (! $type) {
             throw new DefinitionException(
                 "The node '$node->kind' does not have a type associated with it."
             );
@@ -160,7 +160,7 @@ class ASTHelper
     {
         $valueNode = $arg->value;
 
-        if (!$valueNode) {
+        if (! $valueNode) {
             return $default;
         }
 
@@ -241,7 +241,7 @@ class ASTHelper
         );
 
         $globalIdFieldDefinition = PartialParser::fieldDefinition(
-            config('lighthouse.global_id_field') . ': ID! @globalId'
+            config('lighthouse.global_id_field').': ID! @globalId'
         );
         $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
 
