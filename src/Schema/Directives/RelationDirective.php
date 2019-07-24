@@ -108,7 +108,7 @@ abstract class RelationDirective extends BaseDirective
         if ($edgeType = $this->directiveArgValue('edgeType')) {
             if (! isset($documentAST->types[$edgeType])) {
                 throw new DirectiveException(
-                    'The edgeType argument on ' . $this->definitionNode->name->value . ' must reference an existing type definition'
+                    'The edgeType argument on '.$this->definitionNode->name->value.' must reference an existing type definition'
                 );
             }
 
