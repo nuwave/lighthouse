@@ -98,7 +98,7 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @return GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      *
      * @throws Nuwave\Lighthouse\Exceptions\DirectiveException
@@ -107,7 +107,9 @@ abstract class RelationDirective extends BaseDirective
     {
         if ($edgeType = $this->directiveArgValue('edgeType')) {
             if (! isset($documentAST->types[$edgeType])) {
-                throw new DirectiveException('edgeType arg must provide a defined Type');
+                throw new DirectiveException(
+                    'The edgeType argument on ' . $this->definitionNode->name->value . ' must reference an existing type definition'
+                );
             }
 
             return $documentAST->types[$edgeType];

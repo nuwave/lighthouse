@@ -44,28 +44,35 @@ class ConnectionField
      */
     public function edgeResolver(LengthAwarePaginator $paginator, $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
-        $typeFields = $resolveInfo->returnType->ofType->getFields();
+        $returnTypeFields = $resolveInfo
+            ->returnType
+            ->ofType
+            ->getFields();
         $firstItem = $paginator->firstItem();
 
-        return $paginator->values()->map(function ($item, $index) use ($firstItem, $typeFields): array {
-            $data = [];
+        return $paginator
+            ->values()
+            ->map(function ($item, $index) use ($firstItem, $returnTypeFields): array {
+                $data = [];
 
-            foreach ($typeFields as $field) {
-                switch ($field->name) {
-                    case 'cursor':
-                        $data['cursor'] = Cursor::encode($firstItem + $index);
-                        break;
+                foreach ($returnTypeFields as $field) {
+                    switch ($field->name) {
+                        case 'cursor':
+                            $data['cursor'] = Cursor::encode($firstItem + $index);
+                            break;
 
-                    case 'node':
-                        $data['node'] = $item;
-                        break;
+                        case 'node':
+                            $data['node'] = $item;
+                            break;
 
-                    default:
-                        $data[$field->name] = $item->pivot->{$field->name};
+                        default:
+                            // All other fields on the return type are assumed to be part
+                            // of the edge, so we try to locate them in the pivot attribute
+                            $data[$field->name] = $item->pivot->{$field->name};
+                    }
                 }
-            }
 
-            return $data;
-        });
+                return $data;
+            });
     }
 }

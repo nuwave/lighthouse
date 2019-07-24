@@ -9,6 +9,6 @@
         "start": "npm run docs:dev",
         "docs:dev": "vuepress dev .",
         "docs:version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
-        "docs:build": "vuepress build ."
+        "docs:build": "node --max_old_space_size=8192 ./node_modules/vuepress/cli.js build ."
     }
 }

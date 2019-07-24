@@ -22,6 +22,7 @@ class PaginationManipulator
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
      * @return void
      */
     public static function transformToPaginatedField(
@@ -48,6 +49,7 @@ class PaginationManipulator
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
      * @return void
      */
     public static function registerConnection(
@@ -71,12 +73,13 @@ class PaginationManipulator
             }
         ");
 
-        $connectionEdge = $edgeType ?? PartialParser::objectTypeDefinition("
-            type $connectionEdgeName {
-                node: $fieldTypeName
-                cursor: String!
-            }
-        ");
+        $connectionEdge = $edgeType
+            ?? PartialParser::objectTypeDefinition("
+                type $connectionEdgeName {
+                    node: $fieldTypeName
+                    cursor: String!
+                }
+            ");
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),

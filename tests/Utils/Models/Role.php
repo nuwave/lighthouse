@@ -14,7 +14,9 @@ class Role extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withPivot(['meta']);
+        return $this
+            ->belongsToMany(User::class)
+            ->withPivot(['meta']);
     }
 
     public function acl(): BelongsTo

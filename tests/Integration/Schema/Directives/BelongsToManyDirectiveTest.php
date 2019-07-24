@@ -37,7 +37,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
         $this->user
             ->roles()
-            ->attach($this->roles, ['meta' => 'new']);
+            ->attach(
+                $this->roles,
+                ['meta' => 'new']
+            );
 
         $this->be($this->user);
     }
