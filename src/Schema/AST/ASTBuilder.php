@@ -75,7 +75,7 @@ class ASTBuilder
         // Allow to register listeners that add in additional schema definitions.
         // This can be used by plugins to hook into the schema building process
         // while still allowing the user to add in their schema as usual.
-        $additionalSchemas = (array) $this->eventDispatcher->dispatch(
+        $additionalSchemas = (array)$this->eventDispatcher->dispatch(
             new BuildSchemaString($schemaString)
         );
 
@@ -279,7 +279,7 @@ class ASTBuilder
     /**
      * Returns whether or not the given interface is used within the defined types.
      *
-     * @param string $interfaceName
+     * @param  string  $interfaceName
      *
      * @return bool
      */
@@ -305,7 +305,7 @@ class ASTBuilder
     {
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if (! $this->hasTypeImplementingInterface('Node')) {
+        if (!$this->hasTypeImplementingInterface('Node')) {
             return;
         }
 
@@ -343,18 +343,18 @@ GRAPHQL
     {
         // Only add the Edge interface if a type actually implements it
         // Otherwise, a validation error is thrown
-        if (! $this->hasTypeImplementingInterface('Edge')) {
+        if (!$this->hasTypeImplementingInterface('Edge')) {
             return;
         }
 
         $this->documentAST->setTypeDefinition(
             PartialParser::interfaceTypeDefinition('
-                "Edge interface"
+                "Edge interface that can be used for custom Relay edges"
                 interface Edge {
-                    "Pagination cursor"
+                    "The current cursor position for the given node"
                     cursor: String!
                     
-                    "Node object"
+                    "Node object for the current type object"
                     node: Node
                 }
             ')

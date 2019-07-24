@@ -51,8 +51,8 @@ class PaginationManipulator
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
-     * @return void
-     * @throws DefinitionException
+     * @return  void
+     * @throws  DefinitionException
      */
     public static function registerConnection(
         FieldDefinitionNode &$fieldDefinition,

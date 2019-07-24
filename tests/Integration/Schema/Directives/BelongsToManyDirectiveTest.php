@@ -288,7 +288,6 @@ class BelongsToManyDirectiveTest extends DBTestCase
             id: Int!
             name: String!
         }
-       
         
         type Query {
             user: User @auth
