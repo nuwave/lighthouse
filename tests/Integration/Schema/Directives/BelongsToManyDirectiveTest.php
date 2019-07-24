@@ -2,12 +2,12 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class BelongsToManyDirectiveTest extends DBTestCase
 {
@@ -361,7 +361,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
                         'edges' => [
                             [
                                 'meta' => 'new',
-                                'nofield' => null
+                                'nofield' => null,
                             ],
                         ],
                     ],

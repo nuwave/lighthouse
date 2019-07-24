@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\AST;
 
 use Illuminate\Support\Arr;
-use GraphQL\Language\AST\NamedTypeNode;
 use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Events\BuildSchemaString;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
@@ -278,7 +277,7 @@ class ASTBuilder
     }
 
     /**
-     * Returns whether or not the given interface is used within the defined types
+     * Returns whether or not the given interface is used within the defined types.
      *
      * @param string $interfaceName
      *
@@ -288,7 +287,7 @@ class ASTBuilder
     {
         foreach ($this->documentAST->types as $typeDefinition) {
             if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                if ( ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName) ) {
+                if (ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName)) {
                     return true;
                 }
             }
@@ -336,7 +335,7 @@ GRAPHQL
     }
 
     /**
-     * Add the Edge interface if it is expected
+     * Add the Edge interface if it is expected.
      *
      * @return void
      */

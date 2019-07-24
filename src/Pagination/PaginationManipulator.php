@@ -2,12 +2,12 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginationManipulator
 {
@@ -84,7 +84,7 @@ class PaginationManipulator
                 }
             ");
 
-        if (!ASTHelper::typeImplementsInterface($connectionEdge, 'Edge')) {
+        if (! ASTHelper::typeImplementsInterface($connectionEdge, 'Edge')) {
             throw new DefinitionException('Custom edge type must implement the Edge interface');
         }
 

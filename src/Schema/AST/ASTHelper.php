@@ -249,7 +249,7 @@ class ASTHelper
     }
 
     /**
-     * Checks the given type to see whether it implements the given interface
+     * Checks the given type to see whether it implements the given interface.
      *
      * @param ObjectTypeDefinitionNode $type
      * @param string                   $interfaceName
@@ -258,7 +258,7 @@ class ASTHelper
      */
     public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
     {
-        foreach($type->interfaces as $interface) {
+        foreach ($type->interfaces as $interface) {
             if ($interface->name->value === $interfaceName) {
                 return true;
             }
