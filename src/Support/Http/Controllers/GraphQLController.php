@@ -7,7 +7,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Container\Container;
 use Nuwave\Lighthouse\Events\StartRequest;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
-use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 

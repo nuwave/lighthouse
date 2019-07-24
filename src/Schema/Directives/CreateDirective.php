@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\DatabaseManager;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
