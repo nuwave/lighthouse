@@ -19,11 +19,6 @@ class GraphQLController extends Controller
     protected $graphQL;
 
     /**
-     * @var \Nuwave\Lighthouse\Support\Contracts\CreatesContext
-     */
-    protected $createsContext;
-
-    /**
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $eventsDispatcher;
@@ -42,7 +37,6 @@ class GraphQLController extends Controller
      * Inject middleware into request.
      *
      * @param  \Nuwave\Lighthouse\GraphQL  $graphQL
-     * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesContext  $createsContext
      * @param  \Illuminate\Contracts\Events\Dispatcher  $eventsDispatcher
      * @param  \Nuwave\Lighthouse\Support\Contracts\CreatesResponse  $createsResponse
      * @param  \Illuminate\Container\Container  $container
@@ -50,13 +44,11 @@ class GraphQLController extends Controller
      */
     public function __construct(
         GraphQL $graphQL,
-        CreatesContext $createsContext,
         EventsDispatcher $eventsDispatcher,
         CreatesResponse $createsResponse,
         Container $container
     ) {
         $this->graphQL = $graphQL;
-        $this->createsContext = $createsContext;
         $this->eventsDispatcher = $eventsDispatcher;
         $this->createsResponse = $createsResponse;
         $this->container = $container;
