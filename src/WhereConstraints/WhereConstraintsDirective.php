@@ -61,7 +61,7 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
         }
 
         if ($column = $whereConstraints['column'] ?? null) {
-            if (! array_key_exists($whereConstraints['value'])) {
+            if (! array_key_exists('value', $whereConstraints)) {
                 throw new Error(
                     self::missingValueForColumn($column)
                 );
