@@ -95,6 +95,7 @@ class ASTBuilder
 
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
+        $this->addEdgeSupport();
         $this->addOrderByTypes();
 
         // Listeners may manipulate the DocumentAST that is passed by reference
@@ -277,29 +278,35 @@ class ASTBuilder
     }
 
     /**
+     * Returns whether or not the given interface is used within the defined types
+     *
+     * @param string $interfaceName
+     *
+     * @return bool
+     */
+    protected function hasTypeImplementingInterface(string $interfaceName): bool
+    {
+        foreach ($this->documentAST->types as $typeDefinition) {
+            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
+                if ( ASTHelper::typeImplementsInterface($typeDefinition, $interfaceName) ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Inject the Node interface and a node field into the Query type.
      *
      * @return void
      */
     protected function addNodeSupport(): void
     {
-        $hasTypeImplementingNode = false;
-
-        foreach ($this->documentAST->types as $typeDefinition) {
-            if ($typeDefinition instanceof ObjectTypeDefinitionNode) {
-                /** @var NamedTypeNode $interface */
-                foreach ($typeDefinition->interfaces as $interface) {
-                    if ($interface->name->value === 'Node') {
-                        $hasTypeImplementingNode = true;
-                        break 2;
-                    }
-                }
-            }
-        }
-
         // Only add the node type and node field if a type actually implements them
         // Otherwise, a validation error is thrown
-        if (! $hasTypeImplementingNode) {
+        if (! $this->hasTypeImplementingInterface('Node')) {
             return;
         }
 
@@ -325,6 +332,33 @@ GRAPHQL
                     node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
                 '),
             ]
+        );
+    }
+
+    /**
+     * Add the Edge interface if it is expected
+     *
+     * @return void
+     */
+    protected function addEdgeSupport(): void
+    {
+        // Only add the Edge interface if a type actually implements it
+        // Otherwise, a validation error is thrown
+        if (! $this->hasTypeImplementingInterface('Edge')) {
+            return;
+        }
+
+        $this->documentAST->setTypeDefinition(
+            PartialParser::interfaceTypeDefinition('
+                "Edge interface"
+                interface Edge {
+                    "Pagination cursor"
+                    cursor: string!
+                    
+                    "Node object"
+                    node: Node
+                }
+            ')
         );
     }
 

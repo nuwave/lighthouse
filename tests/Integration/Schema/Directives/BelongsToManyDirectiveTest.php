@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Illuminate\Support\Arr;
@@ -190,7 +191,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
             name: String!
         }
         
-        type CustomRoleEdge {
+        type CustomRoleEdge implements Edge {
             node: Role
             cursor: String!
             meta: String
@@ -232,7 +233,51 @@ class BelongsToManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itThrowExceptionForInvalidEdgeTypeFromDirective(): void
+    public function itThrowsExceptionForEdgeTypeNotImplementingEdge()
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type RoleEdge {
+            node: Role
+            cursor: String!
+            meta: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->expectException(DefinitionException::class);
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsExceptionForInvalidEdgeTypeFromDirective(): void
     {
         $this->schema = '
         type User {
@@ -283,7 +328,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
             name: String!
         }
         
-        type RoleEdge {
+        type RoleEdge implements Edge {
             node: Role
             cursor: String!
             meta: String

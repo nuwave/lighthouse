@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Pagination;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -51,6 +52,7 @@ class PaginationManipulator
      * @param  int|null  $maxCount
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
      * @return void
+     * @throws DefinitionException
      */
     public static function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
@@ -76,11 +78,15 @@ class PaginationManipulator
         $connectionEdge = $edgeType
             ?? $documentAST->types[$connectionEdgeName]
             ?? PartialParser::objectTypeDefinition("
-                type $connectionEdgeName {
+                type $connectionEdgeName implements Edge {
                     node: $fieldTypeName
                     cursor: String!
                 }
             ");
+
+        if (!ASTHelper::typeImplementsInterface($connectionEdge, 'Edge')) {
+            throw new DefinitionException('Custom edge type must implement the Edge interface');
+        }
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),
