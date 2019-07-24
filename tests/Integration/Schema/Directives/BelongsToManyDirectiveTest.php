@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Models\Role;
@@ -177,11 +178,104 @@ class BelongsToManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itCanQueryBelongsToManyRelayConnectionWithCustomEdge(): void
+    public function itCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
         $this->schema = '
         type User {
-            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "RoleEdge")
+            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type CustomRoleEdge {
+            node: Role
+            cursor: String!
+            meta: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'edges' => [
+                            [
+                                'meta' => 'new',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowExceptionForInvalidEdgeTypeFromDirective(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+       
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->expectException(DirectiveException::class);
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay")
         }
         
         type Role {
