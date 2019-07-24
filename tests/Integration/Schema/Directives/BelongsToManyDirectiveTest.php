@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class BelongsToManyDirectiveTest extends DBTestCase
 {
@@ -191,7 +190,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
             name: String!
         }
         
-        type CustomRoleEdge implements Edge {
+        type CustomRoleEdge {
             node: Role
             cursor: String!
             meta: String
@@ -228,50 +227,6 @@ class BelongsToManyDirectiveTest extends DBTestCase
                 ],
             ],
         ])->assertJsonCount(2, 'data.user.roles.edges');
-    }
-
-    /**
-     * @test
-     */
-    public function itThrowsExceptionForEdgeTypeNotImplementingEdge(): void
-    {
-        $this->schema = '
-        type User {
-            roles: [Role!]! @belongsToMany(type: "relay")
-        }
-        
-        type Role {
-            id: Int!
-            name: String!
-        }
-        
-        type RoleEdge {
-            node: Role
-            cursor: String!
-            meta: String
-        }
-        
-        type Query {
-            user: User @auth
-        }
-        ';
-
-        $this->expectException(DefinitionException::class);
-
-        $this->graphQL('
-        {
-            user {
-                roles(first: 2) {
-                    edges {
-                        meta
-                        node {
-                            id
-                        }
-                    }
-                }
-            }
-        }
-        ');
     }
 
     /**
@@ -327,7 +282,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
             name: String!
         }
         
-        type RoleEdge implements Edge {
+        type RoleEdge {
             node: Role
             cursor: String!
             meta: String

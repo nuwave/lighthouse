@@ -78,15 +78,11 @@ class PaginationManipulator
         $connectionEdge = $edgeType
             ?? $documentAST->types[$connectionEdgeName]
             ?? PartialParser::objectTypeDefinition("
-                type $connectionEdgeName implements Edge {
+                type $connectionEdgeName {
                     node: $fieldTypeName
                     cursor: String!
                 }
             ");
-
-        if (! ASTHelper::typeImplementsInterface($connectionEdge, 'Edge')) {
-            throw new DefinitionException('Custom edge type must implement the Edge interface');
-        }
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),

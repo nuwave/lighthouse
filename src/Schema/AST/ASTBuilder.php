@@ -94,7 +94,6 @@ class ASTBuilder
 
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
-        $this->addEdgeSupport();
         $this->addOrderByTypes();
 
         // Listeners may manipulate the DocumentAST that is passed by reference
@@ -331,33 +330,6 @@ GRAPHQL
                     node(id: ID! @globalId): Node @field(resolver: "Nuwave\\\Lighthouse\\\Schema\\\NodeRegistry@resolve")
                 '),
             ]
-        );
-    }
-
-    /**
-     * Add the Edge interface if it is expected.
-     *
-     * @return void
-     */
-    protected function addEdgeSupport(): void
-    {
-        // Only add the Edge interface if a type actually implements it
-        // Otherwise, a validation error is thrown
-        if (! $this->hasTypeImplementingInterface('Edge')) {
-            return;
-        }
-
-        $this->documentAST->setTypeDefinition(
-            PartialParser::interfaceTypeDefinition('
-                "Edge interface that can be used for custom Relay edges"
-                interface Edge {
-                    "The current cursor position for the given node"
-                    cursor: String!
-                    
-                    "Node object for the current type object"
-                    node: Node
-                }
-            ')
         );
     }
 

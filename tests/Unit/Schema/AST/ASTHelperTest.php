@@ -133,11 +133,11 @@ class ASTHelperTest extends TestCase
     public function itChecksWhetherTypeImplementsInterface(): void
     {
         $type = PartialParser::objectTypeDefinition('
-            type CustomEdge implements Edge {
-                foo: String
+            type Foo implements Bar {
+                baz: String
             }
         ');
-        $this->assertTrue(ASTHelper::typeImplementsInterface($type, 'Edge'));
+        $this->assertTrue(ASTHelper::typeImplementsInterface($type, 'Bar'));
         $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
     }
 }
