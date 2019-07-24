@@ -233,7 +233,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itThrowsExceptionForEdgeTypeNotImplementingEdge()
+    public function itThrowsExceptionForEdgeTypeNotImplementingEdge(): void
     {
         $this->schema = '
         type User {
