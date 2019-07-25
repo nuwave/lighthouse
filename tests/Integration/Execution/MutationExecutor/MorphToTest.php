@@ -29,6 +29,20 @@ class MorphToTest extends DBTestCase
         from: String
         to: String
         weekday: Int
+        hourable: CreateHourableOperations
+    }
+    
+    input CreateHourableOperations {
+        create: CreateHourableInput
+    
+    input CreateHourableInput {
+        type: String!
+        # TODO at this point the lack of polymorphic input types becomes problematic
+        input: CreateXXX
+
+    input ConnectHourableInput {
+        id: Int!
+        type: String!
     }
     ';
 
