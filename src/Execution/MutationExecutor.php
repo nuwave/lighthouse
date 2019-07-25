@@ -113,16 +113,17 @@ class MutationExecutor
     {
         $reflection = new ReflectionClass($model);
 
-        [$belongsTo, $remaining] = self::partitionArgsByRelationType(
-            $reflection,
-            $args,
-            BelongsTo::class
-        );
-
+        // Extract $morphTo first, as MorphTo extends BelongsTo
         [$morphTo, $remaining] = self::partitionArgsByRelationType(
             $reflection,
-            $remaining,
+            $args,
             MorphTo::class
+        );
+
+        [$belongsTo, $remaining] = self::partitionArgsByRelationType(
+            $reflection,
+            $remaining,
+            BelongsTo::class
         );
 
         // Use all the remaining attributes and fill the model
