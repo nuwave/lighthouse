@@ -476,17 +476,13 @@ input UpdateAuthorInput {
 
 ## MorphTo
 
-```graphql
-type Mutation {
-  createHour(input: CreateHourInput! @spread): Hour @create
-}
+__The GraphQL Specification does not support Input Union types,
+for now we are limiting this implementation to `connect` and `disconnect` operations.__
 
-input CreateHourInput {
-  hourable_type: String!
-  hourable_id: Int!
-  from: String
-  to: String
-  weekday: Int
+```graphql
+type Task {
+  id: ID
+  name: String
 }
 
 type Hour {
@@ -495,21 +491,75 @@ type Hour {
   hourable: Task
 }
 
-type Task {
-  id: ID
-  name: String
-  hour: Hour
+type Mutation {
+  createHour(input: CreateHourInput! @spread): Hour @create
+  updateHour(input: UpdateHourInput! @spread): Hour @update
+}
+
+input CreateHourInput {
+  from: String
+  to: String
+  weekday: Int
+  hourable: CreateHourableOperations
+}
+
+input UpdateHourInput {
+  id: ID!
+  from: String
+  to: String
+  weekday: Int
+  hourable: UpdateHourableOperations
+}
+
+input CreateHourableOperations {
+  connect: ConnectHourableInput
+}
+
+input UpdateHourableOperations {
+  connect: ConnectHourableInput
+  disconnect: Boolean
+}
+
+input ConnectHourableInput {
+  type: String!
+  id: ID!
 }
 ```
+
+You can use `connect` to associate existing models.
 
 ```graphql
 mutation {
   createHour(input: {
-    hourable_type: "App\\\Task"
-    hourable_id: 1
     weekday: 2
+    hourable: {
+      connect: {
+        type: "Tests\\\Utils\\\Models\\\Task"
+        id: 1
+      }
+    }
   }) {
     id
+    weekday
+    hourable {
+      id
+      name
+    }
+  }
+}
+```
+
+The `disconnect` operations allows you to detach the currently associated model.
+
+```graphql
+mutation {
+  updateHour(input: {
+    id: 1
+    weekday: 2
+    hourable: {
+      disconnect: true
+    }
+  }) {
     weekday
     hourable {
       id

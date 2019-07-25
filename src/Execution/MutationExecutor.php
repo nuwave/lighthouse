@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Arr;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -167,22 +168,23 @@ class MutationExecutor
             }
         });
 
-        $morphTo->each(function (array $nestedOperations, string $relationName) use ($model): void {
+        $morphTo->each(function(array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $relation */
             $relation = $model->{$relationName}();
 
-            if (isset($nestedOperations['create'])) {
-                $createArgs = $nestedOperations['create'];
-                $morphToModel = $relation->createModelByType(
-                    $createArgs['type']
-                );
-
-                $morphToModel = self::executeCreate(
-                    $morphToModel,
-                    new Collection($createArgs['input'])
-                );
-                $relation->associate($morphToModel);
-            }
+            # TODO at this point the lack of polymorphic input types becomes problematic
+//            if (isset($nestedOperations['create'])) {
+//                $createArgs = $nestedOperations['create'];
+//                $morphToModel = $relation->createModelByType(
+//                    $createArgs['type']
+//                );
+//
+//                $morphToModel = self::executeCreate(
+//                    $morphToModel,
+//                    new Collection($createArgs['input'])
+//                );
+//                $relation->associate($morphToModel);
+//            }
 
             if (isset($nestedOperations['connect'])) {
                 $connectArgs = $nestedOperations['connect'];
@@ -198,18 +200,18 @@ class MutationExecutor
                 $relation->associate($morphToModel);
             }
 
-            if (isset($nestedOperations['update'])) {
-                $updateArgs = $nestedOperations['update'];
-                $morphToModel = $relation->createModelByType(
-                    $updateArgs['type']
-                );
-
-                $morphToModel = self::executeUpdate(
-                    $morphToModel,
-                    new Collection($updateArgs['input'])
-                );
-                $relation->associate($morphToModel);
-            }
+//            if (isset($nestedOperations['update'])) {
+//                $updateArgs = $nestedOperations['update'];
+//                $morphToModel = $relation->createModelByType(
+//                    $updateArgs['type']
+//                );
+//
+//                $morphToModel = self::executeUpdate(
+//                    $morphToModel,
+//                    new Collection($updateArgs['input'])
+//                );
+//                $relation->associate($morphToModel);
+//            }
 
             // We proceed with disconnecting/deleting only if the given $values is truthy.
             // There is no other information to be passed when issuing those operations,
@@ -219,9 +221,9 @@ class MutationExecutor
                 $relation->dissociate();
             }
 
-            if ($nestedOperations['delete'] ?? false) {
-                $relation->delete();
-            }
+//            if ($nestedOperations['delete'] ?? false) {
+//                $relation->delete();
+//            }
         });
 
         if ($parentRelation && ! $parentRelation instanceof BelongsToMany) {
