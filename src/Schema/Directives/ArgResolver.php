@@ -2,19 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\FieldDefinition;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\DatabaseManager;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Arguments\AfterResolver;
-use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
+use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\Arguments\AfterResolver;
+use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 
-class CreateDirective extends BaseDirective implements FieldResolver
+class ArgResolver extends BaseDirective implements FieldResolver
 {
     /**
      * @var \Illuminate\Database\DatabaseManager
@@ -58,7 +57,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 $model->save();
 
                 /** @var AfterResolver $afterResolver */
-                foreach($afterResolvers as $afterResolver){
+                foreach ($afterResolvers as $afterResolver) {
                     $afterResolver->resolve($model, $args, $context);
                 }
                 $executeMutation = function () use ($model, $args): Model {
@@ -74,7 +73,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
 
     protected function partitionResolverInputs(array $args, $definitions): array
     {
-        return $this->partitionArguments($args, $definitions, function(ArgumentExtensions $argumentExtensions){
+        return $this->partitionArguments($args, $definitions, function (ArgumentExtensions $argumentExtensions) {
             return $argumentExtensions->resolver instanceof AfterResolver;
         });
     }
@@ -88,7 +87,7 @@ class CreateDirective extends BaseDirective implements FieldResolver
         $special = [];
         $regular = [];
 
-        foreach($args as $name => $value){
+        foreach ($args as $name => $value) {
             $argDef = $definitions['name'];
             /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $config */
             $config = $argDef->config['lighthouse'];
