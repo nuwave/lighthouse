@@ -46,7 +46,7 @@ class ASTHelper
      *
      * @param  \GraphQL\Language\AST\NodeList|array  $original
      * @param  \GraphQL\Language\AST\NodeList|array  $addition
-     * @param  bool  $overwriteDuplicates By default this throws if a collision occurs. If
+     * @param  bool  $overwriteDuplicates  By default this throws if a collision occurs. If
      *                                            this is set to true, the fields of the original list will be overwritten.
      * @return \GraphQL\Language\AST\NodeList
      */
@@ -246,5 +246,24 @@ class ASTHelper
         $objectType->fields = $objectType->fields->merge([$globalIdFieldDefinition]);
 
         return $objectType;
+    }
+
+    /**
+     * Checks the given type to see whether it implements the given interface.
+     *
+     * @param  ObjectTypeDefinitionNode  $type
+     * @param  string  $interfaceName
+     *
+     * @return bool
+     */
+    public static function typeImplementsInterface(ObjectTypeDefinitionNode $type, string $interfaceName): bool
+    {
+        foreach ($type->interfaces as $interface) {
+            if ($interface->name->value === $interfaceName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -126,4 +126,18 @@ class ASTHelperTest extends TestCase
             ASTHelper::directiveArgValue($directive, 'bar')
         );
     }
+
+    /**
+     * @test
+     */
+    public function itChecksWhetherTypeImplementsInterface(): void
+    {
+        $type = PartialParser::objectTypeDefinition('
+            type Foo implements Bar {
+                baz: String
+            }
+        ');
+        $this->assertTrue(ASTHelper::typeImplementsInterface($type, 'Bar'));
+        $this->assertFalse(ASTHelper::typeImplementsInterface($type, 'FakeInterface'));
+    }
 }
