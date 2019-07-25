@@ -2,14 +2,13 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Arr;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -168,7 +167,7 @@ class MutationExecutor
             }
         });
 
-        $morphTo->each(function(array $nestedOperations, string $relationName) use ($model): void {
+        $morphTo->each(function (array $nestedOperations, string $relationName) use ($model): void {
             /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $relation */
             $relation = $model->{$relationName}();
 
