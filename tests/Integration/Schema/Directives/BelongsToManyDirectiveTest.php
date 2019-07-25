@@ -6,6 +6,7 @@ use Tests\DBTestCase;
 use Illuminate\Support\Arr;
 use Tests\Utils\Models\Role;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class BelongsToManyDirectiveTest extends DBTestCase
 {
@@ -37,7 +38,10 @@ class BelongsToManyDirectiveTest extends DBTestCase
 
         $this->user
             ->roles()
-            ->attach($this->roles);
+            ->attach(
+                $this->roles,
+                ['meta' => 'new']
+            );
 
         $this->be($this->user);
     }
@@ -164,6 +168,155 @@ class BelongsToManyDirectiveTest extends DBTestCase
                     'roles' => [
                         'pageInfo' => [
                             'hasNextPage' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type CustomRoleEdge {
+            node: Role
+            cursor: String!
+            meta: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'edges' => [
+                            [
+                                'meta' => 'new',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->assertJsonCount(2, 'data.user.roles.edges');
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsExceptionForInvalidEdgeTypeFromDirective(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay", edgeType: "CustomRoleEdge")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->expectException(DirectiveException::class);
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
+    {
+        $this->schema = '
+        type User {
+            roles: [Role!]! @belongsToMany(type: "relay")
+        }
+        
+        type Role {
+            id: Int!
+            name: String!
+        }
+        
+        type RoleEdge {
+            node: Role
+            cursor: String!
+            meta: String
+            nofield: String
+        }
+        
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $this->graphQL('
+        {
+            user {
+                roles(first: 2) {
+                    edges {
+                        meta
+                        nofield
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'roles' => [
+                        'edges' => [
+                            [
+                                'meta' => 'new',
+                                'nofield' => null,
+                            ],
                         ],
                     ],
                 ],

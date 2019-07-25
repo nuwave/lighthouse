@@ -7,6 +7,7 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginationManipulator
 {
@@ -22,6 +23,7 @@ class PaginationManipulator
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
      * @return void
      */
     public static function transformToPaginatedField(
@@ -30,10 +32,11 @@ class PaginationManipulator
         ObjectTypeDefinitionNode &$parentType,
         DocumentAST &$documentAST,
         ?int $defaultCount = null,
-        ?int $maxCount = null
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null
     ): void {
         if ($paginationType->isConnection()) {
-            self::registerConnection($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount);
+            self::registerConnection($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount, $edgeType);
         } else {
             self::registerPaginator($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount);
         }
@@ -47,19 +50,22 @@ class PaginationManipulator
      * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
-     * @return void
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
+     * @return  void
+     * @throws  DefinitionException
      */
     public static function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
         DocumentAST &$documentAST,
         ?int $defaultCount = null,
-        ?int $maxCount = null
+        ?int $maxCount = null,
+        ?ObjectTypeDefinitionNode $edgeType = null
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
         $connectionTypeName = "{$fieldTypeName}Connection";
-        $connectionEdgeName = "{$fieldTypeName}Edge";
+        $connectionEdgeName = $edgeType->name->value ?? "{$fieldTypeName}Edge";
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = PartialParser::objectTypeDefinition("
@@ -69,12 +75,14 @@ class PaginationManipulator
             }
         ");
 
-        $connectionEdge = PartialParser::objectTypeDefinition("
-            type $connectionEdgeName {
-                node: $fieldTypeName
-                cursor: String!
-            }
-        ");
+        $connectionEdge = $edgeType
+            ?? $documentAST->types[$connectionEdgeName]
+            ?? PartialParser::objectTypeDefinition("
+                type $connectionEdgeName {
+                    node: $fieldTypeName
+                    cursor: String!
+                }
+            ");
 
         $inputValueDefinitions = [
             self::countArgument('first', $defaultCount, $maxCount),

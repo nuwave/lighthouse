@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
@@ -82,7 +83,8 @@ abstract class RelationDirective extends BaseDirective
             $parentType,
             $documentAST,
             $this->directiveArgValue('defaultCount'),
-            $this->paginateMaxCount()
+            $this->paginateMaxCount(),
+            $this->edgeType($documentAST)
         );
     }
 
@@ -90,6 +92,27 @@ abstract class RelationDirective extends BaseDirective
     {
         if ($paginationType = $this->directiveArgValue('type')) {
             return new PaginationType($paginationType);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return GraphQL\Language\AST\ObjectTypeDefinitionNode|null
+     *
+     * @throws Nuwave\Lighthouse\Exceptions\DirectiveException
+     */
+    protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
+    {
+        if ($edgeType = $this->directiveArgValue('edgeType')) {
+            if (! isset($documentAST->types[$edgeType])) {
+                throw new DirectiveException(
+                    'The edgeType argument on '.$this->definitionNode->name->value.' must reference an existing type definition'
+                );
+            }
+
+            return $documentAST->types[$edgeType];
         }
 
         return null;

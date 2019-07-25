@@ -166,6 +166,12 @@ class User extends Model
 ```graphql
 directive @belongsToMany(
   """
+  Which pagination style to use.
+  Allowed values: paginator, connection.
+  """
+  type: String = "paginator"
+  
+  """
   Specify the default quantity of elements to be returned.
   """
   defaultCount: Int
@@ -185,6 +191,12 @@ directive @belongsToMany(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
+  
+  """
+  Specify a custom type that implements the Edge interface
+  to extend edge object.
+  """
+  edgeType: String
 ) on FIELD_DEFINITION
 ```
 
@@ -196,6 +208,26 @@ has a different name than the field.
 ```graphql
 type User {
     jobs: [Role!]! @belongsToMany(relation: "roles")
+}
+```
+
+When using the connection `type` argument, you may create your own 
+[Edge type](https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types) which
+may have fields that resolve from the model [pivot](https://laravel.com/docs/5.8/eloquent-relationships#many-to-many) 
+data. You may also add a custom field resolver for fields you want to resolve yourself.
+
+You may either specify the edge using the `edgetype` argument, or it will automatically
+look for a {type}Edge type to be defined. In this case it would be `RoleEdge`.
+
+```graphql
+type User {
+    roles: [Role!]! @belongsToMany(type: "connection", edgeType: "CustomRoleEdge")
+}
+
+type CustomRoleEdge implements Edge {
+    cursor: String!
+    node: Node
+    meta: String
 }
 ```
 
