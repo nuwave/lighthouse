@@ -121,7 +121,7 @@ class MutationExecutor
 
         [$morphTo, $remaining] = self::partitionArgsByRelationType(
             $reflection,
-            $args,
+            $remaining,
             MorphTo::class
         );
 
