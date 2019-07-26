@@ -2,16 +2,16 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use GraphQL\Type\Definition\FieldArgument;
-use GraphQL\Type\Definition\InputObjectField;
-use GraphQL\Type\Definition\InputObjectType;
+use Tests\TestCase;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\FieldArgument;
+use GraphQL\Type\Definition\InputObjectType;
+use GraphQL\Type\Definition\InputObjectField;
+use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
-use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
-use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Tests\TestCase;
 
 class TypedArgsTest extends TestCase
 {
@@ -26,8 +26,8 @@ class TypedArgsTest extends TestCase
             [
                 new FieldArgument([
                     'type' => $fooType,
-                    'name' => 'foo'
-                ])
+                    'name' => 'foo',
+                ]),
             ]
         );
 
@@ -50,27 +50,27 @@ class TypedArgsTest extends TestCase
                 [
                     'name' => 'child',
                     'type' => ScalarType::string(),
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $typedArgs = TypedArgs::fromArgs(
             [
                 'input' => [
-                    'child' => 'asdf'
-                ]
+                    'child' => 'asdf',
+                ],
             ],
             [
                 new InputObjectField([
                     'name' => 'input',
-                    'type' => $input
-                ])
+                    'type' => $input,
+                ]),
             ]
         );
 
         $this->assertCount(1, $typedArgs);
 
-        foreach($typedArgs as $key => $arg){
+        foreach ($typedArgs as $key => $arg) {
             $this->assertInstanceOf(
                 TypedArgs::class,
                 $arg
@@ -95,8 +95,8 @@ class TypedArgsTest extends TestCase
                 [
                     'name' => 'bar',
                     'type' => $afterInnerType,
-                ]
-            ]
+                ],
+            ],
         ]);
         $afterExtension = new ArgumentExtensions();
         $afterExtension->resolver = new After();
@@ -105,23 +105,23 @@ class TypedArgsTest extends TestCase
                 'regular' => 'asdf',
                 'before' => 'asdf',
                 'after' => [
-                    'bar' => 'baz'
-                ]
+                    'bar' => 'baz',
+                ],
             ],
             [
                 new FieldArgument([
                     'type' => ScalarType::string(),
-                    'name' => 'regular'
+                    'name' => 'regular',
                 ]),
                 new FieldArgument([
                     'type' => ScalarType::string(),
                     'name' => 'before',
-                    'lighthouse' => $beforeExtension
+                    'lighthouse' => $beforeExtension,
                 ]),
                 new FieldArgument([
                     'type' => $afterType,
                     'name' => 'after',
-                    'lighthouse' => $afterExtension
+                    'lighthouse' => $afterExtension,
                 ]),
             ]
         );
@@ -155,15 +155,15 @@ class TypedArgsTest extends TestCase
     }
 }
 
-class Before implements ResolveNestedBefore {
-
+class Before implements ResolveNestedBefore
+{
     public function resolveBefore($root, $value, GraphQLContext $context)
     {
     }
 }
 
-class After implements ResolveNestedAfter {
-
+class After implements ResolveNestedAfter
+{
     public function resolveBefore($root, $value, GraphQLContext $context)
     {
     }

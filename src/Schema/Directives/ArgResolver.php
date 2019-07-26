@@ -2,20 +2,18 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Type\Definition\FieldDefinition;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\DatabaseManager;
 use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
-use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
+use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
 
-class CreateDirective extends BaseDirective implements FieldResolver
+class ArgResolver extends BaseDirective implements FieldResolver
 {
     /**
      * @var \Illuminate\Database\DatabaseManager
@@ -59,14 +57,14 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 $model = new $modelClassName($regular);
 
                 /** @var ResolveNestedBefore $afterResolver */
-                foreach($before as $afterResolver){
+                foreach ($before as $afterResolver) {
                     $afterResolver->resolveBefore($model, $args, $context);
                 }
 
                 $model->save();
 
                 /** @var ResolveNestedAfter $afterResolver */
-                foreach($after as $afterResolver){
+                foreach ($after as $afterResolver) {
                     $afterResolver->resolveAfter($model, $args, $context);
                 }
                 $executeMutation = function () use ($model, $args): Model {

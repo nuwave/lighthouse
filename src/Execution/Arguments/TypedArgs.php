@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Generator;
-use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InputType;
+use GraphQL\Type\Definition\InputObjectType;
 
 class TypedArgs extends \ArrayObject
 {
@@ -18,7 +17,7 @@ class TypedArgs extends \ArrayObject
     public static function fromArgs(array $input, array $definitions)
     {
         $instance = new self($input);
-        foreach($definitions as $definition) {
+        foreach ($definitions as $definition) {
             $instance->definitions[$definition->name] = $definition;
         }
 
@@ -30,7 +29,7 @@ class TypedArgs extends \ArrayObject
         $value = parent::offsetGet($name);
 
         $argType = $this->definitions[$name]->getType();
-        if($argType instanceof InputObjectType) {
+        if ($argType instanceof InputObjectType) {
             $value = self::fromArgs($value, $argType->getFields());
         }
 
@@ -46,7 +45,7 @@ class TypedArgs extends \ArrayObject
 
     public function type(string $offset): ?InputType
     {
-        if(! isset($this->definitions[$offset])){
+        if (! isset($this->definitions[$offset])) {
             return null;
         }
 
@@ -59,10 +58,10 @@ class TypedArgs extends \ArrayObject
         $regular = [];
         $after = [];
 
-        foreach($this->getIterator() as $name => $value){
+        foreach ($this->getIterator() as $name => $value) {
             $argDef = $this->definitions[$name];
 
-            if(! isset($argDef->config['lighthouse'])){
+            if (! isset($argDef->config['lighthouse'])) {
                 $regular[$name] = $value;
                 continue;
             }
@@ -70,9 +69,9 @@ class TypedArgs extends \ArrayObject
             /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $config */
             $config = $argDef->config['lighthouse'];
 
-            if($config->resolver instanceof ResolveNestedBefore){
+            if ($config->resolver instanceof ResolveNestedBefore) {
                 $before[$name] = $value;
-            } elseif ($config->resolver instanceof ResolveNestedAfter){
+            } elseif ($config->resolver instanceof ResolveNestedAfter) {
                 $after[$name] = $value;
             } else {
                 $regular[$name] = $value;
@@ -82,7 +81,7 @@ class TypedArgs extends \ArrayObject
         return [
             $before,
             $regular,
-            $after
+            $after,
         ];
     }
 }
