@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use Carbon\Carbon;
 use GraphQL\Deferred;
+use GraphQL\Language\AST\NamedTypeNode;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
@@ -163,6 +164,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         foreach ($typeDefinition->fields as $field) {
             if (
                 $field->type instanceof NonNullTypeNode
+                && $field->type->type instanceof NamedTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {
                 $typeValue->setCacheKey(

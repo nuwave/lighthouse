@@ -131,6 +131,43 @@ class CacheDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function itCanStoreResolverResultInCacheWhenUseModelDirective(): void
+    {
+        $this->schema = "
+        type Post {
+            id: ID!
+        }
+        
+        type User @model {
+            name: String @cache
+            posts: [Post!]!
+        }
+        
+        type Query {
+            user: User @field(resolver: \"{$this->qualifyTestResolver()}\")
+        }
+        ";
+
+        $this->graphQL('
+        {
+            user {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => 'foobar',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('foobar', $this->cache->get('user:1:name'));
+    }
+
+    /**
+     * @test
+     */
     public function itFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
     {
         $this->schema = "
