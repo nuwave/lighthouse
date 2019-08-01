@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -78,7 +79,7 @@ class SchemaBuilder
         foreach ($documentAST->directives as $directiveDefinition) {
             $clientDirectives [] = $this->clientDirectiveFactory->handle($directiveDefinition);
         }
-        $config->setDirectives($clientDirectives);
+        $config->setDirectives(array_merge(GraphQL::getStandardDirectives(), $clientDirectives));
 
         return new Schema($config);
     }
