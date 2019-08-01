@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.7.0...master)
 
 ### Added
-
+- Add `@include` and `@skip` directives that are part of the graphql spec into lighthouse.
 - Add the `@namespace` directive as a replacement for the removed `@group` directive https://github.com/nuwave/lighthouse/pull/768
 - The `@defer` extension now supports deferring nested fields of mutations https://github.com/nuwave/lighthouse/pull/855
 - Add a simple way to define complex validation directives by extending `\Nuwave\Lighthouse\Schema\Directives\ValidationDirective` https://github.com/nuwave/lighthouse/pull/846
