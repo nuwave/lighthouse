@@ -79,7 +79,9 @@ class SchemaBuilder
         foreach ($documentAST->directives as $directiveDefinition) {
             $clientDirectives [] = $this->clientDirectiveFactory->handle($directiveDefinition);
         }
-        $config->setDirectives(array_merge(GraphQL::getStandardDirectives(), $clientDirectives));
+        $config->setDirectives(
+            array_merge(GraphQL::getStandardDirectives(), $clientDirectives)
+        );
 
         return new Schema($config);
     }
