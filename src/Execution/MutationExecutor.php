@@ -221,9 +221,9 @@ class MutationExecutor
                 $relation->dissociate();
             }
 
-//            if ($nestedOperations['delete'] ?? false) {
-//                $relation->delete();
-//            }
+            if ($nestedOperations['delete'] ?? false) {
+                $relation->delete();
+            }
         });
 
         if ($parentRelation && ! $parentRelation instanceof BelongsToMany) {

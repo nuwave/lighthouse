@@ -47,6 +47,7 @@ class MorphToTest extends DBTestCase
     input UpdateHourableOperations {
         connect: ConnectHourableInput
         disconnect: Boolean
+        delete: Boolean
     }
     
     input ConnectHourableInput {
@@ -144,8 +145,6 @@ class MorphToTest extends DBTestCase
      */
     public function itDeletesMorphTo(): void
     {
-        $this->markTestIncomplete('Not implemented correctly right now');
-
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
         $task->hour()->create([
@@ -179,7 +178,7 @@ class MorphToTest extends DBTestCase
 
         $this->assertSame(
             0,
-            Hour::count()
+            Task::count()
         );
     }
 }
