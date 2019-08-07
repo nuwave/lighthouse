@@ -25,4 +25,5 @@ services:
     working_dir: /app
     ports:
     - 8080:8080
-    command: bash -c "yarn && yarn docs:dev"
+    entrypoint: /bin/bash -c "echo 'Done! keep container running :)' && tail -F /dev/null"
+
