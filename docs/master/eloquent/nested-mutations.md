@@ -477,7 +477,8 @@ input UpdateAuthorInput {
 ## MorphTo
 
 __The GraphQL Specification does not support Input Union types,
-for now we are limiting this implementation to `connect` and `disconnect` operations.__
+for now we are limiting this implementation to `connect`, `disconnect` and `delete` operations.
+See https://github.com/nuwave/lighthouse/issues/900 for further discussion.__
 
 ```graphql
 type Task {
@@ -518,6 +519,7 @@ input CreateHourableOperations {
 input UpdateHourableOperations {
   connect: ConnectHourableInput
   disconnect: Boolean
+  delete: Boolean
 }
 
 input ConnectHourableInput {
@@ -558,6 +560,26 @@ mutation {
     weekday: 2
     hourable: {
       disconnect: true
+    }
+  }) {
+    weekday
+    hourable {
+      id
+      name
+    }
+  }
+}
+```
+
+The `delete` operation both detaches and deletes the currently associated model.
+
+```graphql
+mutation {
+  updateHour(input: {
+    id: 1
+    weekday: 2
+    hourable: {
+      delete: true
     }
   }) {
     weekday
