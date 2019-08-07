@@ -3,7 +3,6 @@
 namespace Tests\Integration\Execution\MutationExecutor;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Hour;
 use Tests\Utils\Models\Task;
 
 class MorphToTest extends DBTestCase
