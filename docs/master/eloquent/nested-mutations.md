@@ -534,7 +534,7 @@ mutation {
     weekday: 2
     hourable: {
       connect: {
-        type: "Tests\\\Utils\\\Models\\\Task"
+        type: "App\\\Models\\\Task"
         id: 1
       }
     }
