@@ -364,6 +364,7 @@ class TypeRegistry
 
     protected function findTypeResolverClass(string $nodeName, array $namespaces): ?Closure
     {
+        // TODO use only __invoke in v5
         $className = Utils::namespaceClassname(
             $nodeName,
             $namespaces,

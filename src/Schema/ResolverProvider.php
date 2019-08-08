@@ -23,6 +23,7 @@ class ResolverProvider implements ProvidesResolver
     public function provideResolver(FieldValue $fieldValue): Closure
     {
         if ($fieldValue->parentIsRootType()) {
+            // TODO use only __invoke in v5
             $resolverClass = $this->findResolverClass($fieldValue, 'resolve');
             if ($resolverClass) {
                 return Closure::fromCallable(
