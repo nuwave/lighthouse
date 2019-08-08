@@ -1,6 +1,6 @@
 <template>
   <ParentLayout>
-    <Footer slot="page-bottom" />
+    <Footer slot="page-bottom"/>
   </ParentLayout>
 </template>
 
