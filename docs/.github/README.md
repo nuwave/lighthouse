@@ -45,6 +45,24 @@ Then, start Vue Press on development mode (with hot reloading).
 > Keep a eye on the console when editing pages.
 If an error occurs, it might be necessary to restart the compilation process.
 
+If you use Docker you can start up the environment (including docs) by:
+
+```bash
+# start containers
+docker-compose up --build
+
+# in another terminal enter to "node" container
+docker-compose exec node bash
+
+# install dependencies
+yarn
+
+# run on development mode
+yarn docs:dev
+
+```
+Finally, navigate to http://localhost:8080
+
 ## Files
 
 ### Creating new files
