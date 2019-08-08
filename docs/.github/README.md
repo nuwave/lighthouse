@@ -36,7 +36,7 @@ Make sure you have:
 - Node 8+
 - Yarn 
 
-Then, start Vue Press on development mode (with hot reloading).
+Then, start Vue Press in development mode (with hot reloading).
 
     cd docs/
     yarn
@@ -48,19 +48,19 @@ If an error occurs, it might be necessary to restart the compilation process.
 If you use Docker you can start up the environment (including docs) by:
 
 ```bash
-# start containers
-docker-compose up --build
+# Start a stack of PHP and Node dev containers
+docker-compose up --build --detach
 
-# in another terminal enter to "node" container
+# Enter the node container
 docker-compose exec node bash
 
-# install dependencies
+# Install dependencies
 yarn
 
-# run on development mode
+# Start Vue Press in development mode (with hot reloading)
 yarn docs:dev
-
 ```
+
 Finally, navigate to http://localhost:8080
 
 ## Files
