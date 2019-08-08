@@ -25,5 +25,4 @@ services:
     working_dir: /app
     ports:
     - 8080:8080
-    entrypoint: /bin/bash -c "echo 'Done! keep container running :)' && tail -F /dev/null"
-
+    entrypoint: /bin/bash -c "echo 'Run `docker-compose exec node bash` followed by `yarn` and `yarn docs:dev` to work on the docs.' && tail -F /dev/null"
