@@ -334,7 +334,7 @@ directive @builder(
   """
   Reference a method that is passed the query builder.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name and omit the method, it defaults to `__invoke`.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
 ) on FIELD_DEFINITION
@@ -525,7 +525,7 @@ directive @complexity(
   """
   Reference a function to customize the complexity score calculation.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name and omit the method, it defaults to `__invoke`.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String
 ) on FIELD_DEFINITION
@@ -696,7 +696,7 @@ directive @deprecated(
 Assign a resolver function to a field.
 
 Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
-If you pass only a class name and omit the method, it defaults to `__invoke`. 
+If you pass only a class name, the method name defaults to `__invoke`. 
 
 ```graphql
 type Mutation {
@@ -715,7 +715,7 @@ directive @field(
   """
   A reference to the resolver function to be used.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name and omit the method, it defaults to `__invoke`.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
 
@@ -1198,7 +1198,7 @@ directive @interface(
   """
   Reference to a custom type-resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name and omit the method, it defaults to `__invoke`.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolveType: String!
 ) on INTERFACE
@@ -1407,7 +1407,7 @@ directive @node(
   """
   Reference to resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name and omit the method, it defaults to `__invoke`.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
 ) on FIELD_DEFINITION
@@ -2006,7 +2006,7 @@ directive @union(
   """
   Reference a function that returns the implementing Object Type.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name and omit the method, it defaults to `__invoke`.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolveType: String!
 ) on UNION
