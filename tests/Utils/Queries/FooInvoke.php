@@ -4,5 +4,7 @@ namespace Tests\Utils\Queries;
 
 class FooInvoke
 {
-    public function __invoke(): int {}
+    public function __invoke(): int
+    {
+    }
 }
