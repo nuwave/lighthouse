@@ -61,4 +61,33 @@ class LaravelEnumTypeTest extends DBTestCase
         }
         ')->assertJsonFragment($typeAdmistrator);
     }
+
+    public function testReceivesEnumInstanceInternally(): void
+    {
+        $resolver = $this->qualifyTestResolver();
+        $this->schema = "
+        type Query {
+            foo(bar: UserType): Boolean @field(resolver: \"$resolver\")
+        }
+        ";
+
+        $this->typeRegistry->register(
+            new LaravelEnumType(UserType::class)
+        );
+
+        $this->graphQL('
+        {
+            foo(bar: Administrator)
+        }
+        ')->assertJson([
+            'data' => [
+                'foo' => true,
+            ],
+        ]);
+    }
+
+    public function resolve($root, array $args): bool
+    {
+        return $args['bar'] instanceof UserType;
+    }
 }

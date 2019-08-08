@@ -38,7 +38,7 @@
         "webonyx/graphql-php": "^0.13.2"
     },
     "require-dev": {
-        "bensampo/laravel-enum": "^1.19",
+        "bensampo/laravel-enum": "^1.22",
         "laravel/lumen-framework": "5.5.*|5.6.*|5.7.*|5.8.*",
         "laravel/scout": "^4.0",
         "mll-lab/graphql-php-scalars": "^2.1",
