@@ -23,27 +23,45 @@ class ResolverProvider implements ProvidesResolver
     public function provideResolver(FieldValue $fieldValue): Closure
     {
         if ($fieldValue->parentIsRootType()) {
-            $resolverClass = Utils::namespaceClassname(
-                Str::studly($fieldValue->getFieldName()),
-                $fieldValue->defaultNamespacesForParent(),
-                function (string $class): bool {
-                    return method_exists($class, 'resolve');
-                }
-            );
+            $resolverClass = $this->findResolverClass($fieldValue, 'method');
+            if($resolverClass){
+                return Closure::fromCallable(
+                    [app($resolverClass), 'resolve']
+                );
+            }
+
+            $resolverClass = $this->findResolverClass($fieldValue, '__invoke');
+            if($resolverClass){
+                return Closure::fromCallable(
+                    [app($resolverClass), '__invoke']
+                );
+            }
 
             if (! $resolverClass) {
                 throw new DefinitionException(
                     "Could not locate a default resolver for the field {$fieldValue->getFieldName()}"
                 );
             }
-
-            return Closure::fromCallable(
-                [app($resolverClass), 'resolve']
-            );
         }
 
         return Closure::fromCallable(
             Executor::getDefaultFieldResolver()
+        );
+    }
+
+    /**
+     * @param  FieldValue  $fieldValue
+     * @param  string  $methodName
+     * @return string|null
+     */
+    protected function findResolverClass(FieldValue $fieldValue, string $methodName): ?string
+    {
+        return Utils::namespaceClassname(
+            Str::studly($fieldValue->getFieldName()),
+            $fieldValue->defaultNamespacesForParent(),
+            function (string $class) use ($methodName): bool {
+                return method_exists($class, $methodName);
+            }
         );
     }
 }

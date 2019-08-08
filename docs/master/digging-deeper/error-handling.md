@@ -105,7 +105,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class SomeField
 {
-    public function resolve($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
+    public function __invoke($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
     {
         if ($this->errorConditionIsMet()) {   
             throw new CustomException(
