@@ -3,6 +3,15 @@
 Hey, thank you for contributing to Lighthouse. Here are some tips to make
 it easy for you.
 
+## Committing code
+
+1. Fork the project
+1. Create a new branch
+1. Think about how the changes you are about to make can be tested, write tests before coding 
+1. Run tests, make sure they fail
+1. Write the actual code to make the tests pass
+1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
+
 ## Testing
 
 We use **PHPUnit** for unit tests and integration tests.
@@ -29,14 +38,27 @@ If you want to use Xdebug, you can enter that container instead:
 
 Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
 
-## Committing code
+## Documentation
 
-1. Fork the project
-1. Create a new branch
-1. Think about how the changes you are about to make can be tested, write tests before coding 
-1. Run tests, make sure they fail
-1. Write the actual code to make the tests pass
-1. Open a pull request detailing your changes. Make sure to follow the [template](.github/PULL_REQUEST_TEMPLATE.md)
+The docs for Lighthouse are located in [`/docs`](/docs).
+You can check out the [Docs README](/docs/.github/README.md) for more information on how to to contribute to the docs.
+
+## Changelog
+
+We keep a [changelog](/CHANGELOG.md) to inform users about changes in our releases.
+
+When you change something notable, add it to the top of the file in the `Unreleased` section.
+
+Choose the appropriate type for your change:
+
+- `Added` for new features.
+- `Changed` for changes in existing functionality.
+- `Deprecated` for soon-to-be removed features.
+- `Removed` for now removed features.
+- `Fixed` for any bug fixes.
+- `Security` in case of vulnerabilities.
+
+Then, add a short description of your change and close it off with a link to your PR.
 
 ## Code guidelines
 
@@ -209,13 +231,6 @@ You can use the following two case-sensitive regexes to search for violations:
 @(var|param|return|throws).*\|[A-Z]
 @(var|param|return|throws)\s*[A-Z]
 ```
-
-## Documentation
-
-The docs for Lighthouse are located in [`/docs`](/docs).
-You can check out the [Docs README](/docs/.github/README.md) for more information on how to to contribute to the docs.
-
-We keep a [changelog](/CHANGELOG.md) to inform users about changes in our releases.
 
 ## Benchmarks
 
