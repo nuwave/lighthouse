@@ -60,8 +60,14 @@ module.exports = {
     try {
       fse.copySync(`${path}/master`, `${path}/${version}`)
 
-      // update versions.json file
+      // remove 'master' from the top of list
+      versions.shift()
+      // add new generated version on top of list
       versions.unshift(version)
+      // add 'master' again on top of list
+      versions.unshift('master')
+
+      // write to versions.json
 
       fs.writeFileSync(
         `${path}/.vuepress/versions.json`,
