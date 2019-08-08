@@ -371,7 +371,7 @@ class TypeRegistry
                 return method_exists($className, 'resolveType');
             }
         );
-        if($className) {
+        if ($className) {
             return Closure::fromCallable(
                 [app($className), 'resolveType']
             );
@@ -384,7 +384,7 @@ class TypeRegistry
                 return method_exists($className, '__invoke');
             }
         );
-        if($className) {
+        if ($className) {
             return Closure::fromCallable(
                 [app($className), '__invoke']
             );

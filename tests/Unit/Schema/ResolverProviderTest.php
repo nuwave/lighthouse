@@ -4,12 +4,12 @@ namespace Tests\Unit\Schema;
 
 use Closure;
 use Tests\TestCase;
+use Tests\Utils\Queries\FooBar;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Tests\Utils\Queries\FooBar;
 
 class ResolverProviderTest extends TestCase
 {
