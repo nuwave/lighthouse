@@ -178,7 +178,7 @@ class MutationExecutor
                 $connectArgs = $nestedOperations['connect'];
 
                 $morphToModel = $relation->createModelByType(
-                    $connectArgs['type']
+                    (string) $connectArgs['type']
                 );
                 $morphToModel->setAttribute(
                     $morphToModel->getKeyName(),
