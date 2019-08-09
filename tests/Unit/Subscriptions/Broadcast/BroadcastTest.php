@@ -2,16 +2,15 @@
 
 namespace Tests\Unit\Subscriptions\Iterators;
 
+use Tests\DBTestCase;
 use Mockery\MockInterface;
+use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
-use Tests\DBTestCase;
-use Tests\Utils\Models\Task;
 
 class BroadcastTest extends DBTestCase
 {
-
     protected $schema = '
     type Task {
         id: ID!
@@ -43,10 +42,11 @@ class BroadcastTest extends DBTestCase
     /**
      * @return MockInterface
      */
-    public function withMockedBroadcasts (): MockInterface
+    public function withMockedBroadcasts(): MockInterface
     {
         $broadcast = \Mockery::mock(SubscriptionBroadcaster::class);
         $this->app->instance(SubscriptionBroadcaster::class, $broadcast);
+
         return $broadcast;
     }
 
@@ -67,7 +67,7 @@ class BroadcastTest extends DBTestCase
                         name
                     }
                 }
-            '
+            ',
         ]);
 
         // Broadcast
@@ -91,7 +91,7 @@ class BroadcastTest extends DBTestCase
                         name
                     }
                 }
-            '
+            ',
         ]);
 
         // Broadcast
@@ -102,7 +102,7 @@ class BroadcastTest extends DBTestCase
                         name
                     }
                 }
-            '
+            ',
         ]);
     }
 }
