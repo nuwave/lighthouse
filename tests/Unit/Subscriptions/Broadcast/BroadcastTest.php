@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Subscriptions\Iterators;
+namespace Tests\Unit\Subscriptions\Broadcasts;
 
 use Tests\DBTestCase;
 use Mockery\MockInterface;
