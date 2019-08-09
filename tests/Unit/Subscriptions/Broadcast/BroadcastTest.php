@@ -30,11 +30,17 @@ class BroadcastTest extends DBTestCase
     }
     ';
 
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SubscriptionServiceProvider::class]
+        );
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        app()->register(SubscriptionServiceProvider::class);
 
         factory(Task::class, 1)->create();
     }
