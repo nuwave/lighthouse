@@ -1392,6 +1392,8 @@ decoded `id` and resolves to a result.
 function resolveUser($id): \App\User
 ```
 
+Note: if you plan on resolving using an Eloquent Model, be sure to check out the [@model](#model) directive.
+
 ### Definition
 
 ```graphql
