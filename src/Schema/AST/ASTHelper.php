@@ -2,6 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
+use GraphQL\Language\AST\ValueNode;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\AST;
 use GraphQL\Language\Parser;
 use GraphQL\Language\AST\Node;
@@ -165,6 +168,22 @@ class ASTHelper
         }
 
         return AST::valueFromASTUntyped($valueNode);
+    }
+
+    /**
+     * Return the PHP internal value of an arguments default value.
+     *
+     * @param  \GraphQL\Language\AST\ValueNode  $defaultValue
+     * @param  \GraphQL\Type\Definition\Type  $argumentType
+     * @return mixed
+     */
+    public static function defaultValueForArgument(ValueNode $defaultValue, Type $argumentType)
+    {
+        // webonyx/graphql-php expects the internal value here, whereas the
+        // SDL uses the ENUM's name, so we run the conversion here
+        return $argumentType instanceof EnumType
+            ? $argumentType->getValue($defaultValue->value)->value
+            : AST::valueFromASTUntyped($defaultValue);
     }
 
     /**
