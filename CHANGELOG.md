@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix Lumen route registration https://github.com/nuwave/lighthouse/pull/853
 - Fix handling of `@include` directive, it is semantically opposite to `@skip`, when using it with `@defer` https://github.com/nuwave/lighthouse/pull/855
 - Allow querying for null values using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/872
+- Fix issue when using the `@model` directive in a type that has a list field https://github.com/nuwave/lighthouse/pull/883
 - Make the `@include` and `@skip` directives that are part of the GraphQL spec show up in introspection
   and fix handling of default values in custom client directives https://github.com/nuwave/lighthouse/pull/892
 
