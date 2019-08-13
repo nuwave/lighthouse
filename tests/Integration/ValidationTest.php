@@ -60,7 +60,7 @@ class ValidationTest extends DBTestCase
     ';
 
     /** @var bool */
-    private $wasCalled = false;
+    private static $wasCalled = false;
 
     /**
      * @param  mixed  $root
@@ -101,7 +101,7 @@ class ValidationTest extends DBTestCase
         }
         ');
 
-        $this->assertFalse($this->wasCalled);
+        $this->assertFalse(self::$wasCalled);
         $this->assertValidationKeysSame(
             ['bar'],
             $response
@@ -110,7 +110,7 @@ class ValidationTest extends DBTestCase
 
     public function resolveDoNotCall()
     {
-        $this->wasCalled = true;
+        self::$wasCalled = true;
     }
 
     /**
