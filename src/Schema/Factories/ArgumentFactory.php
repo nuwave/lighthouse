@@ -4,10 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Utils\AST;
 use GraphQL\Type\Definition\EnumType;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
+use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
 
 class ArgumentFactory
 {

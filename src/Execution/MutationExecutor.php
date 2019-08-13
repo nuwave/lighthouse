@@ -2,7 +2,6 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
-use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Support\Collection;
@@ -11,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
