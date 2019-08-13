@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use GraphQL\Language\AST\NameNode;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\FieldArgument;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
@@ -36,15 +37,17 @@ class ClientDirectiveFactory
         $arguments = [];
         /** @var InputValueDefinitionNode $argument */
         foreach ($directive->arguments as $argument) {
+            $argumentType = $this->definitionNodeConverter->toType($argument->type);
+
             $fieldArgumentConfig = [
                 'name' => $argument->name->value,
                 'description' => data_get($argument->description, 'value'),
-                'type' => $this->definitionNodeConverter->toType($argument->type),
+                'type' => $argumentType,
             ];
 
             if ($defaultValue = $argument->defaultValue) {
                 $fieldArgumentConfig += [
-                    'defaultValue' => $defaultValue,
+                    'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $argumentType),
                 ];
             }
 
