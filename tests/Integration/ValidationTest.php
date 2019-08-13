@@ -59,6 +59,9 @@ class ValidationTest extends DBTestCase
     }
     ';
 
+    /** @var bool */
+    private $wasCalled = false;
+
     /**
      * @param  mixed  $root
      * @param  mixed[]  $args
@@ -77,6 +80,37 @@ class ValidationTest extends DBTestCase
     public function resolveEmail($root, array $args): string
     {
         return Arr::get($args, 'email.emailAddress', 'no-email');
+    }
+
+    /**
+     * @test
+     */
+    public function itRunsValidationBeforeCallingTheResolver(): void
+    {
+        $this->schema = '
+        type Mutation {
+            resolveDoNotCall(
+                bar: String @rules(apply: ["required"])
+            ): String @field(resolver: "'.$this->qualifyTestResolver('resolveDoNotCall').'")
+        }
+        ' . $this->placeholderQuery();
+
+        $response = $this->graphQL('
+        mutation {
+            resolveDoNotCall
+        }
+        ');
+
+        $this->assertFalse($this->wasCalled);
+        $this->assertValidationKeysSame(
+            ['bar'],
+            $response
+        );
+    }
+
+    public function resolveDoNotCall()
+    {
+        $this->wasCalled = true;
     }
 
     /**
