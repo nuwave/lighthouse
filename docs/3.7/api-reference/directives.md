@@ -1929,7 +1929,7 @@ type Employee {
     employeeId: ID!
 }
 
-union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
+union Person @union(resolveType: "App\\GraphQL\\Unions\\Person@resolveType") =
       User
     | Employee
 ```

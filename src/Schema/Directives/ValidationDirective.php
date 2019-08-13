@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
@@ -56,9 +57,9 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
                             ]
                         );
 
-                    // The validation exception is caught in the FieldFactory and merged with
-                    // argument directive based validation
-                    $validator->validate();
+                    if ($validator->fails()) {
+                        throw new ValidationException($validator);
+                    }
 
                     return $resolver($root, $args, $context, $resolveInfo);
                 }
