@@ -43,13 +43,38 @@ class TypedArgs extends \ArrayObject
         }
     }
 
-    public function type(string $offset): ?InputType
+
+    /**
+     * @param  string  $offset
+     * @return \GraphQL\Type\Definition\FieldArgument|\GraphQL\Type\Definition\InputObjectField|null
+     */
+    public function definition(string $offset)
     {
         if (! isset($this->definitions[$offset])) {
             return null;
         }
 
-        return $this->definitions[$offset]->getType();
+        return $this->definitions[$offset];
+    }
+
+    public function type(string $offset): ?InputType
+    {
+        $definition = $this->definition($offset);
+
+        return $definition
+            ? $definition->getType()
+            : null;
+    }
+
+    public function iteratorWithDefinition()
+    {
+        foreach (parent::getIterator() as $key => $_) {
+            $typedArg = new TypedArg();
+            $typedArg->value = $this->offsetGet($key);
+            $typedArg->definition = $this->definition($key);
+
+            yield $key => $typedArg;
+        }
     }
 
     public function partitionResolverInputs(): array
@@ -69,9 +94,9 @@ class TypedArgs extends \ArrayObject
             /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $config */
             $config = $argDef->config['lighthouse'];
 
-            if ($config->resolver instanceof ResolveNestedBefore) {
+            if ($config->resolveBefore instanceof ResolveNestedBefore) {
                 $before[$name] = $value;
-            } elseif ($config->resolver instanceof ResolveNestedAfter) {
+            } elseif ($config->resolveBefore instanceof ResolveNestedAfter) {
                 $after[$name] = $value;
             } else {
                 $regular[$name] = $value;

@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Support\Collection;
@@ -28,7 +29,7 @@ class MutationExecutor
      *         If we are in a nested create, we can use this to associate the new model to its parent
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public static function executeCreate(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    public static function executeCreate(Model $model, TypedArgs $args, ?Relation $parentRelation = null): Model
     {
         $reflection = new ReflectionClass($model);
 

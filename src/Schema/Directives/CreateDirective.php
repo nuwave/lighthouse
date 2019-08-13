@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
+use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -47,16 +48,31 @@ class CreateDirective extends BaseDirective implements FieldResolver
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+                $typedArgs = TypedArgs::fromArgs($args, $resolveInfo->fieldDefinition->args);
+
                 $modelClassName = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
                 $model = new $modelClassName;
 
+                foreach($typedArgs as $typedArg) {
+
+                }
                 $executeMutation = function () use ($model, $args): Model {
-                    return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
+                    foreach
+                    return MutationExecutor
+                        ::executeCreate(
+                            $model,
+                            $typedArgs
+                        )
+                        ->refresh();
                 };
 
                 return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection($model->getConnectionName())->transaction($executeMutation)
+                    ? $this->databaseManager
+                        ->connection(
+                            $model->getConnectionName()
+                        )
+                        ->transaction($executeMutation)
                     : $executeMutation();
             }
         );

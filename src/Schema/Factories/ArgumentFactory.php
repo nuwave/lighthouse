@@ -4,10 +4,27 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 
 use GraphQL\Utils\AST;
 use GraphQL\Type\Definition\EnumType;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
 class ArgumentFactory
 {
+    /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     */
+    protected $directiveFactory;
+
+    /**
+     * ArgumentFactory constructor.
+     * @param \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory $directiveFactory
+     */
+    public function __construct(DirectiveFactory $directiveFactory)
+    {
+        $this->directiveFactory = $directiveFactory;
+    }
+
     /**
      * Convert argument definition to type.
      *
@@ -36,6 +53,9 @@ class ArgumentFactory
                     : AST::valueFromASTUntyped($defaultValue),
             ];
         }
+
+        $extensions = new ArgumentExtensions();
+        $extensions->resolveBefore = $this->directiveFactory->createAssociatedDirectivesOfType($definition, ResolveNestedBefore::class);
 
         // Add any dynamically declared public properties of the FieldArgument
         $fieldArgument += get_object_vars($argumentValue);

@@ -18,6 +18,30 @@ class TypedArgsTest extends TestCase
     /**
      * @test
      */
+    public function itReturnsDefinition(): void
+    {
+        $fooDefinition = new FieldArgument([
+            'type' => ScalarType::string(),
+            'name' => 'foo',
+        ]);
+        $typedArgs = TypedArgs::fromArgs(
+            ['foo' => 'bar'],
+            [
+                $fooDefinition,
+            ]
+        );
+
+        $this->assertSame(
+            $fooDefinition,
+            $typedArgs->definition('foo')
+        );
+
+        $this->assertNull($typedArgs->definition('bar'));
+    }
+
+    /**
+     * @test
+     */
     public function itReturnsType(): void
     {
         $fooType = ScalarType::string();
@@ -86,7 +110,7 @@ class TypedArgsTest extends TestCase
     public function itPartitionsArgs(): void
     {
         $beforeExtension = new ArgumentExtensions();
-        $beforeExtension->resolver = new Before();
+        $beforeExtension->resolveBefore = new Before();
 
         $afterInnerType = ScalarType::string();
         $afterType = new InputObjectType([
@@ -99,7 +123,7 @@ class TypedArgsTest extends TestCase
             ],
         ]);
         $afterExtension = new ArgumentExtensions();
-        $afterExtension->resolver = new After();
+        $afterExtension->resolveBefore = new After();
         $typedArgs = TypedArgs::fromArgs(
             [
                 'regular' => 'asdf',
