@@ -44,7 +44,7 @@ class ClientDirectiveFactory
 
             if ($defaultValue = $argument->defaultValue) {
                 $fieldArgumentConfig += [
-                    'defaultValue' => $defaultValue,
+                    'defaultValue' => $defaultValue->value,
                 ];
             }
 

@@ -2,57 +2,85 @@
 
 namespace Tests\Unit\Schema;
 
+use GraphQL\Type\Definition\Directive;
+use Illuminate\Support\Arr;
+use Tests\Integration\IntrospectionTest;
 use Tests\TestCase;
-use Illuminate\Support\Collection;
-use GraphQL\Language\AST\FieldNode;
-use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\DirectiveNode;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ClientDirectiveTest extends TestCase
 {
     /**
      * @test
      */
-    public function itCanDefineAClientDirective(): void
+    public function itReturnsDefaultDirectivesInIntrospection(): void
     {
-        $this->schema = '
-        directive @filter(key: String = "default value") on FIELD
-        
-        type Query {
-            foo: String @field(resolver: "'.$this->qualifyTestResolver().'")
-        }
-        ';
+        $this->schema = $this->placeholderQuery();
 
-        $this->graphQL('
-        {
-            foo @filter(key: "baz")
-        }
-        ')->assertJson([
-            'data' => [
-                'foo' => 'baz',
-            ],
-        ]);
+        $directives = $this->introspectDirectives();
+
+        $this->assertNotNull(
+            Arr::first($directives, $this->makeDirectiveNameMatcher(Directive::SKIP_NAME))
+        );
+        $this->assertNotNull(
+            Arr::first($directives, $this->makeDirectiveNameMatcher(Directive::INCLUDE_NAME))
+        );
     }
 
-    public function resolve($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): string
+    /**
+     * @test
+     */
+    public function itCanDefineACustomClientDirective(): void
     {
-        /** @var \GraphQL\Language\AST\ArgumentNode $key */
-        $key = (new Collection($resolveInfo->fieldNodes))
-            ->flatMap(function (FieldNode $node): Collection {
-                return new Collection($node->directives);
-            })
-            ->filter(function (DirectiveNode $directive): bool {
-                return $directive->name->value === 'filter';
-            })
-            ->flatMap(function (DirectiveNode $directive): Collection {
-                return new Collection($directive->arguments);
-            })
-            ->first(function (ArgumentNode $arg): bool {
-                return $arg->name->value === 'key';
-            });
+        $this->schema = '
+        "foo"
+        directive @bar(
+            "foobar"
+            baz: String = "barbaz"
+        ) on FIELD
+        ' .  $this->placeholderQuery();
 
-        return $key->value->value;
+        $directives = $this->introspectDirectives();
+
+        $bar = Arr::first($directives, $this->makeDirectiveNameMatcher('bar'));
+
+        $this->assertSame(
+            [
+                'name' => 'bar',
+                'description' => 'foo',
+                'args' => [
+                    [
+                        'name' => 'baz',
+                        'description' => 'foobar',
+                        'type' => [
+                            'kind' => 'SCALAR',
+                            'name' => 'String',
+                            'ofType' => NULL,
+                        ],
+                        'defaultValue' => '"barbaz"'
+                    ]
+                ],
+                'locations' => [
+                    'FIELD'
+                ]
+            ],
+            $bar
+        );
+    }
+
+    protected function makeDirectiveNameMatcher(string $name): \Closure
+    {
+        return function(array $directive) use ($name): bool {
+            return $directive['name'] === $name;
+        };
+    }
+
+    /**
+     * @return array[]
+     */
+    public function introspectDirectives(): array
+    {
+        $introspection = $this->graphQL(IntrospectionTest::INTROSPECTION_QUERY);
+
+        return $introspection->jsonGet('data.__schema.directives');
     }
 }
