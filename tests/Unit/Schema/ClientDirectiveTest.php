@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema;
 
-use GraphQL\Type\Definition\Directive;
-use Illuminate\Support\Arr;
-use Tests\Integration\IntrospectionTest;
 use Tests\TestCase;
+use Illuminate\Support\Arr;
+use GraphQL\Type\Definition\Directive;
+use Tests\Integration\IntrospectionTest;
 
 class ClientDirectiveTest extends TestCase
 {
@@ -37,7 +37,7 @@ class ClientDirectiveTest extends TestCase
             "foobar"
             baz: String = "barbaz"
         ) on FIELD
-        ' .  $this->placeholderQuery();
+        '.$this->placeholderQuery();
 
         $directives = $this->introspectDirectives();
 
@@ -54,14 +54,14 @@ class ClientDirectiveTest extends TestCase
                         'type' => [
                             'kind' => 'SCALAR',
                             'name' => 'String',
-                            'ofType' => NULL,
+                            'ofType' => null,
                         ],
-                        'defaultValue' => '"barbaz"'
-                    ]
+                        'defaultValue' => '"barbaz"',
+                    ],
                 ],
                 'locations' => [
-                    'FIELD'
-                ]
+                    'FIELD',
+                ],
             ],
             $bar
         );
@@ -69,7 +69,7 @@ class ClientDirectiveTest extends TestCase
 
     protected function makeDirectiveNameMatcher(string $name): \Closure
     {
-        return function(array $directive) use ($name): bool {
+        return function (array $directive) use ($name): bool {
             return $directive['name'] === $name;
         };
     }

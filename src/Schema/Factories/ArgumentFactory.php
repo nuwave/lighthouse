@@ -2,8 +2,6 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Utils\AST;
-use GraphQL\Type\Definition\EnumType;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
