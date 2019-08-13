@@ -32,11 +32,10 @@ Just clone the project and run the following in the project root:
     composer install
     composer test
 
-If you want to use Xdebug, you can enter that container instead:
-
-    docker-compose exec xdebug bash
-
 Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm/configuring-xdebug.html
+
+> Enabling Xdebug slows down tests by an order of magnitude.
+> Stop listening for Debug Connection to speed it back up. 
 
 ## Documentation
 
