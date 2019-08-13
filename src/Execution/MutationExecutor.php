@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -110,9 +111,18 @@ class MutationExecutor
      */
     protected static function saveModelWithPotentialParent(Model $model, Collection $args, ?Relation $parentRelation = null): Model
     {
-        [$belongsTo, $remaining] = self::partitionArgsByRelationType(
-            new ReflectionClass($model),
+        $reflection = new ReflectionClass($model);
+
+        // Extract $morphTo first, as MorphTo extends BelongsTo
+        [$morphTo, $remaining] = self::partitionArgsByRelationType(
+            $reflection,
             $args,
+            MorphTo::class
+        );
+
+        [$belongsTo, $remaining] = self::partitionArgsByRelationType(
+            $reflection,
+            $remaining,
             BelongsTo::class
         );
 
@@ -143,6 +153,39 @@ class MutationExecutor
                     new Collection($nestedOperations['update'])
                 );
                 $relation->associate($belongsToModel);
+            }
+
+            // We proceed with disconnecting/deleting only if the given $values is truthy.
+            // There is no other information to be passed when issuing those operations,
+            // but GraphQL forces us to pass some value. It would be unintuitive for
+            // the end user if the given value had no effect on the execution.
+            if ($nestedOperations['disconnect'] ?? false) {
+                $relation->dissociate();
+            }
+
+            if ($nestedOperations['delete'] ?? false) {
+                $relation->delete();
+            }
+        });
+
+        $morphTo->each(function (array $nestedOperations, string $relationName) use ($model): void {
+            /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $relation */
+            $relation = $model->{$relationName}();
+
+            // TODO implement create and update once we figure out how to do polymorphic input types https://github.com/nuwave/lighthouse/issues/900
+
+            if (isset($nestedOperations['connect'])) {
+                $connectArgs = $nestedOperations['connect'];
+
+                $morphToModel = $relation->createModelByType(
+                    (string) $connectArgs['type']
+                );
+                $morphToModel->setAttribute(
+                    $morphToModel->getKeyName(),
+                    $connectArgs['id']
+                );
+
+                $relation->associate($morphToModel);
             }
 
             // We proceed with disconnecting/deleting only if the given $values is truthy.

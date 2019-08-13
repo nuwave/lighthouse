@@ -57,8 +57,13 @@ class SchemaBuilder
             );
         }
         if (isset($documentAST->types['Subscription'])) {
+            /** @var \GraphQL\Type\Definition\ObjectType $subscription */
+            $subscription = $this->typeRegistry->get('Subscription');
+            // Eager-load the subscription fields to ensure they are registered
+            $subscription->getFields();
+
             $config->setSubscription(
-                $this->typeRegistry->get('Subscription')
+                $subscription
             );
         }
 

@@ -83,7 +83,7 @@ type Mutation <span class="token punctuation">{</span>
         <div class="w-full md:w-1/3 md:mb-0 px-4">
           <h4 class="text-purple-darkest text-xl mb-2">⚡ Optimized for Eloquent</h4>
           <p class="mb-2">Eloquent is an extremely powerful ORM. Lighthouse leverages your current model relationships and creates optimized database queries.</p>
-          <a href="/docs/latest/guides/relationships.html" @click.prevent="$router.push('/docs/latest/guides/relationships.html')" class="font-bold uppercase text-sm">Read More</a>
+          <a href="/docs/latest/eloquent/getting-started.html" @click.prevent="$router.push('/docs/latest/eloquent/getting-started.html')" class="font-bold uppercase text-sm">Read More</a>
         </div>
       </div>
     </div>

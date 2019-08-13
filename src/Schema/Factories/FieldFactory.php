@@ -188,7 +188,12 @@ class FieldFactory
                     }
                 );
 
+                // Recurse down the given args and apply ArgDirectives
                 $this->runArgDirectives();
+
+                // Now that we are finished with all argument based validation,
+                // we flush the validation error buffer
+                $this->flushValidationErrorBuffer();
 
                 // Apply the argument spreadings after we are finished with all
                 // the other argument handling
@@ -218,24 +223,7 @@ class FieldFactory
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
 
-                $result = null;
-                try {
-                    $result = $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
-                } catch (\Illuminate\Validation\ValidationException $validationException) {
-                    $this->addValidationErrorsToBuffer(
-                        $validationException->errors()
-                    );
-                }
-
-                $path = implode(
-                    '.',
-                    $this->resolveInfo()->path
-                );
-                $this->validationErrorBuffer->flush(
-                    "Validation failed for the field [$path]."
-                );
-
-                return $result;
+                return $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
             }
         );
 
@@ -525,5 +513,17 @@ class FieldFactory
                 $this->validationErrorBuffer->push($errorMessage, $key);
             }
         }
+    }
+
+    protected function flushValidationErrorBuffer(): void
+    {
+        $path = implode(
+            '.',
+            $this->resolveInfo()->path
+        );
+
+        $this->validationErrorBuffer->flush(
+            "Validation failed for the field [$path]."
+        );
     }
 }

@@ -167,7 +167,7 @@ $typeRegistry->register($episodeEnum);
 ```
 
 If you are using [BenSampo/laravel-enum](https://github.com/BenSampo/laravel-enum)
-you can use a convenient wrapper to construct an enum type from it.
+you can use `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` to construct an enum type from it.
 
 Given the following enum:
 
