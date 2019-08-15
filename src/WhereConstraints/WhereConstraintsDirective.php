@@ -3,16 +3,16 @@
 namespace Nuwave\Lighthouse\WhereConstraints;
 
 use GraphQL\Error\Error;
-use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Support\Str;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use GraphQL\Language\AST\EnumTypeDefinitionNode;
+use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator
 {
@@ -147,8 +147,8 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
     protected function allowedColumnsEnumName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
     {
         return Str::studly($parentField->name->value)
-            . Str::studly($argDefinition->name->value)
-            . 'Column';
+            .Str::studly($argDefinition->name->value)
+            .'Column';
     }
 
     /**
@@ -163,8 +163,8 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
     protected function restrictedWhereConstraintsName(InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField): string
     {
         return Str::studly($parentField->name->value)
-            . Str::studly($argDefinition->name->value)
-            . 'WhereConstraints';
+            .Str::studly($argDefinition->name->value)
+            .'WhereConstraints';
     }
 
     /**
@@ -181,21 +181,20 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
         FieldDefinitionNode &$parentField,
         array $allowedColumns,
         string $allowedColumnsEnumName
-    ): EnumTypeDefinitionNode
-    {
+    ): EnumTypeDefinitionNode {
         $enumValues = array_map(
             function (string $columnName): string {
                 return
                     strtoupper(
                         Str::snake($columnName)
                     )
-                    . ' @enum(value: "' . $columnName . '")';
+                    .' @enum(value: "'.$columnName.'")';
             },
             $allowedColumns
         );
 
         $enumDefinition = "\"Allowed column names for the `{$argDefinition->name->value}` argument on the query `{$parentField->name->value}`.\"\n"
-            . "enum $allowedColumnsEnumName {\n";
+            ."enum $allowedColumnsEnumName {\n";
         foreach ($enumValues as $enumValue) {
             $enumDefinition .= "$enumValue\n";
         }

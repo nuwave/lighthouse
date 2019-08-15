@@ -2,8 +2,8 @@
 
 namespace Tests\Integration\WhereConstraints;
 
-use Illuminate\Support\Arr;
 use Tests\DBTestCase;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
@@ -310,16 +310,16 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                 'whitelistedColumns' => [
                     [
 
-                    'id' => 1
-                    ]
-                ]
-            ]
+                    'id' => 1,
+                    ],
+                ],
+            ],
         ]);
 
         $types = $this->introspect()->jsonGet('data.__schema.types');
 
         $expectedEnumName = 'WhitelistedColumnsWhereColumn';
-        $enum = Arr::first($types, function(array $type) use ($expectedEnumName): bool {
+        $enum = Arr::first($types, function (array $type) use ($expectedEnumName): bool {
             return $type['name'] === $expectedEnumName;
         });
 
@@ -335,7 +335,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
                     [
                         'name' => 'CAMEL_CASE',
                     ],
-                ]
+                ],
             ],
             $enum
         );

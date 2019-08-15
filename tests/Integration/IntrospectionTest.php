@@ -10,7 +10,6 @@ use Illuminate\Foundation\Testing\TestResponse;
 
 class IntrospectionTest extends TestCase
 {
-
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
      */
