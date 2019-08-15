@@ -37,13 +37,13 @@ class IntrospectionTest extends TestCase
         }        
         '.$this->placeholderQuery();
 
-        $this->assertIsArray(
+        $this->assertNotNull(
             $this->introspectType('Foo')
         );
-        $this->assertIsArray(
+        $this->assertNotNull(
             $this->introspectType('Query')
         );
-        $this->assertIsArray(
+        $this->assertNotNull(
             $this->introspectType('Bar')
         );
     }
@@ -58,7 +58,7 @@ class IntrospectionTest extends TestCase
             new Email()
         );
 
-        $this->assertIsArray(
+        $this->assertNotNull(
             $this->introspectType('Email')
         );
     }
