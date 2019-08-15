@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.7.0...master)
 
+### Fixed
+- Fixed the `ValidationDirective` not setting the mutation or query arguments to itself 
+
 ## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
 ### Added
