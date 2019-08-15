@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Restrict the allowed column names to a well-defined list in `@whereContraints`
   and generate definitions for an `Enum` type and an `Input` type
-  that are restricted to the defined columns. 
+  that are restricted to the defined columns. https://github.com/nuwave/lighthouse/pull/916
 
 ## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
