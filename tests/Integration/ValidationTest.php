@@ -485,11 +485,10 @@ class ValidationTest extends DBTestCase
             'data' => [
                 'updateUser' => [
                     'id' => 2,
-                    'name' => 'bar'
-                ]
-            ]
+                    'name' => 'bar',
+                ],
+            ],
         ]);
-
     }
 
     /**
