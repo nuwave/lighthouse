@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema;
 
 use Tests\TestCase;
-use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Directive;
 
 class ClientDirectiveTest extends TestCase
@@ -15,13 +14,11 @@ class ClientDirectiveTest extends TestCase
     {
         $this->schema = $this->placeholderQuery();
 
-        $directives = $this->introspectDirectives();
-
         $this->assertNotNull(
-            Arr::first($directives, $this->makeDirectiveNameMatcher(Directive::SKIP_NAME))
+            $this->introspectDirective(Directive::SKIP_NAME)
         );
         $this->assertNotNull(
-            Arr::first($directives, $this->makeDirectiveNameMatcher(Directive::INCLUDE_NAME))
+            $this->introspectDirective(Directive::INCLUDE_NAME)
         );
     }
 
@@ -38,14 +35,15 @@ class ClientDirectiveTest extends TestCase
         ) on FIELD
         '.$this->placeholderQuery();
 
-        $directives = $this->introspectDirectives();
-
-        $bar = Arr::first($directives, $this->makeDirectiveNameMatcher('bar'));
+        $bar = $this->introspectDirective('bar');
 
         $this->assertSame(
             [
                 'name' => 'bar',
                 'description' => 'foo',
+                'locations' => [
+                    'FIELD',
+                ],
                 'args' => [
                     [
                         'name' => 'baz',
@@ -58,28 +56,8 @@ class ClientDirectiveTest extends TestCase
                         'defaultValue' => '"barbaz"',
                     ],
                 ],
-                'locations' => [
-                    'FIELD',
-                ],
             ],
             $bar
         );
-    }
-
-    protected function makeDirectiveNameMatcher(string $name): \Closure
-    {
-        return function (array $directive) use ($name): bool {
-            return $directive['name'] === $name;
-        };
-    }
-
-    /**
-     * @return array[]
-     */
-    public function introspectDirectives(): array
-    {
-        return $this
-            ->introspect()
-            ->jsonGet('data.__schema.directives');
     }
 }

@@ -160,3 +160,33 @@ $this->multipartGraphQL(
     ]
 )
 ```
+
+## Introspection
+
+If you create or manipulate parts of your schema programmatically, you might
+want to test that. You can use introspection to query your final schema in tests.
+
+Lighthouse uses the introspection query from [`\GraphQL\Type\Introspection::getIntrospectionQuery()`](https://github.com/webonyx/graphql-php/blob/master/src/Type/Introspection.php).
+
+The `introspect()` helper method runs the full introspection query against your schema.
+
+```php
+$introspectionResult = $this->introspect();
+```
+
+Most often, you will want to look for a specific named type. 
+
+```php
+$generatedType = $this->introspectType('Generated');
+// Ensure the type is present and matches a certain definition
+$this->assertSame(
+    [], // Adjust accordingly
+    $generatedType
+);
+```
+
+You can also introspect client directives.
+
+```php
+$customDirective = $this->introspectDirective('custom');
+```

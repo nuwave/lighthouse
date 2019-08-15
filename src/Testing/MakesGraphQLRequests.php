@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
+use Illuminate\Support\Arr;
 use GraphQL\Type\Introspection;
 use Illuminate\Foundation\Testing\TestResponse;
 
@@ -13,6 +14,16 @@ use Illuminate\Foundation\Testing\TestResponse;
  */
 trait MakesGraphQLRequests
 {
+    /**
+     * Stores the result of the introspection query.
+     *
+     * On the first call to introspect() this property is set to
+     * cache the result, as introspection is quite expensive.
+     *
+     * @var \Illuminate\Foundation\Testing\TestResponse|null
+     */
+    protected $introspectionResult;
+
     /**
      * Visit the given URI with a POST request, expecting a JSON response.
      *
@@ -107,96 +118,60 @@ trait MakesGraphQLRequests
      */
     protected function introspect(): TestResponse
     {
-        return $this->graphQL(Introspection::getIntrospectionQuery());
+        if($this->introspectionResult) {
+            return $this->introspectionResult;
+        }
+
+        return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
     }
 
     /**
-     * Return the full introspection query.
+     * Run introspection and return a type by name, if present.
      *
-     * @see https://gist.github.com/craigbeck/b90915d49fda19d5b2b17ead14dcd6da
-     *
-     * @return string
+     * @param  string  $name
+     * @return mixed[]|null
      */
-    public static function introspectionQuery(): string
+    protected function introspectType(string $name): ?array
     {
-        return /* @lang GraphQL */
-    <<<'GRAPHQL'
-  query IntrospectionQuery {
-    __schema {
-      queryType { name }
-      mutationType { name }
-      subscriptionType { name }
-      types {
-        ...FullType
-      }
-      directives {
-        name
-        description
-        args {
-          ...InputValue
+        return $this->introspectByName('data.__schema.type', $name);
+    }
+
+    /**
+     * Run introspection and return a directive by name, if present.
+     *
+     * @param  string  $name
+     * @return mixed[]|null
+     */
+    protected function introspectDirective(string $name): ?array
+    {
+        return $this->introspectByName('data.__schema.directives', $name);
+    }
+
+    /**
+     * Run introspection and return a result from the given path by name, if present.
+     *
+     * @param  string  $path
+     * @param  string  $name
+     * @return mixed[]|null
+     */
+    protected function introspectByName(string $path, string $name): ?array
+    {
+        if(! $this->introspectionResult){
+            $this->introspect();
         }
-        locations
-      }
-    }
-  }
 
-  fragment FullType on __Type {
-    kind
-    name
-    description
-    fields(includeDeprecated: true) {
-      name
-      description
-      args {
-        ...InputValue
-      }
-      type {
-        ...TypeRef
-      }
-      isDeprecated
-      deprecationReason
-    }
-    inputFields {
-      ...InputValue
-    }
-    interfaces {
-      ...TypeRef
-    }
-    enumValues(includeDeprecated: true) {
-      name
-      description
-      isDeprecated
-      deprecationReason
-    }
-    possibleTypes {
-      ...TypeRef
-    }
-  }
+        // TODO Replace with ->json() once we remove support for Laravel 5.5
+        $results = data_get(
+            $this->introspectionResult->decodeResponseJson(),
+            $path
+        );
 
-  fragment InputValue on __InputValue {
-    name
-    description
-    type { ...TypeRef }
-    defaultValue
-  }
-
-  fragment TypeRef on __Type {
-    kind
-    name
-    ofType {
-      kind
-      name
-      ofType {
-        kind
-        name
-        ofType {
-          kind
-          name
-        }
-      }
-    }
-  }
-GRAPHQL;
+        return Arr::first(
+            $results,
+            function (array $result) use ($name): bool {
+                return $result['name'] === $name;
+            }
+        );
     }
 
     /**

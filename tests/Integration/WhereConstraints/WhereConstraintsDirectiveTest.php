@@ -316,12 +316,8 @@ class WhereConstraintsDirectiveTest extends DBTestCase
             ],
         ]);
 
-        $types = $this->introspect()->jsonGet('data.__schema.types');
-
         $expectedEnumName = 'WhitelistedColumnsWhereColumn';
-        $enum = Arr::first($types, function (array $type) use ($expectedEnumName): bool {
-            return $type['name'] === $expectedEnumName;
-        });
+        $enum = $this->introspectType($expectedEnumName);
 
         $this->assertArraySubset(
             [

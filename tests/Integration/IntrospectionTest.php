@@ -4,7 +4,6 @@ namespace Tests\Integration;
 
 use Tests\TestCase;
 use Tests\Utils\Scalars\Email;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Illuminate\Foundation\Testing\TestResponse;
 
@@ -38,16 +37,14 @@ class IntrospectionTest extends TestCase
         }        
         '.$this->placeholderQuery();
 
-        $introspection = $this->introspect();
-
-        $this->assertTrue(
-            $this->isTypeNamePresent($introspection, 'Foo')
+        $this->assertIsArray(
+            $this->introspectType('Foo')
         );
-        $this->assertTrue(
-            $this->isTypeNamePresent($introspection, 'Query')
+        $this->assertIsArray(
+            $this->introspectType('Query')
         );
-        $this->assertFalse(
-            $this->isTypeNamePresent($introspection, 'Bar')
+        $this->assertIsArray(
+            $this->introspectType('Bar')
         );
     }
 
@@ -61,16 +58,8 @@ class IntrospectionTest extends TestCase
             new Email()
         );
 
-        $this->assertTrue(
-            $this->isTypeNamePresent($this->introspect(), 'Email')
+        $this->assertIsArray(
+            $this->introspectType('Email')
         );
-    }
-
-    protected function isTypeNamePresent(TestResponse $introspection, string $typeName): bool
-    {
-        return (new Collection($introspection->jsonGet('data.__schema.types')))
-            ->contains(function (array $type) use ($typeName): bool {
-                return $type['name'] === $typeName;
-            });
     }
 }
