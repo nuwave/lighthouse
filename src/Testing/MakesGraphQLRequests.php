@@ -133,7 +133,7 @@ trait MakesGraphQLRequests
      */
     protected function introspectType(string $name): ?array
     {
-        return $this->introspectByName('data.__schema.type', $name);
+        return $this->introspectByName('data.__schema.types', $name);
     }
 
     /**
