@@ -5,7 +5,6 @@ namespace Tests\Unit\Schema;
 use Tests\TestCase;
 use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\Directive;
-use Tests\Integration\IntrospectionTest;
 
 class ClientDirectiveTest extends TestCase
 {
@@ -79,8 +78,8 @@ class ClientDirectiveTest extends TestCase
      */
     public function introspectDirectives(): array
     {
-        $introspection = $this->graphQL(IntrospectionTest::INTROSPECTION_QUERY);
-
-        return $introspection->jsonGet('data.__schema.directives');
+        return $this
+            ->introspect()
+            ->jsonGet('data.__schema.directives');
     }
 }

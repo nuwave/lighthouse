@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
+use GraphQL\Type\Introspection;
 use Illuminate\Foundation\Testing\TestResponse;
 
 /**
@@ -97,6 +98,105 @@ trait MakesGraphQLRequests
                 'Content-Type' => 'multipart/form-data',
             ])
         );
+    }
+
+    /**
+     * Execute the introspection query on the GraphQL server.
+     *
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    protected function introspect(): TestResponse
+    {
+        return $this->graphQL(Introspection::getIntrospectionQuery());
+    }
+
+    /**
+     * Return the full introspection query.
+     *
+     * @see https://gist.github.com/craigbeck/b90915d49fda19d5b2b17ead14dcd6da
+     *
+     * @return string
+     */
+    public static function introspectionQuery(): string
+    {
+        return /* @lang GraphQL */
+    <<<'GRAPHQL'
+  query IntrospectionQuery {
+    __schema {
+      queryType { name }
+      mutationType { name }
+      subscriptionType { name }
+      types {
+        ...FullType
+      }
+      directives {
+        name
+        description
+        args {
+          ...InputValue
+        }
+        locations
+      }
+    }
+  }
+
+  fragment FullType on __Type {
+    kind
+    name
+    description
+    fields(includeDeprecated: true) {
+      name
+      description
+      args {
+        ...InputValue
+      }
+      type {
+        ...TypeRef
+      }
+      isDeprecated
+      deprecationReason
+    }
+    inputFields {
+      ...InputValue
+    }
+    interfaces {
+      ...TypeRef
+    }
+    enumValues(includeDeprecated: true) {
+      name
+      description
+      isDeprecated
+      deprecationReason
+    }
+    possibleTypes {
+      ...TypeRef
+    }
+  }
+
+  fragment InputValue on __InputValue {
+    name
+    description
+    type { ...TypeRef }
+    defaultValue
+  }
+
+  fragment TypeRef on __Type {
+    kind
+    name
+    ofType {
+      kind
+      name
+      ofType {
+        kind
+        name
+        ofType {
+          kind
+          name
+        }
+      }
+    }
+  }
+GRAPHQL;
     }
 
     /**
