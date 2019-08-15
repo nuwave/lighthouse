@@ -26,7 +26,7 @@ class ComplexValidationDirective extends ValidationDirective
     {
         return [
             'id' => ['required'],
-            'name' => ['sometimes', Rule::unique('users', 'name')->ignore((int)$this->args['id'], 'id')],
+            'name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
         ];
     }
 
