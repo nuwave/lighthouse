@@ -2,6 +2,8 @@
 
 These directives can generally be applied to [type definitions](../the-basics/types.md) in the schema.
 
+> This is not limited to `type` but also includes `input`, `enum`, `union`, `interface` and `scalar` types.
+
 ## TypeManipulator
 
 The [`\Nuwave\Lighthouse\Support\Contracts\TypeManipulator`](https://github.com/nuwave/lighthouse/tree/master/src/Support/Contracts/TypeManipulator.php)
