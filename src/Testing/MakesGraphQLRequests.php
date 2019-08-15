@@ -118,7 +118,7 @@ trait MakesGraphQLRequests
      */
     protected function introspect(): TestResponse
     {
-        if($this->introspectionResult) {
+        if ($this->introspectionResult) {
             return $this->introspectionResult;
         }
 
@@ -156,7 +156,7 @@ trait MakesGraphQLRequests
      */
     protected function introspectByName(string $path, string $name): ?array
     {
-        if(! $this->introspectionResult){
+        if (! $this->introspectionResult) {
             $this->introspect();
         }
 

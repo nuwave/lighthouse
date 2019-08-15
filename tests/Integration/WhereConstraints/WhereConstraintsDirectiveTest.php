@@ -3,7 +3,6 @@
 namespace Tests\Integration\WhereConstraints;
 
 use Tests\DBTestCase;
-use Illuminate\Support\Arr;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
