@@ -10,8 +10,7 @@ event and add in schema definitions as a simple string.
 
 ## Native PHP types
 
-While Lighthouse is a schema first GraphQL server and primarily uses the SDL,
-you can also use native PHP type definitions.
+While Lighthouse is an SDL-first GraphQL server, you can also use native PHP type definitions.
 
 Check out the [webonyx/graphql-php documentation](http://webonyx.github.io/graphql-php/type-system/)
 on how to define types.  
