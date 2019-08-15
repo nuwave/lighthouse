@@ -25,8 +25,8 @@ class ComplexValidationDirective extends ValidationDirective
     public function rules(): array
     {
         return [
-            'input.id' => ['required'],
-            'input.name' => ['sometimes', Rule::unique('users', 'name')->ignore($this->args['id'], 'id')],
+            'id' => ['required'],
+            'name' => ['sometimes', Rule::unique('users', 'name')->ignore((int)$this->args['id'], 'id')],
         ];
     }
 
@@ -36,7 +36,7 @@ class ComplexValidationDirective extends ValidationDirective
     public function messages(): array
     {
         return [
-            'input.name.unique' => self::UNIQUE_VALIDATION_MESSAGE,
+            'name.unique' => self::UNIQUE_VALIDATION_MESSAGE,
         ];
     }
 }

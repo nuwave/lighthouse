@@ -387,7 +387,7 @@ class ValidationTest extends DBTestCase
         $this->schema = '
         type Mutation {
             updateUser(
-                input: UpdateUserInput
+                input: UpdateUserInput @spread
             ): User
                 @complexValidation
                 @update
@@ -427,12 +427,69 @@ class ValidationTest extends DBTestCase
 
         $this->assertSame(
             [
-                'input.name' => [
+                'name' => [
                     ComplexValidationDirective::UNIQUE_VALIDATION_MESSAGE,
                 ],
             ],
             $duplicateName->jsonGet('errors.0.extensions.validation')
         );
+    }
+
+    /**
+     * @test
+     */
+    public function itIgnoresTheUserWeAreUpdating(): void
+    {
+        $this->schema = '
+        type Mutation {
+            updateUser(
+                input: UpdateUserInput @spread
+            ): User
+                @complexValidation
+                @update
+        }
+        
+        input UpdateUserInput {
+            id: ID
+            name: String
+        }
+        
+        type User {
+            id: ID
+            name: String
+        }
+        '.$this->placeholderQuery();
+
+        factory(User::class)->create([
+                                         'name' => 'foo',
+                                     ]);
+
+        factory(User::class)->create([
+                                         'name' => 'bar',
+                                     ]);
+
+        $updateSelf = $this->graphQL('
+        mutation {
+            updateUser(
+                input: {
+                    id: 2
+                    name: "bar"
+                }
+            ) {
+                id
+                name
+            }
+        } 
+        ');
+        $updateSelf->assertJson([
+            'data' => [
+                'updateUser' => [
+                    'id' => 2,
+                    'name' => 'bar'
+                ]
+            ]
+        ]);
+
     }
 
     /**
