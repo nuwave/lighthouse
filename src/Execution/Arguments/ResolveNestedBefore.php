@@ -6,5 +6,5 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 interface ResolveNestedBefore
 {
-    public function resolveBefore($root, $value, GraphQLContext $context);
+    public function resolveBefore($root, $args, GraphQLContext $context);
 }

@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 
@@ -50,7 +50,13 @@ class ArgumentFactory
         }
 
         $extensions = new ArgumentExtensions();
-        $extensions->resolveBefore = $this->directiveFactory->createAssociatedDirectivesOfType($definition, ResolveNestedBefore::class);
+        $extensions->resolveBefore = $this
+            ->directiveFactory
+            ->createAssociatedDirectivesOfType($definition, ResolveNestedBefore::class);
+        $extensions->resolveAfter = $this
+            ->directiveFactory
+            ->createAssociatedDirectivesOfType($definition, ResolveNestedAfter::class);
+        $fieldArgument['lighthouse'] = $extensions;
 
         // Add any dynamically declared public properties of the FieldArgument
         $fieldArgument += get_object_vars($argumentValue);

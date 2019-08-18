@@ -5,81 +5,59 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\DatabaseManager;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
+use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
+use Closure;
 
-class ArgResolver extends BaseDirective implements FieldResolver
+class ArgResolver
 {
     /**
-     * @var \Illuminate\Database\DatabaseManager
-     */
-    protected $databaseManager;
-
-    /**
-     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
-     * @return void
-     */
-    public function __construct(DatabaseManager $databaseManager)
-    {
-        $this->databaseManager = $databaseManager;
-    }
-
-    /**
-     * Name of the directive.
+     * Deal with nested argument resolvers.
      *
-     * @return string
+     * @param  \Closure  $resolver
+     * @return \Closure
      */
-    public function name(): string
+    public function wrapResolver(Closure $resolver): Closure
     {
-        return 'create';
-    }
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+            $argPartitioner = new ArgPartitioner();
+            $argPartitioner->setResolverArguments($root, $args, $context, $resolveInfo);
+            [$before, $regular, $after] = $argPartitioner->partitionResolverInputs();
 
-    /**
-     * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    public function resolveField(FieldValue $fieldValue): FieldValue
-    {
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
-                [$before, $regular, $after] = $this->partitionResolverInputs($args, $resolveInfo->fieldDefinition);
+            // Prepare a callback that is passed into the field resolver
+            // It should be called with the new root object
+            $resolveBeforeResolvers = function ($root) use ($before, $context, $resolveInfo) {
+                /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $beforeArg */
+                foreach ($before as $beforeArg) {
+                    /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $argumentExtensions */
+                    $argumentExtensions = $beforeArg->definition['lighthouse'];
 
-                $modelClassName = $this->getModelClass();
-
-                /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClassName($regular);
-
-                /** @var ResolveNestedBefore $afterResolver */
-                foreach ($before as $afterResolver) {
-                    $afterResolver->resolveBefore($model, $args, $context);
+                    /** @var ResolveNestedBefore $beforeResolver */
+                    foreach ($argumentExtensions->resolveBefore as $beforeResolver) {
+                        $beforeResolver->resolveBefore($root, $beforeArg, $context, $resolveInfo);
+                    }
                 }
+            };
+            $resolveInfo->resolveBeforeResolvers = $resolveBeforeResolvers;
 
-                $model->save();
+            $result = $resolver($root, $regular, $context, $resolveInfo);
 
-                /** @var ResolveNestedAfter $afterResolver */
-                foreach ($after as $afterResolver) {
-                    $afterResolver->resolveAfter($model, $args, $context);
+            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $afterArg */
+            foreach ($after as $afterArg) {
+                /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $argumentExtensions */
+                $argumentExtensions = $afterArg->definition['lighthouse'];
+
+                /** @var \Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter $afterResolver */
+                foreach ($argumentExtensions->resolveAfter as $afterResolver) {
+                    $afterResolver->resolveAfter($root, $afterArg, $context, $resolveInfo);
                 }
-                $executeMutation = function () use ($model, $args): Model {
-                    return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
-                };
-
-                return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection($model->getConnectionName())->transaction($executeMutation)
-                    : $executeMutation();
             }
-        );
-    }
 
-    public static function defaultArgResolver($root, $value)
-    {
-        $root->value;
+            return $result;
+        };
     }
 }

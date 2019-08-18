@@ -181,14 +181,14 @@ class TypedArgsTest extends TestCase
 
 class Before implements ResolveNestedBefore
 {
-    public function resolveBefore($root, $value, GraphQLContext $context)
+    public function resolveBefore($root, $args, GraphQLContext $context)
     {
     }
 }
 
 class After implements ResolveNestedAfter
 {
-    public function resolveBefore($root, $value, GraphQLContext $context)
+    public function resolveAfter($root, $args, GraphQLContext $context)
     {
     }
 }
