@@ -25,13 +25,13 @@ class WhereJsonContainsDirectiveTest extends DBTestCase
         $this->markTestSkipped('Can not be functionally tested with the SQLite test database we currently use.');
         factory(User::class)->create([
             'name' => \Safe\json_encode([
-                'nested' => 'bar'
-            ])
+                'nested' => 'bar',
+            ]),
         ]);
         factory(User::class)->create([
             'name' => \Safe\json_encode([
-                'nested' => 'baz'
-            ])
+                'nested' => 'baz',
+            ]),
         ]);
 
         $this->graphQL('
