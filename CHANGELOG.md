@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.0.0...master)
 
+### Added
+
+- Add the `@whereJsonContains` directive to an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses)
+
 ## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
 ### Added
