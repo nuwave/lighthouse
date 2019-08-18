@@ -22,11 +22,11 @@ class WhereJsonContainsDirectiveTest extends DBTestCase
      */
     public function itCanOrderByTheGivenFieldAndSortOrderASC(): void
     {
-        $this->markTestSkipped('Can not be functionally tested with the SQLite test database we currently use.');
+        $nestedBar = \Safe\json_encode([
+            'nested' => 'bar',
+        ]);
         factory(User::class)->create([
-            'name' => \Safe\json_encode([
-                'nested' => 'bar',
-            ]),
+            'name' => $nestedBar,
         ]);
         factory(User::class)->create([
             'name' => \Safe\json_encode([
@@ -44,7 +44,7 @@ class WhereJsonContainsDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     [
-                        'name' => 'bar',
+                        'name' => $nestedBar,
                     ],
                 ],
             ],
