@@ -43,7 +43,8 @@ class IntrospectionTest extends TestCase
         $this->assertNotNull(
             $this->introspectType('Query')
         );
-        $this->assertNotNull(
+
+        $this->assertNull(
             $this->introspectType('Bar')
         );
     }
