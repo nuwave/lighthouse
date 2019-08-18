@@ -17,10 +17,19 @@ class WhereJsonContainsDirectiveTest extends DBTestCase
     }    
     ';
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if ((float) $this->app->version() < 5.6) {
+            $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
+        }
+    }
+
     /**
      * @test
      */
-    public function itCanOrderByTheGivenFieldAndSortOrderASC(): void
+    public function itCanApplyWhereJsonContainsFilter(): void
     {
         $nestedBar = \Safe\json_encode([
             'nested' => 'bar',
