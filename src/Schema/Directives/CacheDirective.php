@@ -8,6 +8,7 @@ use GraphQL\Deferred;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
+use GraphQL\Language\AST\NamedTypeNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -163,6 +164,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
         foreach ($typeDefinition->fields as $field) {
             if (
                 $field->type instanceof NonNullTypeNode
+                && $field->type->type instanceof NamedTypeNode
                 && $field->type->type->name->value === 'ID'
             ) {
                 $typeValue->setCacheKey(
