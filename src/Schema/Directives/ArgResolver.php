@@ -2,16 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
-use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
-use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
-use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
 use Closure;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
+use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
 
 class ArgResolver
 {
