@@ -43,7 +43,6 @@ class TypedArgs extends \ArrayObject
         }
     }
 
-
     /**
      * @param  string  $offset
      * @return \GraphQL\Type\Definition\FieldArgument|\GraphQL\Type\Definition\InputObjectField|null
@@ -51,7 +50,7 @@ class TypedArgs extends \ArrayObject
     public function definition(string $offset)
     {
         if (! isset($this->definitions[$offset])) {
-            return null;
+            return;
         }
 
         return $this->definitions[$offset];
