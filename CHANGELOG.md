@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v3.7.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.0.0...master)
+
+### Added
+
+- Add the `@whereJsonContains` directive to an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses) https://github.com/nuwave/lighthouse/pull/919
+
+## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
 ### Added
 
@@ -28,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix Lumen route registration https://github.com/nuwave/lighthouse/pull/853
 - Fix handling of `@include` directive, it is semantically opposite to `@skip`, when using it with `@defer` https://github.com/nuwave/lighthouse/pull/855
 - Allow querying for null values using `@whereConstraints` https://github.com/nuwave/lighthouse/pull/872
+- Fix issue when using the `@model` directive in a type that has a list field https://github.com/nuwave/lighthouse/pull/883
+- Make the `@include` and `@skip` directives that are part of the GraphQL spec show up in introspection
+  and fix handling of default values in custom client directives https://github.com/nuwave/lighthouse/pull/892
 
 ### Changed
 
@@ -46,9 +55,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   now default tos `first` instead of `count`. The config `pagination_amount_argument`
   can be used to change the argument name https://github.com/nuwave/lighthouse/pull/852
 - Rename `ArgValidationDirective` to `ProvidesRules` and drop `get` prefix from the methods within https://github.com/nuwave/lighthouse/pull/846
-- Make the argument used for finding a model to check @can against configurable.
-  The previous behaviour of implicitely using the `id` argument for finding a specific
+- Make the argument used for finding a model to check `@can` against configurable.
+  The previous behaviour of implicitly using the `id` argument for finding a specific
   model to authorize against now no longer works. https://github.com/nuwave/lighthouse/pull/856
+- Change the `Nuwave\Lighthouse\Schema\Types\LaravelEnumType` wrapper to map to Enum instances internally https://github.com/nuwave/lighthouse/pull/908
 
 ### Removed
 

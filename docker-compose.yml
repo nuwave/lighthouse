@@ -6,17 +6,16 @@ services:
     image: lighthouse-php:base
     volumes:
     - ./:/var/www
-
-  xdebug:
-    build:
-      context: .
-      dockerfile: Dockerfile_xdebug
-    image: lighthouse-php:xdebug
     environment:
-      XDEBUG_CONFIG: "remote_enable=1 remote_mode=req remote_port=9000 remote_host=10.0.2.2 remote_connect_back=0"
+      XDEBUG_CONFIG: "remote_enable=1 remote_mode=req remote_port=9000 remote_host=host.docker.internal remote_connect_back=0"
       PHP_IDE_CONFIG: "serverName=lighthouse"
-    volumes:
-    - ./:/var/www
+
+  mysql:
+    image: mysql:5.7
+    tmpfs: /var/lib/mysql
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   node:
     image: node
@@ -25,4 +24,4 @@ services:
     working_dir: /app
     ports:
     - 8080:8080
-    command: bash -c "yarn && yarn docs:dev"
+    entrypoint: /bin/bash -c "echo 'Run `docker-compose exec node bash` followed by `yarn` and `yarn docs:dev` to work on the docs.' && tail -F /dev/null"

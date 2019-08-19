@@ -15,8 +15,8 @@ export default ({
             redirect: `/${siteData.themeConfig.versions.latest}/the-basics/schema.html`
         },
         {
-            path: '/docs/latest/guides/relationships.html',
-            redirect: `/${siteData.themeConfig.versions.latest}/guides/relationships.html`
+            path: '/docs/latest/eloquent/getting-started.html',
+            redirect: `/${siteData.themeConfig.versions.latest}/eloquent/getting-started.html`
         },
     ])
 

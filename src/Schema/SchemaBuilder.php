@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
+use GraphQL\GraphQL;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
@@ -56,8 +57,13 @@ class SchemaBuilder
             );
         }
         if (isset($documentAST->types['Subscription'])) {
+            /** @var \GraphQL\Type\Definition\ObjectType $subscription */
+            $subscription = $this->typeRegistry->get('Subscription');
+            // Eager-load the subscription fields to ensure they are registered
+            $subscription->getFields();
+
             $config->setSubscription(
-                $this->typeRegistry->get('Subscription')
+                $subscription
             );
         }
 
@@ -78,7 +84,9 @@ class SchemaBuilder
         foreach ($documentAST->directives as $directiveDefinition) {
             $clientDirectives [] = $this->clientDirectiveFactory->handle($directiveDefinition);
         }
-        $config->setDirectives($clientDirectives);
+        $config->setDirectives(
+            array_merge(GraphQL::getStandardDirectives(), $clientDirectives)
+        );
 
         return new Schema($config);
     }
