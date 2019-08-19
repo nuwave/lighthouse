@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow using callable classes with `__invoke` when referencing methods in directives
   and when looking for default resolvers or type resolvers https://github.com/nuwave/lighthouse/issues/882
 
+### Deprecated
+
+- The default name of resolver and type resolver methods will be `__invoke` in v5
+
 ## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
 ### Added
@@ -73,7 +77,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - The configuration option `pagination_amount_argument` will be removed in v5
-- The default name of resolver and type resolver methods will be `__invoke` in v5
 
 ## [3.7.0](https://github.com/nuwave/lighthouse/compare/v3.6.1...v3.7.0)
 
