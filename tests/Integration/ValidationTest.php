@@ -466,7 +466,7 @@ class ValidationTest extends DBTestCase
         mutation {
             updateUser(
                 input: {
-                    id: 2
+                    id: 1
                     name: "bar"
                 }
             ) {
@@ -478,7 +478,7 @@ class ValidationTest extends DBTestCase
         $updateSelf->assertJson([
             'data' => [
                 'updateUser' => [
-                    'id' => 2,
+                    'id' => 1,
                     'name' => 'bar',
                 ],
             ],
