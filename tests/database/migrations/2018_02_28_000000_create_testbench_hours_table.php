@@ -13,7 +13,7 @@ class CreateTestbenchHoursTable extends Migration
     {
         Schema::create('hours', function (Blueprint $table): void {
             $table->increments('id');
-            $table->string('hourable_type', 15)->nullable();
+            $table->string('hourable_type')->nullable();
             $table->unsignedInteger('hourable_id')->nullable();
             $table->string('from', 5)->nullable();
             $table->string('to', 5)->nullable();
