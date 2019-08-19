@@ -430,7 +430,7 @@ class TypeRegistry
                     $nodeName,
                     (array) config('lighthouse.namespaces.unions')
                 )
-                    ?: static::typeResolverFallback();
+                ?: static::typeResolverFallback();
         }
 
         return new UnionType([
