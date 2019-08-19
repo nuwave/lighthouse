@@ -2,6 +2,7 @@
 
 namespace Tests\Utils\Models;
 
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,5 +38,10 @@ class Post extends Model
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    public function hours(): MorphMany
+    {
+        return $this->morphMany(Hour::class, 'hourable');
     }
 }
