@@ -2,6 +2,8 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
+use Illuminate\Support\Arr;
+use GraphQL\Type\Introspection;
 use Illuminate\Foundation\Testing\TestResponse;
 
 /**
@@ -12,6 +14,16 @@ use Illuminate\Foundation\Testing\TestResponse;
  */
 trait MakesGraphQLRequests
 {
+    /**
+     * Stores the result of the introspection query.
+     *
+     * On the first call to introspect() this property is set to
+     * cache the result, as introspection is quite expensive.
+     *
+     * @var \Illuminate\Foundation\Testing\TestResponse|null
+     */
+    protected $introspectionResult;
+
     /**
      * Visit the given URI with a POST request, expecting a JSON response.
      *
@@ -96,6 +108,69 @@ trait MakesGraphQLRequests
             $this->transformHeadersToServerVars([
                 'Content-Type' => 'multipart/form-data',
             ])
+        );
+    }
+
+    /**
+     * Execute the introspection query on the GraphQL server.
+     *
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    protected function introspect(): TestResponse
+    {
+        if ($this->introspectionResult) {
+            return $this->introspectionResult;
+        }
+
+        return $this->introspectionResult = $this->graphQL(Introspection::getIntrospectionQuery());
+    }
+
+    /**
+     * Run introspection and return a type by name, if present.
+     *
+     * @param  string  $name
+     * @return mixed[]|null
+     */
+    protected function introspectType(string $name): ?array
+    {
+        return $this->introspectByName('data.__schema.types', $name);
+    }
+
+    /**
+     * Run introspection and return a directive by name, if present.
+     *
+     * @param  string  $name
+     * @return mixed[]|null
+     */
+    protected function introspectDirective(string $name): ?array
+    {
+        return $this->introspectByName('data.__schema.directives', $name);
+    }
+
+    /**
+     * Run introspection and return a result from the given path by name, if present.
+     *
+     * @param  string  $path
+     * @param  string  $name
+     * @return mixed[]|null
+     */
+    protected function introspectByName(string $path, string $name): ?array
+    {
+        if (! $this->introspectionResult) {
+            $this->introspect();
+        }
+
+        // TODO Replace with ->json() once we remove support for Laravel 5.5
+        $results = data_get(
+            $this->introspectionResult->decodeResponseJson(),
+            $path
+        );
+
+        return Arr::first(
+            $results,
+            function (array $result) use ($name): bool {
+                return $result['name'] === $name;
+            }
         );
     }
 

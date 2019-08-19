@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add the `@whereJsonContains` directive to an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses) https://github.com/nuwave/lighthouse/pull/919
+- Allow to restrict column names to a well-defined list in `@whereContraints`
+  and generate definitions for an `Enum` type and an `Input` type
+  that are restricted to the defined columns https://github.com/nuwave/lighthouse/pull/916
+- Add test helpers for introspection queries to `MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/916
 
 ## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
