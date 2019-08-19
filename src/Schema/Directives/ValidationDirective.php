@@ -44,6 +44,8 @@ abstract class ValidationDirective extends BaseDirective implements FieldMiddlew
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
+                    $this->setResolverArguments($root, $args, $context, $resolveInfo);
+
                     $validator = $this->validationFactory
                         ->make(
                             $args,
