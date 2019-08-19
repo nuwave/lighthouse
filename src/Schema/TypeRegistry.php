@@ -346,17 +346,12 @@ class TypeRegistry
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
         } else {
-            $interfaceClass = Utils::namespaceClassname(
-                $nodeName,
-                (array) config('lighthouse.namespaces.interfaces'),
-                function (string $className): bool {
-                    return method_exists($className, 'resolveType');
-                }
-            );
-
-            $typeResolver = $interfaceClass
-                ? [app($interfaceClass), 'resolveType']
-                : static::typeResolverFallback();
+            $typeResolver =
+                $this->findTypeResolverClass(
+                    $nodeName,
+                    (array) config('lighthouse.namespaces.interfaces')
+                )
+                ?: static::typeResolverFallback();
         }
 
         return new InterfaceType([
@@ -365,6 +360,38 @@ class TypeRegistry
             'fields' => $this->resolveFieldsFunction($interfaceDefinition),
             'resolveType' => $typeResolver,
         ]);
+    }
+
+    protected function findTypeResolverClass(string $nodeName, array $namespaces): ?Closure
+    {
+        // TODO use only __invoke in v5
+        $className = Utils::namespaceClassname(
+            $nodeName,
+            $namespaces,
+            function (string $className): bool {
+                return method_exists($className, 'resolveType');
+            }
+        );
+        if ($className) {
+            return Closure::fromCallable(
+                [app($className), 'resolveType']
+            );
+        }
+
+        $className = Utils::namespaceClassname(
+            $nodeName,
+            $namespaces,
+            function (string $className): bool {
+                return method_exists($className, '__invoke');
+            }
+        );
+        if ($className) {
+            return Closure::fromCallable(
+                [app($className), '__invoke']
+            );
+        }
+
+        return null;
     }
 
     /**
@@ -398,17 +425,12 @@ class TypeRegistry
 
             $typeResolver = $unionDirective->getResolverFromArgument('resolveType');
         } else {
-            $unionClass = Utils::namespaceClassname(
-                $nodeName,
-                (array) config('lighthouse.namespaces.unions'),
-                function (string $className): bool {
-                    return method_exists($className, 'resolveType');
-                }
-            );
-
-            $typeResolver = $unionClass
-                ? [app($unionClass), 'resolveType']
-                : static::typeResolverFallback();
+            $typeResolver =
+                $this->findTypeResolverClass(
+                    $nodeName,
+                    (array) config('lighthouse.namespaces.unions')
+                )
+                ?: static::typeResolverFallback();
         }
 
         return new UnionType([

@@ -46,7 +46,7 @@ class Upload
      * @param  mixed[]  $args
      * @return string|null
      */
-    public function resolve($root, array $args): ?string
+    public function __invoke($root, array $args): ?string
     {
         /** @var \Illuminate\Http\UploadedFile $file */
         $file = $args['file'];

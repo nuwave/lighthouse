@@ -22,7 +22,7 @@ This defines the shape of our data and informs the client what they can expect.
 You need to implement the actual resolver next.
 
 By default, Lighthouse looks for a class with the capitalized name of the field in `App\GraphQL\Queries`
-or `App\GraphQL\Mutations` and calls its `resolve` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
+or `App\GraphQL\Mutations` and calls its `__invoke` function with [the usual resolver arguments](../api-reference/resolvers.md#resolver-function-signature).
 
 In this case, our field is a query and is called `hello`, so we need to define our class as follows:
 
@@ -33,7 +33,7 @@ namespace App\GraphQL\Queries;
 
 class Hello
 {
-    public static function resolve(): string
+    public function __invoke(): string
     {
         return 'world!';
     }
@@ -93,7 +93,7 @@ namespace App\GraphQL\Queries;
 
 class Greet
 {
-    public function resolve($rootValue, array $args): string
+    public function __invoke($rootValue, array $args): string
     {
         return "Hello, {$args['name']}!";
     }

@@ -334,6 +334,7 @@ directive @builder(
   """
   Reference a method that is passed the query builder.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
 ) on FIELD_DEFINITION
@@ -524,6 +525,7 @@ directive @complexity(
   """
   Reference a function to customize the complexity score calculation.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String
 ) on FIELD_DEFINITION
@@ -694,6 +696,7 @@ directive @deprecated(
 Assign a resolver function to a field.
 
 Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
+If you pass only a class name, the method name defaults to `__invoke`. 
 
 ```graphql
 type Mutation {
@@ -712,6 +715,7 @@ directive @field(
   """
   A reference to the resolver function to be used.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
 
@@ -1162,11 +1166,11 @@ Use a custom resolver to determine the concrete type of an interface.
 Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding
 to use this directive, you probably don't need it.
 
-Set the `resolver` argument to a function that returns the implementing Object Type.
+Set the `resolveType` argument to a function that returns the implementing Object Type.
 
 ```graphql
 interface Commentable
-    @interface(resolver: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
+    @interface(resolveType: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
     id: ID!
 }
 ```
@@ -1227,8 +1231,9 @@ directive @interface(
   """
   Reference to a custom type-resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String!
+  resolveType: String!
 ) on INTERFACE
 ```
 
@@ -1437,6 +1442,7 @@ directive @node(
   """
   Reference to resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
 ) on FIELD_DEFINITION
@@ -2004,7 +2010,7 @@ type Employee {
     employeeId: ID!
 }
 
-union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
+union Person @union(resolveType: "App\\GraphQL\\Unions\\Person@resolveType") =
       User
     | Employee
 ```
@@ -2065,6 +2071,7 @@ directive @union(
   """
   Reference a function that returns the implementing Object Type.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolveType: String!
 ) on UNION
