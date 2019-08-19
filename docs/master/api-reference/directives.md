@@ -2160,6 +2160,12 @@ directive @where(
   operator: String = "="
 
   """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+
+  """
   Use Laravel's where clauses upon the query builder.
   """
   clause: String
@@ -2301,6 +2307,39 @@ input WhereConstraints {
 }
 
 scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
+```
+
+## @whereJsonContains
+
+Use an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses).
+
+```graphql
+type Query {
+    posts(tags: [String]! @whereJsonContains): [Post!]! @all
+}
+```
+
+You may use the `key` argument to look into the JSON content:
+
+```graphql
+type Query {
+    posts(tags: [String]! @whereJsonContains(key: "tags->recent")): [Post!]! @all
+}
+```
+
+### Definition
+
+```graphql
+"""
+Use an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses).
+"""
+directive @whereJsonContains(
+  """
+  Specify the database column and path inside the JSON to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @whereNotBetween
