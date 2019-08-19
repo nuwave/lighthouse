@@ -460,13 +460,7 @@ class ValidationTest extends DBTestCase
         }
         '.$this->placeholderQuery();
 
-        factory(User::class)->create([
-                                         'name' => 'foo',
-                                     ]);
-
-        factory(User::class)->create([
-                                         'name' => 'bar',
-                                     ]);
+        factory(User::class)->create(['name' => 'bar',]);
 
         $updateSelf = $this->graphQL('
         mutation {
