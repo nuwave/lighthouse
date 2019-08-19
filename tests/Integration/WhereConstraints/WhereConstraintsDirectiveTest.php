@@ -18,6 +18,9 @@ class WhereConstraintsDirectiveTest extends DBTestCase
     
     type Query {
         users(where: WhereConstraints @whereConstraints): [User!]! @all
+        whitelistedColumns(
+            where: WhereConstraints @whereConstraints(columns: ["id", "camelCase"])
+        ): [User!]! @all
     }
     
     enum Operator {
@@ -281,5 +284,55 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonFragment([
             'message' => WhereConstraintsDirective::missingValueForColumn('no_value'),
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itOnlyAllowsWhitelistedColumns(): void
+    {
+        factory(User::class)->create();
+
+        $this->graphQL('
+        {
+            whitelistedColumns(
+                where: {
+                    column: ID
+                    value: 1
+                }
+            ) {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'whitelistedColumns' => [
+                    [
+
+                    'id' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $expectedEnumName = 'WhitelistedColumnsWhereColumn';
+        $enum = $this->introspectType($expectedEnumName);
+
+        $this->assertArraySubset(
+            [
+                'kind' => 'ENUM',
+                'name' => $expectedEnumName,
+                'description' => 'Allowed column names for the `where` argument on the query `whitelistedColumns`.',
+                'enumValues' => [
+                    [
+                        'name' => 'ID',
+                    ],
+                    [
+                        'name' => 'CAMEL_CASE',
+                    ],
+                ],
+            ],
+            $enum
+        );
     }
 }
