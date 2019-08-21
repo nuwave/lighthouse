@@ -4,6 +4,7 @@ namespace Tests\Unit\Schema;
 
 use Closure;
 use Tests\TestCase;
+use Tests\Utils\Queries\FooBar;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -47,6 +48,39 @@ class ResolverProviderTest extends TestCase
         $this->assertInstanceOf(
             Closure::class,
             $this->resolverProvider->provideResolver($fieldValue)
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
+    {
+        $fieldValue = $this->constructFieldValue('fooInvoke: Int');
+
+        $this->assertInstanceOf(
+            Closure::class,
+            $this->resolverProvider->provideResolver($fieldValue)
+        );
+    }
+
+    /**
+     * @test
+     * @deprecated will be changed in v5
+     */
+    public function itGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
+    {
+        $fieldValue = $this->constructFieldValue('fooBar: String');
+
+        $resolver = $this->resolverProvider->provideResolver($fieldValue);
+        $this->assertInstanceOf(
+            Closure::class,
+            $resolver
+        );
+
+        $this->assertSame(
+            FooBar::RESOLVE_RESULT,
+            $resolver()
         );
     }
 
