@@ -6,6 +6,7 @@ use Tests\DBTestCase;
 use Tests\Utils\LaravelEnums\UserType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
+use Tests\Utils\Models\User;
 
 class LaravelEnumTypeTest extends DBTestCase
 {
@@ -83,6 +84,46 @@ class LaravelEnumTypeTest extends DBTestCase
             'data' => [
                 'foo' => true,
             ],
+        ]);
+    }
+
+    public function testWhereJsonContainsUsingEnumType(): void
+    {
+        // We use the "name" field to store the "type" JSON
+        $this->schema = '
+        type Query {
+            user(
+                type: UserType @whereJsonContains(key: "name")
+            ): User @find
+        }
+
+        type User {
+            name: String
+        }
+        ';
+
+        $this->typeRegistry->register(
+            new LaravelEnumType(UserType::class)
+        );
+
+        $encodedType = json_encode([UserType::Administrator]);
+
+        $user = new User();
+        $user->name = $encodedType;
+        $user->save();
+
+        $this->graphQL('
+        {
+            user(type: Administrator) {
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'user' => [
+                    'name' => $encodedType,
+                ]
+            ]
         ]);
     }
 
