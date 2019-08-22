@@ -89,6 +89,10 @@ class LaravelEnumTypeTest extends DBTestCase
 
     public function testWhereJsonContainsUsingEnumType(): void
     {
+        if ((float) $this->app->version() < 5.6) {
+            $this->markTestSkipped('Laravel supports whereJsonContains from version 5.6.');
+        }
+
         // We use the "name" field to store the "type" JSON
         $this->schema = '
         type Query {
