@@ -29,12 +29,12 @@
     "require": {
         "php": ">= 7.1",
         "ext-json": "*",
-        "illuminate/contracts": "5.5.*|5.6.*|5.7.*|5.8.*|6.0.*",
-        "illuminate/http": "5.5.*|5.6.*|5.7.*|5.8.*|6.0.*",
-        "illuminate/pagination": "5.5.*|5.6.*|5.7.*|5.8.*|6.0.*",
-        "illuminate/routing": "5.5.*|5.6.*|5.7.*|5.8.*|6.0.*",
-        "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*|6.0.*",
-        "illuminate/validation": "5.5.*|5.6.*|5.7.*|5.8.*|6.0.*",
+        "illuminate/contracts": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0",
+        "illuminate/http": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0",
+        "illuminate/pagination": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0",
+        "illuminate/routing": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0",
+        "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0",
+        "illuminate/validation": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0",
         "webonyx/graphql-php": "^0.13.2"
     },
     "require-dev": {
