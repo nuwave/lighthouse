@@ -31,6 +31,12 @@ class Builder
     public function apply($builder, array $args)
     {
         foreach ($args as $key => $value) {
+            // TODO switch to instanceof when we require bensampo/laravel-enum
+            // Unbox Enum values to ensure their underlying value is used for queries
+            if (is_a($value, '\BenSampo\Enum\Enum')) {
+                $value = $value->value;
+            }
+
             /** @var \Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective $builderDirective */
             if ($builderDirective = Arr::get($this->builderDirectives, $key)) {
                 $builder = $builderDirective->handleBuilder($builder, $value);
