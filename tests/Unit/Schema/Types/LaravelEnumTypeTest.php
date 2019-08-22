@@ -3,10 +3,10 @@
 namespace Tests\Unit\Schema\Types;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\User;
 use Tests\Utils\LaravelEnums\UserType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
-use Tests\Utils\Models\User;
 
 class LaravelEnumTypeTest extends DBTestCase
 {
@@ -122,8 +122,8 @@ class LaravelEnumTypeTest extends DBTestCase
             'data' => [
                 'user' => [
                     'name' => $encodedType,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
