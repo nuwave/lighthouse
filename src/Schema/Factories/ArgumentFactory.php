@@ -34,8 +34,8 @@ class ArgumentFactory
     {
         $arguments = [];
 
-        /** @var InputValueDefinitionNode $inputValueDefinitionNode */
-        foreach($definitionNodes as $inputDefinition) {
+        /* @var InputValueDefinitionNode $inputValueDefinitionNode */
+        foreach ($definitionNodes as $inputDefinition) {
             $arguments[$inputDefinition->name->value] = $this->convert($inputDefinition);
         }
 

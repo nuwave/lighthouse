@@ -179,7 +179,7 @@ class FieldFactory
 
                 $this->builder = new Builder;
 
-                foreach($argumentMap as $name => $argumentValue) {
+                foreach ($argumentMap as $name => $argumentValue) {
                     $this->handleArgDirectivesRecursively(
                         $argumentValue['type'],
                         $argumentValue['astNode'],
