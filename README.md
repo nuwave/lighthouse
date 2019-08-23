@@ -45,7 +45,8 @@ Check out [the docs](https://lighthouse-php.com/) to learn more.
 
 We welcome contributions of any kind.
 
-- Have a question? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWI1ZDQ1YWM1NmM2MmQ0NTU0NGNjZWFkMTJhY2VjMDAwZmMyZDFlZTc1Mjc3ZGY0MWM1Y2Q5MWNjYmJmYWJkYmU) 
+- Have a question? [Use the laravel-lighthouse tag on Stackoverflow](https://stackoverflow.com/questions/tagged/laravel-lighthouse) 
+- Talk to other users? [Hop into Slack](https://join.slack.com/t/lighthouse-php/shared_invite/enQtMzc1NzQwNTUxMjk3LWI1ZDQ1YWM1NmM2MmQ0NTU0NGNjZWFkMTJhY2VjMDAwZmMyZDFlZTc1Mjc3ZGY0MWM1Y2Q5MWNjYmJmYWJkYmU) 
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Need a feature? [Open a feature request](https://github.com/nuwave/lighthouse/issues/new?template=feature_request.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/.github/CONTRIBUTING.md)
