@@ -5,12 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Extensions;
 class ArgumentExtensions
 {
     /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore[]
+     * @var \Nuwave\Lighthouse\Execution\Resolver
      */
-    public $resolveBefore;
-
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter[]
-     */
-    public $resolveAfter;
+    public $resolver;
 }

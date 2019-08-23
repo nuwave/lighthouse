@@ -2,110 +2,36 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use GraphQL\Type\Definition\InputType;
-use GraphQL\Type\Definition\InputObjectType;
-
 class TypedArgs extends \ArrayObject
 {
-    /** @var \GraphQL\Type\Definition\FieldArgument[]|\GraphQL\Type\Definition\InputObjectField[] $definitions */
-    protected $definitions;
-
     /**
-     * @param  array  $input
+     * @param  array  $args
      * @param  \GraphQL\Type\Definition\FieldArgument[]|\GraphQL\Type\Definition\InputObjectField[] $definitions
      */
-    public static function fromArgs(array $input, array $definitions)
+    public function __construct(array $args, array $definitions)
     {
-        $instance = new self($input);
-        foreach ($definitions as $definition) {
-            $instance->definitions[$definition->name] = $definition;
+        $definitionMap = [];
+        foreach($definitions as $definition) {
+            $definitionMap[$definition->name] = $definition;
         }
 
-        return $instance;
-    }
-
-    public function offsetGet($name)
-    {
-        $value = parent::offsetGet($name);
-
-        $argType = $this->definitions[$name]->getType();
-        if ($argType instanceof InputObjectType) {
-            $value = self::fromArgs($value, $argType->getFields());
-        }
-
-        return $value;
-    }
-
-    public function getIterator()
-    {
-        foreach (parent::getIterator() as $key => $_) {
-            yield $key => $this->offsetGet($key);
-        }
-    }
-
-    /**
-     * @param  string  $offset
-     * @return \GraphQL\Type\Definition\FieldArgument|\GraphQL\Type\Definition\InputObjectField|null
-     */
-    public function definition(string $offset)
-    {
-        if (! isset($this->definitions[$offset])) {
-            return;
-        }
-
-        return $this->definitions[$offset];
-    }
-
-    public function type(string $offset): ?InputType
-    {
-        $definition = $this->definition($offset);
-
-        return $definition
-            ? $definition->getType()
-            : null;
-    }
-
-    public function iteratorWithDefinition()
-    {
-        foreach (parent::getIterator() as $key => $_) {
+        foreach ($args as $key => $value) {
             $typedArg = new TypedArg();
-            $typedArg->value = $this->offsetGet($key);
-            $typedArg->definition = $this->definition($key);
 
-            yield $key => $typedArg;
-        }
-    }
+            $typedArg->value = $value;
 
-    public function partitionResolverInputs(): array
-    {
-        $before = [];
-        $regular = [];
-        $after = [];
+            $definition = $definitionMap[$key];
+            $typedArg->definition = $definition;
 
-        foreach ($this->getIterator() as $name => $value) {
-            $argDef = $this->definitions[$name];
+            if($config = $definition->config['lighthouse'] ?? false) {
+                if($resolver = $config->resolver) {
+                    $typedArg->resolver = $resolver;
+                }
+            };
 
-            if (! isset($argDef->config['lighthouse'])) {
-                $regular[$name] = $value;
-                continue;
-            }
-
-            /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $config */
-            $config = $argDef->config['lighthouse'];
-
-            if ($config->resolveBefore instanceof ResolveNestedBefore) {
-                $before[$name] = $value;
-            } elseif ($config->resolveBefore instanceof ResolveNestedAfter) {
-                $after[$name] = $value;
-            } else {
-                $regular[$name] = $value;
-            }
+            $args[$key] = $typedArg;
         }
 
-        return [
-            $before,
-            $regular,
-            $after,
-        ];
+        parent::__construct($args);
     }
 }

@@ -33,5 +33,10 @@ namespace GraphQL\Type\Definition {
          * @var \Nuwave\Lighthouse\Execution\Builder
          */
         public $builder;
+
+        /**
+         * @var \Closure|\Nuwave\Lighthouse\Execution\Resolver
+         */
+        public $resolveBeforeResolvers;
     }
 }

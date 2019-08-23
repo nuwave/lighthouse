@@ -9,4 +9,7 @@ class TypedArg
 
     /** @var \GraphQL\Type\Definition\FieldArgument|\GraphQL\Type\Definition\InputObjectField */
     public $definition;
+
+    /** @var \Nuwave\Lighthouse\Execution\Resolver|null */
+    public $resolver;
 }

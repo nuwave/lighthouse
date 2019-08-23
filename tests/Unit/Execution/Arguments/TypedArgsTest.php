@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Tests\TestCase;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\FieldArgument;
@@ -181,14 +182,15 @@ class TypedArgsTest extends TestCase
 
 class Before implements ResolveNestedBefore
 {
-    public function resolveBefore($root, $args, GraphQLContext $context)
+    public function __invoke($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
     }
 }
 
 class After implements ResolveNestedAfter
 {
-    public function resolveAfter($root, $args, GraphQLContext $context)
+    public function __invoke($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
+        // TODO: Implement __invoke() method.
     }
 }

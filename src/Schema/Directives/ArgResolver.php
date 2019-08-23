@@ -4,55 +4,54 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Resolver;
+use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
 use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
 
-class ArgResolver
+class ArgResolver implements Resolver
 {
     /**
-     * Deal with nested argument resolvers.
-     *
-     * @param  \Closure  $resolver
-     * @return \Closure
+     * @var \Closure|\Nuwave\Lighthouse\Execution\Resolver
      */
-    public function wrapResolver(Closure $resolver): Closure
+    private $previous;
+
+    /**
+     * ArgResolver constructor.
+     * @param \Closure|\Nuwave\Lighthouse\Execution\Resolver $previous
+     */
+    public function __construct($previous)
     {
-        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($resolver) {
-            $argPartitioner = new ArgPartitioner();
-            $argPartitioner->setResolverArguments($root, $args, $context, $resolveInfo);
-            [$before, $regular, $after] = $argPartitioner->partitionResolverInputs();
+        $this->previous = $previous;
+    }
 
-            // Prepare a callback that is passed into the field resolver
-            // It should be called with the new root object
-            $resolveBeforeResolvers = function ($root) use ($before, $context, $resolveInfo) {
-                /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $beforeArg */
-                foreach ($before as $beforeArg) {
-                    /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $argumentExtensions */
-                    $argumentExtensions = $beforeArg->definition['lighthouse'];
+    public function __invoke($root, $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        $argPartitioner = new ArgPartitioner();
+        $argPartitioner->setResolverArguments($root, $args, $context, $resolveInfo);
+        [$before, $regular, $after] = $argPartitioner->partitionResolverInputs();
 
-                    /** @var ResolveNestedBefore $beforeResolver */
-                    foreach ($argumentExtensions->resolveBefore as $beforeResolver) {
-                        $beforeResolver->resolveBefore($root, $beforeArg, $context, $resolveInfo);
-                    }
-                }
-            };
-            $resolveInfo->resolveBeforeResolvers = $resolveBeforeResolvers;
+        // Prepare a callback that is passed into the field resolver
+        // It should be called with the new root object
+        $resolveBeforeResolvers = function ($root) use ($before, $context, $resolveInfo) {
+            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $beforeArg */
+            foreach ($before as $beforeArg) {
+                // TODO we might continue to automatically wrap the types in ArgResolvers,
+                // but we would have to deal with non-null and list types
 
-            $result = $resolver($root, $regular, $context, $resolveInfo);
-
-            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $afterArg */
-            foreach ($after as $afterArg) {
-                /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $argumentExtensions */
-                $argumentExtensions = $afterArg->definition['lighthouse'];
-
-                /** @var \Nuwave\Lighthouse\Execution\Arguments\ResolveNestedAfter $afterResolver */
-                foreach ($argumentExtensions->resolveAfter as $afterResolver) {
-                    $afterResolver->resolveAfter($root, $afterArg, $context, $resolveInfo);
-                }
+                ($beforeArg->resolver)($root, $beforeArg->value, $context, $resolveInfo);
             }
-
-            return $result;
         };
+        $resolveInfo->resolveBeforeResolvers = $resolveBeforeResolvers;
+
+        $result = ($this->previous)($root, $regular, $context, $resolveInfo);
+
+        /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $afterArg */
+        foreach ($after as $afterArg) {
+            ($afterArg->resolver)($result, $afterArg->value, $context, $resolveInfo);
+        }
+
+        return $result;
     }
 }

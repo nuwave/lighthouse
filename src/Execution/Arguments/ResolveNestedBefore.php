@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Execution\Resolver;
 
-interface ResolveNestedBefore
+interface ResolveNestedBefore extends Resolver
 {
-    public function resolveBefore($root, $args, GraphQLContext $context);
 }

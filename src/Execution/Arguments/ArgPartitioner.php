@@ -5,7 +5,10 @@ namespace Nuwave\Lighthouse\Execution\Arguments;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\InputObjectType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Nuwave\Lighthouse\Schema\Directives\ArgResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use ReflectionNamedType;
 
@@ -15,7 +18,7 @@ class ArgPartitioner
 
     public function partitionResolverInputs(): array
     {
-        if($this->root instanceof Model){
+        if ($this->root instanceof Model){
             $model = new \ReflectionClass($this->root);
         }
 
@@ -23,44 +26,52 @@ class ArgPartitioner
         $regular = [];
         $after = [];
 
-        foreach ($this->args as $name => $value) {
-            $argDef = $this->resolveInfo->fieldDefinition->args[$name];
-//
-//            if (! isset($argDef->config['lighthouse'])) {
-//                $regular[$name] = $value;
-//                continue;
-//            }
+        // TODO deal with @spread arguments
+        $typedArgs = new TypedArgs($this->args, $this->resolveInfo->fieldDefinition->args);
 
-            /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $config */
-            $config = $argDef->config['lighthouse'];
-
-            if ($config->resolveBefore instanceof ResolveNestedBefore) {
-                $before[$name] = $value;
-            } elseif ($config->resolveBefore instanceof ResolveNestedAfter) {
-                $after[$name] = $value;
+        /**
+         * @var string $name
+         * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $typedArg
+         */
+        foreach ($typedArgs as $name => $typedArg) {
+            if ($resolver = $typedArg->resolver){
+                if ($resolver instanceof ResolveNestedBefore) {
+                    $before[$name] = $typedArg;
+                } elseif ($resolver instanceof ResolveNestedAfter) {
+                    $after[$name] = $typedArg;
+                }
             } elseif (isset($model)) {
                 if (! $model->hasMethod($name)) {
-                    $regular[$name] = $value;
+                    $regular[$name] = $typedArg->value;
+                    continue;
                 }
 
                 $relationMethodCandidate = $model->getMethod($name);
                 if (! $returnType = $relationMethodCandidate->getReturnType()) {
-                    $regular[$name] = $value;
+                    $regular[$name] = $typedArg->value;
+                    continue;
                 }
 
                 if (! $returnType instanceof ReflectionNamedType) {
-                    $regular[$name] = $value;
+                    $regular[$name] = $typedArg->value;
+                    continue;
                 }
 
                 $returnTypeName = $returnType->getName();
+                $isRelation = static function (string $class) use ($returnTypeName): bool {
+                    return is_a($returnTypeName, $class, true);
+                };
 
-                if(is_a($returnTypeName, MorphTo::class, true)){
-                    $before[$name] => $value;
-                } elseif(){
-
-                } else {
-                    $regular[$name] = $value;
+                if($isRelation( MorphTo::class)){
+                    $typedArg->resolver = new ArgResolver(new NestedMorphTo($name));
+                    $before[$name] = $typedArg;
+                } elseif($isRelation(BelongsTo::class)){
+                    $before[$name] = $typedArg;
+                } elseif($isRelation(HasMany::class)) {
+                    $typedArg->resolver = new ArgResolver(new NestedOneToMany($name));
                 }
+            } else {
+                $regular[$name] = $typedArg;
             }
         }
 
@@ -71,5 +82,33 @@ class ArgPartitioner
         ];
     }
 
+    public function makeNestedResolvers()
+    {
+        [$before, $regular, $after] = $this->partitionResolverInputs();
 
+        // Prepare a callback that is passed into the field resolver
+        // It should be called with the new root object
+        $resolveBeforeResolvers = function ($root) use ($before) {
+            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $beforeArg */
+            foreach ($before as $beforeArg) {
+                // TODO we might continue to automatically wrap the types in ArgResolvers,
+                // but we would have to deal with non-null and list types
+
+                ($beforeArg->resolver)($root, $beforeArg->value, $this->context, $this->resolveInfo);
+            }
+        };
+
+        $resolveAfterResolvers = function($root) use ($after) {
+            /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $afterArg */
+            foreach ($after as $afterArg) {
+                ($afterArg->resolver)($root, $afterArg->value, $this->context, $this->resolveInfo);
+            }
+        };
+
+        return [
+            $resolveBeforeResolvers,
+            $regular,
+            $resolveAfterResolvers
+        ];
+    }
 }
