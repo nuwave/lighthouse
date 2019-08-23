@@ -13,7 +13,6 @@ use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
@@ -170,23 +169,23 @@ class FieldFactory
             )
             ->getResolver();
 
-        $argumentValues = $this->getArgumentValues();
+        $argumentMap = $this->argumentFactory->toTypeMap(
+            $this->fieldValue->getField()->arguments
+        );
 
         $this->fieldValue->setResolver(
-            function () use ($argumentValues, $resolverWithMiddleware) {
+            function () use ($argumentMap, $resolverWithMiddleware) {
                 $this->setResolverArguments(...func_get_args());
 
                 $this->builder = new Builder;
 
-                $argumentValues->each(
-                    function (ArgumentValue $argumentValue): void {
-                        $this->handleArgDirectivesRecursively(
-                            $argumentValue->getType(),
-                            $argumentValue->getAstNode(),
-                            [$argumentValue->getName()]
-                        );
-                    }
-                );
+                foreach($argumentMap as $name => $argumentValue) {
+                    $this->handleArgDirectivesRecursively(
+                        $argumentValue['type'],
+                        $argumentValue['astNode'],
+                        [$name]
+                    );
+                }
 
                 // Recurse down the given args and apply ArgDirectives
                 $this->runArgDirectives();
@@ -232,25 +231,12 @@ class FieldFactory
         return [
             'name' => $fieldDefinitionNode->name->value,
             'type' => $this->fieldValue->getReturnType(),
-            'args' => $this->getInputValueDefinitions($argumentValues),
+            'args' => $argumentMap,
             'resolve' => $this->fieldValue->getResolver(),
             'description' => data_get($fieldDefinitionNode->description, 'value'),
             'complexity' => $this->fieldValue->getComplexity(),
             'deprecationReason' => $this->fieldValue->getDeprecationReason(),
         ];
-    }
-
-    /**
-     * Get a collection of the fields argument definitions.
-     *
-     * @return \Illuminate\Support\Collection<\Nuwave\Lighthouse\Schema\Values\ArgumentValue>
-     */
-    protected function getArgumentValues(): Collection
-    {
-        return (new Collection($this->fieldValue->getField()->arguments))
-            ->map(function (InputValueDefinitionNode $inputValueDefinition): ArgumentValue {
-                return new ArgumentValue($inputValueDefinition, $this->fieldValue);
-            });
     }
 
     /**
@@ -487,23 +473,6 @@ class FieldFactory
         if (count($this->handleArgDirectivesSnapshots) > 0) {
             $this->runArgDirectives();
         }
-    }
-
-    /**
-     * Transform the ArgumentValues into the final InputValueDefinitions.
-     *
-     * @param  \Illuminate\Support\Collection<ArgumentValue>  $argumentValues
-     * @return \GraphQL\Language\AST\InputValueDefinitionNode[]
-     */
-    protected function getInputValueDefinitions(Collection $argumentValues): array
-    {
-        return $argumentValues
-            ->mapWithKeys(function (ArgumentValue $argumentValue): array {
-                return [
-                    $argumentValue->getName() => $this->argumentFactory->handle($argumentValue),
-                ];
-            })
-            ->all();
     }
 
     protected function addValidationErrorsToBuffer(array $validationErrors): void

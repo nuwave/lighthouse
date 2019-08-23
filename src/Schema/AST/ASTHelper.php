@@ -181,9 +181,15 @@ class ASTHelper
     {
         // webonyx/graphql-php expects the internal value here, whereas the
         // SDL uses the ENUM's name, so we run the conversion here
-        return $argumentType instanceof EnumType
-            ? $argumentType->getValue($defaultValue->value)->value
-            : AST::valueFromASTUntyped($defaultValue);
+        if($argumentType instanceof EnumType) {
+            return $argumentType
+                ->getValue(
+                    $defaultValue->value
+                )
+                ->value;
+        }
+
+        return AST::valueFromAST($defaultValue, $argumentType);
     }
 
     /**
