@@ -49,3 +49,8 @@ We welcome contributions of any kind.
 - Found a bug? [Report a bug](https://github.com/nuwave/lighthouse/issues/new?template=bug_report.md)
 - Need a feature? [Open a feature request](https://github.com/nuwave/lighthouse/issues/new?template=feature_request.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/.github/CONTRIBUTING.md)
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Lighthouse,
+please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
