@@ -2,9 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use Nuwave\Lighthouse\Execution\Resolver;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 
 class ArgumentFactory
 {
@@ -69,6 +71,11 @@ class ArgumentFactory
                 'defaultValue' => ASTHelper::defaultValueForArgument($defaultValue, $type),
             ];
         }
+
+        $extensions = new ArgumentExtensions();
+        $extensions->resolver = $this->directiveFactory
+            ->createAssociatedDirectivesOfType($definitionNode, Resolver::class);
+        $config['lighthouse'] = $extensions;
 
         return $config;
     }
