@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Tests\TestCase;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InputObjectField;

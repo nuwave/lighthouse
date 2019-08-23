@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Collection;
-use Nuwave\Lighthouse\Execution\Resolver;
 use Nuwave\Lighthouse\Schema\Context;
+use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Execution\Resolver;
 
 class BelongsTo implements Resolver
 {

@@ -2,15 +2,13 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use GraphQL\Type\Definition\InputType;
-use GraphQL\Type\Definition\InputObjectType;
+use ReflectionNamedType;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Nuwave\Lighthouse\Schema\Directives\ArgResolver;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
-use ReflectionNamedType;
 
 class ArgPartitioner
 {
@@ -18,7 +16,7 @@ class ArgPartitioner
 
     public function partitionResolverInputs(): array
     {
-        if ($this->root instanceof Model){
+        if ($this->root instanceof Model) {
             $model = new \ReflectionClass($this->root);
         }
 
@@ -30,11 +28,11 @@ class ArgPartitioner
         $typedArgs = new TypedArgs($this->args, $this->resolveInfo->fieldDefinition->args);
 
         /**
-         * @var string $name
+         * @var string
          * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $typedArg
          */
         foreach ($typedArgs as $name => $typedArg) {
-            if ($resolver = $typedArg->resolver){
+            if ($resolver = $typedArg->resolver) {
                 if ($resolver instanceof ResolveNestedBefore) {
                     $before[$name] = $typedArg;
                 } elseif ($resolver instanceof ResolveNestedAfter) {
@@ -62,12 +60,12 @@ class ArgPartitioner
                     return is_a($returnTypeName, $class, true);
                 };
 
-                if($isRelation( MorphTo::class)){
+                if ($isRelation(MorphTo::class)) {
                     $typedArg->resolver = new ArgResolver(new NestedMorphTo($name));
                     $before[$name] = $typedArg;
-                } elseif($isRelation(BelongsTo::class)){
+                } elseif ($isRelation(BelongsTo::class)) {
                     $before[$name] = $typedArg;
-                } elseif($isRelation(HasMany::class)) {
+                } elseif ($isRelation(HasMany::class)) {
                     $typedArg->resolver = new ArgResolver(new NestedOneToMany($name));
                 }
             } else {
@@ -98,7 +96,7 @@ class ArgPartitioner
             }
         };
 
-        $resolveAfterResolvers = function($root) use ($after) {
+        $resolveAfterResolvers = function ($root) use ($after) {
             /** @var \Nuwave\Lighthouse\Execution\Arguments\TypedArg $afterArg */
             foreach ($after as $afterArg) {
                 ($afterArg->resolver)($root, $afterArg->value, $this->context, $this->resolveInfo);
@@ -108,7 +106,7 @@ class ArgPartitioner
         return [
             $resolveBeforeResolvers,
             $regular,
-            $resolveAfterResolvers
+            $resolveAfterResolvers,
         ];
     }
 }

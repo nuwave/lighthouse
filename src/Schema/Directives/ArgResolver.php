@@ -2,13 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolver;
-use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Execution\Arguments\ArgPartitioner;
-use Nuwave\Lighthouse\Execution\Arguments\ResolveNestedBefore;
 
 class ArgResolver implements Resolver
 {

@@ -26,14 +26,14 @@ class NestedOneToMany implements Resolver
 
         $saveModel = new ArgResolver(new SaveModel());
         if (isset($args['create'])) {
-            foreach($args['create'] as $childArgs) {
+            foreach ($args['create'] as $childArgs) {
                 $saveModel($relation->make(), $childArgs, $context, $resolveInfo);
             }
         }
 
         $updateModel = new ArgResolver(new UpdateModel());
         if (isset($args['update'])) {
-            foreach($args['update'] as $childArgs){
+            foreach ($args['update'] as $childArgs) {
                 $updateModel($relation->make(), $childArgs, $context, $resolveInfo);
             }
         }

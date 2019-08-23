@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolver;
-use Nuwave\Lighthouse\Schema\Context;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class UpdateModel implements Resolver

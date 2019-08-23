@@ -2,9 +2,9 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Nuwave\Lighthouse\Schema\Context;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\Resolver;
-use Nuwave\Lighthouse\Schema\Context;
 
 class NestedMorphTo implements Resolver
 {
