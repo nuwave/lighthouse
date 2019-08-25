@@ -12,10 +12,7 @@ class IdeHelperCommand extends Command
      *
      * @var string
      */
-    protected $signature = '
-        lighthouse:ide-helper
-        {--W|write : Write the output to a file}
-    ';
+    protected $signature = 'lighthouse:ide-helper';
 
     /**
      * The console command description.
@@ -44,7 +41,7 @@ class IdeHelperCommand extends Command
         // Create all built-in directives
         collect(ClassFinder::getClassesInNamespace('Nuwave\Lighthouse\Schema\Directives'))
             ->each(function ($namespace) use (&$directives) {
-                if (method_exists($namespace, 'definition')) {
+                if (is_callable($namespace, 'definition')) {
                     $directives[$this->directiveName($namespace)] = $namespace;
                 }
             });
@@ -52,7 +49,7 @@ class IdeHelperCommand extends Command
         // Create all custom directives (may overwrite built-in directives)
         collect(ClassFinder::getClassesInNamespace('App\GraphQL\Directives'))
             ->each(function ($namespace) use (&$directives) {
-                if (method_exists($namespace, 'definition')) {
+                if (is_callable($namespace, 'definition')) {
                     $directives[$this->directiveName($namespace)] = $namespace;
                 }
             });
@@ -67,7 +64,9 @@ class IdeHelperCommand extends Command
 
     private function createSchemaDefinition($namespace)
     {
-        $this->schema .= "\n\n".'# Directive class: '.$namespace."\n".trim($namespace::definition());
+        try {
+            $this->schema .= "\n\n" . '# Directive class: ' . $namespace . "\n" . trim(call_user_func([$namespace, 'definition']));
+        } catch (\Exception $e) { }
     }
 
     private function directiveName($namespace): string

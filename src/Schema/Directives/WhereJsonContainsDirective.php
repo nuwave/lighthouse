@@ -16,6 +16,11 @@ class WhereJsonContainsDirective extends BaseDirective implements ArgBuilderDire
         return 'whereJsonContains';
     }
 
+    public static function definition(): string
+    {
+        return ''; // TODO
+    }
+
     /**
      * Add a "WHERE JSON_CONTAINS()" clause to the builder.
      *
