@@ -65,11 +65,14 @@ class IdeHelperCommand extends Command
     private function createSchemaDefinition($namespace)
     {
         try {
+
             $definition = trim(call_user_func([$namespace, 'definition']));
             if ($definition != '') {
                 $this->schema .= "\n\n" . '# Directive class: ' . $namespace . "\n" . $definition;
             }
-        } catch (\Exception $e) { }
+        } catch (\Exception $e) {
+
+        }
     }
 
     private function directiveName($namespace): string
