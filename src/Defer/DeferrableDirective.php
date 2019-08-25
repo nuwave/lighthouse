@@ -20,6 +20,11 @@ class DeferrableDirective extends BaseDirective implements Directive, FieldMiddl
     const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_ROOT_MUTATION_FIELD = 'The @defer directive cannot be used on a root mutation field.';
     const THE_DEFER_DIRECTIVE_CANNOT_BE_USED_ON_A_NON_NULLABLE_FIELD = 'The @defer directive cannot be used on a Non-Nullable field.';
 
+    public static function definition(): string
+    {
+        return ''; // TODO
+    }
+
     /**
      * @var \Nuwave\Lighthouse\Defer\Defer
      */
