@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Console\Command;
+use HaydenPierce\ClassFinder\ClassFinder;
 
 class IdeHelperCommand extends Command
 {
@@ -43,7 +43,7 @@ class IdeHelperCommand extends Command
 
         // Create all built-in directives
         collect(ClassFinder::getClassesInNamespace('Nuwave\Lighthouse\Schema\Directives'))
-            ->each(function($namespace) use (&$directives) {
+            ->each(function ($namespace) use (&$directives) {
                 if (method_exists($namespace, 'definition')) {
                     $directives[$this->directiveName($namespace)] = $namespace;
                 }
@@ -51,9 +51,9 @@ class IdeHelperCommand extends Command
 
         // Create all custom directives (may overwrite built-in directives)
         collect(ClassFinder::getClassesInNamespace('App\GraphQL\Directives'))
-            ->each(function($namespace) use (&$directives) {
+            ->each(function ($namespace) use (&$directives) {
                 if (method_exists($namespace, 'definition')) {
-                    #$directives[$this->directiveName($namespace)] = $namespace;
+                    //$directives[$this->directiveName($namespace)] = $namespace;
                 }
             });
 
@@ -65,7 +65,8 @@ class IdeHelperCommand extends Command
         $this->info('Created ide-helper schema in '.base_path().'/.graphql/lighthouse.graphql.');
     }
 
-    private function createSchemaDefinition($namespace) {
+    private function createSchemaDefinition($namespace)
+    {
         $this->schema .= "\n\n".'# Directive class: '.$namespace."\n".trim($namespace::definition());
     }
 
@@ -73,6 +74,7 @@ class IdeHelperCommand extends Command
     {
         $name = substr($namespace, strrpos($namespace, '\\') + 1);
         $name = str_replace('Directive', '', $name);
+
         return lcfirst($name);
     }
 }
