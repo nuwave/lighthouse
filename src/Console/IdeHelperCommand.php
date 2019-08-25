@@ -53,7 +53,7 @@ class IdeHelperCommand extends Command
         collect(ClassFinder::getClassesInNamespace('App\GraphQL\Directives'))
             ->each(function($namespace) use (&$directives) {
                 if (method_exists($namespace, 'definition')) {
-                    #$directives[$this->directiveName($namespace)] = $namespace;
+                    $directives[$this->directiveName($namespace)] = $namespace;
                 }
             });
 
