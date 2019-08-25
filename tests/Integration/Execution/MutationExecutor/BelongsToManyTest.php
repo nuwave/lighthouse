@@ -362,10 +362,10 @@ class BelongsToManyTest extends DBTestCase
                     'id' => '1',
                     'users' => [
                         [
-                            'id' => '2',
+                            'id' => '1',
                         ],
                         [
-                            'id' => '1',
+                            'id' => '2',
                         ],
                     ],
                 ],
@@ -411,10 +411,10 @@ class BelongsToManyTest extends DBTestCase
                     'id' => '1',
                     'users' => [
                         [
-                            'id' => '2',
+                            'id' => '1',
                         ],
                         [
-                            'id' => '1',
+                            'id' => '2',
                         ],
                     ],
                 ],

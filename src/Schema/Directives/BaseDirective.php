@@ -183,13 +183,16 @@ abstract class BaseDirective implements Directive
         );
 
         if (
-            count($argumentParts) !== 2
+            count($argumentParts) > 2
             || empty($argumentParts[0])
-            || empty($argumentParts[1])
         ) {
             throw new DirectiveException(
-                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName'"
+                "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
             );
+        }
+
+        if (empty($argumentParts[1])) {
+            $argumentParts[1] = '__invoke';
         }
 
         return $argumentParts;

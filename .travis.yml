@@ -1,5 +1,8 @@
 sudo: false
 
+services:
+  - mysql
+
 cache:
   directories:
     - $HOME/.composer/cache
@@ -47,6 +50,7 @@ matrix:
 before_install:
   - phpenv config-rm xdebug.ini || true
   - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - mysql -e 'CREATE DATABASE test;'
 
 install:
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update

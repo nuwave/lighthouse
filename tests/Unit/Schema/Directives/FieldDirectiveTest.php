@@ -5,6 +5,7 @@ namespace Tests\Unit\Schema\Directives;
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class FieldDirectiveTest extends TestCase
 {
@@ -26,6 +27,28 @@ class FieldDirectiveTest extends TestCase
         ')->assertJson([
             'data' => [
                 'bar' => 'foo.bar',
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itAssignsResolverWithInvokableClass(): void
+    {
+        $this->schema = '
+        type Query {
+            baz: String! @field(resolver:"Tests\\\Utils\\\Resolvers\\\Foo")
+        }
+        ';
+
+        $this->graphQL('
+        {
+            baz
+        }
+        ')->assertJson([
+            'data' => [
+                'baz' => 'foo.baz',
             ],
         ]);
     }
@@ -77,9 +100,32 @@ class FieldDirectiveTest extends TestCase
     /**
      * @test
      */
-    public function itThrowsAnErrorOnlyOnePartIsDefined(): void
+    public function itUsesDefaultFieldNamespaceForInvokableClass(): void
+    {
+        $this->schema = '
+        type Query {
+            baz: String! @field(resolver: "FooBar")
+        }
+        ';
+
+        $this->graphQL('
+        {
+            baz
+        }
+        ')->assertJson([
+            'data' => [
+                'baz' => FooBar::INVOKE_RESULT,
+            ],
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsAnErrorWhenNoClassFound(): void
     {
         $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessage("No class 'bar' was found for directive 'field'");
 
         $this->schema = '
         type Query {
@@ -91,6 +137,27 @@ class FieldDirectiveTest extends TestCase
         {
             bar
         }        
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsAnErrorWhenClassIsntInvokable(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\Foo'");
+
+        $this->schema = '
+        type Query {
+            bar: String! @field(resolver: "Foo")
+        }
+        ';
+
+        $this->graphQL('
+        {
+            bar
+        }
         ');
     }
 }

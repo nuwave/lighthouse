@@ -5,7 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.0.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.1.1...master)
+
+## [4.1.1](https://github.com/nuwave/lighthouse/compare/v4.1.0...v4.1.1)
+
+### Fixed
+
+- Unbox laravel-enum inputs when using the builder directives https://github.com/nuwave/lighthouse/pull/927
+
+## [4.1.0](https://github.com/nuwave/lighthouse/compare/v4.0.0...v4.1.0)
+
+### Added
+
+- Add the `@whereJsonContains` directive to an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses) https://github.com/nuwave/lighthouse/pull/919
+- Allow using callable classes with `__invoke` when referencing methods in directives
+  and when looking for default resolvers or type resolvers https://github.com/nuwave/lighthouse/issues/882
+- Allow to restrict column names to a well-defined list in `@whereContraints`
+  and generate definitions for an `Enum` type and an `Input` type
+  that are restricted to the defined columns https://github.com/nuwave/lighthouse/pull/916
+- Add test helpers for introspection queries to `MakesGraphQLRequests` https://github.com/nuwave/lighthouse/pull/916
+
+### Deprecated
+
+- The default name of resolver and type resolver methods will be `__invoke` in v5 https://github.com/nuwave/lighthouse/issues/882
+
+### Fixed
+
+- Fixed the `ValidationDirective` not setting the mutation or query arguments to itself https://github.com/nuwave/lighthouse/pull/915
 
 ## [4.0.0](https://github.com/nuwave/lighthouse/compare/v3.7.0...v4.0.0)
 
