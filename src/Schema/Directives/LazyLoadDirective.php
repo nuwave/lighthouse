@@ -20,6 +20,11 @@ class LazyLoadDirective extends BaseDirective implements FieldMiddleware
         return 'lazyLoad';
     }
 
+    public static function definition(): string
+    {
+        return ''; // TODO
+    }
+
     /**
      * Resolve the field directive.
      *

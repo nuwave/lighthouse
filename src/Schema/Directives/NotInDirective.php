@@ -16,6 +16,18 @@ class NotInDirective extends BaseDirective implements ArgBuilderDirective
         return 'notIn';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @notIn(      
+  """
+  Specify the name of the column.
+  Only required if it differs from the name of the argument.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
+
     /**
      * Apply a simple "WHERE NOT IN $values" clause.
      *

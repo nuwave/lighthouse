@@ -19,6 +19,17 @@ class MethodDirective extends BaseDirective implements FieldResolver
         return 'method';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @method(      
+  """
+  Specify the method of which to fetch the data from.
+  """
+  name: String
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

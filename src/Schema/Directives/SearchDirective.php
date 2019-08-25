@@ -16,6 +16,20 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
         return 'search';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Perform a full-text by the given input value.
+"""
+directive @search(
+  """
+  Specify a custom index to use for search.
+  """
+  within: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
+
     /**
      * Apply a scout search to the builder.
      *

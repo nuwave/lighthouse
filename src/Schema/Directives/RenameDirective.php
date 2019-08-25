@@ -18,6 +18,18 @@ class RenameDirective extends BaseDirective implements FieldResolver
         return 'rename';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @rename(
+  """
+  Specify the original name of the property/key that the field
+  value can be retrieved from.
+  """
+  attribute: String!
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

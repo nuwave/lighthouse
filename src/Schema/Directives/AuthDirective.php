@@ -35,6 +35,20 @@ class AuthDirective extends BaseDirective implements FieldResolver
         return 'auth';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Return the currently authenticated user as the result of a query.
+"""
+directive @auth(
+  """
+  Use a particular guard to retreive the user.
+  """
+  guard: String
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

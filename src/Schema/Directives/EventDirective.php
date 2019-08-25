@@ -35,6 +35,17 @@ class EventDirective extends BaseDirective implements FieldMiddleware
         return 'event';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @event(  
+  """
+  Specify the fully qualified class name (FQCN) of the event to dispatch.
+  """
+  dispatch: String!
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

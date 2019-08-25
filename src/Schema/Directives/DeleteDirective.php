@@ -41,6 +41,22 @@ class DeleteDirective extends BaseDirective implements FieldResolver
         return 'delete';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Delete one or more models by their ID.
+The field must have an single non-null argument that may be a list.
+"""
+directive @delete(
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

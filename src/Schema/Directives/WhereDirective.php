@@ -16,6 +16,31 @@ class WhereDirective extends BaseDirective implements ArgBuilderDirective
         return 'where';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
+"""
+directive @where(
+  """
+  Specify the operator to use within the WHERE condition.
+  """
+  operator: String = "="
+
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+
+  """
+  Use Laravel\'s where clauses upon the query builder.
+  """
+  clause: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
+
     /**
      * Add any "WHERE" clause to the builder.
      *

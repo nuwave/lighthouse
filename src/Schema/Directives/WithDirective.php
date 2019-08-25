@@ -24,6 +24,26 @@ class WithDirective extends RelationDirective implements FieldMiddleware
         return 'with';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Eager-load an Eloquent relation.
+"""
+directive @with(
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Eager load a relation on the parent instance.
      *

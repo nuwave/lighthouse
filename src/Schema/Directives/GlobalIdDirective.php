@@ -39,6 +39,24 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
         return 'globalId';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Converts between IDs/types and global IDs.
+When used upon a field, it encodes,
+when used upon an argument, it decodes.
+"""
+directive @globalId(
+  """
+  By default, an array of `[$type, $id]` is returned when decoding.
+  You may limit this to returning just one of both.
+  Allowed values: "ARRAY", "TYPE", "ID"
+  """
+  decode: String = "ARRAY"
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

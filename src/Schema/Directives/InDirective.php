@@ -16,6 +16,18 @@ class InDirective extends BaseDirective implements ArgBuilderDirective
         return 'in';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @in(      
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
+
     /**
      * Apply a simple "WHERE IN $values" clause.
      *

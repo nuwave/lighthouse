@@ -16,4 +16,31 @@ class HasManyDirective extends RelationDirective implements FieldResolver, Field
     {
         return 'hasMany';
     }
+
+    public static function definition(): string
+    {
+        return '
+directive @hasMany(
+  """
+  Specify the default quantity of elements to be returned.
+  """
+  defaultCount: Int
+  
+  """
+  Specify the maximum quantity of elements to be returned.
+  """
+  maxCount: Int
+      
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION';
+    }
 }

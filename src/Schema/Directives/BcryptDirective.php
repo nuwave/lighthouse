@@ -16,6 +16,10 @@ class BcryptDirective implements ArgTransformerDirective
         return 'bcrypt';
     }
 
+    public static function definition(): string {
+        return 'directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
+
     /**
      * Run Laravel's bcrypt helper on the argument.
      *

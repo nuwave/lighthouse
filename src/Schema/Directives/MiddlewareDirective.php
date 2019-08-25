@@ -73,6 +73,19 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
         return self::NAME;
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @middleware(      
+  """
+  Specify which middleware to run. 
+  Pass in either a fully qualified class name, an alias or
+  a middleware group - or any combination of them.
+  """
+  checks: [String!]
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

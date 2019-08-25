@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Routing\Router;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\ServiceProvider;
+use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
@@ -165,6 +166,7 @@ class LighthouseServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ClearCacheCommand::class,
+                IdeHelperCommand::class,
                 InterfaceCommand::class,
                 MutationCommand::class,
                 PrintSchemaCommand::class,

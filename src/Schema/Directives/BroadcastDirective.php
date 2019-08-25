@@ -20,6 +20,23 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
         return 'broadcast';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @broadcast(
+  """
+  Name of the subscription that should be retriggered as a result of this operation..
+  """
+  subscription: String!
+
+  """
+  Specify whether or not the job should be queued.
+  This defaults to the global config option `lighthouse.subscriptions.queue_broadcasts`.
+  """
+  shouldQueue: Boolean
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

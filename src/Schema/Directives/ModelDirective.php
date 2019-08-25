@@ -38,6 +38,11 @@ class ModelDirective extends BaseDirective implements TypeMiddleware, TypeManipu
         return 'model';
     }
 
+    public static function definition(): string
+    {
+        return 'directive @model on OBJECT';
+    }
+
     /**
      * Handle type construction.
      *

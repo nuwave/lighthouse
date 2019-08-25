@@ -16,6 +16,22 @@ class BuilderDirective extends BaseDirective implements ArgBuilderDirective
         return 'builder';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Use an argument to modify the query builder for a field.
+"""
+directive @builder(
+  """
+  Reference a method that is passed the query builder.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  method: String!
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Dynamically call a user-defined method to enhance the builder.
      *

@@ -15,4 +15,13 @@ class SpreadDirective implements ArgDirective
     {
         return 'spread';
     }
+
+    public static function definition(): string
+    {
+        return '
+"""
+Spread out the nested values of an argument of type input object into it\'s parent.
+"""
+directive @spread on ARGUMENT_DEFINITION';
+    }
 }

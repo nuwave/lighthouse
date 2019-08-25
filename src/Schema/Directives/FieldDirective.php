@@ -20,6 +20,27 @@ class FieldDirective extends BaseDirective implements FieldResolver
         return 'field';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Assign a resolver function to a field.
+"""
+directive @field(
+  """
+  A reference to the resolver function to be used.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String!
+
+  """
+  Supply additional data to the resolver.
+  """
+  args: [String!]
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

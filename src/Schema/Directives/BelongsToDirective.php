@@ -15,4 +15,21 @@ class BelongsToDirective extends RelationDirective implements FieldResolver
     {
         return 'belongsTo';
     }
+
+    public static function definition(): string
+    {
+        return '
+directive @belongsTo(  
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION';
+    }
 }

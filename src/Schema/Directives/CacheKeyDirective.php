@@ -15,4 +15,13 @@ class CacheKeyDirective implements Directive
     {
         return 'cacheKey';
     }
+
+    public static function definition(): string
+    {
+        return '
+"""
+Specify the field to use as a key when creating a cache.
+"""
+directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
 }

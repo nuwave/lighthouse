@@ -16,6 +16,15 @@ class TrimDirective implements ArgTransformerDirective
         return 'trim';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Run the `trim` function on an input value.
+"""
+directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
+
     /**
      * Remove whitespace from the beginning and end of a given input.
      *

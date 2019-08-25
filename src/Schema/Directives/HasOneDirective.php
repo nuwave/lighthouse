@@ -15,4 +15,21 @@ class HasOneDirective extends RelationDirective implements FieldResolver
     {
         return 'hasOne';
     }
+
+    public static function definition(): string
+    {
+        return '
+directive @hasOne(      
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION';
+    }
 }

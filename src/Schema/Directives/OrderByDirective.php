@@ -24,6 +24,11 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
         return 'orderBy';
     }
 
+    public static function definition(): string
+    {
+        return 'directive @orderBy on ARGUMENT_DEFINITION';
+    }
+
     /**
      * Apply an "ORDER BY" clause.
      *

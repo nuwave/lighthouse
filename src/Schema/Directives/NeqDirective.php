@@ -16,6 +16,18 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective
         return 'neq';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @neq(  
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema. 
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+    }
+
     /**
      * Apply a "WHERE <> $value" clause.
      *

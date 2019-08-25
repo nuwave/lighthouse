@@ -38,6 +38,22 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
         return 'node';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Register a type for relay global object identification.
+"""
+directive @node(
+  """
+  Reference to resolver function.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String!
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Handle type construction.
      *

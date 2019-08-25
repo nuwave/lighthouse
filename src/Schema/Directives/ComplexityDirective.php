@@ -20,6 +20,22 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
         return 'complexity';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Customize the calculation of a fields complexity score before execution.
+"""
+directive @complexity(
+  """
+  Reference a function to customize the complexity score calculation.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

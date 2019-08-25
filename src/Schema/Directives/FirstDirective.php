@@ -20,6 +20,23 @@ class FirstDirective extends BaseDirective implements FieldResolver
         return 'first';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @first(  
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

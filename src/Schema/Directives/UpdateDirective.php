@@ -47,6 +47,27 @@ class UpdateDirective extends BaseDirective implements FieldResolver
         return 'update';
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Update an Eloquent model with the input values of the field.
+"""
+directive @update(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Resolve the field directive.
      *

@@ -38,6 +38,28 @@ class CanDirective extends BaseDirective implements FieldMiddleware
         return 'can';
     }
 
+    public static function definition(): string
+    {
+        return '
+directive @can(
+  """
+  The ability to check permissions for.
+  """
+  ability: String!
+  
+  """
+  The name of the argument that is used to find a specific model
+  instance against which the permissions should be checked.
+  """
+  find: String
+  
+  """
+  Additional arguments that are passed to `Gate::check`. 
+  """
+  args: [String!]
+) on FIELD_DEFINITION';
+    }
+
     /**
      * Ensure the user is authorized to access this field.
      *

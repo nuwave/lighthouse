@@ -32,6 +32,16 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
         return self::NAME;
     }
 
+    public static function definition(): string
+    {
+        return '
+"""
+Redefine the default namespaces used in other directives.
+The arguments are a map from directive names to namespaces.
+"""
+directive @namespace on FIELD_DEFINITION | OBJECT';
+    }
+
     /**
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\ObjectTypeExtensionNode  $objectType
      * @return void
