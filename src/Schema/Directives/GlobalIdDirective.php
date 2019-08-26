@@ -4,10 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
 class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, DefinedDirective
@@ -42,7 +42,7 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Converts between IDs/types and global IDs.
 When used upon a field, it encodes,

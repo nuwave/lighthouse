@@ -6,9 +6,9 @@ use GraphQL\Error\Error;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class FindDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
@@ -24,7 +24,7 @@ class FindDirective extends BaseDirective implements FieldResolver, DefinedDirec
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Find a model based on the arguments provided.
 """

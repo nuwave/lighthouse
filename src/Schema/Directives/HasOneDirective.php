@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class HasOneDirective extends RelationDirective implements FieldResolver, DefinedDirective
 {
@@ -19,7 +19,7 @@ class HasOneDirective extends RelationDirective implements FieldResolver, Define
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
 """

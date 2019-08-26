@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class DirectiveNamespaces

@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class CacheKeyDirective implements Directive, DefinedDirective
 {
@@ -19,7 +19,7 @@ class CacheKeyDirective implements Directive, DefinedDirective
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Specify the field to use as a key when creating a cache.
 """

@@ -18,7 +18,7 @@ class InterfaceDirective extends BaseDirective implements DefinedDirective
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Use a custom resolver to determine the concrete type of an interface.
 """

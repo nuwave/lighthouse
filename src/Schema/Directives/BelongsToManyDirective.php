@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
@@ -20,7 +20,7 @@ class BelongsToManyDirective extends RelationDirective implements FieldResolver,
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Resolves a field through the Eloquent `BelongsToMany` relationship.
 """

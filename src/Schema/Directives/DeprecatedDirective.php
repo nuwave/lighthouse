@@ -5,8 +5,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use GraphQL\Type\Definition\Directive;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class DeprecatedDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
@@ -22,7 +22,7 @@ class DeprecatedDirective extends BaseDirective implements FieldMiddleware, Defi
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Marks an element of a GraphQL schema as no longer supported.
 """

@@ -9,9 +9,9 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ModelDirective extends BaseDirective implements TypeMiddleware, TypeManipulator, DefinedDirective
 {
@@ -41,7 +41,7 @@ class ModelDirective extends BaseDirective implements TypeMiddleware, TypeManipu
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 
 """
 Enable fetching an Eloquent model by its global id through the `node` query.

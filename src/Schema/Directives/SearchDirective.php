@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class SearchDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
@@ -19,7 +19,7 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective, Defi
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Perform a full-text by the given input value.
 """

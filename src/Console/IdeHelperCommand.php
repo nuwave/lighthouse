@@ -6,8 +6,8 @@ use Illuminate\Console\Command;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespaces;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class IdeHelperCommand extends Command
 {
@@ -33,13 +33,14 @@ class IdeHelperCommand extends Command
      */
     public function handle(DirectiveNamespaces $directiveNamespaces): int
     {
-        if(! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
+        if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
             $this->error(
                 "This command requires haydenpierce/class-finder. Install it by running:\n"
-                . "\n"
-                . "    composer require --dev haydenpierce/class-finder\n"
+                ."\n"
+                ."    composer require --dev haydenpierce/class-finder\n"
                 ."\n"
             );
+
             return 1;
         }
 
@@ -49,7 +50,7 @@ class IdeHelperCommand extends Command
 
         $schema = $this->buildSchemaString($directiveClasses);
 
-        $fileName = base_path() . '/schema-directives.graphql';
+        $fileName = base_path().'/schema-directives.graphql';
         file_put_contents($fileName, $schema);
 
         $this->info("Wrote schema directive definitions to $fileName.");
@@ -57,7 +58,7 @@ class IdeHelperCommand extends Command
 
     protected function define(string $name, string $directiveClass): string
     {
-        if(is_a($directiveClass, DefinedDirective::class)) {
+        if (is_a($directiveClass, DefinedDirective::class)) {
             /** @var DefinedDirective $directiveClass */
             $definition = $directiveClass::definition();
 
@@ -66,8 +67,8 @@ class IdeHelperCommand extends Command
 
             return trim($definition);
         } else {
-            return '# Add a proper definition by implementing ' . DefinedDirective::class . "\n"
-                . "directive @{$name}";
+            return '# Add a proper definition by implementing '.DefinedDirective::class."\n"
+                ."directive @{$name}";
         }
     }
 
@@ -84,11 +85,11 @@ class IdeHelperCommand extends Command
         foreach ($directiveNamespaces as $directiveNamespace) {
             foreach (ClassFinder::getClassesInNamespace($directiveNamespace) as $class) {
                 $reflection = new \ReflectionClass($class);
-                if (!$reflection->isInstantiable()) {
+                if (! $reflection->isInstantiable()) {
                     continue;
                 }
 
-                if (!is_a($class, Directive::class)) {
+                if (! is_a($class, Directive::class)) {
                     continue;
                 }
 
@@ -122,8 +123,8 @@ class IdeHelperCommand extends Command
             $definition = $this->define($name, $directiveClass);
 
             $schema .= "\n"
-                . "# Directive class: $directiveClass\n"
-                . $definition;
+                ."# Directive class: $directiveClass\n"
+                .$definition;
         }
 
         return $schema;

@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class AllDirective extends BaseDirective implements DefinedDirective, FieldResolver
 {
@@ -23,7 +23,7 @@ class AllDirective extends BaseDirective implements DefinedDirective, FieldResol
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 directive @all(
   """
   Specify the class name of the model to use.

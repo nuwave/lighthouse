@@ -18,7 +18,7 @@ class NeqDirective extends BaseDirective implements ArgBuilderDirective
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Place a not equals operator `!=` on an Eloquent query.
 """

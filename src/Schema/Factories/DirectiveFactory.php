@@ -14,8 +14,6 @@ use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 
 class DirectiveFactory
 {
-
-
     /**
      * A map from short directive names to full class names.
      *

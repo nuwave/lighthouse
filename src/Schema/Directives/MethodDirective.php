@@ -4,9 +4,9 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class MethodDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
@@ -22,7 +22,7 @@ class MethodDirective extends BaseDirective implements FieldResolver, DefinedDir
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Call a method with a given `name` on the class that represents a type to resolve a field.
 Use this if the data is not accessible as an attribute (e.g. `$model->myData`).

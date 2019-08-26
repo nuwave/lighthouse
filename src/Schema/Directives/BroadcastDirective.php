@@ -6,8 +6,8 @@ use Closure;
 use GraphQL\Deferred;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class BroadcastDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
@@ -23,7 +23,7 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware, Defin
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 directive @broadcast(
   """
   Name of the subscription that should be retriggered as a result of this operation..

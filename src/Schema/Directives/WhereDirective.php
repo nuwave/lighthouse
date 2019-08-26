@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class WhereDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
@@ -19,7 +19,7 @@ class WhereDirective extends BaseDirective implements ArgBuilderDirective, Defin
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<'SDL'
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
 """
