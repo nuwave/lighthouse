@@ -7,9 +7,9 @@ use GraphQL\Deferred;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class LazyLoadDirective extends BaseDirective implements DefinedDirective, FieldMiddleware
 {
@@ -25,7 +25,7 @@ class LazyLoadDirective extends BaseDirective implements DefinedDirective, Field
 
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<SDL
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
 on the relations of a list of models.
