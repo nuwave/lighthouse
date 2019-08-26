@@ -32,6 +32,8 @@ matrix:
       env: LARAVEL='5.7.*'
     - php: "7.2"
       env: LARAVEL='5.8.*'
+    - php: "7.2"
+      env: LARAVEL='^6.0'
     - php: "7.3"
       env: LARAVEL='5.5.*'
     - php: "7.3"
@@ -40,6 +42,8 @@ matrix:
       env: LARAVEL='5.7.*'
     - php: "7.3"
       env: LARAVEL='5.8.*' COVERAGE=1 STATIC_ANALYSIS=1
+    - php: "7.3"
+      env: LARAVEL='^6.0'
     - php: "7.3"
       env: LARAVEL='5.8.*' BENCHMARKS=1
   allow_failures:
