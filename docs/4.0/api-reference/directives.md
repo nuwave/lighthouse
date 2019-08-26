@@ -2194,7 +2194,7 @@ Verify that a column's value is between two values.
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
-directive @whereNotBetween(
+directive @whereBetween(
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema.
