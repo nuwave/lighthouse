@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class NeqDirective extends BaseDirective implements ArgBuilderDirective
+class NeqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
      * Name of the directive.
