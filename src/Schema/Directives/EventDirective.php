@@ -4,10 +4,11 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Illuminate\Contracts\Events\Dispatcher as EventsDispatcher;
 
-class EventDirective extends BaseDirective implements FieldMiddleware
+class EventDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * @var \Illuminate\Contracts\Events\Dispatcher
@@ -37,13 +38,19 @@ class EventDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Fire an event after a mutation has taken place.
+It requires the `dispatch` argument that should be
+the class name of the event you want to fire.
+"""
 directive @event(  
   """
   Specify the fully qualified class name (FQCN) of the event to dispatch.
   """
   dispatch: String!
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

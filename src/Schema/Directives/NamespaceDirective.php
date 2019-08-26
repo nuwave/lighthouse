@@ -8,6 +8,7 @@ use GraphQL\Language\AST\TypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\ObjectTypeExtensionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 
@@ -18,7 +19,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
  * For example `@namespace(field: "App\\GraphQL")` applies the namespace
  * `App\GraphQL` to the `@field` directive.
  */
-class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeExtensionManipulator
+class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeExtensionManipulator, DefinedDirective
 {
     const NAME = 'namespace';
 
@@ -34,12 +35,13 @@ class NamespaceDirective extends BaseDirective implements TypeManipulator, TypeE
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Redefine the default namespaces used in other directives.
 The arguments are a map from directive names to namespaces.
 """
-directive @namespace on FIELD_DEFINITION | OBJECT';
+directive @namespace on FIELD_DEFINITION | OBJECT
+SDL;
     }
 
     /**

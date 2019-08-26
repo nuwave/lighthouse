@@ -16,10 +16,11 @@ use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Schema\Values\CacheValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class CacheDirective extends BaseDirective implements FieldMiddleware
+class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /** @var \Illuminate\Cache\CacheManager */
     protected $cacheManager;
@@ -45,7 +46,10 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Cache the result of a resolver.
+"""
 directive @cache(
   """
   Set the duration it takes for the cache to expire in seconds.
@@ -59,7 +63,8 @@ directive @cache(
   any effect, they will access a shared cache.
   """
   private: Boolean = false
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

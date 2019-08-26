@@ -13,13 +13,14 @@ use Nuwave\Lighthouse\Pagination\PaginationType;
 use Nuwave\Lighthouse\Pagination\PaginationUtils;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
+class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -33,7 +34,7 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Query multiple entries as a paginated list.
 """
@@ -72,7 +73,8 @@ directive @paginate(
   in case the client does not request it explicitly
   """
   defaultCount: Int
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

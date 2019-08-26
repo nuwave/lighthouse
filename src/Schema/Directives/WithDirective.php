@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Execution\DataLoader\RelationBatchLoader;
 
-class WithDirective extends RelationDirective implements FieldMiddleware
+class WithDirective extends RelationDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -26,7 +27,7 @@ class WithDirective extends RelationDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Eager-load an Eloquent relation.
 """
@@ -41,7 +42,8 @@ directive @with(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

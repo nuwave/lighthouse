@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class WhereJsonContainsDirective extends BaseDirective implements ArgBuilderDirective
+class WhereJsonContainsDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -18,7 +19,18 @@ class WhereJsonContainsDirective extends BaseDirective implements ArgBuilderDire
 
     public static function definition(): string
     {
-        return ''; // TODO
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Use an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses).
+"""
+directive @whereJsonContains(
+  """
+  Specify the database column and path inside the JSON to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator
+class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -19,7 +20,10 @@ class BelongsToManyDirective extends RelationDirective implements FieldResolver,
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Resolves a field through the Eloquent `BelongsToMany` relationship.
+"""
 directive @belongsToMany(
   """
   Which pagination style to use.
@@ -53,6 +57,7 @@ directive @belongsToMany(
   to extend edge object.
   """
   edgeType: String
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 }

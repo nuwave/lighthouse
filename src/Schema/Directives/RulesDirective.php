@@ -4,11 +4,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 
-class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract
+class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRules, HasArgumentPathContract, DefinedDirective
 {
     use HasArgumentPathTrait;
 
@@ -24,7 +25,7 @@ class RulesDirective extends BaseDirective implements ArgDirective, ProvidesRule
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Validate an argument using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
@@ -42,7 +43,8 @@ directive @rules(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: [RulesMessageMap!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

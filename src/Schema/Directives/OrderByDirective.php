@@ -11,8 +11,9 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator
+class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, ArgManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -26,7 +27,12 @@ class OrderByDirective implements ArgBuilderDirective, ArgDirectiveForArray, Arg
 
     public static function definition(): string
     {
-        return 'directive @orderBy on ARGUMENT_DEFINITION';
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Sort a result list by one or more given fields.
+"""
+directive @orderBy on ARGUMENT_DEFINITION
+SDL;
     }
 
     /**

@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class BcryptDirective implements ArgTransformerDirective
+class BcryptDirective implements ArgTransformerDirective, DefinedDirective
 {
     /**
      * Directive name.
@@ -18,7 +19,12 @@ class BcryptDirective implements ArgTransformerDirective
 
     public static function definition(): string
     {
-        return 'directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Run the `bcrypt` function on the argument it is defined on.
+"""
+directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

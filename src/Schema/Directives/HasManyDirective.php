@@ -2,10 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class HasManyDirective extends RelationDirective implements FieldResolver, FieldManipulator
+class HasManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -19,7 +20,10 @@ class HasManyDirective extends RelationDirective implements FieldResolver, Field
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
+"""
 directive @hasMany(
   """
   Specify the default quantity of elements to be returned.
@@ -41,6 +45,7 @@ directive @hasMany(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 }

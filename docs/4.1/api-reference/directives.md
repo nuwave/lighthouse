@@ -264,6 +264,9 @@ The `subscription` argument must reference the name of a subscription field.
 ### Definition
 
 ```graphql
+"""
+Broadcast the results of a mutation to subscribed clients.
+"""
 directive @broadcast(
   """
   Name of the subscription that should be retriggered as a result of this operation..
@@ -963,7 +966,7 @@ own mechanism of encoding/decoding global ids.
 
 ## @hasMany
 
-Corresponds to [Eloquent's HasMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
+Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
 
 ```graphql
 type User {
@@ -974,6 +977,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
+"""
 directive @hasMany(
   """
   Specify the default quantity of elements to be returned.
@@ -1506,6 +1512,9 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Sort a result list by one or more given fields.
+"""
 directive @orderBy on ARGUMENT_DEFINITION
 ```
 

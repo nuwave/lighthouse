@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TrimDirective implements ArgTransformerDirective
+class TrimDirective implements ArgTransformerDirective, DefinedDirective
 {
     /**
      * Directive name.
@@ -18,11 +19,12 @@ class TrimDirective implements ArgTransformerDirective
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run the `trim` function on an input value.
 """
-directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+directive @trim on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

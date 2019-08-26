@@ -2,7 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-class InterfaceDirective extends BaseDirective
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+
+class InterfaceDirective extends BaseDirective implements DefinedDirective
 {
     /**
      * Name of the directive.
@@ -16,7 +18,7 @@ class InterfaceDirective extends BaseDirective
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Use a custom resolver to determine the concrete type of an interface.
 """
@@ -27,6 +29,7 @@ directive @interface(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolveType: String!
-) on INTERFACE';
+) on INTERFACE
+SDL;
     }
 }

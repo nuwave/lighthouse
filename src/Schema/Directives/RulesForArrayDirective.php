@@ -4,12 +4,13 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Traits\HasArgumentPath as HasArgumentPathTrait;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath as HasArgumentPathContract;
 
-class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArray, ProvidesRules, HasArgumentPathContract
+class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArray, ProvidesRules, HasArgumentPathContract, DefinedDirective
 {
     use HasArgumentPathTrait;
 
@@ -25,7 +26,7 @@ class RulesForArrayDirective extends BaseDirective implements ArgDirectiveForArr
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Run validation on an array itself, using [Laravel built-in validation](https://laravel.com/docs/validation).
 """
@@ -43,7 +44,8 @@ directive @rulesForArray(
   e.g. { email: "Must be a valid email", max: "The input was too long" }
   """
   messages: [RulesMessageMap!]
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

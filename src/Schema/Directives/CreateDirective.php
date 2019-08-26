@@ -8,10 +8,11 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class CreateDirective extends BaseDirective implements FieldResolver
+class CreateDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
      * @var \Illuminate\Database\DatabaseManager
@@ -39,14 +40,18 @@ class CreateDirective extends BaseDirective implements FieldResolver
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Create a new Eloquent model with the given arguments.
+"""
 directive @create(  
   """
   Specify the class name of the model to use.
   This is only needed when the default model resolution does not work.
   """
   model: String
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

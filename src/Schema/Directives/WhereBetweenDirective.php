@@ -3,8 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
+class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     const NAME = 'whereBetween';
 
@@ -20,7 +21,7 @@ class WhereBetweenDirective extends BaseDirective implements ArgBuilderDirective
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Verify that a column\'s value is between two values.
 The type of the input value this is defined upon should be
@@ -32,7 +33,8 @@ directive @whereBetween(
   Only required if database column has a different name than the attribute in your schema.
   """
   key: String
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

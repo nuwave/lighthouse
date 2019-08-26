@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class BelongsToDirective extends RelationDirective implements FieldResolver
+class BelongsToDirective extends RelationDirective implements FieldResolver, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -18,7 +19,10 @@ class BelongsToDirective extends RelationDirective implements FieldResolver
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Resolves a field through the Eloquent `BelongsTo` relationship.
+"""
 directive @belongsTo(  
   """
   Specify the relationship method name in the model class,
@@ -30,6 +34,7 @@ directive @belongsTo(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 }

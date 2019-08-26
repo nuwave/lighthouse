@@ -5,10 +5,11 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class FirstDirective extends BaseDirective implements FieldResolver
+class FirstDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -22,7 +23,10 @@ class FirstDirective extends BaseDirective implements FieldResolver
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Get the first query result from a collection of Eloquent models.
+"""
 directive @first(  
   """
   Specify the class name of the model to use.
@@ -34,7 +38,8 @@ directive @first(
   Apply scopes to the underlying query.
   """
   scopes: [String!]
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

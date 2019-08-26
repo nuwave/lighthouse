@@ -7,10 +7,11 @@ use Illuminate\Support\Arr;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class InjectDirective extends BaseDirective implements FieldMiddleware
+class InjectDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -24,7 +25,7 @@ class InjectDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 directive @inject(      
   """
   A path to the property of the context that will be injected.
@@ -39,7 +40,8 @@ directive @inject(
   within the incoming argument.
   """
   name: String!
-) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION';
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

@@ -4,11 +4,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Utils;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class ComplexityDirective extends BaseDirective implements FieldMiddleware
+class ComplexityDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -22,7 +23,7 @@ class ComplexityDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Customize the calculation of a fields complexity score before execution.
 """
@@ -33,7 +34,8 @@ directive @complexity(
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

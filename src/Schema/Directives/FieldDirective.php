@@ -2,13 +2,14 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
-class FieldDirective extends BaseDirective implements FieldResolver
+class FieldDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -22,7 +23,7 @@ class FieldDirective extends BaseDirective implements FieldResolver
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Assign a resolver function to a field.
 """
@@ -38,7 +39,8 @@ directive @field(
   Supply additional data to the resolver.
   """
   args: [String!]
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

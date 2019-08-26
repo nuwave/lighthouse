@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-class UpdateDirective extends BaseDirective implements FieldResolver
+class UpdateDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
      * @var \Illuminate\Database\DatabaseManager
@@ -49,7 +50,7 @@ class UpdateDirective extends BaseDirective implements FieldResolver
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 """
 Update an Eloquent model with the input values of the field.
 """
@@ -65,7 +66,8 @@ directive @update(
   If set to `false`, regular non-global ids are used.
   """
   globalId: Boolean = false
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

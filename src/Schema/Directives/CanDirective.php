@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 
-class CanDirective extends BaseDirective implements FieldMiddleware
+class CanDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * @var \Illuminate\Contracts\Auth\Access\Gate
@@ -40,7 +41,10 @@ class CanDirective extends BaseDirective implements FieldMiddleware
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
+"""
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+"""
 directive @can(
   """
   The ability to check permissions for.
@@ -57,7 +61,8 @@ directive @can(
   Additional arguments that are passed to `Gate::check`. 
   """
   args: [String!]
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

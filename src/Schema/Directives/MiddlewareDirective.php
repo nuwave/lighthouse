@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Pipeline;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\TypeExtensionNode;
@@ -25,7 +26,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Support\Compatibility\MiddlewareAdapter;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 
-class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator
+class MiddlewareDirective extends BaseDirective implements FieldMiddleware, TypeManipulator, TypeExtensionManipulator, DefinedDirective
 {
     /**
      * todo remove as soon as name() is static itself.
@@ -75,7 +76,7 @@ class MiddlewareDirective extends BaseDirective implements FieldMiddleware, Type
 
     public static function definition(): string
     {
-        return '
+        return /** @lang GraphQL */ <<<'SDL'
 directive @middleware(      
   """
   Specify which middleware to run. 
@@ -83,7 +84,8 @@ directive @middleware(
   a middleware group - or any combination of them.
   """
   checks: [String!]
-) on FIELD_DEFINITION';
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

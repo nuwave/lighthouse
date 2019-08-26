@@ -164,6 +164,9 @@ class User extends Model
 ### Definition
 
 ```graphql
+"""
+Resolves a field through the Eloquent `BelongsToMany` relationship.
+"""
 directive @belongsToMany(
   """
   Specify the default quantity of elements to be returned.
@@ -1013,7 +1016,7 @@ type User {
 
 ## @hasOne
 
-Corresponds to [Eloquent's HasOne-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-one).
+Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
 
 ```graphql
 type User {
@@ -1024,6 +1027,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
+"""
 directive @hasOne(      
   """
   Specify the relationship method name in the model class,
@@ -1349,6 +1355,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Place a not equals operator `!=` on an Eloquent query.
+"""
 directive @neq(  
   """
   Specify the database column to compare. 

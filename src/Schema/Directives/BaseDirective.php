@@ -22,11 +22,6 @@ abstract class BaseDirective implements Directive
      */
     protected $definitionNode;
 
-    public static function definition(): string
-    {
-        return '';
-    }
-
     /**
      * The hydrate function is called when retrieving a directive from the directive registry.
      *

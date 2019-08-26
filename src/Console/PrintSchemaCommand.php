@@ -45,8 +45,8 @@ class PrintSchemaCommand extends Command
         );
 
         if ($this->option('write')) {
-            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
             $storage->put('lighthouse-schema.graphql', $schema);
+            $this->info('Wrote schema to the default file storage (usually storage/app) as "lighthouse-schema.graphql".');
         } else {
             $this->info($schema);
         }
