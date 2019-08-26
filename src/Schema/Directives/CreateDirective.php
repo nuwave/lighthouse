@@ -51,9 +51,8 @@ class CreateDirective extends BaseDirective implements FieldResolver
                 $model = new $modelClassName;
 
                 $executeMutation = function () use ($model, $args, $context, $resolveInfo): Model {
-                    $resolver = new ArgResolver(new SaveModel());
-
-                    $model = $resolver($model, $args, $context, $resolveInfo);
+                    $saveModel = new SaveModel();
+                    $model = $saveModel($model, $args, $context, $resolveInfo);
 
                     return $model->refresh();
                 };

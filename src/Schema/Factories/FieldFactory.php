@@ -2,11 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
+use GraphQL\Type\Definition\FieldArgument;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
+use Nuwave\Lighthouse\Schema\Directives\ArgResolver;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Execution\Builder;
 use GraphQL\Type\Definition\InputObjectType;
@@ -141,7 +143,9 @@ class FieldFactory
         $fieldDefinitionNode = $fieldValue->getField();
 
         // Directives have the first priority for defining a resolver for a field
-        if ($resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class)) {
+        /** @var \Nuwave\Lighthouse\Support\Contracts\FieldResolver $resolverDirective */
+        $resolverDirective = $this->directiveFactory->createSingleDirectiveOfType($fieldDefinitionNode, FieldResolver::class);
+        if ($resolverDirective) {
             $this->fieldValue = $resolverDirective->resolveField($fieldValue);
         } else {
             $this->fieldValue = $fieldValue->setResolver(
@@ -150,6 +154,10 @@ class FieldFactory
                     : $this->providesResolver->provideResolver($fieldValue)
             );
         }
+
+        $this->fieldValue->setResolver(
+            new ArgResolver($this->fieldValue->getResolver())
+        );
 
         $fieldMiddleware = $this->passResolverArguments(
             $this->directiveFactory->createAssociatedDirectivesOfType($fieldDefinitionNode, FieldMiddleware::class)
@@ -193,34 +201,36 @@ class FieldFactory
                 // Now that we are finished with all argument based validation,
                 // we flush the validation error buffer
                 $this->flushValidationErrorBuffer();
-
-                // Apply the argument spreadings after we are finished with all
-                // the other argument handling
-                foreach ($this->pathsToSpread as $argumentPath) {
-                    $inputValues = $this->argValue($argumentPath);
-
-                    // If no input is given, there is nothing to spread
-                    if (! $inputValues) {
-                        continue;
-                    }
-
-                    // We remove the value from where it was defined before
-                    $this->unsetArgValue($argumentPath);
-
-                    // The last part of the path is the name of the input value,
-                    // the exact thing we want to remove
-                    array_pop($argumentPath);
-
-                    foreach ($inputValues as $key => $value) {
-                        $this->setArgValue(
-                            array_merge($argumentPath, [$key]),
-                            $value
-                        );
-                    }
-                }
+//
+//                // Apply the argument spreadings after we are finished with all
+//                // the other argument handling
+//                foreach ($this->pathsToSpread as $argumentPath) {
+//                    $inputValues = $this->argValue($argumentPath);
+//
+//                    // If no input is given, there is nothing to spread
+//                    if (! $inputValues) {
+//                        continue;
+//                    }
+//
+//                    // We remove the value from where it was defined before
+//                    $this->unsetArgValue($argumentPath);
+//
+//                    // The last part of the path is the name of the input value,
+//                    // the exact thing we want to remove
+//                    array_pop($argumentPath);
+//
+//                    foreach ($inputValues as $key => $value) {
+//                        $this->setArgValue(
+//                            array_merge($argumentPath, [$key]),
+//                            $value
+//                        );
+//                    }
+//                }
 
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
+
+
 
                 return $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
             }
@@ -253,28 +263,20 @@ class FieldFactory
         array $argumentPath
     ): void {
         if ($type instanceof NonNull) {
-            $this->handleArgDirectivesRecursively(
-                $type->getWrappedType(),
-                $astNode,
-                $argumentPath
-            );
-
-            return;
+            $type = $type->getWrappedType();
         }
 
-        $directives = $this->passResolverArguments(
-            $this->directiveFactory->createAssociatedDirectivesOfType($astNode, ArgDirective::class)
-        );
+//        /** @var \Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions $extensions */
+//        $extensions = $input->config['lighthouse'] ?? null;
 
-        if (
-            $directives->contains(function (Directive $directive): bool {
-                return $directive instanceof SpreadDirective;
-            })
-            && $type instanceof InputObjectType
-        ) {
-            $this->pathsToSpread [] = $argumentPath;
-        }
+//        if (
+//            $extensions->spread
+//            && $type instanceof InputObjectType
+//        ) {
+//            $this->pathsToSpread [] = $argumentPath;
+//        }
 
+        $directives = $this->directiveFactory->createAssociatedDirectivesOfType($astNode, ArgDirective::class);
         // Handle the argument itself. At this point, it can be wrapped
         // in a list or an input object
         $this->handleArgWithAssociatedDirectives($type, $astNode, $directives, $argumentPath);

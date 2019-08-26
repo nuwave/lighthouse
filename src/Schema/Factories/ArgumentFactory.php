@@ -5,8 +5,9 @@ namespace Nuwave\Lighthouse\Schema\Factories;
 use Nuwave\Lighthouse\Execution\Resolver;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
 
 class ArgumentFactory
 {
@@ -73,8 +74,10 @@ class ArgumentFactory
         }
 
         $extensions = new ArgumentExtensions();
-        $extensions->resolver = $this->directiveFactory
-            ->createAssociatedDirectivesOfType($definitionNode, Resolver::class);
+
+        $extensions->resolver = $this->directiveFactory->createSingleDirectiveOfType($definitionNode, Resolver::class);
+        $extensions->spread = $this->directiveFactory->createSingleDirectiveOfType($definitionNode, SpreadDirective::class);
+
         $config['lighthouse'] = $extensions;
 
         return $config;
