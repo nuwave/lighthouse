@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Console;
 
+use Tests\TestCase;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
-use Tests\TestCase;
 
 class IdeHelperCommandTest extends TestCase
 {
@@ -14,6 +14,7 @@ class IdeHelperCommandTest extends TestCase
 
         unlink(IdeHelperCommand::filePath());
     }
+
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
