@@ -9,22 +9,6 @@ use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 class ArgumentFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
-     */
-    protected $directiveFactory;
-
-    /**
-     * ArgumentFactory constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @return void
-     */
-    public function __construct(DirectiveFactory $directiveFactory)
-    {
-        $this->directiveFactory = $directiveFactory;
-    }
-
-    /**
      * Convert input value definitions to a executable types.
      *
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitions
