@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\InputObjectType;
 
 class TypedArgs extends \ArrayObject
 {
@@ -28,15 +28,15 @@ class TypedArgs extends \ArrayObject
             $definition = $definitionMap[$key];
 
             $type = $definition->getType();
-            if($type instanceof NonNull){
+            if ($type instanceof NonNull) {
                 $type->getWrappedType();
             }
 
-            if($type instanceof InputObjectType) {
+            if ($type instanceof InputObjectType) {
                 $typedChildren = new static($value, $type->getFields());
 
-                if(isset($extensions->spread)){
-                    foreach($typedChildren as $childKey => $typedChild){
+                if (isset($extensions->spread)) {
+                    foreach ($typedChildren as $childKey => $typedChild) {
                         $args[$childKey] = $typedChild;
                     }
                 } else {
@@ -63,7 +63,7 @@ class TypedArgs extends \ArrayObject
     {
         array_walk_recursive(
             $this,
-            function(TypedArg &$typedArg){
+            function (TypedArg &$typedArg) {
                 $typedArg = $typedArg->value;
             }
         );

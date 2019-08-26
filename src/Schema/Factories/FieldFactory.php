@@ -2,13 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Factories;
 
-use GraphQL\Type\Definition\FieldArgument;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
-use Nuwave\Lighthouse\Schema\Directives\ArgResolver;
 use Nuwave\Lighthouse\Support\Pipeline;
 use Nuwave\Lighthouse\Execution\Builder;
 use GraphQL\Type\Definition\InputObjectType;
@@ -16,11 +14,11 @@ use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
+use Nuwave\Lighthouse\Schema\Directives\ArgResolver;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
-use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
@@ -229,8 +227,6 @@ class FieldFactory
 
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
-
-
 
                 return $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
             }
