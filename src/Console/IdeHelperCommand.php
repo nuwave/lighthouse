@@ -58,8 +58,8 @@ class IdeHelperCommand extends Command
             $this->createSchemaDefinition($directive);
         }
 
-        file_put_contents(base_path().'/.graphql/lighthouse.graphql', $this->schema);
-        $this->info('Created ide-helper schema in '.base_path().'/.graphql/lighthouse.graphql.');
+        file_put_contents(base_path().'/schema-directives.graphql', $this->schema);
+        $this->info('Created ide-helper schema in '.base_path().'/schema-directives.graphql.');
     }
 
     private function createSchemaDefinition($namespace)
