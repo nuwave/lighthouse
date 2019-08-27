@@ -183,7 +183,6 @@ class AllDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.tasks');
     }
 
-
     /**
      * @test
      */
@@ -223,5 +222,4 @@ class AllDirectiveTest extends DBTestCase
         }
         ')->assertJsonCount(2, 'data.tasks2');
     }
-
 }

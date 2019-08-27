@@ -174,7 +174,6 @@ class FindDirectiveTest extends DBTestCase
         ])->assertStatus(200);
     }
 
-
     /**
      * @test
      */

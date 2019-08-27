@@ -662,5 +662,4 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ')->assertJsonCount(2, 'data.tasks2.data');
     }
-
 }

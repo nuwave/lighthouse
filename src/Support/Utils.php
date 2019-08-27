@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
-use Laravel\Scout\Builder as ScoutBuilder;
 use ReflectionClass;
 use ReflectionException;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ResolveInfo;
+use Laravel\Scout\Builder as ScoutBuilder;
 use GraphQL\Type\Definition\FieldDefinition;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
