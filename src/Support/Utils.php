@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
+use Laravel\Scout\Builder as ScoutBuilder;
 use ReflectionClass;
 use ReflectionException;
 use GraphQL\Type\Definition\EnumType;
@@ -97,7 +98,11 @@ class Utils
     public static function applyTrashedModificationIfNeeded(ResolveInfo $resolveInfo, array $args, $query): void
     {
         // skip execution, if model doesn't support soft delete
-        if (! in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($query->getModel()))) {
+        $model = $query instanceof ScoutBuilder
+            ? $query->model
+            : $query->getModel();
+
+        if (! in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($model))) {
             return;
         }
 
