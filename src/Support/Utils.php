@@ -3,6 +3,9 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\FieldDefinition;
+use GraphQL\Type\Definition\ResolveInfo;
 use ReflectionClass;
 use ReflectionException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -77,6 +80,46 @@ class Utils
             return $property->getValue($object);
         } catch (ReflectionException $ex) {
             return $default;
+        }
+    }
+
+    /**
+     * Apply withTrashed, onlyTrashed or withoutTrashed to given $query if needed.
+     * Resolve info is used to get list if argument definitions of current field.
+     * If there is any argument of enum type Trash, then modifications are applied
+     *
+     * @param \GraphQL\Type\Definition\ResolveInfo $resolveInfo
+     * @param array $args
+     * @param \Illuminate\Database\Eloquent\Builder | \Laravel\Scout\Builder $query
+     *
+     * @return void
+     */
+    public static function applyTrashedModificationIfNeeded(ResolveInfo $resolveInfo, array $args, $query): void {
+        // skip execution, if model doesn't support soft delete
+        if (!in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($query->getModel()))) {
+            return;
+        }
+
+        $trashedArgumentName = null;
+
+        // get field definition
+        $fieldDefinition = $resolveInfo->parentType->getField($resolveInfo->fieldName);
+        if (!$fieldDefinition instanceof FieldDefinition) {
+            return;
+        }
+
+        // search for trashed argument name
+        foreach ($fieldDefinition->args as $fieldArgument) {
+            $fieldArgumentType = $fieldArgument->getType();
+            if ($fieldArgumentType instanceof EnumType && $fieldArgumentType->name === 'Trash') {
+                $trashedArgumentName = $fieldArgument->name;
+            }
+        }
+
+        // apply trashed query modification
+        if ($trashedArgumentName !== null && array_key_exists($trashedArgumentName, $args)) {
+            $trashModificationMethod = "{$args[$trashedArgumentName]}Trashed";
+            $query->$trashModificationMethod();
         }
     }
 }

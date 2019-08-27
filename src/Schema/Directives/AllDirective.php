@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class AllDirective extends BaseDirective implements FieldResolver
 {
@@ -33,7 +34,7 @@ class AllDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $modelClass */
                 $modelClass = $this->getModelClass();
 
-                return $resolveInfo
+                $query = $resolveInfo
                     ->builder
                     ->addScopes(
                         $this->directiveArgValue('scopes', [])
@@ -41,8 +42,11 @@ class AllDirective extends BaseDirective implements FieldResolver
                     ->apply(
                         $modelClass::query(),
                         $args
-                    )
-                    ->get();
+                    );
+
+                Utils::applyTrashedModificationIfNeeded($resolveInfo, $args, $query);
+
+                return $query->get();
             }
         );
     }

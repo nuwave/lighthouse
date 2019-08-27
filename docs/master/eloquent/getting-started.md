@@ -249,3 +249,29 @@ This mutation will return the deleted object, so you will have a last chance to 
   }
 }
 ```
+
+## Soft delete
+
+If your model uses soft delete, you can define an attribute with enum type `Trash`, that is provided by lighthouse. It has `ONLY`, `WITH` and `WITHOUT` values, according laravels `onlyTrashed()`, `withTrashed()` and `withoutTrashed()` methods.
+
+You are free to choose an attribute name you like, as lightouse searches for attributes of type `Trash` automatically.
+
+Currently `@all`, `@paginate` and `@find` directives supports this feature
+
+For example your schema has following structure
+
+```graphql
+type Query {
+  tasks(trashed: Trash): [Task!]! @all
+}
+```
+
+Then you can make queries like this:
+
+```graphql
+{
+  tasks(trashed: WITH) {
+    ...
+  }
+}
+```

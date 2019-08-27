@@ -95,6 +95,7 @@ class ASTBuilder
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
         $this->addOrderByTypes();
+        $this->addTrashEnum();
 
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
@@ -357,6 +358,26 @@ GRAPHQL
                 input OrderByClause {
                    field: String!
                    order: SortOrder!
+                }
+            ')
+        );
+    }
+
+    /**
+     * Add Trash enum that can be used in arguments with @paginate.
+     *
+     * @see \Nuwave\Lighthouse\Schema\Directives\PaginateDirective
+     *
+     * @return void
+     */
+    protected function addTrashEnum(): void
+    {
+        $this->documentAST->setTypeDefinition(
+            PartialParser::enumTypeDefinition('
+                enum Trash {
+                    ONLY @enum(value: "only")
+                    WITH @enum(value: "with")
+                    WITHOUT @enum(value: "without")
                 }
             ')
         );

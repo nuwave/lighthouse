@@ -3,6 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
 
@@ -171,5 +172,118 @@ class FindDirectiveTest extends DBTestCase
                 'user' => null,
             ],
         ])->assertStatus(200);
+    }
+
+
+    /**
+     * @test
+     */
+    public function itCanApplyTrashedArgument(): void
+    {
+        $taskToRemove = factory(Task::class)->create();
+        $taskToRemove->delete();
+
+        $this->schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            task(id: ID! @eq, trashed: Trash): Task @find
+        }
+        ';
+
+        $this->graphQL('
+        {
+            task(id: 1, trashed: ONLY) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'task' => [
+                    'id' => $taskToRemove->id,
+                    'name' => $taskToRemove->name,
+                ]
+            ]
+        ]);
+
+        $this->graphQL('
+        {
+            task(id: 1, trashed: WITH) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'task' => [
+                    'id' => $taskToRemove->id,
+                    'name' => $taskToRemove->name,
+                ]
+            ]
+        ]);
+
+        $this->graphQL('
+        {
+            task(id: 1, trashed: WITHOUT) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'task' => null
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function itCanReturnsNullOnMissedTrashedArgument(): void
+    {
+        $taskToRemove = factory(Task::class)->create();
+        $taskToRemove->delete();
+
+        $this->schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            task(id: ID! @eq, trashed: Trash): Task @find
+            task2(id: ID! @eq): Task @find
+        }
+        ';
+
+        $this->graphQL('
+        {
+            task(id: 1) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'task' => null
+            ]
+        ]);
+
+        $this->graphQL('
+        {
+            task2(id: 1) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'task2' => null
+            ]
+        ]);
     }
 }

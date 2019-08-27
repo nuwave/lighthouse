@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
 use Illuminate\Database\Eloquent\Builder;
@@ -552,4 +553,114 @@ class PaginateDirectiveTest extends DBTestCase
         }
         ')->assertJsonCount(10, 'data.users2.data');
     }
+
+    /**
+     * @test
+     */
+    public function itCanApplyTrashedArgument(): void
+    {
+        $tasks = factory(Task::class, 3)->create();
+        $taskToRemove = $tasks[2];
+        $taskToRemove->delete();
+
+        $this->schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            tasks(trashed: Trash): [Task!]! @paginate
+        }
+        ';
+
+        $this->graphQL('
+        {
+            tasks(first: 10, trashed: ONLY) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'tasks' => [
+                    'data' => [
+                        [
+                            'id'   => $taskToRemove->id,
+                            'name' => $taskToRemove->name,
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->graphQL('
+        {
+            tasks(first: 10, trashed: WITH) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJsonCount(3, 'data.tasks.data');
+
+        $this->graphQL('
+        {
+            tasks(first: 10, trashed: WITHOUT) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.tasks.data');
+    }
+
+    /**
+     * @test
+     */
+    public function itCanFetchWithoutTrashedOnMissedTrashedArgument(): void
+    {
+        $tasks = factory(Task::class, 3)->create();
+        $taskToRemove = $tasks[2];
+        $taskToRemove->delete();
+
+        $this->schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            tasks(trashed: Trash): [Task!]! @paginate
+            tasks2: [Task!]! @paginate
+        }
+        ';
+
+        $this->graphQL('
+        {
+            tasks(first: 10) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.tasks.data');
+
+        $this->graphQL('
+        {
+            tasks2(first: 10) {
+                data {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJsonCount(2, 'data.tasks2.data');
+    }
+
 }

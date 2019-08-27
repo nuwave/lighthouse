@@ -18,6 +18,7 @@ use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Support\Utils;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
@@ -86,6 +87,8 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                         $query,
                         $args
                     );
+
+                Utils::applyTrashedModificationIfNeeded($resolveInfo, $args, $query);
 
                 if ($query instanceof ScoutBuilder) {
                     return $query->paginate($first, 'page', $page);

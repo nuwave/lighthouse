@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
+use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class AllDirectiveTest extends DBTestCase
@@ -124,4 +125,103 @@ class AllDirectiveTest extends DBTestCase
         }
         ')->assertJsonCount(2, 'data.users');
     }
+
+    /**
+     * @test
+     */
+    public function itCanApplyTrashedArgument(): void
+    {
+        $tasks = factory(Task::class, 3)->create();
+        $taskToRemove = $tasks[2];
+        $taskToRemove->delete();
+
+        $this->schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            tasks(trashed: Trash): [Task!]! @all
+        }
+        ';
+
+        $this->graphQL('
+        {
+            tasks(trashed: ONLY) {
+                id
+                name
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'tasks' => [
+                    [
+                        'id'   => $taskToRemove->id,
+                        'name' => $taskToRemove->name,
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->graphQL('
+        {
+            tasks(trashed: WITH) {
+                id
+                name
+            }
+        }
+        ')->assertJsonCount(3, 'data.tasks');
+
+        $this->graphQL('
+        {
+            tasks(trashed: WITHOUT) {
+                id
+                name
+            }
+        }
+        ')->assertJsonCount(2, 'data.tasks');
+    }
+
+
+    /**
+     * @test
+     */
+    public function itCanFetchWithoutTrashedOnMissedTrashedArgument(): void
+    {
+        $tasks = factory(Task::class, 3)->create();
+        $taskToRemove = $tasks[2];
+        $taskToRemove->delete();
+
+        $this->schema = '
+        type Task {
+            id: ID!
+            name: String!
+        }
+        
+        type Query {
+            tasks(trashed: Trash): [Task!]! @all
+            tasks2: [Task!]! @all
+        }
+        ';
+
+        $this->graphQL('
+        {
+            tasks {
+                id
+                name
+            }
+        }
+        ')->assertJsonCount(2, 'data.tasks');
+
+        $this->graphQL('
+        {
+            tasks2 {
+                id
+                name
+            }
+        }
+        ')->assertJsonCount(2, 'data.tasks2');
+    }
+
 }

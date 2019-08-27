@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.1.1...master)
 
+### Added
+
+- Add support for defining `onlyTrashed`, `withTrashed`, and `withoutTrashed` on models with soft delete for `@all`, `@find` and `@paginate` directives
+
 ## [4.1.1](https://github.com/nuwave/lighthouse/compare/v4.1.0...v4.1.1)
 
 ### Fixed

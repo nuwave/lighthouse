@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Utils;
 
 class FindDirective extends BaseDirective implements FieldResolver
 {
@@ -34,7 +35,7 @@ class FindDirective extends BaseDirective implements FieldResolver
 
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model): ?Model {
-                $results = $resolveInfo
+                $query = $resolveInfo
                     ->builder
                     ->addScopes(
                         $this->directiveArgValue('scopes', [])
@@ -42,8 +43,11 @@ class FindDirective extends BaseDirective implements FieldResolver
                     ->apply(
                         $model::query(),
                         $args
-                    )
-                    ->get();
+                    );
+
+                Utils::applyTrashedModificationIfNeeded($resolveInfo, $args, $query);
+
+                $results = $query->get();
 
                 if ($results->count() > 1) {
                     throw new Error('The query returned more than one result.');
