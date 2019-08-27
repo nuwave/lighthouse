@@ -206,8 +206,8 @@ class FindDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $taskToRemove->id,
                     'name' => $taskToRemove->name,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $this->graphQL('
@@ -222,8 +222,8 @@ class FindDirectiveTest extends DBTestCase
                 'task' => [
                     'id' => $taskToRemove->id,
                     'name' => $taskToRemove->name,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $this->graphQL('
@@ -235,8 +235,8 @@ class FindDirectiveTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'task' => null
-            ]
+                'task' => null,
+            ],
         ]);
     }
 
@@ -269,8 +269,8 @@ class FindDirectiveTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'task' => null
-            ]
+                'task' => null,
+            ],
         ]);
 
         $this->graphQL('
@@ -282,8 +282,8 @@ class FindDirectiveTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'task2' => null
-            ]
+                'task2' => null,
+            ],
         ]);
     }
 }

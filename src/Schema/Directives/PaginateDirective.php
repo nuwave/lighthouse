@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Support\Str;
+use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Type\Definition\ResolveInfo;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
@@ -18,7 +19,6 @@ use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
-use Nuwave\Lighthouse\Support\Utils;
 
 class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {

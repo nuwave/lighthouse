@@ -3,11 +3,11 @@
 namespace Nuwave\Lighthouse\Support;
 
 use Closure;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\FieldDefinition;
-use GraphQL\Type\Definition\ResolveInfo;
 use ReflectionClass;
 use ReflectionException;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\FieldDefinition;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class Utils
@@ -86,7 +86,7 @@ class Utils
     /**
      * Apply withTrashed, onlyTrashed or withoutTrashed to given $query if needed.
      * Resolve info is used to get list if argument definitions of current field.
-     * If there is any argument of enum type Trash, then modifications are applied
+     * If there is any argument of enum type Trash, then modifications are applied.
      *
      * @param \GraphQL\Type\Definition\ResolveInfo $resolveInfo
      * @param array $args
@@ -94,9 +94,10 @@ class Utils
      *
      * @return void
      */
-    public static function applyTrashedModificationIfNeeded(ResolveInfo $resolveInfo, array $args, $query): void {
+    public static function applyTrashedModificationIfNeeded(ResolveInfo $resolveInfo, array $args, $query): void
+    {
         // skip execution, if model doesn't support soft delete
-        if (!in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($query->getModel()))) {
+        if (! in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($query->getModel()))) {
             return;
         }
 
@@ -104,7 +105,7 @@ class Utils
 
         // get field definition
         $fieldDefinition = $resolveInfo->parentType->getField($resolveInfo->fieldName);
-        if (!$fieldDefinition instanceof FieldDefinition) {
+        if (! $fieldDefinition instanceof FieldDefinition) {
             return;
         }
 

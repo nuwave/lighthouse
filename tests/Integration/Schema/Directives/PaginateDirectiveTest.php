@@ -590,10 +590,10 @@ class PaginateDirectiveTest extends DBTestCase
                         [
                             'id'   => $taskToRemove->id,
                             'name' => $taskToRemove->name,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
         $this->graphQL('
