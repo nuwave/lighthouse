@@ -334,6 +334,7 @@ directive @builder(
   """
   Reference a method that is passed the query builder.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
 ) on FIELD_DEFINITION
@@ -524,6 +525,7 @@ directive @complexity(
   """
   Reference a function to customize the complexity score calculation.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String
 ) on FIELD_DEFINITION
@@ -694,6 +696,7 @@ directive @deprecated(
 Assign a resolver function to a field.
 
 Pass a class and a method to the `resolver` argument and separate them with an `@` symbol.
+If you pass only a class name, the method name defaults to `__invoke`. 
 
 ```graphql
 type Mutation {
@@ -712,6 +715,7 @@ directive @field(
   """
   A reference to the resolver function to be used.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
 
@@ -1162,11 +1166,11 @@ Use a custom resolver to determine the concrete type of an interface.
 Make sure you read the [basics about Interfaces](../the-basics/types.md#interface) before deciding
 to use this directive, you probably don't need it.
 
-Set the `resolver` argument to a function that returns the implementing Object Type.
+Set the `resolveType` argument to a function that returns the implementing Object Type.
 
 ```graphql
 interface Commentable
-    @interface(resolver: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
+    @interface(resolveType: "App\\GraphQL\\Interfaces\\Commentable@resolveType") {
     id: ID!
 }
 ```
@@ -1227,8 +1231,9 @@ directive @interface(
   """
   Reference to a custom type-resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String!
+  resolveType: String!
 ) on INTERFACE
 ```
 
@@ -1465,6 +1470,7 @@ directive @node(
   """
   Reference to resolver function.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolver: String!
 ) on FIELD_DEFINITION
@@ -2032,7 +2038,7 @@ type Employee {
     employeeId: ID!
 }
 
-union Person @union(resolver: "App\\GraphQL\\UnionResolver@person") =
+union Person @union(resolveType: "App\\GraphQL\\Unions\\Person@resolveType") =
       User
     | Employee
 ```
@@ -2093,6 +2099,7 @@ directive @union(
   """
   Reference a function that returns the implementing Object Type.
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
   """
   resolveType: String!
 ) on UNION
@@ -2239,17 +2246,23 @@ directive @whereNotBetween(
 
 ## @whereConstraints
 
-Add a dynamically client-controlled where constraint to a fields query.
+Add a dynamically client-controlled WHERE constraint to a fields query.
 
 ### Definition
 
 ```graphql
 """
-Add a dynamically client-controlled where constraint to a fields query.
-The input value it is defined on may have any name but **must** be
+Add a dynamically client-controlled WHERE constraint to a fields query.
+The argument it is defined on may have any name but **must** be
 of the input type `WhereConstraints`.
 """
-directive @whereConstraints on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @whereConstraints(
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    """
+    columns: [String!]
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ### Setup
@@ -2267,6 +2280,12 @@ Add the service provider to your `config/app.php`
 Install the dependency [mll-lab/graphql-php-scalars](https://github.com/mll-lab/graphql-php-scalars):
 
     composer require mll-lab/graphql-php-scalars
+
+It contains the scalar type `Mixed`, which enables the dynamic query capabilities.
+
+```graphql
+scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
+```
 
 Add an enum type `Operator` to your schema. Depending on your
 database, you may want to allow different internal values. This default
@@ -2289,7 +2308,9 @@ enum Operator {
 
 ```graphql
 type Query {
-    people(where: WhereConstraints @whereConstraints): [Person!]!
+    people(
+        where: WhereConstraints @whereConstraints(columns: ["age", "type", "haircolour", "height"])
+    ): [Person!]!
 }
 ```
 
@@ -2303,12 +2324,12 @@ that gets actors over age 37 who either have red hair or are at least 150cm.
       where: [
         {
           AND: [
-            { column: "age", operator: GT value: 37 }
-            { column: "type", value: "Actor" }
+            { column: AGE, operator: GT value: 37 }
+            { column: TYPE, value: "Actor" }
             {
               OR: [
-                { column: "haircolour", value: "red" }
-                { column: "height", operator: GTE, value: 150 }
+                { column: HAIRCOLOUR, value: "red" }
+                { column: HEIGHT, operator: GTE, value: 150 }
               ]
             }
           ]
@@ -2321,21 +2342,31 @@ that gets actors over age 37 who either have red hair or are at least 150cm.
 }
 ```
 
-The definition for the `WhereConstraints` input is automatically included
-within your schema.
+Lighthouse generates definitions for an `Enum` type and an `Input` type
+that are restricted to the defined columns.
 
 ```graphql
-input WhereConstraints {
-    column: String
+"Dynamic WHERE constraints for the `where` argument on the query `people`.
+input PeopleWhereWhereConstraints {
+    column: PeopleWhereColumn
     operator: String = EQ
     value: Mixed
-    AND: [WhereConstraints!]
-    OR: [WhereConstraints!]
-    NOT: [WhereConstraints!]
+    AND: [PeopleWhereWhereConstraints!]
+    OR: [PeopleWhereWhereConstraints!]
+    NOT: [PeopleWhereWhereConstraints!]
 }
 
-scalar Mixed @scalar(class: "MLL\\GraphQLScalars\\Mixed")
+"Allowed column names for the `where` argument on the query `people`."
+enum PeopleWhereColumn {
+    AGE @enum(value: "age")
+    TYPE @enum(value: "type")
+    HAIRCOLOUR @enum(value: "haircolour")
+    HEIGHT @enum(value: "height")
+}
 ```
+
+When you are not specifying `columns` to allow, a generic input with dynamic
+column names will be used instead.
 
 ## @whereJsonContains
 

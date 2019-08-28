@@ -5,7 +5,7 @@ about: Report a bug to help us improve Lighthouse
 ---
 
 <!-- Please file a bug report only if there is a problem within Lighthouse.
-To get help on an issue or ask a question, you can visit our Slack channel. -->
+To get help on an issue or ask a question, consult Stackoverflow or Slack. -->
 
 **Describe the bug**
 
