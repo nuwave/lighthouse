@@ -1386,7 +1386,6 @@ directive @morphTo(
 ) on FIELD_DEFINITION
 ```
 
-
 ## @namespace
 
 Redefine the default namespaces used in other directives.
