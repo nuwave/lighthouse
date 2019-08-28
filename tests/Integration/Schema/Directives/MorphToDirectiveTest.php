@@ -20,7 +20,7 @@ class MorphToDirectiveTest extends DBTestCase
     /**
      * User's task.
      *
-     * @var \Tests\Utils\Models\Team
+     * @var \Tests\Utils\Models\Task
      */
     protected $task;
 
