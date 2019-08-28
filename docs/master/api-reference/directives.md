@@ -1349,6 +1349,34 @@ own mechanism of encoding/decoding global ids.
 directive @model on OBJECT
 ```
 
+## @morphTo
+
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+
+```graphql
+type Hour {
+    hourable: Task! @morphTo
+}
+```
+
+### Definition
+
+```graphql
+directive @morphTo(      
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
+
 ## @namespace
 
 Redefine the default namespaces used in other directives.
