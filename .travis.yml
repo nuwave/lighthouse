@@ -44,8 +44,6 @@ matrix:
       env: LARAVEL='5.8.*' COVERAGE=1 STATIC_ANALYSIS=1
     - php: "7.3"
       env: LARAVEL='^6.0'
-    - php: "7.3"
-      env: LARAVEL='5.8.*' BENCHMARKS=1
   allow_failures:
     - php: "7.3"
       env: LARAVEL='5.8.*' BENCHMARKS=1
@@ -57,6 +55,7 @@ before_install:
   - mysql -e 'CREATE DATABASE test;'
 
 install:
+  - if [[ $LARAVEL = ^6.0 ]]; then composer remove laravel/lumen-framework; fi
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
   - composer install --prefer-dist --no-interaction --no-suggest
 
