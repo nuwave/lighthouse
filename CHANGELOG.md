@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.1.1...master)
 
+### Added
+
+- Add `@morphTo` directive for polymorphic one-to-one relationships https://github.com/nuwave/lighthouse/pull/921
+
 ## [4.1.1](https://github.com/nuwave/lighthouse/compare/v4.1.0...v4.1.1)
 
 ### Fixed
@@ -17,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `@morphTo` directive.
 - Add the `@whereJsonContains` directive to an input value as a [whereJsonContains filter](https://laravel.com/docs/queries#json-where-clauses) https://github.com/nuwave/lighthouse/pull/919
 - Allow using callable classes with `__invoke` when referencing methods in directives
   and when looking for default resolvers or type resolvers https://github.com/nuwave/lighthouse/issues/882

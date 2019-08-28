@@ -1359,14 +1359,19 @@ directive @model on OBJECT
 Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 
 ```graphql
-type Hour {
-    hourable: Task! @morphTo
+type Image {
+    imagable: Imageable! @morphTo
 }
+
+union Imageable = Post | User
 ```
 
 ### Definition
 
 ```graphql
+"""
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+"""
 directive @morphTo(      
   """
   Specify the relationship method name in the model class,
