@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unbox laravel-enum inputs when using the builder directives https://github.com/nuwave/lighthouse/pull/927
 
+### Added
+
+- Support Laravel `^6.0` https://github.com/nuwave/lighthouse/pull/926
+
 ## [4.1.0](https://github.com/nuwave/lighthouse/compare/v4.0.0...v4.1.0)
 
 ### Added
