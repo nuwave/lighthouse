@@ -1110,7 +1110,6 @@ query myQuery($someTest: Boolean) {
 }
 ```
 
-
 ## @inject
 
 Inject a value from the context object into the arguments.
@@ -1347,11 +1346,42 @@ type User @model {
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
-
 ### Definition
 
 ```graphql
 directive @model on OBJECT
+```
+
+## @morphTo
+
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+
+```graphql
+type Image {
+    imagable: Imageable! @morphTo
+}
+
+union Imageable = Post | User
+```
+
+### Definition
+
+```graphql
+"""
+Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+"""
+directive @morphTo(      
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
 ```
 
 ## @namespace
