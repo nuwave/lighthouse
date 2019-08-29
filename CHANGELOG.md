@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.1.1...master)
 
+### Added
+
+- Add `@morphTo` directive for polymorphic one-to-one relationships https://github.com/nuwave/lighthouse/pull/921
+
 ## [4.1.1](https://github.com/nuwave/lighthouse/compare/v4.1.0...v4.1.1)
 
 ### Fixed
