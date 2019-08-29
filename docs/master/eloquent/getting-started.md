@@ -250,7 +250,7 @@ This mutation will return the deleted object, so you will have a last chance to 
 }
 ```
 
-## Soft delete
+## Soft Deleting
 
 If your model uses soft delete, you can define an attribute with enum type `Trash`, that is provided by lighthouse. It has `ONLY`, `WITH` and `WITHOUT` values, according laravels `onlyTrashed()`, `withTrashed()` and `withoutTrashed()` methods.
 
