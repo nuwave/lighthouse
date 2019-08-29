@@ -20,3 +20,20 @@ Add the service provider to your `config/app.php`
     \Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider::class,
 ],
 ```
+
+### Pusher Webhook
+
+Subscriptions do not expire by themselves.
+Unless a subscription is deleted, it will continue to broadcast events after the client has disconnected.
+
+Using a `Presence` webhook will mitigate this problem.
+When a Pusher channel is abandoned (ie. unsubscribed), it will trigger the webhook,
+which will instruct Lighthouse to delete the subscription.
+
+The webhook URL will typically be:
+
+```
+/graphql/subscriptions/webhook
+```
+
+You can add the webhook in the Pusher Dashboard. Select the type `Presence`.

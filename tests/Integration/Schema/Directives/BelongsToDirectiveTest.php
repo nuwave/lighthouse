@@ -8,7 +8,7 @@ use Tests\Utils\Models\User;
 use Tests\Utils\Models\Company;
 use Tests\Utils\Models\Product;
 
-class BelongsToTest extends DBTestCase
+class BelongsToDirectiveTest extends DBTestCase
 {
     /**
      * Auth user.
