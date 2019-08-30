@@ -67,9 +67,9 @@ abstract class DeleteRestoreDirective extends BaseDirective implements FieldReso
 
                 /** @var \Illuminate\Database\Eloquent\Model $modelClass */
                 $modelClass = $this->getModelClass();
-                $model = $this->name() === 'restore'
-                    ? $modelClass::withTrashed()->find($idOrIds)
-                    : $modelClass::find($idOrIds);
+                $model = $this->name() === 'delete'
+                    ? $modelClass::find($idOrIds)
+                    : $modelClass::withTrashed()->find($idOrIds);
 
                 if (! $model) {
                     return;
