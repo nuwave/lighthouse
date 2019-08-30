@@ -45,7 +45,7 @@ class DirectiveFactory
      */
     public function __construct(DirectiveNamespaces $directiveNamespaces)
     {
-        $this->directiveNamespaces = $directiveNamespaces;
+        $this->directiveNamespaces = $directiveNamespaces->gather();
     }
 
     /**

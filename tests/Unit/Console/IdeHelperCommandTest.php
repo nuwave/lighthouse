@@ -8,13 +8,6 @@ use Nuwave\Lighthouse\Schema\Directives\FieldDirective;
 
 class IdeHelperCommandTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        unlink(IdeHelperCommand::filePath());
-    }
-
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
@@ -32,13 +25,10 @@ class IdeHelperCommandTest extends TestCase
      */
     public function itGeneratesSchemaDirectives(): void
     {
-        $expectedPath = IdeHelperCommand::filePath();
-        $this->assertFileNotExists($expectedPath);
-
         $this->artisan('lighthouse:ide-helper');
 
-        $this->assertFileExists($expectedPath);
-        $generated = file_get_contents($expectedPath);
+        $this->assertFileExists(IdeHelperCommand::filePath());
+        $generated = file_get_contents(IdeHelperCommand::filePath());
 
         $this->assertStringStartsWith(IdeHelperCommand::GENERATED_NOTICE, $generated);
         $this->assertStringEndsWith("\n", $generated);
