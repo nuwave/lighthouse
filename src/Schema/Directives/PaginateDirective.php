@@ -88,8 +88,6 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
                         $args
                     );
 
-                Utils::applyTrashedModificationIfNeeded($resolveInfo, $args, $query);
-
                 if ($query instanceof ScoutBuilder) {
                     return $query->paginate($first, 'page', $page);
                 }

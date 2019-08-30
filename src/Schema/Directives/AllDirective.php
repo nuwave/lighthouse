@@ -34,7 +34,7 @@ class AllDirective extends BaseDirective implements FieldResolver
                 /** @var \Illuminate\Database\Eloquent\Model $modelClass */
                 $modelClass = $this->getModelClass();
 
-                $query = $resolveInfo
+                return $resolveInfo
                     ->builder
                     ->addScopes(
                         $this->directiveArgValue('scopes', [])
@@ -42,11 +42,8 @@ class AllDirective extends BaseDirective implements FieldResolver
                     ->apply(
                         $modelClass::query(),
                         $args
-                    );
-
-                Utils::applyTrashedModificationIfNeeded($resolveInfo, $args, $query);
-
-                return $query->get();
+                    )
+                    ->get();
             }
         );
     }

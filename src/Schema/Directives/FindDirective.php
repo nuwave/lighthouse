@@ -35,7 +35,7 @@ class FindDirective extends BaseDirective implements FieldResolver
 
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model): ?Model {
-                $query = $resolveInfo
+                $results = $resolveInfo
                     ->builder
                     ->addScopes(
                         $this->directiveArgValue('scopes', [])
@@ -43,11 +43,8 @@ class FindDirective extends BaseDirective implements FieldResolver
                     ->apply(
                         $model::query(),
                         $args
-                    );
-
-                Utils::applyTrashedModificationIfNeeded($resolveInfo, $args, $query);
-
-                $results = $query->get();
+                    )
+                    ->get();
 
                 if ($results->count() > 1) {
                     throw new Error('The query returned more than one result.');
