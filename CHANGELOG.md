@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add support for defining `onlyTrashed`, `withTrashed`, and `withoutTrashed` on models with soft delete for `@all`, `@find` and `@paginate` directives
+- Add `@softDeletes` and `@trash` directives to be able to fetch `onlyTrashed`, `withTrashed` or `withoutTrashed` models https://github.com/nuwave/lighthouse/pull/937
 - Add `@morphTo` directive for polymorphic one-to-one relationships https://github.com/nuwave/lighthouse/pull/921
 - Support Laravel `^6.0` https://github.com/nuwave/lighthouse/pull/926
 
