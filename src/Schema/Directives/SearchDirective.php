@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class SearchDirective extends BaseDirective implements ArgBuilderDirective
+class SearchDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -14,6 +15,21 @@ class SearchDirective extends BaseDirective implements ArgBuilderDirective
     public function name(): string
     {
         return 'search';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Perform a full-text by the given input value.
+"""
+directive @search(
+  """
+  Specify a custom index to use for search.
+  """
+  within: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

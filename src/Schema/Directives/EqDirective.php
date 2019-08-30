@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class EqDirective extends BaseDirective implements ArgBuilderDirective
+class EqDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -14,6 +15,19 @@ class EqDirective extends BaseDirective implements ArgBuilderDirective
     public function name(): string
     {
         return 'eq';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+directive @eq(  
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

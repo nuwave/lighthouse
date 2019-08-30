@@ -17,6 +17,7 @@ use Nuwave\Lighthouse\Console\ScalarCommand;
 use Illuminate\Contracts\Container\Container;
 use Nuwave\Lighthouse\Console\MutationCommand;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
+use Nuwave\Lighthouse\Console\IdeHelperCommand;
 use Nuwave\Lighthouse\Console\InterfaceCommand;
 use Nuwave\Lighthouse\Execution\ContextFactory;
 use Nuwave\Lighthouse\Execution\GraphQLRequest;
@@ -165,6 +166,7 @@ class LighthouseServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ClearCacheCommand::class,
+                IdeHelperCommand::class,
                 InterfaceCommand::class,
                 MutationCommand::class,
                 PrintSchemaCommand::class,

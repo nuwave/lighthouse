@@ -1,11 +1,11 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Tests\Unit\Console;
 
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class CacheKeyDirective implements Directive, DefinedDirective
+class UnionDirective implements Directive, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -14,16 +14,16 @@ class CacheKeyDirective implements Directive, DefinedDirective
      */
     public function name(): string
     {
-        return 'cacheKey';
+        return 'union';
     }
 
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Specify the field to use as a key when creating a cache.
+Some other definition then the original.
 """
-directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @union on UNION
 SDL;
     }
 }

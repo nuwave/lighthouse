@@ -9,8 +9,9 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class TracingDirective extends BaseDirective implements FieldMiddleware
+class TracingDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     const NAME = 'tracing';
 
@@ -38,6 +39,17 @@ class TracingDirective extends BaseDirective implements FieldMiddleware
     public function name(): string
     {
         return self::NAME;
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Do not use this directive directly, it is automatically added to the schema
+when using the tracing extension.
+"""
+directive @tracing on FIELD_DEFINITION
+SDL;
     }
 
     /**

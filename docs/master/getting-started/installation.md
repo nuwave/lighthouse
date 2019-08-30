@@ -17,6 +17,22 @@ it using the following `artisan` command:
 php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
 ```
 
+## IDE Support
+
+Lighthouse makes heavy use of the SDL and utilizes schema directives.
+To improve your editing experience, you can generate a definition file
+[with an artisan command](../api-reference/commands.md#ide-helper):
+
+```bash
+php artisan lighthouse:ide-helper
+```
+
+We recommend the following plugins:
+
+|IDE|Plugin|
+|---|---|
+|PhpStorm|https://plugins.jetbrains.com/plugin/8097-js-graphql|
+
 ## Install GraphQL DevTools
 
 To make use of the amazing tooling around GraphQL, we recommend
