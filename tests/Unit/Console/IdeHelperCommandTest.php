@@ -33,18 +33,18 @@ class IdeHelperCommandTest extends TestCase
         $this->assertStringStartsWith(IdeHelperCommand::GENERATED_NOTICE, $generated);
         $this->assertStringEndsWith("\n", $generated);
 
-        $this->assertStringContainsString(
+        $this->assertContains(
             FieldDirective::definition(),
             $generated,
             'Generates definition for built-in directives'
         );
-        $this->assertStringContainsString(FieldDirective::class, $generated);
+        $this->assertContains(FieldDirective::class, $generated);
 
-        $this->assertStringContainsString(
+        $this->assertContains(
             UnionDirective::definition(),
             $generated,
             'Overwrites definitions through custom namespaces'
         );
-        $this->assertStringContainsString(UnionDirective::class, $generated);
+        $this->assertContains(UnionDirective::class, $generated);
     }
 }
