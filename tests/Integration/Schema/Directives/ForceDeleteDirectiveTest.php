@@ -41,6 +41,40 @@ class ForceDeleteDirectiveTest extends DBTestCase
 
         $this->assertCount(0, Task::withTrashed()->get());
     }
+    /**
+     * @test
+     */
+    public function itForceDeletesDeletedTaskAndReturnsIt(): void
+    {
+        $task = factory(Task::class)->create();
+        $task->delete();
+
+        $this->schema = '
+        type Task {
+            id: ID!
+        }
+        
+        type Mutation {
+            forceDeleteTask(id: ID!): Task @forceDelete
+        }
+        '.$this->placeholderQuery();
+
+        $this->graphQL('
+        mutation {
+            forceDeleteTask(id: 1) {
+                id
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'forceDeleteTask' => [
+                    'id' => 1,
+                ],
+            ],
+        ]);
+
+        $this->assertCount(0, Task::withTrashed()->get());
+    }
 
     /**
      * @test
