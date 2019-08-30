@@ -1999,7 +1999,7 @@ or `WITHOUT` trashed elements should be fetched.
 
 ### Definition
 ```graphql
-directive @softDeletes on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+directive @softDeletes on FIELD_DEFINITION
 ```
 
 ### Examples

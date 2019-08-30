@@ -7,9 +7,10 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class SoftDeletesDirective extends BaseDirective implements FieldManipulator
+class SoftDeletesDirective extends BaseDirective implements FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -19,6 +20,13 @@ class SoftDeletesDirective extends BaseDirective implements FieldManipulator
     public function name(): string
     {
         return 'softDeletes';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+directive @softDeletes on FIELD_DEFINITION
+SDL;
     }
 
     /**

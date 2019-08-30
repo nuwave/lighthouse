@@ -4,9 +4,10 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Laravel\Scout\Builder as ScoutBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class TrashDirective extends BaseDirective implements ArgBuilderDirective
+class TrashDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -16,6 +17,13 @@ class TrashDirective extends BaseDirective implements ArgBuilderDirective
     public function name(): string
     {
         return 'trash';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+directive @trash on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**
