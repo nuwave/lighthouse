@@ -7,11 +7,10 @@ use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
-use Illuminate\Contracts\Events\Dispatcher;
+use Nuwave\Lighthouse\Schema\DirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
-use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class DirectiveFactory
 {
@@ -36,30 +35,17 @@ class DirectiveFactory
      *
      * @var string[]
      */
-    protected $directiveBaseNamespaces = [];
+    protected $directiveNamespaces = [];
 
     /**
      * DirectiveFactory constructor.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespaces  $directiveNamespaces
      * @return void
      */
-    public function __construct(Dispatcher $dispatcher)
+    public function __construct(DirectiveNamespaces $directiveNamespaces)
     {
-        // When looking for a directive by name, the namespaces are tried in order
-        $this->directiveBaseNamespaces = (new Collection([
-            // User defined directives (top priority)
-            config('lighthouse.namespaces.directives'),
-
-            // Plugin developers defined directives
-            $dispatcher->dispatch(new RegisterDirectiveNamespaces),
-
-            // Lighthouse defined directives
-            'Nuwave\\Lighthouse\\Schema\\Directives',
-        ]))
-            ->flatten()
-            ->filter()
-            ->all();
+        $this->directiveNamespaces = $directiveNamespaces->gather();
     }
 
     /**
@@ -102,7 +88,7 @@ class DirectiveFactory
      */
     protected function createOrFail(string $directiveName): Directive
     {
-        foreach ($this->directiveBaseNamespaces as $baseNamespace) {
+        foreach ($this->directiveNamespaces as $baseNamespace) {
             $className = $baseNamespace.'\\'.Str::studly($directiveName).'Directive';
             if (class_exists($className)) {
                 $directive = app($className);

@@ -17,9 +17,10 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Pagination\PaginationManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator
+class PaginateDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -29,6 +30,51 @@ class PaginateDirective extends BaseDirective implements FieldResolver, FieldMan
     public function name(): string
     {
         return 'paginate';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Query multiple entries as a paginated list.
+"""
+directive @paginate(
+  """
+  Which pagination style to use.
+  Allowed values: paginator, connection.
+  """
+  type: String = "paginator"
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Point to a function that provides a Query Builder instance.
+  This replaces the use of a model.
+  """
+  builder: String
+
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+  
+  """
+  Overwrite the paginate_max_count setting value to limit the
+  amount of items that a user can request per page.
+  """
+  maxCount: Int
+
+  """
+  Use a default value for the amount of returned items
+  in case the client does not request it explicitly
+  """
+  defaultCount: Int
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

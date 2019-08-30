@@ -7,8 +7,9 @@ use GraphQL\Deferred;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class BroadcastDirective extends BaseDirective implements FieldMiddleware
+class BroadcastDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -18,6 +19,24 @@ class BroadcastDirective extends BaseDirective implements FieldMiddleware
     public function name(): string
     {
         return 'broadcast';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+directive @broadcast(
+  """
+  Name of the subscription that should be retriggered as a result of this operation..
+  """
+  subscription: String!
+
+  """
+  Specify whether or not the job should be queued.
+  This defaults to the global config option `lighthouse.subscriptions.queue_broadcasts`.
+  """
+  shouldQueue: Boolean
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

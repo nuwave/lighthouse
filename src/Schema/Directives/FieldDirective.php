@@ -7,8 +7,9 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class FieldDirective extends BaseDirective implements FieldResolver
+class FieldDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -18,6 +19,28 @@ class FieldDirective extends BaseDirective implements FieldResolver
     public function name(): string
     {
         return 'field';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Assign a resolver function to a field.
+"""
+directive @field(
+  """
+  A reference to the resolver function to be used.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String!
+
+  """
+  Supply additional data to the resolver.
+  """
+  args: [String!]
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

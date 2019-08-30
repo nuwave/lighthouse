@@ -107,6 +107,9 @@ class Post extends Model
 ### Definition
 
 ```graphql
+"""
+Resolves a field through the Eloquent `BelongsTo` relationship.
+"""
 directive @belongsTo(  
   """
   Specify the relationship method name in the model class,
@@ -164,6 +167,9 @@ class User extends Model
 ### Definition
 
 ```graphql
+"""
+Resolves a field through the Eloquent `BelongsToMany` relationship.
+"""
 directive @belongsToMany(
   """
   Which pagination style to use.
@@ -244,6 +250,9 @@ type Mutation {
 ### Definition
 
 ```graphql
+"""
+Run the `bcrypt` function on the argument it is defined on.
+"""
 directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
@@ -264,6 +273,9 @@ The `subscription` argument must reference the name of a subscription field.
 ### Definition
 
 ```graphql
+"""
+Broadcast the results of a mutation to subscribed clients.
+"""
 directive @broadcast(
   """
   Name of the subscription that should be retriggered as a result of this operation..
@@ -356,6 +368,9 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Cache the result of a resolver.
+"""
 directive @cache(
   """
   Set the duration it takes for the cache to expire in seconds.
@@ -420,8 +435,6 @@ directive @cacheKey on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 Check a Laravel Policy to ensure the current user is authorized to access a field.
 
-Set the name of the policy to check against.
-
 ```graphql
 type Mutation {
     createPost(input: PostInput): Post @can(ability: "create")
@@ -441,6 +454,9 @@ class PostPolicy
 ### Definition
 
 ```graphql
+"""
+Check a Laravel Policy to ensure the current user is authorized to access a field.
+"""
 directive @can(
   """
   The ability to check permissions for.
@@ -562,7 +578,7 @@ class ComplexityAnalyzer {
 
 ## @create
 
-Applies to fields to create a new Eloquent model with the given arguments.
+Create a new Eloquent model with the given arguments.
 
 ```graphql
 type Mutation {
@@ -573,6 +589,9 @@ type Mutation {
 ### Definition
 
 ```graphql
+"""
+Create a new Eloquent model with the given arguments.
+"""
 directive @create(  
   """
   Specify the class name of the model to use.
@@ -761,6 +780,9 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Find a model based on the arguments provided.
+"""
 directive @find(  
   """
   Specify the class name of the model to use.
@@ -801,6 +823,9 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Get the first query result from a collection of Eloquent models.
+"""
 directive @first(  
   """
   Specify the class name of the model to use.
@@ -919,6 +944,11 @@ type Mutation {
 ### Definition
 
 ```graphql
+"""
+Fire an event after a mutation has taken place.
+It requires the `dispatch` argument that should be
+the class name of the event you want to fire.
+"""
 directive @event(  
   """
   Specify the fully qualified class name (FQCN) of the event to dispatch.
@@ -975,7 +1005,7 @@ own mechanism of encoding/decoding global ids.
 
 ## @hasMany
 
-Corresponds to [Eloquent's HasMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
+Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
 
 ```graphql
 type User {
@@ -986,6 +1016,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
+"""
 directive @hasMany(
   """
   Specify the default quantity of elements to be returned.
@@ -1043,6 +1076,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Corresponds to [the Eloquent relationship HasOne](https://laravel.com/docs/eloquent-relationships#one-to-one).
+"""
 directive @hasOne(      
   """
   Specify the relationship method name in the model class,
@@ -1248,6 +1284,29 @@ directive @interface(
 ) on INTERFACE
 ```
 
+## @lazyLoad
+
+```graphql
+"""
+Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
+on the relations of a list of models.
+"""
+directive @lazyLoad(
+    """
+    The names of the relationship methods to load.
+    """
+    relations: [String!]!
+) on FIELD_DEFINITION
+```
+
+This is often useful when loading relationships with the [`@hasMany`](#hasmany) directive.
+
+```graphql
+type Post {
+    comments: [Comment!]! @hasMany @lazyLoad(relations: ["replies"])
+}
+```
+
 ## @method
 
 Call a method with a given `name` on the class that represents a type to resolve a field.
@@ -1267,6 +1326,10 @@ so the method can be `public static` if needed.
 ### Definition
 
 ```graphql
+"""
+Call a method with a given `name` on the class that represents a type to resolve a field.
+Use this if the data is not accessible as an attribute (e.g. `$model->myData`).
+"""
 directive @method(      
   """
   Specify the method of which to fetch the data from.
@@ -1346,8 +1409,7 @@ it is often more suitable to define a custom field directive.
 
 ## @model
 
-Enable fetching an Eloquent model by its global id, may be used for Relay.
-Behind the scenes, Lighthouse will decode the global id sent from the client to find the model by it's primary id in the database.
+Enable fetching an Eloquent model by its global id through the `node` query.
 
 ```graphql
 type User @model {
@@ -1355,12 +1417,18 @@ type User @model {
 }
 ```
 
+Behind the scenes, Lighthouse will decode the global id sent from the client
+to find the model by it's primary id in the database.
+
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
 ### Definition
 
 ```graphql
+"""
+Enable fetching an Eloquent model by its global id through the `node` query.
+"""
 directive @model on OBJECT
 ```
 
@@ -1446,6 +1514,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Place a not equals operator `!=` on an Eloquent query.
+"""
 directive @neq(  
   """
   Specify the database column to compare. 
@@ -1503,6 +1574,9 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Filter a column by an array using a `whereNotIn` clause.
+"""
 directive @notIn(      
   """
   Specify the name of the column.
@@ -2261,7 +2335,7 @@ Verify that a column's value is between two values.
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
-directive @whereNotBetween(
+directive @whereBetween(
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema.

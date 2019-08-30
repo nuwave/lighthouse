@@ -11,8 +11,9 @@ use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Support\Contracts\TypeMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator
+class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipulator, DefinedDirective
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\NodeRegistry
@@ -36,6 +37,23 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
     public function name(): string
     {
         return 'node';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Register a type for relay global object identification.
+"""
+directive @node(
+  """
+  Reference to resolver function.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String!
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**
