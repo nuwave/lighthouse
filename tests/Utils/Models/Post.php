@@ -6,6 +6,7 @@ use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Post extends Model
@@ -37,5 +38,10 @@ class Post extends Model
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    public function hours(): MorphMany
+    {
+        return $this->morphMany(Hour::class, 'hourable');
     }
 }

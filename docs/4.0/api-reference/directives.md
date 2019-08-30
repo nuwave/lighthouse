@@ -1106,7 +1106,6 @@ query myQuery($someTest: Boolean) {
 }
 ```
 
-
 ## @inject
 
 Inject a value from the context object into the arguments.
@@ -1364,7 +1363,6 @@ type User @model {
 
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
-
 
 ### Definition
 

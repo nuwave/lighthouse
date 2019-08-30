@@ -10,7 +10,7 @@ h1, h2, h3, h4, h5, h6
 h1, h2, h3
   font-weight: 400 !important
 
-/****************************** 
+/******************************
   HOME
 *******************************/
 
@@ -26,23 +26,22 @@ h1, h2, h3
   align-content stretch
   justify-content space-between
 
-.home .highlight 
-  flex-grow 1  
+.home .highlight
+  flex-grow 1
   max-width 48%
-  
+
   @media (max-width 719px)
     max-width: 100% !important
 
-.home .highlight h2           
+.home .highlight h2
   font-weight 800
   border none !important
   margin-top 10px
 
 .home .feature h2
   font-weight 800 !important
-  
-  
-/****************************** 
+
+/******************************
   CONTENT
 *******************************/
 
@@ -53,7 +52,7 @@ h1, h2, h3
 .content p
   margin-bottom: 1.5em
 
-.content:not(.custom) > h2 
+.content:not(.custom) > h2
   margin-top: 3rem !important
   padding-top: 0 !important
   margin-bottom: 1.6rem !important
@@ -82,7 +81,7 @@ h1, h2, h3
   margin-top: 0.5rem
   margin-bottom: 0.5rem
 
-/****************************** 
+/******************************
   HERO
 *******************************/
 
@@ -93,7 +92,7 @@ h1, h2, h3
 .home .hero
   display: none !important
 
-/****************************** 
+/******************************
   CODE
 *******************************/
 
@@ -120,7 +119,7 @@ pre[class*="language-"] .token.comment,
 pre code[class*="language-"] .token.comment
   color: slategray
 
-/****************************** 
+/******************************
   PAGE
 *******************************/
 
@@ -128,19 +127,17 @@ pre code[class*="language-"] .token.comment
   .page
     padding-left 17rem
 
-/****************************** 
+/******************************
   NAVBAR
 *******************************/
 
-.navbar  
+.navbar
   border-bottom none !important
   box-shadow 0 2px 4px 0 rgba(0,0,0,.05) !important
-
 
 .navbar .site-name
   font-weight 400 !important
   font-family: $primaryFont
-
 
 .nav-link, .repo-link , .nav-links .dropdown-title
   font-weight 800 !important
@@ -149,35 +146,32 @@ pre code[class*="language-"] .token.comment
   .navbar .home-link .can-hide
     display: inline-block !important
 
-/****************************** 
+/******************************
   BLOCKS
 *******************************/
 
 .custom-block-title
   font-weight 800 !important
 
-.custom-block.danger 
+.custom-block.danger
   background-color #fff6f6 !important
   border-color #ffe6e6 !important
 
-
-.custom-block.warning 
+.custom-block.warning
   background-color rgba(239, 224, 153, 0.3) !important
   border-color #ecd45a !important
 
-.custom-block.tip 
+.custom-block.tip
   border-color #cec3d6 !important
 
-
-/****************************** 
+/******************************
   SIDEBAR
 *******************************/
 
-#app .sidebar     
+#app .sidebar
   width  17rem !important
   border-right none !important
   background-color $backgroundColor !important
-
 
  .sidebar-group:not(.collapsable) .sidebar-heading,
   .sidebar-heading
@@ -205,7 +199,6 @@ pre code[class*="language-"] .token.comment
     color #fff !important
     border-left-color $accentColor !important
 
-
   @media (max-width 959px)
     .sidebar .nav-links
       border-bottom 2px solid rgba(255, 255, 255, 0.1)
@@ -214,14 +207,14 @@ pre code[class*="language-"] .token.comment
     .nav-links a.nav-link, .nav-links a.repo-link, .nav-links .dropdown-title
       color #fff
 
-/****************************** 
+/******************************
   FOOTER
 *******************************/
 
 .footer
   text-align: center
 
-/****************************** 
+/******************************
   USERS
 *******************************/
 
@@ -230,20 +223,20 @@ pre code[class*="language-"] .token.comment
   max-width: 900px
   text-align: center
 
-.showcase .logos 
+.showcase .logos
   align-items: center
   display: flex
   flex-flow: row wrap
   justify-content: center
 
-.showcase .logos img 
+.showcase .logos img
   max-height: 128px
   padding: 20px
   width: 128px
   border: none !important
 
 @media only screen and (max-width: 735px)
-  .showcase .logos img 
+  .showcase .logos img
     max-height: 64px
     padding: 20px
     width: 64px

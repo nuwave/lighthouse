@@ -6,7 +6,6 @@ sidebar: false
 
 ## Plugins
 
-- [deinternetjongens/lighthouse-utils](https://github.com/deInternetJongens/Lighthouse-Utils)
 - [joselfonseca/lighthouse-graphql-passport-auth](https://github.com/joselfonseca/lighthouse-graphql-passport-auth)
 
 ## Tutorials

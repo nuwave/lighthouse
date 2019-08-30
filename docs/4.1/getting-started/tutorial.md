@@ -1,6 +1,5 @@
 # Tutorial
 
-
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
 with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
@@ -304,7 +303,6 @@ naming - the type name `Post` is also the name of our Model - and the use of ser
 - [`@all`](../api-reference/directives.md#all) just gets you a list of all `Post` models
 - [`@find`](../api-reference/directives.md#find) and [`@eq`](../api-reference/directives.md#eq)
   are combined to retrieve a single `Post` by its ID
-
 
 Then, we add additional type definitions that clearly define the shape of our data. 
 

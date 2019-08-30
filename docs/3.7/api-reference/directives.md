@@ -1335,7 +1335,6 @@ type User @model {
 You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
 own mechanism of encoding/decoding global ids.
 
-
 ### Definition
 
 ```graphql
