@@ -16,6 +16,12 @@ This will allow some IDEs to do code completion in your GraphQL-schema.
 
     php artisan lighthouse:ide-helper 
 
+## ide-helper
+
+Gather all schema directive definitions and write them to a file.
+
+    php artisan lighthouse:ide-helper
+
 ## interface
 
 Create a class for a GraphQL interface type.

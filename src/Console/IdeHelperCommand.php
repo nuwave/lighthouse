@@ -30,7 +30,7 @@ SDL;
      *
      * @var string
      */
-    protected $description = 'Gather all schema directive definitions and print the result.';
+    protected $description = 'Gather all schema directive definitions and write them to a file.';
 
     /**
      * Execute the console command.
@@ -45,7 +45,6 @@ SDL;
                 "This command requires haydenpierce/class-finder. Install it by running:\n"
                 ."\n"
                 ."    composer require --dev haydenpierce/class-finder\n"
-                ."\n"
             );
 
             return 1;
