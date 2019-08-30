@@ -7,9 +7,10 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
-class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective
+class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTransformerDirective, DefinedDirective
 {
     /**
      * The GlobalId resolver.
@@ -37,6 +38,25 @@ class GlobalIdDirective extends BaseDirective implements FieldMiddleware, ArgTra
     public function name(): string
     {
         return 'globalId';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Converts between IDs/types and global IDs.
+When used upon a field, it encodes,
+when used upon an argument, it decodes.
+"""
+directive @globalId(
+  """
+  By default, an array of `[$type, $id]` is returned when decoding.
+  You may limit this to returning just one of both.
+  Allowed values: "ARRAY", "TYPE", "ID"
+  """
+  decode: String = "ARRAY"
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+SDL;
     }
 
     /**
