@@ -3,9 +3,7 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
 
 class SoftDeletesAndTrashDirectiveTest extends DBTestCase
 {
@@ -14,7 +12,7 @@ class SoftDeletesAndTrashDirectiveTest extends DBTestCase
      */
     public function itCanBeUsedWithAllDirective(): void
     {
-        $tasks        = factory(Task::class, 3)->create();
+        $tasks = factory(Task::class, 3)->create();
         $taskToRemove = $tasks[2];
         $taskToRemove->delete();
 

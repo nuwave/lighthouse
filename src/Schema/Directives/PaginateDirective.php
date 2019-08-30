@@ -3,7 +3,6 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Support\Str;
-use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Type\Definition\ResolveInfo;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;

@@ -4,7 +4,6 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
 class AllDirectiveTest extends DBTestCase

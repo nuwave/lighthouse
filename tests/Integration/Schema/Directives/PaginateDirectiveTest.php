@@ -5,7 +5,6 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
-use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
 use Illuminate\Database\Eloquent\Builder;

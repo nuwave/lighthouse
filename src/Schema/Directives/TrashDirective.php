@@ -2,9 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class TrashDirective extends BaseDirective implements ArgBuilderDirective
@@ -46,7 +45,7 @@ class TrashDirective extends BaseDirective implements ArgBuilderDirective
         }
 
         // apply trashed query modification
-        if (!isset($value)) {
+        if (! isset($value)) {
             return $builder;
         }
 
