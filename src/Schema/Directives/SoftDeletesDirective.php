@@ -32,5 +32,4 @@ class SoftDeletesDirective extends BaseDirective implements FieldManipulator
         $softDeletesArgument = PartialParser::inputValueDefinition("\"Define if soft deleted models should be also fetched.\"\ntrashed: Trash @trash");
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, [$softDeletesArgument]);
     }
-
 }
