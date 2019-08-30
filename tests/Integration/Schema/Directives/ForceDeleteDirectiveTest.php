@@ -41,6 +41,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
 
         $this->assertCount(0, Task::withTrashed()->get());
     }
+
     /**
      * @test
      */
