@@ -828,6 +828,18 @@ type Query {
 }
 ```
 
+## @forceDelete
+
+Force delete one or more models by their ID.
+
+```graphql
+type Mutation {
+    forceDeletePost(id: ID!): Post @forceDelete
+}
+```
+
+This directive accepts same parameters as [@delete directive](#delete).
+
 ## @enum
 
 Assign an internal value to an enum key. When dealing with the Enum type in your code,
@@ -1735,6 +1747,18 @@ directive @rename(
   attribute: String!
 ) on FIELD_DEFINITION
 ```
+
+## @restore
+
+Restore one or more models by their ID.
+
+```graphql
+type Mutation {
+    restorePost(id: ID!): Post @restore
+}
+```
+
+This directive accepts same parameters as [@delete directive](#delete).
 
 ## @rules
 
