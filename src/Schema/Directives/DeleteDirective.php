@@ -2,18 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-class DeleteDirective extends DeleteRestoreDirective
-use GraphQL\Language\AST\NodeKind;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class DeleteDirective extends BaseDirective implements FieldResolver, DefinedDirective
+class DeleteDirective extends DeleteRestoreDirective implements DefinedDirective
 {
     /**
      * Name of the directive.
@@ -23,5 +14,22 @@ class DeleteDirective extends BaseDirective implements FieldResolver, DefinedDir
     public function name(): string
     {
         return 'delete';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Delete one or more models by their ID.
+The field must have a single non-null argument that may be a list.
+"""
+directive @delete(
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION
+SDL;
     }
 }
