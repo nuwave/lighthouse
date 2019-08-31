@@ -2,14 +2,14 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use GraphQL\Error\Error;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Collection;
 use Tests\DBTestCase;
+use GraphQL\Error\Error;
 use Tests\Utils\Models\Hour;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Illuminate\Support\Collection;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class MorphManyDirectiveTest extends DBTestCase
 {
@@ -208,7 +208,7 @@ class MorphManyDirectiveTest extends DBTestCase
                                 'from' => $hour->from,
                                 'to' => $hour->to,
                             ];
-                        })->toArray()
+                        })->toArray(),
                     ],
                 ],
             ],
