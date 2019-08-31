@@ -68,3 +68,32 @@ type Image {
 
 The default type resolver will be able to determine which concrete object type is returned
 when dealing with Eloquent models, so your definition should just work.
+
+You can also define the inverse of the relationship, i.e.:
+
+```graphql
+type Post {
+    id: ID!
+    title: String!
+    image: Image! @morphOne
+}
+```
+
+## One to Many
+
+Following with the above example, if your Post can have many images, you would
+define a schema like:
+
+```graphql
+type Post {
+    id: ID!
+    name: String!
+    images: [Image]! @morphMany
+}
+
+type Image {
+    id: ID!
+    url: String!
+    imageable: Imageable! @morphTo
+}
+```
