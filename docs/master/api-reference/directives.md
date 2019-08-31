@@ -1420,6 +1420,42 @@ Enable fetching an Eloquent model by its global id through the `node` query.
 directive @model on OBJECT
 ```
 
+## @morphOne
+
+Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+
+```graphql
+type Post {
+    image: Image! @morphOne
+}
+
+type Image {
+    imagable: Imageable! @morphTo
+}
+
+union Imageable = Post | User
+```
+
+### Definition
+
+```graphql
+"""
+Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+"""
+directive @morphOne(      
+  """
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
+  """
+  relation: String
+  
+  """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+) on FIELD_DEFINITION
+```
+
 ## @morphTo
 
 Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
