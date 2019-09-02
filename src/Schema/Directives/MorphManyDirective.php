@@ -6,7 +6,7 @@ use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-class BelongsToManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
+class MorphManyDirective extends RelationDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -15,16 +15,21 @@ class BelongsToManyDirective extends RelationDirective implements FieldResolver,
      */
     public function name(): string
     {
-        return 'belongsToMany';
+        return 'morphMany';
     }
 
-    public static function definition(): string
+    /**
+     * SDL definition of the directive.
+     *
+     * @return string
+     */
+    public static function definition()
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Resolves a field through the Eloquent `BelongsToMany` relationship.
+Corresponds to [Eloquent's MorphMany-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @belongsToMany(
+directive @morphMany(
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.

@@ -5,12 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.1.1...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.2.0...master)
+
+- Add `@softDeletes` and `@trash` directives to be able to fetch `onlyTrashed`, `withTrashed` or `withoutTrashed` models https://github.com/nuwave/lighthouse/pull/937
+
+## [4.2.0](https://github.com/nuwave/lighthouse/compare/v4.1.1...v4.2.0)
 
 ### Added
 
-- Add `@softDeletes` and `@trash` directives to be able to fetch `onlyTrashed`, `withTrashed` or `withoutTrashed` models https://github.com/nuwave/lighthouse/pull/937
+- Add `@morphOne` directive for polymorphic one-to-one relationships https://github.com/nuwave/lighthouse/pull/944
 - Add `@morphTo` directive for polymorphic one-to-one relationships https://github.com/nuwave/lighthouse/pull/921
+- Add `@morphMany` directive for polymorphic one-to-many relationships https://github.com/nuwave/lighthouse/pull/944
 - Support Laravel `^6.0` https://github.com/nuwave/lighthouse/pull/926
 - Add command `lighthouse:ide-helper` for generating a definition file with all schema directives https://github.com/nuwave/lighthouse/pull/933
 

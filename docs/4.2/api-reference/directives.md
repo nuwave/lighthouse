@@ -2100,34 +2100,6 @@ query myQuery($someTest: Boolean) {
 }
 ```
 
-## @softDeletes
-
-This directive adds an `trashed: Trash @trash` argument to you field, which allows you to define if `ONLY`, `WITH` 
-or `WITHOUT` trashed elements should be fetched.
-
-### Definition
-```graphql
-directive @softDeletes on FIELD_DEFINITION
-```
-
-### Examples
-
-With following schema
-
-```graphql
-type Query {
-  tasks: [Tasks!]! @all @softDeletes
-}
-```
-
-It is possible to create queries like this:
-
-```graphql
-{
-  tasks(trashed: ONLY) {...}
-}
-```
-
 ## @spread
 
 Spread out the nested values of an argument of type input object into it's parent.
@@ -2213,16 +2185,6 @@ directive @subscription(
   """
   class: String!
 ) on FIELD_DEFINITION
-```
-
-## @trash
-
-Updates builder query to fetch only specified soft deleted elements.
-This directive is used by [@softDeletes directive](#softdeletes) internally.
-
-### Definition
-```graphql
-directive @trash on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 ## @trim
