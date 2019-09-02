@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.2.1...master)
 
-## [4.2.1](https://github.com/nuwave/lighthouse/compare/v4.2.0...v4.2.1)
-
 ### Added
 
 - Add `@restore` and `@forceDelete` directives, similar to `@delete` https://github.com/nuwave/lighthouse/pull/941
+
+## [4.2.1](https://github.com/nuwave/lighthouse/compare/v4.2.0...v4.2.1)
 
 ### Fixed
 
