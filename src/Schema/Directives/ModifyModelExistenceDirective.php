@@ -6,14 +6,26 @@ use GraphQL\Language\AST\ListTypeNode;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Language\AST\NonNullTypeNode;
 use Illuminate\Database\Eloquent\Collection;
+use GraphQL\Language\AST\FieldDefinitionNode;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver
+abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator
 {
+    /**
+     * The GlobalId resolver.
+     *
+     * @var boolean
+     */
+    protected $verifySoftDeletesUsed = false;
+
     /**
      * The GlobalId resolver.
      *
@@ -126,4 +138,27 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * @return void
      */
     abstract protected function modifyExistence(Model $model): void;
+
+    /**
+     * Field manipulation is used to verify if usage of directive is allowed on defined field
+     *
+     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
+     * @param \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition
+     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
+     *
+     * @return void
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     */
+    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
+    {
+        if ($this->verifySoftDeletesUsed !== true) {
+            return;
+        }
+
+        if (! in_array(SoftDeletes::class, class_uses_recursive($this->getModelClass()))) {
+            throw new DirectiveException(
+                'Use @'.static::name()." directive only for Model classes that use the SoftDeletes trait!"
+            );
+        }
+    }
 }

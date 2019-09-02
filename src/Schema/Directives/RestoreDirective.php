@@ -7,6 +7,8 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class RestoreDirective extends ModifyModelExistenceDirective implements DefinedDirective
 {
+    protected $verifySoftDeletesUsed = true;
+
     /**
      * Name of the directive.
      *

@@ -7,6 +7,8 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class ForceDeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective
 {
+    protected $verifySoftDeletesUsed = true;
+
     /**
      * Name of the directive.
      *

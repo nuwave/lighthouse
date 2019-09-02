@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Tests\Utils\Models\User;
 
 class ForceDeleteDirectiveTest extends DBTestCase
 {
@@ -174,7 +175,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            deleteTask(foo: String, bar: Int): Task @delete
+            deleteTask(foo: String, bar: Int): Task @forceDelete
         }
         '.$this->placeholderQuery();
 
@@ -182,6 +183,33 @@ class ForceDeleteDirectiveTest extends DBTestCase
         mutation {
             deleteTask {
                 name
+            }
+        }
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itRejectUsingDirectiveWithNoSoftDeleteModels(): void
+    {
+        factory(User::class)->create();
+        $this->expectException(DirectiveException::class);
+
+        $this->schema = '
+        type User {
+            id: ID!
+        }
+        
+        type Mutation {
+            deleteUser(id: ID!): User @forceDelete
+        }
+        '.$this->placeholderQuery();
+
+        $this->graphQL('
+        mutation {
+            deleteUser(id: 1) {
+                id
             }
         }
         ');

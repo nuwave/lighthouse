@@ -5,6 +5,7 @@ namespace Tests\Integration\Schema\Directives;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Tests\Utils\Models\User;
 
 class RestoreDirectiveTest extends DBTestCase
 {
@@ -157,6 +158,33 @@ class RestoreDirectiveTest extends DBTestCase
         mutation {
             restoreTask {
                 name
+            }
+        }
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itRejectUsingDirectiveWithNoSoftDeleteModels(): void
+    {
+        $user = factory(User::class)->create();
+        $this->expectException(DirectiveException::class);
+
+        $this->schema = '
+        type User {
+            id: ID!
+        }
+        
+        type Mutation {
+            restoreUser(id: ID!): User @restore
+        }
+        '.$this->placeholderQuery();
+
+        $this->graphQL('
+        mutation {
+            restoreUser(id: 1) {
+                id
             }
         }
         ');
