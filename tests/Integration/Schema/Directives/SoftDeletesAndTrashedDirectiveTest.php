@@ -4,9 +4,9 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\Schema\Directives\TrashDirective;
+use Nuwave\Lighthouse\Schema\Directives\TrashedDirective;
 
-class SoftDeletesAndTrashDirectiveTest extends DBTestCase
+class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 {
     /**
      * @test
@@ -392,11 +392,11 @@ class SoftDeletesAndTrashDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itThrowsIfModelDoesNotSupportSoftDeletesTrash(): void
+    public function itThrowsIfModelDoesNotSupportSoftDeletesTrashed(): void
     {
         $this->schema = '
         type Query {
-            trash(trashed: Trash @trash): [User!]! @all
+            trashed(trashed: Trashed @trashed): [User!]! @all
         }
         
         type User {
@@ -404,10 +404,10 @@ class SoftDeletesAndTrashDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->expectExceptionMessage(TrashDirective::MODEL_MUST_USE_SOFT_DELETES);
+        $this->expectExceptionMessage(TrashedDirective::MODEL_MUST_USE_SOFT_DELETES);
         $this->graphQL('
         {
-            trash(trashed: WITH) {
+            trashed(trashed: WITH) {
                 id
             }
         }
@@ -429,7 +429,7 @@ class SoftDeletesAndTrashDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->expectExceptionMessage(TrashDirective::MODEL_MUST_USE_SOFT_DELETES);
+        $this->expectExceptionMessage(TrashedDirective::MODEL_MUST_USE_SOFT_DELETES);
         $this->graphQL('
         {
             softDeletes(trashed: WITH) {

@@ -16,11 +16,20 @@ type Query {
 ```
 
 Lighthouse will add an argument `trashed` to the field definition
-and automatically include the enum `Trash`.
+and automatically include the enum `Trashed`.
 
 ```graphql
 type Query {
-  flights(trashed: Trash @trashed): [Flight!]! @all
+  flights(trashed: Trashed @trashed): [Flight!]! @all
+}
+
+"""
+Used for filtering 
+"""
+enum Trashed {
+    ONLY @enum(value: "only")
+    WITH @enum(value: "with")
+    WITHOUT @enum(value: "without")
 }
 ```
 

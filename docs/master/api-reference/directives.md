@@ -2106,7 +2106,7 @@ query myQuery($someTest: Boolean) {
 """
 Allows to filter if trashed elements should be fetched.
 This manipulates the schema by adding the argument
-`trashed: Trash @trash` to the field.
+`trashed: Trashed @trashed` to the field.
 """
 directive @softDeletes on FIELD_DEFINITION
 ```
@@ -2123,11 +2123,11 @@ Will result in a schema that looks like this:
 
 ```graphql
 type Query {
-  tasks(trashed: Trash @trash): [Tasks!]! @all
+  tasks(trashed: Trashed @trashed): [Tasks!]! @all
 }
 ```
 
-Find out how the added filter works: [`@trash`](#trash)
+Find out how the added filter works: [`@trashed`](#trashed)
 
 ## @spread
 
@@ -2216,18 +2216,25 @@ directive @subscription(
 ) on FIELD_DEFINITION
 ```
 
-## @trash
+## @trashed
 
 ```graphql
 """
 Allows to filter if trashed elements should be fetched.
 """
-directive @trash on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 ```
 
 The most convenient way to use this directive is through [`@softDeletes`](#softdeletes).
 
-If you want to add it manually, make sure 
+If you want to add it manually, make sure the argument is of the
+enum type `Trashed`:
+
+```graphql
+type Query {
+    flights(trashed: Trashed @trashed): [Flight!]! @all
+}
+```
 
 ## @trim
 

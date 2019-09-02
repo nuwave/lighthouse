@@ -9,9 +9,9 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class TrashDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
+class TrashedDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
-    const MODEL_MUST_USE_SOFT_DELETES = 'Use @trash only for Model classes that use the SoftDeletes trait.';
+    const MODEL_MUST_USE_SOFT_DELETES = 'Use @trashed only for Model classes that use the SoftDeletes trait.';
 
     /**
      * Name of the directive.
@@ -20,7 +20,7 @@ class TrashDirective extends BaseDirective implements ArgBuilderDirective, Defin
      */
     public function name(): string
     {
-        return 'trash';
+        return 'trashed';
     }
 
     public static function definition(): string
@@ -29,7 +29,7 @@ class TrashDirective extends BaseDirective implements ArgBuilderDirective, Defin
 """
 Allows to filter if trashed elements should be fetched.
 """
-directive @trash on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+directive @trashed on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 
@@ -61,8 +61,8 @@ SDL;
             return $builder;
         }
 
-        $trashModificationMethod = "{$value}Trashed";
-        $builder->{$trashModificationMethod}();
+        $trashedModificationMethod = "{$value}Trashed";
+        $builder->{$trashedModificationMethod}();
 
         return $builder;
     }

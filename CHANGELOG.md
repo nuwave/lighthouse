@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.2.0...master)
 
-- Add `@softDeletes` and `@trash` directives to be able to fetch `onlyTrashed`, `withTrashed` or `withoutTrashed` models https://github.com/nuwave/lighthouse/pull/937
+- Add `@softDeletes` and `@trashed` directives to enable
+  filtering soft deleted models https://github.com/nuwave/lighthouse/pull/937
 
 ## [4.2.0](https://github.com/nuwave/lighthouse/compare/v4.1.1...v4.2.0)
 

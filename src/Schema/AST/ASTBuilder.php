@@ -95,7 +95,7 @@ class ASTBuilder
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
         $this->addOrderByTypes();
-        $this->addTrashEnum();
+        $this->addTrashedEnum();
 
         // Listeners may manipulate the DocumentAST that is passed by reference
         // into the ManipulateAST event. This can be useful for extensions
@@ -364,17 +364,17 @@ GRAPHQL
     }
 
     /**
-     * Add Trash enum that can be used in arguments with @paginate.
+     * Add Trashed enum to filter soft deleted models.
      *
-     * @see \Nuwave\Lighthouse\Schema\Directives\PaginateDirective
+     * @see \Nuwave\Lighthouse\Schema\Directives\TrashedDirective
      *
      * @return void
      */
-    protected function addTrashEnum(): void
+    protected function addTrashedEnum(): void
     {
         $this->documentAST->setTypeDefinition(
             PartialParser::enumTypeDefinition('
-                enum Trash {
+                enum Trashed {
                     ONLY @enum(value: "only")
                     WITH @enum(value: "with")
                     WITHOUT @enum(value: "without")

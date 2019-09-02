@@ -28,7 +28,7 @@ class SoftDeletesDirective extends BaseDirective implements FieldManipulator, De
 """
 Allows to filter if trashed elements should be fetched.
 This manipulates the schema by adding the argument
-`trashed: Trash @trash` to the field.
+`trashed: Trashed @trashed` to the field.
 """
 directive @softDeletes on FIELD_DEFINITION
 SDL;
@@ -46,7 +46,7 @@ SDL;
 """
 Allows to filter if trashed elements should be fetched.
 """
-trashed: Trash @trash
+trashed: Trashed @trashed
 SDL
         );
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, [$softDeletesArgument]);
