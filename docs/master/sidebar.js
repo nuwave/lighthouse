@@ -22,6 +22,7 @@ module.exports = [
         children: [
             ['eloquent/getting-started', 'Getting Started'],
             'eloquent/relationships',
+            'eloquent/polymorphic-relationships',
             'eloquent/nested-mutations',
         ]
     },
