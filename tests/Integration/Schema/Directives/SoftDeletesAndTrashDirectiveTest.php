@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Schema\Directives\TrashDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 
@@ -386,5 +387,55 @@ class SoftDeletesAndTrashDirectiveTest extends DBTestCase
              ->assertJsonCount(3, 'data.user.tasksWith')
              ->assertJsonCount(2, 'data.user.tasksWithout')
              ->assertJsonCount(2, 'data.user.tasksSimple');
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsIfModelDoesNotSupportSoftDeletesTrash(): void
+    {
+        $this->schema = '
+        type Query {
+            trash(trashed: Trash @trash): [User!]! @all
+        }
+        
+        type User {
+            id: ID
+        }
+        ';
+
+        $this->expectExceptionMessage(TrashDirective::MODEL_MUST_USE_SOFT_DELETES);
+        $this->graphQL('
+        {
+            softDeletes(trashed: WITH) {
+                id
+            }
+        }
+        ');
+    }
+
+    /**
+     * @test
+     */
+    public function itThrowsIfModelDoesNotSupportSoftDeletes(): void
+    {
+        $this->schema = '
+        type Query {
+            softDeletes: [User!]! @all @softDeletes
+        }
+        
+        type User {
+            id: ID
+        }
+        ';
+
+        $this->expectExceptionMessage(TrashDirective::MODEL_MUST_USE_SOFT_DELETES);
+        $this->graphQL('
+        {
+            softDeletes(trashed: WITH) {
+                id
+            }
+        }
+        ');
     }
 }
