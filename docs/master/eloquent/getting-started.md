@@ -94,7 +94,7 @@ And can be queried like this:
 }
 ```
 
-## Adding query constraints
+## Adding Query Constraints
 
 Lighthouse provides built-in directives to enhance your queries by giving
 additional query capabilities to the client.
@@ -246,32 +246,6 @@ This mutation will return the deleted object, so you will have a last chance to 
     "deleteUser": {
       "secret": "Pink is my favorite color!"
     }
-  }
-}
-```
-
-## Soft Deleting
-
-If your model uses soft delete, you can use `@softDeletes` directive on your field, to be able to query `onlyTrashed`, `withTrashed` or `withoutTrashed` elements.
-
-`@softDeletes` directive adds new argument `trashed` of enum type `Trash` with available values `ONLY`, `WITH` and `WITHOUT` to your field.
-
-NOTE: You have to use this directive aside builtin field directives like `@all`, `@paginate`, `@find`, `@hasMany`, `@hasOne` etc.
-
-For example your schema has following structure
-
-```graphql
-type Query {
-  tasks: [Task!]! @all @softDeletes
-}
-```
-
-Then you can make queries like this:
-
-```graphql
-{
-  tasks(trashed: WITH) {
-    ...
   }
 }
 ```
