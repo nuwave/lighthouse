@@ -264,6 +264,9 @@ The `subscription` argument must reference the name of a subscription field.
 ### Definition
 
 ```graphql
+"""
+Broadcast the results of a mutation to subscribed clients.
+"""
 directive @broadcast(
   """
   Name of the subscription that should be retriggered as a result of this operation..
@@ -963,7 +966,7 @@ own mechanism of encoding/decoding global ids.
 
 ## @hasMany
 
-Corresponds to [Eloquent's HasMany-Relationship](https://laravel.com/docs/eloquent-relationships#one-to-many).
+Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
 
 ```graphql
 type User {
@@ -974,6 +977,9 @@ type User {
 ### Definition
 
 ```graphql
+"""
+Corresponds to [the Eloquent relationship HasMany](https://laravel.com/docs/eloquent-relationships#one-to-many).
+"""
 directive @hasMany(
   """
   Specify the default quantity of elements to be returned.
@@ -1236,6 +1242,29 @@ directive @interface(
 ) on INTERFACE
 ```
 
+## @lazyLoad
+
+```graphql
+"""
+Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
+on the relations of a list of models.
+"""
+directive @lazyLoad(
+    """
+    The names of the relationship methods to load.
+    """
+    relations: [String!]!
+) on FIELD_DEFINITION
+```
+
+This is often useful when loading relationships with the [`@hasMany`](#hasmany) directive.
+
+```graphql
+type Post {
+    comments: [Comment!]! @hasMany @lazyLoad(relations: ["replies"])
+}
+```
+
 ## @method
 
 Call a method with a given `name` on the class that represents a type to resolve a field.
@@ -1481,6 +1510,9 @@ type Query {
 ### Definition
 
 ```graphql
+"""
+Sort a result list by one or more given fields.
+"""
 directive @orderBy on ARGUMENT_DEFINITION
 ```
 
@@ -2205,7 +2237,7 @@ Verify that a column's value is between two values.
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
-directive @whereNotBetween(
+directive @whereBetween(
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema.
