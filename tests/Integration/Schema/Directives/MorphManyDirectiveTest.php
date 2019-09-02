@@ -59,16 +59,30 @@ class MorphManyDirectiveTest extends DBTestCase
         $this->task = factory(Task::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->taskHours = Collection::times(10)->map(function () {
-            return $this->task->hours()->save(factory(Hour::class)->create());
-        });
+        $this->taskHours = Collection
+            ::times(10)
+            ->map(function () {
+                return $this->task
+                    ->hours()
+                    ->save(
+                        factory(Hour::class)->create()
+                    );
+            });
 
         $this->post = factory(Post::class)->create([
             'user_id' => $this->user->id,
         ]);
-        $this->postHours = Collection::times($this->faker()->numberBetween(1, 10))->map(function () {
-            return $this->post->hours()->save(factory(Hour::class)->create());
-        });
+        $this->postHours = Collection
+            ::times(
+                $this->faker()->numberBetween(1, 10)
+            )
+            ->map(function () {
+                return $this->post
+                    ->hours()
+                    ->save(
+                        factory(Hour::class)->create()
+                    );
+            });
     }
 
     /**
@@ -133,24 +147,28 @@ class MorphManyDirectiveTest extends DBTestCase
                 'post' => [
                     'id' => $this->post->id,
                     'title' => $this->post->title,
-                    'hours' => $this->postHours->map(function (Hour $hour) {
-                        return [
-                            'id' => $hour->id,
-                            'from' => $hour->from,
-                            'to' => $hour->to,
-                        ];
-                    })->toArray(),
+                    'hours' => $this->postHours
+                        ->map(function (Hour $hour) {
+                            return [
+                                'id' => $hour->id,
+                                'from' => $hour->from,
+                                'to' => $hour->to,
+                            ];
+                        })
+                        ->toArray(),
                 ],
                 'task' => [
                     'id' => $this->task->id,
                     'name' => $this->task->name,
-                    'hours' => $this->taskHours->map(function (Hour $hour) {
-                        return [
-                            'id' => $hour->id,
-                            'from' => $hour->from,
-                            'to' => $hour->to,
-                        ];
-                    })->toArray(),
+                    'hours' => $this->taskHours
+                        ->map(function (Hour $hour) {
+                            return [
+                                'id' => $hour->id,
+                                'from' => $hour->from,
+                                'to' => $hour->to,
+                            ];
+                        })
+                        ->toArray(),
                 ],
             ],
         ])->assertJsonCount($this->postHours->count(), 'data.post.hours')
@@ -202,13 +220,15 @@ class MorphManyDirectiveTest extends DBTestCase
                     'id' => $this->post->id,
                     'title' => $this->post->title,
                     'hours' => [
-                        'data' => $this->postHours->map(function (Hour $hour) {
-                            return [
-                                'id' => $hour->id,
-                                'from' => $hour->from,
-                                'to' => $hour->to,
-                            ];
-                        })->toArray(),
+                        'data' => $this->postHours
+                            ->map(function (Hour $hour) {
+                                return [
+                                    'id' => $hour->id,
+                                    'from' => $hour->from,
+                                    'to' => $hour->to,
+                                ];
+                            })
+                            ->toArray(),
                     ],
                 ],
             ],

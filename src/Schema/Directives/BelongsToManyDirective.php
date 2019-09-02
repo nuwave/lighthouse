@@ -26,35 +26,38 @@ Resolves a field through the Eloquent `BelongsToMany` relationship.
 """
 directive @belongsToMany(
   """
-  Which pagination style to use.
-  Allowed values: paginator, connection.
+  Specify the relationship method name in the model class,
+  if it is named different from the field in the schema.
   """
-  type: String = "paginator"
+  relation: String
   
   """
+  Apply scopes to the underlying query.
+  """
+  scopes: [String!]
+
+  """
+  ALlows to resolve the relation as a paginated list.
+  Allowed values: paginator, connection.
+  """
+  type: String
+
+  """
   Specify the default quantity of elements to be returned.
+  Only applies when using pagination.
   """
   defaultCount: Int
   
   """
   Specify the maximum quantity of elements to be returned.
+  Only applies when using pagination.
   """
   maxCount: Int
   
   """
-  Specify the relationship method name in the model class,
-  if it is named different from the field in the schema.
-  """
-  relation: String
-
-  """
-  Apply scopes to the underlying query.
-  """
-  scopes: [String!]
-  
-  """
   Specify a custom type that implements the Edge interface
   to extend edge object.
+  Only applies when using Relay style "connection" pagination.
   """
   edgeType: String
 ) on FIELD_DEFINITION
