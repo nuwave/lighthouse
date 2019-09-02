@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class RestoreDirectiveModel extends ModifyModelExistenceDirective implements DefinedDirective
+class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective
 {
     /**
      * Name of the directive.
@@ -14,17 +14,17 @@ class RestoreDirectiveModel extends ModifyModelExistenceDirective implements Def
      */
     public function name(): string
     {
-        return 'restore';
+        return 'delete';
     }
 
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Un-delete one or more soft deleted models by their ID. 
+Delete one or more models by their ID.
 The field must have a single non-null argument that may be a list.
 """
-directive @restore(
+directive @delete(
   """
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
@@ -49,7 +49,7 @@ SDL;
      */
     protected function find(string $modelClass, $idOrIds)
     {
-        return $modelClass::withTrashed($modelClass)->find($idOrIds);
+        return $modelClass::find($idOrIds);
     }
 
     /**
@@ -60,6 +60,6 @@ SDL;
      */
     protected function modifyExistence(Model $model): void
     {
-        $model->forceDelete();
+        $model->delete();
     }
 }

@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class ForceDeleteDirectiveModel extends ModifyModelExistenceDirective implements DefinedDirective
+class ForceDeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective
 {
     /**
      * Name of the directive.
@@ -43,19 +43,19 @@ SDL;
     /**
      * Find one or more models by id.
      *
-     * @param string|\Illuminate\Database\Eloquent\Model $modelClass
+     * @param string|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes $modelClass
      * @param string|int|string[]|int[] $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
     protected function find(string $modelClass, $idOrIds)
     {
-        return $modelClass::withTrashed($modelClass)->find($idOrIds);
+        return $modelClass::withTrashed()->find($idOrIds);
     }
 
     /**
      * Bring a model in or out of existence.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes $model
      * @return void
      */
     protected function modifyExistence(Model $model): void

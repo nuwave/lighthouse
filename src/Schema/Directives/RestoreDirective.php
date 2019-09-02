@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class DeleteDirectiveModel extends ModifyModelExistenceDirective implements DefinedDirective
+class RestoreDirective extends ModifyModelExistenceDirective implements DefinedDirective
 {
     /**
      * Name of the directive.
@@ -14,17 +14,17 @@ class DeleteDirectiveModel extends ModifyModelExistenceDirective implements Defi
      */
     public function name(): string
     {
-        return 'delete';
+        return 'restore';
     }
 
     public static function definition(): string
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Delete one or more models by their ID.
+Un-delete one or more soft deleted models by their ID. 
 The field must have a single non-null argument that may be a list.
 """
-directive @delete(
+directive @restore(
   """
   Set to `true` to use global ids for finding the model.
   If set to `false`, regular non-global ids are used.
@@ -43,23 +43,23 @@ SDL;
     /**
      * Find one or more models by id.
      *
-     * @param string|\Illuminate\Database\Eloquent\Model $modelClass
+     * @param string|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes $modelClass
      * @param string|int|string[]|int[] $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
     protected function find(string $modelClass, $idOrIds)
     {
-        return $modelClass::find($idOrIds);
+        return $modelClass::withTrashed()->find($idOrIds);
     }
 
     /**
      * Bring a model in or out of existence.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes $model
      * @return void
      */
     protected function modifyExistence(Model $model): void
     {
-        $model->delete();
+        $model->restore();
     }
 }
