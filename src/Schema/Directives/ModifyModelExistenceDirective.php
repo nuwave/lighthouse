@@ -22,7 +22,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     /**
      * The GlobalId resolver.
      *
-     * @var boolean
+     * @var bool
      */
     protected $verifySoftDeletesUsed = false;
 
@@ -140,7 +140,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     abstract protected function modifyExistence(Model $model): void;
 
     /**
-     * Field manipulation is used to verify if usage of directive is allowed on defined field
+     * Field manipulation is used to verify if usage of directive is allowed on defined field.
      *
      * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
      * @param \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition
@@ -157,7 +157,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
 
         if (! in_array(SoftDeletes::class, class_uses_recursive($this->getModelClass()))) {
             throw new DirectiveException(
-                'Use @'.static::name()." directive only for Model classes that use the SoftDeletes trait!"
+                'Use @'.static::name().' directive only for Model classes that use the SoftDeletes trait!'
             );
         }
     }
