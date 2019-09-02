@@ -370,6 +370,40 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
+    public function relayTypeHasAConnectionTypeDerivedFromTheEdgeTypeName(): void
+    {
+        $this->schema = '
+        type User {
+            tasks: [Task!]! @hasMany (
+                type: "relay"
+                edgeType: "TaskEdge"
+            )
+        }
+
+        type Task {
+            id: Int
+            foo: String
+        }
+
+        type TaskEdge {
+            cursor: String!
+            node: Task!
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $generatedType = $this->introspectType('TaskEdgeConnection');
+
+        $this->assertNotEmpty($generatedType);
+        $this->assertEquals('TaskEdgeConnection', $generatedType['name']);
+    }
+
+    /**
+     * @test
+     */
     public function itCanQueryHasManyPaginatorWithADefaultCount(): void
     {
         $this->schema = '
