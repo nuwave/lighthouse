@@ -47,7 +47,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
                 $argumentType = $argumentDefinition->type;
                 if (! $argumentType instanceof NonNullTypeNode) {
                     throw new DirectiveException(
-                        'The @' . static::name() ." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
+                        'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
                     );
                 }
 
@@ -103,7 +103,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     {
         if (count($this->definitionNode->arguments) !== 1) {
             throw new DirectiveException(
-                'The @' . static::name() ." directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
+                'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
             );
         }
 
@@ -117,7 +117,7 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * @param  string|int|string[]|int[]  $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
-    protected abstract function find(string $modelClass, $idOrIds);
+    abstract protected function find(string $modelClass, $idOrIds);
 
     /**
      * Bring a model in or out of existence.
@@ -125,5 +125,5 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
-    protected abstract function modifyExistence(Model $model): void;
+    abstract protected function modifyExistence(Model $model): void;
 }
