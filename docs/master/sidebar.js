@@ -23,6 +23,7 @@ module.exports = [
             ['eloquent/getting-started', 'Getting Started'],
             'eloquent/relationships',
             'eloquent/polymorphic-relationships',
+            'eloquent/soft-deleting',
             'eloquent/nested-mutations',
         ]
     },
