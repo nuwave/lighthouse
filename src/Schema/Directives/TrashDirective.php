@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Builder as ScoutBuilder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -45,7 +45,7 @@ SDL;
     {
         if ($builder instanceof Relation) {
             $model = $builder->getRelated();
-        } elseif($builder instanceof ScoutBuilder) {
+        } elseif ($builder instanceof ScoutBuilder) {
             $model = $builder->model;
         } else {
             $model = $builder->getModel();

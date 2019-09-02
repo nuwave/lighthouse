@@ -2,9 +2,9 @@
 
 namespace Tests\Integration\Schema\Directives;
 
-use Nuwave\Lighthouse\Schema\Directives\TrashDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
+use Nuwave\Lighthouse\Schema\Directives\TrashDirective;
 
 class SoftDeletesAndTrashDirectiveTest extends DBTestCase
 {
