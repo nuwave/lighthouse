@@ -627,20 +627,10 @@ type Mutation {
 
 ## @delete
 
-Delete one or more models by their ID.
-
-```graphql
-type Mutation {
-    deletePost(id: ID!): Post @delete
-}
-```
-
-### Definition
-
 ```graphql
 """
 Delete one or more models by their ID.
-The field must have an single non-null argument that may be a list.
+The field must have a single non-null argument that may be a list.
 """
 directive @delete(
   """
@@ -648,7 +638,21 @@ directive @delete(
   If set to `false`, regular non-global ids are used.
   """
   globalId: Boolean = false
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
 ) on FIELD_DEFINITION
+```
+
+Use it on a root mutation field that returns an instance of the Model.
+
+```graphql
+type Mutation {
+    deletePost(id: ID!): Post @delete
+}
 ```
 
 ### Examples
@@ -665,6 +669,8 @@ type Mutation {
 You can also delete multiple models at once.
 Define a field that takes a list of IDs and returns a Collection of the
 deleted models.
+
+_In contrast to Laravel mass updates, this does trigger model events._
 
 ```graphql
 type Mutation {
@@ -855,7 +861,27 @@ type Query {
 
 ## @forceDelete
 
-Force delete one or more models by their ID.
+```graphql
+"""
+Permanently remove one or more soft deleted models by their ID. 
+The field must have a single non-null argument that may be a list.
+"""
+directive @forceDelete(
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+```
+
+Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
@@ -863,7 +889,7 @@ type Mutation {
 }
 ```
 
-This directive accepts same parameters as [@delete directive](#delete).
+Works very similar to the [`@delete`](#delete) directive.
 
 ## @enum
 
@@ -1824,7 +1850,27 @@ directive @rename(
 
 ## @restore
 
-Restore one or more models by their ID.
+```graphql
+"""
+Un-delete one or more soft deleted models by their ID. 
+The field must have a single non-null argument that may be a list.
+"""
+directive @restore(
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+```
+
+Use it on a root mutation field that returns an instance of the Model.
 
 ```graphql
 type Mutation {
@@ -1832,7 +1878,7 @@ type Mutation {
 }
 ```
 
-This directive accepts same parameters as [@delete directive](#delete).
+Works very similar to the [`@delete`](#delete) directive.
 
 ## @rules
 

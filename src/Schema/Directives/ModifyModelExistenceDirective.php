@@ -2,8 +2,9 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\ListTypeNode;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Language\AST\NonNullTypeNode;
 use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
@@ -11,7 +12,7 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 
-abstract class DeleteRestoreDirective extends BaseDirective implements FieldResolver
+abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver
 {
     /**
      * The GlobalId resolver.
@@ -43,17 +44,19 @@ abstract class DeleteRestoreDirective extends BaseDirective implements FieldReso
             function ($root, array $args) {
                 $argumentDefinition = $this->getSingleArgumentDefinition();
 
-                if ($argumentDefinition->type->kind !== NodeKind::NON_NULL_TYPE) {
+                $argumentType = $argumentDefinition->type;
+                if (! $argumentType instanceof NonNullTypeNode) {
                     throw new DirectiveException(
-                        "The @delete directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
+                        'The @' . static::name() ." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
                     );
                 }
 
-                /** @var string|int|string[] $idOrIds */
+                /** @var string|int|string[]|int[] $idOrIds */
                 $idOrIds = reset($args);
+
                 if ($this->directiveArgValue('globalId', false)) {
                     // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-                    if ($argumentDefinition->type->type->kind === NodeKind::LIST_TYPE) {
+                    if ($argumentType->type instanceof ListTypeNode) {
                         $idOrIds = array_map(
                             function (string $id): string {
                                 return $this->globalId->decodeID($id);
@@ -65,27 +68,26 @@ abstract class DeleteRestoreDirective extends BaseDirective implements FieldReso
                     }
                 }
 
-                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
-                $modelClass = $this->getModelClass();
-                $model = $this->name() === 'delete'
-                    ? $modelClass::find($idOrIds)
-                    : $modelClass::withTrashed()->find($idOrIds);
+                $modelOrModels = $this->find(
+                    $this->getModelClass(),
+                    $idOrIds
+                );
 
-                if (! $model) {
+                if (! $modelOrModels) {
                     return;
                 }
 
-                if ($model instanceof Model) {
-                    $model->{$this->name()}();
+                if ($modelOrModels instanceof Model) {
+                    $this->modifyExistence($modelOrModels);
                 }
 
-                if ($model instanceof Collection) {
-                    foreach ($model as $modelItem) {
-                        $modelItem->{$this->name()}();
+                if ($modelOrModels instanceof Collection) {
+                    foreach ($modelOrModels as $model) {
+                        $this->modifyExistence($model);
                     }
                 }
 
-                return $model;
+                return $modelOrModels;
             }
         );
     }
@@ -101,10 +103,27 @@ abstract class DeleteRestoreDirective extends BaseDirective implements FieldReso
     {
         if (count($this->definitionNode->arguments) !== 1) {
             throw new DirectiveException(
-                "The @delete directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
+                'The @' . static::name() ." directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
             );
         }
 
         return $this->definitionNode->arguments[0];
     }
+
+    /**
+     * Find one or more models by id.
+     *
+     * @param  string|\Illuminate\Database\Eloquent\Model  $modelClass
+     * @param  string|int|string[]|int[]  $idOrIds
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     */
+    protected abstract function find(string $modelClass, $idOrIds);
+
+    /**
+     * Bring a model in or out of existence.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return void
+     */
+    protected abstract function modifyExistence(Model $model): void;
 }
