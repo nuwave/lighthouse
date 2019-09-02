@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class MorphToDirective extends RelationDirective implements FieldResolver, DefinedDirective
+class MorphOneDirective extends RelationDirective implements FieldResolver, DefinedDirective
 {
     /**
      * Name of the directive.
@@ -14,7 +14,7 @@ class MorphToDirective extends RelationDirective implements FieldResolver, Defin
      */
     public function name(): string
     {
-        return 'morphTo';
+        return 'morphOne';
     }
 
     /**
@@ -26,9 +26,9 @@ class MorphToDirective extends RelationDirective implements FieldResolver, Defin
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Corresponds to [Eloquent's MorphTo-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
+Corresponds to [Eloquent's MorphOne-Relationship](https://laravel.com/docs/5.8/eloquent-relationships#one-to-one-polymorphic-relations).
 """
-directive @morphTo(      
+directive @morphOne(      
   """
   Specify the relationship method name in the model class,
   if it is named different from the field in the schema.
