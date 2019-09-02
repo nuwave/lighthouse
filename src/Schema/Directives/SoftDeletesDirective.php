@@ -46,7 +46,7 @@ SDL;
 """
 Allows to filter if trashed elements should be fetched.
 """
-trashed: Trash @trashed
+trashed: Trash @trash
 SDL
         );
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, [$softDeletesArgument]);

@@ -407,7 +407,7 @@ class SoftDeletesAndTrashDirectiveTest extends DBTestCase
         $this->expectExceptionMessage(TrashDirective::MODEL_MUST_USE_SOFT_DELETES);
         $this->graphQL('
         {
-            softDeletes(trashed: WITH) {
+            trash(trashed: WITH) {
                 id
             }
         }
