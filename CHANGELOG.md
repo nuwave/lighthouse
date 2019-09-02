@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `@restore` and `@forceDelete` directives, similar to `@delete` https://github.com/nuwave/lighthouse/pull/941
 
+### Fixed
+
+- Actually use the specified `edgeType` in Relay style connections https://github.com/nuwave/lighthouse/pull/939
+
 ## [4.2.0](https://github.com/nuwave/lighthouse/compare/v4.1.1...v4.2.0)
 
 ### Added
