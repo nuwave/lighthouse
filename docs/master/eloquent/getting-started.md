@@ -94,7 +94,7 @@ And can be queried like this:
 }
 ```
 
-## Adding query constraints
+## Adding Query Constraints
 
 Lighthouse provides built-in directives to enhance your queries by giving
 additional query capabilities to the client.
