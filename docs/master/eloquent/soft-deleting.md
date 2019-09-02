@@ -6,7 +6,7 @@ Lighthouse offers convenient helpers to work with models that utilize
 ## Filter Soft Deleted Models
 
 If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait,
-you can add the [`@softDeletes`](../api-reference/directives.md) directive to a field
+you can add the [`@softDeletes`](../api-reference/directives.md#softdeletes) directive to a field
 to be able to query `onlyTrashed`, `withTrashed` or `withoutTrashed` elements.
 
 ```graphql
@@ -42,3 +42,58 @@ You can include soft deleted models in your result with a query like this:
   }
 }
 ```
+
+## Restoring Soft Deleted Models
+
+If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait, you can restore your model using [`@restore`](../api-reference/directives.md#restore) directive.
+
+```graphql
+type Query {
+  restoreFlight(id: ID!): Flight @restore
+}
+```
+
+Simply call it with the ID of the flight you want to restore.
+
+```graphql
+{
+  restoreFlight(id: 1) {
+    id
+  }
+}
+```
+
+This mutation will return the restored object.
+
+## Permanently Deleting Models
+
+To truly remove model from database, use [@forceDelete](../api-reference/directives.md#forcedelete) directive. Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait. 
+
+```graphql
+type Mutation {
+  forceDeleteFlight(id: ID!): Flight @forceDelete
+}
+```
+
+Simply call it with the ID of the Flight you want to permanently remove.
+
+```graphql
+mutation {
+  forceDeleteFlight(id: 5){
+    id
+  }
+}
+```
+
+This mutation will return the deleted object, so you will have a last chance to look at the data.
+
+```json
+{
+  "data": {
+    "forceDeleteFlight": {
+      "id": 5
+    }
+  }
+}
+```
+
