@@ -27,19 +27,20 @@ type Image {
 ```
 
 First, let's go ahead and add the relations to `Image` since they are straightforward.
-Just make sure the field name matches your relationship method name.
+The field name should match your relationship method name and be annotated
+with the [`@morphOne`](../api-reference/directives.md#morphone) directive.
 
 ```graphql
 type Post {
     id: ID!
     name: String!
-    image: Image!
+    image: Image! @morphOne
 }
 
 type User {
     id: ID!
     name: String!
-    image: Image
+    image: Image @morphOne
 }
 ```
 
@@ -68,3 +69,26 @@ type Image {
 
 The default type resolver will be able to determine which concrete object type is returned
 when dealing with Eloquent models, so your definition should just work.
+
+## One to Many
+
+Based on the above example, you could change your application to allow
+for a `Post` to have many images attached to it.
+The field `images` now returns a list of `Image` object and is annotated
+with the [`@morphMany`](../api-reference/directives.md#morphmany) directive.
+
+```graphql
+type Post {
+    id: ID!
+    name: String!
+    images: [Image]! @morphMany
+}
+
+type Image {
+    id: ID!
+    url: String!
+    imageable: Imageable! @morphTo
+}
+
+union Imageable = Post | User
+```
