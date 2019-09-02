@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use GraphQL\Error\Error;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -364,6 +365,53 @@ class HasManyDirectiveTest extends DBTestCase
         $this->assertSame(
             'Maximum number of 2 requested items exceeded. Fetch smaller chunks.',
             $result->jsonGet('errors.0.message')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function itUsesEdgeTypeForRelayConnections(): void
+    {
+        $this->schema = '
+        type User {
+            tasks: [Task!]! @hasMany (
+                type: "relay"
+                edgeType: "TaskEdge"
+            )
+        }
+
+        type Task {
+            id: Int
+            foo: String
+        }
+
+        type TaskEdge {
+            cursor: String!
+            node: Task!
+        }
+
+        type Query {
+            user: User @auth
+        }
+        ';
+
+        $expectedConnectionName = 'TaskEdgeConnection';
+
+        $this->assertNotEmpty(
+            $this->introspectType($expectedConnectionName)
+        );
+
+        $user = $this->introspectType('User');
+        $tasks = Arr::first(
+            $user['fields'],
+            function (array $user): bool {
+                return $user['name'] === 'tasks';
+            }
+        );
+        $this->assertSame(
+            $expectedConnectionName,
+            $tasks['type']['name']
         );
     }
 

@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.2.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.2.1...master)
+
+## [4.2.1](https://github.com/nuwave/lighthouse/compare/v4.2.0...v4.2.1)
+
+### Fixed
+
+- Actually use the specified `edgeType` in Relay style connections https://github.com/nuwave/lighthouse/pull/939
 
 - Add `@softDeletes` and `@trashed` directives to enable
   filtering soft deleted models https://github.com/nuwave/lighthouse/pull/937
