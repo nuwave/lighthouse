@@ -4,6 +4,7 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use GraphQL\Error\Error;
+use Illuminate\Support\Arr;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -370,7 +371,7 @@ class HasManyDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function relayTypeHasAConnectionTypeDerivedFromTheEdgeTypeName(): void
+    public function itUsesEdgeTypeForRelayConnections(): void
     {
         $this->schema = '
         type User {
@@ -395,10 +396,23 @@ class HasManyDirectiveTest extends DBTestCase
         }
         ';
 
-        $generatedType = $this->introspectType('TaskEdgeConnection');
+        $expectedConnectionName = 'TaskEdgeConnection';
 
-        $this->assertNotEmpty($generatedType);
-        $this->assertEquals('TaskEdgeConnection', $generatedType['name']);
+        $this->assertNotEmpty(
+            $this->introspectType($expectedConnectionName)
+        );
+
+        $user = $this->introspectType('User');
+        $tasks = Arr::first(
+            $user['fields'],
+            function (array $user): bool {
+                return $user['name'] === 'tasks';
+            }
+        );
+        $this->assertSame(
+            $expectedConnectionName,
+            $tasks['type']['name']
+        );
     }
 
     /**

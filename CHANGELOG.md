@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.2.0...master)
 
+### Fixed
+
+- Actually use the specified `edgeType` in Relay style connections https://github.com/nuwave/lighthouse/pull/939
+
 ## [4.2.0](https://github.com/nuwave/lighthouse/compare/v4.1.1...v4.2.0)
 
 ### Added
@@ -16,10 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `@morphMany` directive for polymorphic one-to-many relationships https://github.com/nuwave/lighthouse/pull/944
 - Support Laravel `^6.0` https://github.com/nuwave/lighthouse/pull/926
 - Add command `lighthouse:ide-helper` for generating a definition file with all schema directives https://github.com/nuwave/lighthouse/pull/933
-
-### Fixed
-
-- The connection type was not based on the edge type when the edge type was specified for the relay type https://github.com/nuwave/lighthouse/pull/939
 
 ## [4.1.1](https://github.com/nuwave/lighthouse/compare/v4.1.0...v4.1.1)
 

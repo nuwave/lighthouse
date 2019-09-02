@@ -64,11 +64,12 @@ class PaginationManipulator
     ): void {
         $fieldTypeName = ASTHelper::getUnderlyingTypeName($fieldDefinition);
 
-        if ($connectionEdgeName = $edgeType->name->value ?? null) {
+        if ($edgeType) {
+            $connectionEdgeName = $edgeType->name->value;
             $connectionTypeName = "{$connectionEdgeName}Connection";
         } else {
-            $connectionTypeName = "{$fieldTypeName}Connection";
             $connectionEdgeName = "{$fieldTypeName}Edge";
+            $connectionTypeName = "{$fieldTypeName}Connection";
         }
 
         $connectionFieldName = addslashes(ConnectionField::class);
