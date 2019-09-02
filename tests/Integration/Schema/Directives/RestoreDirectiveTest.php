@@ -4,8 +4,8 @@ namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class RestoreDirectiveTest extends DBTestCase
 {
