@@ -72,6 +72,45 @@ class CanDirectiveTest extends TestCase
             ],
         ]);
     }
+    /**
+     * @test
+     */
+    public function itWorksWithPaginateDirection(): void
+    {
+        $user = new User;
+        $user->name = UserPolicy::ADMIN;
+        $this->be($user);
+
+        $this->schema = '
+        type Query {
+            users: [User!]!
+                @can(ability: "adminOnly")
+                @paginate
+        }
+        
+        type User {
+            name: String
+        }
+        ';
+
+        $this->graphQL('
+        {
+            users(first: 1) {
+                data {
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'users' => [
+                    'data' => [
+                        'name' => 'foo',
+                    ],
+                ],
+            ],
+        ]);
+    }
 
     /**
      * @test
