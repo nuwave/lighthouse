@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `@softDeletes` and `@trashed` directives to enable
   filtering soft deleted models https://github.com/nuwave/lighthouse/pull/937
 
+### Fixed
+
+- Prevent throwing in `lighthouse:ide-helper` when no custom directives are defined https://github.com/nuwave/lighthouse/pull/948
+
 ## [4.2.1](https://github.com/nuwave/lighthouse/compare/v4.2.0...v4.2.1)
 
 ### Fixed
