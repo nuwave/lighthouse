@@ -93,7 +93,7 @@ class DirectiveFactory
      */
     protected function createOrFail(string $directiveName): Directive
     {
-        if(! $this->directiveNamespaces) {
+        if (! $this->directiveNamespaces) {
             $this->directiveNamespaces = $this->directiveNamespacer->gather();
         }
 

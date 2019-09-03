@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
+use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 
 class RestoreDirective extends ModifyModelExistenceDirective implements DefinedDirective, FieldManipulator
 {

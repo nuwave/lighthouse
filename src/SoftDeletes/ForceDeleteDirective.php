@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\SoftDeletes;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 
 class ForceDeleteDirective extends ModifyModelExistenceDirective

@@ -2,20 +2,19 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Language\AST\NonNullTypeNode;
 use Illuminate\Database\Eloquent\Collection;
+use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
-use GraphQL\Language\AST\InputValueDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
 abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {

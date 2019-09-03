@@ -2,11 +2,11 @@
 
 namespace Tests\Integration\SoftDeletes;
 
-use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
-use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 
 class RestoreDirectiveTest extends DBTestCase
 {

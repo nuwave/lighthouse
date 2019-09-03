@@ -1,16 +1,14 @@
 <?php
 
-
 namespace Nuwave\Lighthouse\SoftDeletes;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class SoftDeletesServiceProvider extends ServiceProvider
 {
@@ -23,12 +21,11 @@ class SoftDeletesServiceProvider extends ServiceProvider
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      * @see \Illuminate\Database\Eloquent\SoftDeletes
-     *
      */
     public static function assertModelUsesSoftDeletes(string $modelClass, string $exceptionMessage): void
     {
         if (
-            !in_array(
+            ! in_array(
                 SoftDeletes::class,
                 class_uses_recursive($modelClass)
             )
