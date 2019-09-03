@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\SoftDeletes;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\Schema\Directives\TrashedDirective;
+use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 
 class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 {

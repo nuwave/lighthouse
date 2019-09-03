@@ -5,7 +5,7 @@ namespace Nuwave\Lighthouse\Console;
 use Illuminate\Console\Command;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Nuwave\Lighthouse\Schema\DirectiveNamespaces;
+use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use HaydenPierce\ClassFinder\Exception\ClassFinderException;
@@ -36,10 +36,10 @@ SDL;
     /**
      * Execute the console command.
      *
-     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespaces  $directiveNamespaces
+     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespacer  $directiveNamespaces
      * @return int
      */
-    public function handle(DirectiveNamespaces $directiveNamespaces): int
+    public function handle(DirectiveNamespacer $directiveNamespaces): int
     {
         if (! class_exists('HaydenPierce\ClassFinder\ClassFinder')) {
             $this->error(

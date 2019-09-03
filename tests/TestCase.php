@@ -16,6 +16,7 @@ use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
+use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -42,6 +43,7 @@ abstract class TestCase extends BaseTestCase
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
             LighthouseServiceProvider::class,
+            SoftDeletesServiceProvider::class,
             ConsoleServiceProvider::class,
         ];
     }

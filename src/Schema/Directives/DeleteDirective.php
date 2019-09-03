@@ -2,36 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use GraphQL\Language\AST\NodeKind;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
-use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class DeleteDirective extends BaseDirective implements FieldResolver, DefinedDirective
+class DeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective
 {
-    /**
-     * The GlobalId resolver.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
-     */
-    protected $globalId;
-
-    /**
-     * DeleteDirective constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
-     * @return void
-     */
-    public function __construct(GlobalId $globalId)
-    {
-        $this->globalId = $globalId;
-    }
-
     /**
      * Name of the directive.
      *
@@ -47,7 +22,7 @@ class DeleteDirective extends BaseDirective implements FieldResolver, DefinedDir
         return /* @lang GraphQL */ <<<'SDL'
 """
 Delete one or more models by their ID.
-The field must have an single non-null argument that may be a list.
+The field must have a single non-null argument that may be a list.
 """
 directive @delete(
   """
@@ -55,80 +30,36 @@ directive @delete(
   If set to `false`, regular non-global ids are used.
   """
   globalId: Boolean = false
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
 ) on FIELD_DEFINITION
 SDL;
     }
 
     /**
-     * Resolve the field directive.
+     * Find one or more models by id.
      *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
+     * @param string|\Illuminate\Database\Eloquent\Model $modelClass
+     * @param string|int|string[]|int[] $idOrIds
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
-    public function resolveField(FieldValue $fieldValue): FieldValue
+    protected function find(string $modelClass, $idOrIds)
     {
-        return $fieldValue->setResolver(
-            function ($root, array $args) {
-                $argumentDefinition = $this->getSingleArgumentDefinition();
-
-                if ($argumentDefinition->type->kind !== NodeKind::NON_NULL_TYPE) {
-                    throw new DirectiveException(
-                        "The @delete directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
-                    );
-                }
-
-                /** @var string|int|string[] $idOrIds */
-                $idOrIds = reset($args);
-                if ($this->directiveArgValue('globalId', false)) {
-                    // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-                    if ($argumentDefinition->type->type->kind === NodeKind::LIST_TYPE) {
-                        $idOrIds = array_map(
-                            function (string $id): string {
-                                return $this->globalId->decodeID($id);
-                            },
-                            $idOrIds
-                        );
-                    } else {
-                        $idOrIds = $this->globalId->decodeID($idOrIds);
-                    }
-                }
-
-                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
-                $modelClass = $this->getModelClass();
-                $model = $modelClass::find($idOrIds);
-
-                if (! $model) {
-                    return;
-                }
-
-                if ($model instanceof Model) {
-                    $model->delete();
-                }
-
-                if ($model instanceof Collection) {
-                    $modelClass::destroy($idOrIds);
-                }
-
-                return $model;
-            }
-        );
+        return $modelClass::find($idOrIds);
     }
 
     /**
-     * Ensure there is only a single argument defined on the field.
+     * Bring a model in or out of existence.
      *
-     * @return \GraphQL\Language\AST\InputValueDefinitionNode
-     *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @return void
      */
-    protected function getSingleArgumentDefinition(): InputValueDefinitionNode
+    protected function modifyExistence(Model $model): void
     {
-        if (count($this->definitionNode->arguments) !== 1) {
-            throw new DirectiveException(
-                "The @delete directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
-            );
-        }
-
-        return $this->definitionNode->arguments[0];
+        $model->delete();
     }
 }
