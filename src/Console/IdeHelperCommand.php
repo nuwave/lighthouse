@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Console;
 
-use HaydenPierce\ClassFinder\Exception\ClassFinderException;
 use Illuminate\Console\Command;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespaces;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use HaydenPierce\ClassFinder\Exception\ClassFinderException;
 
 class IdeHelperCommand extends Command
 {
