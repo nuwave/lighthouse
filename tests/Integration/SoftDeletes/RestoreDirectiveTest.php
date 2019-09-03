@@ -6,18 +6,9 @@ use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 
 class RestoreDirectiveTest extends DBTestCase
 {
-    protected function getPackageProviders($app)
-    {
-        return array_merge(
-            parent::getPackageProviders($app),
-            [SoftDeletesServiceProvider::class]
-        );
-    }
-
     /**
      * @test
      */

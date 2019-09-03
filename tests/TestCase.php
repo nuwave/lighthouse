@@ -6,6 +6,7 @@ use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\GraphQL;
+use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Tests\Utils\Middleware\CountRuns;
 use Laravel\Scout\ScoutServiceProvider;
 use Tests\Utils\Policies\AuthServiceProvider;
@@ -42,6 +43,7 @@ abstract class TestCase extends BaseTestCase
             ScoutServiceProvider::class,
             AuthServiceProvider::class,
             LighthouseServiceProvider::class,
+            SoftDeletesServiceProvider::class,
             ConsoleServiceProvider::class,
         ];
     }
