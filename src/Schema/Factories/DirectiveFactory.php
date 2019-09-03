@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
-use Nuwave\Lighthouse\Schema\DirectiveNamespaces;
+use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -35,17 +35,22 @@ class DirectiveFactory
      *
      * @var string[]
      */
-    protected $directiveNamespaces = [];
+    protected $directiveNamespaces;
+
+    /**
+     * @var DirectiveNamespacer
+     */
+    protected $directiveNamespacer;
 
     /**
      * DirectiveFactory constructor.
      *
-     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespaces  $directiveNamespaces
+     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespacer  $directiveNamespacer
      * @return void
      */
-    public function __construct(DirectiveNamespaces $directiveNamespaces)
+    public function __construct(DirectiveNamespacer $directiveNamespacer)
     {
-        $this->directiveNamespaces = $directiveNamespaces->gather();
+        $this->directiveNamespacer = $directiveNamespacer;
     }
 
     /**
@@ -88,6 +93,10 @@ class DirectiveFactory
      */
     protected function createOrFail(string $directiveName): Directive
     {
+        if(! $this->directiveNamespaces) {
+            $this->directiveNamespaces = $this->directiveNamespacer->gather();
+        }
+
         foreach ($this->directiveNamespaces as $baseNamespace) {
             $className = $baseNamespace.'\\'.Str::studly($directiveName).'Directive';
             if (class_exists($className)) {

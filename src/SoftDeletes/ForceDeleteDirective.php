@@ -1,12 +1,12 @@
 <?php
 
-namespace Nuwave\Lighthouse\Schema\Directives;
+namespace Nuwave\Lighthouse\SoftDeletes;
 
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
-use Nuwave\Lighthouse\SoftDeletes\Utils;
+use Nuwave\Lighthouse\Schema\Directives\ModifyModelExistenceDirective;
 
 class ForceDeleteDirective extends ModifyModelExistenceDirective
 {
@@ -83,6 +83,7 @@ SDL;
     ): void {
         parent::manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
 
-        Utils::assertModelUsesSoftDeletes($this->getModelClass(), self::MODEL_NOT_USING_SOFT_DELETES);
+        SoftDeletesServiceProvider::assertModelUsesSoftDeletes($this->getModelClass(),
+            self::MODEL_NOT_USING_SOFT_DELETES);
     }
 }

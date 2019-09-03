@@ -1,13 +1,22 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\SoftDeletes;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
-use Nuwave\Lighthouse\Schema\Directives\TrashedDirective;
+use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
+use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 
 class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 {
+    protected function getPackageProviders($app)
+    {
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SoftDeletesServiceProvider::class]
+        );
+    }
+
     /**
      * @test
      */

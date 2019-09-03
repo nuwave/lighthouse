@@ -1,91 +1,73 @@
 <?php
 
-namespace Tests\Integration\Schema\Directives;
+namespace Tests\Integration\SoftDeletes;
 
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
-use Nuwave\Lighthouse\Schema\Directives\ForceDeleteDirective;
+use Nuwave\Lighthouse\SoftDeletes\RestoreDirective;
+use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
-use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
-class ForceDeleteDirectiveTest extends DBTestCase
+class RestoreDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itForceDeletesTaskAndReturnsIt(): void
+    protected function getPackageProviders($app)
     {
-        factory(Task::class)->create();
-
-        $this->schema = '
-        type Task {
-            id: ID!
-        }
-        
-        type Mutation {
-            forceDeleteTask(id: ID!): Task @forceDelete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            forceDeleteTask(id: 1) {
-                id
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'forceDeleteTask' => [
-                    'id' => 1,
-                ],
-            ],
-        ]);
-
-        $this->assertCount(0, Task::withTrashed()->get());
+        return array_merge(
+            parent::getPackageProviders($app),
+            [SoftDeletesServiceProvider::class]
+        );
     }
 
     /**
      * @test
      */
-    public function itForceDeletesDeletedTaskAndReturnsIt(): void
+    public function itRestoresTaskAndReturnsIt(): void
     {
         $task = factory(Task::class)->create();
         $task->delete();
 
+        $this->assertCount(1, Task::withTrashed()->get());
+        $this->assertCount(0, Task::withoutTrashed()->get());
+
         $this->schema = '
         type Task {
             id: ID!
         }
         
         type Mutation {
-            forceDeleteTask(id: ID!): Task @forceDelete
+            restoreTask(id: ID!): Task @restore
         }
         '.$this->placeholderQuery();
 
         $this->graphQL('
         mutation {
-            forceDeleteTask(id: 1) {
+            restoreTask(id: 1) {
                 id
             }
         }
         ')->assertJson([
             'data' => [
-                'forceDeleteTask' => [
+                'restoreTask' => [
                     'id' => 1,
                 ],
             ],
         ]);
 
-        $this->assertCount(0, Task::withTrashed()->get());
+        $this->assertCount(1, Task::withoutTrashed()->get());
     }
 
     /**
      * @test
      */
-    public function itForceDeletesMultipleTasksAndReturnsThem(): void
+    public function itRestoresMultipleTasksAndReturnsThem(): void
     {
-        factory(Task::class, 2)->create();
+        $tasks = factory(Task::class, 2)->create();
+        foreach ($tasks as $task) {
+            $task->delete();
+        }
+
+        $this->assertCount(2, Task::withTrashed()->get());
+        $this->assertCount(0, Task::withoutTrashed()->get());
 
         $this->schema = '
         type Task {
@@ -94,19 +76,19 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
         
         type Mutation {
-            forceDeleteTasks(id: [ID!]!): [Task!]! @forceDelete
+            restoreTasks(id: [ID!]!): [Task!]! @restore
         }
         '.$this->placeholderQuery();
 
         $this->graphQL('
         mutation {
-            forceDeleteTasks(id: [1, 2]) {
+            restoreTasks(id: [1, 2]) {
                 name
             }
         }
-        ')->assertJsonCount(2, 'data.forceDeleteTasks');
+        ')->assertJsonCount(2, 'data.restoreTasks');
 
-        $this->assertCount(0, Task::withTrashed()->get());
+        $this->assertCount(2, Task::withoutTrashed()->get());
     }
 
     /**
@@ -122,7 +104,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
         
         type Query {
-            deleteTask(id: ID): Task @forceDelete
+            restoreTask(id: ID): Task @restore
         }
         ');
     }
@@ -140,7 +122,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
         
         type Query {
-            deleteTask: Task @forceDelete
+            restoreTask: Task @restore
         }
         ');
     }
@@ -158,7 +140,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         }
         
         type Query {
-            deleteTask(foo: String, bar: Int): Task @forceDelete
+            restoreTask(foo: String, bar: Int): Task @restore
         }
         ');
     }
@@ -168,14 +150,15 @@ class ForceDeleteDirectiveTest extends DBTestCase
      */
     public function itRejectsUsingDirectiveWithNoSoftDeleteModels(): void
     {
-        $this->expectExceptionMessage(ForceDeleteDirective::MODEL_NOT_USING_SOFT_DELETES);
+        $this->expectExceptionMessage(RestoreDirective::MODEL_NOT_USING_SOFT_DELETES);
+
         $this->buildSchema('
         type User {
             id: ID!
         }
         
         type Query {
-            deleteUser(id: ID!): User @forceDelete
+            restoreUser(id: ID!): User @restore
         }
         ');
     }
