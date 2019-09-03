@@ -47,4 +47,21 @@ class IdeHelperCommandTest extends TestCase
         );
         $this->assertContains(UnionDirective::class, $generated);
     }
+
+    /**
+     * @test
+     */
+    public function itDoesNotRequireCustomDirectives(): void
+    {
+        /** @var \Illuminate\Contracts\Config\Repository $config */
+        $config = $this->app['config'];
+
+        $config->set('lighthouse.namespaces.directives', [
+            'Empty\\Because\\The\\User\\Has\\Not\\Created\\Custom\\Directives\\Yet',
+        ]);
+
+        $this->artisan('lighthouse:ide-helper');
+
+        $this->assertFileExists(IdeHelperCommand::filePath());
+    }
 }
