@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective
+class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     const NAME = 'whereNotBetween';
 
@@ -16,6 +17,24 @@ class WhereNotBetweenDirective extends BaseDirective implements ArgBuilderDirect
     public function name(): string
     {
         return self::NAME;
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Verify that a column\'s value lies outside of two values.
+The type of the input value this is defined upon should be
+an `input` object with two fields.
+"""
+directive @whereNotBetween(
+  """
+  Specify the database column to compare. 
+  Only required if database column has a different name than the attribute in your schema.
+  """
+  key: String
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

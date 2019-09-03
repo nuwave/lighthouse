@@ -46,7 +46,8 @@
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.*|3.9.*",
         "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*|3.9.*",
         "phpbench/phpbench": "@dev",
-        "pusher/pusher-php-server": "^3.2"
+        "pusher/pusher-php-server": "^3.2",
+        "haydenpierce/class-finder": "^0.3.3"
     },
     "suggest": {
         "laravel/scout": "Required for the @search directive",

@@ -9,8 +9,9 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class UpdateDirective extends BaseDirective implements FieldResolver
+class UpdateDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
      * @var \Illuminate\Database\DatabaseManager
@@ -45,6 +46,28 @@ class UpdateDirective extends BaseDirective implements FieldResolver
     public function name(): string
     {
         return 'update';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Update an Eloquent model with the input values of the field.
+"""
+directive @update(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**

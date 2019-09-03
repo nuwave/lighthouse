@@ -12,9 +12,10 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator
+class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
     const NAME = 'whereConstraints';
     const INVALID_COLUMN_MESSAGE = 'Column names may contain only alphanumerics or underscores, and may not begin with a digit.';
@@ -27,6 +28,24 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
     public function name(): string
     {
         return self::NAME;
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Add a dynamically client-controlled WHERE constraint to a fields query.
+The argument it is defined on may have any name but **must** be
+of the input type `WhereConstraints`.
+"""
+directive @whereConstraints(
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    """
+    columns: [String!]
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**

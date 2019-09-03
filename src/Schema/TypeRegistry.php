@@ -24,10 +24,8 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
-use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
-use Nuwave\Lighthouse\Schema\Values\ArgumentValue;
 use Nuwave\Lighthouse\Schema\Factories\FieldFactory;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
@@ -320,15 +318,7 @@ class TypeRegistry
             'name' => $inputDefinition->name->value,
             'description' => data_get($inputDefinition->description, 'value'),
             'fields' => function () use ($inputDefinition): array {
-                return (new Collection($inputDefinition->fields))
-                    ->mapWithKeys(function (InputValueDefinitionNode $inputValueDefinition) {
-                        $argumentValue = new ArgumentValue($inputValueDefinition);
-
-                        return [
-                            $inputValueDefinition->name->value => $this->argumentFactory->handle($argumentValue),
-                        ];
-                    })
-                    ->toArray();
+                return $this->argumentFactory->toTypeMap($inputDefinition->fields);
             },
         ]);
     }

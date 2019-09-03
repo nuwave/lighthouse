@@ -1231,6 +1231,29 @@ directive @interface(
 ) on INTERFACE
 ```
 
+## @lazyLoad
+
+```graphql
+"""
+Perform a [lazy eager load](https://laravel.com/docs/eloquent-relationships#lazy-eager-loading)
+on the relations of a list of models.
+"""
+directive @lazyLoad(
+    """
+    The names of the relationship methods to load.
+    """
+    relations: [String!]!
+) on FIELD_DEFINITION
+```
+
+This is often useful when loading relationships with the [`@hasMany`](#hasmany) directive.
+
+```graphql
+type Post {
+    comments: [Comment!]! @hasMany @lazyLoad(relations: ["replies"])
+}
+```
+
 ## @method
 
 Call a method with a given `name` on the class that represents a type to resolve a field.
@@ -2192,7 +2215,7 @@ Verify that a column's value is between two values.
 The type of the input value this is defined upon should be
 an `input` object with two fields.
 """
-directive @whereNotBetween(
+directive @whereBetween(
   """
   Specify the database column to compare. 
   Only required if database column has a different name than the attribute in your schema.
