@@ -78,22 +78,14 @@ class DeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type User {
             id: ID!
             name: String
         }
         
-        type Mutation {
+        type Query {
             deleteUser(id: ID): User @delete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteUser(id: 1) {
-                name
-            }
         }
         ');
     }
@@ -105,22 +97,13 @@ class DeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type User {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             deleteUser: User @delete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteUser {
-                name
-            }
         }
         ');
     }
@@ -132,22 +115,13 @@ class DeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type User {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             deleteUser(foo: String, bar: Int): User @delete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteUser {
-                name
-            }
         }
         ');
     }

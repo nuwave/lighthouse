@@ -2,30 +2,23 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ListTypeNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
 use GraphQL\Language\AST\NonNullTypeNode;
 use Illuminate\Database\Eloquent\Collection;
-use GraphQL\Language\AST\FieldDefinitionNode;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 
-abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator
+abstract class ModifyModelExistenceDirective extends BaseDirective implements FieldResolver, FieldManipulator, DefinedDirective
 {
-    /**
-     * The GlobalId resolver.
-     *
-     * @var bool
-     */
-    protected $verifySoftDeletesUsed = false;
-
     /**
      * The GlobalId resolver.
      *
@@ -54,21 +47,12 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     {
         return $fieldValue->setResolver(
             function ($root, array $args) {
-                $argumentDefinition = $this->getSingleArgumentDefinition();
-
-                $argumentType = $argumentDefinition->type;
-                if (! $argumentType instanceof NonNullTypeNode) {
-                    throw new DirectiveException(
-                        'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
-                    );
-                }
-
                 /** @var string|int|string[]|int[] $idOrIds */
                 $idOrIds = reset($args);
 
                 if ($this->directiveArgValue('globalId', false)) {
                     // At this point we know the type is at least wrapped in a NonNull type, so we go one deeper
-                    if ($argumentType->type instanceof ListTypeNode) {
+                    if ($this->idArgument()->type instanceof ListTypeNode) {
                         $idOrIds = array_map(
                             function (string $id): string {
                                 return $this->globalId->decodeID($id);
@@ -105,21 +89,43 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
     }
 
     /**
-     * Ensure there is only a single argument defined on the field.
+     * Get the type of the id argument.
      *
-     * @return \GraphQL\Language\AST\InputValueDefinitionNode
+     * Not using an actual type hint, as the manipulateFieldDefinition function
+     * validates the type during schema build time.f
+     *
+     * @return \GraphQL\Language\AST\NonNullTypeNode
+     */
+    protected function idArgument()
+    {
+        return $this->definitionNode->arguments[0]->type;
+    }
+
+    /**
+     * @param  DocumentAST  $documentAST
+     * @param  FieldDefinitionNode  $fieldDefinition
+     * @param  ObjectTypeDefinitionNode  $parentType
+     * @return void
      *
      * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
-    protected function getSingleArgumentDefinition(): InputValueDefinitionNode
-    {
+    public function manipulateFieldDefinition(
+        DocumentAST &$documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode &$parentType
+    ): void {
+        // Ensure there is only a single argument defined on the field.
         if (count($this->definitionNode->arguments) !== 1) {
             throw new DirectiveException(
                 'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to only contain a single argument."
             );
         }
 
-        return $this->definitionNode->arguments[0];
+        if (! $this->idArgument() instanceof NonNullTypeNode) {
+            throw new DirectiveException(
+                'The @'.static::name()." directive requires the field {$this->definitionNode->name->value} to have a NonNull argument. Mark it with !"
+            );
+        }
     }
 
     /**
@@ -138,27 +144,4 @@ abstract class ModifyModelExistenceDirective extends BaseDirective implements Fi
      * @return void
      */
     abstract protected function modifyExistence(Model $model): void;
-
-    /**
-     * Field manipulation is used to verify if usage of directive is allowed on defined field.
-     *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
-     *
-     * @return void
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
-    {
-        if ($this->verifySoftDeletesUsed !== true) {
-            return;
-        }
-
-        if (! in_array(SoftDeletes::class, class_uses_recursive($this->getModelClass()))) {
-            throw new DirectiveException(
-                'Use @'.static::name().' directive only for Model classes that use the SoftDeletes trait!'
-            );
-        }
-    }
 }

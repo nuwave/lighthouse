@@ -2,6 +2,8 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
+use Nuwave\Lighthouse\Schema\Directives\ForceDeleteDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -114,22 +116,13 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type Task {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             deleteTask(id: ID): Task @forceDelete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteTask(id: 1) {
-                name
-            }
         }
         ');
     }
@@ -141,22 +134,13 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type Task {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             deleteTask: Task @forceDelete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteTask {
-                name
-            }
         }
         ');
     }
@@ -168,22 +152,13 @@ class ForceDeleteDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type Task {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             deleteTask(foo: String, bar: Int): Task @forceDelete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteTask {
-                name
-            }
         }
         ');
     }
@@ -191,26 +166,16 @@ class ForceDeleteDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itRejectUsingDirectiveWithNoSoftDeleteModels(): void
+    public function itRejectsUsingDirectiveWithNoSoftDeleteModels(): void
     {
-        factory(User::class)->create();
-        $this->expectException(DirectiveException::class);
-
-        $this->schema = '
+        $this->expectExceptionMessage(ForceDeleteDirective::MODEL_NOT_USING_SOFT_DELETES);
+        $this->buildSchema('
         type User {
             id: ID!
         }
         
-        type Mutation {
+        type Query {
             deleteUser(id: ID!): User @forceDelete
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            deleteUser(id: 1) {
-                id
-            }
         }
         ');
     }

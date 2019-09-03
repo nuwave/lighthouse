@@ -2,12 +2,15 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use GraphQL\Language\AST\FieldDefinitionNode;
+use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
+use Nuwave\Lighthouse\SoftDeletes\Utils;
 
-class ForceDeleteDirective extends ModifyModelExistenceDirective implements DefinedDirective
+class ForceDeleteDirective extends ModifyModelExistenceDirective
 {
-    protected $verifySoftDeletesUsed = true;
+    const MODEL_NOT_USING_SOFT_DELETES = 'Use the @forceDelete directive only for Model classes that use the SoftDeletes trait.';
 
     /**
      * Name of the directive.
@@ -45,8 +48,8 @@ SDL;
     /**
      * Find one or more models by id.
      *
-     * @param string|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes $modelClass
-     * @param string|int|string[]|int[] $idOrIds
+     * @param  string|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes  $modelClass
+     * @param  string|int|string[]|int[]  $idOrIds
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
     protected function find(string $modelClass, $idOrIds)
@@ -57,11 +60,29 @@ SDL;
     /**
      * Bring a model in or out of existence.
      *
-     * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes $model
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\SoftDeletes  $model
      * @return void
      */
     protected function modifyExistence(Model $model): void
     {
         $model->forceDelete();
+    }
+
+    /**
+     * Manipulate the AST based on a field definition.
+     *
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @return void
+     */
+    public function manipulateFieldDefinition(
+        DocumentAST &$documentAST,
+        FieldDefinitionNode &$fieldDefinition,
+        ObjectTypeDefinitionNode &$parentType
+    ): void {
+        parent::manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
+
+        Utils::assertModelUsesSoftDeletes($this->getModelClass(), self::MODEL_NOT_USING_SOFT_DELETES);
     }
 }

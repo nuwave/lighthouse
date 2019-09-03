@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Schema\Directives;
 
+use Nuwave\Lighthouse\Schema\Directives\RestoreDirective;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
@@ -89,22 +90,13 @@ class RestoreDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type Task {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             restoreTask(id: ID): Task @restore
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            restoreTask(id: 1) {
-                name
-            }
         }
         ');
     }
@@ -116,22 +108,13 @@ class RestoreDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type Task {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             restoreTask: Task @restore
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            restoreTask {
-                name
-            }
         }
         ');
     }
@@ -143,22 +126,13 @@ class RestoreDirectiveTest extends DBTestCase
     {
         $this->expectException(DirectiveException::class);
 
-        $this->schema = '
+        $this->buildSchema('
         type Task {
             id: ID!
-            name: String
         }
         
-        type Mutation {
+        type Query {
             restoreTask(foo: String, bar: Int): Task @restore
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            restoreTask {
-                name
-            }
         }
         ');
     }
@@ -166,26 +140,17 @@ class RestoreDirectiveTest extends DBTestCase
     /**
      * @test
      */
-    public function itRejectUsingDirectiveWithNoSoftDeleteModels(): void
+    public function itRejectsUsingDirectiveWithNoSoftDeleteModels(): void
     {
-        $user = factory(User::class)->create();
-        $this->expectException(DirectiveException::class);
+        $this->expectExceptionMessage(RestoreDirective::MODEL_NOT_USING_SOFT_DELETES);
 
-        $this->schema = '
+        $this->buildSchema('
         type User {
             id: ID!
         }
         
-        type Mutation {
+        type Query {
             restoreUser(id: ID!): User @restore
-        }
-        '.$this->placeholderQuery();
-
-        $this->graphQL('
-        mutation {
-            restoreUser(id: 1) {
-                id
-            }
         }
         ');
     }

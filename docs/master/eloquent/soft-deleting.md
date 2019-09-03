@@ -15,8 +15,8 @@ type Query {
 }
 ```
 
-Lighthouse will add an argument `trashed` to the field definition
-and automatically include the enum `Trashed`.
+Lighthouse will automatically add an argument `trashed` to the field definition
+and include the enum `Trashed`.
 
 ```graphql
 type Query {
@@ -45,18 +45,19 @@ You can include soft deleted models in your result with a query like this:
 
 ## Restoring Soft Deleted Models
 
-If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait, you can restore your model using [`@restore`](../api-reference/directives.md#restore) directive.
+If your model uses the `Illuminate\Database\Eloquent\SoftDeletes` trait,
+you can restore your model using the [`@restore`](../api-reference/directives.md#restore) directive.
 
 ```graphql
-type Query {
+type Mutation {
   restoreFlight(id: ID!): Flight @restore
 }
 ```
 
-Simply call it with the ID of the flight you want to restore.
+Simply call the field with the ID of the flight you want to restore.
 
 ```graphql
-{
+mutation {
   restoreFlight(id: 1) {
     id
   }
@@ -67,7 +68,9 @@ This mutation will return the restored object.
 
 ## Permanently Deleting Models
 
-To truly remove model from database, use [@forceDelete](../api-reference/directives.md#forcedelete) directive. Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait. 
+To truly remove model from database,
+use the [@forceDelete](../api-reference/directives.md#forcedelete) directive.
+Your model must use the `Illuminate\Database\Eloquent\SoftDeletes` trait. 
 
 ```graphql
 type Mutation {
@@ -96,4 +99,3 @@ This mutation will return the deleted object, so you will have a last chance to 
   }
 }
 ```
-
