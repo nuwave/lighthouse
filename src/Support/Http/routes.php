@@ -22,5 +22,4 @@ if ($routeConfig = config('lighthouse.route')) {
             ]
         );
     });
-
 }
