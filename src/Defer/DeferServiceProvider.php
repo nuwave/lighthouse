@@ -5,6 +5,7 @@ namespace Nuwave\Lighthouse\Defer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\ManipulateAST;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
 
@@ -19,9 +20,11 @@ class DeferServiceProvider extends ServiceProvider
      */
     public function boot(DirectiveFactory $directiveFactory, Dispatcher $dispatcher): void
     {
-        $directiveFactory->addResolved(
-            DeferrableDirective::NAME,
-            DeferrableDirective::class
+        $dispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+                return __NAMESPACE__;
+            }
         );
 
         $dispatcher->listen(
