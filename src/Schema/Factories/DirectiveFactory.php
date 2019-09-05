@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -116,6 +117,9 @@ class DirectiveFactory
     }
 
     /**
+     * @deprecated use the RegisterDirectiveNamespaces instead, will be removed as of v5
+     * @see \Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces
+     *
      * @param  string  $directiveName
      * @param  string  $className
      * @return $this

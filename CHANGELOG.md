@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.3.0...master)
 
+### Deprecated
+
+- Use the `RegisterDirectiveNamespaces` event instead of `DirectiveFactory#addResolved()` https://github.com/nuwave/lighthouse/pull/950
+
 ## [4.3.0](https://github.com/nuwave/lighthouse/compare/v4.2.1...v4.3.0)
 
 ### Added
