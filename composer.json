@@ -39,6 +39,8 @@
     },
     "require-dev": {
         "bensampo/laravel-enum": "^1.22",
+        "dms/phpunit-arraysubset-asserts": "^0.1.0",
+        "haydenpierce/class-finder": "^0.3.3",
         "laravel/lumen-framework": "5.5.*|5.6.*|5.7.*|5.8.*|^6.0",
         "laravel/scout": "^4.0",
         "mll-lab/graphql-php-scalars": "^2.1",
@@ -46,8 +48,7 @@
         "orchestra/database": "3.5.*|3.6.*|3.7.*|3.8.*|3.9.*",
         "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*|3.9.*",
         "phpbench/phpbench": "@dev",
-        "pusher/pusher-php-server": "^3.2",
-        "haydenpierce/class-finder": "^0.3.3"
+        "pusher/pusher-php-server": "^3.2"
     },
     "suggest": {
         "laravel/scout": "Required for the @search directive",

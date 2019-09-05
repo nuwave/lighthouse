@@ -4,11 +4,14 @@ namespace Tests\Integration\WhereConstraints;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsDirective;
 use Nuwave\Lighthouse\WhereConstraints\WhereConstraintsServiceProvider;
 
 class WhereConstraintsDirectiveTest extends DBTestCase
 {
+    use ArraySubsetAsserts;
+
     protected $schema = '
     type User {
         id: ID!
