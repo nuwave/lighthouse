@@ -7,7 +7,6 @@ if ($routeConfig = config('lighthouse.route')) {
     $router = app('router');
 
     $router->group(config('lighthouse.route', []), function () use ($router, $routeConfig): void {
-
         $method = 'addRoute';
         if (Str::startsWith(app()->version(), '5.5.')) {
             $method = 'match';
@@ -23,4 +22,5 @@ if ($routeConfig = config('lighthouse.route')) {
             ]
         );
     });
+
 }
