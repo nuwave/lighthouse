@@ -5,9 +5,9 @@ namespace Nuwave\Lighthouse\Defer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Nuwave\Lighthouse\Events\ManipulateAST;
-use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 use Nuwave\Lighthouse\Support\Contracts\CreatesResponse;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class DeferServiceProvider extends ServiceProvider
 {
