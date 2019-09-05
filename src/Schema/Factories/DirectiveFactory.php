@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class DirectiveFactory
 {
@@ -116,6 +117,9 @@ class DirectiveFactory
     }
 
     /**
+     * @deprecated use the RegisterDirectiveNamespaces instead, will be removed as of v5
+     * @see \Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces
+     *
      * @param  string  $directiveName
      * @param  string  $className
      * @return $this
