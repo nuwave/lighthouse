@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Wrap route in group to allow additional configurations such as domain https://github.com/nuwave/lighthouse/pull/951
+- Allow additional route configurations `prefix` and `domain` https://github.com/nuwave/lighthouse/pull/951
 
 ### Deprecated
 

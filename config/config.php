@@ -33,6 +33,12 @@ return [
         'middleware' => [
             \Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson::class,
         ],
+
+        /*
+         * The `prefix` and `domain` configuration options are optional.
+         */
+        #'prefix' => '',
+        #'domain' => '',
     ],
 
     /*
