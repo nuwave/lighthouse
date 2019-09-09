@@ -2,12 +2,11 @@
 
 namespace Tests\Integration;
 
-use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase;
+use Nuwave\Lighthouse\LighthouseServiceProvider;
 
 class RouteRegistrationTest extends TestCase
 {
-
     /**
      * Get package providers.
      *

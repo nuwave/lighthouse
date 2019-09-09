@@ -37,8 +37,8 @@ return [
         /*
          * The `prefix` and `domain` configuration options are optional.
          */
-        #'prefix' => '',
-        #'domain' => '',
+        //'prefix' => '',
+        //'domain' => '',
     ],
 
     /*

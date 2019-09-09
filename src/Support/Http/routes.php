@@ -17,11 +17,11 @@ if ($routeConfig = config('lighthouse.route')) {
         'middleware' => $routeConfig['middleware'],
     ];
 
-    if(isset($routeConfig['prefix'])) {
+    if (isset($routeConfig['prefix'])) {
         $actions['prefix'] = $routeConfig['prefix'];
     }
 
-    if(isset($routeConfig['domain'])) {
+    if (isset($routeConfig['domain'])) {
         $actions['domain'] = $routeConfig['domain'];
     }
 
