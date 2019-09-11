@@ -11,8 +11,7 @@ before_install:
 
 install:
   - if [ $LARAVEL = '^6.0' ]; then composer remove --dev --no-update laravel/lumen-framework; fi
-  - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
-  - composer install --prefer-dist --no-interaction --no-suggest
+  - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --prefer-dist --no-interaction --no-suggest
 
 script: vendor/bin/phpunit --colors=always --verbose
 
