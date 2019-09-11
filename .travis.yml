@@ -10,6 +10,7 @@ before_install:
   - mysql -e 'CREATE DATABASE test;'
 
 install:
+  - env
   - if [[ $LARAVEL = ^6.0 ]]; then composer remove laravel/lumen-framework; fi
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
   - composer install --prefer-dist --no-interaction --no-suggest
