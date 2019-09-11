@@ -14,10 +14,8 @@ install:
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
   - composer install --prefer-dist --no-interaction --no-suggest
 
-script:
-  - vendor/bin/phpunit --colors=always --verbose
-
 jobs:
+  fast_finish: true
   allow_failures:
     - stage: coverage
     - stage: bench
@@ -28,6 +26,8 @@ jobs:
       script:
         - composer require nunomaduro/larastan
         - composer stan
+    - stage: test
+      script: vendor/bin/phpunit --colors=always --verbose
     - stage: coverage
       php: "7.3"
       env: LARAVEL='^6.0'
