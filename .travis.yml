@@ -1,18 +1,42 @@
-sudo: false
+stages:
+  - lint
+  - test
+  - coverage
+  - bench
 
-services:
-  - mysql
+before_install:
+  - phpenv config-rm xdebug.ini || true
+  - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - mysql -e 'CREATE DATABASE test;'
 
-cache:
-  directories:
-    - $HOME/.composer/cache
+install:
+  - if [[ $LARAVEL = ^6.0 ]]; then composer remove laravel/lumen-framework; fi
+  - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
+  - composer install --prefer-dist --no-interaction --no-suggest
 
-language: php
+script:
+  - vendor/bin/phpunit --colors=always --verbose
 
-env:
-  global:
-    - COVERAGE=0
-    - STATIC_ANALYSIS=0
+jobs:
+  allow_failures:
+    - stage: coverage
+    - stage: bench
+  include:
+    - stage: lint
+      php: "7.3"
+      script:
+        - composer require nunomaduro/larastan
+        - composer stan
+    - stage: coverage
+      php: "7.3"
+      env: LARAVEL='^6.0'
+      script:
+        - phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml
+        - bash <(curl -s https://codecov.io/bash)
+    - stage: bench
+      php: "7.3"
+      script:
+        - vendor/bin/phpbench run --progress=none --report=ast
 
 matrix:
   include:
@@ -41,29 +65,15 @@ matrix:
     - php: "7.3"
       env: LARAVEL='5.7.*'
     - php: "7.3"
-      env: LARAVEL='5.8.*' COVERAGE=1 STATIC_ANALYSIS=1
+      env: LARAVEL='5.8.*'
     - php: "7.3"
       env: LARAVEL='^6.0'
-  allow_failures:
-    - php: "7.3"
-      env: LARAVEL='5.8.*' BENCHMARKS=1
-  fast_finish: true
 
-before_install:
-  - phpenv config-rm xdebug.ini || true
-  - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - mysql -e 'CREATE DATABASE test;'
+services:
+  - mysql
 
-install:
-  - if [[ $LARAVEL = ^6.0 ]]; then composer remove laravel/lumen-framework; fi
-  - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
-  - composer install --prefer-dist --no-interaction --no-suggest
+cache:
+  directories:
+    - $HOME/.composer/cache
 
-script:
-  - if [[ $COVERAGE = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml; fi
-  - if [[ $STATIC_ANALYSIS = 1 ]]; then composer require nunomaduro/larastan && composer stan; fi
-  - if [[ $COVERAGE = 0 ]]; then vendor/bin/phpunit --colors=always --verbose; fi
-  - if [[ $BENCHMARKS = 1 ]]; then vendor/bin/phpbench run --progress=none --report=ast; fi
-
-after_success:
-  - if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
+language: php
