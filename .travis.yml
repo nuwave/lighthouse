@@ -11,7 +11,7 @@ before_install:
 
 install:
   - env
-  - if [[ $LARAVEL = ^6.0 ]]; then echo "foo"; fi
+  - if [ $LARAVEL = '^6.0' ]; then echo "foo"; fi
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
   - composer install --prefer-dist --no-interaction --no-suggest
 
@@ -40,6 +40,18 @@ jobs:
       env: LARAVEL='^6.0'
       script:
         - vendor/bin/phpbench run --progress=none --report=ast
+
+php:
+  - "7.1"
+  - "7.2"
+  - "7.3"
+
+env:
+  - LARAVEL='5.5.*'
+  - LARAVEL='5.6.*'
+  - LARAVEL='5.7.*'
+  - LARAVEL='5.8.*'
+  - LARAVEL='^6.0'
 
 matrix:
   include:
