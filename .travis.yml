@@ -24,6 +24,7 @@ jobs:
   include:
     - stage: lint
       php: "7.3"
+      env: LARAVEL='^6.0'
       script:
         - composer require nunomaduro/larastan
         - composer stan
@@ -35,6 +36,7 @@ jobs:
         - bash <(curl -s https://codecov.io/bash)
     - stage: bench
       php: "7.3"
+      env: LARAVEL='^6.0'
       script:
         - vendor/bin/phpbench run --progress=none --report=ast
 
