@@ -1,9 +1,8 @@
-version: '2.2'
+version: '3.7'
 
 services:
   php:
     build: .
-    image: lighthouse-php:base
     volumes:
     - ./:/var/www
     environment:
@@ -18,7 +17,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   node:
-    image: node
+    image: node:12
     volumes:
     - ./docs:/app
     working_dir: /app
