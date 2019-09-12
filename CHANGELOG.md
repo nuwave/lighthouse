@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Allow additional route configurations `prefix` and `domain` https://github.com/nuwave/lighthouse/pull/951
+- Enable schema cache only when `APP_ENV` != 'local' https://github.com/nuwave/lighthouse/pull/957
 
 ### Deprecated
 
