@@ -22,6 +22,12 @@ Gather all schema directive definitions and write them to a file.
 
     php artisan lighthouse:ide-helper
 
+## interface
+
+Create a class for a GraphQL interface type.
+
+    php artisan lighthouse:interface <name>
+
 ## mutation
 
 Create a class for a single field on the root Mutation type.
