@@ -17,7 +17,6 @@ use GraphQL\Type\Definition\InterfaceType;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -293,18 +292,19 @@ class TypeRegistry
     protected function resolveFieldsFunction($definition): Closure
     {
         return function () use ($definition): array {
-            return (new Collection($definition->fields))
-                ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition): array {
-                    $fieldValue = new FieldValue(
-                        new TypeValue($definition),
-                        $fieldDefinition
-                    );
+            $fieldFactory = app(FieldFactory::class);
+            $fieldDefinitions = [];
 
-                    return [
-                        $fieldDefinition->name->value => app(FieldFactory::class)->handle($fieldValue),
-                    ];
-                })
-                ->toArray();
+            foreach ($definition->fields as $fieldDefinition) {
+                $fieldValue = new FieldValue(
+                    new TypeValue($definition),
+                    $fieldDefinition
+                );
+
+                $fieldDefinitions[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
+            }
+
+            return $fieldDefinitions;
         };
     }
 
