@@ -76,14 +76,7 @@ SDL;
         $directives = [];
 
         foreach ($directiveNamespaces as $directiveNamespace) {
-            try {
-                $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
-            } catch (ClassFinderException $classFinderException) {
-                // TODO remove if https://gitlab.com/hpierce1102/ClassFinder/merge_requests/16 is merged
-                // The ClassFinder throws if no classes are found. Since we can not know
-                // in advance if the user has defined custom directives, this behaviour is problematic.
-                continue;
-            }
+            $classesInNamespace = ClassFinder::getClassesInNamespace($directiveNamespace);
 
             foreach ($classesInNamespace as $class) {
                 $reflection = new \ReflectionClass($class);
