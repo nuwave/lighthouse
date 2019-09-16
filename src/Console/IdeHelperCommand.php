@@ -8,7 +8,6 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use HaydenPierce\ClassFinder\Exception\ClassFinderException;
 
 class IdeHelperCommand extends Command
 {
