@@ -10,9 +10,6 @@ before_install:
   - mysql -e 'CREATE DATABASE test;'
 
 install:
-  - if [ $LARAVEL = '^6.0' ]; then composer remove --dev --no-update laravel/lumen-framework; fi
-  - ls
-  - cat composer.json
   - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --prefer-dist --no-interaction --no-suggest
 
 script: vendor/bin/phpunit --colors=always --verbose
