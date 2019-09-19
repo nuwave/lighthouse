@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Allow overwriting the name of Enum types created through `LaravelEnumType`
+- Allow overwriting the name of Enum types created through `LaravelEnumType` https://github.com/nuwave/lighthouse/pull/968
 
 ### Changed
 
