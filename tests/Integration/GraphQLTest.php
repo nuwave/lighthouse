@@ -64,10 +64,7 @@ class GraphQLTest extends DBTestCase
         $this->be($this->user);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesQueryViaPostRequest(): void
+    public function testResolvesQueryViaPostRequest(): void
     {
         $this->graphQL('
         query UserWithTasks {
@@ -94,10 +91,7 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesQueryViaGetRequest(): void
+    public function testResolvesQueryViaGetRequest(): void
     {
         $this->getJson(
             'graphql?'
@@ -128,10 +122,7 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveBatchedQueries(): void
+    public function testCanResolveBatchedQueries(): void
     {
         $this->postGraphQL([
             [
@@ -170,10 +161,7 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesNamedOperation(): void
+    public function testResolvesNamedOperation(): void
     {
         $this->postGraphQL([
             'query' => '
@@ -198,45 +186,7 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsInvalidQuery(): void
-    {
-        $result = $this->graphQL('
-        {
-            nonExistingField
-        }
-        ');
-
-        // TODO remove as we stop supporting Laravel 5.5/PHPUnit 6
-        $assertContains = method_exists($this, 'assertStringContainsString')
-            ? 'assertStringContainsString'
-            : 'assertContains';
-
-        $this->{$assertContains}(
-            'nonExistingField',
-            $result->jsonGet('errors.0.message')
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function itIgnoresInvalidJSONVariables(): void
-    {
-        $result = $this->postGraphQL([
-            'query' => '{}',
-            'variables' => '{}',
-        ]);
-
-        $result->assertStatus(200);
-    }
-
-    /**
-     * @test
-     */
-    public function itResolvesQueryViaMultipartRequest(): void
+    public function testResolvesQueryViaMultipartRequest(): void
     {
         $this->multipartGraphQL(
             [
@@ -261,10 +211,9 @@ class GraphQLTest extends DBTestCase
     }
 
     /**
-     * @test
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file.
      */
-    public function itResolvesUploadViaMultipartRequest(): void
+    public function testResolvesUploadViaMultipartRequest(): void
     {
         $this->multipartGraphQL(
             [
@@ -295,10 +244,9 @@ class GraphQLTest extends DBTestCase
     }
 
     /**
-     * @test
-     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching
+     * https://github.com/jaydenseric/graphql-multipart-request-spec#batching.
      */
-    public function itResolvesUploadViaBatchedMultipartRequest(): void
+    public function testResolvesUploadViaBatchedMultipartRequest(): void
     {
         $this->multipartGraphQL(
             [

@@ -22,6 +22,7 @@ class LighthouseRequest extends BaseRequest
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $request->
 
         // If the request has neither a query, nor an operationName,
         // we assume we are resolving a batched query.

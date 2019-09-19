@@ -98,8 +98,7 @@ class GraphQL
     }
 
     /**
-     * Execute a set of batched queries on the lighthouse schema and return a
-     * collection of ExecutionResults.
+     * Execute a request against the schema and return a serializable result array.
      *
      * @param  \Nuwave\Lighthouse\Execution\GraphQLRequest  $request
      * @return mixed[]
@@ -138,7 +137,7 @@ class GraphQL
     }
 
     /**
-     * Execute a GraphQL query on the Lighthouse schema and return the raw ExecutionResult.
+     * Execute a GraphQL query against the schema and return the raw ExecutionResult.
      *
      * To render the ExecutionResult, you will probably want to call `->toArray($debug)` on it,
      * with $debug being a combination of flags in \GraphQL\Error\Debug

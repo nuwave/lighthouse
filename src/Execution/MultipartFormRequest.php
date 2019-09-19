@@ -13,7 +13,7 @@ class MultipartFormRequest extends BaseRequest
      *
      * https://github.com/jaydenseric/graphql-multipart-request-spec#single-file
      *
-     * @var mixed[]
+     * @var mixed[]|mixed[][]
      */
     protected $operations;
 
