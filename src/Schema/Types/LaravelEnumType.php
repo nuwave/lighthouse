@@ -25,7 +25,7 @@ class LaravelEnumType extends EnumType
      * @param  string|null  $name
      * @return void
      */
-    public function __construct(string $enumClass, ?string $name)
+    public function __construct(string $enumClass, ?string $name = null)
     {
         if (! is_subclass_of($enumClass, Enum::class)) {
             throw new InvalidArgumentException(
