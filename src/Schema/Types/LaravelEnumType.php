@@ -22,9 +22,10 @@ class LaravelEnumType extends EnumType
      * Create a GraphQL enum from a Laravel enum type.
      *
      * @param  string|\BenSampo\Enum\Enum  $enumClass
+     * @param  string|null  $name
      * @return void
      */
-    public function __construct(string $enumClass)
+    public function __construct(string $enumClass, ?string $name)
     {
         if (! is_subclass_of($enumClass, Enum::class)) {
             throw new InvalidArgumentException(
@@ -35,7 +36,7 @@ class LaravelEnumType extends EnumType
         $this->enumClass = $enumClass;
 
         parent::__construct([
-            'name' => class_basename($enumClass),
+            'name' => $name ?? class_basename($enumClass),
             'values' => array_map(
                 function (Enum $enum): array {
                     return [
