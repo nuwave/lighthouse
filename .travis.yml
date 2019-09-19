@@ -1,4 +1,71 @@
-sudo: false
+stages:
+  - lint
+  - test
+  - coverage
+  - bench
+
+before_install:
+  - phpenv config-rm xdebug.ini || true
+  - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - mysql -e 'CREATE DATABASE test;'
+
+install:
+  - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --prefer-dist --no-interaction --no-suggest
+
+script: vendor/bin/phpunit --colors=always --verbose
+
+jobs:
+  fast_finish: true
+  allow_failures:
+    - stage: coverage
+    - stage: bench
+  include:
+    - stage: lint
+      php: "7.3"
+      env: LARAVEL='^6.0'
+      script:
+        - composer require nunomaduro/larastan
+        - composer stan
+    - stage: test
+      php: "7.1"
+      env: LARAVEL='5.5.*'
+    - php: "7.1"
+      env: LARAVEL='5.6.*'
+    - php: "7.1"
+      env: LARAVEL='5.7.*'
+    - php: "7.1"
+      env: LARAVEL='5.8.*'
+    - php: "7.2"
+      env: LARAVEL='5.5.*'
+    - php: "7.2"
+      env: LARAVEL='5.6.*'
+    - php: "7.2"
+      env: LARAVEL='5.7.*'
+    - php: "7.2"
+      env: LARAVEL='5.8.*'
+    - php: "7.2"
+      env: LARAVEL='^6.0'
+    - php: "7.3"
+      env: LARAVEL='5.5.*'
+    - php: "7.3"
+      env: LARAVEL='5.6.*'
+    - php: "7.3"
+      env: LARAVEL='5.7.*'
+    - php: "7.3"
+      env: LARAVEL='5.8.*'
+    - php: "7.3"
+      env: LARAVEL='^6.0'
+    - stage: coverage
+      php: "7.3"
+      env: LARAVEL='^6.0'
+      script:
+        - phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml
+        - bash <(curl -s https://codecov.io/bash)
+    - stage: bench
+      php: "7.3"
+      env: LARAVEL='^6.0'
+      script:
+        - vendor/bin/phpbench run --progress=none --report=ast
 
 services:
   - mysql
@@ -8,62 +75,3 @@ cache:
     - $HOME/.composer/cache
 
 language: php
-
-env:
-  global:
-    - COVERAGE=0
-    - STATIC_ANALYSIS=0
-
-matrix:
-  include:
-    - php: "7.1"
-      env: LARAVEL='5.5.*'
-    - php: "7.1"
-      env: LARAVEL='5.6.*'
-    - php: "7.1"
-      env: LARAVEL='5.7.*'
-    - php: "7.1"
-      env: LARAVEL='5.8.*'
-    - php: "7.2"
-      env: LARAVEL='5.5.*'
-    - php: "7.2"
-      env: LARAVEL='5.6.*'
-    - php: "7.2"
-      env: LARAVEL='5.7.*'
-    - php: "7.2"
-      env: LARAVEL='5.8.*'
-    - php: "7.2"
-      env: LARAVEL='^6.0'
-    - php: "7.3"
-      env: LARAVEL='5.5.*'
-    - php: "7.3"
-      env: LARAVEL='5.6.*'
-    - php: "7.3"
-      env: LARAVEL='5.7.*'
-    - php: "7.3"
-      env: LARAVEL='5.8.*' COVERAGE=1 STATIC_ANALYSIS=1
-    - php: "7.3"
-      env: LARAVEL='^6.0'
-  allow_failures:
-    - php: "7.3"
-      env: LARAVEL='5.8.*' BENCHMARKS=1
-  fast_finish: true
-
-before_install:
-  - phpenv config-rm xdebug.ini || true
-  - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - mysql -e 'CREATE DATABASE test;'
-
-install:
-  - if [[ $LARAVEL = ^6.0 ]]; then composer remove laravel/lumen-framework; fi
-  - composer require "illuminate/contracts:${LARAVEL}" --no-interaction --no-update
-  - composer install --prefer-dist --no-interaction --no-suggest
-
-script:
-  - if [[ $COVERAGE = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml; fi
-  - if [[ $STATIC_ANALYSIS = 1 ]]; then composer require nunomaduro/larastan && composer stan; fi
-  - if [[ $COVERAGE = 0 ]]; then vendor/bin/phpunit --colors=always --verbose; fi
-  - if [[ $BENCHMARKS = 1 ]]; then vendor/bin/phpbench run --progress=none --report=ast; fi
-
-after_success:
-  - if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
