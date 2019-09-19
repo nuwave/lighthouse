@@ -67,7 +67,6 @@ jobs:
       script:
         - vendor/bin/phpbench run --progress=none --report=ast
 
-
 services:
   - mysql
 
