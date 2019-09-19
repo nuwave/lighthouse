@@ -42,10 +42,7 @@ class MorphToDirectiveTest extends DBTestCase
         $this->hour = $this->task->hours()->save(factory(Hour::class)->create());
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveMorphToRelationship(): void
+    public function testCanResolveMorphToRelationship(): void
     {
         $this->schema = '
         type Hour {
@@ -94,10 +91,7 @@ class MorphToDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveMorphToWithCustomName(): void
+    public function testCanResolveMorphToWithCustomName(): void
     {
         $this->schema = '
         type Hour {
@@ -146,10 +140,7 @@ class MorphToDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveMorphToUsingInterfaces(): void
+    public function testCanResolveMorphToUsingInterfaces(): void
     {
         $post = factory(Post::class)->create([
             'user_id' => $this->user->id,

@@ -24,10 +24,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->cache = $app->make('cache');
     }
 
-    /**
-     * @test
-     */
-    public function itCanStoreResolverResultInCache(): void
+    public function testCanStoreResolverResultInCache(): void
     {
         $this->schema = "
         type User {
@@ -57,10 +54,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanPlaceCacheKeyOnAnyField(): void
+    public function testCanPlaceCacheKeyOnAnyField(): void
     {
         $this->schema = "
         type User {
@@ -91,10 +85,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:foo@bar.com:name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanStoreResolverResultInPrivateCache(): void
+    public function testCanStoreResolverResultInPrivateCache(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
@@ -128,10 +119,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get($cacheKey));
     }
 
-    /**
-     * @test
-     */
-    public function itCanStoreResolverResultInCacheWhenUseModelDirective(): void
+    public function testCanStoreResolverResultInCacheWhenUseModelDirective(): void
     {
         $this->schema = "
         type Post {
@@ -165,10 +153,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    /**
-     * @test
-     */
-    public function itFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
+    public function testFallsBackToPublicCacheIfUserIsNotAuthenticated(): void
     {
         $this->schema = "
         type User {
@@ -198,10 +183,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertSame('foobar', $this->cache->get('user:1:name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanStorePaginateResolverInCache(): void
+    public function testCanStorePaginateResolverInCache(): void
     {
         factory(User::class, 5)->create();
 
@@ -233,10 +215,7 @@ class CacheDirectiveTest extends DBTestCase
         $this->assertCount(5, $result);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCacheHasManyResolver(): void
+    public function testCanCacheHasManyResolver(): void
     {
         $user = factory(User::class)->create();
 
@@ -297,10 +276,7 @@ class CacheDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanAttachTagsToCache(): void
+    public function testCanAttachTagsToCache(): void
     {
         config(['lighthouse.cache.tags' => true]);
 

@@ -8,10 +8,7 @@ use Tests\Utils\Models\Company;
 
 class FindDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itReturnsSingleUser(): void
+    public function testReturnsSingleUser(): void
     {
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
@@ -41,10 +38,7 @@ class FindDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itDefaultsToFieldTypeIfNoModelIsSupplied(): void
+    public function testDefaultsToFieldTypeIfNoModelIsSupplied(): void
     {
         $userA = factory(User::class)->create(['name' => 'A']);
         $userB = factory(User::class)->create(['name' => 'B']);
@@ -71,10 +65,7 @@ class FindDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCannotFetchIfMultipleModelsMatch(): void
+    public function testCannotFetchIfMultipleModelsMatch(): void
     {
         factory(User::class)->create(['name' => 'A']);
         factory(User::class)->create(['name' => 'A']);
@@ -100,10 +91,7 @@ class FindDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'errors');
     }
 
-    /**
-     * @test
-     */
-    public function itCanUseScopes(): void
+    public function testCanUseScopes(): void
     {
         $companyA = factory(Company::class)->create(['name' => 'CompanyA']);
         $companyB = factory(Company::class)->create(['name' => 'CompanyB']);
@@ -143,10 +131,7 @@ class FindDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itReturnsAnEmptyObjectWhenTheModelIsNotFound(): void
+    public function testReturnsAnEmptyObjectWhenTheModelIsNotFound(): void
     {
         $this->schema = '
         type User {

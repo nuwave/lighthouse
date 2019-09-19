@@ -29,10 +29,7 @@ class TypeRegistryTest extends TestCase
         $this->typeRegistry = app(TypeRegistry::class);
     }
 
-    /**
-     * @test
-     */
-    public function itSetsEnumValueThroughDirective(): void
+    public function testSetsEnumValueThroughDirective(): void
     {
         $enumNode = PartialParser::enumTypeDefinition('
         enum Role {
@@ -47,10 +44,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame(123, $enumType->getValue('ADMIN')->value);
     }
 
-    /**
-     * @test
-     */
-    public function itDefaultsEnumValueToItsName(): void
+    public function testDefaultsEnumValueToItsName(): void
     {
         $enumNode = PartialParser::enumTypeDefinition('
         enum Role {
@@ -65,10 +59,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('EMPLOYEE', $enumType->getValue('EMPLOYEE')->value);
     }
 
-    /**
-     * @test
-     */
-    public function itCanTransformScalars(): void
+    public function testCanTransformScalars(): void
     {
         $scalarNode = PartialParser::scalarTypeDefinition('
         scalar Email
@@ -80,10 +71,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('Email', $scalarType->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanPointToScalarClassThroughDirective(): void
+    public function testCanPointToScalarClassThroughDirective(): void
     {
         $scalarNode = PartialParser::scalarTypeDefinition('
         scalar DateTime @scalar(class: "Nuwave\\\Lighthouse\\\Schema\\\Types\\\Scalars\\\DateTime")
@@ -95,10 +83,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('DateTime', $scalarType->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanPointToScalarClassThroughDirectiveWithoutNamespace(): void
+    public function testCanPointToScalarClassThroughDirectiveWithoutNamespace(): void
     {
         $scalarNode = PartialParser::scalarTypeDefinition('
         scalar SomeEmail @scalar(class: "Email")
@@ -110,10 +95,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('SomeEmail', $scalarType->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanTransformInterfaces(): void
+    public function testCanTransformInterfaces(): void
     {
         $interfaceNode = PartialParser::interfaceTypeDefinition('
         interface Foo {
@@ -128,10 +110,7 @@ class TypeRegistryTest extends TestCase
         $this->assertArrayHasKey('bar', $interfaceType->getFields());
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesInterfaceThoughNamespace(): void
+    public function testResolvesInterfaceThoughNamespace(): void
     {
         $interfaceNode = PartialParser::interfaceTypeDefinition('
         interface Nameable {
@@ -145,10 +124,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('Nameable', $interfaceType->name);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesInterfaceThoughSecondaryNamespace(): void
+    public function testResolvesInterfaceThoughSecondaryNamespace(): void
     {
         $interfaceNode = PartialParser::interfaceTypeDefinition('
         interface Bar {
@@ -162,10 +138,7 @@ class TypeRegistryTest extends TestCase
         $this->assertSame('Bar', $interfaceType->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanTransformUnions(): void
+    public function testCanTransformUnions(): void
     {
         $unionNode = PartialParser::unionTypeDefinition('
         union Foo = Bar
@@ -178,10 +151,7 @@ class TypeRegistryTest extends TestCase
         $this->assertInstanceOf(Closure::class, $unionType->config['resolveType']);
     }
 
-    /**
-     * @test
-     */
-    public function itCanTransformObjectTypes(): void
+    public function testCanTransformObjectTypes(): void
     {
         $objectTypeNode = PartialParser::objectTypeDefinition('
         type User {
@@ -196,10 +166,7 @@ class TypeRegistryTest extends TestCase
         $this->assertArrayHasKey('foo', $objectType->getFields());
     }
 
-    /**
-     * @test
-     */
-    public function itCanTransformInputObjectTypes(): void
+    public function testCanTransformInputObjectTypes(): void
     {
         $inputNode = PartialParser::inputObjectTypeDefinition('
         input UserInput {

@@ -9,10 +9,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class RestoreDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itRestoresTaskAndReturnsIt(): void
+    public function testRestoresTaskAndReturnsIt(): void
     {
         $task = factory(Task::class)->create();
         $task->delete();
@@ -47,10 +44,7 @@ class RestoreDirectiveTest extends DBTestCase
         $this->assertCount(1, Task::withoutTrashed()->get());
     }
 
-    /**
-     * @test
-     */
-    public function itRestoresMultipleTasksAndReturnsThem(): void
+    public function testRestoresMultipleTasksAndReturnsThem(): void
     {
         $tasks = factory(Task::class, 2)->create();
         foreach ($tasks as $task) {
@@ -82,10 +76,7 @@ class RestoreDirectiveTest extends DBTestCase
         $this->assertCount(2, Task::withoutTrashed()->get());
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNullableArgument(): void
+    public function testRejectsDefinitionWithNullableArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -100,10 +91,7 @@ class RestoreDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNoArgument(): void
+    public function testRejectsDefinitionWithNoArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -118,10 +106,7 @@ class RestoreDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithMultipleArguments(): void
+    public function testRejectsDefinitionWithMultipleArguments(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -136,10 +121,7 @@ class RestoreDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsUsingDirectiveWithNoSoftDeleteModels(): void
+    public function testRejectsUsingDirectiveWithNoSoftDeleteModels(): void
     {
         $this->expectExceptionMessage(RestoreDirective::MODEL_NOT_USING_SOFT_DELETES);
 

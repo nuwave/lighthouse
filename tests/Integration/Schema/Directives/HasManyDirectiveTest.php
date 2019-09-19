@@ -42,10 +42,7 @@ class HasManyDirectiveTest extends DBTestCase
         $this->be($this->user);
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryHasManyRelationship(): void
+    public function testCanQueryHasManyRelationship(): void
     {
         $this->schema = '
         type User {
@@ -80,10 +77,7 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(3, 'data.user.tasks');
     }
 
-    /**
-     * @test
-     */
-    public function itCallsScopeWithResolverArgs(): void
+    public function testCallsScopeWithResolverArgs(): void
     {
         $this->assertCount(3, $this->user->tasks);
 
@@ -113,10 +107,7 @@ class HasManyDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.user.tasks');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryHasManyPaginator(): void
+    public function testCanQueryHasManyPaginator(): void
     {
         $this->schema = '
         type User {
@@ -167,9 +158,6 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
-    /**
-     * @test
-     */
     public function paginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
@@ -206,10 +194,7 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itHandlesPaginationWithCountZero(): void
+    public function testHandlesPaginationWithCountZero(): void
     {
         $this->schema = '
         type User {
@@ -247,9 +232,6 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
-    /**
-     * @test
-     */
     public function relayTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
@@ -288,9 +270,6 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
     public function paginatorTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
@@ -327,9 +306,6 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
     public function relayTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
@@ -368,10 +344,7 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itUsesEdgeTypeForRelayConnections(): void
+    public function testUsesEdgeTypeForRelayConnections(): void
     {
         $this->schema = '
         type User {
@@ -415,10 +388,7 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryHasManyPaginatorWithADefaultCount(): void
+    public function testCanQueryHasManyPaginatorWithADefaultCount(): void
     {
         $this->schema = '
         type User {
@@ -464,10 +434,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryHasManyRelayConnection(): void
+    public function testCanQueryHasManyRelayConnection(): void
     {
         $this->schema = '
         type User {
@@ -511,10 +478,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryHasManyRelayConnectionWithADefaultCount(): void
+    public function testCanQueryHasManyRelayConnectionWithADefaultCount(): void
     {
         $this->schema = '
         type User {
@@ -558,10 +522,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryHasManyNestedRelationships(): void
+    public function testCanQueryHasManyNestedRelationships(): void
     {
         $this->schema = '
         type User {
@@ -616,10 +577,7 @@ class HasManyDirectiveTest extends DBTestCase
         ->assertJsonCount(2, 'data.user.tasks.edges.0.node.user.tasks.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryHasManySelfReferencingRelationships(): void
+    public function testCanQueryHasManySelfReferencingRelationships(): void
     {
         $post1 = factory(Post::class)->create([
             'id' => 1,
@@ -686,10 +644,7 @@ class HasManyDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsErrorWithUnknownTypeArg(): void
+    public function testThrowsErrorWithUnknownTypeArg(): void
     {
         $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 

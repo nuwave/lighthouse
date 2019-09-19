@@ -22,10 +22,7 @@ use Tests\Utils\ModelsSecondary\Category as CategorySecondary;
  */
 class BaseDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itDefaultsToFieldTypeForTheModelClass(): void
+    public function testDefaultsToFieldTypeForTheModelClass(): void
     {
         $directive = $this->constructFieldDirective('foo: User @dummy');
 
@@ -35,10 +32,7 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfTheClassIsNotAModel(): void
+    public function testThrowsIfTheClassIsNotAModel(): void
     {
         $directive = $this->constructFieldDirective('foo: Exception @dummy');
 
@@ -46,10 +40,7 @@ class BaseDirectiveTest extends TestCase
         $directive->getModelClass();
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesAModelThatIsNamedLikeABaseClass(): void
+    public function testResolvesAModelThatIsNamedLikeABaseClass(): void
     {
         $directive = $this->constructFieldDirective('foo: Closure @dummy');
 
@@ -59,10 +50,7 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itPrefersThePrimaryModelNamespace(): void
+    public function testPrefersThePrimaryModelNamespace(): void
     {
         $directive = $this->constructFieldDirective('foo: Category @dummy');
 
@@ -72,10 +60,7 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itAllowsOverwritingTheDefaultModel(): void
+    public function testAllowsOverwritingTheDefaultModel(): void
     {
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy(model: "Tests\\\Utils\\\ModelsSecondary\\\Category")');
 
@@ -85,10 +70,7 @@ class BaseDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesFromTheSecondaryModelNamespace(): void
+    public function testResolvesFromTheSecondaryModelNamespace(): void
     {
         $directive = $this->constructFieldDirective('foo: OnlyHere @dummy');
 

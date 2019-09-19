@@ -7,10 +7,7 @@ use Illuminate\Support\Arr;
 
 class ComplexityDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanSetDefaultComplexityOnField(): void
+    public function testCanSetDefaultComplexityOnField(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
@@ -30,10 +27,7 @@ class ComplexityDirectiveTest extends TestCase
         $this->assertSame(100, $complexityFn(10, [config('lighthouse.pagination_amount_argument') => 10]));
     }
 
-    /**
-     * @test
-     */
-    public function itCanSetCustomComplexityResolver(): void
+    public function testCanSetCustomComplexityResolver(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
@@ -54,10 +48,7 @@ class ComplexityDirectiveTest extends TestCase
         $this->assertSame(100, $complexityFn(10, ['foo' => 10]));
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesComplexityResolverThroughDefaultNamespace(): void
+    public function testResolvesComplexityResolverThroughDefaultNamespace(): void
     {
         $schema = $this->buildSchema('
         type Query {

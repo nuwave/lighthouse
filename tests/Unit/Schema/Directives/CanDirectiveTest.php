@@ -9,10 +9,7 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 class CanDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itThrowsIfNotAuthorized(): void
+    public function testThrowsIfNotAuthorized(): void
     {
         $this->be(new User);
 
@@ -37,10 +34,7 @@ class CanDirectiveTest extends TestCase
         ')->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
-    /**
-     * @test
-     */
-    public function itPassesAuthIfAuthorized(): void
+    public function testPassesAuthIfAuthorized(): void
     {
         $user = new User;
         $user->name = UserPolicy::ADMIN;
@@ -73,10 +67,7 @@ class CanDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itAcceptsGuestUser(): void
+    public function testAcceptsGuestUser(): void
     {
         if ((float) $this->app->version() < 5.7) {
             $this->markTestSkipped('Version less than 5.7 do not support guest user.');
@@ -109,10 +100,7 @@ class CanDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itPassesMultiplePolicies(): void
+    public function testPassesMultiplePolicies(): void
     {
         $user = new User;
         $user->name = UserPolicy::ADMIN;
@@ -145,10 +133,7 @@ class CanDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itProcessesTheArgsArgument(): void
+    public function testProcessesTheArgsArgument(): void
     {
         $this->schema = '
         type Query {

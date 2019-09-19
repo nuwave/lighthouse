@@ -39,10 +39,7 @@ class BroadcastManagerTest extends TestCase
         $this->broadcastManager = app(BroadcastManager::class);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveDrivers(): void
+    public function testCanResolveDrivers(): void
     {
         $pusherDriver = $this->broadcastManager->driver('pusher');
         $this->assertInstanceOf(PusherBroadcaster::class, $pusherDriver);
@@ -51,10 +48,7 @@ class BroadcastManagerTest extends TestCase
         $this->assertInstanceOf(LogBroadcaster::class, $logDriver);
     }
 
-    /**
-     * @test
-     */
-    public function itCanExtendBroadcastManager(): void
+    public function testCanExtendBroadcastManager(): void
     {
         $broadcasterConfig = [];
 
@@ -97,10 +91,7 @@ class BroadcastManagerTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfDriverDoesNotImplementInterface(): void
+    public function testThrowsIfDriverDoesNotImplementInterface(): void
     {
         $this->broadcastManager->extend('foo', function () {
             return new class {

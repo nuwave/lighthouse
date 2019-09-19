@@ -85,10 +85,7 @@ class MorphManyDirectiveTest extends DBTestCase
             });
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryMorphManyRelationship(): void
+    public function testCanQueryMorphManyRelationship(): void
     {
         $this->schema = '
         type Post {
@@ -175,10 +172,7 @@ class MorphManyDirectiveTest extends DBTestCase
             ->assertJsonCount($this->taskHours->count(), 'data.task.hours');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryMorphManyPaginator(): void
+    public function testCanQueryMorphManyPaginator(): void
     {
         $this->schema = '
         type Post {
@@ -235,9 +229,6 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertJsonCount($this->postHours->count(), 'data.post.hours.data');
     }
 
-    /**
-     * @test
-     */
     public function paginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
@@ -282,9 +273,6 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
     public function paginatorTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
@@ -329,10 +317,7 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itHandlesPaginationWithCountZero(): void
+    public function testHandlesPaginationWithCountZero(): void
     {
         $this->schema = '
         type Post {
@@ -379,10 +364,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryMorphManyPaginatorWithADefaultCount(): void
+    public function testCanQueryMorphManyPaginatorWithADefaultCount(): void
     {
         $this->schema = '
         type Task {
@@ -438,10 +420,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(3, 'data.task.hours.data');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryMorphManyRelayConnection(): void
+    public function testCanQueryMorphManyRelayConnection(): void
     {
         $this->schema = '
         type Task {
@@ -495,9 +474,6 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(3, 'data.task.hours.edges');
     }
 
-    /**
-     * @test
-     */
     public function relayTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
@@ -544,9 +520,6 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
     public function relayTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
@@ -593,10 +566,7 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryMorphManyRelayConnectionWithADefaultCount(): void
+    public function testCanQueryMorphManyRelayConnectionWithADefaultCount(): void
     {
         $this->schema = '
         type Task {

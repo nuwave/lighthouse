@@ -46,10 +46,7 @@ class MorphToManyTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateATaskWithExistingTagsByUsingConnect(): void
+    public function testCanCreateATaskWithExistingTagsByUsingConnect(): void
     {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
@@ -79,10 +76,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateATaskWithExistingTagsByUsingSync(): void
+    public function testCanCreateATaskWithExistingTagsByUsingSync(): void
     {
         $id = factory(Tag::class)->create(['name' => 'php'])->id;
 
@@ -112,10 +106,7 @@ class MorphToManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateANewTagRelationByUsingCreate(): void
+    public function testCanCreateANewTagRelationByUsingCreate(): void
     {
         $this->graphQL('
         mutation {

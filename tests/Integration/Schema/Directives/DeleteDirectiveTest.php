@@ -8,10 +8,7 @@ use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class DeleteDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itDeletesUserAndReturnsIt(): void
+    public function testDeletesUserAndReturnsIt(): void
     {
         factory(User::class)->create();
 
@@ -42,10 +39,7 @@ class DeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, User::all());
     }
 
-    /**
-     * @test
-     */
-    public function itDeletesMultipleUsersAndReturnsThem(): void
+    public function testDeletesMultipleUsersAndReturnsThem(): void
     {
         factory(User::class, 2)->create();
 
@@ -71,10 +65,7 @@ class DeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, User::all());
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNullableArgument(): void
+    public function testRejectsDefinitionWithNullableArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -90,10 +81,7 @@ class DeleteDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNoArgument(): void
+    public function testRejectsDefinitionWithNoArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -108,10 +96,7 @@ class DeleteDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithMultipleArguments(): void
+    public function testRejectsDefinitionWithMultipleArguments(): void
     {
         $this->expectException(DirectiveException::class);
 

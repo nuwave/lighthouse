@@ -26,10 +26,7 @@ class SyncIteratorTest extends TestCase
         $this->iterator = new SyncIterator;
     }
 
-    /**
-     * @test
-     */
-    public function itCanIterateOverItemsWithCallback(): void
+    public function testCanIterateOverItemsWithCallback(): void
     {
         $items = [];
 
@@ -43,10 +40,7 @@ class SyncIteratorTest extends TestCase
         $this->assertCount(3, $items);
     }
 
-    /**
-     * @test
-     */
-    public function itCanPassExceptionToHandler(): void
+    public function testCanPassExceptionToHandler(): void
     {
         /** @var \Exception|null $exception */
         $exception = null;

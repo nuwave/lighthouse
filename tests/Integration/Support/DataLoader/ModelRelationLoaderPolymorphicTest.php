@@ -26,10 +26,7 @@ class ModelRelationLoaderPolymorphicTest extends DBTestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function itGetsPolymorphicRelationship(): void
+    public function testGetsPolymorphicRelationship(): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = Task::first();

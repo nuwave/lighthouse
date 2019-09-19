@@ -62,10 +62,7 @@ class MorphOneTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewMorphOne(): void
+    public function testCanCreateWithNewMorphOne(): void
     {
         $this->graphQL('
         mutation {
@@ -97,10 +94,7 @@ class MorphOneTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateWithNewMorphOne(): void
+    public function testCanUpdateWithNewMorphOne(): void
     {
         factory(Task::class)->create();
 
@@ -135,10 +129,7 @@ class MorphOneTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndUpdateMorphOne(): void
+    public function testCanUpdateAndUpdateMorphOne(): void
     {
         factory(Task::class)
             ->create()
@@ -179,10 +170,7 @@ class MorphOneTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndDeleteMorphOne(): void
+    public function testCanUpdateAndDeleteMorphOne(): void
     {
         factory(Task::class)
             ->create()
