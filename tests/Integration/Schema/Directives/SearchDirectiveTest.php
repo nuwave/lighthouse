@@ -37,7 +37,7 @@ class SearchDirectiveTest extends DBTestCase
             ->andReturn($this->engine);
     }
 
-    public function canSearch(): void
+    public function testCanSearch(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -87,7 +87,7 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    public function canSearchWithCustomIndex(): void
+    public function testCanSearchWithCustomIndex(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',

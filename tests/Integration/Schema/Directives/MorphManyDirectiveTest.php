@@ -229,7 +229,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertJsonCount($this->postHours->count(), 'data.post.hours.data');
     }
 
-    public function paginatorTypeIsLimitedByMaxCountFromDirective(): void
+    public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
 
@@ -273,7 +273,7 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    public function paginatorTypeIsLimitedToMaxCountFromConfig(): void
+    public function testPaginatorTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
@@ -474,7 +474,7 @@ class MorphManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(3, 'data.task.hours.edges');
     }
 
-    public function relayTypeIsLimitedByMaxCountFromDirective(): void
+    public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
 
@@ -520,7 +520,7 @@ class MorphManyDirectiveTest extends DBTestCase
         );
     }
 
-    public function relayTypeIsLimitedToMaxCountFromConfig(): void
+    public function testRelayTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
 

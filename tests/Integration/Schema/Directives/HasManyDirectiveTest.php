@@ -158,7 +158,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.tasks.data');
     }
 
-    public function paginatorTypeIsLimitedByMaxCountFromDirective(): void
+    public function testPaginatorTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
 
@@ -232,7 +232,7 @@ class HasManyDirectiveTest extends DBTestCase
         ])->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
-    public function relayTypeIsLimitedByMaxCountFromDirective(): void
+    public function testRelayTypeIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 1]);
 
@@ -270,7 +270,7 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    public function paginatorTypeIsLimitedToMaxCountFromConfig(): void
+    public function testPaginatorTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
@@ -306,7 +306,7 @@ class HasManyDirectiveTest extends DBTestCase
         );
     }
 
-    public function relayTypeIsLimitedToMaxCountFromConfig(): void
+    public function testRelayTypeIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 2]);
 
