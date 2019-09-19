@@ -11,8 +11,8 @@ class ErrorTest extends TestCase
         $this->postGraphQL([])
             ->assertExactJson([
                 'errors' => [
-                    'foo'
-                ]
+                    'foo',
+                ],
             ]);
     }
 
