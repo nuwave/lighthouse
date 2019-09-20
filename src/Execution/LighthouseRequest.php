@@ -22,11 +22,10 @@ class LighthouseRequest extends BaseRequest
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $request->
+        $input = $request->all();
 
-        // If the request has neither a query, nor an operationName,
-        // we assume we are resolving a batched query.
-        if (! $request->hasAny('query', 'operationName')) {
+        // If operations is 0-indexed, we assume we are resolving a batched query
+        if (! isset($input[0])) {
             $this->batchIndex = 0;
         }
     }
