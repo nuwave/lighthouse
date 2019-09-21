@@ -46,10 +46,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->be($this->user);
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyRelationship(): void
+    public function testCanQueryBelongsToManyRelationship(): void
     {
         $this->schema = '
         type User {
@@ -77,10 +74,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ')->assertJsonCount($this->rolesCount, 'data.user.roles');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyPaginator(): void
+    public function testCanQueryBelongsToManyPaginator(): void
     {
         $this->schema = '
         type User {
@@ -127,10 +121,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.data');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyRelayConnection(): void
+    public function testCanQueryBelongsToManyRelayConnection(): void
     {
         $this->schema = '
         type User {
@@ -175,10 +166,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
+    public function testCanQueryBelongsToManyRelayConnectionWithCustomEdgeUsingDirective(): void
     {
         $this->schema = '
         type User {
@@ -229,10 +217,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsExceptionForInvalidEdgeTypeFromDirective(): void
+    public function testThrowsExceptionForInvalidEdgeTypeFromDirective(): void
     {
         $this->schema = '
         type User {
@@ -267,10 +252,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
+    public function testCanQueryBelongsToManyRelayConnectionWithCustomMagicEdge(): void
     {
         $this->schema = '
         type User {
@@ -324,10 +306,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         ])->assertJsonCount(2, 'data.user.roles.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryBelongsToManyNestedRelationships(): void
+    public function testCanQueryBelongsToManyNestedRelationships(): void
     {
         $this->schema = '
         type User {
@@ -398,10 +377,7 @@ class BelongsToManyDirectiveTest extends DBTestCase
         $this->assertSame(Arr::get($userRolesEdges, 'node.1.acl.id'), Arr::get($nestedUserRolesEdges, 'node.1.acl.id'));
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsErrorWithUnknownTypeArg(): void
+    public function testThrowsErrorWithUnknownTypeArg(): void
     {
         $this->expectExceptionMessageRegExp('/^Found invalid pagination type/');
 

@@ -9,10 +9,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class FieldDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itAssignsResolverFromCombinedDefinition(): void
+    public function testAssignsResolverFromCombinedDefinition(): void
     {
         $this->schema = '
         type Query {
@@ -31,10 +28,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itAssignsResolverWithInvokableClass(): void
+    public function testAssignsResolverWithInvokableClass(): void
     {
         $this->schema = '
         type Query {
@@ -53,10 +47,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveFieldWithMergedArgs(): void
+    public function testCanResolveFieldWithMergedArgs(): void
     {
         $this->schema = '
         type Query {
@@ -75,10 +66,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itUsesDefaultFieldNamespace(): void
+    public function testUsesDefaultFieldNamespace(): void
     {
         $this->schema = '
         type Query {
@@ -97,10 +85,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itUsesDefaultFieldNamespaceForInvokableClass(): void
+    public function testUsesDefaultFieldNamespaceForInvokableClass(): void
     {
         $this->schema = '
         type Query {
@@ -119,10 +104,7 @@ class FieldDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsAnErrorWhenNoClassFound(): void
+    public function testThrowsAnErrorWhenNoClassFound(): void
     {
         $this->expectException(DirectiveException::class);
         $this->expectExceptionMessage("No class 'bar' was found for directive 'field'");
@@ -140,10 +122,7 @@ class FieldDirectiveTest extends TestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsAnErrorWhenClassIsntInvokable(): void
+    public function testThrowsAnErrorWhenClassIsntInvokable(): void
     {
         $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage("Method '__invoke' does not exist on class 'Tests\Utils\Queries\Foo'");

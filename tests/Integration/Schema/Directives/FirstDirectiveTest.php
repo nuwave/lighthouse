@@ -7,10 +7,7 @@ use Tests\Utils\Models\User;
 
 class FirstDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itReturnsASingleUser(): void
+    public function testReturnsASingleUser(): void
     {
         $this->schema = '
         type User {
@@ -42,10 +39,7 @@ class FirstDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itReturnsASingleUserWhenMultiplesMatch(): void
+    public function testReturnsASingleUserWhenMultiplesMatch(): void
     {
         $this->schema = '
         type User {

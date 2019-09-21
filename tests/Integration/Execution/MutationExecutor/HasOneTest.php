@@ -64,10 +64,7 @@ class HasOneTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewHasOne(): void
+    public function testCanCreateWithNewHasOne(): void
     {
         $this->graphQL('
         mutation {
@@ -101,10 +98,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateWithNewHasOne(): void
+    public function testCanUpdateWithNewHasOne(): void
     {
         factory(Task::class)->create();
 
@@ -141,10 +135,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndUpdateHasOne(): void
+    public function testCanUpdateAndUpdateHasOne(): void
     {
         factory(Task::class)
             ->create()
@@ -187,10 +178,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndDeleteHasOne(): void
+    public function testCanUpdateAndDeleteHasOne(): void
     {
         factory(Task::class)
             ->create()

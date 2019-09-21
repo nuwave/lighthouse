@@ -10,10 +10,7 @@ use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class ASTHelperTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itThrowsWhenMergingUniqueNodeListWithCollision(): void
+    public function testThrowsWhenMergingUniqueNodeListWithCollision(): void
     {
         $objectType1 = PartialParser::objectTypeDefinition('
         type User {
@@ -35,10 +32,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itMergesUniqueNodeListsWithOverwrite(): void
+    public function testMergesUniqueNodeListsWithOverwrite(): void
     {
         $objectType1 = PartialParser::objectTypeDefinition('
         type User {
@@ -69,10 +63,7 @@ class ASTHelperTest extends TestCase
         $this->assertCount(1, $firstNameField->directives);
     }
 
-    /**
-     * @test
-     */
-    public function itCanExtractStringArguments(): void
+    public function testCanExtractStringArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: "baz")');
         $this->assertSame(
@@ -81,10 +72,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanExtractBooleanArguments(): void
+    public function testCanExtractBooleanArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: true)');
         $this->assertTrue(
@@ -92,10 +80,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanExtractArrayArguments(): void
+    public function testCanExtractArrayArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: ["one", "two"])');
         $this->assertSame(
@@ -104,10 +89,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanExtractObjectArguments(): void
+    public function testCanExtractObjectArguments(): void
     {
         $directive = PartialParser::directive('@foo(bar: { baz: "foobar" })');
         $this->assertSame(
@@ -116,10 +98,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itReturnsNullForNonExistingArgumentOnDirective(): void
+    public function testReturnsNullForNonExistingArgumentOnDirective(): void
     {
         $directive = PartialParser::directive('@foo');
         $this->assertNull(
@@ -127,10 +106,7 @@ class ASTHelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itChecksWhetherTypeImplementsInterface(): void
+    public function testChecksWhetherTypeImplementsInterface(): void
     {
         $type = PartialParser::objectTypeDefinition('
             type Foo implements Bar {

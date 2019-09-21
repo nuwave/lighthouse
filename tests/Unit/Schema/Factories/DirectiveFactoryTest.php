@@ -27,10 +27,7 @@ class DirectiveFactoryTest extends TestCase
         parent::getEnvironmentSetUp($app);
     }
 
-    /**
-     * @test
-     */
-    public function itRegistersLighthouseDirectives(): void
+    public function testRegistersLighthouseDirectives(): void
     {
         $this->assertInstanceOf(
             FieldDirective::class,
@@ -38,10 +35,7 @@ class DirectiveFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itHydratesBaseDirectives(): void
+    public function testHydratesBaseDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String
@@ -58,10 +52,7 @@ class DirectiveFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itSkipsHydrationForNonBaseDirectives(): void
+    public function testSkipsHydrationForNonBaseDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: String
@@ -85,20 +76,14 @@ class DirectiveFactoryTest extends TestCase
         $this->assertObjectNotHasAttribute('definitionNode', $directive);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfDirectiveNameCanNotBeResolved(): void
+    public function testThrowsIfDirectiveNameCanNotBeResolved(): void
     {
         $this->expectException(DirectiveException::class);
 
         $this->directiveFactory->create('bar');
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateSingleDirective(): void
+    public function testCanCreateSingleDirective(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             foo: [Foo!]! @hasMany
@@ -108,10 +93,7 @@ class DirectiveFactoryTest extends TestCase
         $this->assertInstanceOf(FieldResolver::class, $resolver);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsExceptionWhenMultipleFieldResolverDirectives(): void
+    public function testThrowsExceptionWhenMultipleFieldResolverDirectives(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -122,10 +104,7 @@ class DirectiveFactoryTest extends TestCase
         $this->directiveFactory->createSingleDirectiveOfType($fieldDefinition, FieldResolver::class);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateMultipleDirectives(): void
+    public function testCanCreateMultipleDirectives(): void
     {
         $fieldDefinition = PartialParser::fieldDefinition('
             bar: String @can(if: ["viewBar"]) @event

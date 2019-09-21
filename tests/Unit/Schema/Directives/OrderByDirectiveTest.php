@@ -19,10 +19,7 @@ class OrderByDirectiveTest extends DBTestCase
     }    
     ';
 
-    /**
-     * @test
-     */
-    public function itCanOrderByTheGivenFieldAndSortOrderASC(): void
+    public function testCanOrderByTheGivenFieldAndSortOrderASC(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -54,10 +51,7 @@ class OrderByDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanOrderByTheGivenFieldAndSortOrderDESC(): void
+    public function testCanOrderByTheGivenFieldAndSortOrderDESC(): void
     {
         factory(User::class)->create(['name' => 'B']);
         factory(User::class)->create(['name' => 'A']);
@@ -89,10 +83,7 @@ class OrderByDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanOrderByMultipleFields(): void
+    public function testCanOrderByMultipleFields(): void
     {
         factory(User::class)->create(['name' => 'B', 'team_id' => 2]);
         factory(User::class)->create(['name' => 'A', 'team_id' => 5]);
@@ -136,10 +127,7 @@ class OrderByDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsOnInvalidDefinition(): void
+    public function testThrowsOnInvalidDefinition(): void
     {
         $this->expectException(DefinitionException::class);
 

@@ -9,10 +9,7 @@ use Nuwave\Lighthouse\SoftDeletes\ForceDeleteDirective;
 
 class ForceDeleteDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itForceDeletesTaskAndReturnsIt(): void
+    public function testForceDeletesTaskAndReturnsIt(): void
     {
         factory(Task::class)->create();
 
@@ -43,10 +40,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    /**
-     * @test
-     */
-    public function itForceDeletesDeletedTaskAndReturnsIt(): void
+    public function testForceDeletesDeletedTaskAndReturnsIt(): void
     {
         $task = factory(Task::class)->create();
         $task->delete();
@@ -78,10 +72,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    /**
-     * @test
-     */
-    public function itForceDeletesMultipleTasksAndReturnsThem(): void
+    public function testForceDeletesMultipleTasksAndReturnsThem(): void
     {
         factory(Task::class, 2)->create();
 
@@ -107,10 +98,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         $this->assertCount(0, Task::withTrashed()->get());
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNullableArgument(): void
+    public function testRejectsDefinitionWithNullableArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -125,10 +113,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithNoArgument(): void
+    public function testRejectsDefinitionWithNoArgument(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -143,10 +128,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsDefinitionWithMultipleArguments(): void
+    public function testRejectsDefinitionWithMultipleArguments(): void
     {
         $this->expectException(DirectiveException::class);
 
@@ -161,10 +143,7 @@ class ForceDeleteDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsUsingDirectiveWithNoSoftDeleteModels(): void
+    public function testRejectsUsingDirectiveWithNoSoftDeleteModels(): void
     {
         $this->expectExceptionMessage(ForceDeleteDirective::MODEL_NOT_USING_SOFT_DELETES);
         $this->buildSchema('

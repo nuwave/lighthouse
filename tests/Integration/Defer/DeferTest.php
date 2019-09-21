@@ -33,10 +33,7 @@ class DeferTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itAddsTheDeferClientDirective(): void
+    public function testAddsTheDeferClientDirective(): void
     {
         $this->schema = $this->placeholderQuery();
 
@@ -58,10 +55,7 @@ class DeferTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferFields(): void
+    public function testCanDeferFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -114,10 +108,7 @@ class DeferTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferNestedFields(): void
+    public function testCanDeferNestedFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -170,10 +161,7 @@ class DeferTest extends TestCase
         $this->assertSame(self::$data['parent']['parent']['name'], $nestedDeferred['data']['name']);
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferNestedFieldsOnMutations(): void
+    public function testCanDeferNestedFieldsOnMutations(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -233,10 +221,7 @@ class DeferTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferListFields(): void
+    public function testCanDeferListFields(): void
     {
         self::$data = [
             [
@@ -291,10 +276,7 @@ class DeferTest extends TestCase
         $this->assertSame(self::$data[1]['author']['name'], Arr::get($deferredPost2, 'name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferGroupedListFields(): void
+    public function testCanDeferGroupedListFields(): void
     {
         self::$data = [
             [
@@ -371,10 +353,7 @@ class DeferTest extends TestCase
         $this->assertSame(self::$data[1]['comments'][0]['message'], Arr::get($deferredComment2[0], 'message'));
     }
 
-    /**
-     * @test
-     */
-    public function itCancelsDefermentAfterMaxExecutionTime(): void
+    public function testCancelsDefermentAfterMaxExecutionTime(): void
     {
         $this->schema = "
         type User {
@@ -429,10 +408,7 @@ class DeferTest extends TestCase
         $this->assertSame(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
     }
 
-    /**
-     * @test
-     */
-    public function itCancelsDefermentAfterMaxNestedFields(): void
+    public function testCancelsDefermentAfterMaxNestedFields(): void
     {
         $this->schema = "
         type User {
@@ -485,10 +461,7 @@ class DeferTest extends TestCase
         $this->assertSame(self::$data['parent']['parent']['name'], $deferred['data']['parent']['name']);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsExceptionOnNunNullableFields(): void
+    public function testThrowsExceptionOnNunNullableFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -526,10 +499,7 @@ class DeferTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotDeferWithIncludeAndSkipDirectives(): void
+    public function testDoesNotDeferWithIncludeAndSkipDirectives(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -582,10 +552,7 @@ class DeferTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itRequiresDeferDirectiveOnAllFieldDeclarations(): void
+    public function testRequiresDeferDirectiveOnAllFieldDeclarations(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -627,10 +594,7 @@ class DeferTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfTryingToDeferRootMutationFields(): void
+    public function testThrowsIfTryingToDeferRootMutationFields(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -667,10 +631,7 @@ class DeferTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotDeferFieldsIfFalse(): void
+    public function testDoesNotDeferFieldsIfFalse(): void
     {
         self::$data = [
             'name' => 'John Doe',
@@ -706,10 +667,7 @@ class DeferTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itIncludesErrorsForDeferredFields(): void
+    public function testIncludesErrorsForDeferredFields(): void
     {
         self::$data = [
             'name' => 'John Doe',

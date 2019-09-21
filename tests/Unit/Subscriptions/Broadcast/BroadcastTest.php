@@ -56,10 +56,7 @@ class BroadcastTest extends DBTestCase
         return $broadcast;
     }
 
-    /**
-     * @test
-     */
-    public function itBroadcastsFromPhp(): void
+    public function testBroadcastsFromPhp(): void
     {
         // Assert
         $broadcast = $this->withMockedBroadcasts();
@@ -80,10 +77,7 @@ class BroadcastTest extends DBTestCase
         Subscription::broadcast('taskUpdated', []);
     }
 
-    /**
-     * @test
-     */
-    public function itBroadcastsFromSchema(): void
+    public function testBroadcastsFromSchema(): void
     {
         // Assert
         $broadcast = $this->withMockedBroadcasts();

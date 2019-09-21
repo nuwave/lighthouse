@@ -108,10 +108,7 @@ class StorageManagerTest extends TestCase
         return $subscriber;
     }
 
-    /**
-     * @test
-     */
-    public function itCanStoreSubscribersInCache(): void
+    public function testCanStoreSubscribersInCache(): void
     {
         $subscriber1 = $this->subscriber('{ me }');
         $subscriber2 = $this->subscriber('{ viewer }');

@@ -20,10 +20,7 @@ class IdeHelperCommandTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itGeneratesSchemaDirectives(): void
+    public function testGeneratesSchemaDirectives(): void
     {
         $this->artisan('lighthouse:ide-helper');
 
@@ -48,10 +45,7 @@ class IdeHelperCommandTest extends TestCase
         $this->assertContains(UnionDirective::class, $generated);
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotRequireCustomDirectives(): void
+    public function testDoesNotRequireCustomDirectives(): void
     {
         /** @var \Illuminate\Contracts\Config\Repository $config */
         $config = $this->app['config'];

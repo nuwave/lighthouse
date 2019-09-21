@@ -8,10 +8,7 @@ use Tests\Utils\Models\User;
 
 class AllDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanGetAllModelsAsRootField(): void
+    public function testCanGetAllModelsAsRootField(): void
     {
         factory(User::class, 2)->create();
 
@@ -36,10 +33,7 @@ class AllDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itCanGetAllAsNestedField(): void
+    public function testCanGetAllAsNestedField(): void
     {
         factory(Post::class, 2)->create([
             // Do not create those, as they would create more users
@@ -96,10 +90,7 @@ class AllDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanGetAllModelsFiltered(): void
+    public function testCanGetAllModelsFiltered(): void
     {
         $users = factory(User::class, 3)->create();
         $userName = $users->first()->name;

@@ -12,10 +12,7 @@ use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 
 class DocumentASTTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itParsesSimpleSchema(): void
+    public function testParsesSimpleSchema(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -29,10 +26,7 @@ class DocumentASTTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsOnInvalidSchema(): void
+    public function testThrowsOnInvalidSchema(): void
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessageRegExp('/^Syntax Error/');
@@ -40,10 +34,7 @@ class DocumentASTTest extends TestCase
         DocumentAST::fromSource('foo');
     }
 
-    /**
-     * @test
-     */
-    public function itOverwritesDefinitionWithSameName(): void
+    public function testOverwritesDefinitionWithSameName(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {
@@ -65,10 +56,7 @@ class DocumentASTTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanBeSerialized(): void
+    public function testCanBeSerialized(): void
     {
         $documentAST = DocumentAST::fromSource('
         type Query {

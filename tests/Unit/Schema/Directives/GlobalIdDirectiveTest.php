@@ -20,10 +20,7 @@ class GlobalIdDirectiveTest extends TestCase
         $this->globalId = $this->app->make(GlobalId::class);
     }
 
-    /**
-     * @test
-     */
-    public function itDecodesGlobalId(): void
+    public function testDecodesGlobalId(): void
     {
         $this->schema = '
         type Query {
@@ -42,10 +39,7 @@ class GlobalIdDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itDecodesGlobalIds(): void
+    public function testDecodesGlobalIds(): void
     {
         $this->schema = "
         type Query {

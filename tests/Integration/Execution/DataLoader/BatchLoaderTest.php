@@ -8,10 +8,7 @@ use Tests\Utils\Models\User;
 
 class BatchLoaderTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanResolveBatchedFieldsFromBatchedRequests(): void
+    public function testCanResolveBatchedFieldsFromBatchedRequests(): void
     {
         $users = factory(User::class, 2)
             ->create()

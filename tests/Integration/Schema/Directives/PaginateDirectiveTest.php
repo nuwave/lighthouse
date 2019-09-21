@@ -11,10 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PaginateDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanCreateQueryPaginators(): void
+    public function testCanCreateQueryPaginators(): void
     {
         factory(User::class, 10)->create();
 
@@ -57,10 +54,7 @@ class PaginateDirectiveTest extends DBTestCase
         ])->assertJsonCount(5, 'data.users.data');
     }
 
-    /**
-     * @test
-     */
-    public function itHandlesPaginationWithCountZero(): void
+    public function testHandlesPaginationWithCountZero(): void
     {
         $this->schema = '
         type User {
@@ -90,10 +84,7 @@ class PaginateDirectiveTest extends DBTestCase
         ->assertErrorCategory(Error::CATEGORY_GRAPHQL);
     }
 
-    /**
-     * @test
-     */
-    public function itCanSpecifyCustomBuilder(): void
+    public function testCanSpecifyCustomBuilder(): void
     {
         factory(User::class, 2)->create();
 
@@ -135,10 +126,7 @@ class PaginateDirectiveTest extends DBTestCase
         return User::orderBy('id', 'DESC');
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateQueryPaginatorsWithDifferentPages(): void
+    public function testCanCreateQueryPaginatorsWithDifferentPages(): void
     {
         $users = factory(User::class, 10)->create();
         $posts = factory(Post::class, 10)->create([
@@ -226,10 +214,7 @@ class PaginateDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateQueryConnections(): void
+    public function testCanCreateQueryConnections(): void
     {
         factory(User::class, 10)->create();
 
@@ -269,10 +254,7 @@ class PaginateDirectiveTest extends DBTestCase
         ])->assertJsonCount(5, 'data.users.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itQueriesConnectionWithNoData(): void
+    public function testQueriesConnectionWithNoData(): void
     {
         $this->schema = '
         type User {
@@ -324,10 +306,7 @@ class PaginateDirectiveTest extends DBTestCase
         ])->assertJsonCount(0, 'data.users.edges');
     }
 
-    /**
-     * @test
-     */
-    public function itQueriesPaginationWithNoData(): void
+    public function testQueriesPaginationWithNoData(): void
     {
         $this->schema = '
         type User {
@@ -375,10 +354,7 @@ class PaginateDirectiveTest extends DBTestCase
         ])->assertJsonCount(0, 'data.users.data');
     }
 
-    /**
-     * @test
-     */
-    public function itPaginatesWhenDefinedInTypeExtension(): void
+    public function testPaginatesWhenDefinedInTypeExtension(): void
     {
         factory(User::class, 2)->create();
 
@@ -405,10 +381,7 @@ class PaginateDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users.data');
     }
 
-    /**
-     * @test
-     */
-    public function itCanHaveADefaultPaginationCount(): void
+    public function testCanHaveADefaultPaginationCount(): void
     {
         factory(User::class, 10)->create();
 
@@ -448,10 +421,7 @@ class PaginateDirectiveTest extends DBTestCase
         ])->assertJsonCount(5, 'data.users.data');
     }
 
-    /**
-     * @test
-     */
-    public function itIsLimitedToMaxCountFromConfig(): void
+    public function testIsLimitedToMaxCountFromConfig(): void
     {
         config(['lighthouse.paginate_max_count' => 5]);
 
@@ -504,10 +474,7 @@ class PaginateDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itIsLimitedByMaxCountFromDirective(): void
+    public function testIsLimitedByMaxCountFromDirective(): void
     {
         config(['lighthouse.paginate_max_count' => 5]);
 

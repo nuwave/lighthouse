@@ -6,10 +6,7 @@ use Tests\DBTestCase;
 
 class TrimDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itTrimsInput(): void
+    public function testTrimsInput(): void
     {
         $this->schema = '
         type Company {

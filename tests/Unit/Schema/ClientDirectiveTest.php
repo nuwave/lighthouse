@@ -7,10 +7,7 @@ use GraphQL\Type\Definition\Directive;
 
 class ClientDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itReturnsDefaultDirectivesInIntrospection(): void
+    public function testReturnsDefaultDirectivesInIntrospection(): void
     {
         $this->schema = $this->placeholderQuery();
 
@@ -22,10 +19,7 @@ class ClientDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDefineACustomClientDirective(): void
+    public function testCanDefineACustomClientDirective(): void
     {
         $this->schema = '
         "foo"

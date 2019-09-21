@@ -48,10 +48,7 @@ class SchemaSourceProviderTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function itCanSetRootPath(): void
+    public function testCanSetRootPath(): void
     {
         $this->filesystem->put('foo', 'bar');
 

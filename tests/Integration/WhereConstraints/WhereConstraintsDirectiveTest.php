@@ -43,10 +43,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itAddsASingleWhereFilter(): void
+    public function testAddsASingleWhereFilter(): void
     {
         factory(User::class, 2)->create();
 
@@ -64,10 +61,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itOverwritesTheOperator(): void
+    public function testOverwritesTheOperator(): void
     {
         factory(User::class, 3)->create();
 
@@ -86,10 +80,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itAddsNestedAnd(): void
+    public function testAddsNestedAnd(): void
     {
         factory(User::class, 3)->create();
 
@@ -117,10 +108,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(1, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itAddsNestedOr(): void
+    public function testAddsNestedOr(): void
     {
         factory(User::class, 3)->create();
 
@@ -146,10 +134,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itAddsNestedNot(): void
+    public function testAddsNestedNot(): void
     {
         factory(User::class, 3)->create();
 
@@ -171,10 +156,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.users');
     }
 
-    /**
-     * @test
-     */
-    public function itRejectsInvalidColumnName(): void
+    public function testRejectsInvalidColumnName(): void
     {
         $this->graphQL('
         {
@@ -196,10 +178,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itQueriesEmptyStrings(): void
+    public function testQueriesEmptyStrings(): void
     {
         factory(User::class, 3)->create();
 
@@ -231,10 +210,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanQueryForNull(): void
+    public function testCanQueryForNull(): void
     {
         factory(User::class, 3)->create();
 
@@ -266,10 +242,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itRequiresAValueForAColumn(): void
+    public function testRequiresAValueForAColumn(): void
     {
         $this->graphQL('
         {
@@ -286,10 +259,7 @@ class WhereConstraintsDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itOnlyAllowsWhitelistedColumns(): void
+    public function testOnlyAllowsWhitelistedColumns(): void
     {
         factory(User::class)->create();
 

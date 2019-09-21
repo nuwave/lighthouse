@@ -82,10 +82,7 @@ class ValidationTest extends DBTestCase
         return Arr::get($args, 'email.emailAddress', 'no-email');
     }
 
-    /**
-     * @test
-     */
-    public function itRunsValidationBeforeCallingTheResolver(): void
+    public function testRunsValidationBeforeCallingTheResolver(): void
     {
         $shouldNotBeCalled = '@field(resolver: "'.$this->qualifyTestResolver('resolveDoNotCall').'")';
         $this->schema = '
@@ -128,10 +125,7 @@ class ValidationTest extends DBTestCase
         self::$callCount++;
     }
 
-    /**
-     * @test
-     */
-    public function itValidatesDifferentPathsIndividually(): void
+    public function testValidatesDifferentPathsIndividually(): void
     {
         $result = $this->graphQL('
         {
@@ -164,10 +158,7 @@ class ValidationTest extends DBTestCase
         ], $result);
     }
 
-    /**
-     * @test
-     */
-    public function itValidatesList(): void
+    public function testValidatesList(): void
     {
         $result = $this->graphQL('
         {
@@ -189,10 +180,7 @@ class ValidationTest extends DBTestCase
         ], $result);
     }
 
-    /**
-     * @test
-     */
-    public function itValidatesInputCount(): void
+    public function testValidatesInputCount(): void
     {
         $result = $this->graphQL('
         {
@@ -230,10 +218,7 @@ class ValidationTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itPassesIfNothingRequiredIsMissing(): void
+    public function testPassesIfNothingRequiredIsMissing(): void
     {
         $this->graphQL('
         {
@@ -246,10 +231,7 @@ class ValidationTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itEvaluatesArgDirectivesInDefinitionOrder(): void
+    public function testEvaluatesArgDirectivesInDefinitionOrder(): void
     {
         $validPasswordResult = $this->graphQL('
         {
@@ -274,10 +256,7 @@ class ValidationTest extends DBTestCase
         $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
     }
 
-    /**
-     * @test
-     */
-    public function itEvaluatesConditionalValidation(): void
+    public function testEvaluatesConditionalValidation(): void
     {
         $validPasswordResult = $this->graphQL('
         {
@@ -300,10 +279,7 @@ class ValidationTest extends DBTestCase
         $this->assertValidationKeysSame(['password'], $invalidPasswordResult);
     }
 
-    /**
-     * @test
-     */
-    public function itEvaluatesInputArgValidation(): void
+    public function testEvaluatesInputArgValidation(): void
     {
         $result = $this->graphQL('
         {
@@ -318,10 +294,7 @@ class ValidationTest extends DBTestCase
         $this->assertValidationKeysSame(['bar'], $result);
     }
 
-    /**
-     * @test
-     */
-    public function itEvaluatesNonNullInputArgValidation(): void
+    public function testEvaluatesNonNullInputArgValidation(): void
     {
         $this->graphQL('
         {
@@ -359,10 +332,7 @@ class ValidationTest extends DBTestCase
         ], $invalidEmailResult);
     }
 
-    /**
-     * @test
-     */
-    public function itErrorsIfSomethingRequiredIsMissing(): void
+    public function testErrorsIfSomethingRequiredIsMissing(): void
     {
         $result = $this->graphQL('
         {
@@ -379,10 +349,7 @@ class ValidationTest extends DBTestCase
         ], $result);
     }
 
-    /**
-     * @test
-     */
-    public function itSetsArgumentsOnCustomValidationDirective(): void
+    public function testSetsArgumentsOnCustomValidationDirective(): void
     {
         $this->schema = '
         type Mutation {
@@ -435,10 +402,7 @@ class ValidationTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itIgnoresTheUserWeAreUpdating(): void
+    public function testIgnoresTheUserWeAreUpdating(): void
     {
         $this->schema = '
         type Mutation {
@@ -485,10 +449,7 @@ class ValidationTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCombinesFieldValidationAndArgumentValidation(): void
+    public function testCombinesFieldValidationAndArgumentValidation(): void
     {
         $this->markTestSkipped('Not implemented as of now as it would require a larger redo.');
 
@@ -523,10 +484,7 @@ class ValidationTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCombinesArgumentValidationByPausingAndResuming(): void
+    public function testCombinesArgumentValidationByPausingAndResuming(): void
     {
         $this->markTestSkipped('
         This should work once we can reliably depend upon repeatable directives.

@@ -35,10 +35,7 @@ class DeferDBTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferBelongsToFields(): void
+    public function testCanDeferBelongsToFields(): void
     {
         $company = factory(Company::class)->create();
         $user = factory(User::class)->create([
@@ -93,10 +90,7 @@ class DeferDBTest extends DBTestCase
         $this->assertSame($company->name, Arr::get($deferredCompany['user.company']['data'], 'name'));
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferNestedRelationshipFields(): void
+    public function testCanDeferNestedRelationshipFields(): void
     {
         $company = factory(Company::class)->create();
         $users = factory(User::class, 5)->create([
@@ -170,10 +164,7 @@ class DeferDBTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeferNestedListFields(): void
+    public function testCanDeferNestedListFields(): void
     {
         /** @var \Illuminate\Database\Eloquent\Collection<\Tests\Utils\Models\Company> $companies */
         $companies = factory(Company::class, 2)
