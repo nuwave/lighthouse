@@ -7,10 +7,7 @@ use Tests\Utils\Models\User;
 
 class SpreadDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itSpreadsTheInputIntoTheQuery(): void
+    public function testSpreadsTheInputIntoTheQuery(): void
     {
         factory(User::class, 2)->create();
 
@@ -45,10 +42,7 @@ class SpreadDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itIgnoresSpreadedInputIfNotGiven(): void
+    public function testIgnoresSpreadedInputIfNotGiven(): void
     {
         factory(User::class)->create();
 

@@ -8,10 +8,7 @@ use Nuwave\Lighthouse\SoftDeletes\TrashedDirective;
 
 class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanBeUsedWithAllDirective(): void
+    public function testCanBeUsedWithAllDirective(): void
     {
         $tasks = factory(Task::class, 3)->create();
         $taskToRemove = $tasks[2];
@@ -74,10 +71,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.tasks');
     }
 
-    /**
-     * @test
-     */
-    public function itCanBeUsedWithFindDirective(): void
+    public function testCanBeUsedWithFindDirective(): void
     {
         $taskToRemove = factory(Task::class)->create();
         $taskToRemove->delete();
@@ -152,10 +146,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCanBeUsedWIthPaginateDirective(): void
+    public function testCanCanBeUsedWIthPaginateDirective(): void
     {
         $tasks = factory(Task::class, 3)->create();
         $taskToRemove = $tasks[2];
@@ -228,10 +219,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ')->assertJsonCount(2, 'data.tasks.data');
     }
 
-    /**
-     * @test
-     */
-    public function itCanBeUsedNested(): void
+    public function testCanBeUsedNested(): void
     {
         $taskToRemove = factory(Task::class)->create();
         factory(Task::class, 2)->create(['user_id' => $taskToRemove->user->id]);
@@ -389,10 +377,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
              ->assertJsonCount(2, 'data.user.tasksSimple');
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfModelDoesNotSupportSoftDeletesTrashed(): void
+    public function testThrowsIfModelDoesNotSupportSoftDeletesTrashed(): void
     {
         $this->schema = '
         type Query {
@@ -414,10 +399,7 @@ class SoftDeletesAndTrashedDirectiveTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfModelDoesNotSupportSoftDeletes(): void
+    public function testThrowsIfModelDoesNotSupportSoftDeletes(): void
     {
         $this->schema = '
         type Query {

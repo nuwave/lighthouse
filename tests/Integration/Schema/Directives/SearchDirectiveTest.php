@@ -37,10 +37,7 @@ class SearchDirectiveTest extends DBTestCase
             ->andReturn($this->engine);
     }
 
-    /**
-     * @test
-     */
-    public function canSearch(): void
+    public function testCanSearch(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -90,10 +87,7 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function canSearchWithCustomIndex(): void
+    public function testCanSearchWithCustomIndex(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',
@@ -160,10 +154,7 @@ class SearchDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itHandlesScoutBuilderPaginationArguments(): void
+    public function testHandlesScoutBuilderPaginationArguments(): void
     {
         $postA = factory(Post::class)->create([
             'title' => 'great title',

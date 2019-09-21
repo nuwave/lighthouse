@@ -68,10 +68,7 @@ class BelongsToManyTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewBelongsToMany(): void
+    public function testCanCreateWithNewBelongsToMany(): void
     {
         $this->graphQL('
         mutation {
@@ -110,10 +107,7 @@ class BelongsToManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateAndConnectWithBelongsToMany(): void
+    public function testCanCreateAndConnectWithBelongsToMany(): void
     {
         factory(User::class)->create(['name' => 'user_one']);
         factory(User::class)->create(['name' => 'user_two']);
@@ -156,10 +150,7 @@ class BelongsToManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithBelongsToMany(): void
+    public function testCanCreateWithBelongsToMany(): void
     {
         factory(Role::class)->create([
             'name' => 'is_admin',
@@ -212,10 +203,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertSame('is_user', $role->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateWithBelongsToMany(): void
+    public function testCanUpdateWithBelongsToMany(): void
     {
         factory(Role::class)
             ->create([
@@ -275,10 +263,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertSame('is_user', $role->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeleteWithBelongsToMany(): void
+    public function testCanDeleteWithBelongsToMany(): void
     {
         factory(Role::class)
             ->create([
@@ -328,10 +313,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertNotNull(User::find(2));
     }
 
-    /**
-     * @test
-     */
-    public function itCanConnectWithBelongsToMany(): void
+    public function testCanConnectWithBelongsToMany(): void
     {
         factory(User::class)->create();
         factory(Role::class)
@@ -377,10 +359,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertCount(2, $role->users()->get());
     }
 
-    /**
-     * @test
-     */
-    public function itCanSyncWithBelongsToMany(): void
+    public function testCanSyncWithBelongsToMany(): void
     {
         factory(User::class)->create();
         factory(Role::class)
@@ -426,10 +405,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertCount(2, $role->users()->get());
     }
 
-    /**
-     * @test
-     */
-    public function itCanDisconnectWithBelongsToMany(): void
+    public function testCanDisconnectWithBelongsToMany(): void
     {
         factory(Role::class)
             ->create()
@@ -473,10 +449,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertNotNull(User::find(2));
     }
 
-    /**
-     * @test
-     */
-    public function itCanSyncExistingUsersDuringCreateToABelongsToManyRelation(): void
+    public function testCanSyncExistingUsersDuringCreateToABelongsToManyRelation(): void
     {
         factory(User::class, 2)->create();
 
@@ -515,10 +488,7 @@ class BelongsToManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanDisconnectAllRelatedModelsOnEmptySync(): void
+    public function testCanDisconnectAllRelatedModelsOnEmptySync(): void
     {
         /** @var User $user */
         $user = factory(User::class)->create();

@@ -8,10 +8,7 @@ use Illuminate\Support\Facades\Event;
 
 class EventDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itDispatchesAnEvent(): void
+    public function testDispatchesAnEvent(): void
     {
         Event::fake([
             CompanyWasCreatedEvent::class,

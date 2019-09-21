@@ -26,10 +26,7 @@ class IntrospectionTest extends TestCase
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
 
-    /**
-     * @test
-     */
-    public function itFindsTypesFromSchema(): void
+    public function testFindsTypesFromSchema(): void
     {
         $this->schema = '
         type Foo {
@@ -49,10 +46,7 @@ class IntrospectionTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itFindsManuallyRegisteredTypes(): void
+    public function testFindsManuallyRegisteredTypes(): void
     {
         $this->schema = $this->placeholderQuery();
         $this->typeRegistry->register(

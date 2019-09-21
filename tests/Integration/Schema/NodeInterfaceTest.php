@@ -34,10 +34,7 @@ class NodeInterfaceTest extends DBTestCase
         ],
     ];
 
-    /**
-     * @test
-     */
-    public function itCanResolveNodes(): void
+    public function testCanResolveNodes(): void
     {
         $this->schema = '
         type User @node(resolver: "Tests\\\Integration\\\Schema\\\NodeInterfaceTest@resolveNode") {
@@ -86,10 +83,7 @@ class NodeInterfaceTest extends DBTestCase
         return $this->testTuples[$id];
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveModelsNodes(): void
+    public function testCanResolveModelsNodes(): void
     {
         $this->schema = '
         type User @model {

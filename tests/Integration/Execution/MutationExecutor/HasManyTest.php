@@ -63,10 +63,7 @@ class HasManyTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewHasMany(): void
+    public function testCanCreateWithNewHasMany(): void
     {
         $this->graphQL('
         mutation {
@@ -102,10 +99,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateHasMany(): void
+    public function testCanCreateHasMany(): void
     {
         factory(User::class)->create();
 
@@ -144,10 +138,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateHasMany(): void
+    public function testCanUpdateHasMany(): void
     {
         factory(User::class)
             ->create()
@@ -192,10 +183,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanDeleteHasMany(): void
+    public function testCanDeleteHasMany(): void
     {
         factory(User::class)
             ->create()

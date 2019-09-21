@@ -6,10 +6,7 @@ use Tests\TestCase;
 
 class BcryptDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanBcryptAnArgument(): void
+    public function testCanBcryptAnArgument(): void
     {
         $this->schema = '
         type Mutation {
@@ -50,10 +47,7 @@ class BcryptDirectiveTest extends TestCase
         $this->assertTrue(password_verify('123', $passwordFromQuery));
     }
 
-    /**
-     * @test
-     */
-    public function itCanBcryptAnArgumentInInputObjectAndArray(): void
+    public function testCanBcryptAnArgumentInInputObjectAndArray(): void
     {
         $this->schema = '
         type Query {

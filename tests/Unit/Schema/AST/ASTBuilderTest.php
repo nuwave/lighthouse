@@ -20,10 +20,7 @@ class ASTBuilderTest extends TestCase
         $this->astBuilder = app(ASTBuilder::class);
     }
 
-    /**
-     * @test
-     */
-    public function itCanMergeTypeExtensionFields(): void
+    public function testCanMergeTypeExtensionFields(): void
     {
         $this->schema = '
         type Query {
@@ -46,10 +43,7 @@ class ASTBuilderTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
+    public function testDoesNotAllowDuplicateFieldsOnTypeExtensions(): void
     {
         $this->schema = '
         type Query {

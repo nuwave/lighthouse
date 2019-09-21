@@ -7,10 +7,7 @@ use Nuwave\Lighthouse\Events\BuildSchemaString;
 
 class BuildSchemaStringTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itInjectsSourceSchemaIntoEvent(): void
+    public function testInjectsSourceSchemaIntoEvent(): void
     {
         $schema = $this->placeholderQuery();
 
@@ -24,10 +21,7 @@ class BuildSchemaStringTest extends TestCase
         $this->buildSchema($schema);
     }
 
-    /**
-     * @test
-     */
-    public function itCanAddAdditionalSchemaThroughEvent(): void
+    public function testCanAddAdditionalSchemaThroughEvent(): void
     {
         app('events')->listen(
             BuildSchemaString::class,

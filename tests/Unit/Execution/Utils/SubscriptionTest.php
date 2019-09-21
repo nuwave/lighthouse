@@ -56,10 +56,7 @@ class SubscriptionTest extends TestCase
         $this->app->instance(BroadcastsSubscriptions::class, $this->broadcaster->reveal());
     }
 
-    /**
-     * @test
-     */
-    public function itCanSendSubscriptionToBroadcaster(): void
+    public function testCanSendSubscriptionToBroadcaster(): void
     {
         $root = [
             'post' => [
@@ -76,10 +73,7 @@ class SubscriptionTest extends TestCase
         Subscription::broadcast(self::SUBSCRIPTION_FIELD, $root);
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsOnInvalidSubscriptionField(): void
+    public function testThrowsOnInvalidSubscriptionField(): void
     {
         $this->broadcaster->broadcast(Argument::any())->shouldNotBeCalled();
         $this->expectException(InvalidArgumentException::class);

@@ -9,10 +9,7 @@ use Tests\Utils\Models\User;
 
 class CreateDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanCreateFromFieldArguments(): void
+    public function testCanCreateFromFieldArguments(): void
     {
         $this->schema = '
         type Company {
@@ -42,10 +39,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateFromInputObject(): void
+    public function testCanCreateFromInputObject(): void
     {
         $this->schema = '
         type Company {
@@ -81,10 +75,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
+    public function testCreatesAnEntryWithDatabaseDefaultsAndReturnsItImmediately(): void
     {
         $this->schema = '
         type Mutation {
@@ -114,10 +105,7 @@ class CreateDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotCreateWithFailingRelationship(): void
+    public function testDoesNotCreateWithFailingRelationship(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
@@ -183,10 +171,7 @@ class CreateDirectiveTest extends DBTestCase
         $this->assertCount(1, User::all());
     }
 
-    /**
-     * @test
-     */
-    public function itDoesCreateWithFailingRelationshipAndTransactionParam(): void
+    public function testDoesCreateWithFailingRelationshipAndTransactionParam(): void
     {
         factory(Task::class)->create(['name' => 'Uniq']);
 
@@ -257,10 +242,7 @@ class CreateDirectiveTest extends DBTestCase
         $this->assertCount(2, User::all());
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
+    public function testDoesNotFailWhenPropertyNameMatchesModelsNativeMethods(): void
     {
         $this->schema = '
         type Task {

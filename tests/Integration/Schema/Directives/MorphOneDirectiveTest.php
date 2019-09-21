@@ -41,10 +41,7 @@ class MorphOneDirectiveTest extends DBTestCase
         $this->hour = $this->task->hours()->save(factory(Hour::class)->create());
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveMorphOneRelationship(): void
+    public function testCanResolveMorphOneRelationship(): void
     {
         $this->schema = '
         type Hour {
@@ -93,10 +90,7 @@ class MorphOneDirectiveTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveMorphOneWithCustomName(): void
+    public function testCanResolveMorphOneWithCustomName(): void
     {
         $this->schema = '
         type Hour {

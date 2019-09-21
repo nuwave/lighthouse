@@ -73,10 +73,7 @@ class RulesDirectiveTest extends TestCase
         ";
     }
 
-    /**
-     * @test
-     */
-    public function itCanValidateQueryRootFieldArguments(): void
+    public function testCanValidateQueryRootFieldArguments(): void
     {
         $this->graphQL('
         {
@@ -119,10 +116,7 @@ class RulesDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanReturnValidFieldsAndErrorMessagesForInvalidFields(): void
+    public function testCanReturnValidFieldsAndErrorMessagesForInvalidFields(): void
     {
         $this->graphQL('
         {
@@ -166,10 +160,7 @@ class RulesDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanValidateRootMutationFieldArgs(): void
+    public function testCanValidateRootMutationFieldArgs(): void
     {
         $this->graphQL('
         mutation {
@@ -197,10 +188,7 @@ class RulesDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanValidateArrayType(): void
+    public function testCanValidateArrayType(): void
     {
         $this->graphQL('
         {
@@ -261,10 +249,7 @@ class RulesDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanReturnCorrectValidationForInputObjects(): void
+    public function testCanReturnCorrectValidationForInputObjects(): void
     {
         $this->graphQL('
         {
@@ -313,10 +298,7 @@ class RulesDirectiveTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itUsesCustomRuleClass(): void
+    public function testUsesCustomRuleClass(): void
     {
         $this->graphQL('
         mutation {

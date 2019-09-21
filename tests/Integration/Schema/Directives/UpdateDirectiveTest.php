@@ -9,10 +9,7 @@ use Tests\Utils\Models\Category;
 
 class UpdateDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanUpdateFromFieldArguments(): void
+    public function testCanUpdateFromFieldArguments(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
@@ -51,10 +48,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Company::first()->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateFromInputObject(): void
+    public function testCanUpdateFromInputObject(): void
     {
         factory(Company::class)->create(['name' => 'foo']);
 
@@ -97,10 +91,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Company::first()->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateWithCustomPrimaryKey(): void
+    public function testCanUpdateWithCustomPrimaryKey(): void
     {
         factory(Category::class)->create(['name' => 'foo']);
 
@@ -139,10 +130,7 @@ class UpdateDirectiveTest extends DBTestCase
         $this->assertSame('bar', Category::first()->name);
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotUpdateWithFailingRelationship(): void
+    public function testDoesNotUpdateWithFailingRelationship(): void
     {
         factory(User::class)->create(['name' => 'Original']);
 
