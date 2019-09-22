@@ -4,7 +4,6 @@ namespace Nuwave\Lighthouse\Schema;
 
 use Closure;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\EnumType;
@@ -17,12 +16,10 @@ use GraphQL\Type\Definition\InterfaceType;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
 use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\Values\TypeValue;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
-use GraphQL\Language\AST\EnumValueDefinitionNode;
 use GraphQL\Language\AST\UnionTypeDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use GraphQL\Language\AST\ScalarTypeDefinitionNode;
@@ -129,6 +126,8 @@ class TypeRegistry
     public function possibleTypes(): array
     {
         // Make sure all the types from the AST are eagerly converted
+        // to find orphaned types, such as an object type that is only
+        // ever used through its association to an interface
         /** @var TypeDefinitionNode $typeDefinition */
         foreach ($this->documentAST->types as $typeDefinition) {
             $name = $typeDefinition->name->value;
@@ -159,9 +158,7 @@ class TypeRegistry
             ->via('handleNode')
             ->then(function (TypeValue $value) use ($definition): Type {
                 /** @var \Nuwave\Lighthouse\Support\Contracts\TypeResolver $typeResolver */
-                $typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class);
-
-                if ($typeResolver) {
+                if ($typeResolver = $this->directiveFactory->createSingleDirectiveOfType($definition, TypeResolver::class)) {
                     return $typeResolver->resolveNode($value);
                 }
 
@@ -179,7 +176,6 @@ class TypeRegistry
      */
     protected function resolveType(TypeDefinitionNode $typeDefinition): Type
     {
-        // Ignore TypeExtensionNode since they are merged before we get here
         switch (get_class($typeDefinition)) {
             case EnumTypeDefinitionNode::class:
                 return $this->resolveEnumType($typeDefinition);
@@ -193,6 +189,7 @@ class TypeRegistry
                 return $this->resolveInterfaceType($typeDefinition);
             case UnionTypeDefinitionNode::class:
                 return $this->resolveUnionType($typeDefinition);
+            // Ignore TypeExtensionNode since they are merged before we get here
             default:
                 throw new InvariantViolation(
                     "Unknown type for definition [{$typeDefinition->name->value}]"
@@ -206,25 +203,23 @@ class TypeRegistry
      */
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
     {
+        $values = [];
+        foreach($enumDefinition->values as $enumValue) {
+            $directive = ASTHelper::directiveDefinition($enumValue, 'enum');
+
+            $values[$enumValue->name->value] = [
+                // If no explicit value is given, we default to the name of the value
+                'value' => $directive
+                    ? ASTHelper::directiveArgValue($directive, 'value')
+                    : $enumValue->name->value,
+                'description' => data_get($enumValue->description, 'value'),
+            ];
+        }
+
         return new EnumType([
             'name' => $enumDefinition->name->value,
             'description' => data_get($enumDefinition->description, 'value'),
-            'values' => (new Collection($enumDefinition->values))
-                ->mapWithKeys(function (EnumValueDefinitionNode $field): array {
-                    // Get the directive that is defined on the field itself
-                    $directive = ASTHelper::directiveDefinition($field, 'enum');
-
-                    return [
-                        $field->name->value => [
-                            // If no explicit value is given, we default to the field name
-                            'value' => $directive
-                                ? ASTHelper::directiveArgValue($directive, 'value')
-                                : $field->name->value,
-                            'description' => data_get($field->description, 'value'),
-                        ],
-                    ];
-                })
-                ->toArray(),
+            'values' => $values,
         ]);
     }
 
@@ -275,11 +270,12 @@ class TypeRegistry
             'description' => data_get($objectDefinition->description, 'value'),
             'fields' => $this->resolveFieldsFunction($objectDefinition),
             'interfaces' => function () use ($objectDefinition): array {
-                return (new Collection($objectDefinition->interfaces))
-                    ->map(function (NamedTypeNode $interface): Type {
+                return array_map(
+                    function (NamedTypeNode $interface): Type {
                         return $this->get($interface->name->value);
-                    })
-                    ->toArray();
+                    },
+                    $objectDefinition->interfaces
+                );
             },
         ]);
     }
@@ -287,24 +283,24 @@ class TypeRegistry
     /**
      * Returns a closure that lazy loads the fields for a constructed type.
      *
-     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $definition
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|\GraphQL\Language\AST\InterfaceTypeDefinitionNode  $typeDefinition
      * @return \Closure
      */
-    protected function resolveFieldsFunction($definition): Closure
+    protected function resolveFieldsFunction($typeDefinition): Closure
     {
-        return function () use ($definition): array {
-            return (new Collection($definition->fields))
-                ->mapWithKeys(function (FieldDefinitionNode $fieldDefinition) use ($definition): array {
-                    $fieldValue = new FieldValue(
-                        new TypeValue($definition),
-                        $fieldDefinition
-                    );
+        return function () use ($typeDefinition): array {
+            $typeValue = new TypeValue($typeDefinition);
+            $fields = [];
 
-                    return [
-                        $fieldDefinition->name->value => app(FieldFactory::class)->handle($fieldValue),
-                    ];
-                })
-                ->toArray();
+            foreach($typeDefinition->fields as $fieldDefinition) {
+                /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
+                $fieldFactory = app(FieldFactory::class);
+                $fieldValue = new FieldValue($typeValue, $fieldDefinition);
+
+                $fields[$fieldDefinition->name->value] = $fieldFactory->handle($fieldValue);
+            }
+
+            return $fields;
         };
     }
 
@@ -331,7 +327,7 @@ class TypeRegistry
     {
         $nodeName = $interfaceDefinition->name->value;
 
-        if ($directive = ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
+        if (ASTHelper::directiveDefinition($interfaceDefinition, 'interface')) {
             $interfaceDirective = (new InterfaceDirective)->hydrate($interfaceDefinition);
 
             $typeResolver = $interfaceDirective->getResolverFromArgument('resolveType');
@@ -396,9 +392,7 @@ class TypeRegistry
     public function typeResolverFallback(): Closure
     {
         return function ($rootValue): Type {
-            return $this->get(
-                class_basename($rootValue)
-            );
+            return $this->get(class_basename($rootValue));
         };
     }
 
@@ -427,13 +421,12 @@ class TypeRegistry
             'name' => $nodeName,
             'description' => data_get($unionDefinition->description, 'value'),
             'types' => function () use ($unionDefinition): array {
-                return (new Collection($unionDefinition->types))
-                    ->map(function (NamedTypeNode $type): Type {
-                        return $this->get(
-                            $type->name->value
-                        );
-                    })
-                    ->toArray();
+                return array_map(
+                    function (NamedTypeNode $type): Type {
+                        return $this->get($type->name->value);
+                    },
+                    $unionDefinition->types
+                );
             },
             'resolveType' => $typeResolver,
         ]);

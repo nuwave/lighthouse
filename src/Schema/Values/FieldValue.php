@@ -53,13 +53,6 @@ class FieldValue
     protected $complexity;
 
     /**
-     * Cache key should be private.
-     *
-     * @var bool
-     */
-    protected $privateCache = false;
-
-    /**
      * Create new field value instance.
      *
      * @param  \Nuwave\Lighthouse\Schema\Values\TypeValue  $parent

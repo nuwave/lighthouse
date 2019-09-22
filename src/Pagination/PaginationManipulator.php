@@ -54,7 +54,7 @@ class PaginationManipulator
      * @return  void
      * @throws  DefinitionException
      */
-    public static function registerConnection(
+    protected static function registerConnection(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
         DocumentAST &$documentAST,
@@ -115,7 +115,7 @@ class PaginationManipulator
      * @param  int|null  $maxCount
      * @return void
      */
-    public static function registerPaginator(
+    protected static function registerPaginator(
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
         DocumentAST &$documentAST,
