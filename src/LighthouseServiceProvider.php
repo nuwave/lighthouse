@@ -61,7 +61,7 @@ class LighthouseServiceProvider extends ServiceProvider
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__.'/../config/config.php' => $this->app->make('path.config').DIRECTORY_SEPARATOR.'lighthouse.php',
+            __DIR__.'/../config/config.php' => $this->app->make('path.config').'/lighthouse.php',
         ], 'config');
 
         $this->publishes([
@@ -122,10 +122,12 @@ class LighthouseServiceProvider extends ServiceProvider
             /** @var \Illuminate\Http\Request $request */
             $request = $app->make('request');
 
-            return Str::startsWith(
+            $isMultipartFormRequest = Str::startsWith(
                 $request->header('Content-Type'),
                 'multipart/form-data'
-            )
+            );
+
+            return $isMultipartFormRequest
                 ? new MultipartFormRequest($request)
                 : new LighthouseRequest($request);
         });
