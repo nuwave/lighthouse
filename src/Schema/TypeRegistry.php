@@ -204,7 +204,7 @@ class TypeRegistry
     protected function resolveEnumType(EnumTypeDefinitionNode $enumDefinition): EnumType
     {
         $values = [];
-        foreach($enumDefinition->values as $enumValue) {
+        foreach ($enumDefinition->values as $enumValue) {
             $directive = ASTHelper::directiveDefinition($enumValue, 'enum');
 
             $values[$enumValue->name->value] = [
@@ -292,7 +292,7 @@ class TypeRegistry
             $typeValue = new TypeValue($typeDefinition);
             $fields = [];
 
-            foreach($typeDefinition->fields as $fieldDefinition) {
+            foreach ($typeDefinition->fields as $fieldDefinition) {
                 /** @var \Nuwave\Lighthouse\Schema\Factories\FieldFactory $fieldFactory */
                 $fieldFactory = app(FieldFactory::class);
                 $fieldValue = new FieldValue($typeValue, $fieldDefinition);
