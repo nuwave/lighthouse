@@ -371,7 +371,7 @@ and how Lighthouse makes it easy to build your own server with Laravel.
 
 ## Next Steps
 
-The app you just build might use some more features.
+The app you just built might use some more features.
 Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../api-reference/directives.md#paginate)
