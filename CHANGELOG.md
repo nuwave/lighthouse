@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix the default model detection when using other directives combination with `@paginate`
+- Fix default model detection when using other directives combination with `@paginate`
 
 ### Deprecated
 

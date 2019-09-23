@@ -77,9 +77,8 @@ SDL;
         if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
-            $modelClass = $this->getModelClass();
-            $resolver = function ($id) use ($modelClass): ?Model {
-                return $modelClass::find($id);
+            $resolver = function ($id): ?Model {
+                return $this->getModelClass()::find($id);
             };
         }
 

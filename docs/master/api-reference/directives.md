@@ -1474,6 +1474,8 @@ directive @modelClass(
 ) on OBJECT
 ```
 
+**Attention** This directive will be renamed to `@model` in v5.
+
 Lighthouse will respect the overwritten model name in it's directives.
 
 ```graphql

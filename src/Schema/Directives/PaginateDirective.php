@@ -116,9 +116,7 @@ SDL;
                         $resolveInfo
                     );
                 } else {
-                    /** @var string|\Illuminate\Database\Eloquent\Model $model */
-                    $model = $this->getModelClass();
-                    $query = $model::query();
+                    $query = $this->getModelClass()::query();
                 }
 
                 $query = $resolveInfo

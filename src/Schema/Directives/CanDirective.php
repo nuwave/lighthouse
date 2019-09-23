@@ -79,12 +79,8 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    // TODO get access to the return type of the field, including its directives
-                    // A type might have something like @model on it
-                    $modelClass = $this->getModelClass();
-
                     if ($find = $this->directiveArgValue('find')) {
-                        $modelOrModels = $modelClass::findOrFail($args[$find]);
+                        $modelOrModels = $this->getModelClass()::findOrFail($args[$find]);
 
                         if ($modelOrModels instanceof Model) {
                             $modelOrModels = [$modelOrModels];
@@ -95,7 +91,7 @@ SDL;
                             $this->authorize($context->user(), $model);
                         }
                     } else {
-                        $this->authorize($context->user(), $modelClass);
+                        $this->authorize($context->user(), $this->getModelClass());
                     }
 
                     return call_user_func_array($previousResolver, func_get_args());
