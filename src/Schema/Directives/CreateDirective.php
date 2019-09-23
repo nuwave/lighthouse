@@ -64,8 +64,9 @@ SDL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
+                $modelClass = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new ($this->getModelClass());
+                $model = new $modelClass;
 
                 $executeMutation = function () use ($model, $args): Model {
                     return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
