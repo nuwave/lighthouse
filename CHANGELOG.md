@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Allow overwriting the name of Enum types created through `LaravelEnumType` https://github.com/nuwave/lighthouse/pull/968
-- Resolve models through Relay's global identification using `@node`
+- Resolve models through Relay's global identification using `@node` https://github.com/nuwave/lighthouse/pull/974
+- Add experimental `@modelClass` directive to map types to models. It will be renamed
+  to `@model` in v5 https://github.com/nuwave/lighthouse/pull/974
 
 ### Changed
 
@@ -19,12 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix default model detection when using other directives combination with `@paginate`
+- Fix default model detection when using other directives combination with `@paginate` https://github.com/nuwave/lighthouse/pull/974
 
 ### Deprecated
 
 - Use the `RegisterDirectiveNamespaces` event instead of `DirectiveFactory#addResolved()` https://github.com/nuwave/lighthouse/pull/950
-- Use `@node` instead of the `@model` to resolve models through Relay's global identification
+- Use `@node` instead of `@model` to resolve models through Relay's global identification https://github.com/nuwave/lighthouse/pull/974
 
 ## [4.3.0](https://github.com/nuwave/lighthouse/compare/v4.2.1...v4.3.0)
 
