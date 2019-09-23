@@ -117,6 +117,20 @@ abstract class BatchLoader
     }
 
     /**
+     * Load many objects by keys.
+     *
+     * @param  mixed[]  $keys
+     * @param  mixed[]  $metaInfo
+     * @return \GraphQL\Deferred[]
+     */
+    public function loadMany(array $keys, array $metaInfo = []): array
+    {
+        return array_map(function ($key) use ($metaInfo) {
+            return $this->load($key, $metaInfo);
+        }, $keys);
+    }
+
+    /**
      * Resolve the keys.
      *
      * The result has to be an associative array: [key => result]
