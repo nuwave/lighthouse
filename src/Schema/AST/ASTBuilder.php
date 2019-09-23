@@ -13,8 +13,8 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
-use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 
 class ASTBuilder
 {
@@ -81,7 +81,7 @@ class ASTBuilder
      */
     public function documentAST(): DocumentAST
     {
-        if(isset($this->documentAST)) {
+        if (isset($this->documentAST)) {
             return $this->documentAST;
         }
 

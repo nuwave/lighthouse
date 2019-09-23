@@ -125,12 +125,12 @@ class NodeInterfaceTest extends DBTestCase
     public function modelNodeDirectiveStyles(): array
     {
         return [
-            /**
+            /*
              * @deprecated @model will be repurposed in v5
              */
             ['@model'],
             ['@node'],
-            ['@node(model: "User")']
+            ['@node(model: "User")'],
         ];
     }
 }

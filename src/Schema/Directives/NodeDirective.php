@@ -74,7 +74,7 @@ SDL;
      */
     public function handleNode(TypeValue $value, Closure $next): Type
     {
-        if($this->directiveHasArgument('resolver')) {
+        if ($this->directiveHasArgument('resolver')) {
             $resolver = $this->getResolverFromArgument('resolver');
         } else {
             $modelClass = $this->getModelClass();

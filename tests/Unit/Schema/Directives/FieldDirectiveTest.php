@@ -4,7 +4,6 @@ namespace Tests\Unit\Schema\Directives;
 
 use Tests\TestCase;
 use Tests\Utils\Queries\FooBar;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class FieldDirectiveTest extends TestCase

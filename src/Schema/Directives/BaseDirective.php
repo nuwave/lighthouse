@@ -114,7 +114,7 @@ abstract class BaseDirective implements Directive
             if ($this->definitionNode instanceof FieldDefinitionNode) {
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
 
-                if(!isset($documentAST->types[$returnTypeName])) {
+                if (! isset($documentAST->types[$returnTypeName])) {
                     throw new DefinitionException(
                         "Type '$returnTypeName' on '{$this->definitionNode->name->value}' can not be found in the schema.'"
                     );

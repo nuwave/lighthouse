@@ -271,9 +271,10 @@ class TypeRegistry
             'fields' => $this->resolveFieldsFunction($objectDefinition),
             'interfaces' => function () use ($objectDefinition): array {
                 $interfaces = [];
-                foreach($objectDefinition->interfaces as $interface){
-                    $interfaces []= $this->get($interface->name->value);
+                foreach ($objectDefinition->interfaces as $interface) {
+                    $interfaces [] = $this->get($interface->name->value);
                 }
+
                 return $interfaces;
             },
         ]);
