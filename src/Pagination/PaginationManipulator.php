@@ -9,6 +9,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
+// TODO make builder-pattern like
 class PaginationManipulator
 {
     /**

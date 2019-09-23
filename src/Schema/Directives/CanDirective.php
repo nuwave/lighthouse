@@ -79,6 +79,8 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
+                    // TODO get access to the return type of the field, including its directives
+                    // A type might have something like @model on it
                     $modelClass = $this->getModelClass();
 
                     if ($find = $this->directiveArgValue('find')) {
