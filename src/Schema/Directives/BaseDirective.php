@@ -4,14 +4,13 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Language\AST\Node;
-use GraphQL\Utils\AST;
 use Nuwave\Lighthouse\GraphQL;
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Language\AST\DirectiveNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\FieldDefinitionNode;
+use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
@@ -117,7 +116,7 @@ abstract class BaseDirective implements Directive
                 $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
                 $type = $documentAST->types[$returnTypeName];
 
-                if($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')){
+                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')) {
                     $model = ASTHelper::directiveArgValue($modelClass, 'class');
                 } else {
                     $model = $returnTypeName;
