@@ -270,12 +270,11 @@ class TypeRegistry
             'description' => data_get($objectDefinition->description, 'value'),
             'fields' => $this->resolveFieldsFunction($objectDefinition),
             'interfaces' => function () use ($objectDefinition): array {
-                return array_map(
-                    function (NamedTypeNode $interface): Type {
-                        return $this->get($interface->name->value);
-                    },
-                    $objectDefinition->interfaces
-                );
+                $interfaces = [];
+                foreach($objectDefinition->interfaces as $interface){
+                    $interfaces []= $this->get($interface->name->value);
+                }
+                return $interfaces;
             },
         ]);
     }

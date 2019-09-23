@@ -9,16 +9,14 @@ class BuildSchemaStringTest extends TestCase
 {
     public function testInjectsSourceSchemaIntoEvent(): void
     {
-        $schema = $this->placeholderQuery();
-
         app('events')->listen(
             BuildSchemaString::class,
-            function (BuildSchemaString $buildSchemaString) use ($schema): void {
-                $this->assertSame($schema, $buildSchemaString->userSchema);
+            function (BuildSchemaString $buildSchemaString): void {
+                $this->assertSame(self::PLACEHOLDER_QUERY, $buildSchemaString->userSchema);
             }
         );
 
-        $this->buildSchema($schema);
+        $this->buildSchema(self::PLACEHOLDER_QUERY);
     }
 
     public function testCanAddAdditionalSchemaThroughEvent(): void

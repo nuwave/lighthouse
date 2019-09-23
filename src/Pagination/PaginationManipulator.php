@@ -7,11 +7,19 @@ use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
-use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-// TODO make builder-pattern like
 class PaginationManipulator
 {
+    /**
+     * @var DocumentAST
+     */
+    protected $documentAST;
+
+    public function __construct(DocumentAST $documentAST)
+    {
+        $this->documentAST = $documentAST;
+    }
+
     /**
      * Transform the definition for a field to a field with pagination.
      *
@@ -19,46 +27,47 @@ class PaginationManipulator
      * The types in between are automatically generated and applied to the schema.
      *
      * @param  \Nuwave\Lighthouse\Pagination\PaginationType  $paginationType
+     * @param  string  $modelClass
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
      * @return void
      */
-    public static function transformToPaginatedField(
+    public function transformToPaginatedField(
         PaginationType $paginationType,
+        string $modelClass,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
-        DocumentAST &$documentAST,
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
     ): void {
+        $modelClassDirective = '@modelClass(class: "'.addslashes($modelClass).'")';
+
         if ($paginationType->isConnection()) {
-            self::registerConnection($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount, $edgeType);
+            $this->registerConnection($modelClassDirective, $fieldDefinition, $parentType, $defaultCount, $maxCount, $edgeType);
         } else {
-            self::registerPaginator($fieldDefinition, $parentType, $documentAST, $defaultCount, $maxCount);
+            $this->registerPaginator($modelClassDirective, $fieldDefinition, $parentType, $defaultCount, $maxCount);
         }
     }
 
     /**
-     * Register connection w/ schema.
+     * Register connection with schema.
      *
+     * @param  string  $modelClassDirective
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode|null  $edgeType
      * @return  void
-     * @throws  DefinitionException
      */
-    protected static function registerConnection(
+    protected function registerConnection(
+        string $modelClassDirective,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
-        DocumentAST &$documentAST,
         ?int $defaultCount = null,
         ?int $maxCount = null,
         ?ObjectTypeDefinitionNode $edgeType = null
@@ -76,14 +85,14 @@ class PaginationManipulator
         $connectionFieldName = addslashes(ConnectionField::class);
 
         $connectionType = PartialParser::objectTypeDefinition("
-            type $connectionTypeName {
+            type $connectionTypeName $modelClassDirective {
                 pageInfo: PageInfo! @field(resolver: \"{$connectionFieldName}@pageInfoResolver\")
                 edges: [$connectionEdgeName] @field(resolver: \"{$connectionFieldName}@edgeResolver\")
             }
         ");
 
         $connectionEdge = $edgeType
-            ?? $documentAST->types[$connectionEdgeName]
+            ?? $this->documentAST->types[$connectionEdgeName]
             ?? PartialParser::objectTypeDefinition("
                 type $connectionEdgeName {
                     node: $fieldTypeName
@@ -102,24 +111,24 @@ class PaginationManipulator
         $fieldDefinition->type = PartialParser::namedType($connectionTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
 
-        $documentAST->setTypeDefinition($connectionType);
-        $documentAST->setTypeDefinition($connectionEdge);
+        $this->documentAST->setTypeDefinition($connectionType);
+        $this->documentAST->setTypeDefinition($connectionEdge);
     }
 
     /**
-     * Register paginator w/ schema.
+     * Register paginator with schema.
      *
+     * @param  string  $modelClassDirective
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $fieldDefinition
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
      * @param  int|null  $defaultCount
      * @param  int|null  $maxCount
      * @return void
      */
-    protected static function registerPaginator(
+    protected function registerPaginator(
+        string $modelClassDirective,
         FieldDefinitionNode &$fieldDefinition,
         ObjectTypeDefinitionNode &$parentType,
-        DocumentAST &$documentAST,
         ?int $defaultCount = null,
         ?int $maxCount = null
     ): void {
@@ -128,7 +137,7 @@ class PaginationManipulator
         $paginatorFieldClassName = addslashes(PaginatorField::class);
 
         $paginatorType = PartialParser::objectTypeDefinition("
-            type $paginatorTypeName {
+            type $paginatorTypeName $modelClassDirective {
                 paginatorInfo: PaginatorInfo! @field(resolver: \"{$paginatorFieldClassName}@paginatorInfoResolver\")
                 data: [$fieldTypeName!]! @field(resolver: \"{$paginatorFieldClassName}@dataResolver\")
             }
@@ -145,7 +154,7 @@ class PaginationManipulator
         $fieldDefinition->type = PartialParser::namedType($paginatorTypeName);
         $parentType->fields = ASTHelper::mergeNodeList($parentType->fields, [$fieldDefinition]);
 
-        $documentAST->setTypeDefinition($paginatorType);
+        $this->documentAST->setTypeDefinition($paginatorType);
     }
 
     /**

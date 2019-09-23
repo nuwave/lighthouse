@@ -11,8 +11,6 @@ class ManipulateResultTest extends TestCase
 {
     public function testCanManipulateTheResult(): void
     {
-        $this->schema = $this->placeholderQuery();
-
         Event::listen(
             ManipulateResult::class,
             function (ManipulateResult $manipulateResult): void {

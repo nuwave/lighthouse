@@ -53,14 +53,7 @@ class MorphToTest extends DBTestCase
         type: String!
         id: ID!
     }
-    ';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
-    }
+    '.self::PLACEHOLDER_QUERY;
 
     public function testConnectsMorphTo(): void
     {

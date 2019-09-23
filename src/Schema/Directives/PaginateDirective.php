@@ -85,11 +85,12 @@ SDL;
      */
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
-        PaginationManipulator::transformToPaginatedField(
+        $paginationManipulator = new PaginationManipulator($documentAST);
+        $paginationManipulator->transformToPaginatedField(
             $this->paginationType(),
+            $this->getModelClass(),
             $fieldDefinition,
             $parentType,
-            $documentAST,
             $this->directiveArgValue('defaultCount'),
             $this->paginateMaxCount()
         );
@@ -118,8 +119,8 @@ SDL;
                         $resolveInfo
                     );
                 } else {
-                    /** @var \Illuminate\Database\Eloquent\Model $model */
-                    $model = $this->getPaginatorModel();
+                    /** @var string|\Illuminate\Database\Eloquent\Model $model */
+                    $model = $this->getModelClass();
                     $query = $model::query();
                 }
 
@@ -158,35 +159,5 @@ SDL;
     {
         return $this->directiveArgValue('maxCount')
             ?? config('lighthouse.paginate_max_count');
-    }
-
-    /**
-     * Get the model class from the `model` argument of the field.
-     *
-     * This works differently as in other directives, so we define a separate function for it.
-     *
-     * @return string
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
-     */
-    protected function getPaginatorModel(): string
-    {
-        $model = $this->directiveArgValue('model');
-
-        // Fallback to using information from the schema definition as the model name
-        if (! $model) {
-            $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
-
-            // Cut the added type suffix to get the base model class name
-            $model = Str::before($model, 'Paginator');
-            $model = Str::before($model, 'Connection');
-        }
-
-        if (! $model) {
-            throw new DirectiveException(
-                "A `model` argument must be assigned to the '{$this->name()}' directive on '{$this->definitionNode->name->value}"
-            );
-        }
-
-        return $this->namespaceModelClass($model);
     }
 }

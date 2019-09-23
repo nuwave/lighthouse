@@ -12,7 +12,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->schema = '
+        $this->schema .= '
         type User {
             id: ID!
         }
@@ -20,7 +20,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUser(id: ID!): User @delete
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -43,7 +43,7 @@ class DeleteDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = '
+        $this->schema .= '
         type User {
             id: ID!
             name: String
@@ -52,7 +52,7 @@ class DeleteDirectiveTest extends DBTestCase
         type Mutation {
             deleteUsers(id: [ID!]!): [User!]! @delete
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

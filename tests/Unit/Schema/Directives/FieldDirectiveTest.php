@@ -106,7 +106,7 @@ class FieldDirectiveTest extends TestCase
 
     public function testThrowsAnErrorWhenNoClassFound(): void
     {
-        $this->expectException(DirectiveException::class);
+        $this->expectException(DefinitionException::class);
         $this->expectExceptionMessage("No class 'bar' was found for directive 'field'");
 
         $this->schema = '

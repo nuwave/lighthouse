@@ -10,15 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Allow overwriting the name of Enum types created through `LaravelEnumType` https://github.com/nuwave/lighthouse/pull/968
+- Resolve models through Relay's global identification using `@node`
 
 ### Changed
 
 - Allow additional route configurations `prefix` and `domain` https://github.com/nuwave/lighthouse/pull/951
 - Enable schema cache only when `APP_ENV` != 'local' https://github.com/nuwave/lighthouse/pull/957
 
+### Fixed
+
+- Fix the default model detection when using other directives combination with `@paginate`
+
 ### Deprecated
 
 - Use the `RegisterDirectiveNamespaces` event instead of `DirectiveFactory#addResolved()` https://github.com/nuwave/lighthouse/pull/950
+- Use `@node` instead of the `@model` to resolve models through Relay's global identification
 
 ## [4.3.0](https://github.com/nuwave/lighthouse/compare/v4.2.1...v4.3.0)
 

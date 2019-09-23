@@ -8,7 +8,7 @@ class TrimDirectiveTest extends DBTestCase
 {
     public function testTrimsInput(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -17,7 +17,7 @@ class TrimDirectiveTest extends DBTestCase
         type Mutation {
             createCompany(name: String @trim): Company @create
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

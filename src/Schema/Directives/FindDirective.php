@@ -51,7 +51,6 @@ SDL;
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = $this->getModelClass();
 
         return $fieldValue->setResolver(

@@ -1446,27 +1446,40 @@ it is often more suitable to define a custom field directive.
 
 ## @model
 
-Enable fetching an Eloquent model by its global id through the `node` query.
-
-```graphql
-type User @model {
-    id: ID! @globalId
-}
-```
-
-Behind the scenes, Lighthouse will decode the global id sent from the client
-to find the model by it's primary id in the database.
-
-You may rebind the `\Nuwave\Lighthouse\Support\Contracts\GlobalId` interface to add your
-own mechanism of encoding/decoding global ids.
-
-### Definition
-
 ```graphql
 """
 Enable fetching an Eloquent model by its global id through the `node` query.
+
+@deprecated(reason: "Use @node instead. This directive will be repurposed and do what @modelClass does now in v5.")
 """
 directive @model on OBJECT
+```
+
+**Deprecated** Use [`@node`](#node) for Relay global object identification.
+
+## @modelClass
+
+```graphql
+"""
+Map a model class to an object type.
+This can be used when the name of the model differs from the name of the type.
+
+**This directive will be renamed to @model in v5.**
+"""
+directive @modelClass(
+    """
+    The class name of the corresponding model.
+    """
+    class: String!
+) on OBJECT
+```
+
+Lighthouse will respect the overwritten model name in it's directives.
+
+```graphql
+type Post @modelClass(class: "\\App\\BlogPost") {
+    title: String!
+}
 ```
 
 ## @morphMany
@@ -1662,10 +1675,41 @@ directive @neq(
 
 ## @node
 
-Register a type for relay global object identification.
+```graphql
+"""
+Register a type for Relay's global object identification.
+When used without any arguments, Lighthouse will attempt
+to resolve the type through a model with the same name.
+"""
+directive @node(
+  """
+  Reference to a function that receives the decoded `id` and returns a result.
+  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  If you pass only a class name, the method name defaults to `__invoke`.
+  """
+  resolver: String
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+) on FIELD_DEFINITION
+```
+
+Lighthouse defaults to resolving types through the underlying model,
+for example by calling `User::find($id)`.
 
 ```graphql
-type User @node(resolver: "App\\GraphQL\\NodeResolver@resolveUser") {
+type User @node {
+    id: ID! @globalId
+}
+```
+
+You can also use a custom resolver function to resolve any kind of data.
+
+```graphql
+type Country @node(resolver: "App\\Countries@byId") {
     name: String!
 }
 ```
@@ -1674,26 +1718,20 @@ The `resolver` argument has to specify a function which will be passed the
 decoded `id` and resolves to a result.
 
 ```php
-function resolveUser($id): \App\User
+public function byId($id): array {
+    return [
+        'DE' => ['name' => 'Germany'],
+        'MY' => ['name' => 'Malaysia'],
+    ][$id];
+}
 ```
 
-Note: if you plan on resolving using an Eloquent Model, be sure to check out the [`@model`](#model) directive.
+[Read more](../digging-deeper/relay.md#global-object-identification).
 
 ### Definition
 
-```graphql
-"""
-Register a type for relay global object identification.
-"""
-directive @node(
-  """
-  Reference to resolver function.
-  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
-  If you pass only a class name, the method name defaults to `__invoke`.
-  """
-  resolver: String!
-) on FIELD_DEFINITION
-```
+Behind the scenes, Lighthouse will decode the global id sent from the client
+to find the model by it's primary id in the database.
 
 ## @notIn
 

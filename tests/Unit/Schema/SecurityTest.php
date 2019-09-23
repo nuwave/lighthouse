@@ -48,8 +48,6 @@ class SecurityTest extends TestCase
     {
         config(['lighthouse.security.disable_introspection' => true]);
 
-        $this->schema = $this->placeholderQuery();
-
         $this->assertIntrospectionIsDisabled();
     }
 

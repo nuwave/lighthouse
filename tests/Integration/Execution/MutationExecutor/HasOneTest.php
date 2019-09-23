@@ -55,14 +55,7 @@ class HasOneTest extends DBTestCase
         id: ID!
         title: String
     }
-    ';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
-    }
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCanCreateWithNewHasOne(): void
     {

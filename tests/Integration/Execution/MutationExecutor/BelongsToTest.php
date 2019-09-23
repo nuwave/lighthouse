@@ -55,14 +55,7 @@ class BelongsToTest extends DBTestCase
         disconnect: Boolean
         delete: Boolean
     }
-    ';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
-    }
+    ' . self::PLACEHOLDER_QUERY;
 
     public function testCanCreateAndConnectWithBelongsTo(): void
     {
