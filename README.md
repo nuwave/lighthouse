@@ -57,7 +57,7 @@ All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG
 
 ## Contributing
 
-See how you can start [`CONTRIBUTING.md`](.github/CONTRIBUTING.md) to this project.
+See how you can start [`CONTRIBUTING.md`](CONTRIBUTING.md) to this project.
 
 ## Security Vulnerabilities
 
