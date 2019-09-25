@@ -11,14 +11,13 @@ class ArgumentFactory
     /**
      * Convert input value definitions to a executable types.
      *
-     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitions
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode[]|\GraphQL\Language\AST\NodeList  $definitionNodes
      * @return mixed[]
      */
     public function toTypeMap($definitionNodes): array
     {
         $arguments = [];
 
-        /* @var InputValueDefinitionNode $inputValueDefinitionNode */
         foreach ($definitionNodes as $inputDefinition) {
             $arguments[$inputDefinition->name->value] = $this->convert($inputDefinition);
         }

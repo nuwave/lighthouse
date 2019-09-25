@@ -10,7 +10,7 @@ class EventDirectiveTest extends DBTestCase
 {
     public function testDispatchesAnEvent(): void
     {
-        Event::fake([
+        $fake = Event::fake([
             CompanyWasCreatedEvent::class,
         ]);
 
@@ -42,7 +42,7 @@ class EventDirectiveTest extends DBTestCase
             ],
         ]);
 
-        Event::assertDispatched(CompanyWasCreatedEvent::class, function ($event): bool {
+        $fake->assertDispatched(CompanyWasCreatedEvent::class, function ($event): bool {
             return $event->company->id === 1
                 && $event->company->name === 'foo';
         });

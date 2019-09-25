@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution;
 
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Support\Collection;
@@ -201,7 +202,7 @@ class MutationExecutor
             }
         });
 
-        if ($parentRelation && ! $parentRelation instanceof BelongsToMany) {
+        if ($parentRelation && $parentRelation instanceof HasOneOrMany) {
             // If we are already resolving a nested create, we might
             // already have an instance of the parent relation available.
             // In that case, use it to set the current model as a child.

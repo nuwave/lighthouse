@@ -98,10 +98,10 @@ abstract class RelationDirective extends BaseDirective
     }
 
     /**
-     * @param  Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return GraphQL\Language\AST\ObjectTypeDefinitionNode|null
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @return \GraphQL\Language\AST\ObjectTypeDefinitionNode|null
      *
-     * @throws Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
      */
     protected function edgeType(DocumentAST $documentAST): ?ObjectTypeDefinitionNode
     {

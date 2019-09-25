@@ -22,7 +22,7 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /** @var \Illuminate\Cache\CacheManager */
+    /** @var \Illuminate\Cache\CacheManager|\Illuminate\Cache\Repository */
     protected $cacheManager;
 
     /**
@@ -100,7 +100,7 @@ SDL;
 
             $cacheKey = $cacheValue->getKey();
 
-            /** @var \Illuminate\Cache\Repository|\Illuminate\Cache\TaggedCache $repository */
+            /** @var \Illuminate\Cache\Repository|\Illuminate\Cache\TaggedCache $cache */
             $cache = $this->shouldUseTags()
                 ? $this->cacheManager->tags($cacheValue->getTags())
                 : $this->cacheManager;

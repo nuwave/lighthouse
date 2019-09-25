@@ -178,7 +178,7 @@ class DirectiveFactory
      *
      * @param  \GraphQL\Language\AST\Node  $node
      * @param  string  $directiveClass
-     * @return \Illuminate\Support\Collection <$directiveClass>
+     * @return \Illuminate\Support\Collection of type <$directiveClass>
      */
     public function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {

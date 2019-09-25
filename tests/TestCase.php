@@ -115,29 +115,7 @@ abstract class TestCase extends BaseTestCase
 
         $config->set('app.debug', true);
 
-        TestResponse::macro(
-            'assertErrorCategory',
-            function (string $category): TestResponse {
-                $this->assertJson([
-                    'errors' => [
-                        [
-                            'extensions' => [
-                                'category' => $category,
-                            ],
-                        ],
-                    ],
-                ]);
-
-                return $this;
-            }
-        );
-
-        TestResponse::macro(
-            'jsonGet',
-            function (string $key = null) {
-                return data_get($this->decodeResponseJson(), $key);
-            }
-        );
+        TestResponse::mixin(new TestResponseMixin());
     }
 
     /**
