@@ -126,7 +126,7 @@ SDL;
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return \void
+     * @return void
      */
     public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType): void
     {

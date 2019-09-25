@@ -58,6 +58,7 @@ SDL;
             $resolver = Utils::constructResolver($namespacedClassName, $methodName);
         } else {
             $resolver = function (int $childrenComplexity, array $args): int {
+                /** @var int $complexity */
                 $complexity = Arr::get(
                     $args,
                     'first',
