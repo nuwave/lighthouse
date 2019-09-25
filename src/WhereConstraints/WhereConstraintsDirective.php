@@ -122,17 +122,17 @@ SDL;
     /**
      * Manipulate the AST.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode $argDefinition
-     * @param \GraphQL\Language\AST\FieldDefinitionNode $parentField
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @return \void
      */
-    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType): void
     {
         $allowedColumns = $this->directiveArgValue('columns');
         if (! $allowedColumns) {
-            return $documentAST;
+            return;
         }
 
         $restrictedWhereConstraintsName = $this->restrictedWhereConstraintsName($argDefinition, $parentField);
@@ -141,7 +141,7 @@ SDL;
 
         $allowedColumnsEnumName = $this->allowedColumnsEnumName($argDefinition, $parentField);
 
-        return $documentAST
+        $documentAST
             ->setTypeDefinition(
                 WhereConstraintsServiceProvider::createWhereConstraintsInputType(
                     $restrictedWhereConstraintsName,

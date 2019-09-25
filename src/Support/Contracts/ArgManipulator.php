@@ -16,7 +16,7 @@ interface ArgManipulator extends Directive
      * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
      * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
      * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @return void
      */
     public function manipulateArgDefinition(
         DocumentAST &$documentAST,

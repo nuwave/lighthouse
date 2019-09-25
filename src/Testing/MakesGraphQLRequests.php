@@ -43,7 +43,7 @@ trait MakesGraphQLRequests
      * @param  array  $cookies
      * @param  array  $files
      * @param  array  $server
-     * @param  string  $content
+     * @param  string|null  $content
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
     abstract public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null);

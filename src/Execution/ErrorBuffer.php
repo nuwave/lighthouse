@@ -10,7 +10,7 @@ class ErrorBuffer
     /**
      * The gathered error messages.
      *
-     * @var string[]
+     * @var string[]|string[][]
      */
     protected $errors = [];
 

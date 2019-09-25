@@ -36,7 +36,7 @@ class ConnectionField
     /**
      * Resolve edges for connection.
      *
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
+     * @param  \Illuminate\Pagination\LengthAwarePaginator  $paginator
      * @param  array  $args
      * @param  \Nuwave\Lighthouse\Support\Contracts\GraphQLContext  $context
      * @param  \GraphQL\Type\Definition\ResolveInfo  $resolveInfo
