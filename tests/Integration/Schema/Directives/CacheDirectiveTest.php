@@ -13,7 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class CacheDirectiveTest extends DBTestCase
 {
     /**
-     * @var \Illuminate\Cache\CacheManager|\Illuminate\Contracts\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
 

@@ -64,7 +64,7 @@ class Date extends ScalarType
      * Try to parse the given value into a Carbon instance, throw if it does not work.
      *
      * @param  string  $value
-     * @param  string  $exceptionClass
+     * @param  string|\Exception  $exceptionClass
      * @return \Carbon\Carbon
      *
      * @throws \GraphQL\Error\InvariantViolation|\GraphQL\Error\Error

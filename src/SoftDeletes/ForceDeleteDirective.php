@@ -83,7 +83,9 @@ SDL;
     ): void {
         parent::manipulateFieldDefinition($documentAST, $fieldDefinition, $parentType);
 
-        SoftDeletesServiceProvider::assertModelUsesSoftDeletes($this->getModelClass(),
-            self::MODEL_NOT_USING_SOFT_DELETES);
+        SoftDeletesServiceProvider::assertModelUsesSoftDeletes(
+            $this->getModelClass(),
+            self::MODEL_NOT_USING_SOFT_DELETES
+        );
     }
 }

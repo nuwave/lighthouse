@@ -13,7 +13,7 @@ use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
 class ClientDirectiveFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\TypeRegistry
+     * @var \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter
      */
     protected $definitionNodeConverter;
 
