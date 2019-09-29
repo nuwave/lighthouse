@@ -26,8 +26,8 @@ class MocksResolversTest extends TestCase
         }
         ')->assertExactJson([
             'data' => [
-                'foo' => 2
-            ]
+                'foo' => 2,
+            ],
         ]);
     }
 }

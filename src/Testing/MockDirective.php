@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class MockDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
@@ -42,7 +42,7 @@ class MockDirective extends BaseDirective implements FieldResolver, DefinedDirec
      */
     public static function definition(): string
     {
-        return /** @lang GraphQL */ <<<SDL
+        return /* @lang GraphQL */ <<<'SDL'
 """
 Allows you to easily hook up a resolver for an endpoint.
 """
@@ -62,8 +62,8 @@ SDL;
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
         return $fieldValue->setResolver(
-            function() {
-               return ($this->mock)(...func_get_args());
+            function () {
+                return ($this->mock)(...func_get_args());
             }
         );
     }

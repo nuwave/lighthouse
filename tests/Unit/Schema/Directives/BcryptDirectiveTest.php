@@ -19,7 +19,7 @@ class BcryptDirectiveTest extends TestCase
         ';
 
         $this->mockResolver()
-            ->willReturnCallback(function($root, $args) {
+            ->willReturnCallback(function ($root, $args) {
                 return $args;
             });
 
@@ -56,7 +56,7 @@ class BcryptDirectiveTest extends TestCase
         ';
 
         $this->mockResolver()
-            ->willReturnCallback(function($root, $args) {
+            ->willReturnCallback(function ($root, $args) {
                 return $args['input'];
             });
 

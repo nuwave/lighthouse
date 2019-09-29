@@ -4,8 +4,8 @@ namespace Tests\Unit\Schema\Types;
 
 use Tests\TestCase;
 use Tests\Utils\LaravelEnums\UserType;
-use PHPUnit\Framework\Constraint\Callback;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
+use PHPUnit\Framework\Constraint\Callback;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
 class LaravelEnumTypeTest extends TestCase
@@ -32,18 +32,18 @@ class LaravelEnumTypeTest extends TestCase
 
     public function testReceivesEnumInstanceInternally(): void
     {
-        $this->schema = "
+        $this->schema = '
         type Query {
             foo(bar: UserType): Boolean @mock
         }
-        ";
+        ';
 
         $this->typeRegistry->register(
             new LaravelEnumType(UserType::class)
         );
 
         $this->mockResolver()
-            ->with(null, new Callback(function(array $args): bool {
+            ->with(null, new Callback(function (array $args): bool {
                 return $args['bar'] instanceof UserType;
             }));
 
