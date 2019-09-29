@@ -159,15 +159,11 @@ class FieldFactory
 
         $resolverWithMiddleware = $this->pipeline
             ->send($this->fieldValue)
-            ->through(
-                $fieldMiddleware
-            )
+            ->through($fieldMiddleware)
             ->via('handleField')
-            ->then(
-                function (FieldValue $fieldValue): FieldValue {
-                    return $fieldValue;
-                }
-            )
+            ->then(function (FieldValue $fieldValue): FieldValue {
+                return $fieldValue;
+            })
             ->getResolver();
 
         $argumentMap = $this->argumentFactory->toTypeMap(
