@@ -26,10 +26,7 @@ class CustomDefaultResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
-    public function itCanSpecifyACustomDefaultResolver(): void
+    public function testCanSpecifyACustomDefaultResolver(): void
     {
         $previous = Executor::getDefaultFieldResolver();
 

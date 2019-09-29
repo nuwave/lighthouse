@@ -12,9 +12,10 @@ use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgManipulator;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
-class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator
+class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirective, ArgManipulator, DefinedDirective
 {
     const NAME = 'whereConstraints';
     const INVALID_COLUMN_MESSAGE = 'Column names may contain only alphanumerics or underscores, and may not begin with a digit.';
@@ -27,6 +28,24 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
     public function name(): string
     {
         return self::NAME;
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Add a dynamically client-controlled WHERE constraint to a fields query.
+The argument it is defined on may have any name but **must** be
+of the input type `WhereConstraints`.
+"""
+directive @whereConstraints(
+    """
+    Restrict the allowed column names to a well-defined list.
+    This improves introspection capabilities and security.
+    """
+    columns: [String!]
+) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
     }
 
     /**
@@ -103,17 +122,17 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
     /**
      * Manipulate the AST.
      *
-     * @param \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST
-     * @param \GraphQL\Language\AST\InputValueDefinitionNode $argDefinition
-     * @param \GraphQL\Language\AST\FieldDefinitionNode $parentField
-     * @param \GraphQL\Language\AST\ObjectTypeDefinitionNode $parentType
-     * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $argDefinition
+     * @param  \GraphQL\Language\AST\FieldDefinitionNode  $parentField
+     * @param  \GraphQL\Language\AST\ObjectTypeDefinitionNode  $parentType
+     * @return void
      */
-    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType)
+    public function manipulateArgDefinition(DocumentAST &$documentAST, InputValueDefinitionNode &$argDefinition, FieldDefinitionNode &$parentField, ObjectTypeDefinitionNode &$parentType): void
     {
         $allowedColumns = $this->directiveArgValue('columns');
         if (! $allowedColumns) {
-            return $documentAST;
+            return;
         }
 
         $restrictedWhereConstraintsName = $this->restrictedWhereConstraintsName($argDefinition, $parentField);
@@ -122,7 +141,7 @@ class WhereConstraintsDirective extends BaseDirective implements ArgBuilderDirec
 
         $allowedColumnsEnumName = $this->allowedColumnsEnumName($argDefinition, $parentField);
 
-        return $documentAST
+        $documentAST
             ->setTypeDefinition(
                 WhereConstraintsServiceProvider::createWhereConstraintsInputType(
                     $restrictedWhereConstraintsName,

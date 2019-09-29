@@ -11,10 +11,7 @@ use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
 class CanDirectiveDbTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itQueriesForSpecificModel(): void
+    public function testQueriesForSpecificModel(): void
     {
         $this->be(
             new User([
@@ -52,10 +49,7 @@ class CanDirectiveDbTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itFailsToFindSpecificModel(): void
+    public function testFailsToFindSpecificModel(): void
     {
         $this->be(
             new User([
@@ -86,10 +80,7 @@ class CanDirectiveDbTest extends DBTestCase
         ');
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfNotAuthorized(): void
+    public function testThrowsIfNotAuthorized(): void
     {
         $this->be(
             new User([
@@ -128,10 +119,7 @@ class CanDirectiveDbTest extends DBTestCase
         ")->assertErrorCategory(AuthorizationException::CATEGORY);
     }
 
-    /**
-     * @test
-     */
-    public function itCanHandleMultipleModels(): void
+    public function testCanHandleMultipleModels(): void
     {
         $user = User::create([
             'name' => UserPolicy::ADMIN,

@@ -18,10 +18,11 @@ use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class CacheDirective extends BaseDirective implements FieldMiddleware
+class CacheDirective extends BaseDirective implements FieldMiddleware, DefinedDirective
 {
-    /** @var \Illuminate\Cache\CacheManager */
+    /** @var \Illuminate\Cache\CacheManager|\Illuminate\Cache\Repository */
     protected $cacheManager;
 
     /**
@@ -41,6 +42,29 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
     public function name(): string
     {
         return 'cache';
+    }
+
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Cache the result of a resolver.
+"""
+directive @cache(
+  """
+  Set the duration it takes for the cache to expire in seconds.
+  If not given, the result will be stored forever.
+  """
+  maxAge: Int
+
+  """
+  Limit access to cached data to the currently authenticated user.
+  When the field is accessible by guest users, this will not have
+  any effect, they will access a shared cache.
+  """
+  private: Boolean = false
+) on FIELD_DEFINITION
+SDL;
     }
 
     /**
@@ -76,7 +100,7 @@ class CacheDirective extends BaseDirective implements FieldMiddleware
 
             $cacheKey = $cacheValue->getKey();
 
-            /** @var \Illuminate\Cache\Repository|\Illuminate\Cache\TaggedCache $repository */
+            /** @var \Illuminate\Cache\Repository|\Illuminate\Cache\TaggedCache $cache */
             $cache = $this->shouldUseTags()
                 ? $this->cacheManager->tags($cacheValue->getTags())
                 : $this->cacheManager;

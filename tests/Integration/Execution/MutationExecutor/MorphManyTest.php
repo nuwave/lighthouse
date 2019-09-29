@@ -62,10 +62,7 @@ class MorphManyTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewMorphMany(): void
+    public function testCanCreateWithNewMorphMany(): void
     {
         $this->graphQL('
         mutation {
@@ -99,10 +96,7 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateWithNewMorphMany(): void
+    public function testCanUpdateWithNewMorphMany(): void
     {
         factory(Task::class)->create();
 
@@ -139,10 +133,7 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndUpdateMorphMany(): void
+    public function testCanUpdateAndUpdateMorphMany(): void
     {
         factory(Task::class)
             ->create()
@@ -185,10 +176,7 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndDeleteMorphMany(): void
+    public function testCanUpdateAndDeleteMorphMany(): void
     {
         factory(Task::class)
             ->create()

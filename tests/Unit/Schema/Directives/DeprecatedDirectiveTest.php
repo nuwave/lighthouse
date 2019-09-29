@@ -9,10 +9,7 @@ use GraphQL\Type\Definition\Directive;
 
 class DeprecatedDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanRemoveDeprecatedFieldsFromIntrospection(): void
+    public function testCanRemoveDeprecatedFieldsFromIntrospection(): void
     {
         $reason = 'Use `bar` field';
         $resolver = addslashes(Foo::class).'@bar';

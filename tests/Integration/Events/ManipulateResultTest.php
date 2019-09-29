@@ -9,10 +9,7 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 
 class ManipulateResultTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanManipulateTheResult(): void
+    public function testCanManipulateTheResult(): void
     {
         $this->schema = $this->placeholderQuery();
 

@@ -50,7 +50,7 @@ class Defer implements CreatesResponse
     protected $isStreaming = false;
 
     /**
-     * @var int
+     * @var float
      */
     protected $maxExecutionTime = 0;
 

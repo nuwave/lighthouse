@@ -22,6 +22,14 @@ class LaravelEnumTypeTest extends DBTestCase
         $this->typeRegistry = $this->app->make(TypeRegistry::class);
     }
 
+    public function testMakeEnumWithCustomName(): void
+    {
+        $customName = 'CustomName';
+        $enumType = new LaravelEnumType(UserType::class, $customName);
+
+        $this->assertSame($customName, $enumType->name);
+    }
+
     public function testUseLaravelEnumType(): void
     {
         $this->schema = '

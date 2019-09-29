@@ -1146,7 +1146,7 @@ input PostInput {
 }
 ```
 
-The chema does not change, client side usage works the same:
+The schema does not change, client side usage works the same:
 
 ```graphql
 mutation {

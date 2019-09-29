@@ -30,7 +30,7 @@ class Product extends Model
     public function getKey(): array
     {
         $attributes = [];
-        foreach ($this->getKeyName() as $key) {
+        foreach ($this->primaryKey as $key) {
             $attributes[$key] = $this->getAttribute($key);
         }
 

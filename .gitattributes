@@ -15,7 +15,6 @@ CHANGELOG.md export-ignore
 CONTRIBUTING.md export-ignore
 docker-compose.yml export-ignore
 Dockerfile export-ignore
-Dockerfile_xdebug export-ignore
 logo.png export-ignore
 netlify.toml export-ignore
 phpbench.json export-ignore

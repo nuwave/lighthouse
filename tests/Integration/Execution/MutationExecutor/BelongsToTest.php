@@ -64,10 +64,7 @@ class BelongsToTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateAndConnectWithBelongsTo(): void
+    public function testCanCreateAndConnectWithBelongsTo(): void
     {
         factory(User::class)->create();
 
@@ -99,10 +96,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateWithNewBelongsTo(): void
+    public function testCanCreateWithNewBelongsTo(): void
     {
         $this->graphQL('
         mutation {
@@ -134,10 +128,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanCreateAndUpdateBelongsTo(): void
+    public function testCanCreateAndUpdateBelongsTo(): void
     {
         factory(User::class)->create([
             'name' => 'foo',
@@ -176,10 +167,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndDisconnectBelongsTo(): void
+    public function testCanUpdateAndDisconnectBelongsTo(): void
     {
         factory(Task::class)->create();
 
@@ -220,10 +208,7 @@ class BelongsToTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itCanUpdateAndDeleteBelongsTo(): void
+    public function testCanUpdateAndDeleteBelongsTo(): void
     {
         factory(Task::class)->create();
 
@@ -264,10 +249,7 @@ class BelongsToTest extends DBTestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itDoesNotDeleteOrDisconnectOnFalsyValues(): void
+    public function testDoesNotDeleteOrDisconnectOnFalsyValues(): void
     {
         factory(Task::class)->create();
 

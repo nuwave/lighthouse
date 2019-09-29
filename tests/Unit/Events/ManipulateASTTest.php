@@ -9,10 +9,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 
 class ManipulateASTTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanManipulateTheAST(): void
+    public function testCanManipulateTheAST(): void
     {
         $this->schema = '
         type Query {

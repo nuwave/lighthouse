@@ -51,7 +51,16 @@ We welcome contributions of any kind.
 - Need a feature? [Open a feature request](https://github.com/nuwave/lighthouse/issues/new?template=feature_request.md)
 - Want to improve Lighthouse? [Read our contribution guidelines](https://github.com/nuwave/lighthouse/blob/master/.github/CONTRIBUTING.md)
 
+## Changelog
+
+All notable changes to this project are documented in [`CHANGELOG.md`](CHANGELOG.md).
+
+## Contributing
+
+See how you can start [`CONTRIBUTING.md`](CONTRIBUTING.md) to this project.
+
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Lighthouse,
-please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech).
+please email Benedikt Franke via [benedikt@franke.tech](mailto:benedikt@franke.tech)
+or visit https://tidelift.com/security.

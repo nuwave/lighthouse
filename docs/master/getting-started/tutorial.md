@@ -1,6 +1,5 @@
 # Tutorial
 
-
 This is an introductory tutorial for building a GraphQL server with Lighthouse.
 While we try to keep it beginner friendly, we recommend familiarizing yourself
 with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
@@ -8,6 +7,7 @@ with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
 ## What is GraphQL?
 
 GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data.
+
 GraphQL provides a complete and understandable description of the data in your API,
 gives clients the power to ask for exactly what they need and nothing more,
 makes it easier to evolve APIs over time, and enables powerful developer tools.
@@ -21,7 +21,7 @@ GraphQL has been released only as a [*specification*](https://facebook.github.io
 This means that GraphQL is in fact not more than a long document that describes in detail
 the behaviour of a GraphQL server. 
 
-So, GraphQL has its own type system that’s used to define the schema of an API.
+GraphQL has its own type system that’s used to define the schema of an API.
 The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51/) or short **SDL**.
 
 Here is an example how we can use the SDL to define a type called `Person` and its
@@ -46,9 +46,9 @@ The type `Person` has a field `posts` that returns a list of `Post` types.
 We also defined the inverse relationship from `Post` to `Person` through the `author` field.
 
 ::: tip NOTE
- This short intro is a compilation from many sources, all credits goes to the original authors.
- - [https://graphql.org](https://graphql.org)
- - [https://howtographql.com](https://howtographql.com)
+This short intro is a compilation from many sources, all credits goes to the original authors.
+- [https://graphql.org](https://graphql.org)
+- [https://howtographql.com](https://howtographql.com)
 :::
 
 ## What is Lighthouse?
@@ -76,9 +76,9 @@ The whole process of building your own GraphQL server can be described in 3 step
 
 In this tutorial we will create a GraphQL API for a simple Blog from scratch with:
 
-- Laravel 5.7
-- Lighthouse 2.x
-- Laravel GraphQL Playground
+- Laravel
+- Lighthouse
+- GraphQL Playground
 - MySQL
 
 ::: tip
@@ -93,23 +93,18 @@ Read more about [installing Laravel](https://laravel.com/docs/#installing-larave
 
     laravel new lighthouse-tutorial
 
-In this tutorial we will use [Laravel GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground)
-as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
 Of course, we will use Lighthouse as the GraphQL Server.
 
-    composer require nuwave/lighthouse mll-lab/laravel-graphql-playground
+    composer require nuwave/lighthouse
 
-Then publish the configurations files and the default schema.
+In this tutorial we will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
 
-```bash
-# lighthouse
-php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider"
+    composer require mll-lab/laravel-graphql-playground
 
-# playground
-php artisan vendor:publish --provider="MLL\GraphQLPlayground\GraphQLPlaygroundServiceProvider"
-```
+Then publish default schema to `graphql/schema.graphql`.
 
-The default schema will be published to `graphql/schema.graphql`.
+    php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
 
 Consult the [Laravel docs on database configuration](https://laravel.com/docs/database#configuration)
 and ensure you have a working database set up.
@@ -129,7 +124,7 @@ Use [Homestead](https://laravel.com/docs/homestead),
 
     php artisan serve
 
-To make sure everything is working, access Laravel GraphQL Playground on http://127.0.0.1:8000/graphql-playground
+To make sure everything is working, access Laravel GraphQL Playground on `/graphql-playground`
 and try the following query:
 
 ```graphql
@@ -286,7 +281,7 @@ class User extends Authenticatable
 
 ## The Magic
 
-Let's edit `routes/graphql/schema.graphql` and define our blog schema,
+Let's edit `graphql/schema.graphql` and define our blog schema,
 based on the Eloquent Models we created.
 
 First, we define the root Query type which contains two different queries for retrieving posts.
@@ -304,7 +299,6 @@ naming - the type name `Post` is also the name of our Model - and the use of ser
 - [`@all`](../api-reference/directives.md#all) just gets you a list of all `Post` models
 - [`@find`](../api-reference/directives.md#find) and [`@eq`](../api-reference/directives.md#eq)
   are combined to retrieve a single `Post` by its ID
-
 
 Then, we add additional type definitions that clearly define the shape of our data. 
 
@@ -346,7 +340,7 @@ Just like in Eloquent, we express the relationship between our types using the
 Insert some fake data into your database,
 you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.
 
-Visit [http://127.0.0.1:8000/graphql-playground](http://127.0.0.1:8000/graphql-playground) and try the following query:
+Visit `/graphql-playground` and try the following query:
 
 ```graphql
 {
@@ -373,7 +367,7 @@ and how Lighthouse makes it easy to build your own server with Laravel.
 
 ## Next Steps
 
-The app you just build might use some more features.
+The app you just built might use some more features.
 Here are a few ideas on what you might add to learn more about Lighthouse.
 
 - [Add pagination to your fields](../api-reference/directives.md#paginate)

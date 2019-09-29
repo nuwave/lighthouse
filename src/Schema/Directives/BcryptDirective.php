@@ -2,9 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 
-class BcryptDirective implements ArgTransformerDirective
+class BcryptDirective implements ArgTransformerDirective, DefinedDirective
 {
     /**
      * Directive name.
@@ -16,13 +17,23 @@ class BcryptDirective implements ArgTransformerDirective
         return 'bcrypt';
     }
 
+    public static function definition(): string
+    {
+        return /* @lang GraphQL */ <<<'SDL'
+"""
+Run the `bcrypt` function on the argument it is defined on.
+"""
+directive @bcrypt on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+SDL;
+    }
+
     /**
      * Run Laravel's bcrypt helper on the argument.
      *
      * Useful for hashing passwords before inserting them into the database.
      *
      * @param  string  $argumentValue
-     * @return mixed
+     * @return string
      */
     public function transform($argumentValue): string
     {

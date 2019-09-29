@@ -11,10 +11,7 @@ use GraphQL\Type\Definition\InputObjectType;
 
 class SchemaBuilderTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itGeneratesValidSchema(): void
+    public function testGeneratesValidSchema(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
@@ -23,10 +20,7 @@ class SchemaBuilderTest extends TestCase
         $schema->assertValid();
     }
 
-    /**
-     * @test
-     */
-    public function itGeneratesWithEmptyQueryType(): void
+    public function testGeneratesWithEmptyQueryType(): void
     {
         $schema = $this->buildSchema('
         type Query
@@ -41,10 +35,7 @@ class SchemaBuilderTest extends TestCase
         $schema->assertValid();
     }
 
-    /**
-     * @test
-     */
-    public function itGeneratesWithEmptyMutationType(): void
+    public function testGeneratesWithEmptyMutationType(): void
     {
         $schema = $this->buildSchema('
         type Query
@@ -63,10 +54,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('foo', $foo->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveEnumTypes(): void
+    public function testCanResolveEnumTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         "Role description"
@@ -89,10 +77,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('Company administrator.', $enumType->getValue('ADMIN')->description);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveInterfaceTypes(): void
+    public function testCanResolveInterfaceTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         """
@@ -112,10 +97,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('bar is baz', $interfaceType->getField('bar')->description);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveObjectTypes(): void
+    public function testCanResolveObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         "asdf"
@@ -143,10 +125,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertFalse($baz->defaultValue);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveInputObjectTypes(): void
+    public function testCanResolveInputObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         "bla"
@@ -167,10 +146,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame(123, $inputObjectType->getField('bar')->defaultValue);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveMutations(): void
+    public function testCanResolveMutations(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type Mutation {
@@ -185,10 +161,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('foo', $foo->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanResolveQueries(): void
+    public function testCanResolveQueries(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('');
 
@@ -199,10 +172,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('foo', $field->name);
     }
 
-    /**
-     * @test
-     */
-    public function itCanExtendObjectTypes(): void
+    public function testCanExtendObjectTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type Foo {
@@ -221,10 +191,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertArrayHasKey('baz', $fields);
     }
 
-    /**
-     * @test
-     */
-    public function itCanExtendTypes(): void
+    public function testCanExtendTypes(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type Foo {
@@ -243,10 +210,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertSame('yo?', $type->getField('bar')->description);
     }
 
-    /**
-     * @test
-     */
-    public function itResolvesEnumDefaultValuesToInternalValues(): void
+    public function testResolvesEnumDefaultValuesToInternalValues(): void
     {
         $schema = $this->buildSchema('
         type Query {

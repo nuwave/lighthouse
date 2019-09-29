@@ -25,10 +25,7 @@ class ResolverProviderTest extends TestCase
         $this->resolverProvider = new ResolverProvider;
     }
 
-    /**
-     * @test
-     */
-    public function itGetsTheWebonyxDefaultResolverForNonRootFields(): void
+    public function testGetsTheWebonyxDefaultResolverForNonRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('nonExisting: Int', 'NonRoot');
 
@@ -38,10 +35,7 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itGetsTheConventionBasedDefaultResolverForRootFields(): void
+    public function testGetsTheConventionBasedDefaultResolverForRootFields(): void
     {
         $fieldValue = $this->constructFieldValue('foo: Int');
 
@@ -51,10 +45,7 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
+    public function testGetsTheConventionBasedDefaultResolverForRootFieldsWithInvoke(): void
     {
         $fieldValue = $this->constructFieldValue('fooInvoke: Int');
 
@@ -65,10 +56,9 @@ class ResolverProviderTest extends TestCase
     }
 
     /**
-     * @test
      * @deprecated will be changed in v5
      */
-    public function itGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
+    public function testGetsTheConventionBasedDefaultResolverForRootFieldsAndDefaultsToResolve(): void
     {
         $fieldValue = $this->constructFieldValue('fooBar: String');
 
@@ -84,10 +74,7 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
+    public function testLooksAtMultipleNamespacesWhenLookingForDefaultFieldResolvers(): void
     {
         $fieldValue = $this->constructFieldValue('baz: Int');
 
@@ -97,10 +84,7 @@ class ResolverProviderTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itThrowsIfRootFieldHasNoResolver(): void
+    public function testThrowsIfRootFieldHasNoResolver(): void
     {
         $this->expectException(DefinitionException::class);
 

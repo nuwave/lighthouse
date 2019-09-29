@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Events\ManipulateAST;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
+use Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces;
 
 class WhereConstraintsServiceProvider extends ServiceProvider
 {
@@ -20,9 +21,11 @@ class WhereConstraintsServiceProvider extends ServiceProvider
      */
     public function boot(DirectiveFactory $directiveFactory, Dispatcher $dispatcher): void
     {
-        $directiveFactory->addResolved(
-            WhereConstraintsDirective::NAME,
-            WhereConstraintsDirective::class
+        $dispatcher->listen(
+            RegisterDirectiveNamespaces::class,
+            function (RegisterDirectiveNamespaces $registerDirectiveNamespaces): string {
+                return __NAMESPACE__;
+            }
         );
 
         $dispatcher->listen(

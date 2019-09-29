@@ -8,10 +8,7 @@ use GraphQL\Type\Definition\FieldDefinition;
 
 class PaginateDirectiveTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function itCanAliasRelayToConnection(): void
+    public function testCanAliasRelayToConnection(): void
     {
         $connection = $this->getConnectionQueryField('connection');
         $relay = $this->getConnectionQueryField('relay');
@@ -35,10 +32,7 @@ class PaginateDirectiveTest extends TestCase
             ->getField('users');
     }
 
-    /**
-     * @test
-     */
-    public function itOnlyRegistersOneTypeForMultiplePaginators(): void
+    public function testOnlyRegistersOneTypeForMultiplePaginators(): void
     {
         $schema = $this->buildSchema('
         type User {
@@ -67,10 +61,7 @@ class PaginateDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itRegistersPaginatorFromTypeExtensionField(): void
+    public function testRegistersPaginatorFromTypeExtensionField(): void
     {
         $schema = $this->buildSchemaWithPlaceholderQuery('
         type User {
@@ -96,10 +87,7 @@ class PaginateDirectiveTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function itHasMaxCountInGeneratedCountDescription(): void
+    public function testHasMaxCountInGeneratedCountDescription(): void
     {
         config(['lighthouse.paginate_max_count' => 5]);
 
@@ -139,7 +127,7 @@ class PaginateDirectiveTest extends TestCase
         );
     }
 
-    public function itCanChangePaginationAmountArgument(): void
+    public function testCanChangePaginationAmountArgument(): void
     {
         config(['lighthouse.pagination_amount_argument' => 'first']);
 

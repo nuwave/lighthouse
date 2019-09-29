@@ -62,10 +62,7 @@ class MorphToTest extends DBTestCase
         $this->schema .= $this->placeholderQuery();
     }
 
-    /**
-     * @test
-     */
-    public function itConnectsMorphTo(): void
+    public function testConnectsMorphTo(): void
     {
         factory(Task::class)->create(['name' => 'first_task']);
 
@@ -102,10 +99,7 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itDisconnectsMorphTo(): void
+    public function testDisconnectsMorphTo(): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
@@ -139,10 +133,7 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function itDeletesMorphTo(): void
+    public function testDeletesMorphTo(): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);

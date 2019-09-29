@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use GraphQL\Language\AST\Node;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\DirectiveNode;
-use Illuminate\Contracts\Events\Dispatcher;
+use Nuwave\Lighthouse\Schema\DirectiveNamespacer;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
@@ -36,30 +36,22 @@ class DirectiveFactory
      *
      * @var string[]
      */
-    protected $directiveBaseNamespaces = [];
+    protected $directiveNamespaces;
+
+    /**
+     * @var DirectiveNamespacer
+     */
+    protected $directiveNamespacer;
 
     /**
      * DirectiveFactory constructor.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Nuwave\Lighthouse\Schema\DirectiveNamespacer  $directiveNamespacer
      * @return void
      */
-    public function __construct(Dispatcher $dispatcher)
+    public function __construct(DirectiveNamespacer $directiveNamespacer)
     {
-        // When looking for a directive by name, the namespaces are tried in order
-        $this->directiveBaseNamespaces = (new Collection([
-            // User defined directives (top priority)
-            config('lighthouse.namespaces.directives'),
-
-            // Plugin developers defined directives
-            $dispatcher->dispatch(new RegisterDirectiveNamespaces),
-
-            // Lighthouse defined directives
-            'Nuwave\\Lighthouse\\Schema\\Directives',
-        ]))
-            ->flatten()
-            ->filter()
-            ->all();
+        $this->directiveNamespacer = $directiveNamespacer;
     }
 
     /**
@@ -102,7 +94,11 @@ class DirectiveFactory
      */
     protected function createOrFail(string $directiveName): Directive
     {
-        foreach ($this->directiveBaseNamespaces as $baseNamespace) {
+        if (! $this->directiveNamespaces) {
+            $this->directiveNamespaces = $this->directiveNamespacer->gather();
+        }
+
+        foreach ($this->directiveNamespaces as $baseNamespace) {
             $className = $baseNamespace.'\\'.Str::studly($directiveName).'Directive';
             if (class_exists($className)) {
                 $directive = app($className);
@@ -121,6 +117,9 @@ class DirectiveFactory
     }
 
     /**
+     * @deprecated use the RegisterDirectiveNamespaces instead, will be removed as of v5
+     * @see \Nuwave\Lighthouse\Events\RegisterDirectiveNamespaces
+     *
      * @param  string  $directiveName
      * @param  string  $className
      * @return $this
@@ -179,7 +178,7 @@ class DirectiveFactory
      *
      * @param  \GraphQL\Language\AST\Node  $node
      * @param  string  $directiveClass
-     * @return \Illuminate\Support\Collection <$directiveClass>
+     * @return \Illuminate\Support\Collection of type <$directiveClass>
      */
     public function createAssociatedDirectivesOfType(Node $node, string $directiveClass): Collection
     {

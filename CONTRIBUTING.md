@@ -37,6 +37,10 @@ Here is how to set up Xdebug in PhpStorm https://www.jetbrains.com/help/phpstorm
 > Enabling Xdebug slows down tests by an order of magnitude.
 > Stop listening for Debug Connection to speed it back up. 
 
+Set the environment variable `XDEBUG_REMOTE_HOST` to the IP of your host machine as
+seen from the Docker container. This may differ based on your setup: When running
+Docker for Desktop, it is usually `10.0.2.2`, when running from a VM it is something else.
+
 ## Documentation
 
 The docs for Lighthouse are located in [`/docs`](/docs).

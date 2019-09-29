@@ -7,10 +7,7 @@ use Tests\Utils\Models\User;
 
 class InjectDirectiveTest extends DBTestCase
 {
-    /**
-     * @test
-     */
-    public function itCanInjectDataFromContextIntoArgs(): void
+    public function testCanInjectDataFromContextIntoArgs(): void
     {
         $user = factory(User::class)->create();
         $this->be($user);
