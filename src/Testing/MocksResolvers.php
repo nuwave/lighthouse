@@ -27,7 +27,7 @@ trait MocksResolvers
             ->expects($this->once())
             ->method('__invoke');
 
-        if($resolver) {
+        if ($resolver) {
             $method->willReturnCallback($resolver);
         }
 
