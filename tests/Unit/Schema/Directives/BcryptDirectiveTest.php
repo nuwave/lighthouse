@@ -18,10 +18,9 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver()
-            ->willReturnCallback(function ($root, $args) {
-                return $args;
-            });
+        $this->mockResolver(function ($root, $args) {
+            return $args;
+        });
 
         $password = $this->graphQL('
         {
@@ -55,10 +54,9 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver()
-            ->willReturnCallback(function ($root, $args) {
-                return $args['input'];
-            });
+        $this->mockResolver(function ($root, $args) {
+            return $args['input'];
+        });
 
         $result = $this->graphQL('
         query {

@@ -12,9 +12,10 @@ trait MocksResolvers
     /**
      * Create and register a PHPUnit mock to be called through the @mock directive.
      *
+     * @param  callable|null  $resolver
      * @return \PHPUnit\Framework\MockObject\Builder\InvocationMocker
      */
-    protected function mockResolver(): InvocationMocker
+    protected function mockResolver(callable $resolver = null): InvocationMocker
     {
         $mock = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['__invoke'])
@@ -22,9 +23,15 @@ trait MocksResolvers
 
         $this->registerMockResolver($mock);
 
-        return $mock
+        $method = $mock
             ->expects($this->once())
             ->method('__invoke');
+
+        if($resolver) {
+            $method->willReturnCallback($resolver);
+        }
+
+        return $method;
     }
 
     /**
