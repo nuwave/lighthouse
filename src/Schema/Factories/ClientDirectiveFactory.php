@@ -8,20 +8,20 @@ use GraphQL\Type\Definition\FieldArgument;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\DirectiveDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Schema\Conversion\TypeNodeConverter;
 
 class ClientDirectiveFactory
 {
     /**
-     * @var \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter
+     * @var \Nuwave\Lighthouse\Schema\Conversion\TypeNodeConverter
      */
     protected $definitionNodeConverter;
 
     /**
-     * @param  \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter  $definitionNodeConverter
+     * @param  \Nuwave\Lighthouse\Schema\Conversion\TypeNodeConverter  $definitionNodeConverter
      * @return void
      */
-    public function __construct(DefinitionNodeConverter $definitionNodeConverter)
+    public function __construct(TypeNodeConverter $definitionNodeConverter)
     {
         $this->definitionNodeConverter = $definitionNodeConverter;
     }

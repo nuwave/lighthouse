@@ -3,12 +3,13 @@
 namespace Nuwave\Lighthouse\Schema\Conversion;
 
 use GraphQL\Type\Definition\Type;
+use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\AST\NodeKind;
 use Illuminate\Support\Collection;
 use GraphQL\Language\AST\NamedTypeNode;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 
-class DefinitionNodeConverter
+class TypeNodeConverter
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
@@ -25,24 +26,24 @@ class DefinitionNodeConverter
     }
 
     /**
-     * Convert a definition node to an executable Type.
+     * Convert an AST type to an executable Type.
      *
-     * @param  mixed  $node
+     * @param  \GraphQL\Language\AST\TypeNode  $node
      * @return \GraphQL\Type\Definition\Type
      */
-    public function toType($node): Type
+    public function toType(TypeNode $node): Type
     {
         return $this->convertWrappedDefinitionNode($node);
     }
 
     /**
-     * Unwrap the node if needed and convert to type.
+     * Unwrap the node if needed and convert to Type.
      *
-     * @param  mixed  $node
+     * @param  \GraphQL\Language\AST\TypeNode  $node
      * @param  string[]  $wrappers
      * @return \GraphQL\Type\Definition\Type
      */
-    protected function convertWrappedDefinitionNode($node, array $wrappers = []): Type
+    protected function convertWrappedDefinitionNode(TypeNode $node, array $wrappers = []): Type
     {
         // Recursively unwrap the type and save the wrappers
         if ($node->kind === NodeKind::NON_NULL_TYPE || $node->kind === NodeKind::LIST_TYPE) {
@@ -74,7 +75,7 @@ class DefinitionNodeConverter
     }
 
     /**
-     * Converted named node to type.
+     * Converted an AST named type to an executable Type.
      *
      * @param  \GraphQL\Language\AST\NamedTypeNode  $node
      * @return \GraphQL\Type\Definition\Type
