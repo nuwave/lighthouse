@@ -8,10 +8,11 @@ use Nuwave\Lighthouse\Support\Utils;
 use GraphQL\Language\AST\DirectiveNode;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Support\Contracts\Directive;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 abstract class BaseDirective implements Directive
 {
@@ -97,9 +98,9 @@ abstract class BaseDirective implements Directive
      * Get the model class from the `model` argument of the field.
      *
      * @param  string  $argumentName The default argument name "model" may be overwritten
-     * @return string
+     * @return string|\Illuminate\Database\Eloquent\Model
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function getModelClass(string $argumentName = 'model'): string
     {
@@ -107,15 +108,31 @@ abstract class BaseDirective implements Directive
 
         // Fallback to using information from the schema definition as the model name
         if (! $model) {
+            /** @var \Nuwave\Lighthouse\Schema\AST\DocumentAST $documentAST */
+            $documentAST = app(ASTBuilder::class)->documentAST();
+
             if ($this->definitionNode instanceof FieldDefinitionNode) {
-                $model = ASTHelper::getUnderlyingTypeName($this->definitionNode);
+                $returnTypeName = ASTHelper::getUnderlyingTypeName($this->definitionNode);
+
+                if (! isset($documentAST->types[$returnTypeName])) {
+                    throw new DefinitionException(
+                        "Type '$returnTypeName' on '{$this->definitionNode->name->value}' can not be found in the schema.'"
+                    );
+                }
+                $type = $documentAST->types[$returnTypeName];
+
+                if ($modelClass = ASTHelper::directiveDefinition($type, 'modelClass')) {
+                    $model = ASTHelper::directiveArgValue($modelClass, 'class');
+                } else {
+                    $model = $returnTypeName;
+                }
             } elseif ($this->definitionNode instanceof ObjectTypeDefinitionNode) {
                 $model = $this->definitionNode->name->value;
             }
         }
 
         if (! $model) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 "A `model` argument must be assigned to the '{$this->name()}'directive on '{$this->definitionNode->name->value}"
             );
         }
@@ -129,7 +146,7 @@ abstract class BaseDirective implements Directive
      * @param  callable  $determineMatch
      * @return string
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function namespaceClassName(string $classCandidate, array $namespacesToTry = [], callable $determineMatch = null): string
     {
@@ -153,7 +170,7 @@ abstract class BaseDirective implements Directive
         );
 
         if (! $className) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 "No class '{$classCandidate}' was found for directive '{$this->name()}'"
             );
         }
@@ -171,7 +188,7 @@ abstract class BaseDirective implements Directive
      * @param  string  $argumentName
      * @return string[] Contains two entries: [string $className, string $methodName]
      *
-     * @throws \Nuwave\Lighthouse\Exceptions\DirectiveException
+     * @throws \Nuwave\Lighthouse\Exceptions\DefinitionException
      */
     protected function getMethodArgumentParts(string $argumentName): array
     {
@@ -184,7 +201,7 @@ abstract class BaseDirective implements Directive
             count($argumentParts) > 2
             || empty($argumentParts[0])
         ) {
-            throw new DirectiveException(
+            throw new DefinitionException(
                 "Directive '{$this->name()}' must have an argument '{$argumentName}' in the form 'ClassName@methodName' or 'ClassName'"
             );
         }

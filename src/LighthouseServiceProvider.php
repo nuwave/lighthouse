@@ -14,6 +14,7 @@ use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Console\QueryCommand;
 use Nuwave\Lighthouse\Console\UnionCommand;
 use Nuwave\Lighthouse\Console\ScalarCommand;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Illuminate\Contracts\Container\Container;
 use Nuwave\Lighthouse\Console\MutationCommand;
 use Nuwave\Lighthouse\Schema\ResolverProvider;
@@ -61,7 +62,7 @@ class LighthouseServiceProvider extends ServiceProvider
     public function boot(ValidationFactory $validationFactory, ConfigRepository $configRepository): void
     {
         $this->publishes([
-            __DIR__.'/../config/config.php' => $this->app->make('path.config').DIRECTORY_SEPARATOR.'lighthouse.php',
+            __DIR__.'/../config/config.php' => $this->app->make('path.config').'/lighthouse.php',
         ], 'config');
 
         $this->publishes([
@@ -107,7 +108,7 @@ class LighthouseServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'lighthouse');
 
         $this->app->singleton(GraphQL::class);
-
+        $this->app->singleton(ASTBuilder::class);
         $this->app->singleton(DirectiveFactory::class);
         $this->app->singleton(NodeRegistry::class);
         $this->app->singleton(TypeRegistry::class);
@@ -122,10 +123,12 @@ class LighthouseServiceProvider extends ServiceProvider
             /** @var \Illuminate\Http\Request $request */
             $request = $app->make('request');
 
-            return Str::startsWith(
+            $isMultipartFormRequest = Str::startsWith(
                 $request->header('Content-Type'),
                 'multipart/form-data'
-            )
+            );
+
+            return $isMultipartFormRequest
                 ? new MultipartFormRequest($request)
                 : new LighthouseRequest($request);
         });

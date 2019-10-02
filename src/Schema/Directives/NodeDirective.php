@@ -4,6 +4,7 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Closure;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Schema\NodeRegistry;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
@@ -43,7 +44,9 @@ class NodeDirective extends BaseDirective implements TypeMiddleware, TypeManipul
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Register a type for relay global object identification.
+Register a type for Relay's global object identification.
+When used without any arguments, Lighthouse will attempt
+to resolve the type through a model with the same name.
 """
 directive @node(
   """
@@ -51,7 +54,13 @@ directive @node(
   Consists of two parts: a class name and a method name, seperated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
-  resolver: String!
+  resolver: String
+
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -65,9 +74,17 @@ SDL;
      */
     public function handleNode(TypeValue $value, Closure $next): Type
     {
+        if ($this->directiveHasArgument('resolver')) {
+            $resolver = $this->getResolverFromArgument('resolver');
+        } else {
+            $resolver = function ($id): ?Model {
+                return $this->getModelClass()::find($id);
+            };
+        }
+
         $this->nodeRegistry->registerNode(
             $value->getTypeDefinitionName(),
-            $this->getResolverFromArgument('resolver')
+            $resolver
         );
 
         return $next($value);

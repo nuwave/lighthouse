@@ -12,7 +12,7 @@ class InjectDirectiveTest extends DBTestCase
         $user = factory(User::class)->create();
         $this->be($user);
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String!
@@ -30,7 +30,7 @@ class InjectDirectiveTest extends DBTestCase
         input CreateTaskInput {
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

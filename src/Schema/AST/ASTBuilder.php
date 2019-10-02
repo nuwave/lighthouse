@@ -13,6 +13,7 @@ use Nuwave\Lighthouse\Support\Contracts\TypeManipulator;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Nuwave\Lighthouse\Support\Contracts\TypeExtensionManipulator;
 
 class ASTBuilder
@@ -25,6 +26,13 @@ class ASTBuilder
     protected $directiveFactory;
 
     /**
+     * The schema source provider.
+     *
+     * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
+     */
+    protected $schemaSourceProvider;
+
+    /**
      * The event dispatcher.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
@@ -32,11 +40,11 @@ class ASTBuilder
     protected $eventDispatcher;
 
     /**
-     * The schema source provider.
+     * The config repository.
      *
-     * @var \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider
+     * @var ConfigRepository
      */
-    protected $schemaSourceProvider;
+    protected $configRepository;
 
     /**
      * The document AST.
@@ -49,18 +57,21 @@ class ASTBuilder
      * ASTBuilder constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
      * @param  \Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider  $schemaSourceProvider
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $eventDispatcher
+     * @param  \Illuminate\Contracts\Config\Repository  $configRepository
      * @return void
      */
     public function __construct(
         DirectiveFactory $directiveFactory,
+        SchemaSourceProvider $schemaSourceProvider,
         EventDispatcher $eventDispatcher,
-        SchemaSourceProvider $schemaSourceProvider
+        ConfigRepository $configRepository
     ) {
         $this->directiveFactory = $directiveFactory;
-        $this->eventDispatcher = $eventDispatcher;
         $this->schemaSourceProvider = $schemaSourceProvider;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->configRepository = $configRepository;
     }
 
     /**
@@ -68,7 +79,29 @@ class ASTBuilder
      *
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
-    public function build(): DocumentAST
+    public function documentAST(): DocumentAST
+    {
+        if (isset($this->documentAST)) {
+            return $this->documentAST;
+        }
+
+        $cacheConfig = $this->configRepository->get('lighthouse.cache');
+        if ($cacheConfig['enable']) {
+            $this->documentAST = app('cache')->remember(
+                $cacheConfig['key'],
+                $cacheConfig['ttl'],
+                function (): DocumentAST {
+                    return $this->build();
+                }
+            );
+        } else {
+            $this->documentAST = $this->build();
+        }
+
+        return $this->documentAST;
+    }
+
+    protected function build(): DocumentAST
     {
         $schemaString = $this->schemaSourceProvider->getSchemaString();
 
@@ -92,6 +125,7 @@ class ASTBuilder
         $this->applyFieldManipulators();
         $this->applyArgManipulators();
 
+        // TODO seperate out into modules
         $this->addPaginationInfoTypes();
         $this->addNodeSupport();
         $this->addOrderByTypes();

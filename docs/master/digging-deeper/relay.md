@@ -32,7 +32,7 @@ own mechanism of encoding/decoding global ids.
 
 [Global Object Identification](https://facebook.github.io/relay/graphql/objectidentification.htm)
 
-[@model](../api-reference/directives.md#model)
+[@node](../api-reference/directives.md#node)
 
 [@globalId](../api-reference/directives.md#globalid)
 

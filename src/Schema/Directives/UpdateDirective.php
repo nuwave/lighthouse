@@ -80,9 +80,9 @@ SDL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args): Model {
-                $modelClassName = $this->getModelClass();
+                $modelClass = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClassName;
+                $model = new $modelClass;
 
                 if ($this->directiveArgValue('globalId', false)) {
                     $args['id'] = $this->globalId->decodeId($args['id']);

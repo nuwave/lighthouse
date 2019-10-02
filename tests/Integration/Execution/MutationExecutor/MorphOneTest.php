@@ -53,14 +53,7 @@ class MorphOneTest extends DBTestCase
         id: ID!
         weekday: Int
     }
-    ';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
-    }
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCanCreateWithNewMorphOne(): void
     {

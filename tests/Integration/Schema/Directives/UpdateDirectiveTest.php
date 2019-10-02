@@ -13,7 +13,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -25,7 +25,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Company @update
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -52,7 +52,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Company::class)->create(['name' => 'foo']);
 
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -68,7 +68,7 @@ class UpdateDirectiveTest extends DBTestCase
             id: ID!
             name: String
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -95,7 +95,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(Category::class)->create(['name' => 'foo']);
 
-        $this->schema = '
+        $this->schema .= '
         type Category {
             category_id: ID!
             name: String!
@@ -107,7 +107,7 @@ class UpdateDirectiveTest extends DBTestCase
                 name: String
             ): Category @update
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {
@@ -134,7 +134,7 @@ class UpdateDirectiveTest extends DBTestCase
     {
         factory(User::class)->create(['name' => 'Original']);
 
-        $this->schema = '
+        $this->schema .= '
         type Task {
             id: ID!
             name: String!
@@ -164,7 +164,7 @@ class UpdateDirectiveTest extends DBTestCase
             name: String
             user: ID
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

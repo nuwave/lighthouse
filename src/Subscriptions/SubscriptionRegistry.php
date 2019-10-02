@@ -130,7 +130,7 @@ class SubscriptionRegistry
      */
     public function subscriptions(Subscriber $subscriber): Collection
     {
-        // A subscription can be fired w/out a request so we must make
+        // A subscription can be fired without a request so we must make
         // sure the schema has been generated.
         $this->graphQL->prepSchema();
 

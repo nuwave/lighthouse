@@ -14,7 +14,7 @@ class EventDirectiveTest extends DBTestCase
             CompanyWasCreatedEvent::class,
         ]);
 
-        $this->schema = '
+        $this->schema .= '
         type Company {
             id: ID!
             name: String!
@@ -24,7 +24,7 @@ class EventDirectiveTest extends DBTestCase
             createCompany(name: String): Company @create
                 @event(dispatch: "Tests\\\\Integration\\\\Schema\\\\Directives\\\\CompanyWasCreatedEvent")
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         mutation {

@@ -22,6 +22,12 @@ abstract class TestCase extends BaseTestCase
 {
     use MakesGraphQLRequests;
 
+    const PLACEHOLDER_QUERY = '
+    type Query {
+        foo: Int
+    }
+    ';
+
     /**
      * This variable is injected the main GraphQL class
      * during execution of each test. It may be set either
@@ -29,7 +35,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @var string
      */
-    protected $schema = '';
+    protected $schema = self::PLACEHOLDER_QUERY;
 
     /**
      * Get package providers.
@@ -170,7 +176,7 @@ abstract class TestCase extends BaseTestCase
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema.$this->placeholderQuery()
+            $schema.self::PLACEHOLDER_QUERY
         );
     }
 
@@ -187,21 +193,6 @@ abstract class TestCase extends BaseTestCase
         return $this->app
             ->make(GraphQL::class)
             ->prepSchema();
-    }
-
-    /**
-     * Convenience method to get a default Query, sometimes needed
-     * because the Schema is invalid without it.
-     *
-     * @return string
-     */
-    protected function placeholderQuery(): string
-    {
-        return '
-        type Query {
-            foo: Int
-        }
-        ';
     }
 
     /**

@@ -180,7 +180,7 @@ class MiddlewareDirectiveTest extends TestCase
 
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = app(ASTBuilder::class);
-        $document = $astBuilder->build();
+        $document = $astBuilder->documentAST();
 
         $queryType = $document->types['Query'];
 
@@ -207,7 +207,7 @@ class MiddlewareDirectiveTest extends TestCase
 
         /** @var \Nuwave\Lighthouse\Schema\AST\ASTBuilder $astBuilder */
         $astBuilder = app(ASTBuilder::class);
-        $document = $astBuilder->build();
+        $document = $astBuilder->documentAST();
 
         $queryType = $document->types['Query'];
 
