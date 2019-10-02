@@ -2,13 +2,13 @@
 
 namespace Nuwave\Lighthouse\Testing;
 
-use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 
+/**
+ * @mixin \PHPUnit\Framework\TestCase
+ */
 trait MocksResolvers
 {
-    abstract protected function getMockBuilder($originalClassName): MockBuilder;
-
     /**
      * Create and register a PHPUnit mock to be called through the @mock directive.
      *
