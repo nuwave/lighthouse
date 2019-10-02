@@ -37,6 +37,7 @@ class ArgumentFactory
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
+        /** @var \Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter $definitionNodeConverter */
         $definitionNodeConverter = app(DefinitionNodeConverter::class);
         $type = $definitionNodeConverter->toType($definitionNode->type);
 
