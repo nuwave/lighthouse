@@ -54,14 +54,7 @@ class HasManyTest extends DBTestCase
         id: ID!
         name: String
     }
-    ';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->schema .= $this->placeholderQuery();
-    }
+    '.self::PLACEHOLDER_QUERY;
 
     public function testCanCreateWithNewHasMany(): void
     {

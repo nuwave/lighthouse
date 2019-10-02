@@ -358,7 +358,7 @@ class PaginateDirectiveTest extends DBTestCase
     {
         factory(User::class, 2)->create();
 
-        $this->schema = '
+        $this->schema .= '
         type User {
             id: ID!
             name: String!
@@ -367,7 +367,7 @@ class PaginateDirectiveTest extends DBTestCase
         extend type Query {
             users: [User!]! @paginate(model: "User")
         }
-        '.$this->placeholderQuery();
+        ';
 
         $this->graphQL('
         {

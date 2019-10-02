@@ -77,11 +77,12 @@ abstract class RelationDirective extends BaseDirective
             return;
         }
 
-        PaginationManipulator::transformToPaginatedField(
+        $paginationManipulator = new PaginationManipulator($documentAST);
+        $paginationManipulator->transformToPaginatedField(
             $paginationType,
+            $this->getModelClass(),
             $fieldDefinition,
             $parentType,
-            $documentAST,
             $this->directiveArgValue('defaultCount'),
             $this->paginateMaxCount(),
             $this->edgeType($documentAST)

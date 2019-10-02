@@ -360,7 +360,7 @@ Visit `/graphql-playground` and try the following query:
 ```
 
 You should get a list of all the posts in your database,
-together will all the comments and user information defined upon.
+together with all the comments and user information defined upon.
 
 I hope this example shows a taste of the power of GraphQL
 and how Lighthouse makes it easy to build your own server with Laravel. 

@@ -49,16 +49,13 @@ SDL;
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection {
-                /** @var \Illuminate\Database\Eloquent\Model $modelClass */
-                $modelClass = $this->getModelClass();
-
                 return $resolveInfo
                     ->builder
                     ->addScopes(
                         $this->directiveArgValue('scopes', [])
                     )
                     ->apply(
-                        $modelClass::query(),
+                        $this->getModelClass()::query(),
                         $args
                     )
                     ->get();

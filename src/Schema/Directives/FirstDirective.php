@@ -50,18 +50,15 @@ SDL;
      */
     public function resolveField(FieldValue $fieldValue): FieldValue
     {
-        /** @var \Illuminate\Database\Eloquent\Model $model */
-        $model = $this->getModelClass();
-
         return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($model): ?Model {
+            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): ?Model {
                 return $resolveInfo
                     ->builder
                     ->addScopes(
                         $this->directiveArgValue('scopes', [])
                     )
                     ->apply(
-                        $model::query(),
+                        $this->getModelClass()::query(),
                         $args
                     )
                     ->first();

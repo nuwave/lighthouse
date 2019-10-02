@@ -35,8 +35,6 @@ class DeferTest extends TestCase
 
     public function testAddsTheDeferClientDirective(): void
     {
-        $this->schema = $this->placeholderQuery();
-
         $introspection = $this->graphQL('
           query IntrospectionQuery {
             __schema {

@@ -19,9 +19,7 @@ class ManipulateASTTest extends TestCase
 
         Event::listen(ManipulateAST::class, function (ManipulateAST $manipulateAST): void {
             $manipulateAST->documentAST->setTypeDefinition(
-                PartialParser::objectTypeDefinition(
-                    $this->placeholderQuery()
-                )
+                PartialParser::objectTypeDefinition(self::PLACEHOLDER_QUERY)
             );
         });
 

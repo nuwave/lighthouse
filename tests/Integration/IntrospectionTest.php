@@ -28,11 +28,11 @@ class IntrospectionTest extends TestCase
 
     public function testFindsTypesFromSchema(): void
     {
-        $this->schema = '
+        $this->schema .= '
         type Foo {
             bar: Int
         }        
-        '.$this->placeholderQuery();
+        ';
 
         $this->assertNotNull(
             $this->introspectType('Foo')
@@ -48,7 +48,6 @@ class IntrospectionTest extends TestCase
 
     public function testFindsManuallyRegisteredTypes(): void
     {
-        $this->schema = $this->placeholderQuery();
         $this->typeRegistry->register(
             new Email()
         );

@@ -79,10 +79,8 @@ SDL;
         return $next(
             $fieldValue->setResolver(
                 function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($previousResolver) {
-                    $modelClass = $this->getModelClass();
-
                     if ($find = $this->directiveArgValue('find')) {
-                        $modelOrModels = $modelClass::findOrFail($args[$find]);
+                        $modelOrModels = $this->getModelClass()::findOrFail($args[$find]);
 
                         if ($modelOrModels instanceof Model) {
                             $modelOrModels = [$modelOrModels];
@@ -93,7 +91,7 @@ SDL;
                             $this->authorize($context->user(), $model);
                         }
                     } else {
-                        $this->authorize($context->user(), $modelClass);
+                        $this->authorize($context->user(), $this->getModelClass());
                     }
 
                     return call_user_func_array($previousResolver, func_get_args());

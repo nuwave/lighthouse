@@ -32,13 +32,6 @@ class GraphQL
     protected $executableSchema;
 
     /**
-     * The parsed schema AST.
-     *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
-
-    /**
      * The schema builder.
      *
      * @var \Nuwave\Lighthouse\Schema\SchemaBuilder
@@ -225,7 +218,7 @@ class GraphQL
     {
         if (empty($this->executableSchema)) {
             $this->executableSchema = $this->schemaBuilder->build(
-                $this->documentAST()
+                $this->astBuilder->documentAST()
             );
         }
 
@@ -249,23 +242,11 @@ class GraphQL
     /**
      * Get instance of DocumentAST.
      *
+     * @deprecated use ASTBuilder instead
      * @return \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     public function documentAST(): DocumentAST
     {
-        if (empty($this->documentAST)) {
-            $this->documentAST = config('lighthouse.cache.enable')
-                ? app('cache')
-                    ->remember(
-                        config('lighthouse.cache.key'),
-                        config('lighthouse.cache.ttl'),
-                        function (): DocumentAST {
-                            return $this->astBuilder->build();
-                        }
-                    )
-                : $this->astBuilder->build();
-        }
-
-        return $this->documentAST;
+        return $this->astBuilder->documentAST();
     }
 }

@@ -8,6 +8,7 @@ use GraphQL\Type\Schema;
 use Nuwave\Lighthouse\GraphQL;
 use Tests\Utils\Middleware\CountRuns;
 use Laravel\Scout\ScoutServiceProvider;
+use Nuwave\Lighthouse\Testing\MocksResolvers;
 use Tests\Utils\Policies\AuthServiceProvider;
 use Orchestra\Database\ConsoleServiceProvider;
 use Illuminate\Foundation\Testing\TestResponse;
@@ -15,12 +16,20 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Nuwave\Lighthouse\LighthouseServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Nuwave\Lighthouse\Testing\MakesGraphQLRequests;
+use Nuwave\Lighthouse\Testing\TestingServiceProvider;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
 use Nuwave\Lighthouse\SoftDeletes\SoftDeletesServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
     use MakesGraphQLRequests;
+    use MocksResolvers;
+
+    const PLACEHOLDER_QUERY = '
+    type Query {
+        foo: Int
+    }
+    ';
 
     /**
      * This variable is injected the main GraphQL class
@@ -29,7 +38,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @var string
      */
-    protected $schema = '';
+    protected $schema = self::PLACEHOLDER_QUERY;
 
     /**
      * Get package providers.
@@ -44,6 +53,7 @@ abstract class TestCase extends BaseTestCase
             AuthServiceProvider::class,
             LighthouseServiceProvider::class,
             SoftDeletesServiceProvider::class,
+            TestingServiceProvider::class,
             ConsoleServiceProvider::class,
         ];
     }
@@ -170,7 +180,7 @@ abstract class TestCase extends BaseTestCase
     protected function buildSchemaWithPlaceholderQuery(string $schema): Schema
     {
         return $this->buildSchema(
-            $schema.$this->placeholderQuery()
+            $schema.self::PLACEHOLDER_QUERY
         );
     }
 
@@ -187,21 +197,6 @@ abstract class TestCase extends BaseTestCase
         return $this->app
             ->make(GraphQL::class)
             ->prepSchema();
-    }
-
-    /**
-     * Convenience method to get a default Query, sometimes needed
-     * because the Schema is invalid without it.
-     *
-     * @return string
-     */
-    protected function placeholderQuery(): string
-    {
-        return '
-        type Query {
-            foo: Int
-        }
-        ';
     }
 
     /**
