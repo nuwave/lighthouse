@@ -62,7 +62,7 @@ class SpreadDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            user{
+            user {
                 id
             }
         }
@@ -72,6 +72,45 @@ class SpreadDirectiveTest extends DBTestCase
                     'id' => 1,
                 ],
             ],
+        ]);
+    }
+
+    public function testNestedSpread(): void
+    {
+        $this->mockResolver()
+            ->with(null, [
+                'foo' => 1,
+                'bar' => 2,
+            ])
+            ->willReturn(3);
+
+        $this->schema = '
+        type Query {
+            foo(input: Foo @spread): Int @mock
+        }
+        
+        input Foo {
+            foo: Int
+            bar: Bar @spread
+        }
+        
+        input Bar {
+            baz: Int
+        }
+        ';
+
+        $this->graphQL('
+        {
+            foo(input: {
+                foo: 1
+                bar: {
+                    baz: 2
+                }
+            })
+        ')->assertExactJson([
+            'data' => [
+                'foo' => 3
+            ]
         ]);
     }
 }
