@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow overwriting the name of Enum types created through `LaravelEnumType` https://github.com/nuwave/lighthouse/pull/968
 
+### Fixed
+
+- Remove the extra new line from the returned value when using `@globalId(decode: "ID")` https://github.com/nuwave/lighthouse/pull/982
+
 ### Changed
 
 - Allow additional route configurations `prefix` and `domain` https://github.com/nuwave/lighthouse/pull/951
