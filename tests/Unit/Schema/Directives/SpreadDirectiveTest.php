@@ -81,8 +81,7 @@ class SpreadDirectiveTest extends DBTestCase
             ->with(null, [
                 'foo' => 1,
                 'bar' => 2,
-            ])
-            ->willReturn(3);
+            ]);
 
         $this->schema = '
         type Query {
@@ -107,10 +106,7 @@ class SpreadDirectiveTest extends DBTestCase
                     baz: 2
                 }
             })
-        ')->assertExactJson([
-            'data' => [
-                'foo' => 3
-            ]
-        ]);
+        }
+        ');
     }
 }
