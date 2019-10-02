@@ -17,8 +17,7 @@ trait MocksResolvers
      */
     protected function mockResolver(callable $resolver = null): InvocationMocker
     {
-        $mock = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['__invoke'])
+        $mock = $this->getMockBuilder(MockResolver::class)
             ->getMock();
 
         $this->registerMockResolver($mock);
