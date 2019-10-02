@@ -579,6 +579,30 @@ class ComplexityAnalyzer {
     }
 ```
 
+## Count
+
+Returns the count of a given relationship
+
+```
+type User  {
+    id: ID!
+    likes: Int! @count(relation: "likes")
+}
+```
+### Definition
+
+```graphql
+"""
+Resolve the field through a count.
+"""
+directive @count(
+  """
+  The relationship which you want to run the count on.
+  """
+  relation: String!
+) on FIELD_DEFINITION
+```
+
 ## @create
 
 Create a new Eloquent model with the given arguments.
