@@ -3,8 +3,8 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
@@ -53,11 +53,11 @@ SDL;
                 $relation = $this->directiveArgValue('relation');
                 $modelArg = $this->directiveArgValue('model');
 
-                if(!is_null($relation)) {
+                if (! is_null($relation)) {
                     return $model->{$relation}()->count();
                 }
 
-                if (!is_null($model)) {
+                if (! is_null($model)) {
                     return $modelArg::count();
                 }
 
