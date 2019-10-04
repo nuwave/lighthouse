@@ -186,6 +186,40 @@ class GraphQLTest extends DBTestCase
         ]);
     }
 
+    public function testRejectsEmptyRequest(): void
+    {
+        $this->postGraphQL([])
+             ->assertStatus(200)
+             ->assertJson([
+                 [
+                     'errors' => [
+                         [
+                             'message' => 'Syntax Error: Unexpected <EOF>',
+                             'extensions' => [
+                                 'category' => 'graphql',
+                             ],
+                         ],
+                     ],
+                 ],
+             ]);
+    }
+
+    public function testRejectsEmptyQuery(): void
+    {
+        $this->graphQL('')
+             ->assertStatus(200)
+             ->assertJson([
+                 'errors' => [
+                     [
+                         'message' => 'Syntax Error: Unexpected <EOF>',
+                         'extensions' => [
+                             'category' => 'graphql',
+                         ],
+                     ],
+                 ],
+             ]);
+    }
+
     public function testRejectsInvalidQuery(): void
     {
         $result = $this->graphQL('
