@@ -3,10 +3,9 @@
 namespace Nuwave\Lighthouse\Schema\Directives;
 
 use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class CountDirective extends BaseDirective implements FieldResolver, DefinedDirective
@@ -31,7 +30,12 @@ directive @count(
   """
   The relationship which you want to run the count on.
   """
-  relation: String!
+  relation: String
+
+  """
+  The model to run the count on.
+  """
+  model: String
 ) on FIELD_DEFINITION
 SDL;
     }
@@ -45,10 +49,21 @@ SDL;
     public function resolveField(FieldValue $value)
     {
         return $value->setResolver(
-            function (Model $model, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) {
-                $relation = $this->directiveArgValue('relation', $this->definitionNode->name->value);
+            function (Model $model) {
+                $relation = $this->directiveArgValue('relation');
+                $modelArg = $this->directiveArgValue('model');
 
-                return $model->{$relation}()->count();
+                if(!is_null($relation)) {
+                    return $model->{$relation}()->count();
+                }
+
+                if (!is_null($model)) {
+                    return $modelArg::count();
+                }
+
+                throw new DirectiveException(
+                    "A `model` or `relation argument must be assigned to the '{$this->name()}' directive on '{$this->definitionNode->name->value}"
+                );
             }
         );
     }

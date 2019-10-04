@@ -581,12 +581,18 @@ class ComplexityAnalyzer {
 
 ## Count
 
-Returns the count of a given relationship
+Returns the count of a given relationship or a model
 
-```
+```graphql
 type User  {
     id: ID!
     likes: Int! @count(relation: "likes")
+}
+```
+
+```graphql
+type Query {
+    categories: Int! @count(model: "Category")
 }
 ```
 ### Definition
@@ -599,7 +605,12 @@ directive @count(
   """
   The relationship which you want to run the count on.
   """
-  relation: String!
+  relation: String
+  
+  """
+  The model to run the count on.
+  """
+  model: String
 ) on FIELD_DEFINITION
 ```
 
