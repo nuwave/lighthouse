@@ -9,7 +9,7 @@ to add functionality to your GraphQL schema.
 
 ## Definition
 
-Directives always begin with an `@` symbol, followed by an unique name. They may be used
+Directives always begin with an `@` symbol, followed by a unique name. They may be used
 at specified parts of the GraphQL schema.
 
 This example directive `@upperCase` may be used on field definitions to UPPERCASE the result.
