@@ -189,7 +189,7 @@ class FindDirectiveTest extends DBTestCase
         ")->assertJson([
             'data' => [
                 'user' => [
-                    'id' => (string)$user->id,
+                    'id' => (string) $user->id,
                     'name' => $user->name,
                     'companyName' => $company->name,
                 ],
