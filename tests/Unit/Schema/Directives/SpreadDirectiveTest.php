@@ -80,7 +80,7 @@ class SpreadDirectiveTest extends DBTestCase
         $this->mockResolver()
             ->with(null, [
                 'foo' => 1,
-                'bar' => 2,
+                'baz' => 2,
             ]);
 
         $this->schema = '

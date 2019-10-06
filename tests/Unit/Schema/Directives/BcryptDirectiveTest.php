@@ -54,7 +54,7 @@ class BcryptDirectiveTest extends TestCase
         }
         ';
 
-        $this->mockResolver(function ($root, $args) {
+        $this->mockResolver(function ($root, array $args) {
             return $args['input'];
         });
 

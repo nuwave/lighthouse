@@ -7,6 +7,8 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 class SpreadDirective implements ArgDirective, DefinedDirective
 {
+    const NAME = 'spread';
+
     /**
      * Directive name.
      *
@@ -14,7 +16,7 @@ class SpreadDirective implements ArgDirective, DefinedDirective
      */
     public function name(): string
     {
-        return 'spread';
+        return self::NAME;
     }
 
     public static function definition(): string

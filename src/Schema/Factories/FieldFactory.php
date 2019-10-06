@@ -18,11 +18,11 @@ use Nuwave\Lighthouse\Support\Contracts\ArgDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesRules;
 use Nuwave\Lighthouse\Support\Contracts\HasErrorBuffer;
-use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Support\Contracts\FieldMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
+use Nuwave\Lighthouse\Execution\Arguments\SpreadMiddleware;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
@@ -97,13 +97,6 @@ class FieldFactory
      * @var mixed[]
      */
     protected $handleArgDirectivesSnapshots = [];
-
-    /**
-     * Arg paths to spread out.
-     *
-     * @var array[]
-     */
-    protected $pathsToSpread = [];
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
@@ -191,35 +184,14 @@ class FieldFactory
                 // we flush the validation error buffer
                 $this->flushValidationErrorBuffer();
 
-                // Apply the argument spreadings after we are finished with all
-                // the other argument handling
-                foreach ($this->pathsToSpread as $argumentPath) {
-                    $inputValues = $this->argValue($argumentPath);
-
-                    // If no input is given, there is nothing to spread
-                    if (! $inputValues) {
-                        continue;
-                    }
-
-                    // We remove the value from where it was defined before
-                    $this->unsetArgValue($argumentPath);
-
-                    // The last part of the path is the name of the input value,
-                    // the exact thing we want to remove
-                    array_pop($argumentPath);
-
-                    foreach ($inputValues as $key => $value) {
-                        $this->setArgValue(
-                            array_merge($argumentPath, [$key]),
-                            $value
-                        );
-                    }
-                }
-
                 // The final resolver can access the builder through the ResolveInfo
                 $this->resolveInfo->builder = $this->builder;
 
-                return $resolverWithMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
+                /** @var \Nuwave\Lighthouse\Execution\Arguments\SpreadMiddleware $spreadMiddleware */
+                $spreadMiddleware = app(SpreadMiddleware::class);
+                $resolverWithSpreadMiddleware = $spreadMiddleware->wrap($resolverWithMiddleware);
+
+                return $resolverWithSpreadMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
             }
         );
 
@@ -262,15 +234,6 @@ class FieldFactory
         $directives = $this->passResolverArguments(
             $this->directiveFactory->createAssociatedDirectivesOfType($astNode, ArgDirective::class)
         );
-
-        if (
-            $directives->contains(function (Directive $directive): bool {
-                return $directive instanceof SpreadDirective;
-            })
-            && $type instanceof InputObjectType
-        ) {
-            $this->pathsToSpread [] = $argumentPath;
-        }
 
         // Handle the argument itself. At this point, it can be wrapped
         // in a list or an input object
@@ -398,11 +361,6 @@ class FieldFactory
     protected function setArgValue(array $argumentPath, $value): array
     {
         return Arr::set($this->args, implode('.', $argumentPath), $value);
-    }
-
-    protected function unsetArgValue(array $argumentPath): void
-    {
-        Arr::forget($this->args, implode('.', $argumentPath));
     }
 
     protected function argValue(array $argumentPath)

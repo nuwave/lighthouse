@@ -175,11 +175,11 @@ SDL;
 
         $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
 
-        /** @var FieldDefinitionNode $fieldDefinition */
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
         foreach ($objectType->fields as $fieldDefinition) {
             // If the field already has middleware defined, skip over it
             // Field middleware are more specific then those defined on a type
-            if (ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
+            if (ASTHelper::hasDirective($fieldDefinition, self::NAME)) {
                 return;
             }
 
