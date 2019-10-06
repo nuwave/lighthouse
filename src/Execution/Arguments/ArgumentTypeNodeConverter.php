@@ -2,27 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Nuwave\Lighthouse\Schema\AST\TypeNodeConverter;
 
 class ArgumentTypeNodeConverter extends TypeNodeConverter
 {
-    /**
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
-     */
-    protected $documentAST;
-
-    /**
-     * ArgumentTypeNodeConverter constructor.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\AST\DocumentAST  $documentAST
-     * @return void
-     */
-    public function __construct(DocumentAST $documentAST)
-    {
-        $this->documentAST = $documentAST;
-    }
-
     /**
      * @param \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType $type
      * @return \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType

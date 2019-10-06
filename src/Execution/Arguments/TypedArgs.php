@@ -11,25 +11,26 @@ use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
 class TypedArgs
 {
     /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter
-     */
-    protected $argumentTypeNodeConverter;
-
-    /**
      * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
      */
     protected $documentAST;
 
     /**
+     * @var \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter
+     */
+    protected $argumentTypeNodeConverter;
+
+    /**
      * TypedArgs constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter  $argumentTypeNodeConverter
      * @return void
      */
-    public function __construct(ASTBuilder $astBuilder)
+    public function __construct(ASTBuilder $astBuilder, ArgumentTypeNodeConverter $argumentTypeNodeConverter)
     {
         $this->documentAST = $astBuilder->documentAST();
-        $this->argumentTypeNodeConverter = new ArgumentTypeNodeConverter($this->documentAST);
+        $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
     }
 
     /**
