@@ -65,4 +65,9 @@ class User extends Authenticatable
             $q->where('name', $args['company']);
         });
     }
+
+    public function getCompanyNameAttribute()
+    {
+        return $this->company->name;
+    }
 }
