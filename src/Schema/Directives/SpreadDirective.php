@@ -23,9 +23,10 @@ class SpreadDirective implements ArgDirective, DefinedDirective
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Spread out the nested values of an argument of type input object into it\'s parent.
+Merge the fields of a nested input object into the arguments of its parent
+when processing the field arguments given by a client.
 """
-directive @spread on ARGUMENT_DEFINITION
+directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 SDL;
     }
 }

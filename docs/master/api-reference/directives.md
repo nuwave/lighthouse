@@ -2241,7 +2241,15 @@ Find out how the added filter works: [`@trashed`](#trashed)
 
 ## @spread
 
-Spread out the nested values of an argument of type input object into it's parent.
+```graphql
+"""
+Merge the fields of a nested input object into the arguments of its parent
+when processing the field arguments given by a client.
+"""
+directive @spread on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+```
+
+You may use `@spread` on field arguments or on input object fields:
 
 ```graphql
 type Mutation {
@@ -2253,11 +2261,15 @@ type Mutation {
 
 input PostInput {
     title: String!
-    body: String
+    content: PostContent @spread
+}
+
+input PostContent {
+    imageUrl: String
 }
 ```
 
-The schema does not change, client side usage works the same:
+The schema does not change, client side usage works as if `@spread` was not there:
 
 ```graphql
 mutation {
@@ -2265,11 +2277,14 @@ mutation {
         id: 12 
         input: {
             title: "My awesome title"
+            content: {
+                imageUrl: "http://some.site/image.jpg"
+            }
         }
     ) {
         id
     }
-}   
+}
 ```
 
 Internally, the arguments will be transformed into a flat structure before
@@ -2277,22 +2292,14 @@ they are passed along to the resolver:
 
 ```php
 [
-    'id' => 12
-    'title' = 'My awesome title'
+    'id' => 12,
+    'title' => 'My awesome title',
+    'imageUrl' = 'http://some.site/image.jpg',
 ]
 ```
 
-Note that Lighthouse spreads out the arguments **after** all other `ArgDirectives` have
-been applied, e.g. validation, transformation.
-
-### Definition
-
-```graphql
-"""
-Spread out the nested values of an argument of type input object into it's parent.
-"""
-directive @spread on ARGUMENT_DEFINITION
-```
+Note that Lighthouse spreads out the arguments **after** all other [ArgDirectives](../custom-directives/argument-directives.md)
+have been applied, e.g. validation, transformation.
 
 ## @subscription
 
