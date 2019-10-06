@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
-use Tests\TestCase;
 
 class ArgumentSetTest extends TestCase
 {
@@ -84,7 +84,7 @@ class ArgumentSetTest extends TestCase
             [
                 'input' => [
                     'foo' => $fooValue,
-                ]
+                ],
             ],
             $argumentSet->toArray()
         );
@@ -114,7 +114,7 @@ class ArgumentSetTest extends TestCase
                     [
                         'foo' => $fooValue,
                     ],
-                ]
+                ],
             ],
             $argumentSet->toArray()
         );

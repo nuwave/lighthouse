@@ -98,13 +98,13 @@ class TypedArgs
 
             // We have to do this conversion here and not in the TypeNodeConverter,
             // because the incoming arguments put a bound on recursion depth
-            if($type instanceof ListType) {
+            if ($type instanceof ListType) {
                 $typeInList = $type->type;
                 $typeInListName = $typeInList->name;
 
                 $argument->value = [];
-                foreach($value as $singleValue) {
-                    $argument->value []= $this->wrapWithTypeInfo($singleValue, $typeInListName);
+                foreach ($value as $singleValue) {
+                    $argument->value [] = $this->wrapWithTypeInfo($singleValue, $typeInListName);
                 }
             } else {
                 $argument->value = $this->wrapWithTypeInfo($value, $type->name);
@@ -131,7 +131,7 @@ class TypedArgs
         $typeDef = $this->documentAST->types[$typeName] ?? null;
 
         // We recurse down only if the type is an Input
-        if($typeDef instanceof InputObjectTypeDefinitionNode) {
+        if ($typeDef instanceof InputObjectTypeDefinitionNode) {
             $subArgumentSet = new ArgumentSet();
             $subArgumentSet->directives = $typeDef->directives;
             $subArgumentSet->arguments = $this->wrapArgs($value, $typeDef->fields);

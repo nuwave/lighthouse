@@ -2,8 +2,8 @@
 
 namespace Nuwave\Lighthouse\Schema\AST;
 
-use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\AST\NodeKind;
+use GraphQL\Language\AST\TypeNode;
 use Illuminate\Support\Collection;
 
 abstract class TypeNodeConverter
@@ -73,7 +73,6 @@ abstract class TypeNodeConverter
      * @return mixed
      */
     abstract protected function listOf($type);
-
 
     /**
      * Get the named type for the given node name.

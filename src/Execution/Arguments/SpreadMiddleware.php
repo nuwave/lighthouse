@@ -31,7 +31,7 @@ class SpreadMiddleware
      */
     public function wrap(\Closure $next): \Closure
     {
-        return function($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($next) {
+        return function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo) use ($next) {
             return $next(
                 $root,
                 $this->typedArgs

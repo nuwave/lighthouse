@@ -11,10 +11,8 @@ use Illuminate\Support\Collection;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Language\AST\ArgumentNode;
-use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\NamedTypeNode;
-use GraphQL\Language\AST\NonNullTypeNode;
 use GraphQL\Language\AST\ObjectTypeDefinitionNode;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 use Nuwave\Lighthouse\Schema\Directives\NamespaceDirective;
@@ -220,8 +218,8 @@ class ASTHelper
     public static function firstByName($nodes, string $name): ?Node
     {
         /** @var \GraphQL\Language\AST\Node $node */
-        foreach($nodes as $node) {
-            if($node->name->value === $name) {
+        foreach ($nodes as $node) {
+            if ($node->name->value === $name) {
                 return $node;
             }
         }

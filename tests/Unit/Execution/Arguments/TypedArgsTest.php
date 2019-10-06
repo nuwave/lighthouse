@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use Nuwave\Lighthouse\Execution\Arguments\Argument;
-use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Tests\TestCase;
+use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
+use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 
 class TypedArgsTest extends TestCase

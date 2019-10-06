@@ -3,7 +3,6 @@
 namespace Tests\Unit\Schema\AST;
 
 use Tests\TestCase;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;

@@ -33,7 +33,7 @@ class ArgumentSet
     {
         $plainArguments = [];
 
-        foreach($this->arguments as $name => $argument) {
+        foreach ($this->arguments as $name => $argument) {
             $plainArguments[$name] = $argument->toPlain();
         }
 
