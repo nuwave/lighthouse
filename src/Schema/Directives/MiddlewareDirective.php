@@ -10,7 +10,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Language\AST\TypeExtensionNode;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\TypeDefinitionNode;
-use GraphQL\Language\AST\FieldDefinitionNode;
 use Nuwave\Lighthouse\Schema\AST\DocumentAST;
 use Illuminate\Routing\MiddlewareNameResolver;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
@@ -175,11 +174,11 @@ SDL;
 
         $middlewareDirective = PartialParser::directive("@middleware(checks: [\"$middlewareArgValue\"])");
 
-        /** @var FieldDefinitionNode $fieldDefinition */
+        /** @var \GraphQL\Language\AST\FieldDefinitionNode $fieldDefinition */
         foreach ($objectType->fields as $fieldDefinition) {
             // If the field already has middleware defined, skip over it
             // Field middleware are more specific then those defined on a type
-            if (ASTHelper::directiveDefinition($fieldDefinition, self::NAME)) {
+            if (ASTHelper::hasDirective($fieldDefinition, self::NAME)) {
                 return;
             }
 
