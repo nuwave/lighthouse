@@ -1,13 +1,14 @@
 {
     "license": "MIT",
     "dependencies": {
+        "@vuepress/plugin-back-to-top": "^1.1.0",
+        "@vuepress/plugin-medium-zoom": "^1.1.0",
         "fs-extra": "^7.0.1",
         "vuepress": "^1.0.3"
     },
     "scripts": {
-        "start": "npm run docs:dev",
-        "docs:dev": "vuepress dev .",
-        "docs:version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
-        "docs:build": "vuepress build ."
+        "start": "vuepress dev .",
+        "bump-version": "node -e 'require(\"./.vuepress/lib/versioning.js\").generate()'",
+        "build": "vuepress build ."
     }
 }

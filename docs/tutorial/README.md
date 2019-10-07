@@ -7,12 +7,13 @@ with [GraphQL](https://graphql.org/) and [Laravel](https://laravel.com/) first.
 ## What is GraphQL?
 
 GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data.
+
 GraphQL provides a complete and understandable description of the data in your API,
 gives clients the power to ask for exactly what they need and nothing more,
 makes it easier to evolve APIs over time, and enables powerful developer tools.
 
 <div align="center">
-  <img src="./assets/tutorial/playground.png">  
+  <img src="./playground.png">  
   <small>GraphQL Playground</small>
 </div>
 
@@ -20,16 +21,16 @@ GraphQL has been released only as a [*specification*](https://facebook.github.io
 This means that GraphQL is in fact not more than a long document that describes in detail
 the behaviour of a GraphQL server. 
 
-So, GraphQL has its own type system that’s used to define the schema of an API.
+GraphQL has its own type system that’s used to define the schema of an API.
 The syntax for writing schemas is called [Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51/) or short **SDL**.
 
-Here is an example how we can use the SDL to define a type called `Person` and its
+Here is an example how we can use the SDL to define a type called `User` and its
 relation to another type `Post`.
 
 ```graphql
-type Person {
+type User {
+  id: ID!
   name: String!
-  age: Int!
   posts: [Post!]!
 }
 
@@ -39,35 +40,24 @@ type Post {
 }
 ```
 
-Note that we just created a one-to-many relationship between `Person` and `Post`.
-The type `Person` has a field `posts` that returns a list of `Post` types.
+Note that we just created a one-to-many relationship between `User` and `Post`.
+The type `User` has a field `posts` that returns a list of `Post` types.
 
-We also defined the inverse relationship from `Post` to `Person` through the `author` field.
-
-::: tip NOTE
- This short intro is a compilation from many sources, all credits goes to the original authors.
- - [https://graphql.org](https://graphql.org)
- - [https://howtographql.com](https://howtographql.com)
-:::
+We also defined the inverse relationship from `Post` to `User` through the `author` field.
 
 ## What is Lighthouse?
 
-Lighthouse is a PHP package that allows you to serve a GraphQL endpoint from your Laravel application.
+Lighthouse integrates with any Laravel project to make it easy to serve
+your own GraphQL server.
 
-It greatly reduces the boilerplate required to create a schema,
-integrates well with any Laravel project,
-and is highly customizable giving you full control over your data.
+The process of building a GraphQL server with Lighthouse can be described in 3 steps:
 
-The whole process of building your own GraphQL server can be described in 3 steps:
-
-1. Define the shape of your data using the Schema Definition Language
-1. Use pre-built directives to bring your schema to life
+1. Define the shape of your data using the GraphQL Schema Definition Language
+1. Use Lighthouses pre-built directives to bring your schema to life
 1. Extend Lighthouse with custom functionality where you need it
 
-**... and you are done!**
-
 <div align="center">
-  <img src="./assets/tutorial/flow.png">  
+  <img src="./flow.png">  
   <small>The role of GraphQL in your application</small>
 </div>
 
@@ -75,10 +65,9 @@ The whole process of building your own GraphQL server can be described in 3 step
 
 In this tutorial we will create a GraphQL API for a simple Blog from scratch with:
 
-- Laravel 5.7
-- Lighthouse 2.x
-- Laravel GraphQL Playground
-- MySQL
+- Laravel
+- Lighthouse
+- GraphQL Playground
 
 ::: tip
 You can download the source code for this tutorial at [https://github.com/nuwave/lighthouse-tutorial](https://github.com/nuwave/lighthouse-tutorial)
@@ -86,29 +75,18 @@ You can download the source code for this tutorial at [https://github.com/nuwave
 
 ## Installation
 
-Create a new Laravel project.
-You can use an existing project if you like, but you may have to adapt as we go along.
-Read more about [installing Laravel](https://laravel.com/docs/#installing-laravel).
+### Create a new Laravel project
+
+::: tip
+This tutorial starts with a fresh Laravel project.
+You can use an existing project and skip ahead to [Installing Lighthouse](#installing-lighthouse),
+but you may have to adapt a few things to fit your existing app as we go along.
+:::
+
+Assuming you are using the Laravel installer, create a new project
+(read more about [installing Laravel](https://laravel.com/docs/#installing-laravel)):
 
     laravel new lighthouse-tutorial
-
-In this tutorial we will use [Laravel GraphQL Playground](https://github.com/mll-lab/laravel-graphql-playground)
-as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
-Of course, we will use Lighthouse as the GraphQL Server.
-
-    composer require nuwave/lighthouse mll-lab/laravel-graphql-playground
-
-Then publish the configurations files and the default schema.
-
-```bash
-# lighthouse
-php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider"
-
-# playground
-php artisan vendor:publish --provider="MLL\GraphQLPlayground\GraphQLPlaygroundServiceProvider"
-```
-
-The default schema will be published to `graphql/schema.graphql`.
 
 Consult the [Laravel docs on database configuration](https://laravel.com/docs/database#configuration)
 and ensure you have a working database set up.
@@ -122,13 +100,22 @@ Seed the database with some fake users:
     php artisan tinker
     factory('App\User', 10)->create();
 
-Now you are ready to start your server.
-Use [Homestead](https://laravel.com/docs/homestead),
-[Valet](https://laravel.com/docs/5.7/valet) or:
+### Installing Lighthouse
 
-    php artisan serve
+Of course, we will use Lighthouse as the GraphQL Server.
 
-To make sure everything is working, access Laravel GraphQL Playground on http://127.0.0.1:8000/graphql-playground
+    composer require nuwave/lighthouse
+
+In this tutorial we will use [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
+as an IDE for GraphQL queries. It's like Postman for GraphQL, but with super powers.
+
+    composer require mll-lab/laravel-graphql-playground
+
+Then publish default schema to `graphql/schema.graphql`.
+
+    php artisan vendor:publish --provider="Nuwave\Lighthouse\LighthouseServiceProvider" --tag=schema
+
+To make sure everything is working, access Laravel GraphQL Playground on `/graphql-playground`
 and try the following query:
 
 ```graphql
@@ -141,18 +128,23 @@ and try the following query:
 }
 ```
 
-Now, let's move on and create a GraphQL API for our Blog.
+Now, let's move on and create a GraphQL API for our blog.
 
 ## The Models
 
-One user can publish many posts, and each post has many comments from anonymous users.
+This first part will show you how to set up the models and database migrations
+and does not include any specifics related to GraphQL or Lighthouse.
+
+Our blog follows some simples rules:
+- a user can publish multiple posts
+- each post can have multiple comments from anonymous users
+
+We can model this in our database schema like this.
 
 <div align="center">
-  <img src="./assets/tutorial/model.png">  
+  <img src="./model.png">  
   <p><small>Database relations diagram</small></p>
 </div>
-
-This first part is pure Laravel, we will add the GraphQL part afterwards.
 
 Begin by defining models and migrations for your posts and comments
 
@@ -164,15 +156,17 @@ Begin by defining models and migrations for your posts and comments
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Post extends Model
 {
-    public function user()
+    public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function comments()
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
@@ -214,10 +208,11 @@ class CreatePostsTable extends Migration
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Comment extends Model
 {
-    public function post()
+    public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }
@@ -262,6 +257,7 @@ Finally, add the `posts` relation to `app/User.php`
 namespace App;
 
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
@@ -276,7 +272,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public function posts()
+    public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
@@ -285,13 +281,13 @@ class User extends Authenticatable
 
 ## The Magic
 
-Let's edit `routes/graphql/schema.graphql` and define our blog schema,
-based on the Eloquent Models we created.
+Let's edit `graphql/schema.graphql` and define our blog schema,
+based on the Eloquent models we created.
 
-First, we define the root Query type which contains two different queries for retrieving posts.
+We add two queries for retrieving posts to the root Query type:
 
 ```graphql
-type Query{
+type Query {
     posts: [Post!]! @all
     post(id: Int! @eq): Post @find
 }
@@ -300,11 +296,11 @@ type Query{
 The way that Lighthouse knows how to resolve the queries is a combination of convention-based
 naming - the type name `Post` is also the name of our Model - and the use of server-side directives.
 
-- [`@all`](../api-reference/directives.md#all) just gets you a list of all `Post` models
-- [`@find`](../api-reference/directives.md#find) and [`@eq`](../api-reference/directives.md#eq)
+- [`@all`](../master/api-reference/directives.md#all) returns a list of all `Post` models
+- [`@find`](../master/api-reference/directives.md#find) and [`@eq`](../master/api-reference/directives.md#eq)
   are combined to retrieve a single `Post` by its ID
 
-Then, we add additional type definitions that clearly define the shape of our data. 
+We add additional type definitions that clearly define the shape of our data: 
 
 ```graphql
 type Query{
@@ -325,7 +321,7 @@ type Post {
     id: ID!
     title: String!
     content: String!
-    user: User! @belongsTo
+    author: User! @belongsTo
     comments: [Comment!]! @hasMany
 }
 
@@ -337,22 +333,21 @@ type Comment{
 ```
 
 Just like in Eloquent, we express the relationship between our types using the
-[`@belongsTo`](../api-reference/directives.md#belongsto) and [`@hasMany`](../api-reference/directives.md#hasmany) directives.
+[`@belongsTo`](../master/api-reference/directives.md#belongsto) and [`@hasMany`](../master/api-reference/directives.md#hasmany) directives.
 
 ## The Final Test
 
 Insert some fake data into your database,
 you can use [Laravel seeders](https://laravel.com/docs/seeding) for that.
 
-Visit [http://127.0.0.1:8000/graphql-playground](http://127.0.0.1:8000/graphql-playground) and try the following query:
+Visit `/graphql-playground` and try the following query:
 
 ```graphql
 {
   posts {
     id
     title
-    user {
-      id
+    author {
       name
     }
     comments {
@@ -364,16 +359,16 @@ Visit [http://127.0.0.1:8000/graphql-playground](http://127.0.0.1:8000/graphql-p
 ```
 
 You should get a list of all the posts in your database,
-together with all the comments and user information defined upon.
+together with all of its comments and the name of the author.
 
-I hope this example shows a taste of the power of GraphQL
+Hopefully, this example showed you a glimpse of the power of GraphQL
 and how Lighthouse makes it easy to build your own server with Laravel. 
 
 ## Next Steps
 
-The app you just build might use some more features.
+The app you just built might use some more features.
 Here are a few ideas on what you might add to learn more about Lighthouse.
 
-- [Add pagination to your fields](../api-reference/directives.md#paginate)
-- [Create and update eloquent models](../eloquent/getting-started.md#create)
-- [Validate the inputs that are sent to your server](../security/validation.md)
+- [Add pagination to your fields](../master/api-reference/directives.md#paginate)
+- [Create and update eloquent models](../master/eloquent/getting-started.md#create)
+- [Validate the inputs that are sent to your server](../master/security/validation.md)
