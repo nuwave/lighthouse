@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Tutorial
 
 This is an introductory tutorial for building a GraphQL server with Lighthouse.

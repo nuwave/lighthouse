@@ -3,23 +3,15 @@ home: true
 heroImage: /logo.svg
 actionText: Get Started  →
 actionLink: /docs/latest
+features:
+- title: 📜 SDL First
+  details: Use the GraphQL Schema Definition Language to describe your data and add functionality through server-side directives.
+- title: ❤ Laravel Friendly
+  details: Build a GraphQL server on top of an existing Laravel application. Maximize code reuse and work with concepts you already know.
+- title: ⚡ Optimized for Eloquent
+  details: Lighthouse leverages your existing models and creates optimized database queries out of the box.
 footer: Made with ❤ by people
 ---
-
-<div class="features">
-  <div class="feature">
-    <h2>📜 SDL First</h2>
-    <p>Use the GraphQL Schema Definition Language to describe your data and add functionality through server-side directives.</p>
-  </div>
-  <div class="feature">
-    <h2>❤ Laravel Friendly</h2>
-    <p>Build a GraphQL server on top of an existing Laravel application. Maximize code reuse and work with concepts you already know.</p>
-  </div>
-  <div class="feature">
-    <h2>⚡ Optimized for Eloquent</h2>
-    <p>Lighthouse leverages your existing models and creates optimized database queries out of the box.</p>
-  </div>
-</div>
 
 ### Boilerplate free schema definition
 

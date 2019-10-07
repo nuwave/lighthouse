@@ -1,8 +1,7 @@
----
-sidebar: false
----
+<div align="center">
 
 # Who's Using This?
+</div>
 
 <div class="showcase">
   <div class="logos">
