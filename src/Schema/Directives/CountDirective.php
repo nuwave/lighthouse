@@ -49,7 +49,7 @@ SDL;
     public function resolveField(FieldValue $value)
     {
         return $value->setResolver(
-            function (Model $model) {
+            function (?Model $model) {
                 $relation = $this->directiveArgValue('relation');
                 $modelArg = $this->directiveArgValue('model');
 
@@ -57,8 +57,9 @@ SDL;
                     return $model->{$relation}()->count();
                 }
 
-                if (! is_null($model)) {
-                    return $modelArg::count();
+                if (! is_null($modelArg)) {
+
+                    return $this->namespaceModelClass($modelArg)::count();
                 }
 
                 throw new DirectiveException(
