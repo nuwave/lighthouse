@@ -110,48 +110,50 @@ const pusherClient = new Pusher(PUSHER_API_KEY, {
 });
 
 const createHandler = options => {
-    let channelName;
-    const { pusher, fetchOperation } = options;
+  let channelName;
+  const { pusher, fetchOperation } = options;
 
-    return (operation, variables, cacheConfig, observer) => {
-        fetchOperation(operation, variables, cacheConfig)
-            .then(response => {
-                return response.json();
-            })
-            .then(response => {
-                channelName =
-                    !!response.extensions &&
-                    !!response.extensions.lighthouse_subscriptions &&
-                    !!response.extensions.lighthouse_subscriptions.channels
-                        ? response.extensions.lighthouse_subscriptions.channels[
-                              operation.name
-                          ]
-                        : null;
+  return (operation, variables, cacheConfig) => {
+    return Observable.create(sink => {
+      fetchOperation(operation, variables, cacheConfig)
+        .then(response => {
+          return response.json();
+        })
+        .then(json => {
+          channelName =
+            !!response.extensions &&
+            !!response.extensions.lighthouse_subscriptions &&
+            !!response.extensions.lighthouse_subscriptions.channels
+              ? response.extensions.lighthouse_subscriptions.channels[
+                  operation.name
+                ]
+              : null;
 
-                if (!channelName) {
-                    return;
-                }
+          if (!channelName) {
+            return
+          }
 
-                const channel = pusher.subscribe(channelName);
+          const channel = pusherClient.subscribe(channelName)
 
-                channel.bind("lighthouse-subscription", payload => {
-                    const result = payload.result;
-                    if (result && result.errors) {
-                        observer.onError(result.errors);
-                    } else if (result) {
-                        observer.onNext({
-                            data: result.data
-                        });
-                    }
-                    if (!payload.more) {
-                        observer.onCompleted();
-                    }
-                });
-            });
+          channel.bind(`lighthouse-subscription`, payload => {
+            const result = payload.result
+            
+            if (result && result.errors) {
+              sink.error(result.errors)
+            } else if (result) {
+              sink.next({
+                data: result.data
+              })
+            }
 
-        return {
-            dispose: () => pusher.unsubscribe(channelName)
-        };
+            if (!payload.more) {
+              sink.complete()
+            }
+          })
+        })
+      }).finally(() => {
+        pusherClient.unsubscribe(channelName)
+      })
     };
 };
 
