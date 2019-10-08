@@ -41,7 +41,7 @@ SDL;
     }
 
     /**
-     * Makes a simple count query for the relation.
+     * Returns the count of a given relationship or model.
      *
      * @param FieldValue $value
      * @return FieldValue
