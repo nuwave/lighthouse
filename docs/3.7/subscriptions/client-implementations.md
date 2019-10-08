@@ -97,7 +97,7 @@ need to create a custom handler and inject it into Relay's environment.
 
 ```js
 import Pusher from "pusher-js";
-import { Environment, Network, RecordSource, Store } from "relay-runtime";
+import { Environment, Network, Observable, RecordSource, Store } from "relay-runtime";
 
 const pusherClient = new Pusher(PUSHER_API_KEY, {
     cluster: "us2",
