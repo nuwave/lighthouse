@@ -579,7 +579,7 @@ class ComplexityAnalyzer {
     }
 ```
 
-## Count
+## @count
 
 Returns the count of a given relationship or model.
 
