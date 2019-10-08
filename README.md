@@ -24,6 +24,7 @@ Laravel application. It greatly reduces the boilerplate required to create a sch
 it integrates well with any Laravel project, and it's highly customizable
 giving you full control over your data.
 
+## Suscriptions
 ## [Documentation](https://lighthouse-php.com/)
 
 The documentation lives at [lighthouse-php.com](https://lighthouse-php.com/).
