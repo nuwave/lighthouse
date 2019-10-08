@@ -581,7 +581,7 @@ class ComplexityAnalyzer {
 
 ## Count
 
-Returns the count of a given relationship or a model
+Returns the count of a given relationship or model.
 
 ```graphql
 type User  {
