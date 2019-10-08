@@ -24,7 +24,7 @@ class CountDirective extends BaseDirective implements FieldResolver, DefinedDire
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Resolve the field through a count.
+Returns the count of a given relationship or model.
 """
 directive @count(
   """
@@ -41,7 +41,7 @@ SDL;
     }
 
     /**
-     * Makes a simple count query for the relation.
+     * Returns the count of a given relationship or model.
      *
      * @param FieldValue $value
      * @return FieldValue
