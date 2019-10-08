@@ -50,15 +50,15 @@ SDL;
     {
         return $value->setResolver(
             function (?Model $model) {
+                // Fetch the count by relation
                 $relation = $this->directiveArgValue('relation');
-                $modelArg = $this->directiveArgValue('model');
-
                 if (! is_null($relation)) {
                     return $model->{$relation}()->count();
                 }
 
+                // Else we try to fetch by model.
+                $modelArg = $this->directiveArgValue('model');
                 if (! is_null($modelArg)) {
-
                     return $this->namespaceModelClass($modelArg)::count();
                 }
 

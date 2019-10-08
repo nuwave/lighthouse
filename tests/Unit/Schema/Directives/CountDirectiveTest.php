@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Tests\DBTestCase;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 
 class CountDirectiveTest extends DBTestCase
 {
@@ -19,14 +19,14 @@ class CountDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL('
         {
             users
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
-                'users' => 3
-            ]
+                'users' => 3,
+            ],
         ]);
     }
 
@@ -51,18 +51,18 @@ class CountDirectiveTest extends DBTestCase
         }
         ';
 
-        $this->graphQL("
+        $this->graphQL('
         {
             user {
                 taskCount
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'user' => [
-                    'taskCount' => 4
-                ]
-            ]
+                    'taskCount' => 4,
+                ],
+            ],
         ]);
     }
 
@@ -75,10 +75,10 @@ class CountDirectiveTest extends DBTestCase
         ';
 
         $this->expectException(DirectiveException::class);
-        $this->graphQL("
+        $this->graphQL('
         {
             users
         }
-        ");
+        ');
     }
 }

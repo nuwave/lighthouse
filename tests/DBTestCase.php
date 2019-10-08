@@ -20,14 +20,12 @@ abstract class DBTestCase extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('database.connections.mysql', [
+            'driver' => 'mysql',
+            'database' => 'test',
+            'host' => env('TRAVIS') ? '127.0.0.1' : 'mysql',
+            'username' => 'root',
         ]);
-
-
     }
 }
