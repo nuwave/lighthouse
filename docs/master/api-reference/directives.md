@@ -599,7 +599,7 @@ type Query {
 
 ```graphql
 """
-Resolve the field through a count.
+Returns the count of a given relationship or model.
 """
 directive @count(
   """
