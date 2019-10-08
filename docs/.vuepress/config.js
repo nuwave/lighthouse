@@ -50,7 +50,8 @@ module.exports = {
         ['@vuepress/medium-zoom', true],
         ['@vuepress/search', {
             searchMaxSuggestions: 10,
-            test: '/master/'
+            // Only search the latest version, e.g. 4.3, otherwise many duplicates will show up
+            test: `/${versioning.versions.latest.replace('.', '\\.')}/`
         }]
     ]
 }
