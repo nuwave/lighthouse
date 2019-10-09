@@ -32,7 +32,7 @@ directive @scope(
   The name of the scope.
   """
   name: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 SDL;
     }
 
