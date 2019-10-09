@@ -36,7 +36,7 @@ directive @count(
   The model to run the count on.
   """
   model: String
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 SDL;
     }
 
