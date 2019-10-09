@@ -27,7 +27,7 @@ module.exports = {
 
     return sidebars
   },
-  // Build dropdown items for each version  
+  // Build dropdown items for each version
   linksFor (url) {
     let links = []
 
@@ -48,7 +48,7 @@ module.exports = {
     }
 
     if (typeof version === 'undefined') {
-      this.error('No version number specified! \nPass the version you wish to create as an argument.\nEx: 1.0.0')
+      this.error('No version number specified! \nPass the version you wish to create as an argument.\nEx: 4.4')
     }
 
     if (versions.includes(version)) {
