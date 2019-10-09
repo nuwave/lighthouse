@@ -595,6 +595,7 @@ type Query {
     categories: Int! @count(model: "Category")
 }
 ```
+
 ### Definition
 
 ```graphql
