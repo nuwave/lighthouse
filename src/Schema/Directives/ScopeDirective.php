@@ -4,8 +4,8 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 
 use BadMethodCallException;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class ScopeDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
@@ -49,7 +49,7 @@ SDL;
             return $builder->{$scope}($value);
         } catch (BadMethodCallException $exception) {
             throw new DirectiveException(
-                $exception->getMessage() . " in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
+                $exception->getMessage() ." in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
                 $exception->getCode(),
                 $exception->getPrevious()
             );
