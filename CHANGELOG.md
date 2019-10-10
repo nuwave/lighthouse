@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.4.0...master)
 
+### Added
+- Add `@scope` directive for adding a scope to the query builder https://github.com/nuwave/lighthouse/pull/998
+
 ## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
 
 ### Added
