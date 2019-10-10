@@ -2,6 +2,7 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
@@ -73,16 +74,12 @@ class TypedArgs
      * Wrap client-given args with type information.
      *
      * @param  mixed[]  $args
-     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[] $argumentDefinitions
+     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]  $argumentDefinitions
      * @return \Nuwave\Lighthouse\Execution\Arguments\Argument[]
      */
     protected function wrapArgs(array $args, $argumentDefinitions): array
     {
-        /** @var \GraphQL\Language\AST\InputValueDefinitionNode[] $argumentDefinitionMap */
-        $argumentDefinitionMap = [];
-        foreach ($argumentDefinitions as $definition) {
-            $argumentDefinitionMap[$definition->name->value] = $definition;
-        }
+        $argumentDefinitionMap = $this->makeDefinitionMap($argumentDefinitions);
 
         /** @var \Nuwave\Lighthouse\Execution\Arguments\Argument[] $arguments */
         $arguments = [];
@@ -91,45 +88,87 @@ class TypedArgs
             /** @var \GraphQL\Language\AST\InputValueDefinitionNode $definition */
             $definition = $argumentDefinitionMap[$key];
 
-            $type = $this->argumentTypeNodeConverter->convert($definition->type);
-
-            $argument = new Argument();
-            $argument->directives = $definition->directives;
-            $argument->type = $type;
-
-            // We have to do this conversion here and not in the TypeNodeConverter,
-            // because the incoming arguments put a bound on recursion depth
-            if ($type instanceof ListType) {
-                $typeInList = $type->type;
-                $typeInListName = $typeInList->name;
-
-                $argument->value = [];
-                foreach ($value as $singleValue) {
-                    $argument->value [] = $this->wrapWithTypeInfo($singleValue, $typeInListName);
-                }
-            } else {
-                $argument->value = $this->wrapWithTypeInfo($value, $type->name);
-            }
-
-            $arguments[$key] = $argument;
+            $arguments[$key] = $this->wrapInArgument($value, $definition);
         }
 
         return $arguments;
     }
 
     /**
-     * Wrap a client-given value in type information.
+     * Make a map with the name as keys.
+     *
+     * @param  \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]  $argumentDefinitions
+     * @return \GraphQL\Language\AST\NodeList|\GraphQL\Language\AST\InputValueDefinitionNode[]
+     */
+    protected function makeDefinitionMap($argumentDefinitions): array
+    {
+        /** @var \GraphQL\Language\AST\InputValueDefinitionNode[] $argumentDefinitionMap */
+        $argumentDefinitionMap = [];
+
+        foreach ($argumentDefinitions as $definition) {
+            $argumentDefinitionMap[$definition->name->value] = $definition;
+        }
+
+        return $argumentDefinitionMap;
+    }
+
+    /**
+     * Wrap a single client-given argument with type information.
      *
      * @param  mixed  $value
-     * @param  string  $typeName
+     * @param  \GraphQL\Language\AST\InputValueDefinitionNode  $definition
+     * @return \Nuwave\Lighthouse\Execution\Arguments\Argument
+     */
+    protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
+    {
+        $type = $this->argumentTypeNodeConverter->convert($definition->type);
+
+        $argument = new Argument();
+        $argument->directives = $definition->directives;
+        $argument->type = $type;
+        $argument->value = $this->wrapWithType($value, $type);
+
+        return $argument;
+    }
+
+    /**
+     * Wrap a client-given value with information from a type.
+     *
+     * @param  mixed|mixed[]  $valueOrValues
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\ListType|\Nuwave\Lighthouse\Execution\Arguments\NamedType  $type
+     * @return array|mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
+     */
+    protected function wrapWithType($valueOrValues, $type)
+    {
+        // We have to do this conversion here and not in the TypeNodeConverter,
+        // because the incoming arguments put a bound on recursion depth
+        if ($type instanceof ListType) {
+            $typeInList = $type->type;
+
+            $values = [];
+            foreach ($valueOrValues as $singleValue) {
+                $values [] = $this->wrapWithNamedType($singleValue, $typeInList);
+            }
+
+            return $values;
+        } else {
+            return $this->wrapWithNamedType($valueOrValues, $type);
+        }
+    }
+
+    /**
+     * Wrap a client-given value with information from a named type.
+     *
+     * @param  mixed  $value
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $namedType
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */
-    protected function wrapWithTypeInfo($value, string $typeName)
+    protected function wrapWithNamedType($value, NamedType $namedType)
     {
         // This might be null if the type is
         // - created outside of the schema string
         // - one of the built in types
-        $typeDef = $this->documentAST->types[$typeName] ?? null;
+        $typeDef = $this->documentAST->types[$namedType->name] ?? null;
 
         // We recurse down only if the type is an Input
         if ($typeDef instanceof InputObjectTypeDefinitionNode) {
