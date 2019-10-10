@@ -49,7 +49,7 @@ SDL;
             return $builder->{$scope}($value);
         } catch (BadMethodCallException $exception) {
             throw new DirectiveException(
-                $exception->getMessage() ." in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
+                $exception->getMessage()." in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
                 $exception->getCode(),
                 $exception->getPrevious()
             );
