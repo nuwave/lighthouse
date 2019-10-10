@@ -2173,6 +2173,34 @@ scalar DateTime
     @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 ```
 
+## @scope
+
+Adds a scope to the query builder through a graphql argument.
+The scope method will get the argument value from graphql as the second argument, where the first is of course the query builder.
+
+```graphql
+type User {
+    id: ID!
+    likes(
+        liker: ID @scope(name: "whereLiker")
+    ): [Like] @hasMany
+}
+```
+
+### Definition
+
+```graphql
+"""
+This directive adds a scope to the builder and supplies the argument value as the argument to the scope.
+"""
+directive @scope(
+  """
+  The name of the scope.
+  """
+  name: String
+) on ARGUMENT_DEFINITION
+```
+
 ## @search
 
 Perform a full-text by the given input value.

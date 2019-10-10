@@ -2,13 +2,11 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use BadMethodCallException;
+use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-/**
- * This directive adds a scope to the builder and supplies the argument value
- * as the argument to the scope.
- */
 class ScopeDirective extends BaseDirective implements ArgBuilderDirective, DefinedDirective
 {
     /**
@@ -25,7 +23,7 @@ class ScopeDirective extends BaseDirective implements ArgBuilderDirective, Defin
     {
         return /* @lang GraphQL */ <<<'SDL'
 """
-Adds a scope to the builder.
+This directive adds a scope to the builder and supplies the argument value as the argument to the scope.
 """
 directive @scope(
   """
@@ -39,14 +37,22 @@ SDL;
     /**
      * Add additional constraints to the builder based on the given argument value.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder 
- $builder
-     * @param  mixed  $value
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param mixed $value
      * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @throws DirectiveException
      */
     public function handleBuilder($builder, $value)
     {
         $scope = $this->directiveArgValue('name');
-        return $builder->{$scope}($value);
+        try {
+            return $builder->{$scope}($value);
+        } catch (BadMethodCallException $exception) {
+            throw new DirectiveException(
+                $exception->getMessage() . " in {$this->name()} directive on {$this->definitionNode->name->value} argument.",
+                $exception->getCode(),
+                $exception->getPrevious()
+            );
+        }
     }
 }
