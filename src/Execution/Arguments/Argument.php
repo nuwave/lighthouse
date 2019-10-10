@@ -32,7 +32,7 @@ class Argument
      */
     public function toPlain()
     {
-        return $this->toPlainRecursive($this->value);
+        return static::toPlainRecursive($this->value);
     }
 
     /**
@@ -41,14 +41,14 @@ class Argument
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet[]|mixed|mixed[]  $value
      * @return mixed|mixed[]
      */
-    protected function toPlainRecursive($value)
+    protected static function toPlainRecursive($value)
     {
         if ($value instanceof ArgumentSet) {
             return $value->toArray();
         }
 
         if (is_array($value)) {
-            return array_map([$this, 'toPlainRecursive'], $value);
+            return array_map([static::class, 'toPlainRecursive'], $value);
         }
 
         return $value;
