@@ -33,19 +33,7 @@ class ExecutableTypeNodeConverter extends TypeNodeConverter
 
     protected function namedType(string $nodeName)
     {
-        switch ($nodeName) {
-            case 'ID':
-                return Type::id();
-            case 'Int':
-                return Type::int();
-            case 'Boolean':
-                return Type::boolean();
-            case 'Float':
-                return Type::float();
-            case 'String':
-                return Type::string();
-            default:
-                return $this->typeRegistry->get($nodeName);
-        }
+        return Type::getStandardTypes()[$nodeName]
+            ?? $this->typeRegistry->get($nodeName);
     }
 }
