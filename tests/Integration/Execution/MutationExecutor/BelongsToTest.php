@@ -415,11 +415,11 @@ class BelongsToTest extends DBTestCase
     {
         factory(User::class)->create();
 
-        $this->graphQL("
+        $this->graphQL('
         mutation {
             upsertTask(input: {
                 id: 1
-                name: \"foo\"
+                name: "foo"
                 user: {
                     disconnect: true
                 }
@@ -431,7 +431,7 @@ class BelongsToTest extends DBTestCase
                 }
             }
         }
-        ")->assertJson([
+        ')->assertJson([
             'data' => [
                 'upsertTask' => [
                     'id' => '1',
