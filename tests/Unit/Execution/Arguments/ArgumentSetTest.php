@@ -2,11 +2,10 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
-use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Tests\TestCase;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
 use Nuwave\Lighthouse\Execution\Arguments\ArgumentSet;
+use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 
 class ArgumentSetTest extends TestCase
 {

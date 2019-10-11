@@ -12,17 +12,17 @@ abstract class DBTestCase extends TestCase
     {
         parent::setUp();
 
-        if(! static::$migrated) {
-            $this->artisan('migrate:fresh --realpath --path ' .__DIR__.'/database/migrations');
+        if (! static::$migrated) {
+            $this->artisan('migrate:fresh --realpath --path '.__DIR__.'/database/migrations');
 
             static::$migrated = true;
         }
 
         // Ensure we start from a clean slate each time
         // We cannot use transactions, as they do not reset autoincrement
-        foreach(DB::select('SHOW TABLES') as $table) {
+        foreach (DB::select('SHOW TABLES') as $table) {
             DB::table($table->Tables_in_test)->truncate();
-        };
+        }
 
         $this->withFactories(__DIR__.'/database/factories');
     }

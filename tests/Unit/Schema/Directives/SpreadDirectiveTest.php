@@ -6,7 +6,6 @@ use Tests\TestCase;
 
 class SpreadDirectiveTest extends TestCase
 {
-
     public function testNestedSpread(): void
     {
         $this->mockResolver()

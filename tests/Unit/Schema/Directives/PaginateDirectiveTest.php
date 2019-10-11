@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Schema\Directives;
 
-use GraphQL\Error\Error;
 use Tests\TestCase;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
 
