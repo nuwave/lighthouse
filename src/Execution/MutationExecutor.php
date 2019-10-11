@@ -338,11 +338,11 @@ class MutationExecutor
      * Execute an upsert mutation.
      *
      * @param \Illuminate\Database\Eloquent\Model $model
-     *         An empty instance of the model that should be updated
+     *         An empty instance of the model that should be created or updated
      * @param \Illuminate\Support\Collection $args
-     *         The corresponding slice of the input arguments for updating this model
+     *         The corresponding slice of the input arguments for creating or updating this model
      * @param \Illuminate\Database\Eloquent\Relations\Relation|null $parentRelation
-     *         If we are in a nested update, we can use this to associate the new model to its parent
+     *         If we are in a nested upsert, we can use this to associate the new model to its parent
      *
      * @return \Illuminate\Database\Eloquent\Model
      */

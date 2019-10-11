@@ -26,7 +26,7 @@ class UpsertDirective extends BaseDirective implements FieldResolver, DefinedDir
     protected $globalId;
 
     /**
-     * UpdateDirective constructor.
+     * UpsertDirective constructor.
      *
      * @param  \Illuminate\Database\DatabaseManager  $databaseManager
      * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
