@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Console;
+namespace Tests\Unit\Console;
 
 use Tests\TestCase;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
