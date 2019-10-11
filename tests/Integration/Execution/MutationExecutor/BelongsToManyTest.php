@@ -23,6 +23,7 @@ class BelongsToManyTest extends DBTestCase
     type Mutation {
         createRole(input: CreateRoleInput! @spread): Role @create
         updateRole(input: UpdateRoleInput! @spread): Role @update
+        upsertRole(input: UpsertRoleInput! @spread): Role @upsert
     }
 
     input CreateRoleInput {
@@ -32,6 +33,7 @@ class BelongsToManyTest extends DBTestCase
     
     input CreateUserRelation {
         create: [CreateUserInput!]
+        upsert: [UpsertUserInput!]
         connect: [ID!]
         sync: [ID!]
     }
@@ -49,6 +51,7 @@ class BelongsToManyTest extends DBTestCase
     input UpdateUserRelation {
         create: [CreateUserInput!]
         update: [UpdateUserInput!]
+        upsert: [UpsertUserInput!]
         delete: [ID!]
         connect: [ID!]
         sync: [ID!]
@@ -56,6 +59,27 @@ class BelongsToManyTest extends DBTestCase
     }
     
     input UpdateUserInput {
+        id: ID!
+        name: String
+    }
+
+    input UpsertRoleInput {
+        id: ID!
+        name: String
+        users: UpsertUserRelation
+    }
+
+    input UpsertUserRelation {
+        create: [CreateUserInput!]
+        update: [UpdateUserInput!]
+        upsert: [UpsertUserInput!]
+        delete: [ID!]
+        connect: [ID!]
+        sync: [ID!]
+        disconnect: [ID!]
+    }
+
+    input UpsertUserInput {
         id: ID!
         name: String
     }
@@ -519,5 +543,57 @@ class BelongsToManyTest extends DBTestCase
         $role->refresh();
 
         $this->assertCount(0, $role->users);
+    }
+
+
+    public function testCanUpsertWithBelongsToManyOnNonExistentData(): void
+    {
+        $this->graphQL('
+        mutation {
+            upsertRole(input: {
+                id: 1
+                name: "is_user"
+                users: {
+                    upsert: [{
+                        id: 1
+                        name: "user1"
+                    },
+                    {
+                        id: 2
+                        name: "user2"
+                    }]
+                }
+            }) {
+                id
+                name
+                users {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'upsertRole' => [
+                    'id' => '1',
+                    'name' => 'is_user',
+                    'users' => [
+                        [
+                            'id' => '1',
+                            'name' => 'user1',
+                        ],
+                        [
+                            'id' => '2',
+                            'name' => 'user2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        /** @var Role $role */
+        $role = Role::first();
+        $this->assertCount(2, $role->users()->get());
+        $this->assertSame('is_user', $role->name);
     }
 }

@@ -6,6 +6,7 @@ use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -85,6 +86,16 @@ class MutationExecutor
             if (isset($nestedOperations['update'])) {
                 (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
                     self::executeUpdate(
+                        $relation->getModel()->newInstance(),
+                        new Collection($singleValues),
+                        $relation
+                    );
+                });
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
+                    self::executeUpsert(
                         $relation->getModel()->newInstance(),
                         new Collection($singleValues),
                         $relation
@@ -270,6 +281,103 @@ class MutationExecutor
 
         $model = $model->newQuery()->findOrFail($id);
 
+        return self::executeUpdateWithLoadedModel($model, $args, $parentRelation);
+    }
+
+    /**
+     * Extract all the arguments that correspond to a relation of a certain type on the model.
+     *
+     * For example, if the args input looks like this:
+     *
+     * [
+     *  'comments' =>
+     *    ['foo' => 'Bar'],
+     *  'name' => 'Ralf',
+     * ]
+     *
+     * and the model has a method "comments" that returns a HasMany relationship,
+     * the result will be:
+     * [
+     *   [
+     *    'comments' =>
+     *      ['foo' => 'Bar'],
+     *   ],
+     *   [
+     *    'name' => 'Ralf',
+     *   ]
+     * ]
+     *
+     * @param  \ReflectionClass  $modelReflection
+     * @param  \Illuminate\Support\Collection  $args
+     * @param  string  $relationClass
+     * @return \Illuminate\Support\Collection  [relationshipArgs, remainingArgs]
+     */
+    protected static function partitionArgsByRelationType(ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
+    {
+        return $args->partition(
+            function ($value, string $key) use ($modelReflection, $relationClass): bool {
+                if (!$modelReflection->hasMethod($key)) {
+                    return false;
+                }
+
+                $relationMethodCandidate = $modelReflection->getMethod($key);
+                if (!$returnType = $relationMethodCandidate->getReturnType()) {
+                    return false;
+                }
+
+                if (!$returnType instanceof ReflectionNamedType) {
+                    return false;
+                }
+
+                return is_a($returnType->getName(), $relationClass, true);
+            }
+        );
+    }
+
+    /**
+     * Execute an upsert mutation.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *         An empty instance of the model that should be updated
+     * @param \Illuminate\Support\Collection $args
+     *         The corresponding slice of the input arguments for updating this model
+     * @param \Illuminate\Database\Eloquent\Relations\Relation|null $parentRelation
+     *         If we are in a nested update, we can use this to associate the new model to its parent
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public static function executeUpsert(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    {
+        $id = $args->pull('id')
+            ?? $args->pull(
+                $model->getKeyName()
+            );
+
+        try {
+            $model = $model->newQuery()->findOrFail($id);
+            return self::executeUpdateWithLoadedModel($model, $args, $parentRelation);
+        } catch (ModelNotFoundException $e) {
+            return self::executeCreate($model, $args, $parentRelation);
+        }
+    }
+
+    /**
+     * Execute an update mutation over a loaded model.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *         An empty instance of the model that should be updated
+     * @param \Illuminate\Support\Collection $args
+     *         The corresponding slice of the input arguments for updating this model
+     * @param \Illuminate\Database\Eloquent\Relations\Relation|null $parentRelation
+     *         If we are in a nested update, we can use this to associate the new model to its parent
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected static function executeUpdateWithLoadedModel(
+        Model $model,
+        Collection $args,
+        ?Relation $parentRelation
+    ): Model {
         $reflection = new ReflectionClass($model);
 
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
@@ -373,55 +481,5 @@ class MutationExecutor
         $morphToMany->each($updateManyToMany);
 
         return $model;
-    }
-
-    /**
-     * Extract all the arguments that correspond to a relation of a certain type on the model.
-     *
-     * For example, if the args input looks like this:
-     *
-     * [
-     *  'comments' =>
-     *    ['foo' => 'Bar'],
-     *  'name' => 'Ralf',
-     * ]
-     *
-     * and the model has a method "comments" that returns a HasMany relationship,
-     * the result will be:
-     * [
-     *   [
-     *    'comments' =>
-     *      ['foo' => 'Bar'],
-     *   ],
-     *   [
-     *    'name' => 'Ralf',
-     *   ]
-     * ]
-     *
-     * @param  \ReflectionClass  $modelReflection
-     * @param  \Illuminate\Support\Collection  $args
-     * @param  string  $relationClass
-     * @return \Illuminate\Support\Collection  [relationshipArgs, remainingArgs]
-     */
-    protected static function partitionArgsByRelationType(ReflectionClass $modelReflection, Collection $args, string $relationClass): Collection
-    {
-        return $args->partition(
-            function ($value, string $key) use ($modelReflection, $relationClass): bool {
-                if (! $modelReflection->hasMethod($key)) {
-                    return false;
-                }
-
-                $relationMethodCandidate = $modelReflection->getMethod($key);
-                if (! $returnType = $relationMethodCandidate->getReturnType()) {
-                    return false;
-                }
-
-                if (! $returnType instanceof ReflectionNamedType) {
-                    return false;
-                }
-
-                return is_a($returnType->getName(), $relationClass, true);
-            }
-        );
     }
 }
