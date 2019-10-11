@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\Post;
@@ -9,7 +9,7 @@ use Tests\Utils\Policies\UserPolicy;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Nuwave\Lighthouse\Exceptions\AuthorizationException;
 
-class CanDirectiveDbTest extends DBTestCase
+class CanDirectiveDBTest extends DBTestCase
 {
     public function testQueriesForSpecificModel(): void
     {

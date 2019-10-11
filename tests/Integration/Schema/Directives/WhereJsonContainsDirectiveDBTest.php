@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class WhereJsonContainsDirectiveTest extends DBTestCase
+class WhereJsonContainsDirectiveDBTest extends DBTestCase
 {
     protected $schema = '
     type Query {

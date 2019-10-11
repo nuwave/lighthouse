@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 
-class InjectDirectiveTest extends DBTestCase
+class InjectDirectiveDBTest extends DBTestCase
 {
     public function testCanInjectDataFromContextIntoArgs(): void
     {

@@ -2,18 +2,29 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\DB;
+
 abstract class DBTestCase extends TestCase
 {
+    protected static $migrated = false;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
-        $this->withFactories(__DIR__.'/database/factories');
+        if(! static::$migrated) {
+            $this->artisan('migrate:fresh --realpath --path ' .__DIR__.'/database/migrations');
 
-        // This takes care of refreshing the database between tests
-        // as we are using the in-memory SQLite db we do not need RefreshDatabase
-        $this->artisan('migrate');
+            static::$migrated = true;
+        }
+
+        // Ensure we start from a clean slate each time
+        // We cannot use transactions, as they do not reset autoincrement
+        foreach(DB::select('SHOW TABLES') as $table) {
+            DB::table($table->Tables_in_test)->truncate();
+        };
+
+        $this->withFactories(__DIR__.'/database/factories');
     }
 
     protected function getEnvironmentSetUp($app)

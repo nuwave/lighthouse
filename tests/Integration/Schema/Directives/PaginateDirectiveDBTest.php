@@ -9,11 +9,11 @@ use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
 use Illuminate\Database\Eloquent\Builder;
 
-class PaginateDirectiveTest extends DBTestCase
+class PaginateDirectiveDBTest extends DBTestCase
 {
     public function testCanCreateQueryPaginators(): void
     {
-        factory(User::class, 10)->create();
+        factory(User::class, 3)->create();
 
         $this->schema = '
         type User {
@@ -28,7 +28,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(first: 5) {
+            users(first: 2) {
                 paginatorInfo {
                     count
                     total
@@ -44,44 +44,14 @@ class PaginateDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
-                        'count' => 5,
-                        'total' => 10,
+                        'count' => 2,
+                        'total' => 3,
                         'currentPage' => 1,
                     ],
                     'data' => [],
                 ],
             ],
-        ])->assertJsonCount(5, 'data.users.data');
-    }
-
-    public function testHandlesPaginationWithCountZero(): void
-    {
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String!
-        }
-        
-        type Query {
-            users: [User!] @paginate
-        }
-        ';
-
-        $this->graphQL('
-        {
-            users(first: 0) {
-                data {
-                    id
-                }
-            }
-        }
-        ')
-        ->assertJson([
-            'data' => [
-                'users' => null,
-            ],
-        ])
-        ->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+        ])->assertJsonCount(2, 'data.users.data');
     }
 
     public function testCanSpecifyCustomBuilder(): void
@@ -95,7 +65,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         
         type Query {
-            users: [User!]! @paginate(builder: "Tests\\\Integration\\\Schema\\\Directives\\\PaginateDirectiveTest@builder")
+            users: [User!]! @paginate(builder: "' .$this->qualifyTestResolver('builder').'")
         }
         ';
 
@@ -128,11 +98,11 @@ class PaginateDirectiveTest extends DBTestCase
 
     public function testCanCreateQueryPaginatorsWithDifferentPages(): void
     {
-        $users = factory(User::class, 10)->create();
-        $posts = factory(Post::class, 10)->create([
+        $users = factory(User::class, 3)->create();
+        $posts = factory(Post::class, 3)->create([
             'user_id' => $users->first()->id,
         ]);
-        factory(Comment::class, 10)->create([
+        factory(Comment::class, 3)->create([
             'post_id' => $posts->first()->id,
         ]);
 
@@ -159,7 +129,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(first: 3, page: 1) {
+            users(first: 2, page: 1) {
                 paginatorInfo {
                     count
                     total
@@ -216,7 +186,7 @@ class PaginateDirectiveTest extends DBTestCase
 
     public function testCanCreateQueryConnections(): void
     {
-        factory(User::class, 10)->create();
+        factory(User::class, 3)->create();
 
         $this->schema = '
         type User {
@@ -231,7 +201,7 @@ class PaginateDirectiveTest extends DBTestCase
 
         $this->graphQL('
         {
-            users(first: 5) {
+            users(first: 2) {
                 pageInfo {
                     hasNextPage
                 }
@@ -251,7 +221,7 @@ class PaginateDirectiveTest extends DBTestCase
                     ],
                 ],
             ],
-        ])->assertJsonCount(5, 'data.users.edges');
+        ])->assertJsonCount(2, 'data.users.edges');
     }
 
     public function testQueriesConnectionWithNoData(): void
@@ -383,7 +353,7 @@ class PaginateDirectiveTest extends DBTestCase
 
     public function testCanHaveADefaultPaginationCount(): void
     {
-        factory(User::class, 10)->create();
+        factory(User::class, 3)->create();
 
         $this->schema = '
         type User {
@@ -392,7 +362,7 @@ class PaginateDirectiveTest extends DBTestCase
         }
         
         type Query {
-            users: [User!]! @paginate(defaultCount: 5)
+            users: [User!]! @paginate(defaultCount: 2)
         }
         ';
 
@@ -414,109 +384,10 @@ class PaginateDirectiveTest extends DBTestCase
             'data' => [
                 'users' => [
                     'paginatorInfo' => [
-                        'count' => 5,
+                        'count' => 2,
                     ],
                 ],
             ],
-        ])->assertJsonCount(5, 'data.users.data');
-    }
-
-    public function testIsLimitedToMaxCountFromConfig(): void
-    {
-        config(['lighthouse.paginate_max_count' => 5]);
-
-        factory(User::class, 10)->create();
-
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String!
-        }
-        
-        type Query {
-            users1: [User!]! @paginate
-            users2: [User!]! @paginate(type: "relay")
-        }
-        ';
-
-        $resultFromDefaultPagination = $this->graphQL('
-        {
-            users1(first: 10) {
-                data {
-                    id
-                    name
-                }
-            }
-        }
-        ');
-
-        $this->assertSame(
-            'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
-            $resultFromDefaultPagination->jsonGet('errors.0.message')
-        );
-
-        $resultFromRelayPagination = $this->graphQL('
-        {
-            users2(first: 10) {
-                edges {
-                    node {
-                        id
-                        name
-                    }
-                }
-            }
-        }
-        ');
-
-        $this->assertSame(
-            'Maximum number of 5 requested items exceeded. Fetch smaller chunks.',
-            $resultFromRelayPagination->jsonGet('errors.0.message')
-        );
-    }
-
-    public function testIsLimitedByMaxCountFromDirective(): void
-    {
-        config(['lighthouse.paginate_max_count' => 5]);
-
-        factory(User::class, 10)->create();
-
-        $this->schema = '
-        type User {
-            id: ID!
-            name: String!
-        }
-        
-        type Query {
-            users1: [User!]! @paginate(maxCount: 6)
-            users2: [User!]! @paginate(maxCount: 10)
-        }
-        ';
-
-        $result = $this->graphQL('
-        {
-            users1(first: 10) {
-                data {
-                    id
-                    name
-                }
-            }
-        }
-        ');
-
-        $this->assertSame(
-            'Maximum number of 6 requested items exceeded. Fetch smaller chunks.',
-            $result->jsonGet('errors.0.message')
-        );
-
-        $this->graphQL('
-        {
-            users2(first: 10) {
-                data {
-                    id
-                    name
-                }
-            }
-        }
-        ')->assertJsonCount(10, 'data.users2.data');
+        ])->assertJsonCount(2, 'data.users.data');
     }
 }
