@@ -545,7 +545,6 @@ class BelongsToManyTest extends DBTestCase
         $this->assertCount(0, $role->users);
     }
 
-
     public function testCanUpsertWithBelongsToManyOnNonExistentData(): void
     {
         $this->graphQL('

@@ -6,7 +6,6 @@ use ReflectionClass;
 use ReflectionNamedType;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -15,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -316,16 +316,16 @@ class MutationExecutor
     {
         return $args->partition(
             function ($value, string $key) use ($modelReflection, $relationClass): bool {
-                if (!$modelReflection->hasMethod($key)) {
+                if (! $modelReflection->hasMethod($key)) {
                     return false;
                 }
 
                 $relationMethodCandidate = $modelReflection->getMethod($key);
-                if (!$returnType = $relationMethodCandidate->getReturnType()) {
+                if (! $returnType = $relationMethodCandidate->getReturnType()) {
                     return false;
                 }
 
-                if (!$returnType instanceof ReflectionNamedType) {
+                if (! $returnType instanceof ReflectionNamedType) {
                     return false;
                 }
 
@@ -355,6 +355,7 @@ class MutationExecutor
 
         try {
             $model = $model->newQuery()->findOrFail($id);
+
             return self::executeUpdateWithLoadedModel($model, $args, $parentRelation);
         } catch (ModelNotFoundException $e) {
             return self::executeCreate($model, $args, $parentRelation);
