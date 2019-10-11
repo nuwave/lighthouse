@@ -56,6 +56,16 @@ class MutationExecutor
             if (isset($nestedOperations['create'])) {
                 self::handleMultiRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
+
+            if (isset($nestedOperations['upsert'])) {
+                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
+                    self::executeUpsert(
+                        $relation->getModel()->newInstance(),
+                        new Collection($singleValues),
+                        $relation
+                    );
+                });
+            }
         };
         $hasMany->each($createOneToMany);
         $morphMany->each($createOneToMany);
@@ -125,7 +135,7 @@ class MutationExecutor
     {
         $reflection = new ReflectionClass($model);
 
-        // Extract $morphTo first, as MorphTo extends BelongsTo
+        // Extract $morphTo first, as MorphTo extends
         [$morphTo, $remaining] = self::partitionArgsByRelationType(
             $reflection,
             $args,
@@ -414,6 +424,16 @@ class MutationExecutor
             if (isset($nestedOperations['update'])) {
                 (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
                     self::executeUpdate(
+                        $relation->getModel()->newInstance(),
+                        new Collection($singleValues),
+                        $relation
+                    );
+                });
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
+                    self::executeUpsert(
                         $relation->getModel()->newInstance(),
                         new Collection($singleValues),
                         $relation
