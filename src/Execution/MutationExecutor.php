@@ -465,6 +465,16 @@ class MutationExecutor
                 });
             }
 
+            if (isset($nestedOperations['upsert'])) {
+                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
+                    self::executeUpsert(
+                        $relation->getModel()->newInstance(),
+                        new Collection($singleValues),
+                        $relation
+                    );
+                });
+            }
+
             if (isset($nestedOperations['delete'])) {
                 $relation->detach($nestedOperations['delete']);
                 $relation->getModel()::destroy($nestedOperations['delete']);
