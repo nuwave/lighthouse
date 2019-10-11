@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Execution\Arguments;
 
+use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Tests\TestCase;
 use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Execution\Arguments\Argument;
@@ -11,7 +12,8 @@ class ArgumentSetTest extends TestCase
 {
     public function testSpreadsNestedInput(): void
     {
-        $spreadDirective = PartialParser::directive('@spread');
+        $spreadDirective = new SpreadDirective();
+        $directiveCollection = collect([$spreadDirective]);
 
         // Those are the leave values we want in the spread result
         $bazValue = 2;
@@ -26,7 +28,7 @@ class ArgumentSetTest extends TestCase
         $barInput->arguments['baz'] = $baz;
 
         $barArgument = new Argument();
-        $barArgument->directives = [$spreadDirective];
+        $barArgument->directives = $directiveCollection;
         $barArgument->value = $barInput;
 
         $fooInput = new ArgumentSet();
@@ -34,11 +36,11 @@ class ArgumentSetTest extends TestCase
         $fooInput->arguments['bar'] = $barArgument;
 
         $inputArgument = new Argument();
-        $inputArgument->directives = [$spreadDirective];
+        $inputArgument->directives = $directiveCollection;
         $inputArgument->value = $fooInput;
 
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = [$spreadDirective];
+        $argumentSet->directives = $directiveCollection;
         $argumentSet->arguments['input'] = $inputArgument;
 
         $spreadArgumentSet = $argumentSet->spread();

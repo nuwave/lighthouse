@@ -103,9 +103,8 @@ class RelationBatchLoader extends BatchLoader
             $this->getParentModels(),
             [$this->relationName => function ($query) {
                 return $this->resolveInfo
-                    ->builder
-                    ->addScopes($this->scopes)
-                    ->apply($query, $this->args);
+                    ->argumentSet
+                    ->enhanceBuilder($query, $this->scopes);
             }]
         );
     }

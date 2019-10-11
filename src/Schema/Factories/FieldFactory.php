@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\ListOfType;
+use Nuwave\Lighthouse\Execution\Arguments\TypedArgs;
 use Nuwave\Lighthouse\Support\Pipeline;
-use Nuwave\Lighthouse\Execution\Builder;
 use GraphQL\Type\Definition\InputObjectType;
 use Nuwave\Lighthouse\Execution\ErrorBuffer;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
@@ -23,7 +23,6 @@ use Nuwave\Lighthouse\Support\Contracts\HasArgumentPath;
 use Nuwave\Lighthouse\Support\Contracts\ProvidesResolver;
 use Nuwave\Lighthouse\Support\Traits\HasResolverArguments;
 use Nuwave\Lighthouse\Execution\Arguments\SpreadMiddleware;
-use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
 use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
@@ -69,11 +68,6 @@ class FieldFactory
     protected $fieldValue;
 
     /**
-     * @var \Nuwave\Lighthouse\Execution\Builder
-     */
-    protected $builder;
-
-    /**
      * @var array
      */
     protected $rules = [];
@@ -97,6 +91,10 @@ class FieldFactory
      * @var mixed[]
      */
     protected $handleArgDirectivesSnapshots = [];
+    /**
+     * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs
+     */
+    protected $typedArgs;
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
@@ -105,6 +103,7 @@ class FieldFactory
      * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesResolver  $providesResolver
      * @param  \Nuwave\Lighthouse\Support\Contracts\ProvidesSubscriptionResolver  $providesSubscriptionResolver
      * @param  \Illuminate\Contracts\Validation\Factory  $validationFactory
+     * @param  \Nuwave\Lighthouse\Execution\Arguments\TypedArgs  $typedArgs
      * @return void
      */
     public function __construct(
@@ -113,7 +112,8 @@ class FieldFactory
         Pipeline $pipeline,
         ProvidesResolver $providesResolver,
         ProvidesSubscriptionResolver $providesSubscriptionResolver,
-        ValidationFactory $validationFactory
+        ValidationFactory $validationFactory,
+        TypedArgs $typedArgs
     ) {
         $this->directiveFactory = $directiveFactory;
         $this->argumentFactory = $argumentFactory;
@@ -121,6 +121,7 @@ class FieldFactory
         $this->providesResolver = $providesResolver;
         $this->providesSubscriptionResolver = $providesSubscriptionResolver;
         $this->validationFactory = $validationFactory;
+        $this->typedArgs = $typedArgs;
     }
 
     /**
@@ -167,8 +168,6 @@ class FieldFactory
             function () use ($argumentMap, $resolverWithMiddleware) {
                 $this->setResolverArguments(...func_get_args());
 
-                $this->builder = new Builder;
-
                 foreach ($argumentMap as $name => $argumentValue) {
                     $this->handleArgDirectivesRecursively(
                         $argumentValue['type'],
@@ -184,14 +183,11 @@ class FieldFactory
                 // we flush the validation error buffer
                 $this->flushValidationErrorBuffer();
 
-                // The final resolver can access the builder through the ResolveInfo
-                $this->resolveInfo->builder = $this->builder;
+                $argumentSet = $this->typedArgs->fromResolveInfo($this->args, $this->resolveInfo);
+                $spreadArguments = $argumentSet->spread();
+                $this->resolveInfo->argumentSet = $spreadArguments;
 
-                /** @var \Nuwave\Lighthouse\Execution\Arguments\SpreadMiddleware $spreadMiddleware */
-                $spreadMiddleware = app(SpreadMiddleware::class);
-                $resolverWithSpreadMiddleware = $spreadMiddleware->wrap($resolverWithMiddleware);
-
-                return $resolverWithSpreadMiddleware($this->root, $this->args, $this->context, $this->resolveInfo);
+                return $resolverWithMiddleware($this->root, $spreadArguments->toArray(), $this->context, $this->resolveInfo);
             }
         );
 
@@ -335,13 +331,6 @@ class FieldFactory
                 $this->setArgValue(
                     $argumentPath,
                     $directive->transform($this->argValue($argumentPath))
-                );
-            }
-
-            if ($directive instanceof ArgBuilderDirective) {
-                $this->builder->addBuilderDirective(
-                    $astNode->name->value,
-                    $directive
                 );
             }
         }

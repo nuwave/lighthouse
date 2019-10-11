@@ -2,8 +2,10 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
-use Nuwave\Lighthouse\Schema\AST\ASTHelper;
+use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
+use Nuwave\Lighthouse\Schema\Directives\BuilderDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgBuilderDirective;
 
 class ArgumentSet
 {
@@ -20,9 +22,9 @@ class ArgumentSet
      * This may be coming from the field the arguments are a part of
      * or the parent argument when in a tree of nested inputs.
      *
-     * @var \GraphQL\Language\AST\DirectiveNode[]
+     * @var \Illuminate\Support\Collection<\Nuwave\Lighthouse\Support\Contracts\Directive>
      */
-    public $directives = [];
+    public $directives;
 
     /**
      * Get a plain array representation of this ArgumentSet.
@@ -57,8 +59,11 @@ class ArgumentSet
                 // Recurse down first, as that resolves the more deeply nested spreads first
                 $value = $value->spread();
 
-                $directiveNode = ASTHelper::firstByName($argument->directives, SpreadDirective::NAME);
-                if ($directiveNode) {
+                if ($argument->directives->contains(
+                    function (Directive $directive): bool {
+                        return $directive instanceof SpreadDirective;
+                    }
+                )) {
                     $argumentSet->arguments += $value->arguments;
                     continue;
                 }
@@ -68,5 +73,42 @@ class ArgumentSet
         }
 
         return $argumentSet;
+    }
+
+    /**
+     * Apply ArgBuilderDirectives and scopes to the builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
+     * @param  string[]  $scopes
+     * @return \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     */
+    public function enhanceBuilder($builder, array $scopes)
+    {
+        foreach ($this->arguments as $key => $argument) {
+            $value = $argument->toPlain();
+
+            // TODO switch to instanceof when we require bensampo/laravel-enum
+            // Unbox Enum values to ensure their underlying value is used for queries
+            if (is_a($value, '\BenSampo\Enum\Enum')) {
+                $value = $value->value;
+            }
+
+            $value
+                ->directives
+                ->filter(function (\GraphQL\Type\Definition\Directive $directive): bool {
+                    return $directive instanceof BuilderDirective;
+                })
+                ->each(function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value) {
+                    $builder = $argBuilderDirective->handleBuilder($builder, $value);
+                });
+
+            // TODO add recursion
+        }
+
+        foreach ($scopes as $scope) {
+            call_user_func([$builder, $scope], $this->toArray());
+        }
+
+        return $builder;
     }
 }

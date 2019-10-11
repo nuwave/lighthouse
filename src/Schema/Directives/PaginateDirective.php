@@ -120,13 +120,10 @@ SDL;
                 }
 
                 $query = $resolveInfo
-                    ->builder
-                    ->addScopes(
-                        $this->directiveArgValue('scopes', [])
-                    )
-                    ->apply(
+                    ->argumentSet
+                    ->enhanceBuilder(
                         $query,
-                        $args
+                        $this->directiveArgValue('scopes', [])
                     );
 
                 if ($query instanceof ScoutBuilder) {

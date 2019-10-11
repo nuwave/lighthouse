@@ -8,6 +8,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use GraphQL\Language\AST\InputObjectTypeDefinitionNode;
+use Nuwave\Lighthouse\Schema\Factories\DirectiveFactory;
 
 class TypedArgs
 {
@@ -22,16 +23,26 @@ class TypedArgs
     protected $argumentTypeNodeConverter;
 
     /**
+     * @var \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory
+     */
+    protected $directiveFactory;
+
+    /**
      * TypedArgs constructor.
      *
      * @param  \Nuwave\Lighthouse\Schema\AST\ASTBuilder  $astBuilder
      * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentTypeNodeConverter  $argumentTypeNodeConverter
+     * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
      * @return void
      */
-    public function __construct(ASTBuilder $astBuilder, ArgumentTypeNodeConverter $argumentTypeNodeConverter)
-    {
+    public function __construct(
+        ASTBuilder $astBuilder,
+        ArgumentTypeNodeConverter $argumentTypeNodeConverter,
+        DirectiveFactory $directiveFactory
+    ) {
         $this->documentAST = $astBuilder->documentAST();
         $this->argumentTypeNodeConverter = $argumentTypeNodeConverter;
+        $this->directiveFactory = $directiveFactory;
     }
 
     /**
@@ -64,7 +75,7 @@ class TypedArgs
     public function fromField(array $args, FieldDefinitionNode $fieldDefinition): ArgumentSet
     {
         $argumentSet = new ArgumentSet();
-        $argumentSet->directives = $fieldDefinition->directives;
+        $argumentSet->directives = $this->directiveFactory->createAssociatedDirectives($fieldDefinition);
         $argumentSet->arguments = $this->wrapArgs($args, $fieldDefinition->arguments);
 
         return $argumentSet;
@@ -124,7 +135,7 @@ class TypedArgs
         $type = $this->argumentTypeNodeConverter->convert($definition->type);
 
         $argument = new Argument();
-        $argument->directives = $definition->directives;
+        $argument->directives = $this->directiveFactory->createAssociatedDirectives($definition);
         $argument->type = $type;
         $argument->value = $this->wrapWithType($value, $type);
 
@@ -173,7 +184,7 @@ class TypedArgs
         // We recurse down only if the type is an Input
         if ($typeDef instanceof InputObjectTypeDefinitionNode) {
             $subArgumentSet = new ArgumentSet();
-            $subArgumentSet->directives = $typeDef->directives;
+            $subArgumentSet->directives = $this->directiveFactory->createAssociatedDirectives($typeDef);
             $subArgumentSet->arguments = $this->wrapArgs($value, $typeDef->fields);
 
             return $subArgumentSet;
