@@ -3,7 +3,6 @@
 namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
-use GraphQL\Error\Error;
 use Tests\Utils\Models\Post;
 use Tests\Utils\Models\User;
 use Tests\Utils\Models\Comment;
@@ -65,7 +64,7 @@ class PaginateDirectiveDBTest extends DBTestCase
         }
         
         type Query {
-            users: [User!]! @paginate(builder: "' .$this->qualifyTestResolver('builder').'")
+            users: [User!]! @paginate(builder: "'.$this->qualifyTestResolver('builder').'")
         }
         ';
 
