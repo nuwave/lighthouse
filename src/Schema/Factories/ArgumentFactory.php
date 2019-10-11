@@ -7,7 +7,7 @@ use Nuwave\Lighthouse\Schema\AST\ASTHelper;
 use GraphQL\Language\AST\InputValueDefinitionNode;
 use Nuwave\Lighthouse\Schema\Directives\SpreadDirective;
 use Nuwave\Lighthouse\Schema\Extensions\ArgumentExtensions;
-use Nuwave\Lighthouse\Schema\Conversion\DefinitionNodeConverter;
+use Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter;
 
 class ArgumentFactory
 {
@@ -57,8 +57,9 @@ class ArgumentFactory
      */
     public function convert(InputValueDefinitionNode $definitionNode): array
     {
-        $definitionNodeConverter = app(DefinitionNodeConverter::class);
-        $type = $definitionNodeConverter->toType($definitionNode->type);
+        /** @var \Nuwave\Lighthouse\Schema\ExecutableTypeNodeConverter $definitionNodeConverter */
+        $definitionNodeConverter = app(ExecutableTypeNodeConverter::class);
+        $type = $definitionNodeConverter->convert($definitionNode->type);
 
         $config = [
             'name' => $definitionNode->name->value,

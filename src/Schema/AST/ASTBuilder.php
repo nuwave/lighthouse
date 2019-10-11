@@ -49,7 +49,7 @@ class ASTBuilder
     /**
      * The document AST.
      *
-     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST
+     * @var \Nuwave\Lighthouse\Schema\AST\DocumentAST|null
      */
     protected $documentAST;
 

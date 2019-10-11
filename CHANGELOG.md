@@ -5,10 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.3.0...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.4.0...master)
+
+## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
 
 ### Added
 
+- Add `@count` directive for counting a relationship https://github.com/nuwave/lighthouse/pull/984
 - Allow overwriting the name of Enum types created through `LaravelEnumType` https://github.com/nuwave/lighthouse/pull/968
 - Resolve models through Relay's global identification using `@node` https://github.com/nuwave/lighthouse/pull/974
 - Add experimental `@modelClass` directive to map types to models. It will be renamed
@@ -17,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Remove the extra new line from the returned value when using `@globalId(decode: "ID")` https://github.com/nuwave/lighthouse/pull/982
+- Throw a syntax error instead of an exception when performing an empty request or a request with an empty query https://github.com/nuwave/lighthouse/pull/989
+- Properly apply `@spread` when used within a nested input object https://github.com/nuwave/lighthouse/pull/992
 
 ### Changed
 
@@ -44,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Prevent throwing in `lighthouse:ide-helper` when no custom directives are defined https://github.com/nuwave/lighthouse/pull/948
 
-## Changed
+### Changed
 
 - Validate requirements for argument definitions of `@delete`, `@forceDelete` and `@restore`
   during schema build time https://github.com/nuwave/lighthouse/pull/941

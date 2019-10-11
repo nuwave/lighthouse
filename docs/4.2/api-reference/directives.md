@@ -348,11 +348,11 @@ Use an argument to modify the query builder for a field.
 directive @builder(
   """
   Reference a method that is passed the query builder.
-  Consists of two parts: a class name and a method name, seperated by an `@` symbol.
+  Consists of two parts: a class name and a method name, separated by an `@` symbol.
   If you pass only a class name, the method name defaults to `__invoke`.
   """
   method: String!
-) on FIELD_DEFINITION
+) on ARGUMENT_DEFINITION
 ```
 
 ## @cache
