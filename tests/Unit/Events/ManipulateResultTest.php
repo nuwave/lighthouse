@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Events;
+namespace Tests\Unit\Events;
 
 use Tests\TestCase;
 use Tests\Utils\Queries\Foo;

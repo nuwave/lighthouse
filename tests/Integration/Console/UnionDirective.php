@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Console;
+namespace Tests\Integration\Console;
 
 use Nuwave\Lighthouse\Support\Contracts\Directive;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;

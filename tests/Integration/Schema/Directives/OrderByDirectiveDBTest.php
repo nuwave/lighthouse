@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Unit\Schema\Directives;
+namespace Tests\Integration\Schema\Directives;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
 use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
-class OrderByDirectiveTest extends DBTestCase
+class OrderByDirectiveDBTest extends DBTestCase
 {
     protected $schema = '
     type Query {
