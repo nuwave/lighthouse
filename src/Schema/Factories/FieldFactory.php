@@ -67,6 +67,11 @@ class FieldFactory
     protected $fieldValue;
 
     /**
+     * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs
+     */
+    protected $typedArgs;
+
+    /**
      * @var array
      */
     protected $rules = [];
@@ -90,10 +95,6 @@ class FieldFactory
      * @var mixed[]
      */
     protected $handleArgDirectivesSnapshots = [];
-    /**
-     * @var \Nuwave\Lighthouse\Execution\Arguments\TypedArgs
-     */
-    protected $typedArgs;
 
     /**
      * @param  \Nuwave\Lighthouse\Schema\Factories\DirectiveFactory  $directiveFactory
