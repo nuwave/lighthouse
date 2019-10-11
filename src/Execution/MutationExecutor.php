@@ -155,6 +155,14 @@ class MutationExecutor
                 $relation->associate($belongsToModel);
             }
 
+            if (isset($nestedOperations['upsert'])) {
+                $belongsToModel = self::executeUpsert(
+                    $relation->getModel()->newInstance(),
+                    new Collection($nestedOperations['upsert'])
+                );
+                $relation->associate($belongsToModel);
+            }
+
             if (isset($nestedOperations['connect'])) {
                 $relation->associate($nestedOperations['connect']);
             }
