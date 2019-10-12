@@ -400,7 +400,8 @@ class MutationExecutor
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected static function executeUpdateWithLoadedModel(Model $model, Collection $args, ?Relation $parentRelation): Model {
+    protected static function executeUpdateWithLoadedModel(Model $model, Collection $args, ?Relation $parentRelation): Model
+    {
         $reflection = new ReflectionClass($model);
 
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
