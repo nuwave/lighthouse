@@ -13,7 +13,11 @@ abstract class DBTestCase extends TestCase
         parent::setUp();
 
         if (! static::$migrated) {
-            $this->artisan('migrate:fresh --realpath --path '.__DIR__.'/database/migrations');
+            $this->artisan('migrate:fresh', [
+                '--realpath' => true,
+                '-path' => __DIR__.'/database/migrations'
+            ]);
+
 
             static::$migrated = true;
         }
