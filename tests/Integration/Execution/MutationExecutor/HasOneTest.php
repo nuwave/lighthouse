@@ -33,7 +33,8 @@ class HasOneTest extends DBTestCase
     }
     
     input CreatePostRelation {
-        create: CreatePostInput!
+        create: CreatePostInput
+        upsert: UpsertPostInput
     }
     
     input CreatePostInput {
@@ -85,6 +86,41 @@ class HasOneTest extends DBTestCase
                 name: "foo"
                 post: {
                     create: {
+                        title: "bar"
+                    }
+                }
+            }) {
+                id
+                name
+                post {
+                    id
+                    title
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'post' => [
+                        'id' => '1',
+                        'title' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanUpsertWithNewHasOne(): void
+    {
+        $this->graphQL('
+        mutation {
+            createTask(input: {
+                name: "foo"
+                post: {
+                    upsert: {
+                        id: 1
                         title: "bar"
                     }
                 }

@@ -35,6 +35,7 @@ class BelongsToTest extends DBTestCase
         connect: ID
         create: CreateUserInput
         update: UpdateUserInput
+        upsert: UpsertUserInput
     }
     
     input CreateUserInput {
@@ -151,6 +152,39 @@ class BelongsToTest extends DBTestCase
                 name: "foo"
                 user: {
                     create: {
+                        name: "New User"
+                    }
+                }
+            }) {
+                id
+                name
+                user {
+                    id
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createTask' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'user' => [
+                        'id' => '1',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanUpsertWithNewBelongsTo(): void
+    {
+        $this->graphQL('
+        mutation {
+            createTask(input: {
+                name: "foo"
+                user: {
+                    upsert: {
+                        id: 1
                         name: "New User"
                     }
                 }

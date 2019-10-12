@@ -33,6 +33,7 @@ class HasManyTest extends DBTestCase
     
     input CreateTaskRelation {
         create: [CreateTaskInput!]
+        upsert: [UpsertTaskInput!]
     }
     
     input CreateTaskInput {
@@ -84,6 +85,43 @@ class HasManyTest extends DBTestCase
                 name: "foo"
                 tasks: {
                     create: [{
+                        name: "bar"
+                    }]
+                }
+            }) {
+                id
+                name
+                tasks {
+                    id
+                    name
+                }
+            }
+        }
+        ')->assertJson([
+            'data' => [
+                'createUser' => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'tasks' => [
+                        [
+                            'id' => '1',
+                            'name' => 'bar',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testCanUpsertWithNewHasMany(): void
+    {
+        $this->graphQL('
+        mutation {
+            createUser(input: {
+                name: "foo"
+                tasks: {
+                    upsert: [{
+                        id: 1
                         name: "bar"
                     }]
                 }
