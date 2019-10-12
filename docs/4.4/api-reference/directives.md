@@ -2541,6 +2541,64 @@ type Mutation {
 }
 ```
 
+## @upsert
+
+Create or update an Eloquent model with the input values of the field.
+
+```graphql
+type Mutation {
+    upsertPost(id: ID!, content: String): Post @upsert
+}
+```
+
+### Definition
+
+```graphql
+"""
+Create or update an Eloquent model with the input values of the field.
+"""
+directive @upsert(
+  """
+  Specify the class name of the model to use.
+  This is only needed when the default model resolution does not work.
+  """
+  model: String
+
+  """
+  Set to `true` to use global ids for finding the model.
+  If set to `false`, regular non-global ids are used.
+  """
+  globalId: Boolean = false
+) on FIELD_DEFINITION
+```
+
+### Examples
+
+Lighthouse uses the argument `id` to fetch the model by its primary key if exists.
+If the model doesn't exist it will create it using the primary key indicated.
+This will work even if your model has a differently named primary key,
+so you can keep your schema simple and independent of your database structure.
+
+If you want your schema to directly reflect your database schema,
+you can also use the name of the underlying primary key.
+This is not recommended as it makes client-side caching more difficult
+and couples your schema to the underlying implementation.
+
+```graphql
+type Mutation {
+    upsertPost(post_id: ID!, content: String): Post @upsert
+}
+```
+
+If the name of the Eloquent model does not match the return type of the field,
+or is located in a non-default namespace, set it with the `model` argument.
+
+```graphql
+type Mutation {
+    upsertAuthor(id: ID!, name: String): Author @upsert(model: "App\\User")
+}
+```
+
 ## @where
 
 Use an input value as a [where filter](https://laravel.com/docs/queries#where-clauses).
