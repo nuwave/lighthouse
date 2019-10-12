@@ -22,6 +22,7 @@ class MorphManyTest extends DBTestCase
     type Mutation {
         createTask(input: CreateTaskInput! @spread): Task @create
         updateTask(input: UpdateTaskInput! @spread): Task @update
+        upsertTask(input: UpdateTaskInput! @spread): Task @upsert
     }
     
     input CreateTaskInput {
@@ -30,7 +31,8 @@ class MorphManyTest extends DBTestCase
     }
     
     input CreateHourRelation {
-        create: [CreateHourInput!]!
+        create: [CreateHourInput!]
+        upsert: [UpsertHourInput!]
     }
     
     input CreateHourInput {
@@ -46,10 +48,29 @@ class MorphManyTest extends DBTestCase
     input UpdateHourRelation {
         create: [CreateHourInput!]
         update: [UpdateHourInput!]
+        upsert: [UpsertHourInput!]
         delete: [ID!]
     }
     
     input UpdateHourInput {
+        id: ID!
+        weekday: Int
+    }
+
+    input UpsertTaskInput {
+        id: ID!
+        name: String
+        hours: UpsertHourRelation
+    }
+
+    input UpsertHourRelation {
+        create: [CreateHourInput!]
+        update: [UpdateHourInput!]
+        upsert: [UpsertHourInput!]
+        delete: [ID!]
+    }
+
+    input UpsertHourInput {
         id: ID!
         weekday: Int
     }
@@ -89,59 +110,14 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateWithNewMorphMany(): void
+    public function testCanCreateWithUpsertMorphMany(): void
     {
-        factory(Task::class)->create();
-
         $this->graphQL('
         mutation {
-            updateTask(input: {
-                id: 1
+            createTask(input: {
                 name: "foo"
                 hours: {
-                    create: [{
-                        weekday: 3
-                    }]
-                }
-            }) {
-                id
-                name
-                hours {
-                    weekday
-                }
-            }
-        }
-        ')->assertJson([
-            'data' => [
-                'updateTask' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'hours' => [
-                        [
-                            'weekday' => 3,
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testCanUpdateAndUpdateMorphMany(): void
-    {
-        factory(Task::class)
-            ->create()
-            ->hours()
-            ->save(
-                factory(Hour::class)->create()
-            );
-
-        $this->graphQL('
-        mutation {
-            updateTask(input: {
-                id: 1
-                name: "foo"
-                hours: {
-                    update: [{
+                    upsert: [{
                         id: 1
                         weekday: 3
                     }]
@@ -156,7 +132,7 @@ class MorphManyTest extends DBTestCase
         }
         ')->assertJson([
             'data' => [
-                'updateTask' => [
+                'createTask' => [
                     'id' => '1',
                     'name' => 'foo',
                     'hours' => [
@@ -169,7 +145,56 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    public function testCanUpdateAndDeleteMorphMany(): void
+    public function actionsOverExistingDataProvider()
+    {
+        yield ['Update action' => 'update'];
+        yield ['Upsert action' => 'upsert'];
+    }
+
+    /**
+     * @dataProvider actionsOverExistingDataProvider
+     */
+    public function testCanUpdateWithNewMorphMany($action): void
+    {
+        factory(Task::class)->create();
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                hours: {
+                    create: [{
+                        weekday: 3
+                    }]
+                }
+            }) {
+                id
+                name
+                hours {
+                    weekday
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hours' => [
+                        [
+                            'weekday' => 3,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider actionsOverExistingDataProvider
+     */
+    public function testCanUpdateAndUpdateMorphMany($action): void
     {
         factory(Task::class)
             ->create()
@@ -178,11 +203,103 @@ class MorphManyTest extends DBTestCase
                 factory(Hour::class)->create()
             );
 
-        $this->graphQL('
+        $this->graphQL("
         mutation {
-            updateTask(input: {
+            ${action}Task(input: {
                 id: 1
-                name: "foo"
+                name: \"foo\"
+                hours: {
+                    update: [{
+                        id: 1
+                        weekday: 3
+                    }]
+                }
+            }) {
+                id
+                name
+                hours {
+                    weekday
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hours' => [
+                        [
+                            'weekday' => 3,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider actionsOverExistingDataProvider
+     */
+    public function testCanUpdateAndUpsertMorphMany($action): void
+    {
+        factory(Task::class)
+            ->create()
+            ->hours()
+            ->save(
+                factory(Hour::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
+                hours: {
+                    upsert: [{
+                        id: 1
+                        weekday: 3
+                    }]
+                }
+            }) {
+                id
+                name
+                hours {
+                    weekday
+                }
+            }
+        }
+        ")->assertJson([
+            'data' => [
+                "${action}Task" => [
+                    'id' => '1',
+                    'name' => 'foo',
+                    'hours' => [
+                        [
+                            'weekday' => 3,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @dataProvider actionsOverExistingDataProvider
+     */
+    public function testCanUpdateAndDeleteMorphMany($action): void
+    {
+        factory(Task::class)
+            ->create()
+            ->hours()
+            ->save(
+                factory(Hour::class)->create()
+            );
+
+        $this->graphQL("
+        mutation {
+            ${action}Task(input: {
+                id: 1
+                name: \"foo\"
                 hours: {
                     delete: [1]
                 }
@@ -194,9 +311,9 @@ class MorphManyTest extends DBTestCase
                 }
             }
         }
-        ')->assertJson([
+        ")->assertJson([
             'data' => [
-                'updateTask' => [
+                "${action}Task" => [
                     'id' => '1',
                     'name' => 'foo',
                     'hours' => [],
