@@ -77,6 +77,14 @@ class MutationExecutor
             if (isset($nestedOperations['create'])) {
                 self::handleSingleRelationCreate(new Collection($nestedOperations['create']), $relation);
             }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::executeUpsert(
+                    $relation->getModel()->newInstance(),
+                    new Collection($nestedOperations['upsert']),
+                    $relation
+                );
+            }
         };
         $hasOne->each($createOneToOne);
         $morphOne->each($createOneToOne);
@@ -460,6 +468,14 @@ class MutationExecutor
                 self::executeUpdate(
                     $relation->getModel()->newInstance(),
                     new Collection($nestedOperations['update']),
+                    $relation
+                );
+            }
+
+            if (isset($nestedOperations['upsert'])) {
+                self::executeUpsert(
+                    $relation->getModel()->newInstance(),
+                    new Collection($nestedOperations['upsert']),
                     $relation
                 );
             }
