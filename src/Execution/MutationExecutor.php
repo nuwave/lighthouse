@@ -143,7 +143,7 @@ class MutationExecutor
     {
         $reflection = new ReflectionClass($model);
 
-        // Extract $morphTo first, as MorphTo extends
+        // Extract $morphTo first, as MorphTo extends BelongsTo
         [$morphTo, $remaining] = self::partitionArgsByRelationType(
             $reflection,
             $args,
@@ -400,11 +400,7 @@ class MutationExecutor
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected static function executeUpdateWithLoadedModel(
-        Model $model,
-        Collection $args,
-        ?Relation $parentRelation
-    ): Model {
+    protected static function executeUpdateWithLoadedModel(Model $model, Collection $args, ?Relation $parentRelation): Model {
         $reflection = new ReflectionClass($model);
 
         [$hasMany, $remaining] = self::partitionArgsByRelationType($reflection, $args, HasMany::class);
