@@ -3,6 +3,7 @@
 namespace Tests\Integration\Subscriptions\Broadcast;
 
 use Tests\DBTestCase;
+use Mockery\MockInterface;
 use Tests\Utils\Models\Task;
 use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
@@ -44,9 +45,17 @@ class BroadcastDBTest extends DBTestCase
         factory(Task::class, 1)->create();
     }
 
+    public function withMockedBroadcasts(): MockInterface
+    {
+        $broadcast = \Mockery::mock(SubscriptionBroadcaster::class);
+        $this->app->instance(SubscriptionBroadcaster::class, $broadcast);
+
+        return $broadcast;
+    }
+
     public function testBroadcastsFromPhp(): void
     {
-        $this->mock(SubscriptionBroadcaster::class)
+        $this->withMockedBroadcasts(SubscriptionBroadcaster::class)
             ->shouldReceive('broadcast')
             ->once();
 
@@ -65,7 +74,7 @@ class BroadcastDBTest extends DBTestCase
 
     public function testBroadcastsFromSchema(): void
     {
-        $this->mock(SubscriptionBroadcaster::class)
+        $this->withMockedBroadcasts(SubscriptionBroadcaster::class)
             ->shouldReceive('broadcast')
             ->once();
 
