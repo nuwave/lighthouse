@@ -55,7 +55,7 @@ class BroadcastDBTest extends DBTestCase
 
     public function testBroadcastsFromPhp(): void
     {
-        $this->withMockedBroadcasts(SubscriptionBroadcaster::class)
+        $this->withMockedBroadcasts()
             ->shouldReceive('broadcast')
             ->once();
 
@@ -74,7 +74,7 @@ class BroadcastDBTest extends DBTestCase
 
     public function testBroadcastsFromSchema(): void
     {
-        $this->withMockedBroadcasts(SubscriptionBroadcaster::class)
+        $this->withMockedBroadcasts()
             ->shouldReceive('broadcast')
             ->once();
 
