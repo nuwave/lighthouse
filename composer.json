@@ -36,7 +36,6 @@
     "require-dev": {
         "bensampo/laravel-enum": "^1.22",
         "haydenpierce/class-finder": "^0.4.0",
-        "johnkary/phpunit-speedtrap": "^3.1",
         "laravel/lumen-framework": "5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0",
         "laravel/scout": "^4.0 || ^5.0 || ^6.0 || ^7.0",
         "localheinz/composer-normalize": "^1.3",
