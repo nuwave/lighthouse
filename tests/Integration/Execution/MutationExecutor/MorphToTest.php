@@ -147,14 +147,16 @@ class MorphToTest extends DBTestCase
 
     public function actionsOverExistingDataProvider()
     {
-        yield ['Update action' => 'update'];
-        yield ['Upsert action' => 'upsert'];
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
     }
 
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testDisconnectsMorphTo($action): void
+    public function testDisconnectsMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);
@@ -191,7 +193,7 @@ class MorphToTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testDeletesMorphTo($action): void
+    public function testDeletesMorphTo(string $action): void
     {
         /** @var \Tests\Utils\Models\Task $task */
         $task = factory(Task::class)->create(['name' => 'first_task']);

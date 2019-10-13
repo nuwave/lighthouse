@@ -372,14 +372,16 @@ class BelongsToManyTest extends DBTestCase
 
     public function actionsOverExistingDataProvider()
     {
-        yield ['Update action' => 'update'];
-        yield ['Upsert action' => 'upsert'];
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
     }
 
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateWithBelongsToMany($action): void
+    public function testCanUpdateWithBelongsToMany(string $action): void
     {
         factory(Role::class)
             ->create([
@@ -442,7 +444,7 @@ class BelongsToManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanDeleteWithBelongsToMany($action): void
+    public function testCanDeleteWithBelongsToMany(string $action): void
     {
         factory(Role::class)
             ->create([
@@ -495,7 +497,7 @@ class BelongsToManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanConnectWithBelongsToMany($action): void
+    public function testCanConnectWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
         factory(Role::class)
@@ -544,7 +546,7 @@ class BelongsToManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanSyncWithBelongsToMany($action): void
+    public function testCanSyncWithBelongsToMany(string $action): void
     {
         factory(User::class)->create();
         factory(Role::class)
@@ -593,7 +595,7 @@ class BelongsToManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanDisconnectWithBelongsToMany($action): void
+    public function testCanDisconnectWithBelongsToMany(string $action): void
     {
         factory(Role::class)
             ->create()
@@ -719,7 +721,7 @@ class BelongsToManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanDisconnectAllRelatedModelsOnEmptySync($action): void
+    public function testCanDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {
         /** @var User $user */
         $user = factory(User::class)->create();

@@ -397,14 +397,16 @@ class BelongsToTest extends DBTestCase
 
     public function actionsOverExistingDataProvider()
     {
-        yield ['Update action' => 'update'];
-        yield ['Upsert action' => 'upsert'];
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
     }
 
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndDisconnectBelongsTo($action): void
+    public function testCanUpdateAndDisconnectBelongsTo(string $action): void
     {
         factory(Task::class)->create();
 
@@ -489,7 +491,7 @@ class BelongsToTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndDeleteBelongsTo($action): void
+    public function testCanUpdateAndDeleteBelongsTo(string $action): void
     {
         factory(Task::class)->create();
 
@@ -574,7 +576,7 @@ class BelongsToTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testDoesNotDeleteOrDisconnectOnFalsyValues($action): void
+    public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {
         factory(Task::class)->create();
 

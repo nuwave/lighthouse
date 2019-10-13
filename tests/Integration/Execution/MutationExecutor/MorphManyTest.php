@@ -147,14 +147,16 @@ class MorphManyTest extends DBTestCase
 
     public function actionsOverExistingDataProvider()
     {
-        yield ['Update action' => 'update'];
-        yield ['Upsert action' => 'upsert'];
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
     }
 
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateWithNewMorphMany($action): void
+    public function testCanUpdateWithNewMorphMany(string $action): void
     {
         factory(Task::class)->create();
 
@@ -194,7 +196,7 @@ class MorphManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndUpdateMorphMany($action): void
+    public function testCanUpdateAndUpdateMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -240,7 +242,7 @@ class MorphManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndUpsertMorphMany($action): void
+    public function testCanUpdateAndUpsertMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -286,7 +288,7 @@ class MorphManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndDeleteMorphMany($action): void
+    public function testCanUpdateAndDeleteMorphMany(string $action): void
     {
         factory(Task::class)
             ->create()

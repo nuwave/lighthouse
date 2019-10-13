@@ -190,14 +190,16 @@ class HasManyTest extends DBTestCase
 
     public function actionsOverExistingDataProvider()
     {
-        yield ['Update action' => 'update'];
-        yield ['Upsert action' => 'upsert'];
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
     }
 
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanCreateHasMany($action): void
+    public function testCanCreateHasMany(string $action): void
     {
         factory(User::class)->create();
 
@@ -239,7 +241,7 @@ class HasManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateHasMany($action): void
+    public function testCanUpdateHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -287,7 +289,7 @@ class HasManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpsertHasMany($action): void
+    public function testCanUpsertHasMany(string $action): void
     {
         factory(User::class)
             ->create()
@@ -335,7 +337,7 @@ class HasManyTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanDeleteHasMany($action): void
+    public function testCanDeleteHasMany(string $action): void
     {
         factory(User::class)
             ->create()

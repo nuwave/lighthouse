@@ -58,13 +58,7 @@ class MutationExecutor
             }
 
             if (isset($nestedOperations['upsert'])) {
-                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpsert(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
         };
         $hasMany->each($createOneToMany);
@@ -79,11 +73,7 @@ class MutationExecutor
             }
 
             if (isset($nestedOperations['upsert'])) {
-                self::executeUpsert(
-                    $relation->getModel()->newInstance(),
-                    new Collection($nestedOperations['upsert']),
-                    $relation
-                );
+                self::handleSingleRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
         };
         $hasOne->each($createOneToOne);
@@ -102,23 +92,11 @@ class MutationExecutor
             }
 
             if (isset($nestedOperations['update'])) {
-                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpdate(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpdate(new Collection($nestedOperations['update']), $relation);
             }
 
             if (isset($nestedOperations['upsert'])) {
-                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpsert(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
 
             if (isset($nestedOperations['connect'])) {
@@ -288,6 +266,67 @@ class MutationExecutor
     }
 
     /**
+     * Handle the update with multiple relations.
+     *
+     * @param  \Illuminate\Support\Collection  $multiValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
+     */
+    protected static function handleMultiRelationUpdate(Collection $multiValues, $relation): void
+    {
+        $multiValues->each(function ($singleValues) use ($relation): void {
+            self::handleSingleRelationUpdate(new Collection($singleValues), $relation);
+        });
+    }
+
+    /**
+     * Handle the update with a single relation.
+     *
+     * @param  \Illuminate\Support\Collection  $singleValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
+     */
+    protected static function handleSingleRelationUpdate(Collection $singleValues, Relation $relation): void
+    {
+        self::executeUpdate(
+            $relation->getModel()->newInstance(),
+            new Collection($singleValues),
+            $relation
+        );
+    }
+
+
+    /**
+     * Handle the upsert with multiple relations.
+     *
+     * @param  \Illuminate\Support\Collection  $multiValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
+     */
+    protected static function handleMultiRelationUpsert(Collection $multiValues, $relation): void
+    {
+        $multiValues->each(function ($singleValues) use ($relation): void {
+            self::handleSingleRelationUpsert(new Collection($singleValues), $relation);
+        });
+    }
+
+    /**
+     * Handle the upsert with a single relation.
+     *
+     * @param  \Illuminate\Support\Collection  $singleValues
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @return void
+     */
+    protected static function handleSingleRelationUpsert(Collection $singleValues, Relation $relation): void
+    {
+        self::executeUpsert(
+            $relation->getModel()->newInstance(),
+            new Collection($singleValues),
+            $relation
+        );
+    }
+
+    /**
      * Execute an update mutation.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -427,23 +466,11 @@ class MutationExecutor
             }
 
             if (isset($nestedOperations['update'])) {
-                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpdate(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpdate(new Collection($nestedOperations['update']), $relation);
             }
 
             if (isset($nestedOperations['upsert'])) {
-                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpsert(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
 
             if (isset($nestedOperations['delete'])) {
@@ -462,19 +489,11 @@ class MutationExecutor
             }
 
             if (isset($nestedOperations['update'])) {
-                self::executeUpdate(
-                    $relation->getModel()->newInstance(),
-                    new Collection($nestedOperations['update']),
-                    $relation
-                );
+                self::handleSingleRelationUpdate(new Collection($nestedOperations['update']), $relation);
             }
 
             if (isset($nestedOperations['upsert'])) {
-                self::executeUpsert(
-                    $relation->getModel()->newInstance(),
-                    new Collection($nestedOperations['upsert']),
-                    $relation
-                );
+                self::handleSingleRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
 
             if (isset($nestedOperations['delete'])) {
@@ -497,23 +516,11 @@ class MutationExecutor
             }
 
             if (isset($nestedOperations['update'])) {
-                (new Collection($nestedOperations['update']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpdate(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpdate(new Collection($nestedOperations['update']), $relation);
             }
 
             if (isset($nestedOperations['upsert'])) {
-                (new Collection($nestedOperations['upsert']))->each(function ($singleValues) use ($relation): void {
-                    self::executeUpsert(
-                        $relation->getModel()->newInstance(),
-                        new Collection($singleValues),
-                        $relation
-                    );
-                });
+                self::handleMultiRelationUpsert(new Collection($nestedOperations['upsert']), $relation);
             }
 
             if (isset($nestedOperations['delete'])) {

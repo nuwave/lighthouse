@@ -185,14 +185,16 @@ class HasOneTest extends DBTestCase
 
     public function actionsOverExistingDataProvider()
     {
-        yield ['Update action' => 'update'];
-        yield ['Upsert action' => 'upsert'];
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
     }
 
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateWithNewHasOne($action): void
+    public function testCanUpdateWithNewHasOne(string $action): void
     {
         factory(Task::class)->create();
 
@@ -232,7 +234,7 @@ class HasOneTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndUpdateHasOne($action): void
+    public function testCanUpdateAndUpdateHasOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -278,7 +280,7 @@ class HasOneTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndUpsertHasOne($action): void
+    public function testCanUpdateAndUpsertHasOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -324,7 +326,7 @@ class HasOneTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndDeleteHasOne($action): void
+    public function testCanUpdateAndDeleteHasOne(string $action): void
     {
         factory(Task::class)
             ->create()

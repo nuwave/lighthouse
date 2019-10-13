@@ -143,14 +143,16 @@ class MorphOneTest extends DBTestCase
 
     public function actionsOverExistingDataProvider()
     {
-        yield ['Update action' => 'update'];
-        yield ['Upsert action' => 'upsert'];
+        return [
+            ['Update action' => 'update'],
+            ['Upsert action' => 'upsert'],
+        ];
     }
 
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateWithNewMorphOne($action): void
+    public function testCanUpdateWithNewMorphOne(string $action): void
     {
         factory(Task::class)->create();
 
@@ -188,7 +190,7 @@ class MorphOneTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateWithUpsertMorphOne($action): void
+    public function testCanUpdateWithUpsertMorphOne(string $action): void
     {
         factory(Task::class)->create();
 
@@ -227,7 +229,7 @@ class MorphOneTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndUpdateMorphOne($action): void
+    public function testCanUpdateAndUpdateMorphOne(string $action): void
     {
         factory(Task::class)
             ->create()
@@ -271,7 +273,7 @@ class MorphOneTest extends DBTestCase
     /**
      * @dataProvider actionsOverExistingDataProvider
      */
-    public function testCanUpdateAndDeleteMorphOne($action): void
+    public function testCanUpdateAndDeleteMorphOne(string $action): void
     {
         factory(Task::class)
             ->create()
