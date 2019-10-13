@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Subscriptions;
+namespace Tests\Unit\Subscriptions;
 
 use Tests\TestCase;
 use Illuminate\Http\Request;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Subscriptions\Broadcast;
+namespace Tests\Integration\Subscriptions\Broadcast;
 
 use Tests\DBTestCase;
 use Mockery\MockInterface;
@@ -9,7 +9,7 @@ use Nuwave\Lighthouse\Execution\Utils\Subscription;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionBroadcaster;
 use Nuwave\Lighthouse\Subscriptions\SubscriptionServiceProvider;
 
-class BroadcastTest extends DBTestCase
+class BroadcastDBTest extends DBTestCase
 {
     protected $schema = '
     type Task {
@@ -45,9 +45,6 @@ class BroadcastTest extends DBTestCase
         factory(Task::class, 1)->create();
     }
 
-    /**
-     * @return MockInterface
-     */
     public function withMockedBroadcasts(): MockInterface
     {
         $broadcast = \Mockery::mock(SubscriptionBroadcaster::class);
@@ -58,11 +55,10 @@ class BroadcastTest extends DBTestCase
 
     public function testBroadcastsFromPhp(): void
     {
-        // Assert
-        $broadcast = $this->withMockedBroadcasts();
-        $broadcast->shouldReceive('broadcast')->once();
+        $this->withMockedBroadcasts()
+            ->shouldReceive('broadcast')
+            ->once();
 
-        // Subscribe to event
         $this->postGraphQL([
             'query' => '
                 subscription UserUpdated {
@@ -73,17 +69,15 @@ class BroadcastTest extends DBTestCase
             ',
         ]);
 
-        // Broadcast
         Subscription::broadcast('taskUpdated', []);
     }
 
     public function testBroadcastsFromSchema(): void
     {
-        // Assert
-        $broadcast = $this->withMockedBroadcasts();
-        $broadcast->shouldReceive('broadcast')->once();
+        $this->withMockedBroadcasts()
+            ->shouldReceive('broadcast')
+            ->once();
 
-        // Subscribe to event
         $this->postGraphQL([
             'query' => '
                 subscription TaskUpdated {
@@ -94,7 +88,6 @@ class BroadcastTest extends DBTestCase
             ',
         ]);
 
-        // Broadcast
         $this->postGraphQL([
             'query' => '
                 mutation {

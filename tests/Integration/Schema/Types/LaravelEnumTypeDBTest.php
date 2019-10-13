@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Schema\Types;
+namespace Tests\Integration\Schema\Types;
 
 use Tests\DBTestCase;
 use Tests\Utils\Models\User;
@@ -8,7 +8,7 @@ use Tests\Utils\LaravelEnums\UserType;
 use Nuwave\Lighthouse\Schema\TypeRegistry;
 use Nuwave\Lighthouse\Schema\Types\LaravelEnumType;
 
-class LaravelEnumTypeDbTest extends DBTestCase
+class LaravelEnumTypeDBTest extends DBTestCase
 {
     /**
      * @var \Nuwave\Lighthouse\Schema\TypeRegistry
