@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix regression in 4.4.0 that required matching the type returned from paginated relationship
-  fields with the class name of the model
+  fields with the class name of the model https://github.com/nuwave/lighthouse/pull/1011
 
 ## [4.4.0](https://github.com/nuwave/lighthouse/compare/v4.3.0...v4.4.0)
 
