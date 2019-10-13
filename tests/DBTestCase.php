@@ -13,9 +13,10 @@ abstract class DBTestCase extends TestCase
         parent::setUp();
 
         if (! static::$migrated) {
+            // We have to use this instead of --realpath as long as Laravel 5.5 is supported
+            $this->app->setBasePath(__DIR__);
             $this->artisan('migrate:fresh', [
-                '--realpath' => true,
-                '--path' => __DIR__.'/database/migrations',
+                '--path' => 'database/migrations',
             ]);
 
             static::$migrated = true;
