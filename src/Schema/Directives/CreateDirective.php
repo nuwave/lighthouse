@@ -2,10 +2,10 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class CreateDirective extends MutationExecutorDirective
 {

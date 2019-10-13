@@ -2,16 +2,16 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
 abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
