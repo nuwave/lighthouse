@@ -183,7 +183,7 @@ class HasOneTest extends DBTestCase
         ]);
     }
 
-    public function actionsOverExistingDataProvider()
+    public function existingModelMutations()
     {
         return [
             ['Update action' => 'update'],
@@ -192,7 +192,7 @@ class HasOneTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateWithNewHasOne(string $action): void
     {
@@ -232,7 +232,7 @@ class HasOneTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndUpdateHasOne(string $action): void
     {
@@ -278,7 +278,7 @@ class HasOneTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndUpsertHasOne(string $action): void
     {
@@ -324,7 +324,7 @@ class HasOneTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndDeleteHasOne(string $action): void
     {

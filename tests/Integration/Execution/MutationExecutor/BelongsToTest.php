@@ -395,7 +395,7 @@ class BelongsToTest extends DBTestCase
         ]);
     }
 
-    public function actionsOverExistingDataProvider()
+    public function existingModelMutations()
     {
         return [
             ['Update action' => 'update'],
@@ -404,7 +404,7 @@ class BelongsToTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndDisconnectBelongsTo(string $action): void
     {
@@ -489,7 +489,7 @@ class BelongsToTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndDeleteBelongsTo(string $action): void
     {
@@ -574,7 +574,7 @@ class BelongsToTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testDoesNotDeleteOrDisconnectOnFalsyValues(string $action): void
     {

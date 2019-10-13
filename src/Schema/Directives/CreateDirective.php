@@ -2,32 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Database\DatabaseManager;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class CreateDirective extends BaseDirective implements FieldResolver, DefinedDirective
+class CreateDirective extends MutationExecutorDirective
 {
-    /**
-     * @var \Illuminate\Database\DatabaseManager
-     */
-    protected $databaseManager;
-
-    /**
-     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
-     * @return void
-     */
-    public function __construct(DatabaseManager $databaseManager)
-    {
-        $this->databaseManager = $databaseManager;
-    }
-
     /**
      * Name of the directive.
      *
@@ -36,6 +17,22 @@ class CreateDirective extends BaseDirective implements FieldResolver, DefinedDir
     public function name(): string
     {
         return 'create';
+    }
+
+    /**
+     * Execute a create mutation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     *         An empty instance of the model that should be created
+     * @param  \Illuminate\Support\Collection  $args
+     *         The corresponding slice of the input arguments for creating this model
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
+     *         If we are in a nested create, we can use this to associate the new model to its parent
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected function executeMutation(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    {
+        return MutationExecutor::executeCreate($model, $args, $parentRelation);
     }
 
     public static function definition(): string
@@ -52,30 +49,5 @@ directive @create(
   model: String
 ) on FIELD_DEFINITION
 SDL;
-    }
-
-    /**
-     * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    public function resolveField(FieldValue $fieldValue): FieldValue
-    {
-        return $fieldValue->setResolver(
-            function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
-                $modelClass = $this->getModelClass();
-                /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClass;
-
-                $executeMutation = function () use ($model, $args): Model {
-                    return MutationExecutor::executeCreate($model, new Collection($args))->refresh();
-                };
-
-                return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection($model->getConnectionName())->transaction($executeMutation)
-                    : $executeMutation();
-            }
-        );
     }
 }

@@ -66,6 +66,7 @@ input CreateAuthorRelation {
   connect: ID
   create: CreateUserInput
   update: UpdateUserInput
+  upsert: UpsertUserInput
 }
 ```
 
@@ -73,6 +74,7 @@ There are 3 possible operations that you can expose on a `BelongsTo` relationshi
 - `connect` it to an existing model
 - `create` a new related model and attach it
 - `update` an existing model and attach it
+- `upsert` a new or an existing model and attach it
 
 Finally, you need to define the input that allows you to create a new `User`.
 
@@ -160,6 +162,7 @@ type Mutation {
 }
 
 input UpdatePostInput {
+  id: ID!
   title: String
   author: UpdateAuthorRelation
 }
@@ -180,6 +183,7 @@ and allows the query string to be mostly static, taking a variable value to cont
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean){
   updatePost(input: {
+    id: 1
     title: "An updated title"
     author: {
       disconnect: $disconnectAuthor
@@ -200,7 +204,41 @@ The `author` relationship will only be disconnected if the value of the variable
 {
   "data": {
     "updatePost": {
+      "id": 1,
       "title": "An updated title",
+      "author": null
+    }
+  }
+}
+```
+
+When issuing an upsert you will have all the update options, so the behaviour is the same. In the case that
+you create a new model it will have the same behaviour than an update that doesn't have any connected model.
+
+```graphql
+mutation UpdatePost($disconnectAuthor: Boolean){
+  upsertPost(input: {
+    id: 1
+    title: "An updated or created title"
+    author: {
+      disconnect: $disconnectAuthor
+    }
+  }){
+    id
+    title
+    author {
+      name
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "upsertPost": {
+      "id": 1,
+      "title": "An updated or created title",
       "author": null
     }
   }
@@ -304,6 +342,7 @@ input UpdateUserInput {
 input UpdatePostsRelation {
   create: [CreatePostInput!]
   update: [UpdatePostInput!]
+  upsert: [UpsertPostInput!]
   delete: [ID!]
 }
 
@@ -312,6 +351,11 @@ input CreatePostInput {
 }
 
 input UpdatePostInput {
+  id: ID!
+  title: String
+}
+
+input UpsertPostInput {
   id: ID!
   title: String
 }
@@ -347,6 +391,9 @@ mutation {
 }
 ```
 
+The behaviour when you are upserting is a mix between updating and creating and it won't fail
+if the model exists or not because it will produce the needed action (update or create) in every case.
+
 ## Belongs To Many
 
 A belongs to many relation allows you to create new related models as well
@@ -364,11 +411,17 @@ input CreatePostInput {
 
 input CreateAuthorRelation {
   create: [CreateAuthorInput!]
+  upsert: [UpsertAuthorInput!]
   connect: [ID!]
   sync: [ID!]
 }
 
 input CreateAuthorInput {
+  name: String!
+}
+
+input UpsertAuthorInput {
+  id: ID!
   name: String!
 }
 ```
@@ -386,6 +439,12 @@ mutation {
           name: "Herbert"
         }
       ]
+      upsert: [
+        {
+          id: 2000
+          name: "Newton"
+        }
+      ]
       connect: [
         123
       ]
@@ -399,7 +458,7 @@ mutation {
 }
 ```
 
-Lighthouse will detect the relationship and attach/create it.
+Lighthouse will detect the relationship and attach/update/create it.
 
 ```json
 {
@@ -410,6 +469,10 @@ Lighthouse will detect the relationship and attach/create it.
         {
           "id": 165,
           "name": "Herbert"
+        },
+        {
+          "id": 2000,
+          "name": "Newton"
         },
         {
           "id": 123,
@@ -442,7 +505,7 @@ mutation {
 }
 ```
 
-Updates on BelongsToMany relations may expose up to 6 nested operations.
+Updates on BelongsToMany relations may expose up to 7 nested operations.
 
 ```graphql
 type Mutation {
@@ -459,6 +522,7 @@ input UpdateAuthorRelation {
   create: [CreateAuthorInput!]
   connect: [ID!]
   update: [UpdateAuthorInput!]
+  upsert: [UpsertAuthorInput!]
   sync: [ID!]
   delete: [ID!]
   disconnect: [ID!]
@@ -469,6 +533,11 @@ input CreateAuthorInput {
 }
 
 input UpdateAuthorInput {
+  id: ID!
+  name: String!
+}
+
+input UpsertAuthorInput {
   id: ID!
   name: String!
 }
@@ -495,6 +564,7 @@ type Hour {
 type Mutation {
   createHour(input: CreateHourInput! @spread): Hour @create
   updateHour(input: UpdateHourInput! @spread): Hour @update
+  upsertHour(input: UpsertHourInput! @spread): Hour @upsert
 }
 
 input CreateHourInput {
@@ -512,11 +582,25 @@ input UpdateHourInput {
   hourable: UpdateHourableOperations
 }
 
+input UpsertHourInput {
+  id: ID!
+  from: String
+  to: String
+  weekday: Int
+  hourable: UpsertHourableOperations
+}
+
 input CreateHourableOperations {
   connect: ConnectHourableInput
 }
 
 input UpdateHourableOperations {
+  connect: ConnectHourableInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input UpsertHourableOperations {
   connect: ConnectHourableInput
   disconnect: Boolean
   delete: Boolean
@@ -575,7 +659,7 @@ The `delete` operation both detaches and deletes the currently associated model.
 
 ```graphql
 mutation {
-  updateHour(input: {
+  upsertHour(input: {
     id: 1
     weekday: 2
     hourable: {
@@ -608,6 +692,7 @@ input CreateTaskInput {
 
 input CreateTagRelation {
   create: [CreateTagInput!]
+  upsert: [UpsertTagInput!]
   sync: [ID!]
   connect: [ID!]
 }
@@ -615,6 +700,12 @@ input CreateTagRelation {
 input CreateTagInput {
   name: String!
 }
+
+input UpsertTagInput {
+  id: ID!
+  name: String!
+}
+
 
 type Task {
   id: ID!
@@ -649,7 +740,8 @@ mutation {
 You can either use `connect` or `sync` during creation. 
 
 When you want to create a new tag while creating the task,
-you need use the `create` operation to provide an array of `CreateTagInput`:
+you need use the `create` operation to provide an array of `CreateTagInput` 
+or use the `upsert` operation to provide an array of `UpsertTagInput`:
 
 ```graphql
 mutation {

@@ -145,7 +145,7 @@ class MorphToTest extends DBTestCase
         ]);
     }
 
-    public function actionsOverExistingDataProvider()
+    public function existingModelMutations()
     {
         return [
             ['Update action' => 'update'],
@@ -154,7 +154,7 @@ class MorphToTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testDisconnectsMorphTo(string $action): void
     {
@@ -191,7 +191,7 @@ class MorphToTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testDeletesMorphTo(string $action): void
     {

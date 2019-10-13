@@ -370,7 +370,7 @@ class BelongsToManyTest extends DBTestCase
         $this->assertSame('is_user', $role->name);
     }
 
-    public function actionsOverExistingDataProvider()
+    public function existingModelMutations()
     {
         return [
             ['Update action' => 'update'],
@@ -379,7 +379,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateWithBelongsToMany(string $action): void
     {
@@ -442,7 +442,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanDeleteWithBelongsToMany(string $action): void
     {
@@ -495,7 +495,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanConnectWithBelongsToMany(string $action): void
     {
@@ -544,7 +544,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanSyncWithBelongsToMany(string $action): void
     {
@@ -593,7 +593,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanDisconnectWithBelongsToMany(string $action): void
     {
@@ -719,7 +719,7 @@ class BelongsToManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanDisconnectAllRelatedModelsOnEmptySync(string $action): void
     {

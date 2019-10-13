@@ -188,7 +188,7 @@ class HasManyTest extends DBTestCase
         ]);
     }
 
-    public function actionsOverExistingDataProvider()
+    public function existingModelMutations()
     {
         return [
             ['Update action' => 'update'],
@@ -197,7 +197,7 @@ class HasManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanCreateHasMany(string $action): void
     {
@@ -239,7 +239,7 @@ class HasManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateHasMany(string $action): void
     {
@@ -287,7 +287,7 @@ class HasManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpsertHasMany(string $action): void
     {
@@ -335,7 +335,7 @@ class HasManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanDeleteHasMany(string $action): void
     {

@@ -2,42 +2,13 @@
 
 namespace Nuwave\Lighthouse\Schema\Directives;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\DatabaseManager;
-use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Nuwave\Lighthouse\Support\Contracts\GlobalId;
-use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
-use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 
-class UpsertDirective extends BaseDirective implements FieldResolver, DefinedDirective
+class UpsertDirective extends MutationExecutorDirective
 {
-    /**
-     * @var \Illuminate\Database\DatabaseManager
-     */
-    protected $databaseManager;
-
-    /**
-     * The GlobalId resolver.
-     *
-     * @var \Nuwave\Lighthouse\Support\Contracts\GlobalId
-     */
-    protected $globalId;
-
-    /**
-     * UpsertDirective constructor.
-     *
-     * @param  \Illuminate\Database\DatabaseManager  $databaseManager
-     * @param  \Nuwave\Lighthouse\Support\Contracts\GlobalId  $globalId
-     * @return void
-     */
-    public function __construct(DatabaseManager $databaseManager, GlobalId $globalId)
-    {
-        $this->databaseManager = $databaseManager;
-        $this->globalId = $globalId;
-    }
-
     /**
      * Name of the directive.
      *
@@ -46,6 +17,23 @@ class UpsertDirective extends BaseDirective implements FieldResolver, DefinedDir
     public function name(): string
     {
         return 'upsert';
+    }
+
+    /**
+     * Execute an upsert mutation.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *         An empty instance of the model that should be created or updated
+     * @param \Illuminate\Support\Collection $args
+     *         The corresponding slice of the input arguments for creating or updating this model
+     * @param \Illuminate\Database\Eloquent\Relations\Relation|null $parentRelation
+     *         If we are in a nested upsert, we can use this to associate the new model to its parent
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected function executeMutation(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    {
+        return MutationExecutor::executeUpsert($model, new Collection($args))->refresh();
     }
 
     public static function definition(): string
@@ -68,34 +56,5 @@ directive @upsert(
   globalId: Boolean = false
 ) on FIELD_DEFINITION
 SDL;
-    }
-
-    /**
-     * Resolve the field directive.
-     *
-     * @param  \Nuwave\Lighthouse\Schema\Values\FieldValue  $fieldValue
-     * @return \Nuwave\Lighthouse\Schema\Values\FieldValue
-     */
-    public function resolveField(FieldValue $fieldValue): FieldValue
-    {
-        return $fieldValue->setResolver(
-            function ($root, array $args): Model {
-                $modelClass = $this->getModelClass();
-                /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClass;
-
-                if ($this->directiveArgValue('globalId', false)) {
-                    $args['id'] = $this->globalId->decodeId($args['id']);
-                }
-
-                $executeMutation = function () use ($model, $args): Model {
-                    return MutationExecutor::executeUpsert($model, new Collection($args))->refresh();
-                };
-
-                return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection($model->getConnectionName())->transaction($executeMutation)
-                    : $executeMutation();
-            }
-        );
     }
 }

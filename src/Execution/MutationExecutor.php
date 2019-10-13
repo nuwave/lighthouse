@@ -329,7 +329,7 @@ class MutationExecutor
     /**
      * Execute an update mutation.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model $modelInstance
      *         An empty instance of the model that should be updated
      * @param  \Illuminate\Support\Collection  $args
      *         The corresponding slice of the input arguments for updating this model
@@ -337,16 +337,16 @@ class MutationExecutor
      *         If we are in a nested update, we can use this to associate the new model to its parent
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public static function executeUpdate(Model $model, Collection $args, ?Relation $parentRelation = null): Model
+    public static function executeUpdate(Model $modelInstance, Collection $args, ?Relation $parentRelation = null): Model
     {
         $id = $args->pull('id')
             ?? $args->pull(
-                $model->getKeyName()
+                $modelInstance->getKeyName()
             );
 
-        $model = $model->newQuery()->findOrFail($id);
+        $modelInstance = $modelInstance->newQuery()->findOrFail($id);
 
-        return self::executeUpdateWithLoadedModel($model, $args, $parentRelation);
+        return self::executeUpdateWithLoadedModel($modelInstance, $args, $parentRelation);
     }
 
     /**

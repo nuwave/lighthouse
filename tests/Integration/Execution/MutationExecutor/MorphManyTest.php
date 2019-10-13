@@ -145,7 +145,7 @@ class MorphManyTest extends DBTestCase
         ]);
     }
 
-    public function actionsOverExistingDataProvider()
+    public function existingModelMutations()
     {
         return [
             ['Update action' => 'update'],
@@ -154,7 +154,7 @@ class MorphManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateWithNewMorphMany(string $action): void
     {
@@ -194,7 +194,7 @@ class MorphManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndUpdateMorphMany(string $action): void
     {
@@ -240,7 +240,7 @@ class MorphManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndUpsertMorphMany(string $action): void
     {
@@ -286,7 +286,7 @@ class MorphManyTest extends DBTestCase
     }
 
     /**
-     * @dataProvider actionsOverExistingDataProvider
+     * @dataProvider existingModelMutations
      */
     public function testCanUpdateAndDeleteMorphMany(string $action): void
     {
