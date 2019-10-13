@@ -102,7 +102,7 @@ class ArgumentSet
                     $builder = $argBuilderDirective->handleBuilder($builder, $value);
                 });
 
-            // TODO add recursion
+            // TODO recurse deeper into the input to allow nested input objects to add filters
         }
 
         foreach ($scopes as $scope) {
