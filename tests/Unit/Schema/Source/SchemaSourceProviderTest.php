@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Schema\Source;
+namespace Tests\Unit\Schema\Source;
 
 use Tests\TestCase;
 use League\Flysystem\Filesystem;

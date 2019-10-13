@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Console;
+namespace Tests\Integration\Console;
 
 use Tests\TestCase;
 use Nuwave\Lighthouse\Console\IdeHelperCommand;
@@ -16,10 +16,16 @@ class IdeHelperCommandTest extends TestCase
         $config = $app['config'];
 
         $config->set('lighthouse.namespaces.directives', [
-            'Tests\\Unit\\Console',
+            // Contains an overwritten UnionDirective
+            'Tests\\Integration\\Console',
+            // We need to ensure this does not throw an error
+            'Empty\\Because\\The\\User\\Has\\Not\\Created\\Custom\\Directives\\Yet',
         ]);
     }
 
+    /**
+     * This test is pretty slow, so we put it all in one test method.
+     */
     public function testGeneratesSchemaDirectives(): void
     {
         $this->artisan('lighthouse:ide-helper');
@@ -43,19 +49,5 @@ class IdeHelperCommandTest extends TestCase
             'Overwrites definitions through custom namespaces'
         );
         $this->assertContains(UnionDirective::class, $generated);
-    }
-
-    public function testDoesNotRequireCustomDirectives(): void
-    {
-        /** @var \Illuminate\Contracts\Config\Repository $config */
-        $config = $this->app['config'];
-
-        $config->set('lighthouse.namespaces.directives', [
-            'Empty\\Because\\The\\User\\Has\\Not\\Created\\Custom\\Directives\\Yet',
-        ]);
-
-        $this->artisan('lighthouse:ide-helper');
-
-        $this->assertFileExists(IdeHelperCommand::filePath());
     }
 }
