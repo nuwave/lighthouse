@@ -84,7 +84,7 @@ class ArgumentSet
      */
     public function enhanceBuilder($builder, array $scopes)
     {
-        foreach ($this->arguments as $key => $argument) {
+        foreach ($this->arguments as $argument) {
             $value = $argument->toPlain();
 
             // TODO switch to instanceof when we require bensampo/laravel-enum
@@ -95,7 +95,7 @@ class ArgumentSet
 
             $argument
                 ->directives
-                ->filter(function (\GraphQL\Type\Definition\Directive $directive): bool {
+                ->filter(function (Directive $directive): bool {
                     return $directive instanceof BuilderDirective;
                 })
                 ->each(function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value) {
