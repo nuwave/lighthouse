@@ -93,7 +93,7 @@ class ArgumentSet
                 $value = $value->value;
             }
 
-            $value
+            $argument
                 ->directives
                 ->filter(function (\GraphQL\Type\Definition\Directive $directive): bool {
                     return $directive instanceof BuilderDirective;
