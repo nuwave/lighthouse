@@ -70,7 +70,7 @@ input CreateAuthorRelation {
 }
 ```
 
-There are 3 possible operations that you can expose on a `BelongsTo` relationship when creating:
+You can expose the following operations on a `BelongsTo` relationship when creating:
 - `connect` it to an existing model
 - `create` a new related model and attach it
 - `update` an existing model and attach it
@@ -505,7 +505,7 @@ mutation {
 }
 ```
 
-Updates on BelongsToMany relations may expose up to 7 nested operations.
+Updates on BelongsToMany relations may expose the following nested operations.
 
 ```graphql
 type Mutation {
