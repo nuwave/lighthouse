@@ -2,7 +2,9 @@
 
 namespace Tests\Integration\Execution\DataLoader;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Tests\DBTestCase;
 use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\Task;
@@ -124,16 +126,16 @@ class BatchLoaderTest extends DBTestCase
             ->assertJsonCount(3, 'manyUsers.1.data.user.tasks');
     }
 
-    public function resolveUser($root, array $args)
+    public function resolveUser($root, array $args, GraphQLContext $context, ResolveInfo $info)
     {
-        $loader = BatchLoader::instance(UserLoader::class);
+        $loader = BatchLoader::instance(UserLoader::class, $info->path);
 
         return $loader->load($args['id']);
     }
 
-    public function resolveManyUsers($root, array $args)
+    public function resolveManyUsers($root, array $args, GraphQLContext $context, ResolveInfo $info)
     {
-        $loader = BatchLoader::instance(UserLoader::class);
+        $loader = BatchLoader::instance(UserLoader::class, $info->path);
 
         return $loader->loadMany($args['ids']);
     }
