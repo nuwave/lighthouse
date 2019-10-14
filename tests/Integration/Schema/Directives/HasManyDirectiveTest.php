@@ -162,10 +162,10 @@ class HasManyDirectiveTest extends DBTestCase
     {
         $this->schema = '
         type User {
-            tasks: [FooTask!]! @hasMany(type: "paginator")
+            tasks: [NotTheModelNameTask!]! @hasMany(type: "paginator")
         }
         
-        type FooTask {
+        type NotTheModelNameTask {
             id: Int!
         }
         
