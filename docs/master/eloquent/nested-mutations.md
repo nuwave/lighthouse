@@ -212,8 +212,8 @@ The `author` relationship will only be disconnected if the value of the variable
 }
 ```
 
-When issuing an upsert you will have all the update options, so the behaviour is the same. In the case that
-you create a new model it will have the same behaviour than an update that doesn't have any connected model.
+When issuing an `upsert`, you may expose the same nested operations as an `update`.
+In case a new model is created, they will simply be ignored.
 
 ```graphql
 mutation UpdatePost($disconnectAuthor: Boolean){
@@ -326,7 +326,6 @@ When updating a `User`, further nested operations become possible.
 It is up to you which ones you want to expose through the schema definition.
 
 The following example covers the full range of possible operations:
-`create`, `update` and `delete`.
 
 ```graphql
 type Mutation {
@@ -391,8 +390,8 @@ mutation {
 }
 ```
 
-The behaviour when you are upserting is a mix between updating and creating and it won't fail
-if the model exists or not because it will produce the needed action (update or create) in every case.
+The behaviour for `upsert` is a mix between updating and creating,
+it will produce the needed action regardless of whether the model exists or not.
 
 ## Belongs To Many
 
@@ -505,7 +504,7 @@ mutation {
 }
 ```
 
-Updates on BelongsToMany relations may expose the following nested operations.
+Updates on `BelongsToMany` relations may expose the following nested operations:
 
 ```graphql
 type Mutation {
@@ -740,7 +739,7 @@ mutation {
 You can either use `connect` or `sync` during creation. 
 
 When you want to create a new tag while creating the task,
-you need use the `create` operation to provide an array of `CreateTagInput` 
+you need to use the `create` operation to provide an array of `CreateTagInput` 
 or use the `upsert` operation to provide an array of `UpsertTagInput`:
 
 ```graphql

@@ -220,7 +220,8 @@ may fail to find the model you provided and return `null`:
 
 ## Upsert
 
-You can create or update a model with the [@upsert](../api-reference/directives.md#upsert) directive.
+Use the [@upsert](../api-reference/directives.md#upsert) directive to update a model with 
+a given `id` or create it if it does not exist. 
 
 ```graphql
 type Mutation {
@@ -229,7 +230,7 @@ type Mutation {
 ```
 
 Since upsert can create or update your data you must have all the minimum fields for a creation as required.
-For example the `id` is going to be always mandatory.
+The `id` is always required and must be marked as fillable in the model.
 
 ```graphql
 mutation {
