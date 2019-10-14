@@ -5,34 +5,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class CreateDirective extends MutationExecutorDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
     public function name(): string
     {
         return 'create';
-    }
-
-    /**
-     * Execute a create mutation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     *         An empty instance of the model that should be created
-     * @param  \Illuminate\Support\Collection  $args
-     *         The corresponding slice of the input arguments for creating this model
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation|null  $parentRelation
-     *         If we are in a nested create, we can use this to associate the new model to its parent
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    protected function executeMutation(Model $model, Collection $args, ?Relation $parentRelation = null): Model
-    {
-        return MutationExecutor::executeCreate($model, $args, $parentRelation);
     }
 
     public static function definition(): string
@@ -49,5 +27,10 @@ directive @create(
   model: String
 ) on FIELD_DEFINITION
 SDL;
+    }
+
+    protected function executeMutation(Model $model, Collection $args): Model
+    {
+        return MutationExecutor::executeCreate($model, $args);
     }
 }

@@ -8,7 +8,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Database\DatabaseManager;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\GlobalId;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
@@ -16,6 +15,8 @@ use Nuwave\Lighthouse\Support\Contracts\DefinedDirective;
 abstract class MutationExecutorDirective extends BaseDirective implements FieldResolver, DefinedDirective
 {
     /**
+     * The database manager.
+     *
      * @var \Illuminate\Database\DatabaseManager
      */
     protected $databaseManager;
@@ -50,20 +51,38 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
     {
         return $fieldValue->setResolver(
             function ($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Model {
-                $modelClass = $this->getModelClass();
                 /** @var \Illuminate\Database\Eloquent\Model $model */
-                $model = new $modelClass;
+                $model = new ($this->getModelClass());
 
                 $executeMutation = function () use ($model, $args): Model {
-                    return $this->executeMutation($model, new Collection($args))->refresh();
+                    return $this
+                        ->executeMutation(
+                            $model,
+                            new Collection($args)
+                        )
+                        ->refresh();
                 };
 
                 return config('lighthouse.transactional_mutations', true)
-                    ? $this->databaseManager->connection($model->getConnectionName())->transaction($executeMutation)
+                    ? $this
+                        ->databaseManager
+                        ->connection(
+                            $model->getConnectionName()
+                        )
+                        ->transaction($executeMutation)
                     : $executeMutation();
             }
         );
     }
 
-    abstract protected function executeMutation(Model $model, Collection $args, ?Relation $parentRelation = null): Model;
+    /**
+     * Execute a mutation on a model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     *         An empty instance of the model that should be mutated.
+     * @param  \Illuminate\Support\Collection  $args
+     *         The corresponding slice of the input arguments for mutating this model.
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    abstract protected function executeMutation(Model $model, Collection $args): Model;
 }

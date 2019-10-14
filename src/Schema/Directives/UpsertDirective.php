@@ -5,35 +5,12 @@ namespace Nuwave\Lighthouse\Schema\Directives;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Nuwave\Lighthouse\Execution\MutationExecutor;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class UpsertDirective extends MutationExecutorDirective
 {
-    /**
-     * Name of the directive.
-     *
-     * @return string
-     */
     public function name(): string
     {
         return 'upsert';
-    }
-
-    /**
-     * Execute an upsert mutation.
-     *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     *         An empty instance of the model that should be created or updated
-     * @param \Illuminate\Support\Collection $args
-     *         The corresponding slice of the input arguments for creating or updating this model
-     * @param \Illuminate\Database\Eloquent\Relations\Relation|null $parentRelation
-     *         If we are in a nested upsert, we can use this to associate the new model to its parent
-     *
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    protected function executeMutation(Model $model, Collection $args, ?Relation $parentRelation = null): Model
-    {
-        return MutationExecutor::executeUpsert($model, new Collection($args))->refresh();
     }
 
     public static function definition(): string
@@ -56,5 +33,10 @@ directive @upsert(
   globalId: Boolean = false
 ) on FIELD_DEFINITION
 SDL;
+    }
+
+    protected function executeMutation(Model $model, Collection $args): Model
+    {
+        return MutationExecutor::executeUpsert($model, $args);
     }
 }
