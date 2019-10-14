@@ -87,9 +87,11 @@ class ASTBuilder
 
         $cacheConfig = $this->configRepository->get('lighthouse.cache');
         if ($cacheConfig['enable']) {
-            $this->documentAST = app('cache')->remember(
+            /** @var \Illuminate\Contracts\Cache\Repository $cache */
+            $cache = app('cache');
+            $this->documentAST = $cache->remember(
                 $cacheConfig['key'],
-                $cacheConfig['ttl'],
+                $cacheConfig['ttl'] ?? null,
                 function (): DocumentAST {
                     return $this->build();
                 }
