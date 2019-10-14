@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -417,13 +416,12 @@ class MutationExecutor
                 $model->getKeyName()
             );
 
-        try {
-            $model = $model->newQuery()->findOrFail($id);
-
-            return self::executeUpdateWithLoadedModel($model, $args, $parentRelation);
-        } catch (ModelNotFoundException $e) {
-            return self::executeCreate($model, $args, $parentRelation);
+        $modelInstance = $model->newQuery()->find($id);
+        if($modelInstance) {
+            return self::executeUpdateWithLoadedModel($modelInstance, $args, $parentRelation);
         }
+
+        return self::executeCreate($model, $args, $parentRelation);
     }
 
     /**
