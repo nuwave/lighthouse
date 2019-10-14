@@ -83,10 +83,17 @@ SDL;
     public function manipulateFieldDefinition(DocumentAST &$documentAST, FieldDefinitionNode &$fieldDefinition, ObjectTypeDefinitionNode &$parentType): void
     {
         $paginationManipulator = new PaginationManipulator($documentAST);
-        $paginationManipulator
-            ->setModelClass(
+
+        if($this->directiveHasArgument('builder')) {
+            // This is done only for validation
+            $this->getResolverFromArgument('builder');
+        } else {
+            $paginationManipulator->setModelClass(
                 $this->getModelClass()
-            )
+            );
+        }
+
+        $paginationManipulator
             ->transformToPaginatedField(
                 $this->paginationType(),
                 $fieldDefinition,

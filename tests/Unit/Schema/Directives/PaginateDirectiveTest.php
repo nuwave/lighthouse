@@ -6,6 +6,7 @@ use Tests\TestCase;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
+use Nuwave\Lighthouse\Exceptions\DefinitionException;
 
 class PaginateDirectiveTest extends TestCase
 {
@@ -262,5 +263,33 @@ class PaginateDirectiveTest extends TestCase
             ],
         ])
         ->assertErrorCategory(Error::CATEGORY_GRAPHQL);
+    }
+
+    public function testDoesNotRequireModelWhenUsingBuilder(): void
+    {
+        $validationErrors = $this
+            ->buildSchema('
+            type Query {
+                users: [NotAnActualModelName!] @paginate(builder: "'.$this->qualifyTestResolver('testDoesNotRequireModelWhenUsingBuilder').'")
+            }
+            
+            type NotAnActualModelName {
+                id: ID!
+            }
+            ')
+            ->validate();
+
+        $this->assertCount(0, $validationErrors);
+    }
+
+    public function testThrowsIfBuilderIsNotPresent(): void
+    {
+        $this->expectException(DefinitionException::class);
+        $this->expectExceptionMessageRegExp('/NonexistingClass/');
+        $this->buildSchema('
+        type Query {
+            users: [Query!] @paginate(builder: "NonexistingClass@notFound")
+        }
+        ');
     }
 }

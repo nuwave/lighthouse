@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.4.1...master)
+## [Unreleased](https://github.com/nuwave/lighthouse/compare/v4.4.2...master)
+
+## [4.4.2](https://github.com/nuwave/lighthouse/compare/v4.4.1...v4.4.2)
+
+### Added
+
+- Validate the correctness of the `builder` given to `@paginate` at schema
+  build time
+
+### Fixed
+
+- Do not require the type of a field matching a model class when using the
+  `builder` argument of `@paginate` https://github.com/nuwave/lighthouse/pull/1011
 
 ## [4.4.1](https://github.com/nuwave/lighthouse/compare/v4.4.0...v4.4.1)
 
