@@ -96,7 +96,7 @@ class ArgumentSet
             $argument
                 ->directives
                 ->filter(function (Directive $directive): bool {
-                    return $directive instanceof BuilderDirective;
+                    return $directive instanceof ArgBuilderDirective;
                 })
                 ->each(function (ArgBuilderDirective $argBuilderDirective) use (&$builder, $value) {
                     $builder = $argBuilderDirective->handleBuilder($builder, $value);
