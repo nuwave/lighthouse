@@ -2,7 +2,9 @@
 
 namespace Tests\Integration\Execution\DataLoader;
 
+use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Tests\DBTestCase;
+use Tests\Utils\BatchLoaders\UserLoader;
 use Tests\Utils\Models\Task;
 use Tests\Utils\Models\User;
 
@@ -62,5 +64,77 @@ class BatchLoaderTest extends DBTestCase
             ->assertJsonCount(2)
             ->assertJsonCount(3, '0.data.user.tasks')
             ->assertJsonCount(3, '1.data.user.tasks');
+    }
+
+    public function testCanResolveFieldsByCustomBatchLoader(): void
+    {
+        $users = factory(User::class, 3)
+            ->create()
+            ->each(function (User $user): void {
+                factory(Task::class, 3)->create([
+                    'user_id' => $user->getKey(),
+                ]);
+            });
+
+        $this->schema = '
+        type Task {
+            name: String
+        }
+        type User {
+            name: String
+            email: String
+            tasks: [Task] @hasMany
+        }
+
+        type Query {
+            user(id: ID!): User 
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUsers').'")
+            manyUsers(ids: [ID!]!): User 
+                @field(resolver: "'.$this->qualifyTestResolver('resolveManyUsers').'")
+        }
+        ';
+
+        $query = '
+        query User($id: ID!, $ids: [ID!]!) {
+            user(id: $id) {
+                email
+                tasks {
+                    name
+                }
+            }
+            manyUsers(ids: $ids) {
+                email
+                tasks {
+                    name
+                }
+            }
+        }
+        ';
+
+        $this
+            ->postGraphQL([
+                'query' => $query,
+                'variables' => [
+                    'id' => $users[0]->getKey(),
+                    'ids' => [$users[1]->getKey(), $users[2]->getKey()],
+                ],
+            ])
+            ->assertJsonCount(2, 'user.tasks')
+            ->assertJsonCount(3, 'manyUsers.0.data.user.tasks')
+            ->assertJsonCount(3, 'manyUsers.1.data.user.tasks');
+    }
+
+    public function resolveUser($root, array $args)
+    {
+        $loader = BatchLoader::instance(UserLoader::class);
+
+        return $loader->load($args['id']);
+    }
+
+    public function resolveManyUsers($root, array $args)
+    {
+        $loader = BatchLoader::instance(UserLoader::class);
+
+        return $loader->loadMany($args['ids']);
     }
 }
