@@ -90,7 +90,7 @@ class BatchLoaderTest extends DBTestCase
 
         type Query {
             user(id: ID!): User 
-                @field(resolver: "'.$this->qualifyTestResolver('resolveUsers').'")
+                @field(resolver: "'.$this->qualifyTestResolver('resolveUser').'")
             manyUsers(ids: [ID!]!): User 
                 @field(resolver: "'.$this->qualifyTestResolver('resolveManyUsers').'")
         }
